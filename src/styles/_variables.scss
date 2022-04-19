@@ -1,0 +1,299 @@
+// Colors
+$dark: #2c3243;
+$white: #ffffff;
+
+$slate: #5b6573;
+$grey: #858c9a;
+$steel: #c8ccd4;
+$pale: #eceff2;
+$snow: #f9fbfd;
+
+$primary: #ed1b6c;
+$secondary: $grey;
+$success: #00aa6e;
+$danger: #e24358;
+$warning:#ffb75d;
+$info: #4c84ff;
+$light: $grey;
+
+// Add custom colors to theme-colors map
+$theme-colors: (
+  'primary': $primary,
+  'secondary': $secondary,
+  'success': $success,
+  'info': $info,
+  'warning': $warning,
+  'danger': $danger,
+  'slate': $slate,
+  'grey': $grey,
+  'steel': $steel,
+  'pale': $pale,
+  'snow': $snow,
+);
+
+// Options
+$enable-validation-icons: false;
+
+// Spacers
+$spacer: 1rem;
+
+$spacers: (
+  0: 0,
+  1: (
+    $spacer * 0.125,
+  ),
+  // 2px
+  2:
+    (
+      $spacer * 0.25,
+    ),
+  // 4px
+  3:
+    (
+      $spacer * 0.5,
+    ),
+  // 8px
+  4: $spacer,
+  // 16px
+  5:
+    (
+      $spacer * 1.5,
+    ),
+  // 24px
+  6:
+    (
+      $spacer * 2,
+    ),
+  // 32px
+  7:
+    (
+      $spacer * 2.5,
+    ),
+  // 40px
+  8:
+    (
+      $spacer * 3,
+    ),
+  // 48px
+  9:
+    (
+      $spacer * 3.5,
+    ),
+  // 56px
+  10:
+    (
+      $spacer * 4,
+    ),
+  // 64px
+  11:
+    (
+      $spacer * 4.5,
+    ),
+  // 72px
+  12:
+    (
+      $spacer * 5,
+    ),
+  // 80px
+  13:
+    (
+      $spacer * 5.5,
+    ),
+  // 88px
+  14:
+    (
+      $spacer * 6,
+    ),
+  // 96px
+  15:
+    (
+      $spacer * 6.5,
+    ),
+  // 104px
+  // 16: ($spacer * 7),    // 112px
+  // 17: ($spacer * 7.5),  // 120px
+  // 18: ($spacer * 8),    // 128px
+  // 19: ($spacer * 8.5),  // 136px
+  // 20: ($spacer * 9),    // 144px
+  // 21: ($spacer * 9.5),  // 162px
+  // 22: ($spacer * 10),   // 160px
+  // 23: ($spacer * 10.5), // 168px
+  // 24: ($spacer * 11),   // 176px
+  // 25: ($spacer * 11.5), // 184px
+  // 26: ($spacer * 12),   // 192px
+  // 27: ($spacer * 12.5), // 200px
+  // 28: ($spacer * 13),   // 208px
+  // 29: ($spacer * 13.5), // 216px
+  // 30: ($spacer * 14)    // 224px,
+);
+
+// Body
+$body-bg: $dark;
+$body-color: $white;
+
+// Paragraphs
+$paragraph-margin-bottom: 0;
+
+// Grid columns
+$grid-gutter-width: 24px;
+
+// Border radius
+$border-radius: 6px;
+
+// Typography
+$font-family-primary: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
+  Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+
+$font-family-base: $font-family-primary;
+$font-size-base: 1rem;
+
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-semi-bold: 500;
+$font-weight-bold: 700;
+$font-weight-bolder: $font-weight-bold;
+
+$font-weight-base: $font-weight-normal;
+
+$line-height-base: 1.5;
+
+$headings-margin-bottom: 0;
+$headings-font-family: $font-family-primary;
+$headings-font-weight: $font-weight-normal;
+
+$texts: (
+  hero: (
+    default: (
+      font-size: 48px,
+      line-height: 1.3,
+    ),
+    md: (
+      font-size: 72px,
+      line-height: 1.2,
+    ),
+  ),
+  mega: (
+    default: (
+      font-size: 36px,
+      line-height: 1.4,
+    ),
+    md: (
+      font-size: 48px,
+      line-height: 1.25,
+    ),
+  ),
+  display: (
+    default: (
+      font-size: 28px,
+      line-height: 1.45,
+    ),
+    md: (
+      font-size: 36px,
+      line-height: 1.4,
+    ),
+  ),
+  headline: (
+    default: (
+      font-size: 20px,
+      line-height: 1.45,
+    ),
+    md: (
+      font-size: 24px,
+      line-height: 1.45,
+    ),
+  ),
+  title: (
+    default: (
+      font-size: 19px,
+      line-height: 1.45,
+    ),
+    md: (
+      font-size: 20px,
+      line-height: 1.45,
+    ),
+  ),
+  subheader: (
+    default: (
+      font-size: 16px,
+      line-height: 1.45,
+    ),
+    md: (
+      font-size: 18px,
+      line-height: 1.45,
+    ),
+  ),
+  lead: (
+    default: (
+      font-size: 16px,
+      line-height: 1.63,
+    ),
+    md: (
+      font-size: 18px,
+      line-height: 1.44,
+    ),
+  ),
+  main: (
+    default: (
+      font-size: 16px,
+      line-height: 1.63,
+    ),
+    md: (
+      font-size: 16px,
+      line-height: 1.63,
+    ),
+  ),
+  small: (
+    default: (
+      font-size: 14px,
+      line-height: 1.45,
+    ),
+    md: (
+      font-size: 14px,
+      line-height: 1.45,
+    ),
+  ),
+  micro: (
+    default: (
+      font-size: 12px,
+      line-height: 1.45,
+    ),
+    md: (
+      font-size: 12px,
+      line-height: 1.45,
+    ),
+  ),
+);
+
+// Buttons
+$btn-padding-y-lg: 10px;
+$btn-padding-x-lg: 32px;
+$btn-padding-y: 10px;
+$btn-padding-x: 30px;
+$btn-padding-y-sm: 6px;
+$btn-padding-x-sm: 16px;
+$btn-line-height: 1.5;
+$btn-font-weight: 400;
+$btn-font-size: 16px;
+$btn-border-radius: $border-radius;
+$btn-transition: color 0.15s linear, background-color 0.15s linear, border-color 0.15s linear,
+  box-shadow 0.15s linear;
+$btn-disabled-opacity: 0.5;
+
+$btn-primary-color: $white;
+
+// Forms
+$input-color: $dark;
+$input-border-color: $grey;
+$input-focus-border-color: $primary;
+$input-focus-box-shadow: 0 0 0 1px $primary;
+$input-height: auto;
+$input-line-height: 1.5;
+$input-placeholder-color: $grey;
+$form-group-margin-bottom: 0;
+
+$form-select-indicator: none;
+
+// Custom selects
+$custom-select-line-height: 1.5;
+$custom-select-height: auto;
+$custom-select-focus-box-shadow: 0 0 0 1px $primary;
