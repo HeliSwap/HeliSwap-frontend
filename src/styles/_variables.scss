@@ -12,10 +12,10 @@ $snow: #f9fbfd;
 
 $primary: #ed1b6c;
 $secondary: $grey;
-$success: #00aa6e;
+$success: #23C581;
 $danger: #e24358;
 $warning:#ffb75d;
-$info: #4c84ff;
+$info: #501AC7;
 $light: $grey;
 
 // Add custom colors to theme-colors map
@@ -284,14 +284,18 @@ $btn-disabled-opacity: 0.5;
 $btn-primary-color: $white;
 
 // Forms
-$input-color: $dark;
-$input-border-color: $grey;
+$input-color: #7F89A7;
+$input-border-color:rgba(255, 255, 255, 0.2);
 $input-focus-border-color: $primary;
 $input-focus-box-shadow: 0 0 0 1px $primary;
 $input-height: auto;
-$input-line-height: 1.5;
+$input-line-height: 1.2;
 $input-placeholder-color: $grey;
 $form-group-margin-bottom: 0;
+$input-bg: $darkest;
+$input-padding-y: 14px;
+$input-padding-x: 16px;
+$input-font-size: 25px;
 
 $form-select-indicator: none;
 
