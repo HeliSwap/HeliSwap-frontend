@@ -1,0 +1,59 @@
+// Classes
+@each $size in map-keys($texts) {
+  .text-#{$size} {
+    @include text;
+    font-size: texts-deep-get($texts, $size, 'default', 'font-size');
+    line-height: texts-deep-get($texts, $size, 'default', 'line-height');
+
+    @include media-breakpoint-up(md) {
+      font-size: texts-deep-get($texts, $size, 'md', 'font-size');
+      line-height: texts-deep-get($texts, $size, 'md', 'line-height');
+    }
+  }
+}
+
+// Custom styles
+.text-label {
+  font-weight: $font-weight-normal;
+  margin-bottom: 4px;
+  font-size: 24px;
+}
+
+// Links
+.link {
+  @include custom-underline($body-color);
+
+  color: $body-color;
+  text-decoration: none;
+
+  &:hover {
+    color: $body-color;
+    text-decoration: none;
+  }
+}
+
+.link-primary {
+  @include custom-underline($primary);
+  cursor: pointer;
+
+  color: $primary;
+  text-decoration: none;
+
+  &:hover {
+    color: $primary;
+    text-decoration: none;
+  }
+}
+
+.link-secondary {
+  @include custom-underline($secondary);
+  cursor: pointer;
+
+  color: $secondary;
+  text-decoration: none;
+
+  &:hover {
+    color: $secondary;
+    text-decoration: none;
+  }
+}
