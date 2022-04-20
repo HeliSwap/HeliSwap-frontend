@@ -41,9 +41,10 @@ function App() {
 
     if (foundData) {
       const savedData = JSON.parse(foundData);
-      setReadyToConnect(true);
       await hashconnect.init(appMetadata, savedData.privateKey);
       await hashconnect.connect(savedData.topic, savedData.pairedWalletData);
+      setIsConnectionLoading(false);
+      setReadyToConnect(true);
       setConnected(true);
     } else {
       const initData = await hashconnect.init(appMetadata);
@@ -77,12 +78,13 @@ function App() {
   }, []);
 
   useEffect(() => {
-    hashconnectInstance &&
+    if (hashconnectInstance) {
       hashconnectInstance.foundExtensionEvent.once(walletMetadata => {
         setWalletMetadata(walletMetadata);
         setReadyToConnect(true);
         setIsConnectionLoading(false);
       });
+    }
   }, [hashconnectInstance]);
 
   useEffect(() => {
