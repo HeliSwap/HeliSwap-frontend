@@ -8,7 +8,10 @@ import Styleguide from '../pages/Styleguide';
 import Header from './Header';
 import Footer from './Footer';
 
+import SDK from '../sdk/sdk';
+
 function App() {
+  const [sdk, setSdk] = useState({});
   const [connected, setConnected] = useState(false);
   const [isConnectionLoading, setIsConnectionLoading] = useState(true);
   const [readyToConnect, setReadyToConnect] = useState(false);
@@ -95,6 +98,11 @@ function App() {
       });
     }
   }, [hashconnectInstance, connectionData]);
+
+  useEffect(() => {
+    const sdk = new SDK();
+    setSdk(sdk);
+  }, []);
 
   return (
     <BrowserRouter>
