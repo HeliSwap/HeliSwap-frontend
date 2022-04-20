@@ -1,4 +1,4 @@
-# HBar Dex
+# 💰 HeliSwap Dex Frontend
 
 Node version: `16.14.2`
 
