@@ -16,7 +16,7 @@ const Header = ({
   isConnectionLoading,
 }: IHeaderProps) => {
   return (
-    <div className="container py-3">
+    <div className="container py-3 py-lg-5">
       <div className="d-flex justify-content-end">
         <div className="d-flex align-items-center">
           {!isConnectionLoading ? (
