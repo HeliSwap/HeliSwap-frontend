@@ -1466,7 +1466,7 @@
     "@ethersproject/properties" "^5.5.0"
     "@ethersproject/strings" "^5.5.0"
 
-"@grpc/grpc-js@^1.5.3":
+"@grpc/grpc-js@^1.5.3", "@grpc/grpc-js@^1.6.3":
   version "1.6.6"
   resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.6.6.tgz#ffe21bd51e7964de2a8a5f5cfef536f08f04b8c6"
   integrity sha512-gEMn1+d01yO/QNHsDOPHxJYtA6QItbdQT4mGFS8Gt5IQCq+83OEsD0sbvPf3RLCtHy1HI412JgQPr5HM9QK0mw==
@@ -1485,7 +1485,7 @@
     protobufjs "^6.10.0"
     yargs "^16.2.0"
 
-"@hashgraph/cryptography@^1.1.0-beta.5":
+"@hashgraph/cryptography@^1.1.0-beta.5", "@hashgraph/cryptography@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@hashgraph/cryptography/-/cryptography-1.1.2.tgz#bd2ca9e8f91ab21155f0eb230a58e3e7d45d7982"
   integrity sha512-oSnDDs5foNq6Yni4kCwbA01NuVY2mewVr1jhkJG7yNDT6+xIBCztRWDeINb1JuShXe57Cuf88M1zmN5iFN7JgA==
@@ -1527,6 +1527,14 @@
     long "^4.0.0"
     protobufjs "^6.11.2"
 
+"@hashgraph/proto@2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@hashgraph/proto/-/proto-2.4.0.tgz#95cbe3d6eb36eb9dc4befda7e4aa9425f3f269aa"
+  integrity sha512-GZf/UPkJVjSCJRR+fYXppYllGeG2GYgwRSnkx9FUBlsWrlHMW8zQZhPrIgclM7ukepI1DWbMaNbmdeziSTzeUQ==
+  dependencies:
+    long "^4.0.0"
+    protobufjs "^6.11.2"
+
 "@hashgraph/sdk@2.11.0-beta.1":
   version "2.11.0-beta.1"
   resolved "https://registry.yarnpkg.com/@hashgraph/sdk/-/sdk-2.11.0-beta.1.tgz#bc2d2dbc2c8768c78836dcaf108ec624887578d7"
@@ -1535,6 +1543,22 @@
     "@grpc/grpc-js" "^1.5.3"
     "@hashgraph/cryptography" "^1.1.0-beta.5"
     "@hashgraph/proto" "2.1.5"
+    bignumber.js "^9.0.2"
+    crypto-js "^4.1.1"
+    js-base64 "^3.7.2"
+    js-logger "^1.6.1"
+    long "^4.0.0"
+    protobufjs "^6.11.2"
+    utf8 "^3.0.0"
+
+"@hashgraph/sdk@^2.13.0":
+  version "2.13.0"
+  resolved "https://registry.yarnpkg.com/@hashgraph/sdk/-/sdk-2.13.0.tgz#5d10a0e206868f8c1eba293f4e8c2264bfffc03e"
+  integrity sha512-qWUrAnJ5YVc4++lO1/8uGxGGFqmZRwNFjay1cjj+iUUpoUZi4cch+v4jD5ASjTzYbAcFIoH8gxYnMaJXiHkdow==
+  dependencies:
+    "@grpc/grpc-js" "^1.6.3"
+    "@hashgraph/cryptography" "^1.1.2"
+    "@hashgraph/proto" "2.4.0"
     bignumber.js "^9.0.2"
     crypto-js "^4.1.1"
     js-base64 "^3.7.2"
