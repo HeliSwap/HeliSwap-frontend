@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { HashConnect, HashConnectTypes } from 'hashconnect';
-import axios from 'axios';
+import { getWalletBalanceByTokenId } from '../utils/tokenUtils';
 
 import Home from '../pages/Home';
 import Styleguide from '../pages/Styleguide';
@@ -110,66 +110,13 @@ function App() {
   /* Wallet connect hooks & functions - End */
 
   /* SDK & HTS hooks & functions - Start */
-  const getTokenInfo = async (sdk: any, tokenId: string) => {
-    const tokenInfo = await sdk.getTokenInfo(tokenId);
-
-    console.log('tokenInfo', tokenInfo);
-  };
-
-  const getTokenInfoAPI = async (tokenId: string) => {
-    const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/tokens/${tokenId}`;
-
-    try {
-      const {
-        data: { token_id, name, symbol, decimals, total_supply, expiry_timestamp },
-      } = await axios(url);
-
-      const tokenInfo = {
-        token_id,
-        name,
-        symbol,
-        decimals,
-        total_supply,
-        expiry_timestamp,
-      };
-
-      console.log('tokenInfo from API', tokenInfo);
-    } catch (e) {
-      console.error(e);
-    } finally {
-    }
-  };
-
-  const getWalletBalanceByTokenId = async () => {
-    const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/balances?order=asc&account.id=${userId}`;
-
-    try {
-      const {
-        data: { balances },
-      } = await axios(url);
-
-      const { balance, tokens } = balances[0];
-
-      console.log('tokens', tokens);
-    } catch (e) {
-      console.error(e);
-    } finally {
-    }
-  };
-
   useEffect(() => {
     const sdk = new SDK();
     setSdk(sdk);
-
-    getTokenInfo(sdk, '0.0.34250245');
   }, []);
 
   useEffect(() => {
-    getTokenInfoAPI('0.0.447200');
-  }, []);
-
-  useEffect(() => {
-    userId && getWalletBalanceByTokenId();
+    userId && getWalletBalanceByTokenId(userId);
   }, [userId]);
   /* SDK & HTS hooks & functions - Start */
 

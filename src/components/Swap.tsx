@@ -1,11 +1,44 @@
 import React, { useState, useEffect } from 'react';
+import { getTokenInfo } from '../utils/tokenUtils';
+import { ITokenData } from '../interfaces/tokens';
+
+interface IFormState {
+  [key: string]: string;
+}
 
 const Swap = () => {
   const [tokenList, setTokenList] = useState<string[]>([]);
+  const [tokenDataList, setTokenDataList] = useState<ITokenData[]>([]);
+  const [formState, setFormState] = useState<IFormState>({});
+
+  const getTokensDada = async (tokenList: string[]) => {
+    const arrayPromises = tokenList.map(tokenId => getTokenInfo(tokenId));
+    const result = await Promise.all(arrayPromises);
+    setTokenDataList(result);
+    setFormState(prev => ({
+      ...prev,
+      ['selectFrom']: result[0].tokenId,
+      ['selectТо']: result[1].tokenId,
+    }));
+  };
 
   useEffect(() => {
     setTokenList(['0.0.447200', '0.0.34250206', '0.0.34250234', '0.0.34250245']);
   }, []);
+
+  useEffect(() => {
+    tokenList.length > 0 && getTokensDada(tokenList);
+  }, [tokenList]);
+
+  const handleInputChange = (e: any) => {
+    const {
+      target: { name, value },
+    } = e;
+
+    setFormState(prev => ({ ...prev, [name]: value }));
+  };
+
+  const hasTokens = tokenDataList.length > 0;
 
   return (
     <div className="container-swap">
@@ -22,9 +55,22 @@ const Swap = () => {
         </div>
 
         <div className="col-4">
-          <select name="" id="" className="form-control">
-            <option value="">Select</option>
-          </select>
+          {hasTokens && formState ? (
+            <select
+              value={formState['selectFrom']}
+              onChange={handleInputChange}
+              name="selectFrom"
+              id=""
+              className="form-control"
+            >
+              {tokenDataList.map(item => (
+                <option key={item.tokenId} value={item.tokenId}>
+                  {item.symbol}
+                </option>
+              ))}
+            </select>
+          ) : null}
+
           <p className="text-steel mt-3 text-end">Wallet balance: 400.00</p>
         </div>
       </div>
@@ -42,9 +88,21 @@ const Swap = () => {
         </div>
 
         <div className="col-4">
-          <select name="" id="" className="form-control">
-            <option value="">Select</option>
-          </select>
+          {hasTokens && formState ? (
+            <select
+              value={formState['selectТо']}
+              onChange={handleInputChange}
+              name="selectТо"
+              id=""
+              className="form-control"
+            >
+              {tokenDataList.map(item => (
+                <option key={item.tokenId} value={item.tokenId}>
+                  {item.symbol}
+                </option>
+              ))}
+            </select>
+          ) : null}
           <p className="text-steel mt-3 text-end">Wallet balance: 400.00</p>
         </div>
       </div>
