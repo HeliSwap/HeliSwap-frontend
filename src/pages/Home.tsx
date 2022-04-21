@@ -1,10 +1,14 @@
 import React from 'react';
 import Swap from '../components/Swap';
 
-const Home = () => {
+interface IHomeProps {
+  userId: string;
+}
+
+const Home = ({ userId }: IHomeProps) => {
   return (
     <div className="d-flex justify-content-center">
-      <Swap />
+      <Swap userId={userId} />
     </div>
   );
 };

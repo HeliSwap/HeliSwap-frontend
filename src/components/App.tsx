@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { HashConnect, HashConnectTypes } from 'hashconnect';
-import { getWalletBalanceByTokenId } from '../utils/tokenUtils';
 
 import Home from '../pages/Home';
 import Styleguide from '../pages/Styleguide';
@@ -114,10 +113,6 @@ function App() {
     const sdk = new SDK();
     setSdk(sdk);
   }, []);
-
-  useEffect(() => {
-    userId && getWalletBalanceByTokenId(userId);
-  }, [userId]);
   /* SDK & HTS hooks & functions - Start */
 
   return (
@@ -133,7 +128,7 @@ function App() {
         <div className="main">
           <div className="container py-5 py-lg-7">
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<Home userId={userId} />} />
               <Route path="styleguide" element={<Styleguide />} />
             </Routes>
           </div>

@@ -1,19 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { getTokenInfo } from '../utils/tokenUtils';
-import { ITokenData } from '../interfaces/tokens';
+import { getTokenInfo, getTokensWalletBalance } from '../utils/tokenUtils';
+import { ITokenData, IUserToken } from '../interfaces/tokens';
 
 interface IFormState {
   [key: string]: string;
 }
 
-const Swap = () => {
+interface ISwapProps {
+  userId: string;
+}
+
+const Swap = ({ userId }: ISwapProps) => {
   const [tokenList, setTokenList] = useState<string[]>([]);
+  const [userTokenList, setUserTokenList] = useState<IUserToken[]>([]);
   const [tokenDataList, setTokenDataList] = useState<ITokenData[]>([]);
   const [formState, setFormState] = useState<IFormState>({});
+  const [walletBallances, setWalletBalances] = useState({
+    token1Balance: '0.00',
+    token2Balance: '0.00',
+  });
 
   const getTokensDada = async (tokenList: string[]) => {
     const arrayPromises = tokenList.map(tokenId => getTokenInfo(tokenId));
     const result = await Promise.all(arrayPromises);
+
     setTokenDataList(result);
     setFormState(prev => ({
       ...prev,
@@ -22,13 +32,50 @@ const Swap = () => {
     }));
   };
 
+  const updateUserBalances = () => {
+    const foundToken1 = userTokenList.find(item => item.tokenId === formState['selectFrom']);
+    const foundToken2 = userTokenList.find(item => item.tokenId === formState['selectТо']);
+
+    const token1Decimals =
+      tokenDataList.find(item => item.tokenId === formState['selectFrom'])?.decimals || 2;
+    const token2Decimals =
+      tokenDataList.find(item => item.tokenId === formState['selectТо'])?.decimals || 2;
+
+    const token1Balance = foundToken1
+      ? (foundToken1.balance / Math.pow(10, token1Decimals)).toFixed(token1Decimals)
+      : '0.00';
+    const token2Balance = foundToken2
+      ? (foundToken2.balance / Math.pow(10, token2Decimals)).toFixed(token2Decimals)
+      : '0.00';
+
+    setWalletBalances({ token1Balance, token2Balance });
+  };
+
+  const getUserTokensData = async () => {
+    const { balance, tokens } = await getTokensWalletBalance(userId);
+    setUserTokenList(tokens);
+  };
+
   useEffect(() => {
     setTokenList(['0.0.447200', '0.0.34250206', '0.0.34250234', '0.0.34250245']);
   }, []);
 
   useEffect(() => {
     tokenList.length > 0 && getTokensDada(tokenList);
-  }, [tokenList]);
+  }, [tokenList, userTokenList]);
+
+  useEffect(() => {
+    Object.keys(formState).length > 0 &&
+      tokenList.length > 0 &&
+      userTokenList.length > 0 &&
+      updateUserBalances();
+  }, [tokenList, userTokenList, formState]);
+
+  useEffect(() => {
+    if (userId) {
+      getUserTokensData();
+    }
+  }, [userId, tokenList]);
 
   const handleInputChange = (e: any) => {
     const {
@@ -71,7 +118,9 @@ const Swap = () => {
             </select>
           ) : null}
 
-          <p className="text-steel mt-3 text-end">Wallet balance: 400.00</p>
+          <p className="text-steel mt-3 text-end">
+            Wallet balance: {walletBallances.token1Balance}
+          </p>
         </div>
       </div>
 
@@ -103,7 +152,9 @@ const Swap = () => {
               ))}
             </select>
           ) : null}
-          <p className="text-steel mt-3 text-end">Wallet balance: 400.00</p>
+          <p className="text-steel mt-3 text-end">
+            Wallet balance: {walletBallances.token2Balance}
+          </p>
         </div>
       </div>
 
