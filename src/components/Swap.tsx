@@ -1,6 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Swap = () => {
+  const [tokenList, setTokenList] = useState<string[]>([]);
+
+  useEffect(() => {
+    setTokenList(['0.0.447200', '0.0.34250206', '0.0.34250234', '0.0.34250245']);
+  }, []);
+
   return (
     <div className="container-swap">
       <div className="d-flex justify-content-between">

@@ -165,7 +165,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    getTokenInfoAPI('0.0.34250245');
+    getTokenInfoAPI('0.0.447200');
   }, []);
 
   useEffect(() => {
