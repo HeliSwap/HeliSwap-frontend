@@ -18,6 +18,7 @@ function App() {
   const [readyToConnect, setReadyToConnect] = useState(false);
   const [hashconnectInstance, setHashconnectInstance] = useState<HashConnect>();
   const [walletMetadata, setWalletMetadata] = useState({});
+  const [userId, setUserId] = useState('');
   const [connectionData, setConnectionData] = useState({
     topic: '',
     pairingString: '',
@@ -45,6 +46,8 @@ function App() {
       const savedData = JSON.parse(foundData);
       await hashconnect.init(appMetadata, savedData.privateKey);
       await hashconnect.connect(savedData.topic, savedData.pairedWalletData);
+
+      setUserId(savedData.pairedAccounts[0]);
       setIsConnectionLoading(false);
       setReadyToConnect(true);
       setConnected(true);
@@ -72,6 +75,7 @@ function App() {
     localStorage.removeItem('hashconnectData');
     setConnected(false);
     setWalletMetadata({});
+    setUserId('');
     setConnectionData(prev => ({ ...prev, pairedWalletData: undefined, pairedAccounts: [] }));
   };
 
@@ -97,6 +101,7 @@ function App() {
 
         localStorage.setItem('hashconnectData', JSON.stringify(objectToSave));
 
+        setUserId(pairedAccounts[0]);
         setConnected(true);
         setIsConnectionLoading(false);
       });
@@ -136,7 +141,7 @@ function App() {
   };
 
   const getWalletBalanceByTokenId = async () => {
-    const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/balances?order=asc&account.id=0.0.34184770`;
+    const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/balances?order=asc&account.id=${userId}`;
 
     try {
       const {
@@ -164,8 +169,8 @@ function App() {
   }, []);
 
   useEffect(() => {
-    getWalletBalanceByTokenId();
-  }, []);
+    userId && getWalletBalanceByTokenId();
+  }, [userId]);
   /* SDK & HTS hooks & functions - Start */
 
   return (
