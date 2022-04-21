@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { HashConnect, HashConnectTypes } from 'hashconnect';
 
+import { ConnectionProvider } from '../providers/Connection';
+
 import Home from '../pages/Home';
 import Styleguide from '../pages/Styleguide';
 
@@ -125,24 +127,26 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="wrapper">
-        <Header
-          connected={connected}
-          connectWallet={connectWallet}
-          disconnectWallet={disconnectWallet}
-          readyToConnect={readyToConnect}
-          isConnectionLoading={isConnectionLoading}
-        />
-        <div className="main">
-          <div className="container py-5 py-lg-7">
-            <Routes>
-              <Route path="/" element={<Home userId={userId} />} />
-              <Route path="styleguide" element={<Styleguide />} />
-            </Routes>
+      <ConnectionProvider>
+        <div className="wrapper">
+          <Header
+            connected={connected}
+            connectWallet={connectWallet}
+            disconnectWallet={disconnectWallet}
+            readyToConnect={readyToConnect}
+            isConnectionLoading={isConnectionLoading}
+          />
+          <div className="main">
+            <div className="container py-5 py-lg-7">
+              <Routes>
+                <Route path="/" element={<Home userId={userId} />} />
+                <Route path="styleguide" element={<Styleguide />} />
+              </Routes>
+            </div>
           </div>
+          <Footer />
         </div>
-        <Footer />
-      </div>
+      </ConnectionProvider>
     </BrowserRouter>
   );
 }

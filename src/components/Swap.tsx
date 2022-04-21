@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { getTokenInfo, getTokensWalletBalance } from '../utils/tokenUtils';
 import { ITokenData, IUserToken } from '../interfaces/tokens';
+import { ConnectionContext } from '../providers/Connection';
 
 interface IFormState {
   [key: string]: string;
@@ -11,6 +12,7 @@ interface ISwapProps {
 }
 
 const Swap = ({ userId }: ISwapProps) => {
+  const contextValue = useContext(ConnectionContext);
   const [tokenList, setTokenList] = useState<string[]>([]);
   const [userTokenList, setUserTokenList] = useState<IUserToken[]>([]);
   const [tokenDataList, setTokenDataList] = useState<ITokenData[]>([]);
@@ -19,6 +21,8 @@ const Swap = ({ userId }: ISwapProps) => {
     token1Balance: '0.00',
     token2Balance: '0.00',
   });
+
+  console.log('contextValue', contextValue);
 
   const getTokensDada = async (tokenList: string[]) => {
     const arrayPromises = tokenList.map(tokenId => getTokenInfo(tokenId));
