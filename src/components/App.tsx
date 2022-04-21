@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { HashConnect, HashConnectTypes } from 'hashconnect';
+import axios from 'axios';
 
 import Home from '../pages/Home';
 import Styleguide from '../pages/Styleguide';
@@ -25,6 +26,7 @@ function App() {
     pairedAccounts: [],
   });
 
+  /* Wallet connect hooks & functions - Start */
   const initHashConnect = async () => {
     const hashconnect = new HashConnect();
 
@@ -100,19 +102,50 @@ function App() {
       });
     }
   }, [hashconnectInstance, connectionData]);
+  /* Wallet connect hooks & functions - End */
 
-  const getTokenInfo = async (sdk: any) => {
-    const tokenInfo = await sdk.getTokenInfo('0.0.34250245');
+  /* SDK & HTS hooks & functions - Start */
+  const getTokenInfo = async (sdk: any, tokenId: string) => {
+    const tokenInfo = await sdk.getTokenInfo(tokenId);
 
     console.log('tokenInfo', tokenInfo);
+  };
+
+  const getTokenInfoAPI = async (tokenId: string) => {
+    const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/tokens/${tokenId}`;
+
+    try {
+      const {
+        data: { token_id, name, symbol, decimals, total_supply, expiry_timestamp },
+      } = await axios(url);
+
+      const tokenInfo = {
+        token_id,
+        name,
+        symbol,
+        decimals,
+        total_supply,
+        expiry_timestamp,
+      };
+
+      console.log('tokenInfo from API', tokenInfo);
+    } catch (e) {
+      console.error(e);
+    } finally {
+    }
   };
 
   useEffect(() => {
     const sdk = new SDK();
     setSdk(sdk);
 
-    getTokenInfo(sdk);
+    getTokenInfo(sdk, '0.0.34250245');
   }, []);
+
+  useEffect(() => {
+    getTokenInfoAPI('0.0.34250245');
+  }, []);
+  /* SDK & HTS hooks & functions - Start */
 
   return (
     <BrowserRouter>
