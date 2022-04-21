@@ -135,6 +135,23 @@ function App() {
     }
   };
 
+  const getWalletBalanceByTokenId = async () => {
+    const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/balances?order=asc&account.id=0.0.34184770`;
+
+    try {
+      const {
+        data: { balances },
+      } = await axios(url);
+
+      const { balance, tokens } = balances[0];
+
+      console.log('tokens', tokens);
+    } catch (e) {
+      console.error(e);
+    } finally {
+    }
+  };
+
   useEffect(() => {
     const sdk = new SDK();
     setSdk(sdk);
@@ -144,6 +161,10 @@ function App() {
 
   useEffect(() => {
     getTokenInfoAPI('0.0.34250245');
+  }, []);
+
+  useEffect(() => {
+    getWalletBalanceByTokenId();
   }, []);
   /* SDK & HTS hooks & functions - Start */
 
