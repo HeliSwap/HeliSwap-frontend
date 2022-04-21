@@ -101,9 +101,17 @@ function App() {
     }
   }, [hashconnectInstance, connectionData]);
 
+  const getTokenInfo = async (sdk: any) => {
+    const tokenInfo = await sdk.getTokenInfo('0.0.34250245');
+
+    console.log('tokenInfo', tokenInfo);
+  };
+
   useEffect(() => {
     const sdk = new SDK();
     setSdk(sdk);
+
+    getTokenInfo(sdk);
   }, []);
 
   return (
