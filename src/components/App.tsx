@@ -104,6 +104,14 @@ function App() {
         setConnected(true);
         setIsConnectionLoading(false);
       });
+
+      hashconnectInstance.connectionStatusChange.once(connectionStatus => {
+        console.log('connectionStatus', connectionStatus);
+      });
+
+      hashconnectInstance.acknowledgeMessageEvent.once(acknowledgeData => {
+        console.log('acknowledgeData', acknowledgeData);
+      });
     }
   }, [hashconnectInstance, connectionData]);
   /* Wallet connect hooks & functions - End */
