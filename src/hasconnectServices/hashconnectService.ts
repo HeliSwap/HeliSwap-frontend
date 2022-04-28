@@ -1,14 +1,5 @@
-import {
-  ButtonLayoutDisplay,
-  ButtonMaker,
-  DialogInitializer,
-  DialogLayoutDisplay,
-} from '@costlydeveloper/ngx-awesome-popup';
-import { Transaction, TransactionReceipt } from '@hashgraph/sdk';
 import { HashConnect, HashConnectTypes, MessageTypes } from 'hashconnect';
-// import { ResultModalComponent } from '../components/result-modal/result-modal.component';
-import { SigningService } from './signingService';
-
+import { Transaction, AccountId, TransactionId } from '@hashgraph/sdk';
 export class HashconnectService {
   constructor(
     setLoading: (loading: boolean) => void,
@@ -52,7 +43,6 @@ export class HashconnectService {
   async initHashconnect() {
     //create the hashconnect instance
     this.hashconnect = new HashConnect(true);
-    //set externally passed functions
 
     if (this.loadLocalData()) {
       await this.hashconnect.init(this.appMetadata, this.saveData.privateKey);
@@ -174,18 +164,15 @@ export class HashconnectService {
     this.setConnected(false);
   }
 
-  // showResultOverlay(data: any) {
-  //   // const dialogPopup = new DialogInitializer(ResultModalComponent);
+  async makeBytes(trans: Transaction, signingAcctId: string) {
+    let transId = TransactionId.generate(signingAcctId);
+    trans.setTransactionId(transId);
+    trans.setNodeAccountIds([new AccountId(3)]);
 
-  //   dialogPopup.setCustomData({ data: data });
+    await trans.freeze();
 
-  //   // dialogPopup.setConfig({
-  //   //   Width: '500px',
-  //   //   LayoutType: DialogLayoutDisplay.NONE,
-  //   // });
+    let transBytes = trans.toBytes();
 
-  //   dialogPopup.setButtons([new ButtonMaker('Done', 'send', ButtonLayoutDisplay.SUCCESS)]);
-
-  //   // dialogPopup.openDialog$().subscribe(resp => {});
-  // }
+    return transBytes;
+  }
 }
