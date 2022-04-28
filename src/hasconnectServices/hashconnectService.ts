@@ -10,12 +10,22 @@ import { HashConnect, HashConnectTypes, MessageTypes } from 'hashconnect';
 import { SigningService } from './signingService';
 
 export class HashconnectService {
-  constructor() {
+  constructor(
+    setLoading: (loading: boolean) => void,
+    setExtensionFound: (loading: boolean) => void,
+    setConnected: (loading: boolean) => void,
+  ) {
     this.hashconnect = new HashConnect();
+    this.setLoading = setLoading;
+    this.setExtensionFound = setExtensionFound;
+    this.setConnected = setConnected;
   }
 
   hashconnect: HashConnect;
   status: string = 'Initializing';
+  setLoading: (loading: boolean) => void;
+  setExtensionFound: (loading: boolean) => void;
+  setConnected: (loading: boolean) => void;
 
   availableExtensions: HashConnectTypes.WalletMetadata[] = [];
 
@@ -42,8 +52,16 @@ export class HashconnectService {
   async initHashconnect() {
     //create the hashconnect instance
     this.hashconnect = new HashConnect(true);
+    //set externally passed functions
 
-    if (!this.loadLocalData()) {
+    if (this.loadLocalData()) {
+      await this.hashconnect.init(this.appMetadata, this.saveData.privateKey);
+      await this.hashconnect.connect(this.saveData.topic, this.saveData.pairedWalletData!);
+      this.setLoading(false);
+      this.setExtensionFound(true);
+      this.setConnected(true);
+      this.status = 'Paired';
+    } else {
       //first init, store the private key in localstorage
       let initData = await this.hashconnect.init(this.appMetadata);
       this.saveData.privateKey = initData.privKey;
@@ -60,11 +78,6 @@ export class HashconnectService {
       this.hashconnect.findLocalWallets();
 
       this.status = 'Connected';
-    } else {
-      await this.hashconnect.init(this.appMetadata, this.saveData.privateKey);
-      await this.hashconnect.connect(this.saveData.topic, this.saveData.pairedWalletData!);
-
-      this.status = 'Paired';
     }
 
     this.setUpEvents();
@@ -73,6 +86,8 @@ export class HashconnectService {
   setUpEvents() {
     this.hashconnect.foundExtensionEvent.on(data => {
       this.availableExtensions.push(data);
+      this.setLoading(false);
+      this.setExtensionFound(true);
       console.log('Found extension', data);
     });
 
@@ -96,6 +111,8 @@ export class HashconnectService {
       });
 
       this.saveDataInLocalstorage();
+      this.setLoading(false);
+      this.setConnected(true);
     });
 
     this.hashconnect.transactionEvent.on(data => {
@@ -106,6 +123,7 @@ export class HashconnectService {
 
   async connectToExtension() {
     this.hashconnect.connectToLocalWallet(this.saveData.pairingString);
+    this.setConnected(true);
   }
 
   async sendTransaction(trans: Uint8Array, acctToSign: string, return_trans: boolean = false) {
@@ -153,6 +171,7 @@ export class HashconnectService {
     this.saveData.pairedWalletData = undefined;
     this.status = 'Connected';
     localStorage.removeItem('hashconnectData');
+    this.setConnected(false);
   }
 
   // showResultOverlay(data: any) {
