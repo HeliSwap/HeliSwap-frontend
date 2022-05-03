@@ -11,6 +11,7 @@ const contextInitialValue = {
     extensionFound: false,
     connectWallet: () => {},
     disconnectWallet: () => {},
+    hashconnectConnectorInstance: {} as Hashconnect,
   },
 };
 
@@ -43,6 +44,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
     extensionFound,
     connectWallet,
     disconnectWallet,
+    hashconnectConnectorInstance: hashconnectConnectorInstance || ({} as Hashconnect),
   };
   const contextValue = { sdk, connection };
 
