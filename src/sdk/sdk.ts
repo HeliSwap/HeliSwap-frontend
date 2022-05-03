@@ -1,11 +1,3 @@
-import { Client } from '@hashgraph/sdk';
-
-class SDK {
-  constructor() {
-    const client = Client.forTestnet();
-
-    console.log('client', client);
-  }
-}
+class SDK {}
 
 export default SDK;
