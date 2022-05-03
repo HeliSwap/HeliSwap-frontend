@@ -1,26 +1,17 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { GlobalContext } from '../providers/Global';
 
-interface IHeaderProps {
-  connected: boolean;
-  isConnectionLoading: boolean;
-  readyToConnect: boolean;
-  connectWallet: () => void;
-  disconnectWallet: () => void;
-}
+const Header = () => {
+  const contextValue = useContext(GlobalContext);
+  const { connected, connectWallet, disconnectWallet, extensionFound, isConnectionLoading } =
+    contextValue.connection;
 
-const Header = ({
-  connected,
-  connectWallet,
-  disconnectWallet,
-  readyToConnect,
-  isConnectionLoading,
-}: IHeaderProps) => {
   return (
     <div className="container py-3 py-lg-5">
       <div className="d-flex justify-content-end">
         <div className="d-flex align-items-center">
           {!isConnectionLoading ? (
-            readyToConnect ? (
+            extensionFound ? (
               connected ? (
                 <>
                   <p className="text-success mx-2">Connected</p>
