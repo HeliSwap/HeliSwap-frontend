@@ -9,7 +9,7 @@ interface IFormState {
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
-  const { connection, sdk } = contextValue;
+  const { connection } = contextValue;
   const { userId } = connection;
   const [tokenList, setTokenList] = useState<string[]>([]);
   const [userTokenList, setUserTokenList] = useState<IUserToken[]>([]);
@@ -27,33 +27,9 @@ const Swap = () => {
     setTokenDataList(result);
     setFormState(prev => ({
       ...prev,
-      ['selectFrom']: result[0].tokenId,
-      ['selectТо']: result[1].tokenId,
+      selectFrom: result[0].tokenId,
+      selectТо: result[1].tokenId,
     }));
-  };
-
-  const updateUserBalances = () => {
-    const foundToken1 = userTokenList.find(item => item.tokenId === formState['selectFrom']);
-    const foundToken2 = userTokenList.find(item => item.tokenId === formState['selectТо']);
-
-    const token1Decimals =
-      tokenDataList.find(item => item.tokenId === formState['selectFrom'])?.decimals || 2;
-    const token2Decimals =
-      tokenDataList.find(item => item.tokenId === formState['selectТо'])?.decimals || 2;
-
-    const token1Balance = foundToken1
-      ? (foundToken1.balance / Math.pow(10, token1Decimals)).toFixed(token1Decimals)
-      : '0.00';
-    const token2Balance = foundToken2
-      ? (foundToken2.balance / Math.pow(10, token2Decimals)).toFixed(token2Decimals)
-      : '0.00';
-
-    setWalletBalances({ token1Balance, token2Balance });
-  };
-
-  const getUserTokensData = async () => {
-    const { balance, tokens } = await getTokensWalletBalance(userId);
-    setUserTokenList(tokens);
   };
 
   useEffect(() => {
@@ -72,13 +48,37 @@ const Swap = () => {
   }, [tokenList, userTokenList]);
 
   useEffect(() => {
+    const updateUserBalances = () => {
+      const foundToken1 = userTokenList.find(item => item.tokenId === formState['selectFrom']);
+      const foundToken2 = userTokenList.find(item => item.tokenId === formState['selectТо']);
+
+      const token1Decimals =
+        tokenDataList.find(item => item.tokenId === formState['selectFrom'])?.decimals || 2;
+      const token2Decimals =
+        tokenDataList.find(item => item.tokenId === formState['selectТо'])?.decimals || 2;
+
+      const token1Balance = foundToken1
+        ? (foundToken1.balance / Math.pow(10, token1Decimals)).toFixed(token1Decimals)
+        : '0.00';
+      const token2Balance = foundToken2
+        ? (foundToken2.balance / Math.pow(10, token2Decimals)).toFixed(token2Decimals)
+        : '0.00';
+
+      setWalletBalances({ token1Balance, token2Balance });
+    };
+
     Object.keys(formState).length > 0 &&
       tokenList.length > 0 &&
       userTokenList.length > 0 &&
       updateUserBalances();
-  }, [tokenList, userTokenList, formState]);
+  }, [tokenList, userTokenList, formState, tokenDataList]);
 
   useEffect(() => {
+    const getUserTokensData = async () => {
+      const { tokens } = await getTokensWalletBalance(userId);
+      setUserTokenList(tokens);
+    };
+
     if (userId) {
       getUserTokensData();
     }

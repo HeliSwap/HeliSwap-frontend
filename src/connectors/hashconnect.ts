@@ -63,7 +63,11 @@ class Hashconnect {
       this.saveData.topic = state.topic;
 
       //generate a pairing string, which you can display and generate a QR code from
-      this.saveData.pairingString = this.hashconnect.generatePairingString(state, 'testnet', true);
+      this.saveData.pairingString = this.hashconnect.generatePairingString(
+        state,
+        process.env.REACT_APP_NETWORK_TYPE || '',
+        true,
+      );
 
       //find any supported local wallets
       this.hashconnect.findLocalWallets();
@@ -143,7 +147,7 @@ class Hashconnect {
   async requestAccountInfo() {
     let request: MessageTypes.AdditionalAccountRequest = {
       topic: this.saveData.topic,
-      network: 'mainnet',
+      network: process.env.REACT_APP_NETWORK_TYPE || '',
       multiAccount: true,
     };
 

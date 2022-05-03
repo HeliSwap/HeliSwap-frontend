@@ -48,7 +48,6 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
   };
   const contextValue = { sdk, connection };
 
-  /* Wallet connect hooks & functions - Start */
   useEffect(() => {
     const initHashconnectConnector = async () => {
       const hashconnectConnector = new Hashconnect(
@@ -63,15 +62,10 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
     };
 
     initHashconnectConnector();
-  }, []);
-  /* Wallet connect hooks & functions - End */
 
-  /* SDK & HTS hooks & functions - Start */
-  useEffect(() => {
     const sdk = new SDK();
     setSdk(sdk);
   }, []);
-  /* SDK & HTS hooks & functions - Start */
 
   return <GlobalContext.Provider value={contextValue}>{children}</GlobalContext.Provider>;
 };
