@@ -14,9 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Create .env file
-      - run: |
-          echo "REACT_APP_MIRROR_NODE_URL=https://testnet.mirrornode.hedera.com" >> $GITHUB_ENV
-          echo "REACT_APP_NETWORK_TYPE=testnet" >> $GITHUB_ENV
+        run: |
+          touch .env | echo "${{ secrets.ENVIRONMENT_TESTNET }}" > .env
       - run: npm ci && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
