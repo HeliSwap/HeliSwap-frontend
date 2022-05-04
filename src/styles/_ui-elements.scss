@@ -6,3 +6,31 @@
   max-width: 820px;
   width: 100%;
 }
+
+.container-pairs {
+  background-color: $darkest;
+  border-radius: 15px;
+  box-shadow: 3.1033px 3.1033px 18.6198px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  max-width: 1220px;
+  width: 100%;
+}
+
+.container-table {
+  display: grid;
+  grid-auto-rows: auto;
+  row-gap: 16px;
+
+  .container-table-row {
+    display: grid;
+    gap: 1em;
+    align-items: center;
+    grid-template-columns: 20px 3.5fr repeat(3, 1fr);
+    padding: 8px;
+    border-bottom: 1px solid rgb(31, 33, 40);
+
+    &:hover {
+      background-color: $darker;
+    }
+  }
+}

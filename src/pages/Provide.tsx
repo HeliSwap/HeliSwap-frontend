@@ -7,7 +7,7 @@ interface IFormState {
   [key: string]: string;
 }
 
-const Swap = () => {
+const Provide = () => {
   const contextValue = useContext(GlobalContext);
   const { connection } = contextValue;
   const { userId } = connection;
@@ -95,81 +95,83 @@ const Swap = () => {
   const hasTokens = tokenDataList.length > 0;
 
   return (
-    <div className="container-swap">
-      <div className="d-flex justify-content-between">
-        <span className="badge bg-primary text-uppercase">From</span>
-        <span></span>
-      </div>
-
-      <div className="row justify-content-between align-items-end mt-3">
-        <div className="col-8">
-          <h3>Ethereum</h3>
-          <input type="text" className="form-control mt-2" />
-          <p className="text-success mt-3">$0.00</p>
+    <div className="d-flex justify-content-center">
+      <div className="container-swap">
+        <div className="d-flex justify-content-between">
+          <span className="badge bg-primary text-uppercase">From</span>
+          <span></span>
         </div>
 
-        <div className="col-4">
-          {hasTokens && formState ? (
-            <select
-              value={formState['selectFrom']}
-              onChange={handleInputChange}
-              name="selectFrom"
-              id=""
-              className="form-control"
-            >
-              {tokenDataList.map(item => (
-                <option key={item.tokenId} value={item.tokenId}>
-                  {item.symbol}
-                </option>
-              ))}
-            </select>
-          ) : null}
+        <div className="row justify-content-between align-items-end mt-3">
+          <div className="col-8">
+            <h3>Ethereum</h3>
+            <input type="text" className="form-control mt-2" />
+            <p className="text-success mt-3">$0.00</p>
+          </div>
 
-          <p className="text-steel mt-3 text-end">
-            Wallet balance: {walletBallances.token1Balance}
-          </p>
-        </div>
-      </div>
+          <div className="col-4">
+            {hasTokens && formState ? (
+              <select
+                value={formState['selectFrom']}
+                onChange={handleInputChange}
+                name="selectFrom"
+                id=""
+                className="form-control"
+              >
+                {tokenDataList.map(item => (
+                  <option key={item.tokenId} value={item.tokenId}>
+                    {item.symbol}
+                  </option>
+                ))}
+              </select>
+            ) : null}
 
-      <div className="d-flex justify-content-between mt-5">
-        <span className="badge bg-info text-uppercase">To</span>
-        <span></span>
-      </div>
-
-      <div className="row justify-content-between align-items-end mt-3">
-        <div className="col-8">
-          <h3>BSC</h3>
-          <input type="text" className="form-control mt-2" />
-          <p className="text-success mt-3">$0.00</p>
+            <p className="text-steel mt-3 text-end">
+              Wallet balance: {walletBallances.token1Balance}
+            </p>
+          </div>
         </div>
 
-        <div className="col-4">
-          {hasTokens && formState ? (
-            <select
-              value={formState['selectТо']}
-              onChange={handleInputChange}
-              name="selectТо"
-              id=""
-              className="form-control"
-            >
-              {tokenDataList.map(item => (
-                <option key={item.tokenId} value={item.tokenId}>
-                  {item.symbol}
-                </option>
-              ))}
-            </select>
-          ) : null}
-          <p className="text-steel mt-3 text-end">
-            Wallet balance: {walletBallances.token2Balance}
-          </p>
+        <div className="d-flex justify-content-between mt-5">
+          <span className="badge bg-info text-uppercase">To</span>
+          <span></span>
         </div>
-      </div>
 
-      <div className="mt-5 d-flex justify-content-center">
-        <button className="btn btn-primary">Swap</button>
+        <div className="row justify-content-between align-items-end mt-3">
+          <div className="col-8">
+            <h3>BSC</h3>
+            <input type="text" className="form-control mt-2" />
+            <p className="text-success mt-3">$0.00</p>
+          </div>
+
+          <div className="col-4">
+            {hasTokens && formState ? (
+              <select
+                value={formState['selectТо']}
+                onChange={handleInputChange}
+                name="selectТо"
+                id=""
+                className="form-control"
+              >
+                {tokenDataList.map(item => (
+                  <option key={item.tokenId} value={item.tokenId}>
+                    {item.symbol}
+                  </option>
+                ))}
+              </select>
+            ) : null}
+            <p className="text-steel mt-3 text-end">
+              Wallet balance: {walletBallances.token2Balance}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-5 d-flex justify-content-center">
+          <button className="btn btn-primary">Provide</button>
+        </div>
       </div>
     </div>
   );
 };
 
-export default Swap;
+export default Provide;

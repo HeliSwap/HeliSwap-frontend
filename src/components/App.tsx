@@ -5,7 +5,10 @@ import { ApolloProvider } from '@apollo/client';
 import { GlobalProvider } from '../providers/Global';
 import { getApolloClient } from '../utils/apolloUtils';
 
-import Home from '../pages/Home';
+import Swap from '../pages/Swap';
+import Provide from '../pages/Provide';
+import Pairs from '../pages/Pairs';
+// import CreatePair from '../pages/CreatePair';
 import Styleguide from '../pages/Styleguide';
 
 import Header from './Header';
@@ -23,7 +26,11 @@ function App() {
             <div className="main">
               <div className="container py-5 py-lg-7">
                 <Routes>
-                  <Route path="/" element={<Home />} />
+                  <Route path="/" element={<Swap />} />
+                  <Route path="/provide" element={<Provide />} />
+                  <Route path="/pairs" element={<Pairs />} />
+                  {/*
+                  <Route path="/create-pair" element={<CreatePair />} /> */}
                   <Route path="styleguide" element={<Styleguide />} />
                 </Routes>
               </div>
