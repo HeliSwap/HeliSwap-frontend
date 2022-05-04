@@ -100,7 +100,11 @@ const Swap = () => {
       target: { name, value },
     } = e;
 
-    setFormState(prev => ({ ...prev, [name]: value }));
+    // Validate value
+    const valueNum = Number(value);
+    const updatedValue = valueNum < 0 ? 0 : valueNum;
+
+    setFormState(prev => ({ ...prev, [name]: updatedValue }));
     calculateRate(name, value);
   };
 
