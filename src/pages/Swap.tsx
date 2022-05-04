@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { getTokenInfo, getTokensWalletBalance } from '../utils/tokenUtils';
 import { ITokenData, IUserToken } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
+import Button from '../components/Button';
 
 interface IFormState {
   [key: string]: string;
@@ -202,7 +203,7 @@ const Swap = () => {
         </div>
 
         <div className="mt-5 d-flex justify-content-center">
-          <button className="btn btn-primary">Swap</button>
+          <Button>Swap</Button>
         </div>
       </div>
     </div>
