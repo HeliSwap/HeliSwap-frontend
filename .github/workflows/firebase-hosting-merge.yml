@@ -8,8 +8,6 @@ name: Deploy to Firebase Hosting on merge
       - develop
 env:
   CI: false
-  REACT_APP_MIRROR_NODE_URL: https://testnet.mirrornode.hedera.com
-  REACT_APP_NETWORK_TYPE: testnet
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
