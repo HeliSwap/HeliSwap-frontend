@@ -5,6 +5,8 @@ name: Deploy to Firebase Hosting on PR
 'on': pull_request
 env:
   CI: false
+  REACT_APP_MIRROR_NODE_URL: https://testnet.mirrornode.hedera.com
+  REACT_APP_NETWORK_TYPE: testnet
 jobs:
   build_and_preview:
     if: '${{ github.event.pull_request.head.repo.full_name == github.repository }}'
@@ -15,9 +17,3 @@ jobs:
         run: |
           touch .env | echo "REACT_APP_MIRROR_NODE_URL=https://testnet.mirrornode.hedera.com" > .env
           touch .env | echo "REACT_APP_NETWORK_TYPE=testnet" > .env
-      - run: npm ci && npm run build
-      - uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_HELISWAP_FRONTEND }}'
-          projectId: heliswap-frontend
