@@ -2,9 +2,12 @@ import { gql } from '@apollo/client';
 
 export const GET_PAIRS = gql`
   query {
-    countries {
+    getAllPairs {
       name
-      phone
+      tvl
+      volume24h
+      volume7d
+      icons
     }
   }
 `;
