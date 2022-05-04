@@ -18,7 +18,7 @@ const Swap = () => {
   const [userTokenList, setUserTokenList] = useState<IUserToken[]>([]);
   const [tokenDataList, setTokenDataList] = useState<ITokenData[]>([]);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [formState, setFormState] = useState<IFormState>({
     swapTo: '0',
@@ -83,7 +83,9 @@ const Swap = () => {
       }));
     };
 
-    tokenList.length > 0 && getTokensDada(tokenList);
+    if (tokenList.length > 0) {
+      getTokensDada(tokenList);
+    }
   }, [tokenList, userTokenList]);
 
   useEffect(() => {
@@ -120,6 +122,7 @@ const Swap = () => {
 
     if (userId) {
       getUserTokensData();
+      setIsLoading(false);
     }
   }, [userId, tokenList]);
 
