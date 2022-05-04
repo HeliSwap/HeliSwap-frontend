@@ -26,6 +26,8 @@
     gap: 1em;
     align-items: center;
     grid-template-columns: 20px 3.5fr repeat(3, 1fr);
+    padding: 8px;
+    border-bottom: 1px solid rgb(31, 33, 40);
 
     &:hover {
       background-color: $darker;
