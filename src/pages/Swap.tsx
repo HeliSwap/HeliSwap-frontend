@@ -29,18 +29,6 @@ const Swap = () => {
     token2Balance: '0.00',
   });
 
-  const getTokensDada = async (tokenList: string[]) => {
-    const arrayPromises = tokenList.map(tokenId => getTokenInfo(tokenId));
-    const result = await Promise.all(arrayPromises);
-
-    setTokenDataList(result);
-    setFormState(prev => ({
-      ...prev,
-      selectFrom: result[0].tokenId,
-      selectТо: result[1].tokenId,
-    }));
-  };
-
   const handleSelectChange = (e: any) => {
     const {
       target: { name, value },
@@ -83,6 +71,18 @@ const Swap = () => {
   }, []);
 
   useEffect(() => {
+    const getTokensDada = async (tokenList: string[]) => {
+      const arrayPromises = tokenList.map(tokenId => getTokenInfo(tokenId));
+      const result = await Promise.all(arrayPromises);
+
+      setTokenDataList(result);
+      setFormState(prev => ({
+        ...prev,
+        selectFrom: result[0].tokenId,
+        selectТо: result[1].tokenId,
+      }));
+    };
+
     tokenList.length > 0 && getTokensDada(tokenList);
   }, [tokenList, userTokenList]);
 
