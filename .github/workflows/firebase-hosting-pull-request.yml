@@ -15,3 +15,5 @@ jobs:
         run: |
           touch .env | echo "REACT_APP_MIRROR_NODE_URL=https://testnet.mirrornode.hedera.com" > .env
           touch .env | echo "REACT_APP_NETWORK_TYPE=testnet" > .env
+      - name: Build
+      - run: CI=false npm ci && npm run build
