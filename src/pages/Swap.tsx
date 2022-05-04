@@ -3,6 +3,7 @@ import { getTokenInfo, getTokensWalletBalance } from '../utils/tokenUtils';
 import { ITokenData, IUserToken } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 import Button from '../components/Button';
+import Loader from '../components/Loader';
 
 interface IFormState {
   [key: string]: string;
@@ -12,9 +13,13 @@ const Swap = () => {
   const contextValue = useContext(GlobalContext);
   const { connection } = contextValue;
   const { userId } = connection;
+
   const [tokenList, setTokenList] = useState<string[]>([]);
   const [userTokenList, setUserTokenList] = useState<IUserToken[]>([]);
   const [tokenDataList, setTokenDataList] = useState<ITokenData[]>([]);
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const [formState, setFormState] = useState<IFormState>({
     swapTo: '0',
     swapFrom: '0',
@@ -34,6 +39,36 @@ const Swap = () => {
       selectFrom: result[0].tokenId,
       selectТо: result[1].tokenId,
     }));
+  };
+
+  const handleSelectChange = (e: any) => {
+    const {
+      target: { name, value },
+    } = e;
+
+    setFormState(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleInputChange = (e: any) => {
+    const {
+      target: { name, value },
+    } = e;
+
+    // Validate value
+    const valueNum = Number(value);
+    const updatedValue = valueNum < 0 ? 0 : valueNum;
+
+    setFormState(prev => ({ ...prev, [name]: updatedValue }));
+    calculateRate(name, value);
+  };
+
+  const calculateRate = (name: string, value: string) => {
+    const inputs = ['swapFrom', 'swapTo'];
+    const inputToUpdate = inputs.filter(item => item !== name)[0];
+
+    // Mock calculated data
+    const calculatedValue = Number(value) * 2;
+    setFormState(prev => ({ ...prev, [inputToUpdate]: calculatedValue.toString() }));
   };
 
   useEffect(() => {
@@ -87,36 +122,6 @@ const Swap = () => {
       getUserTokensData();
     }
   }, [userId, tokenList]);
-
-  const handleSelectChange = (e: any) => {
-    const {
-      target: { name, value },
-    } = e;
-
-    setFormState(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleInputChange = (e: any) => {
-    const {
-      target: { name, value },
-    } = e;
-
-    // Validate value
-    const valueNum = Number(value);
-    const updatedValue = valueNum < 0 ? 0 : valueNum;
-
-    setFormState(prev => ({ ...prev, [name]: updatedValue }));
-    calculateRate(name, value);
-  };
-
-  const calculateRate = (name: string, value: string) => {
-    const inputs = ['swapFrom', 'swapTo'];
-    const inputToUpdate = inputs.filter(item => item !== name)[0];
-
-    // Mock calculated data
-    const calculatedValue = Number(value) * 2;
-    setFormState(prev => ({ ...prev, [inputToUpdate]: calculatedValue.toString() }));
-  };
 
   const hasTokens = tokenDataList.length > 0;
 
@@ -203,7 +208,7 @@ const Swap = () => {
         </div>
 
         <div className="mt-5 d-flex justify-content-center">
-          <Button>Swap</Button>
+          {isLoading ? <Loader /> : <Button>Swap</Button>}
         </div>
       </div>
     </div>
