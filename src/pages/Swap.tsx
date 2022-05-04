@@ -14,7 +14,10 @@ const Swap = () => {
   const [tokenList, setTokenList] = useState<string[]>([]);
   const [userTokenList, setUserTokenList] = useState<IUserToken[]>([]);
   const [tokenDataList, setTokenDataList] = useState<ITokenData[]>([]);
-  const [formState, setFormState] = useState<IFormState>({});
+  const [formState, setFormState] = useState<IFormState>({
+    swapTo: '0',
+    swapFrom: '0',
+  });
   const [walletBallances, setWalletBalances] = useState({
     token1Balance: '0.00',
     token2Balance: '0.00',
@@ -84,12 +87,30 @@ const Swap = () => {
     }
   }, [userId, tokenList]);
 
+  const handleSelectChange = (e: any) => {
+    const {
+      target: { name, value },
+    } = e;
+
+    setFormState(prev => ({ ...prev, [name]: value }));
+  };
+
   const handleInputChange = (e: any) => {
     const {
       target: { name, value },
     } = e;
 
     setFormState(prev => ({ ...prev, [name]: value }));
+    calculateRate(name, value);
+  };
+
+  const calculateRate = (name: string, value: string) => {
+    const inputs = ['swapFrom', 'swapTo'];
+    const inputToUpdate = inputs.filter(item => item !== name)[0];
+
+    // Mock calculated data
+    const calculatedValue = Number(value) * 2;
+    setFormState(prev => ({ ...prev, [inputToUpdate]: calculatedValue.toString() }));
   };
 
   const hasTokens = tokenDataList.length > 0;
@@ -104,8 +125,13 @@ const Swap = () => {
 
         <div className="row justify-content-between align-items-end mt-3">
           <div className="col-8">
-            <h3>Ethereum</h3>
-            <input type="text" className="form-control mt-2" />
+            <input
+              value={formState['swapFrom']}
+              name="swapFrom"
+              onChange={handleInputChange}
+              type="number"
+              className="form-control mt-2"
+            />
             <p className="text-success mt-3">$0.00</p>
           </div>
 
@@ -113,7 +139,7 @@ const Swap = () => {
             {hasTokens && formState ? (
               <select
                 value={formState['selectFrom']}
-                onChange={handleInputChange}
+                onChange={handleSelectChange}
                 name="selectFrom"
                 id=""
                 className="form-control"
@@ -139,8 +165,13 @@ const Swap = () => {
 
         <div className="row justify-content-between align-items-end mt-3">
           <div className="col-8">
-            <h3>BSC</h3>
-            <input type="text" className="form-control mt-2" />
+            <input
+              value={formState['swapTo']}
+              onChange={handleInputChange}
+              name="swapTo"
+              type="number"
+              className="form-control mt-2"
+            />
             <p className="text-success mt-3">$0.00</p>
           </div>
 
@@ -148,7 +179,7 @@ const Swap = () => {
             {hasTokens && formState ? (
               <select
                 value={formState['selectТо']}
-                onChange={handleInputChange}
+                onChange={handleSelectChange}
                 name="selectТо"
                 id=""
                 className="form-control"
