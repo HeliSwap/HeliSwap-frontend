@@ -13,7 +13,8 @@ interface IPairData {
 }
 
 const Pairs = () => {
-  const { error, loading, data } = useQuery(GET_PAIRS);
+  const { data } = useQuery(GET_PAIRS);
+  // const { error, loading, data } = useQuery(GET_PAIRS);
   const [pairData, setPairData] = useState<IPairData[]>([]);
 
   useEffect(() => {
