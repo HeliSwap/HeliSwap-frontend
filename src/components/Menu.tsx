@@ -7,9 +7,6 @@ const Menu = () => {
       <Link className="link-menu" to="/">
         Swap
       </Link>
-      <Link className="link-menu" to="/provide">
-        Add Liquidity
-      </Link>
       <Link className="link-menu" to="/pairs">
         Pairs
       </Link>
