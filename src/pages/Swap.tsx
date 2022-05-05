@@ -2,8 +2,10 @@ import React, { useState, useEffect, useContext } from 'react';
 import { getTokenInfo, getTokensWalletBalance } from '../utils/tokenUtils';
 import { ITokenData, IUserToken } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
+
 import Button from '../components/Button';
 import Loader from '../components/Loader';
+import Modal from '../components/Modal';
 
 interface IFormState {
   [key: string]: string;
@@ -213,6 +215,8 @@ const Swap = () => {
         <div className="mt-5 d-flex justify-content-center">
           {isLoading ? <Loader /> : <Button>Swap</Button>}
         </div>
+
+        <Modal />
       </div>
     </div>
   );
