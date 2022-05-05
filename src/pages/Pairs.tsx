@@ -16,30 +16,6 @@ const Pairs = () => {
   const { error, loading, data } = useQuery(GET_PAIRS);
   const [pairData, setPairData] = useState<IPairData[]>([]);
 
-  // const pairData = [
-  //   {
-  //     name: 'USDC/ETH',
-  //     tvl: '345666543',
-  //     volume24h: '45678',
-  //     volume7d: '234567',
-  //     icons: ['usdc', 'ethereum'],
-  //   },
-  //   {
-  //     name: 'USDC/BTC',
-  //     tvl: '384759375',
-  //     volume24h: '24583',
-  //     volume7d: '237549',
-  //     icons: ['usdc', 'btc'],
-  //   },
-  //   {
-  //     name: 'BTC/ETH',
-  //     tvl: '245643456',
-  //     volume24h: '35466',
-  //     volume7d: '456322',
-  //     icons: ['btc', 'ethereum'],
-  //   },
-  // ];
-
   useEffect(() => {
     data && setPairData(data.getAllPairs);
   }, [data]);

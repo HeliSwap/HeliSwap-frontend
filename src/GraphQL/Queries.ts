@@ -11,3 +11,12 @@ export const GET_PAIRS = gql`
     }
   }
 `;
+
+export const GET_TOKENS = gql`
+  query {
+    getTokensIds {
+      id
+      icon
+    }
+  }
+`;
