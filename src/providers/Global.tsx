@@ -26,8 +26,8 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
   const [connected, setConnected] = useState(false);
   const [isConnectionLoading, setIsConnectionLoading] = useState(true);
   const [extensionFound, setExtensionFound] = useState(false);
-
   const [hashconnectConnectorInstance, setHashconnectConnectorInstance] = useState<Hashconnect>();
+  const [userId, setUserId] = useState('');
 
   const connectWallet = () => {
     hashconnectConnectorInstance?.connect();
@@ -39,7 +39,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
 
   const connection = {
     connected,
-    userId: hashconnectConnectorInstance?.saveData.pairedAccounts[0] || '',
+    userId,
     isConnectionLoading,
     extensionFound,
     connectWallet,
@@ -57,7 +57,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
       );
 
       await hashconnectConnector.initHashconnect();
-
+      setUserId(hashconnectConnector.saveData.pairedAccounts[0]);
       setHashconnectConnectorInstance(hashconnectConnector);
     };
 
