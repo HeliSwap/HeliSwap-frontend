@@ -5,7 +5,7 @@ interface IModalProps {
 }
 
 const Modal = ({ setShow }: IModalProps) => {
-  const [shown, setShown] = useState(true);
+  const [shown, setShown] = useState(false);
 
   const openModal = () => {
     setShown(true);
