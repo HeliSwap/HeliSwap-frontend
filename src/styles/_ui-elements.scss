@@ -34,3 +34,14 @@
     }
   }
 }
+
+.input-container {
+  position: relative;
+
+  .text-link-input {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
