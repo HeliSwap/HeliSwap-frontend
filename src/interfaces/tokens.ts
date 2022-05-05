@@ -16,3 +16,10 @@ export interface IWalletBalance {
   balance: number;
   tokens: IUserToken[];
 }
+
+export interface ISwapTokenData {
+  tokenIdIn: string;
+  tokenIdOut: string;
+  amountIn: string;
+  amountOut: string;
+}

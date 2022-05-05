@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { ITokenData, IUserToken } from '../interfaces/tokens';
+// TODO Interfaces to be combined into comon export
+import { IStringToString } from '../interfaces/comon';
 
 interface ITokenInputSelector {
   tokenDataList: ITokenData[];
   userTokenList: IUserToken[];
   inputName: string;
   selectName: string;
+  onInputChange?: ({}: IStringToString) => void;
 }
 
 const TokenInputSelector = ({
@@ -13,15 +16,23 @@ const TokenInputSelector = ({
   userTokenList,
   inputName,
   selectName,
+  onInputChange,
 }: ITokenInputSelector) => {
   const [inputValue, setInputValue] = useState('0');
   const [selectValue, setSelectValue] = useState('0');
   const [tokenBalance, setTokenBalance] = useState('0.00');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
+    const { value, name } = e.target;
 
     setInputValue(value);
+
+    const tokenData = {
+      [selectName]: selectValue,
+      [name]: value,
+    };
+
+    onInputChange && onInputChange(tokenData);
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
