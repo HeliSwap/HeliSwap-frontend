@@ -12,6 +12,26 @@ export const GET_PAIRS = gql`
   }
 `;
 
+export const GET_POOLS = gql`
+  query {
+    pools {
+      id
+      pairName
+      pairAddress
+    }
+  }
+`;
+
+export const GET_POOL_BY_TOKEN = gql`
+  query getPoolByToken($token: String!) {
+    poolsByToken(token: $token) {
+      id
+      pairName
+      pairAddress
+    }
+  }
+`;
+
 export const GET_TOKENS = gql`
   query {
     getTokensIds {
