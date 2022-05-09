@@ -9,6 +9,7 @@ interface ITokenInputSelector {
   inputName: string;
   selectName: string;
   onInputChange?: ({}: IStringToString) => void;
+  onSelectChange?: ({}: IStringToString) => void;
 }
 
 const TokenInputSelector = ({
@@ -17,6 +18,7 @@ const TokenInputSelector = ({
   inputName,
   selectName,
   onInputChange,
+  onSelectChange,
 }: ITokenInputSelector) => {
   const [inputValue, setInputValue] = useState('0');
   const [selectValue, setSelectValue] = useState('0');
@@ -36,9 +38,15 @@ const TokenInputSelector = ({
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { value } = e.target;
+    const { value, name } = e.target;
 
     setSelectValue(value);
+
+    const tokenData = {
+      [name]: value,
+    };
+
+    onSelectChange && onSelectChange(tokenData);
   };
 
   const setMaxNumber = () => {
