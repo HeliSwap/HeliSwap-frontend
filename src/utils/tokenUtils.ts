@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { hethers } from '@hashgraph/hethers';
+
 import { ITokenData, IWalletBalance } from '../interfaces/tokens';
 
 export const getTokenInfo = async (tokenId: string): Promise<ITokenData> => {
@@ -51,4 +53,12 @@ export const getTokensWalletBalance = async (userId: string): Promise<IWalletBal
     console.error(e);
     return {} as IWalletBalance;
   }
+};
+
+export const tokenAddressToId = (tokenAddress: string) => {
+  return hethers.utils.asAccountString(tokenAddress);
+};
+
+export const tokenIdToAddress = (tokenId: string) => {
+  return hethers.utils.getAddressFromAccount(tokenId);
 };
