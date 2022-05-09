@@ -1,7 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import Modal from '../components/Modal';
+import ModalContent from '../components/Modals/ModalContent';
+
 const Styleguide = () => {
+  const [showModal, setShowModal] = useState(false);
+
+  const handleModalOpen = () => {
+    document.body.style.overflow = 'hidden';
+    setShowModal(true);
+  };
+
+  const handleModalClose = () => {
+    document.body.style.overflow = 'visible';
+    setShowModal(false);
+  };
+
   return (
     <>
       <h1 className="text-mega">Styleguide</h1>
@@ -461,6 +476,19 @@ const Styleguide = () => {
               </select>
             </div>
           </div>
+        </div>
+      </div>
+
+      <h3 className="text-headline mb-4">Modals</h3>
+      <div className="row mb-6">
+        <div className="col-lg-6">
+          <button onClick={() => handleModalOpen()} className="btn btn-secondary">
+            Show modal
+          </button>
+
+          <Modal show={showModal} closeModal={() => handleModalClose()}>
+            <ModalContent closeModal={() => handleModalClose()} />
+          </Modal>
         </div>
       </div>
 

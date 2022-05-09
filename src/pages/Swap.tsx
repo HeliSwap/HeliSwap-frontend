@@ -123,8 +123,6 @@ const Swap = () => {
         <div className="mt-5 d-flex justify-content-center">
           {isLoading || loading ? <Loader /> : <Button onClick={() => getSwapRate()}>Swap</Button>}
         </div>
-
-        <Modal />
       </div>
     </div>
   );
