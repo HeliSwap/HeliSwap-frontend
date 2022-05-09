@@ -20,3 +20,11 @@ export const GET_TOKENS = gql`
     }
   }
 `;
+
+export const GET_SWAP_RATE = gql`
+  query {
+    getSwapRate {
+      amountOut
+    }
+  }
+`;

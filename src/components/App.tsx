@@ -7,6 +7,7 @@ import { getApolloClient } from '../utils/apolloUtils';
 
 import Swap from '../pages/Swap';
 import Pairs from '../pages/Pairs';
+import Tokens from '../pages/Tokens';
 import Styleguide from '../pages/Styleguide';
 
 import Header from './Header';
@@ -26,6 +27,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Swap />} />
                   <Route path="/pairs" element={<Pairs />} />
+                  <Route path="/tokens" element={<Tokens />} />
                   <Route path="styleguide" element={<Styleguide />} />
                 </Routes>
               </div>

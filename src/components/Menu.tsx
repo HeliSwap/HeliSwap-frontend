@@ -10,6 +10,9 @@ const Menu = () => {
       <Link className="link-menu" to="/pairs">
         Pairs
       </Link>
+      <Link className="link-menu" to="/tokens">
+        Tokens
+      </Link>
     </div>
   );
 };
