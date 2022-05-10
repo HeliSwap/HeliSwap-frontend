@@ -20,7 +20,10 @@ const Create = () => {
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
 
-  const [tokensData, setTokensData] = useState<ITokensData>();
+  const [tokensData, setTokensData] = useState<ITokensData>({
+    tokenA: {} as ITokenData,
+    tokenB: {} as ITokenData,
+  });
   const [createPairData, setCreatePairData] = useState({
     tokenAAmount: '0',
     tokenBAmount: '0',
@@ -34,10 +37,15 @@ const Create = () => {
     setCreatePairData(prev => ({ ...prev, [name]: value }));
   };
 
-  useEffect(() => {
-    console.log('tokensData', tokensData);
+  const handleCreateClick = () => {
+    console.log('createPairData', createPairData);
+  };
 
-    // setCreatePairData(prev => ({ ...prev, ...tokensData }));
+  useEffect(() => {
+    const { tokenA, tokenB } = tokensData;
+    const newPairData = { tokenAId: tokenA.tokenId, tokenBId: tokenB.tokenId };
+
+    setCreatePairData(prev => ({ ...prev, ...newPairData }));
   }, [tokensData]);
 
   return (
@@ -142,7 +150,7 @@ const Create = () => {
         </div>
 
         <div className="mt-5 d-flex justify-content-center">
-          <Button>Create</Button>
+          <Button onClick={handleCreateClick}>Create</Button>
         </div>
       </div>
     </div>

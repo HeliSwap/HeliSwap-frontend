@@ -30,7 +30,6 @@ const WalletBalance = ({ userId, tokenData, setMaxNumber }: IWalletBalance) => {
       const tokenBalance = tokenFound
         ? (tokenFound.balance / Math.pow(10, tokenDecimals)).toFixed(tokenDecimals)
         : '0.00';
-      console.log('tokenBalance', tokenBalance);
 
       setTokenBalance(tokenBalance);
       setMaxNumber && setMaxNumber(tokenBalance);

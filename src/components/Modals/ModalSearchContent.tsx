@@ -51,6 +51,13 @@ const ModalSearchContent = ({ closeModal, setTokensData, tokenFieldId }: IModalP
       <div className="modal-body">
         <div className="p-4">
           <div>
+            <ul>
+              <li>0.0.447200</li>
+              <li>0.0.34247682</li>
+              <li>0.0.34250206</li>
+              <li>0.0.34250234</li>
+              <li>0.0.34250245</li>
+            </ul>
             <label className="mb-2" htmlFor="">
               Token id
             </label>
