@@ -50,8 +50,7 @@ class SDK {
       responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
     }
 
-    console.log('responce execute', responseData);
-    return response;
+    return responseData;
   }
 }
 
