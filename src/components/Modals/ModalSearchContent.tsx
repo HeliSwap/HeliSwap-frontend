@@ -13,7 +13,7 @@ interface IModalProps {
 const ModalSearchContent = ({ closeModal, setTokensData, tokenFieldId }: IModalProps) => {
   const [searchInputValue, setSearchInputValue] = useState('');
   const [findTokenLoading, setFindTokenLoading] = useState(false);
-  const [foundTokenData, setFountTokenData] = useState<ITokenData>();
+  const [foundTokenData, setFoundTokenData] = useState<ITokenData>({} as ITokenData);
 
   const onSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -23,14 +23,14 @@ const ModalSearchContent = ({ closeModal, setTokensData, tokenFieldId }: IModalP
 
   const handleSearchButtonClick = async () => {
     setFindTokenLoading(true);
-    setFountTokenData(undefined);
+    setFoundTokenData({} as ITokenData);
 
     try {
       const result = await getTokenInfo(searchInputValue);
 
       // Proper check for result
       if (result) {
-        setFountTokenData(result);
+        setFoundTokenData(result);
       }
     } catch (err) {
       console.log('err', err);
@@ -42,7 +42,7 @@ const ModalSearchContent = ({ closeModal, setTokensData, tokenFieldId }: IModalP
   const handleSaveButton = () => {
     setTokensData((prev: any) => ({ ...prev, [tokenFieldId]: foundTokenData }));
     setSearchInputValue('');
-    setFountTokenData(undefined);
+    setFoundTokenData({} as ITokenData);
     closeModal();
   };
 
