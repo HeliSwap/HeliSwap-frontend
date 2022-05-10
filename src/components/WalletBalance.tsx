@@ -37,7 +37,7 @@ const WalletBalance = ({ userId, tokenData, setMaxNumber }: IWalletBalance) => {
     };
 
     tokenData && getTokenBalance();
-  }, [userTokenList, tokenData]);
+  }, [userTokenList, tokenData, setMaxNumber]);
 
   return <p className="text-steel mt-3 text-end">Wallet balance: {tokenBalance}</p>;
 };
