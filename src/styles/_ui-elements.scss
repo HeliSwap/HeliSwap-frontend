@@ -45,3 +45,12 @@
     transform: translateY(-50%);
   }
 }
+
+.container-token-selector {
+  padding: 6px 6px 6px 12px;
+  color: $input-color;
+  background-color: $darkest;
+  border: 1px solid $input-border-color;
+  border-radius: $border-radius;
+  font-size: $input-font-size;
+}
