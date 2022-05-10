@@ -6,6 +6,7 @@ import Button from '../components/Button';
 import Modal from '../components/Modal';
 import ModalSearchContent from '../components/Modals/ModalSearchContent';
 import WalletBalance from '../components/WalletBalance';
+import { ICreatePairData } from '../interfaces/comon';
 
 interface ITokensData {
   tokenA: ITokenData;
@@ -14,8 +15,8 @@ interface ITokensData {
 
 const Create = () => {
   const contextValue = useContext(GlobalContext);
-  const { connection } = contextValue;
-  const { userId } = connection;
+  const { connection, sdk } = contextValue;
+  const { userId, hashconnectConnectorInstance } = connection;
 
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
@@ -24,7 +25,7 @@ const Create = () => {
     tokenA: {} as ITokenData,
     tokenB: {} as ITokenData,
   });
-  const [createPairData, setCreatePairData] = useState({
+  const [createPairData, setCreatePairData] = useState<ICreatePairData>({
     tokenAAmount: '0',
     tokenBAmount: '0',
     tokenAId: '',
@@ -39,6 +40,7 @@ const Create = () => {
 
   const handleCreateClick = () => {
     console.log('createPairData', createPairData);
+    sdk.createPair(hashconnectConnectorInstance, userId, createPairData);
   };
 
   useEffect(() => {

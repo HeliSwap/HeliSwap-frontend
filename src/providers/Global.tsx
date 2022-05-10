@@ -3,7 +3,7 @@ import Hashconnect from '../connectors/hashconnect';
 import SDK from '../sdk/sdk';
 
 const contextInitialValue = {
-  sdk: {},
+  sdk: {} as SDK,
   connection: {
     userId: '',
     connected: false,
@@ -22,7 +22,7 @@ interface IGlobalProps {
 }
 
 export const GlobalProvider = ({ children }: IGlobalProps) => {
-  const [sdk, setSdk] = useState({});
+  const [sdk, setSdk] = useState({} as SDK);
   const [connected, setConnected] = useState(false);
   const [isConnectionLoading, setIsConnectionLoading] = useState(true);
   const [extensionFound, setExtensionFound] = useState(false);
