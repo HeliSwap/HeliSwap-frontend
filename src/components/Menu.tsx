@@ -7,6 +7,9 @@ const Menu = () => {
       <Link className="link-menu" to="/">
         Swap
       </Link>
+      <Link className="link-menu" to="/create">
+        Create
+      </Link>
       <Link className="link-menu" to="/pairs">
         Pairs
       </Link>

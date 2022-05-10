@@ -1,15 +1,13 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { getTokenInfo, getTokensWalletBalance } from '../utils/tokenUtils';
-import { ITokenData, IUserToken, ISwapTokenData } from '../interfaces/tokens';
+import React, { useState, useEffect } from 'react';
+import { getTokenInfo } from '../utils/tokenUtils';
+import { ITokenData, ISwapTokenData } from '../interfaces/tokens';
 import { IStringToString } from '../interfaces/comon';
-import { GlobalContext } from '../providers/Global';
 
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { GET_TOKENS, GET_SWAP_RATE } from '../GraphQL/Queries';
 
 import Button from '../components/Button';
 import Loader from '../components/Loader';
-import Modal from '../components/Modal';
 import TokenInputSelector from '../components/TokenInputSelector';
 
 const Swap = () => {
@@ -19,29 +17,20 @@ const Swap = () => {
     amountIn: '',
     amountOut: '',
   };
-  const contextValue = useContext(GlobalContext);
-  const { connection } = contextValue;
-  const { userId } = connection;
 
   const [tokenList, setTokenList] = useState<string[]>([]);
-  const [userTokenList, setUserTokenList] = useState<IUserToken[]>([]);
   const [tokenDataList, setTokenDataList] = useState<ITokenData[]>([]);
 
   const [swapData, setSwapData] = useState(initialSwapData);
 
-  const [isLoading, setIsLoading] = useState(true);
-
   const { error, loading, data } = useQuery(GET_TOKENS);
-  const [getSwapRate, { called, loading: loadingRate, data: dataRate }] = useLazyQuery(
-    GET_SWAP_RATE,
-    {
-      variables: {
-        amountIn: swapData.amountIn,
-        tokenIdIn: swapData.tokenIdIn,
-        tokenIdOut: swapData.tokenIdOut,
-      },
+  const [getSwapRate] = useLazyQuery(GET_SWAP_RATE, {
+    variables: {
+      amountIn: swapData.amountIn,
+      tokenIdIn: swapData.tokenIdIn,
+      tokenIdOut: swapData.tokenIdOut,
     },
-  );
+  });
 
   function onInputChange(tokenData: IStringToString) {
     setSwapData(prev => ({ ...prev, ...tokenData }));
@@ -69,19 +58,7 @@ const Swap = () => {
     if (tokenList.length > 0) {
       getTokensDada(tokenList);
     }
-  }, [tokenList, userTokenList]);
-
-  useEffect(() => {
-    const getUserTokensData = async () => {
-      const { tokens } = await getTokensWalletBalance(userId);
-      setUserTokenList(tokens);
-    };
-
-    if (userId) {
-      getUserTokensData();
-      setIsLoading(false);
-    }
-  }, [userId, tokenList]);
+  }, [tokenList]);
 
   return (
     <div className="d-flex justify-content-center">
@@ -101,7 +78,6 @@ const Swap = () => {
           inputName="amountIn"
           selectName="tokenIdIn"
           tokenDataList={tokenDataList}
-          userTokenList={userTokenList}
           onInputChange={onInputChange}
           onSelectChange={onSelectChange}
         />
@@ -115,13 +91,12 @@ const Swap = () => {
           inputName="amountOut"
           selectName="tokenIdOut"
           tokenDataList={tokenDataList}
-          userTokenList={userTokenList}
           onInputChange={onInputChange}
           onSelectChange={onSelectChange}
         />
 
         <div className="mt-5 d-flex justify-content-center">
-          {isLoading || loading ? <Loader /> : <Button onClick={() => getSwapRate()}>Swap</Button>}
+          {loading ? <Loader /> : <Button onClick={() => getSwapRate()}>Swap</Button>}
         </div>
       </div>
     </div>

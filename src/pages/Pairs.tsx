@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { useQuery } from '@apollo/client';
-import { GET_PAIRS } from '../GraphQL/Queries';
+import { GET_POOLS, GET_POOL_BY_TOKEN } from '../GraphQL/Queries';
 import { formatStringToPrice } from '../utils/numberUtils';
 
 interface IPairData {
@@ -13,12 +13,18 @@ interface IPairData {
 }
 
 const Pairs = () => {
-  const { error, loading, data } = useQuery(GET_PAIRS);
+  const token = '';
+  const { error, loading, data } = useQuery(GET_POOLS);
+  const { data: dataPBT } = useQuery(GET_POOL_BY_TOKEN, { variables: { token } });
   const [pairData, setPairData] = useState<IPairData[]>([]);
 
   useEffect(() => {
-    data && setPairData(data.getAllPairs);
+    data && setPairData(data.pools);
   }, [data]);
+
+  useEffect(() => {
+    console.log('dataPBT', dataPBT?.poolsByToken);
+  }, [dataPBT]);
 
   const formatIcons = (icons: string[]) =>
     icons &&
