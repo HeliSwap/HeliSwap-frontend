@@ -32,16 +32,15 @@ const ModalSearchContent = ({ closeModal, setTokensData, tokenFieldId }: IModalP
       if (result) {
         setFountTokenData(result);
       }
-    } catch (e) {
-      console.log('e', e);
+    } catch (err) {
+      console.log('err', err);
     } finally {
       setFindTokenLoading(false);
     }
   };
 
   const handleSaveButton = () => {
-    console.log('tokenFieldId', tokenFieldId);
-    setTokensData((prev: any) => ({ ...prev, [tokenFieldId]: foundTokenData?.tokenId }));
+    setTokensData((prev: any) => ({ ...prev, [tokenFieldId]: foundTokenData }));
     setSearchInputValue('');
     setFountTokenData(undefined);
     closeModal();

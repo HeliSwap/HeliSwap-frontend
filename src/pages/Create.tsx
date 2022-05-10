@@ -1,19 +1,25 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { ITokenData } from '../interfaces/tokens';
+import { ITokenData, IUserToken } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
+
+import { getTokensWalletBalance } from '../utils/tokenUtils';
 
 import Button from '../components/Button';
 import Modal from '../components/Modal';
 import ModalSearchContent from '../components/Modals/ModalSearchContent';
 
 interface ITokensData {
-  [key: string]: ITokenData;
+  tokenA: ITokenData;
+  tokenB: ITokenData;
 }
 
 const Create = () => {
   const contextValue = useContext(GlobalContext);
   const { connection } = contextValue;
   const { userId } = connection;
+
+  const [tokenBalance, setTokenBalance] = useState('0.00');
+  const [userTokenList, setUserTokenList] = useState<IUserToken[]>([]);
 
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
@@ -33,11 +39,36 @@ const Create = () => {
   };
 
   useEffect(() => {
-    // console.log('tokensData', tokensData);
-    setCreatePairData(prev => ({ ...prev, ...tokensData }));
+    console.log('tokensData', tokensData);
+
+    // setCreatePairData(prev => ({ ...prev, ...tokensData }));
   }, [tokensData]);
 
-  console.log('createPairData', createPairData);
+  useEffect(() => {
+    const getUserTokensData = async () => {
+      const { tokens } = await getTokensWalletBalance(userId);
+      setUserTokenList(tokens);
+    };
+
+    if (userId) {
+      getUserTokensData();
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    const getTokenBalance = () => {
+      const tokenFound = userTokenList.find(item => item.tokenId === tokensData?.tokenA.tokenId);
+      const tokenDecimals = tokensData?.tokenA.decimals || 2;
+      const tokenBalance = tokenFound
+        ? (tokenFound.balance / Math.pow(10, tokenDecimals)).toFixed(tokenDecimals)
+        : '0.00';
+      console.log('tokenBalance', tokenBalance);
+
+      setTokenBalance(tokenBalance);
+    };
+
+    tokensData && getTokenBalance();
+  }, [userTokenList, tokensData]);
 
   return (
     <div className="d-flex justify-content-center">
@@ -66,8 +97,8 @@ const Create = () => {
 
           <div className="col-4">
             <div className="d-flex justify-content-between align-items-center">
-              {createPairData.tokenAId ? (
-                <span className="me-2">{createPairData.tokenAId}</span>
+              {tokensData?.tokenA ? (
+                <span className="me-2">{tokensData?.tokenA.symbol}</span>
               ) : (
                 <span>Select token</span>
               )}
@@ -80,12 +111,12 @@ const Create = () => {
               closeModal={() => setShowModalA(false)}
             >
               <ModalSearchContent
-                tokenFieldId="tokenAId"
+                tokenFieldId="tokenA"
                 setTokensData={setTokensData}
                 closeModal={() => setShowModalA(false)}
               />
             </Modal>
-            <p className="text-steel mt-3 text-end">Wallet balance:</p>
+            <p className="text-steel mt-3 text-end">Wallet balance: {tokenBalance}</p>
           </div>
         </div>
 
@@ -113,8 +144,8 @@ const Create = () => {
 
           <div className="col-4">
             <div className="d-flex justify-content-between align-items-center">
-              {createPairData.tokenBId ? (
-                <span className="me-2">{createPairData.tokenBId}</span>
+              {tokensData?.tokenB ? (
+                <span className="me-2">{tokensData?.tokenB.symbol}</span>
               ) : (
                 <span>Select token</span>
               )}
@@ -127,7 +158,7 @@ const Create = () => {
               closeModal={() => setShowModalB(false)}
             >
               <ModalSearchContent
-                tokenFieldId="tokenBId"
+                tokenFieldId="tokenB"
                 setTokensData={setTokensData}
                 closeModal={() => setShowModalB(false)}
               />
