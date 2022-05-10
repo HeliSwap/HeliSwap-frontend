@@ -8,8 +8,8 @@ interface ITokenInputSelector {
   userTokenList: IUserToken[];
   inputName: string;
   selectName: string;
-  onInputChange?: ({}: IStringToString) => void;
-  onSelectChange?: ({}: IStringToString) => void;
+  onInputChange?: (tokenData: IStringToString) => void;
+  onSelectChange?: (tokenData: IStringToString) => void;
 }
 
 const TokenInputSelector = ({

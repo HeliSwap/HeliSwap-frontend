@@ -9,7 +9,6 @@ import { GET_TOKENS, GET_SWAP_RATE } from '../GraphQL/Queries';
 
 import Button from '../components/Button';
 import Loader from '../components/Loader';
-import Modal from '../components/Modal';
 import TokenInputSelector from '../components/TokenInputSelector';
 
 const Swap = () => {
@@ -32,16 +31,13 @@ const Swap = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const { error, loading, data } = useQuery(GET_TOKENS);
-  const [getSwapRate, { called, loading: loadingRate, data: dataRate }] = useLazyQuery(
-    GET_SWAP_RATE,
-    {
-      variables: {
-        amountIn: swapData.amountIn,
-        tokenIdIn: swapData.tokenIdIn,
-        tokenIdOut: swapData.tokenIdOut,
-      },
+  const [getSwapRate] = useLazyQuery(GET_SWAP_RATE, {
+    variables: {
+      amountIn: swapData.amountIn,
+      tokenIdIn: swapData.tokenIdIn,
+      tokenIdOut: swapData.tokenIdOut,
     },
-  );
+  });
 
   function onInputChange(tokenData: IStringToString) {
     setSwapData(prev => ({ ...prev, ...tokenData }));
