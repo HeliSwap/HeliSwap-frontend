@@ -5,9 +5,10 @@ import { getTokensWalletBalance } from '../utils/tokenUtils';
 interface IWalletBalance {
   userId: string;
   tokenData: ITokenData;
+  setMaxNumber?: (maxNum: string) => void;
 }
 
-const WalletBalance = ({ userId, tokenData }: IWalletBalance) => {
+const WalletBalance = ({ userId, tokenData, setMaxNumber }: IWalletBalance) => {
   const [tokenBalance, setTokenBalance] = useState('0.00');
   const [userTokenList, setUserTokenList] = useState<IUserToken[]>([]);
 
@@ -32,6 +33,7 @@ const WalletBalance = ({ userId, tokenData }: IWalletBalance) => {
       console.log('tokenBalance', tokenBalance);
 
       setTokenBalance(tokenBalance);
+      setMaxNumber && setMaxNumber(tokenBalance);
     };
 
     tokenData && getTokenBalance();

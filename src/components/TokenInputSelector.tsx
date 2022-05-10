@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { ITokenData, IUserToken } from '../interfaces/tokens';
+import React, { useState, useEffect, useContext } from 'react';
+import { ITokenData } from '../interfaces/tokens';
 // TODO Interfaces to be combined into comon export
 import { IStringToString } from '../interfaces/comon';
+import { GlobalContext } from '../providers/Global';
 
 import WalletBalance from '../components/WalletBalance';
 
 interface ITokenInputSelector {
   tokenDataList: ITokenData[];
-  userTokenList: IUserToken[];
   inputName: string;
   selectName: string;
   onInputChange?: (tokenData: IStringToString) => void;
@@ -16,15 +16,18 @@ interface ITokenInputSelector {
 
 const TokenInputSelector = ({
   tokenDataList,
-  userTokenList,
   inputName,
   selectName,
   onInputChange,
   onSelectChange,
 }: ITokenInputSelector) => {
+  const contextValue = useContext(GlobalContext);
+  const { connection } = contextValue;
+  const { userId } = connection;
+
   const [inputValue, setInputValue] = useState('0');
   const [selectValue, setSelectValue] = useState('0');
-  const [tokenBalance, setTokenBalance] = useState('0.00');
+  const [maxNumber, setMaxNumber] = useState('0.00');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
@@ -51,8 +54,8 @@ const TokenInputSelector = ({
     onSelectChange && onSelectChange(tokenData);
   };
 
-  const setMaxNumber = () => {
-    setInputValue(tokenBalance);
+  const handleMaxNumClick = () => {
+    setInputValue(maxNumber);
   };
 
   useEffect(() => {
@@ -60,20 +63,6 @@ const TokenInputSelector = ({
       setSelectValue(tokenDataList[0].tokenId);
     }
   }, [tokenDataList]);
-
-  useEffect(() => {
-    const getTokenBalance = () => {
-      const tokenFound = userTokenList.find(item => item.tokenId === selectValue);
-      const tokenDecimals = tokenDataList.find(item => item.tokenId === selectValue)?.decimals || 2;
-      const tokenBalance = tokenFound
-        ? (tokenFound.balance / Math.pow(10, tokenDecimals)).toFixed(tokenDecimals)
-        : '0.00';
-
-      setTokenBalance(tokenBalance);
-    };
-
-    selectValue && tokenDataList.length > 0 && getTokenBalance();
-  }, [selectValue, userTokenList, tokenDataList]);
 
   const hasTokens = tokenDataList.length > 0;
 
@@ -88,7 +77,7 @@ const TokenInputSelector = ({
             type="text"
             className="form-control mt-2"
           />
-          <span onClick={() => setMaxNumber()} className="link-primary text-link-input">
+          <span onClick={() => handleMaxNumClick()} className="link-primary text-link-input">
             Max
           </span>
         </div>
@@ -112,7 +101,15 @@ const TokenInputSelector = ({
           </select>
         ) : null}
 
-        <p className="text-steel mt-3 text-end">Wallet balance: {tokenBalance}</p>
+        {hasTokens ? (
+          <WalletBalance
+            setMaxNumber={setMaxNumber}
+            userId={userId}
+            tokenData={
+              tokenDataList.find(item => item.tokenId === selectValue) || ({} as ITokenData)
+            }
+          />
+        ) : null}
       </div>
     </div>
   );
