@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { ITokenData, IUserToken } from '../interfaces/tokens';
+import { ITokenData } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
-
-import { getTokensWalletBalance } from '../utils/tokenUtils';
 
 import Button from '../components/Button';
 import Modal from '../components/Modal';
 import ModalSearchContent from '../components/Modals/ModalSearchContent';
+import WalletBalance from '../components/WalletBalance';
 
 interface ITokensData {
   tokenA: ITokenData;
@@ -18,16 +17,13 @@ const Create = () => {
   const { connection } = contextValue;
   const { userId } = connection;
 
-  const [tokenBalance, setTokenBalance] = useState('0.00');
-  const [userTokenList, setUserTokenList] = useState<IUserToken[]>([]);
-
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
 
   const [tokensData, setTokensData] = useState<ITokensData>();
   const [createPairData, setCreatePairData] = useState({
-    tokenAAmount: '',
-    tokenBAmount: '',
+    tokenAAmount: '0',
+    tokenBAmount: '0',
     tokenAId: '',
     tokenBId: '',
   });
@@ -43,32 +39,6 @@ const Create = () => {
 
     // setCreatePairData(prev => ({ ...prev, ...tokensData }));
   }, [tokensData]);
-
-  useEffect(() => {
-    const getUserTokensData = async () => {
-      const { tokens } = await getTokensWalletBalance(userId);
-      setUserTokenList(tokens);
-    };
-
-    if (userId) {
-      getUserTokensData();
-    }
-  }, [userId]);
-
-  useEffect(() => {
-    const getTokenBalance = () => {
-      const tokenFound = userTokenList.find(item => item.tokenId === tokensData?.tokenA.tokenId);
-      const tokenDecimals = tokensData?.tokenA.decimals || 2;
-      const tokenBalance = tokenFound
-        ? (tokenFound.balance / Math.pow(10, tokenDecimals)).toFixed(tokenDecimals)
-        : '0.00';
-      console.log('tokenBalance', tokenBalance);
-
-      setTokenBalance(tokenBalance);
-    };
-
-    tokensData && getTokenBalance();
-  }, [userTokenList, tokensData]);
 
   return (
     <div className="d-flex justify-content-center">
@@ -116,7 +86,9 @@ const Create = () => {
                 closeModal={() => setShowModalA(false)}
               />
             </Modal>
-            <p className="text-steel mt-3 text-end">Wallet balance: {tokenBalance}</p>
+            {tokensData?.tokenA ? (
+              <WalletBalance userId={userId} tokenData={tokensData.tokenA} />
+            ) : null}
           </div>
         </div>
 
@@ -163,7 +135,9 @@ const Create = () => {
                 closeModal={() => setShowModalB(false)}
               />
             </Modal>
-            <p className="text-steel mt-3 text-end">Wallet balance:</p>
+            {tokensData?.tokenB ? (
+              <WalletBalance userId={userId} tokenData={tokensData.tokenB} />
+            ) : null}
           </div>
         </div>
 

@@ -3,6 +3,8 @@ import { ITokenData, IUserToken } from '../interfaces/tokens';
 // TODO Interfaces to be combined into comon export
 import { IStringToString } from '../interfaces/comon';
 
+import WalletBalance from '../components/WalletBalance';
+
 interface ITokenInputSelector {
   tokenDataList: ITokenData[];
   userTokenList: IUserToken[];
