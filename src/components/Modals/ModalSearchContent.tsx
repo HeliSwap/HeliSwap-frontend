@@ -22,8 +22,10 @@ const ModalSearchContent = ({ closeModal, setTokensData, tokenFieldId }: IModalP
   };
 
   const handleSearchButtonClick = async () => {
-    setFindTokenLoading(true);
     setFoundTokenData({} as ITokenData);
+    if (!searchInputValue) return;
+
+    setFindTokenLoading(true);
 
     try {
       const result = await getTokenInfo(searchInputValue);
@@ -46,18 +48,22 @@ const ModalSearchContent = ({ closeModal, setTokensData, tokenFieldId }: IModalP
     closeModal();
   };
 
+  const hasTokenData = Object.keys(foundTokenData).length > 0;
+
   return (
     <>
       <div className="modal-body">
         <div className="p-4">
           <div>
-            <ul>
-              <li>0.0.447200</li>
-              <li>0.0.34247682</li>
-              <li>0.0.34250206</li>
-              <li>0.0.34250234</li>
-              <li>0.0.34250245</li>
-            </ul>
+            <div className="bg-slate p-3 rounded mb-4">
+              <ul>
+                <li>0.0.447200</li>
+                <li>0.0.34247682</li>
+                <li>0.0.34250206</li>
+                <li>0.0.34250234</li>
+                <li>0.0.34250245</li>
+              </ul>
+            </div>
             <label className="mb-2" htmlFor="">
               Token id
             </label>
@@ -68,18 +74,22 @@ const ModalSearchContent = ({ closeModal, setTokensData, tokenFieldId }: IModalP
                 type="text"
                 className="form-control me-3"
               />
-              <Button loading={findTokenLoading} onClick={handleSearchButtonClick}>
+              <Button
+                loadingText={' '}
+                loading={findTokenLoading}
+                onClick={handleSearchButtonClick}
+              >
                 Search
               </Button>
             </div>
           </div>
-          <div className="mt-3">
-            {foundTokenData ? (
+          {hasTokenData ? (
+            <div className="mt-4 bg-slate p-3 rounded">
               <p>
                 {foundTokenData.name} ({foundTokenData.symbol})
               </p>
-            ) : null}
-          </div>
+            </div>
+          ) : null}
         </div>
       </div>
       <div className="modal-footer">
@@ -91,7 +101,12 @@ const ModalSearchContent = ({ closeModal, setTokensData, tokenFieldId }: IModalP
         >
           Close
         </button>
-        <button onClick={handleSaveButton} type="button" className="btn btn-primary">
+        <button
+          disabled={!hasTokenData}
+          onClick={handleSaveButton}
+          type="button"
+          className="btn btn-primary"
+        >
           Save changes
         </button>
       </div>
