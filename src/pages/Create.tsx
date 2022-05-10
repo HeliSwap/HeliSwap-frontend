@@ -21,6 +21,8 @@ const Create = () => {
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
 
+  const [isProvideLoading, setProvideLoading] = useState(false);
+
   const [tokensData, setTokensData] = useState<ITokensData>({
     tokenA: {} as ITokenData,
     tokenB: {} as ITokenData,
@@ -40,9 +42,16 @@ const Create = () => {
     setCreatePairData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleCreateClick = () => {
-    console.log('createPairData', createPairData);
-    sdk.createPair(hashconnectConnectorInstance, userId, createPairData);
+  const handleCreateClick = async () => {
+    setProvideLoading(true);
+    try {
+      const receipt = await sdk.createPair(hashconnectConnectorInstance, userId, createPairData);
+      console.log('receipt', receipt);
+    } catch (err) {
+      console.log('err', err);
+    } finally {
+      setProvideLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -160,7 +169,7 @@ const Create = () => {
         </div>
 
         <div className="mt-5 d-flex justify-content-center">
-          <Button disabled={!readyToProvide} onClick={handleCreateClick}>
+          <Button loading={isProvideLoading} disabled={!readyToProvide} onClick={handleCreateClick}>
             Create
           </Button>
         </div>

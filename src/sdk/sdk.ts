@@ -16,39 +16,42 @@ class SDK {
     const { tokenAId, tokenBId } = createPairData;
     const tokenAAdress = tokenIdToAddress(tokenAId);
     const tokenBAdress = tokenIdToAddress(tokenBId);
+
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId('0.0.34722908')
 
       //Set the gas for the contract call
       .setGas(3000000)
+
       //Set the contract function to call
       .setFunction(
         'createPair',
         new ContractFunctionParameters().addAddress(tokenAAdress).addAddress(tokenBAdress),
       );
 
-    let transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
+    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
       trans,
       userId as string,
     );
 
-    let res = await hashconnectConnectorInstance?.sendTransaction(
+    const response = await hashconnectConnectorInstance?.sendTransaction(
       transactionBytes as Uint8Array,
       userId as string,
       false,
     );
 
-    //handle response
-    let responseData: any = {
-      response: res,
+    const responseData: any = {
+      response,
       receipt: null,
     };
 
-    if (res?.success)
-      responseData.receipt = TransactionReceipt.fromBytes(res.receipt as Uint8Array);
+    if (response?.success) {
+      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
+    }
 
     console.log('responce execute', responseData);
+    return response;
   }
 }
 
