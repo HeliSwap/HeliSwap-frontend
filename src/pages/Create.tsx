@@ -32,6 +32,8 @@ const Create = () => {
     tokenBId: '',
   });
 
+  const [readyToProvide, setReadyToProvide] = useState(false);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
 
@@ -49,6 +51,18 @@ const Create = () => {
 
     setCreatePairData(prev => ({ ...prev, ...newPairData }));
   }, [tokensData]);
+
+  useEffect(() => {
+    let isReady = true;
+
+    Object.values(createPairData).forEach(item => {
+      if (item === '0' || item === '' || typeof item === 'undefined') {
+        isReady = false;
+      }
+    });
+
+    setReadyToProvide(isReady);
+  }, [createPairData]);
 
   return (
     <div className="d-flex justify-content-center">
@@ -146,7 +160,9 @@ const Create = () => {
         </div>
 
         <div className="mt-5 d-flex justify-content-center">
-          <Button onClick={handleCreateClick}>Create</Button>
+          <Button disabled={!readyToProvide} onClick={handleCreateClick}>
+            Create
+          </Button>
         </div>
       </div>
     </div>
