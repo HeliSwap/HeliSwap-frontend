@@ -59,7 +59,7 @@ const Create = () => {
         </div>
 
         <div className="row justify-content-between align-items-end mt-3">
-          <div className="col-8">
+          <div className="col-7">
             <div className="input-container">
               <input
                 value={createPairData.tokenAAmount}
@@ -68,25 +68,22 @@ const Create = () => {
                 type="text"
                 className="form-control mt-2"
               />
-              {/* <span onClick={() => setMaxNumber()} className="link-primary text-link-input">
-                Max
-              </span> */}
             </div>
             <p className="text-success mt-3">$0.00</p>
           </div>
 
-          <div className="col-4">
-            <div className="d-flex justify-content-between align-items-center">
-              {tokensData?.tokenA ? (
+          <div className="col-5">
+            <div className="container-token-selector d-flex justify-content-between align-items-center">
+              {tokensData?.tokenA.symbol ? (
                 <span className="me-2">{tokensData?.tokenA.symbol}</span>
               ) : (
-                <span>Select token</span>
+                <span>N/A</span>
               )}
 
-              <Button onClick={() => setShowModalA(true)}>Find token</Button>
+              <Button onClick={() => setShowModalA(true)}>Select token</Button>
             </div>
             <Modal
-              modalTitle="Find token"
+              modalTitle="Select token"
               show={showModalA}
               closeModal={() => setShowModalA(false)}
             >
@@ -108,7 +105,7 @@ const Create = () => {
         </div>
 
         <div className="row justify-content-between align-items-end mt-3">
-          <div className="col-8">
+          <div className="col-7">
             <div className="input-container">
               <input
                 value={createPairData.tokenBAmount}
@@ -117,25 +114,22 @@ const Create = () => {
                 type="text"
                 className="form-control mt-2"
               />
-              {/* <span onClick={() => setMaxNumber()} className="link-primary text-link-input">
-                Max
-              </span> */}
             </div>
             <p className="text-success mt-3">$0.00</p>
           </div>
 
-          <div className="col-4">
-            <div className="d-flex justify-content-between align-items-center">
-              {tokensData?.tokenB ? (
+          <div className="col-5">
+            <div className="container-token-selector d-flex justify-content-between align-items-center">
+              {tokensData?.tokenB.symbol ? (
                 <span className="me-2">{tokensData?.tokenB.symbol}</span>
               ) : (
-                <span>Select token</span>
+                <span>N/A</span>
               )}
 
-              <Button onClick={() => setShowModalB(true)}>Find token</Button>
+              <Button onClick={() => setShowModalB(true)}>Select token</Button>
             </div>
             <Modal
-              modalTitle="Find token"
+              modalTitle="Select token"
               show={showModalB}
               closeModal={() => setShowModalB(false)}
             >
