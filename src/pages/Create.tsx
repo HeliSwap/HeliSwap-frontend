@@ -6,27 +6,47 @@ import Button from '../components/Button';
 import Modal from '../components/Modal';
 import ModalSearchContent from '../components/Modals/ModalSearchContent';
 import WalletBalance from '../components/WalletBalance';
+import { ICreatePairData } from '../interfaces/comon';
+import { IPairData } from '../interfaces/tokens';
 
 interface ITokensData {
   tokenA: ITokenData;
   tokenB: ITokenData;
 }
+interface ITokensPairData {
+  tokenA: IPairData[];
+  tokenB: IPairData[];
+}
 
 const Create = () => {
   const contextValue = useContext(GlobalContext);
-  const { connection } = contextValue;
-  const { userId } = connection;
+  const { connection, sdk } = contextValue;
+  const { userId, hashconnectConnectorInstance } = connection;
 
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
 
-  const [tokensData, setTokensData] = useState<ITokensData>();
-  const [createPairData, setCreatePairData] = useState({
+  const [isProvideLoading, setProvideLoading] = useState(false);
+
+  const [tokensData, setTokensData] = useState<ITokensData>({
+    tokenA: {} as ITokenData,
+    tokenB: {} as ITokenData,
+  });
+
+  const [pairsData, setPairsData] = useState<ITokensPairData>({
+    tokenA: [],
+    tokenB: [],
+  });
+
+  const [createPairData, setCreatePairData] = useState<ICreatePairData>({
     tokenAAmount: '0',
     tokenBAmount: '0',
     tokenAId: '',
     tokenBId: '',
   });
+
+  const [readyToProvide, setReadyToProvide] = useState(false);
+  const [tokensInSamePool, setTokensInSamePool] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
@@ -34,11 +54,52 @@ const Create = () => {
     setCreatePairData(prev => ({ ...prev, [name]: value }));
   };
 
-  useEffect(() => {
-    console.log('tokensData', tokensData);
+  const handleCreateClick = async () => {
+    setProvideLoading(true);
+    try {
+      const receipt = await sdk.createPair(hashconnectConnectorInstance, userId, createPairData);
+      console.log('receipt', receipt);
+    } catch (err) {
+      console.log('err', err);
+    } finally {
+      setProvideLoading(false);
+    }
+  };
 
-    // setCreatePairData(prev => ({ ...prev, ...tokensData }));
+  useEffect(() => {
+    const { tokenA, tokenB } = tokensData;
+    const newPairData = { tokenAId: tokenA.tokenId, tokenBId: tokenB.tokenId };
+
+    setCreatePairData(prev => ({ ...prev, ...newPairData }));
   }, [tokensData]);
+
+  useEffect(() => {
+    let inSamePool = false;
+    const { tokenA, tokenB } = pairsData;
+
+    // Check for same pool
+    tokenA.forEach(elementA => {
+      tokenB.forEach(elementB => {
+        if (elementA.pairAddress === elementB.pairAddress) {
+          inSamePool = true;
+        }
+      });
+    });
+
+    setTokensInSamePool(inSamePool);
+  }, [pairsData]);
+
+  useEffect(() => {
+    let isReady = true;
+
+    Object.values(createPairData).forEach(item => {
+      if (item === '0' || item === '' || typeof item === 'undefined') {
+        isReady = false;
+      }
+    });
+
+    setReadyToProvide(isReady);
+  }, [createPairData]);
 
   return (
     <div className="d-flex justify-content-center">
@@ -49,7 +110,7 @@ const Create = () => {
         </div>
 
         <div className="row justify-content-between align-items-end mt-3">
-          <div className="col-8">
+          <div className="col-7">
             <div className="input-container">
               <input
                 value={createPairData.tokenAAmount}
@@ -58,31 +119,26 @@ const Create = () => {
                 type="text"
                 className="form-control mt-2"
               />
-              {/* <span onClick={() => setMaxNumber()} className="link-primary text-link-input">
-                Max
-              </span> */}
             </div>
             <p className="text-success mt-3">$0.00</p>
           </div>
 
-          <div className="col-4">
-            <div className="d-flex justify-content-between align-items-center">
-              {tokensData?.tokenA ? (
+          <div className="col-5">
+            <div className="container-token-selector d-flex justify-content-between align-items-center">
+              {tokensData?.tokenA.symbol ? (
                 <span className="me-2">{tokensData?.tokenA.symbol}</span>
               ) : (
-                <span>Select token</span>
+                <span>N/A</span>
               )}
 
-              <Button onClick={() => setShowModalA(true)}>Find token</Button>
+              <Button onClick={() => setShowModalA(true)}>Select token</Button>
             </div>
-            <Modal
-              modalTitle="Find token"
-              show={showModalA}
-              closeModal={() => setShowModalA(false)}
-            >
+            <Modal show={showModalA}>
               <ModalSearchContent
+                modalTitle="Select token"
                 tokenFieldId="tokenA"
                 setTokensData={setTokensData}
+                setPairsData={setPairsData}
                 closeModal={() => setShowModalA(false)}
               />
             </Modal>
@@ -98,7 +154,7 @@ const Create = () => {
         </div>
 
         <div className="row justify-content-between align-items-end mt-3">
-          <div className="col-8">
+          <div className="col-7">
             <div className="input-container">
               <input
                 value={createPairData.tokenBAmount}
@@ -107,31 +163,26 @@ const Create = () => {
                 type="text"
                 className="form-control mt-2"
               />
-              {/* <span onClick={() => setMaxNumber()} className="link-primary text-link-input">
-                Max
-              </span> */}
             </div>
             <p className="text-success mt-3">$0.00</p>
           </div>
 
-          <div className="col-4">
-            <div className="d-flex justify-content-between align-items-center">
-              {tokensData?.tokenB ? (
+          <div className="col-5">
+            <div className="container-token-selector d-flex justify-content-between align-items-center">
+              {tokensData?.tokenB.symbol ? (
                 <span className="me-2">{tokensData?.tokenB.symbol}</span>
               ) : (
-                <span>Select token</span>
+                <span>N/A</span>
               )}
 
-              <Button onClick={() => setShowModalB(true)}>Find token</Button>
+              <Button onClick={() => setShowModalB(true)}>Select token</Button>
             </div>
-            <Modal
-              modalTitle="Find token"
-              show={showModalB}
-              closeModal={() => setShowModalB(false)}
-            >
+            <Modal show={showModalB}>
               <ModalSearchContent
+                modalTitle="Select token"
                 tokenFieldId="tokenB"
                 setTokensData={setTokensData}
+                setPairsData={setPairsData}
                 closeModal={() => setShowModalB(false)}
               />
             </Modal>
@@ -142,7 +193,23 @@ const Create = () => {
         </div>
 
         <div className="mt-5 d-flex justify-content-center">
-          <Button>Create</Button>
+          {tokensInSamePool ? (
+            <Button
+              loading={isProvideLoading}
+              disabled={!readyToProvide}
+              onClick={handleCreateClick}
+            >
+              Provide
+            </Button>
+          ) : (
+            <Button
+              loading={isProvideLoading}
+              disabled={!readyToProvide}
+              onClick={handleCreateClick}
+            >
+              Create
+            </Button>
+          )}
         </div>
       </div>
     </div>

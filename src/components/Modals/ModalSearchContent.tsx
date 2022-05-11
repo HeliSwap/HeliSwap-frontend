@@ -1,19 +1,35 @@
-import React, { useState } from 'react';
-import { getTokenInfo } from '../../utils/tokenUtils';
-import { ITokenData } from '../../interfaces/tokens';
+import React, { useState, useEffect } from 'react';
+import { getTokenInfo, tokenIdToAddress } from '../../utils/tokenUtils';
+import { ITokenData, IPairData } from '../../interfaces/tokens';
+
+import { useLazyQuery } from '@apollo/client';
+import { GET_POOL_BY_TOKEN } from '../../GraphQL/Queries';
 
 import Button from '../../components/Button';
 
 interface IModalProps {
+  modalTitle?: string;
   closeModal: () => void;
   setTokensData: (prev: any) => void;
+  setPairsData: (prev: any) => void;
   tokenFieldId: string;
 }
 
-const ModalSearchContent = ({ closeModal, setTokensData, tokenFieldId }: IModalProps) => {
+const ModalSearchContent = ({
+  closeModal,
+  setTokensData,
+  setPairsData,
+  tokenFieldId,
+  modalTitle,
+}: IModalProps) => {
   const [searchInputValue, setSearchInputValue] = useState('');
   const [findTokenLoading, setFindTokenLoading] = useState(false);
   const [foundTokenData, setFoundTokenData] = useState<ITokenData>({} as ITokenData);
+
+  const [currentToken, setCurrentToken] = useState('');
+  const [getPoolByToken, { data: dataPBT }] = useLazyQuery(GET_POOL_BY_TOKEN, {
+    variables: { token: currentToken },
+  });
 
   const onSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -22,8 +38,11 @@ const ModalSearchContent = ({ closeModal, setTokensData, tokenFieldId }: IModalP
   };
 
   const handleSearchButtonClick = async () => {
-    setFindTokenLoading(true);
     setFoundTokenData({} as ITokenData);
+    if (!searchInputValue) return;
+
+    setFindTokenLoading(true);
+    getPoolByToken();
 
     try {
       const result = await getTokenInfo(searchInputValue);
@@ -39,18 +58,62 @@ const ModalSearchContent = ({ closeModal, setTokensData, tokenFieldId }: IModalP
     }
   };
 
-  const handleSaveButton = () => {
-    setTokensData((prev: any) => ({ ...prev, [tokenFieldId]: foundTokenData }));
+  const resetModalState = () => {
     setSearchInputValue('');
     setFoundTokenData({} as ITokenData);
+    setCurrentToken('');
+  };
+
+  const handleSaveButton = () => {
+    setTokensData((prev: any) => ({ ...prev, [tokenFieldId]: foundTokenData }));
+    setPairsData((prev: any) => ({ ...prev, [tokenFieldId]: dataPBT.poolsByToken }));
+
+    resetModalState();
     closeModal();
   };
 
+  const handleCloseClick = () => {
+    resetModalState();
+    closeModal();
+  };
+
+  useEffect(() => {
+    Object.keys(foundTokenData).length > 0 &&
+      setCurrentToken(tokenIdToAddress(foundTokenData.tokenId));
+  }, [foundTokenData]);
+
+  const hasTokenData = Object.keys(foundTokenData).length > 0;
+  const hasPools = dataPBT && dataPBT.poolsByToken.length > 0;
+
   return (
     <>
+      <div className="modal-header">
+        {modalTitle ? (
+          <h5 className="modal-title" id="exampleModalLabel">
+            {modalTitle}
+          </h5>
+        ) : null}
+
+        <button
+          onClick={handleCloseClick}
+          type="button"
+          className="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
       <div className="modal-body">
         <div className="p-4">
           <div>
+            <div className="bg-slate p-3 rounded mb-4">
+              <ul>
+                <li>0.0.447200</li>
+                <li>0.0.34247682</li>
+                <li>0.0.34250206</li>
+                <li>0.0.34250234</li>
+                <li>0.0.34250245</li>
+              </ul>
+            </div>
             <label className="mb-2" htmlFor="">
               Token id
             </label>
@@ -61,30 +124,55 @@ const ModalSearchContent = ({ closeModal, setTokensData, tokenFieldId }: IModalP
                 type="text"
                 className="form-control me-3"
               />
-              <Button loading={findTokenLoading} onClick={handleSearchButtonClick}>
+              <Button
+                loadingText={' '}
+                loading={findTokenLoading}
+                onClick={handleSearchButtonClick}
+              >
                 Search
               </Button>
             </div>
           </div>
-          <div className="mt-3">
-            {foundTokenData ? (
-              <p>
-                {foundTokenData.name} ({foundTokenData.symbol})
-              </p>
-            ) : null}
-          </div>
+          {hasTokenData ? (
+            <>
+              <p className="mt-4">Token data:</p>
+              <div className="mt-2 bg-slate p-3 rounded">
+                <p>
+                  {foundTokenData.name} ({foundTokenData.symbol})
+                </p>
+              </div>
+            </>
+          ) : null}
+
+          {hasPools ? (
+            <>
+              <p className="mt-4">Token in pools:</p>
+              <div className="mt-2 bg-slate p-3 rounded">
+                {dataPBT.poolsByToken.map((pool: IPairData, index: number) => (
+                  <p key={index}>
+                    {pool.pairName} ({pool.pairSymbol})
+                  </p>
+                ))}
+              </div>
+            </>
+          ) : null}
         </div>
       </div>
       <div className="modal-footer">
         <button
-          onClick={closeModal}
+          onClick={handleCloseClick}
           type="button"
           className="btn btn-secondary"
           data-bs-dismiss="modal"
         >
           Close
         </button>
-        <button onClick={handleSaveButton} type="button" className="btn btn-primary">
+        <button
+          disabled={!hasTokenData}
+          onClick={handleSaveButton}
+          type="button"
+          className="btn btn-primary"
+        >
           Save changes
         </button>
       </div>

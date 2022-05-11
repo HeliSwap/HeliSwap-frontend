@@ -3,14 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_POOLS, GET_POOL_BY_TOKEN } from '../GraphQL/Queries';
 import { formatStringToPrice } from '../utils/numberUtils';
-
-interface IPairData {
-  name: string;
-  tvl: string;
-  volume24h: string;
-  volume7d: string;
-  icons: string[];
-}
+import { IPairData } from '../interfaces/tokens';
 
 const Pairs = () => {
   const token = '';
@@ -57,7 +50,7 @@ const Pairs = () => {
                 <div>{index + 1}</div>
                 <div className="d-flex align-items-center">
                   {formatIcons(item.icons)}
-                  <span className="ms-3">{item.name}</span>
+                  <span className="ms-3">{item.pairSymbol}</span>
                 </div>
                 <div className="text-end">{formatStringToPrice(item.tvl)}</div>
                 <div className="text-end">{formatStringToPrice(item.volume24h)}</div>
