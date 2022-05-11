@@ -77,6 +77,10 @@ const ModalSearchContent = ({
     closeModal();
   };
 
+  const copyAddress = (address: string) => {
+    setSearchInputValue(address);
+  };
+
   useEffect(() => {
     Object.keys(foundTokenData).length > 0 &&
       setCurrentToken(tokenIdToAddress(foundTokenData.tokenId));
@@ -107,11 +111,30 @@ const ModalSearchContent = ({
           <div>
             <div className="bg-slate p-3 rounded mb-4">
               <ul>
-                <li>0.0.447200</li>
-                <li>0.0.34247682</li>
-                <li>0.0.34250206</li>
-                <li>0.0.34250234</li>
-                <li>0.0.34250245</li>
+                <li>
+                  0.0.447200 - HEX{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.447200')}>
+                    📝
+                  </span>
+                </li>
+                <li>
+                  0.0.34741585 - USDT{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34741585')}>
+                    📝
+                  </span>
+                </li>
+                <li>
+                  0.0.34741650 - WETH{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34741650')}>
+                    📝
+                  </span>
+                </li>
+                <li>
+                  0.0.34741685 - WBTC{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34741685')}>
+                    📝
+                  </span>
+                </li>
               </ul>
             </div>
             <label className="mb-2" htmlFor="">
