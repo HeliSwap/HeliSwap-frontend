@@ -4,7 +4,7 @@ import { ITokenData, ISwapTokenData, IPairData } from '../interfaces/tokens';
 import { IStringToString } from '../interfaces/comon';
 
 import { useQuery, useLazyQuery } from '@apollo/client';
-import { GET_SWAP_RATE, GET_POOLS } from '../GraphQL/Queries';
+import { GET_SWAP_RATE, GET_TOKENS } from '../GraphQL/Queries';
 
 import Button from '../components/Button';
 import Loader from '../components/Loader';
@@ -23,7 +23,7 @@ const Swap = () => {
 
   const [swapData, setSwapData] = useState(initialSwapData);
 
-  const { error, loading, data } = useQuery(GET_POOLS);
+  const { error, loading, data } = useQuery(GET_TOKENS);
   const [getSwapRate] = useLazyQuery(GET_SWAP_RATE, {
     variables: {
       amountIn: swapData.amountIn,
