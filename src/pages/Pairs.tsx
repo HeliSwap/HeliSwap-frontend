@@ -7,6 +7,17 @@ import { formatStringToPrice } from '../utils/numberUtils';
 interface IPairData {
   pairName: string;
   pairAddress: string;
+  pairSymbol: string;
+  token0: string;
+  token0Name: string;
+  token0Amount: number;
+  token0Symbol: string;
+  token0Decimals: number;
+  token1: string;
+  token1Name: string;
+  token1Amount: number;
+  token1Symbol: string;
+  token1Decimals: number;
   tvl: string;
   volume24h: string;
   volume7d: string;
@@ -60,7 +71,7 @@ const Pairs = () => {
                 <div>{index + 1}</div>
                 <div className="d-flex align-items-center">
                   {formatIcons(item.icons)}
-                  <span className="ms-3">{item.pairName}</span>
+                  <span className="ms-3">{item.pairSymbol}</span>
                 </div>
                 <div className="text-end">{formatStringToPrice(item.tvl)}</div>
                 <div className="text-end">{formatStringToPrice(item.volume24h)}</div>
