@@ -46,6 +46,7 @@ const Create = () => {
   });
 
   const [readyToProvide, setReadyToProvide] = useState(false);
+  const [tokensInSamePool, setTokensInSamePool] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
@@ -71,6 +72,22 @@ const Create = () => {
 
     setCreatePairData(prev => ({ ...prev, ...newPairData }));
   }, [tokensData]);
+
+  useEffect(() => {
+    let inSamePool = false;
+    const { tokenA, tokenB } = pairsData;
+
+    // Check for same pool
+    tokenA.forEach(elementA => {
+      tokenB.forEach(elementB => {
+        if (elementA.pairAddress === elementB.pairAddress) {
+          inSamePool = true;
+        }
+      });
+    });
+
+    setTokensInSamePool(inSamePool);
+  }, [pairsData]);
 
   useEffect(() => {
     let isReady = true;
@@ -182,9 +199,23 @@ const Create = () => {
         </div>
 
         <div className="mt-5 d-flex justify-content-center">
-          <Button loading={isProvideLoading} disabled={!readyToProvide} onClick={handleCreateClick}>
-            Create
-          </Button>
+          {tokensInSamePool ? (
+            <Button
+              loading={isProvideLoading}
+              disabled={!readyToProvide}
+              onClick={handleCreateClick}
+            >
+              Provide
+            </Button>
+          ) : (
+            <Button
+              loading={isProvideLoading}
+              disabled={!readyToProvide}
+              onClick={handleCreateClick}
+            >
+              Create
+            </Button>
+          )}
         </div>
       </div>
     </div>
