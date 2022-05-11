@@ -3,26 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_POOLS, GET_POOL_BY_TOKEN } from '../GraphQL/Queries';
 import { formatStringToPrice } from '../utils/numberUtils';
-
-interface IPairData {
-  pairName: string;
-  pairAddress: string;
-  pairSymbol: string;
-  token0: string;
-  token0Name: string;
-  token0Amount: number;
-  token0Symbol: string;
-  token0Decimals: number;
-  token1: string;
-  token1Name: string;
-  token1Amount: number;
-  token1Symbol: string;
-  token1Decimals: number;
-  tvl: string;
-  volume24h: string;
-  volume7d: string;
-  icons: string[];
-}
+import { IPairData } from '../interfaces/tokens';
 
 const Pairs = () => {
   const token = '';

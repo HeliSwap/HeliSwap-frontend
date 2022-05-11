@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
-import { getTokenInfo } from '../../utils/tokenUtils';
-import { ITokenData } from '../../interfaces/tokens';
+import React, { useState, useEffect } from 'react';
+import { getTokenInfo, tokenIdToAddress } from '../../utils/tokenUtils';
+import { ITokenData, IPairData } from '../../interfaces/tokens';
+
+import { useLazyQuery } from '@apollo/client';
+import { GET_POOL_BY_TOKEN } from '../../GraphQL/Queries';
 
 import Button from '../../components/Button';
 
@@ -15,6 +18,11 @@ const ModalSearchContent = ({ closeModal, setTokensData, tokenFieldId }: IModalP
   const [findTokenLoading, setFindTokenLoading] = useState(false);
   const [foundTokenData, setFoundTokenData] = useState<ITokenData>({} as ITokenData);
 
+  const [currentToken, setCurrentToken] = useState('');
+  const [getPoolByToken, { data: dataPBT }] = useLazyQuery(GET_POOL_BY_TOKEN, {
+    variables: { token: currentToken },
+  });
+
   const onSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
@@ -26,6 +34,7 @@ const ModalSearchContent = ({ closeModal, setTokensData, tokenFieldId }: IModalP
     if (!searchInputValue) return;
 
     setFindTokenLoading(true);
+    getPoolByToken();
 
     try {
       const result = await getTokenInfo(searchInputValue);
@@ -48,7 +57,19 @@ const ModalSearchContent = ({ closeModal, setTokensData, tokenFieldId }: IModalP
     closeModal();
   };
 
+  useEffect(() => {
+    Object.keys(foundTokenData).length > 0 &&
+      setCurrentToken(tokenIdToAddress(foundTokenData.tokenId));
+  }, [foundTokenData]);
+
+  useEffect(() => {
+    if (dataPBT) {
+      console.log(dataPBT.poolsByToken);
+    }
+  }, [dataPBT]);
+
   const hasTokenData = Object.keys(foundTokenData).length > 0;
+  const hasPools = dataPBT && dataPBT.poolsByToken.length > 0;
 
   return (
     <>
@@ -84,11 +105,27 @@ const ModalSearchContent = ({ closeModal, setTokensData, tokenFieldId }: IModalP
             </div>
           </div>
           {hasTokenData ? (
-            <div className="mt-4 bg-slate p-3 rounded">
-              <p>
-                {foundTokenData.name} ({foundTokenData.symbol})
-              </p>
-            </div>
+            <>
+              <p className="mt-4">Token data:</p>
+              <div className="mt-2 bg-slate p-3 rounded">
+                <p>
+                  {foundTokenData.name} ({foundTokenData.symbol})
+                </p>
+              </div>
+            </>
+          ) : null}
+
+          {hasPools ? (
+            <>
+              <p className="mt-4">Tokens in pools:</p>
+              <div className="mt-2 bg-slate p-3 rounded">
+                {dataPBT.poolsByToken.map((pool: IPairData) => (
+                  <p>
+                    {pool.pairName} ({pool.pairSymbol})
+                  </p>
+                ))}
+              </div>
+            </>
           ) : null}
         </div>
       </div>

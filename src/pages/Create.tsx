@@ -27,6 +27,7 @@ const Create = () => {
     tokenA: {} as ITokenData,
     tokenB: {} as ITokenData,
   });
+
   const [createPairData, setCreatePairData] = useState<ICreatePairData>({
     tokenAAmount: '0',
     tokenBAmount: '0',
