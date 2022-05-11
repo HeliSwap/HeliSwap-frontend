@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { getTokenInfo } from '../utils/tokenUtils';
-import { ITokenData, ISwapTokenData } from '../interfaces/tokens';
+import { getTokenInfo, tokenAddressToId } from '../utils/tokenUtils';
+import { ITokenData, ISwapTokenData, IPairData } from '../interfaces/tokens';
 import { IStringToString } from '../interfaces/comon';
 
 import { useQuery, useLazyQuery } from '@apollo/client';
-import { GET_TOKENS, GET_SWAP_RATE } from '../GraphQL/Queries';
+import { GET_SWAP_RATE, GET_POOLS } from '../GraphQL/Queries';
 
 import Button from '../components/Button';
 import Loader from '../components/Loader';
@@ -23,7 +23,7 @@ const Swap = () => {
 
   const [swapData, setSwapData] = useState(initialSwapData);
 
-  const { error, loading, data } = useQuery(GET_TOKENS);
+  const { error, loading, data } = useQuery(GET_POOLS);
   const [getSwapRate] = useLazyQuery(GET_SWAP_RATE, {
     variables: {
       amountIn: swapData.amountIn,
@@ -42,8 +42,18 @@ const Swap = () => {
 
   useEffect(() => {
     if (data) {
-      const tokenIds = data.getTokensIds.map((item: { id: string }) => item.id);
-      setTokenList(tokenIds);
+      const { pools } = data;
+      const tokens = pools.reduce((acc: any, item: IPairData) => {
+        const item0Id = tokenAddressToId(item.token0);
+        const item1Id = tokenAddressToId(item.token1);
+
+        if (!acc.includes(item0Id)) acc.push(item0Id);
+        if (!acc.includes(item1Id)) acc.push(item1Id);
+
+        return acc;
+      }, []);
+
+      setTokenList(tokens);
     }
   }, [data]);
 
