@@ -101,6 +101,8 @@ const Create = () => {
     setReadyToProvide(isReady);
   }, [createPairData]);
 
+  console.log('tokensData', tokensData);
+
   return (
     <div className="d-flex justify-content-center">
       <div className="container-swap">
@@ -191,6 +193,42 @@ const Create = () => {
             ) : null}
           </div>
         </div>
+
+        {readyToProvide ? (
+          <div className="bg-slate rounded p-4 my-4">
+            {tokensInSamePool ? (
+              <div>
+                <p>Prices and pool share</p>
+              </div>
+            ) : (
+              <div>
+                <p>Initial prices</p>
+                <div className="mt-3 d-flex justify-content-around">
+                  <div className="text-center">
+                    <p>
+                      <span className="text-title">
+                        {Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount)}
+                      </span>
+                    </p>
+                    <p>
+                      {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p>
+                      <span className="text-title">
+                        {Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount)}
+                      </span>
+                    </p>
+                    <p>
+                      {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : null}
 
         <div className="mt-5 d-flex justify-content-center">
           {tokensInSamePool ? (
