@@ -61,6 +61,7 @@ const ModalSearchContent = ({
     setPairsData((prev: any) => ({ ...prev, [tokenFieldId]: dataPBT.poolsByToken }));
     setSearchInputValue('');
     setFoundTokenData({} as ITokenData);
+    setCurrentToken('');
     closeModal();
   };
 
