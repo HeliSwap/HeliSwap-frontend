@@ -133,12 +133,9 @@ const Create = () => {
 
               <Button onClick={() => setShowModalA(true)}>Select token</Button>
             </div>
-            <Modal
-              modalTitle="Select token"
-              show={showModalA}
-              closeModal={() => setShowModalA(false)}
-            >
+            <Modal show={showModalA}>
               <ModalSearchContent
+                modalTitle="Select token"
                 tokenFieldId="tokenA"
                 setTokensData={setTokensData}
                 setPairsData={setPairsData}
@@ -180,12 +177,9 @@ const Create = () => {
 
               <Button onClick={() => setShowModalB(true)}>Select token</Button>
             </div>
-            <Modal
-              modalTitle="Select token"
-              show={showModalB}
-              closeModal={() => setShowModalB(false)}
-            >
+            <Modal show={showModalB}>
               <ModalSearchContent
+                modalTitle="Select token"
                 tokenFieldId="tokenB"
                 setTokensData={setTokensData}
                 setPairsData={setPairsData}

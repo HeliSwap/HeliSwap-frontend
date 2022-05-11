@@ -8,6 +8,7 @@ import { GET_POOL_BY_TOKEN } from '../../GraphQL/Queries';
 import Button from '../../components/Button';
 
 interface IModalProps {
+  modalTitle?: string;
   closeModal: () => void;
   setTokensData: (prev: any) => void;
   setPairsData: (prev: any) => void;
@@ -19,6 +20,7 @@ const ModalSearchContent = ({
   setTokensData,
   setPairsData,
   tokenFieldId,
+  modalTitle,
 }: IModalProps) => {
   const [searchInputValue, setSearchInputValue] = useState('');
   const [findTokenLoading, setFindTokenLoading] = useState(false);
@@ -56,12 +58,22 @@ const ModalSearchContent = ({
     }
   };
 
-  const handleSaveButton = () => {
-    setTokensData((prev: any) => ({ ...prev, [tokenFieldId]: foundTokenData }));
-    setPairsData((prev: any) => ({ ...prev, [tokenFieldId]: dataPBT.poolsByToken }));
+  const resetModalState = () => {
     setSearchInputValue('');
     setFoundTokenData({} as ITokenData);
     setCurrentToken('');
+  };
+
+  const handleSaveButton = () => {
+    setTokensData((prev: any) => ({ ...prev, [tokenFieldId]: foundTokenData }));
+    setPairsData((prev: any) => ({ ...prev, [tokenFieldId]: dataPBT.poolsByToken }));
+
+    resetModalState();
+    closeModal();
+  };
+
+  const handleCloseClick = () => {
+    resetModalState();
     closeModal();
   };
 
@@ -75,6 +87,21 @@ const ModalSearchContent = ({
 
   return (
     <>
+      <div className="modal-header">
+        {modalTitle ? (
+          <h5 className="modal-title" id="exampleModalLabel">
+            {modalTitle}
+          </h5>
+        ) : null}
+
+        <button
+          onClick={handleCloseClick}
+          type="button"
+          className="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
       <div className="modal-body">
         <div className="p-4">
           <div>
@@ -133,7 +160,7 @@ const ModalSearchContent = ({
       </div>
       <div className="modal-footer">
         <button
-          onClick={closeModal}
+          onClick={handleCloseClick}
           type="button"
           className="btn btn-secondary"
           data-bs-dismiss="modal"
