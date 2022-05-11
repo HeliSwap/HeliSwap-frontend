@@ -19,7 +19,7 @@ class SDK {
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
-      .setContractId('0.0.34722908')
+      .setContractId('0.0.34735045')
 
       //Set the gas for the contract call
       .setGas(3000000)

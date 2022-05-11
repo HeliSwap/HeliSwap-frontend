@@ -5,7 +5,8 @@ import { GET_POOLS, GET_POOL_BY_TOKEN } from '../GraphQL/Queries';
 import { formatStringToPrice } from '../utils/numberUtils';
 
 interface IPairData {
-  name: string;
+  pairName: string;
+  pairAddress: string;
   tvl: string;
   volume24h: string;
   volume7d: string;
@@ -33,6 +34,8 @@ const Pairs = () => {
 
   const havePairs = pairData.length > 0;
 
+  console.log('data', data);
+
   return (
     <div className="d-flex justify-content-center">
       <div className="container-pairs">
@@ -57,7 +60,7 @@ const Pairs = () => {
                 <div>{index + 1}</div>
                 <div className="d-flex align-items-center">
                   {formatIcons(item.icons)}
-                  <span className="ms-3">{item.name}</span>
+                  <span className="ms-3">{item.pairName}</span>
                 </div>
                 <div className="text-end">{formatStringToPrice(item.tvl)}</div>
                 <div className="text-end">{formatStringToPrice(item.volume24h)}</div>
