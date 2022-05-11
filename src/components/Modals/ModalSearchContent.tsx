@@ -117,10 +117,10 @@ const ModalSearchContent = ({ closeModal, setTokensData, tokenFieldId }: IModalP
 
           {hasPools ? (
             <>
-              <p className="mt-4">Tokens in pools:</p>
+              <p className="mt-4">Token in pools:</p>
               <div className="mt-2 bg-slate p-3 rounded">
-                {dataPBT.poolsByToken.map((pool: IPairData) => (
-                  <p>
+                {dataPBT.poolsByToken.map((pool: IPairData, index: number) => (
+                  <p key={index}>
                     {pool.pairName} ({pool.pairSymbol})
                   </p>
                 ))}
