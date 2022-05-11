@@ -101,8 +101,6 @@ const Create = () => {
     setReadyToProvide(isReady);
   }, [createPairData]);
 
-  console.log('tokensData', tokensData);
-
   return (
     <div className="d-flex justify-content-center">
       <div className="container-swap">
@@ -203,7 +201,7 @@ const Create = () => {
             ) : (
               <div>
                 <p>Initial prices</p>
-                <div className="mt-3 d-flex justify-content-around">
+                <div className="mt-3 d-flex justify-content-around rounded border border-success p-2">
                   <div className="text-center">
                     <p>
                       <span className="text-title">
