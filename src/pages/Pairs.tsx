@@ -26,8 +26,6 @@ const Pairs = () => {
 
   const havePairs = pairData.length > 0;
 
-  console.log('data', data);
-
   return (
     <div className="d-flex justify-content-center">
       <div className="container-pairs">

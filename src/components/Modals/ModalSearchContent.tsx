@@ -10,10 +10,16 @@ import Button from '../../components/Button';
 interface IModalProps {
   closeModal: () => void;
   setTokensData: (prev: any) => void;
+  setPairsData: (prev: any) => void;
   tokenFieldId: string;
 }
 
-const ModalSearchContent = ({ closeModal, setTokensData, tokenFieldId }: IModalProps) => {
+const ModalSearchContent = ({
+  closeModal,
+  setTokensData,
+  setPairsData,
+  tokenFieldId,
+}: IModalProps) => {
   const [searchInputValue, setSearchInputValue] = useState('');
   const [findTokenLoading, setFindTokenLoading] = useState(false);
   const [foundTokenData, setFoundTokenData] = useState<ITokenData>({} as ITokenData);
@@ -52,6 +58,7 @@ const ModalSearchContent = ({ closeModal, setTokensData, tokenFieldId }: IModalP
 
   const handleSaveButton = () => {
     setTokensData((prev: any) => ({ ...prev, [tokenFieldId]: foundTokenData }));
+    setPairsData((prev: any) => ({ ...prev, [tokenFieldId]: dataPBT.poolsByToken }));
     setSearchInputValue('');
     setFoundTokenData({} as ITokenData);
     closeModal();
@@ -61,12 +68,6 @@ const ModalSearchContent = ({ closeModal, setTokensData, tokenFieldId }: IModalP
     Object.keys(foundTokenData).length > 0 &&
       setCurrentToken(tokenIdToAddress(foundTokenData.tokenId));
   }, [foundTokenData]);
-
-  useEffect(() => {
-    if (dataPBT) {
-      console.log(dataPBT.poolsByToken);
-    }
-  }, [dataPBT]);
 
   const hasTokenData = Object.keys(foundTokenData).length > 0;
   const hasPools = dataPBT && dataPBT.poolsByToken.length > 0;

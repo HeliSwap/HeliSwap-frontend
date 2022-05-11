@@ -7,10 +7,15 @@ import Modal from '../components/Modal';
 import ModalSearchContent from '../components/Modals/ModalSearchContent';
 import WalletBalance from '../components/WalletBalance';
 import { ICreatePairData } from '../interfaces/comon';
+import { IPairData } from '../interfaces/tokens';
 
 interface ITokensData {
   tokenA: ITokenData;
   tokenB: ITokenData;
+}
+interface ITokensPairData {
+  tokenA: IPairData[];
+  tokenB: IPairData[];
 }
 
 const Create = () => {
@@ -26,6 +31,11 @@ const Create = () => {
   const [tokensData, setTokensData] = useState<ITokensData>({
     tokenA: {} as ITokenData,
     tokenB: {} as ITokenData,
+  });
+
+  const [pairsData, setPairsData] = useState<ITokensPairData>({
+    tokenA: [],
+    tokenB: [],
   });
 
   const [createPairData, setCreatePairData] = useState<ICreatePairData>({
@@ -114,6 +124,7 @@ const Create = () => {
               <ModalSearchContent
                 tokenFieldId="tokenA"
                 setTokensData={setTokensData}
+                setPairsData={setPairsData}
                 closeModal={() => setShowModalA(false)}
               />
             </Modal>
@@ -160,6 +171,7 @@ const Create = () => {
               <ModalSearchContent
                 tokenFieldId="tokenB"
                 setTokensData={setTokensData}
+                setPairsData={setPairsData}
                 closeModal={() => setShowModalB(false)}
               />
             </Modal>
