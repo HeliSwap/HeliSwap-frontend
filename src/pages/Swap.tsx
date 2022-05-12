@@ -20,6 +20,7 @@ const Swap = () => {
 
   const [tokenList, setTokenList] = useState<string[]>([]);
   const [tokenDataList, setTokenDataList] = useState<ITokenData[]>([]);
+  const [tokenApproved, setTokenApproved] = useState(false);
 
   const [swapData, setSwapData] = useState(initialSwapData);
 
@@ -38,6 +39,10 @@ const Swap = () => {
 
   function onSelectChange(tokenData: IStringToString) {
     setSwapData(prev => ({ ...prev, ...tokenData }));
+  }
+
+  function handleApproveClick() {
+    setTokenApproved(true);
   }
 
   useEffect(() => {
@@ -106,7 +111,13 @@ const Swap = () => {
         />
 
         <div className="mt-5 d-flex justify-content-center">
-          {loading ? <Loader /> : <Button onClick={() => getSwapRate()}>Swap</Button>}
+          {loading ? (
+            <Loader />
+          ) : tokenApproved ? (
+            <Button onClick={() => getSwapRate()}>Swap</Button>
+          ) : (
+            <Button onClick={() => handleApproveClick()}>Approve</Button>
+          )}
         </div>
       </div>
     </div>
