@@ -47,6 +47,11 @@ const Create = () => {
     tokenBId: '',
   });
 
+  const [approved, setApproved] = useState({
+    tokenA: false,
+    tokenB: false,
+  });
+
   const [readyToProvide, setReadyToProvide] = useState(false);
   const [tokensInSamePool, setTokensInSamePool] = useState(false);
 
@@ -57,6 +62,10 @@ const Create = () => {
     const { value, name } = e.target;
 
     setCreatePairData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleApproveClick = (key: string) => {
+    setApproved(prev => ({ ...prev, [key]: true }));
   };
 
   const handleCreateClick = async () => {
@@ -253,23 +262,39 @@ const Create = () => {
         ) : null}
 
         <div className="mt-5 d-flex justify-content-center">
-          {tokensInSamePool ? (
+          {tokensData.tokenA.symbol && !approved.tokenA ? (
             <Button
-              loading={isProvideLoading}
-              disabled={!readyToProvide}
-              onClick={handleCreateClick}
-            >
-              Provide
-            </Button>
-          ) : (
+              onClick={() => handleApproveClick('tokenA')}
+              className="mx-2"
+            >{`Approve ${tokensData.tokenA.symbol}`}</Button>
+          ) : null}
+
+          {tokensData.tokenB.symbol && !approved.tokenB ? (
             <Button
-              loading={isProvideLoading}
-              disabled={!readyToProvide}
-              onClick={handleCreateClick}
-            >
-              Create
-            </Button>
-          )}
+              onClick={() => handleApproveClick('tokenB')}
+              className="mx-2"
+            >{`Approve ${tokensData.tokenB.symbol}`}</Button>
+          ) : null}
+
+          {approved.tokenA && approved.tokenB ? (
+            tokensInSamePool ? (
+              <Button
+                loading={isProvideLoading}
+                disabled={!readyToProvide}
+                onClick={handleCreateClick}
+              >
+                Provide
+              </Button>
+            ) : (
+              <Button
+                loading={isProvideLoading}
+                disabled={!readyToProvide}
+                onClick={handleCreateClick}
+              >
+                Create
+              </Button>
+            )
+          ) : null}
         </div>
       </div>
     </div>
