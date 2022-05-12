@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { getTokenInfo, addressToId } from '../utils/tokenUtils';
 import { ITokenData, ISwapTokenData, IPairData } from '../interfaces/tokens';
 import { IStringToString } from '../interfaces/comon';
+import { GlobalContext } from '../providers/Global';
+
+import errorMessages from '../content/errors';
 
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { GET_SWAP_RATE, GET_TOKENS } from '../GraphQL/Queries';
@@ -11,6 +14,13 @@ import Loader from '../components/Loader';
 import TokenInputSelector from '../components/TokenInputSelector';
 
 const Swap = () => {
+  const contextValue = useContext(GlobalContext);
+  const { connection, sdk } = contextValue;
+  const { userId, hashconnectConnectorInstance } = connection;
+
+  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
   const initialSwapData: ISwapTokenData = {
     tokenIdIn: '',
     tokenIdOut: '',
@@ -24,7 +34,7 @@ const Swap = () => {
 
   const [swapData, setSwapData] = useState(initialSwapData);
 
-  const { error, loading, data } = useQuery(GET_TOKENS);
+  const { error: errorGT, loading, data } = useQuery(GET_TOKENS);
   const [getSwapRate] = useLazyQuery(GET_SWAP_RATE, {
     variables: {
       amountIn: swapData.amountIn,
@@ -43,6 +53,35 @@ const Swap = () => {
 
   function handleApproveClick() {
     setTokenApproved(true);
+  }
+
+  async function handleSwapClick() {
+    const { tokenIdIn, tokenIdOut, amountIn, amountOut } = swapData;
+
+    try {
+      const receipt = await sdk.swapTokens(
+        hashconnectConnectorInstance,
+        userId,
+        tokenIdIn,
+        tokenIdOut,
+        amountIn,
+        amountOut,
+      );
+
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (!success) {
+        setError(true);
+        setErrorMessage(error);
+      } else {
+      }
+    } catch (err) {
+      console.error(`[Error on swap]: ${err}`);
+      setError(true);
+    } finally {
+    }
   }
 
   useEffect(() => {
@@ -78,9 +117,16 @@ const Swap = () => {
   return (
     <div className="d-flex justify-content-center">
       <div className="container-swap">
-        {error ? (
+        {errorGT ? (
           <div className="alert alert-danger mb-5" role="alert">
             <strong>Something went wrong!</strong> Cannot get pairs...
+          </div>
+        ) : null}
+
+        {error ? (
+          <div className="alert alert-danger my-5" role="alert">
+            <strong>Something went wrong!</strong>
+            <p>{errorMessages[errorMessage]}</p>
           </div>
         ) : null}
 
@@ -114,7 +160,7 @@ const Swap = () => {
           {loading ? (
             <Loader />
           ) : tokenApproved ? (
-            <Button onClick={() => getSwapRate()}>Swap</Button>
+            <Button onClick={() => handleSwapClick()}>Swap</Button>
           ) : (
             <Button onClick={() => handleApproveClick()}>Approve</Button>
           )}
