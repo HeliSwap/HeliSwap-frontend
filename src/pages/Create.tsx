@@ -14,6 +14,7 @@ import errorMessages from '../content/errors';
 interface ITokensData {
   tokenA: ITokenData;
   tokenB: ITokenData;
+  [key: string]: ITokenData;
 }
 interface ITokensPairData {
   tokenA: IPairData[];
@@ -64,8 +65,28 @@ const Create = () => {
     setCreatePairData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleApproveClick = (key: string) => {
-    setApproved(prev => ({ ...prev, [key]: true }));
+  const handleApproveClick = async (key: string) => {
+    const { tokenId } = tokensData[key];
+
+    try {
+      const receipt = await sdk.approveToken(hashconnectConnectorInstance, userId, tokenId);
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (!success) {
+        setError(true);
+        setErrorMessage(error);
+      } else {
+        setApproved(prev => ({ ...prev, [key]: true }));
+      }
+    } catch (err) {
+      console.error(err);
+      setError(true);
+      setErrorMessage('Error on create');
+    } finally {
+      setProvideLoading(false);
+    }
   };
 
   const handleCreateClick = async () => {
