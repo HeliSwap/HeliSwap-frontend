@@ -10,9 +10,11 @@ export const GET_POOLS = gql`
       token0
       token0Name
       token0Amount
+      token0Symbol
       token0Decimals
       token1
       token1Name
+      token1Symbol
       token1Amount
       token1Decimals
     }
@@ -40,9 +42,21 @@ export const GET_POOL_BY_TOKEN = gql`
 
 export const GET_TOKENS = gql`
   query {
-    getTokensIds {
+    pools {
       id
-      icon
+      pairName
+      pairSymbol
+      pairAddress
+      token0
+      token0Name
+      token0Amount
+      token0Symbol
+      token0Decimals
+      token1
+      token1Name
+      token1Symbol
+      token1Amount
+      token1Decimals
     }
   }
 `;

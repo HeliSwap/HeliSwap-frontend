@@ -1,23 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { useQuery } from '@apollo/client';
-import { GET_POOLS, GET_POOL_BY_TOKEN } from '../GraphQL/Queries';
+import { GET_POOLS } from '../GraphQL/Queries';
 import { formatStringToPrice } from '../utils/numberUtils';
 import { IPairData } from '../interfaces/tokens';
 
 const Pairs = () => {
-  const token = '';
   const { error, loading, data } = useQuery(GET_POOLS);
-  const { data: dataPBT } = useQuery(GET_POOL_BY_TOKEN, { variables: { token } });
   const [pairData, setPairData] = useState<IPairData[]>([]);
 
   useEffect(() => {
     data && setPairData(data.pools);
   }, [data]);
-
-  useEffect(() => {
-    console.log('dataPBT', dataPBT?.poolsByToken);
-  }, [dataPBT]);
 
   const formatIcons = (icons: string[]) =>
     icons &&
@@ -50,7 +45,11 @@ const Pairs = () => {
                 <div>{index + 1}</div>
                 <div className="d-flex align-items-center">
                   {formatIcons(item.icons)}
-                  <span className="ms-3">{item.pairSymbol}</span>
+                  <span className="ms-3">
+                    <Link className="link-primary" to={`${item.pairAddress}`}>
+                      {item.pairSymbol}
+                    </Link>
+                  </span>
                 </div>
                 <div className="text-end">{formatStringToPrice(item.tvl)}</div>
                 <div className="text-end">{formatStringToPrice(item.volume24h)}</div>
