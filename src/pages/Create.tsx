@@ -9,6 +9,8 @@ import WalletBalance from '../components/WalletBalance';
 import { ICreatePairData } from '../interfaces/comon';
 import { IPairData } from '../interfaces/tokens';
 
+import errorMessages from '../content/errors';
+
 interface ITokensData {
   tokenA: ITokenData;
   tokenB: ITokenData;
@@ -48,6 +50,9 @@ const Create = () => {
   const [readyToProvide, setReadyToProvide] = useState(false);
   const [tokensInSamePool, setTokensInSamePool] = useState(false);
 
+  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
 
@@ -56,11 +61,23 @@ const Create = () => {
 
   const handleCreateClick = async () => {
     setProvideLoading(true);
+    setError(false);
+    setErrorMessage('');
+
     try {
       const receipt = await sdk.createPair(hashconnectConnectorInstance, userId, createPairData);
-      console.log('receipt', receipt);
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (!success) {
+        setError(true);
+        setErrorMessage(error);
+      }
     } catch (err) {
-      console.log('err', err);
+      console.error(err);
+      setError(true);
+      setErrorMessage('Error on create');
     } finally {
       setProvideLoading(false);
     }
@@ -104,6 +121,13 @@ const Create = () => {
   return (
     <div className="d-flex justify-content-center">
       <div className="container-swap">
+        {error ? (
+          <div className="alert alert-danger my-5" role="alert">
+            <strong>Something went wrong!</strong>
+            <p>{errorMessages[errorMessage]}</p>
+          </div>
+        ) : null}
+
         <div className="d-flex justify-content-between">
           <span className="badge bg-primary text-uppercase">Token A</span>
           <span></span>
