@@ -66,7 +66,62 @@ class SDK {
       //Set the contract function to call
       .setFunction(
         'approve',
-        new ContractFunctionParameters().addAddress(routerContractAddress).addUint256(10000),
+        new ContractFunctionParameters().addAddress(routerContractAddress).addUint256(1000000),
+      );
+
+    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
+      trans,
+      userId as string,
+    );
+
+    const response = await hashconnectConnectorInstance?.sendTransaction(
+      transactionBytes as Uint8Array,
+      userId as string,
+      false,
+    );
+
+    const responseData: any = {
+      response,
+      receipt: null,
+    };
+
+    if (response?.success) {
+      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
+    }
+
+    return responseData;
+  }
+
+  async addLiquidity(
+    hashconnectConnectorInstance: Hashconnect,
+    userId: string,
+    createPairData: ICreatePairData,
+  ) {
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
+    const token0 = '0x00000000000000000000000000000000021240b2';
+    const token1 = '0x00000000000000000000000000000000021240c8';
+    const amount = 10000;
+
+    const userAddress = tokenIdToAddress(userId);
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the router contract
+      .setContractId('0.0.34750635')
+
+      //Set the gas for the contract call
+      .setGas(3000000)
+
+      //Set the contract function to call
+      .setFunction(
+        'addLiquidity',
+        new ContractFunctionParameters()
+          .addAddress(token0)
+          .addAddress(token1)
+          .addUint256(amount)
+          .addUint256(amount)
+          .addUint256(amount)
+          .addUint256(amount)
+          .addAddress(userAddress)
+          .addUint256(deadline),
       );
 
     const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
