@@ -55,10 +55,10 @@ export const getTokensWalletBalance = async (userId: string): Promise<IWalletBal
   }
 };
 
-export const tokenAddressToId = (tokenAddress: string) => {
+export const addressToId = (tokenAddress: string) => {
   return hethers.utils.asAccountString(tokenAddress);
 };
 
-export const tokenIdToAddress = (tokenId: string) => {
+export const idToAddress = (tokenId: string) => {
   return hethers.utils.getAddressFromAccount(tokenId);
 };

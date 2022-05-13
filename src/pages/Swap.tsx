@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getTokenInfo, tokenAddressToId } from '../utils/tokenUtils';
+import { getTokenInfo, addressToId } from '../utils/tokenUtils';
 import { ITokenData, ISwapTokenData, IPairData } from '../interfaces/tokens';
 import { IStringToString } from '../interfaces/comon';
 
@@ -49,8 +49,8 @@ const Swap = () => {
     if (data) {
       const { pools } = data;
       const tokens = pools.reduce((acc: any, item: IPairData) => {
-        const item0Id = tokenAddressToId(item.token0);
-        const item1Id = tokenAddressToId(item.token1);
+        const item0Id = addressToId(item.token0);
+        const item1Id = addressToId(item.token1);
 
         if (!acc.includes(item0Id)) acc.push(item0Id);
         if (!acc.includes(item1Id)) acc.push(item1Id);

@@ -5,7 +5,7 @@ import {
 } from '@hashgraph/sdk';
 import Hashconnect from '../connectors/hashconnect';
 import { ICreatePairData } from '../interfaces/comon';
-import { tokenIdToAddress } from '../utils/tokenUtils';
+import { idToAddress } from '../utils/tokenUtils';
 
 class SDK {
   async createPair(
@@ -14,8 +14,8 @@ class SDK {
     createPairData: ICreatePairData,
   ) {
     const { tokenAId, tokenBId } = createPairData;
-    const tokenAAdress = tokenIdToAddress(tokenAId);
-    const tokenBAdress = tokenIdToAddress(tokenBId);
+    const tokenAAdress = idToAddress(tokenAId);
+    const tokenBAdress = idToAddress(tokenBId);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
@@ -102,7 +102,7 @@ class SDK {
     const token1 = '0x00000000000000000000000000000000021240c8';
     const amount = 10000;
 
-    const userAddress = tokenIdToAddress(userId);
+    const userAddress = idToAddress(userId);
     const trans = new ContractExecuteTransaction()
       //Set the ID of the router contract
       .setContractId('0.0.34750635')
