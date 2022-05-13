@@ -157,9 +157,9 @@ class SDK {
     amountOut: string,
   ) {
     const routerContractAddress = '0x000000000000000000000000000000000212272e';
-    const tokenInAddress = tokenIdToAddress(tokenInId);
-    const tokenOutAddress = tokenIdToAddress(tokenOutId);
-    const userAddress = tokenIdToAddress(userId);
+    const tokenInAddress = idToAddress(tokenInId);
+    const tokenOutAddress = idToAddress(tokenOutId);
+    const userAddress = idToAddress(userId);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
