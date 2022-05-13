@@ -10,6 +10,7 @@ import Create from '../pages/Create';
 import Pairs from '../pages/Pairs';
 import PairDetails from '../pages/PairDetails';
 import Tokens from '../pages/Tokens';
+import Helpers from '../pages/Helpers';
 import Styleguide from '../pages/Styleguide';
 
 import Header from './Header';
@@ -33,6 +34,7 @@ function App() {
                   <Route path="pairs/:address" element={<PairDetails />} />
                   <Route path="tokens" element={<Tokens />} />
                   <Route path="styleguide" element={<Styleguide />} />
+                  <Route path="helpers" element={<Helpers />} />
                 </Routes>
               </div>
             </div>

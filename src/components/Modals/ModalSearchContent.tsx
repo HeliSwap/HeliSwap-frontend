@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getTokenInfo, tokenIdToAddress } from '../../utils/tokenUtils';
+import { getTokenInfo, idToAddress } from '../../utils/tokenUtils';
 import { ITokenData, IPairData } from '../../interfaces/tokens';
 
 import { useLazyQuery } from '@apollo/client';
@@ -82,8 +82,7 @@ const ModalSearchContent = ({
   };
 
   useEffect(() => {
-    Object.keys(foundTokenData).length > 0 &&
-      setCurrentToken(tokenIdToAddress(foundTokenData.tokenId));
+    Object.keys(foundTokenData).length > 0 && setCurrentToken(idToAddress(foundTokenData.tokenId));
   }, [foundTokenData]);
 
   const hasTokenData = Object.keys(foundTokenData).length > 0;
