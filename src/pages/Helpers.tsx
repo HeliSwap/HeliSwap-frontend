@@ -46,6 +46,7 @@ const Helpers = () => {
               type="text"
               name="idToAddressOut"
               className="form-control mt-3"
+              readOnly
             />
           </div>
 
@@ -67,6 +68,7 @@ const Helpers = () => {
               type="text"
               name="addressToIdOut"
               className="form-control mt-3"
+              readOnly
             />
           </div>
         </div>
