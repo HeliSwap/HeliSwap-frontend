@@ -95,7 +95,7 @@ const Create = () => {
     setErrorMessage('');
 
     try {
-      const receipt = await sdk.createPair(hashconnectConnectorInstance, userId, createPairData);
+      const receipt = await sdk.addLiquidity(hashconnectConnectorInstance, userId, createPairData);
       const {
         response: { success, error },
       } = receipt;

@@ -150,6 +150,34 @@ const ModalSearchContent = ({
                     📝
                   </span>
                 </li>
+
+                <li>
+                  0.0.34752777 - ERC20 Test Token 1{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34752777')}>
+                    📝
+                  </span>
+                </li>
+
+                <li>
+                  0.0.34752779 - ERC20 Test Token 2{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34752779')}>
+                    📝
+                  </span>
+                </li>
+
+                <li>
+                  0.0.34819794 - ERC20 Test Token 3{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34819794')}>
+                    📝
+                  </span>
+                </li>
+
+                <li>
+                  0.0.34819803 - ERC20 Test Token 4{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34819803')}>
+                    📝
+                  </span>
+                </li>
               </ul>
             </div>
             <label className="mb-2" htmlFor="">

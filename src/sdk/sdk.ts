@@ -99,9 +99,18 @@ class SDK {
     createPairData: ICreatePairData,
   ) {
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
-    const token0 = '0x00000000000000000000000000000000021240b2';
-    const token1 = '0x00000000000000000000000000000000021240c8';
-    const amount = 10000;
+    const {
+      tokenAAmount: tokenAAmountString,
+      tokenAId,
+      tokenBAmount: tokenBAmountString,
+      tokenBId,
+    } = createPairData;
+
+    const tokenAAddress = idToAddress(tokenAId);
+    const tokenBAddress = idToAddress(tokenBId);
+
+    const tokenAAmount = Number(tokenAAmountString);
+    const tokenBAmount = Number(tokenBAmountString);
 
     const userAddress = idToAddress(userId);
     const trans = new ContractExecuteTransaction()
@@ -115,12 +124,12 @@ class SDK {
       .setFunction(
         'addLiquidity',
         new ContractFunctionParameters()
-          .addAddress(token0)
-          .addAddress(token1)
-          .addUint256(amount)
-          .addUint256(amount)
-          .addUint256(amount)
-          .addUint256(amount)
+          .addAddress(tokenAAddress)
+          .addAddress(tokenBAddress)
+          .addUint256(tokenAAmount)
+          .addUint256(tokenBAmount)
+          .addUint256(tokenAAmount)
+          .addUint256(tokenBAmount)
           .addAddress(userAddress)
           .addUint256(deadline),
       );
