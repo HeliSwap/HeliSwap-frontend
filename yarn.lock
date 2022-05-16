@@ -1574,22 +1574,6 @@
     protobufjs "^6.11.2"
     utf8 "^3.0.0"
 
-"@hashgraph/sdk@^2.13.0":
-  version "2.13.0"
-  resolved "https://registry.yarnpkg.com/@hashgraph/sdk/-/sdk-2.13.0.tgz#5d10a0e206868f8c1eba293f4e8c2264bfffc03e"
-  integrity sha512-qWUrAnJ5YVc4++lO1/8uGxGGFqmZRwNFjay1cjj+iUUpoUZi4cch+v4jD5ASjTzYbAcFIoH8gxYnMaJXiHkdow==
-  dependencies:
-    "@grpc/grpc-js" "^1.6.3"
-    "@hashgraph/cryptography" "^1.1.2"
-    "@hashgraph/proto" "2.4.0"
-    bignumber.js "^9.0.2"
-    crypto-js "^4.1.1"
-    js-base64 "^3.7.2"
-    js-logger "^1.6.1"
-    long "^4.0.0"
-    protobufjs "^6.11.2"
-    utf8 "^3.0.0"
-
 "@hashgraph/sdk@^2.13.1":
   version "2.13.1"
   resolved "https://registry.yarnpkg.com/@hashgraph/sdk/-/sdk-2.13.1.tgz#7f7c5b0ccfef4a0a7377d5007529d3240cdeea36"

@@ -55,7 +55,7 @@ class SDK {
 
   // Works only for erc20 tokens
   async approveToken(hashconnectConnectorInstance: Hashconnect, userId: string, tokenId: string) {
-    const routerContractAddress = '0x000000000000000000000000000000000212272e';
+    const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
@@ -67,7 +67,9 @@ class SDK {
       //Set the contract function to call
       .setFunction(
         'approve',
-        new ContractFunctionParameters().addAddress(routerContractAddress).addUint256(1000000),
+        new ContractFunctionParameters()
+          .addAddress(routerContractAddress)
+          .addUint256(1000000000000000000),
       );
 
     const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
@@ -113,9 +115,10 @@ class SDK {
     const tokenBAmount = Number(tokenBAmountString);
 
     const userAddress = idToAddress(userId);
+    const routerId = addressToId(process.env.REACT_APP_ROUTER_ADDRESS as string);
     const trans = new ContractExecuteTransaction()
       //Set the ID of the router contract
-      .setContractId('0.0.34750635')
+      .setContractId(routerId)
 
       //Set the gas for the contract call
       .setGas(3000000)
@@ -144,6 +147,8 @@ class SDK {
       userId as string,
       false,
     );
+
+    console.log('response', response);
 
     const responseData: any = {
       response,
