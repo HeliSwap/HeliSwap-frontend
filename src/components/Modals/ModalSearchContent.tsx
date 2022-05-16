@@ -39,6 +39,8 @@ const ModalSearchContent = ({
 
   const handleSearchButtonClick = async () => {
     setFoundTokenData({} as ITokenData);
+
+    // TODO Make proper check for token id format
     if (!searchInputValue) return;
 
     setFindTokenLoading(true);
@@ -46,13 +48,27 @@ const ModalSearchContent = ({
 
     try {
       const result = await getTokenInfo(searchInputValue);
+      const hasResults = Object.keys(result).length > 0;
 
-      // Proper check for result
-      if (result) {
+      if (hasResults) {
         setFoundTokenData(result);
+      } else {
+        console.error('[Error on token search] Token id not found');
+
+        // Let's assume that token is ECR20
+        const resultObject = {
+          decimals: 0,
+          expiryTimestamp: '',
+          name: 'Some ERC20 token',
+          symbol: 'ERC20',
+          tokenId: searchInputValue,
+          totalSupply: '0',
+        };
+
+        setFoundTokenData(resultObject);
       }
     } catch (err) {
-      console.log('err', err);
+      console.error('[Error on token search request]', err);
     } finally {
       setFindTokenLoading(false);
     }
