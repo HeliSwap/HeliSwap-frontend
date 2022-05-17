@@ -10,18 +10,6 @@ import { addressToId, idToAddress } from '../utils/tokenUtils';
 import ERC20 from '../abi/ERC20';
 
 class SDK {
-  private connectedWallet;
-
-  constructor() {
-    const provider = hethers.providers.getDefaultProvider(process.env.REACT_APP_NETWORK_TYPE);
-    const eoaAccount = {
-      account: process.env.REACT_APP_ACCOUNT_ID,
-      privateKey: process.env.REACT_APP_ACCOUNT_KEY,
-    };
-    const walletEoaAccount = new hethers.Wallet(eoaAccount as any, provider as any);
-    this.connectedWallet = walletEoaAccount.connect(provider as any);
-  }
-
   async createPair(
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
@@ -67,20 +55,17 @@ class SDK {
     return responseData;
   }
 
-  async checkAllowance(tokenAddress: string, userAddress: string, spenderAddress: string) {
-    const erc20 = hethers.ContractFactory.getContract(
-      tokenAddress,
-      ERC20.abi,
-      this.connectedWallet,
-    );
+  async checkAllowance(
+    tokenAddress: string,
+    userAddress: string,
+    spenderAddress: string,
+    connectedWallet: any,
+  ) {
+    const erc20 = hethers.ContractFactory.getContract(tokenAddress, ERC20.abi, connectedWallet);
 
-    const allowance = await erc20.allowance(
-      userAddress,
-      process.env.REACT_APP_ROUTER_ADDRESS as string,
-      {
-        gasLimit: 3000000,
-      },
-    );
+    const allowance = await erc20.allowance(userAddress, spenderAddress, {
+      gasLimit: 3000000,
+    });
 
     return allowance;
   }
@@ -89,7 +74,6 @@ class SDK {
   async approveToken(hashconnectConnectorInstance: Hashconnect, userId: string, tokenId: string) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
 
-    // TODO Use Hethers for contracts interactions
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(tokenId)

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { ITokenData, TokenType } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
+import { hethers } from '@hashgraph/hethers';
 
 import Button from '../components/Button';
 import Modal from '../components/Modal';
@@ -116,15 +117,28 @@ const Create = () => {
 
   useEffect(() => {
     const getApproved = async (tokenId: string, index: string) => {
-      const tokenAddress = idToAddress(tokenId);
-      const userAddress = idToAddress(userId);
-      const result = await sdk.checkAllowance(
-        tokenAddress,
-        userAddress,
-        process.env.REACT_APP_ROUTER_ADDRESS as string,
-      );
+      if (process.env.REACT_APP_ACCOUNT_ID && process.env.REACT_APP_ACCOUNT_KEY) {
+        const provider = hethers.providers.getDefaultProvider(process.env.REACT_APP_NETWORK_TYPE);
+        const eoaAccount = {
+          account: process.env.REACT_APP_ACCOUNT_ID,
+          privateKey: process.env.REACT_APP_ACCOUNT_KEY,
+        };
+        const walletEoaAccount = new hethers.Wallet(eoaAccount as any, provider as any);
+        const connectedWallet = walletEoaAccount.connect(provider as any);
 
-      setApproved(prev => ({ ...prev, [index]: Number(result.toString()) > 0 }));
+        const tokenAddress = idToAddress(tokenId);
+        const userAddress = idToAddress(userId);
+        const result = await sdk.checkAllowance(
+          tokenAddress,
+          userAddress,
+          process.env.REACT_APP_ROUTER_ADDRESS as string,
+          connectedWallet,
+        );
+
+        setApproved(prev => ({ ...prev, [index]: Number(result.toString()) > 0 }));
+      } else {
+        setApproved(prev => ({ ...prev, [index]: false }));
+      }
     };
 
     const { tokenA, tokenB } = tokensData;
