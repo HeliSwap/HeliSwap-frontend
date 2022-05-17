@@ -70,6 +70,16 @@ class SDK {
     return allowance;
   }
 
+  async checkBalance(tokenAddress: string, userAddress: string, connectedWallet: any) {
+    const erc20 = hethers.ContractFactory.getContract(tokenAddress, ERC20.abi, connectedWallet);
+
+    const balance = await erc20.balanceOf(userAddress, {
+      gasLimit: 3000000,
+    });
+
+    return balance;
+  }
+
   // Works only for erc20 tokens
   async approveToken(hashconnectConnectorInstance: Hashconnect, userId: string, tokenId: string) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
