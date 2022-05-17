@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { hethers } from '@hashgraph/hethers';
 
-import { ITokenData, IWalletBalance } from '../interfaces/tokens';
+import { ITokenData, IWalletBalance, TokenType } from '../interfaces/tokens';
 
 export const getTokenInfo = async (tokenId: string): Promise<ITokenData> => {
   const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/tokens/${tokenId}`;
@@ -25,12 +25,22 @@ export const getTokenInfo = async (tokenId: string): Promise<ITokenData> => {
       decimals: Number(decimals),
       totalSupply,
       expiryTimestamp,
+      type: TokenType.HTS,
     };
 
     return tokenInfo;
   } catch (e) {
     console.error(e);
-    return {} as ITokenData;
+    // Let's assume that token is ECR20
+    return {
+      decimals: 0,
+      expiryTimestamp: '',
+      name: 'Some ERC20 token',
+      symbol: 'ERC20',
+      tokenId,
+      totalSupply: '0',
+      type: TokenType.ECR20,
+    } as ITokenData;
   }
 };
 
@@ -55,10 +65,10 @@ export const getTokensWalletBalance = async (userId: string): Promise<IWalletBal
   }
 };
 
-export const tokenAddressToId = (tokenAddress: string) => {
+export const addressToId = (tokenAddress: string) => {
   return hethers.utils.asAccountString(tokenAddress);
 };
 
-export const tokenIdToAddress = (tokenId: string) => {
+export const idToAddress = (tokenId: string) => {
   return hethers.utils.getAddressFromAccount(tokenId);
 };

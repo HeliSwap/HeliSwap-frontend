@@ -16,6 +16,9 @@ const Menu = () => {
       <Link className="link-menu" to="/tokens">
         Tokens
       </Link>
+      <Link className="link-menu" to="/helpers">
+        Helpers
+      </Link>
     </div>
   );
 };

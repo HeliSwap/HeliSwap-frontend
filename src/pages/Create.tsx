@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { ITokenData } from '../interfaces/tokens';
+import { ITokenData, TokenType } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
 import Button from '../components/Button';
@@ -9,9 +9,14 @@ import WalletBalance from '../components/WalletBalance';
 import { ICreatePairData } from '../interfaces/comon';
 import { IPairData } from '../interfaces/tokens';
 
+import errorMessages from '../content/errors';
+import { idToAddress } from '../utils/tokenUtils';
+import { getConnectedWallet } from './Helpers';
+
 interface ITokensData {
   tokenA: ITokenData;
   tokenB: ITokenData;
+  [key: string]: ITokenData;
 }
 interface ITokensPairData {
   tokenA: IPairData[];
@@ -45,8 +50,16 @@ const Create = () => {
     tokenBId: '',
   });
 
+  const [approved, setApproved] = useState({
+    tokenA: false,
+    tokenB: false,
+  });
+
   const [readyToProvide, setReadyToProvide] = useState(false);
   const [tokensInSamePool, setTokensInSamePool] = useState(false);
+
+  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
@@ -54,24 +67,98 @@ const Create = () => {
     setCreatePairData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleApproveClick = async (key: string) => {
+    const { tokenId } = tokensData[key];
+
+    try {
+      const receipt = await sdk.approveToken(hashconnectConnectorInstance, userId, tokenId);
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (!success) {
+        setError(true);
+        setErrorMessage(error);
+      } else {
+        setApproved(prev => ({ ...prev, [key]: true }));
+      }
+    } catch (err) {
+      console.error(err);
+      setError(true);
+      setErrorMessage('Error on create');
+    } finally {
+      setProvideLoading(false);
+    }
+  };
+
   const handleCreateClick = async () => {
     setProvideLoading(true);
+    setError(false);
+    setErrorMessage('');
+
     try {
-      const receipt = await sdk.createPair(hashconnectConnectorInstance, userId, createPairData);
-      console.log('receipt', receipt);
+      const receipt = await sdk.addLiquidity(hashconnectConnectorInstance, userId, createPairData);
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (!success) {
+        setError(true);
+        setErrorMessage(error);
+      } else {
+        setTokensData({
+          tokenA: {} as ITokenData,
+          tokenB: {} as ITokenData,
+        });
+
+        setPairsData({
+          tokenA: [],
+          tokenB: [],
+        });
+
+        setCreatePairData({
+          tokenAAmount: '0',
+          tokenBAmount: '0',
+          tokenAId: '',
+          tokenBId: '',
+        });
+      }
     } catch (err) {
-      console.log('err', err);
+      console.error(err);
+      setError(true);
+      setErrorMessage('Error on create');
     } finally {
       setProvideLoading(false);
     }
   };
 
   useEffect(() => {
+    const getApproved = async (tokenId: string, index: string) => {
+      const connectedWallet = getConnectedWallet();
+      if (connectedWallet) {
+        const tokenAddress = idToAddress(tokenId);
+        const userAddress = idToAddress(userId);
+        const result = await sdk.checkAllowance(
+          tokenAddress,
+          userAddress,
+          process.env.REACT_APP_ROUTER_ADDRESS as string,
+          connectedWallet,
+        );
+
+        setApproved(prev => ({ ...prev, [index]: Number(result.toString()) > 0 }));
+      } else {
+        setApproved(prev => ({ ...prev, [index]: false }));
+      }
+    };
+
     const { tokenA, tokenB } = tokensData;
     const newPairData = { tokenAId: tokenA.tokenId, tokenBId: tokenB.tokenId };
 
+    tokenA.tokenId && tokenA.type === TokenType.ECR20 && getApproved(tokenA.tokenId, 'tokenA');
+    tokenB.tokenId && tokenB.type === TokenType.ECR20 && getApproved(tokenB.tokenId, 'tokenB');
+
     setCreatePairData(prev => ({ ...prev, ...newPairData }));
-  }, [tokensData]);
+  }, [tokensData, sdk, userId]);
 
   useEffect(() => {
     let inSamePool = false;
@@ -104,6 +191,13 @@ const Create = () => {
   return (
     <div className="d-flex justify-content-center">
       <div className="container-swap">
+        {error ? (
+          <div className="alert alert-danger my-5" role="alert">
+            <strong>Something went wrong!</strong>
+            <p>{errorMessages[errorMessage]}</p>
+          </div>
+        ) : null}
+
         <div className="d-flex justify-content-between">
           <span className="badge bg-primary text-uppercase">Token A</span>
           <span></span>
@@ -229,23 +323,39 @@ const Create = () => {
         ) : null}
 
         <div className="mt-5 d-flex justify-content-center">
-          {tokensInSamePool ? (
+          {tokensData.tokenA.symbol && !approved.tokenA ? (
             <Button
-              loading={isProvideLoading}
-              disabled={!readyToProvide}
-              onClick={handleCreateClick}
-            >
-              Provide
-            </Button>
-          ) : (
+              onClick={() => handleApproveClick('tokenA')}
+              className="mx-2"
+            >{`Approve ${tokensData.tokenA.symbol}`}</Button>
+          ) : null}
+
+          {tokensData.tokenB.symbol && !approved.tokenB ? (
             <Button
-              loading={isProvideLoading}
-              disabled={!readyToProvide}
-              onClick={handleCreateClick}
-            >
-              Create
-            </Button>
-          )}
+              onClick={() => handleApproveClick('tokenB')}
+              className="mx-2"
+            >{`Approve ${tokensData.tokenB.symbol}`}</Button>
+          ) : null}
+
+          {approved.tokenA && approved.tokenB ? (
+            tokensInSamePool ? (
+              <Button
+                loading={isProvideLoading}
+                disabled={!readyToProvide}
+                onClick={handleCreateClick}
+              >
+                Provide
+              </Button>
+            ) : (
+              <Button
+                loading={isProvideLoading}
+                disabled={!readyToProvide}
+                onClick={handleCreateClick}
+              >
+                Create
+              </Button>
+            )
+          ) : null}
         </div>
       </div>
     </div>

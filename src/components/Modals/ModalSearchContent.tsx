@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getTokenInfo, tokenIdToAddress } from '../../utils/tokenUtils';
+import { getTokenInfo, idToAddress } from '../../utils/tokenUtils';
 import { ITokenData, IPairData } from '../../interfaces/tokens';
 
 import { useLazyQuery } from '@apollo/client';
@@ -39,6 +39,8 @@ const ModalSearchContent = ({
 
   const handleSearchButtonClick = async () => {
     setFoundTokenData({} as ITokenData);
+
+    // TODO Make proper check for token id format
     if (!searchInputValue) return;
 
     setFindTokenLoading(true);
@@ -46,13 +48,15 @@ const ModalSearchContent = ({
 
     try {
       const result = await getTokenInfo(searchInputValue);
+      const hasResults = Object.keys(result).length > 0;
 
-      // Proper check for result
-      if (result) {
+      if (hasResults) {
         setFoundTokenData(result);
+      } else {
+        console.error('[Error on token search] Token id not found');
       }
     } catch (err) {
-      console.log('err', err);
+      console.error('[Error on token search request]', err);
     } finally {
       setFindTokenLoading(false);
     }
@@ -82,8 +86,7 @@ const ModalSearchContent = ({
   };
 
   useEffect(() => {
-    Object.keys(foundTokenData).length > 0 &&
-      setCurrentToken(tokenIdToAddress(foundTokenData.tokenId));
+    Object.keys(foundTokenData).length > 0 && setCurrentToken(idToAddress(foundTokenData.tokenId));
   }, [foundTokenData]);
 
   const hasTokenData = Object.keys(foundTokenData).length > 0;
@@ -132,6 +135,55 @@ const ModalSearchContent = ({
                 <li>
                   0.0.34741685 - WBTC{' '}
                   <span className="cursor-pointer" onClick={() => copyAddress('0.0.34741685')}>
+                    📝
+                  </span>
+                </li>
+
+                <li>
+                  0.0.34752777 - ERC20 Test Token 1{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34752777')}>
+                    📝
+                  </span>
+                </li>
+
+                <li>
+                  0.0.34752779 - ERC20 Test Token 2{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34752779')}>
+                    📝
+                  </span>
+                </li>
+
+                <li>
+                  0.0.34819794 - ERC20 Test Token 3{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34819794')}>
+                    📝
+                  </span>
+                </li>
+
+                <li>
+                  0.0.34819803 - ERC20 Test Token 4{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34819803')}>
+                    📝
+                  </span>
+                </li>
+
+                <li>
+                  0.0.34827526 - ERC20 Test Token 5{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34827526')}>
+                    📝
+                  </span>
+                </li>
+
+                <li>
+                  0.0.34827620 - ERC20 Test Token 11{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34827620')}>
+                    📝
+                  </span>
+                </li>
+
+                <li>
+                  0.0.34827624 - ERC20 Test Token 22{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34827624')}>
                     📝
                   </span>
                 </li>
