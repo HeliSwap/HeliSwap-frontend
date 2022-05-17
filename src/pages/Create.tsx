@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { ITokenData } from '../interfaces/tokens';
+import { ITokenData, TokenType } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
 import Button from '../components/Button';
@@ -10,6 +10,7 @@ import { ICreatePairData } from '../interfaces/comon';
 import { IPairData } from '../interfaces/tokens';
 
 import errorMessages from '../content/errors';
+import { idToAddress } from '../utils/tokenUtils';
 
 interface ITokensData {
   tokenA: ITokenData;
@@ -114,11 +115,26 @@ const Create = () => {
   };
 
   useEffect(() => {
+    const getApproved = async (tokenId: string, index: string) => {
+      const tokenAddress = idToAddress(tokenId);
+      const userAddress = idToAddress(userId);
+      const result = await sdk.checkAllowance(
+        tokenAddress,
+        userAddress,
+        process.env.REACT_APP_ROUTER_ADDRESS as string,
+      );
+
+      setApproved(prev => ({ ...prev, [index]: Number(result.toString()) > 0 }));
+    };
+
     const { tokenA, tokenB } = tokensData;
     const newPairData = { tokenAId: tokenA.tokenId, tokenBId: tokenB.tokenId };
 
+    tokenA.tokenId && tokenA.type === TokenType.ECR20 && getApproved(tokenA.tokenId, 'tokenA');
+    tokenB.tokenId && tokenB.type === TokenType.ECR20 && getApproved(tokenB.tokenId, 'tokenB');
+
     setCreatePairData(prev => ({ ...prev, ...newPairData }));
-  }, [tokensData]);
+  }, [tokensData, sdk, userId]);
 
   useEffect(() => {
     let inSamePool = false;

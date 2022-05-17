@@ -73,6 +73,16 @@ class SDK {
       ERC20.abi,
       this.connectedWallet,
     );
+
+    const allowance = await erc20.allowance(
+      userAddress,
+      process.env.REACT_APP_ROUTER_ADDRESS as string,
+      {
+        gasLimit: 3000000,
+      },
+    );
+
+    return allowance;
   }
 
   // Works only for erc20 tokens
