@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { ITokenData } from '../interfaces/tokens';
+import { ITokenData, TokenType } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
 import Button from '../components/Button';
@@ -10,6 +10,8 @@ import { ICreatePairData } from '../interfaces/comon';
 import { IPairData } from '../interfaces/tokens';
 
 import errorMessages from '../content/errors';
+import { idToAddress } from '../utils/tokenUtils';
+import { getConnectedWallet } from './Helpers';
 
 interface ITokensData {
   tokenA: ITokenData;
@@ -95,7 +97,7 @@ const Create = () => {
     setErrorMessage('');
 
     try {
-      const receipt = await sdk.createPair(hashconnectConnectorInstance, userId, createPairData);
+      const receipt = await sdk.addLiquidity(hashconnectConnectorInstance, userId, createPairData);
       const {
         response: { success, error },
       } = receipt;
@@ -103,6 +105,23 @@ const Create = () => {
       if (!success) {
         setError(true);
         setErrorMessage(error);
+      } else {
+        setTokensData({
+          tokenA: {} as ITokenData,
+          tokenB: {} as ITokenData,
+        });
+
+        setPairsData({
+          tokenA: [],
+          tokenB: [],
+        });
+
+        setCreatePairData({
+          tokenAAmount: '0',
+          tokenBAmount: '0',
+          tokenAId: '',
+          tokenBId: '',
+        });
       }
     } catch (err) {
       console.error(err);
@@ -114,11 +133,32 @@ const Create = () => {
   };
 
   useEffect(() => {
+    const getApproved = async (tokenId: string, index: string) => {
+      const connectedWallet = getConnectedWallet();
+      if (connectedWallet) {
+        const tokenAddress = idToAddress(tokenId);
+        const userAddress = idToAddress(userId);
+        const result = await sdk.checkAllowance(
+          tokenAddress,
+          userAddress,
+          process.env.REACT_APP_ROUTER_ADDRESS as string,
+          connectedWallet,
+        );
+
+        setApproved(prev => ({ ...prev, [index]: Number(result.toString()) > 0 }));
+      } else {
+        setApproved(prev => ({ ...prev, [index]: false }));
+      }
+    };
+
     const { tokenA, tokenB } = tokensData;
     const newPairData = { tokenAId: tokenA.tokenId, tokenBId: tokenB.tokenId };
 
+    tokenA.tokenId && tokenA.type === TokenType.ECR20 && getApproved(tokenA.tokenId, 'tokenA');
+    tokenB.tokenId && tokenB.type === TokenType.ECR20 && getApproved(tokenB.tokenId, 'tokenB');
+
     setCreatePairData(prev => ({ ...prev, ...newPairData }));
-  }, [tokensData]);
+  }, [tokensData, sdk, userId]);
 
   useEffect(() => {
     let inSamePool = false;

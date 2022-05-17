@@ -1,3 +1,4 @@
+import { hethers } from '@hashgraph/hethers';
 import {
   ContractExecuteTransaction,
   ContractFunctionParameters,
@@ -6,6 +7,7 @@ import {
 import Hashconnect from '../connectors/hashconnect';
 import { ICreatePairData } from '../interfaces/comon';
 import { addressToId, idToAddress } from '../utils/tokenUtils';
+import ERC20 from '../abi/ERC20';
 
 class SDK {
   async createPair(
@@ -53,9 +55,34 @@ class SDK {
     return responseData;
   }
 
+  async checkAllowance(
+    tokenAddress: string,
+    userAddress: string,
+    spenderAddress: string,
+    connectedWallet: any,
+  ) {
+    const erc20 = hethers.ContractFactory.getContract(tokenAddress, ERC20.abi, connectedWallet);
+
+    const allowance = await erc20.allowance(userAddress, spenderAddress, {
+      gasLimit: 3000000,
+    });
+
+    return allowance;
+  }
+
+  async checkBalance(tokenAddress: string, userAddress: string, connectedWallet: any) {
+    const erc20 = hethers.ContractFactory.getContract(tokenAddress, ERC20.abi, connectedWallet);
+
+    const balance = await erc20.balanceOf(userAddress, {
+      gasLimit: 3000000,
+    });
+
+    return balance;
+  }
+
   // Works only for erc20 tokens
   async approveToken(hashconnectConnectorInstance: Hashconnect, userId: string, tokenId: string) {
-    const routerContractAddress = '0x000000000000000000000000000000000212272e';
+    const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
@@ -67,7 +94,9 @@ class SDK {
       //Set the contract function to call
       .setFunction(
         'approve',
-        new ContractFunctionParameters().addAddress(routerContractAddress).addUint256(1000000),
+        new ContractFunctionParameters()
+          .addAddress(routerContractAddress)
+          .addUint256(1000000000000000000),
       );
 
     const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
@@ -99,14 +128,24 @@ class SDK {
     createPairData: ICreatePairData,
   ) {
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
-    const token0 = '0x00000000000000000000000000000000021240b2';
-    const token1 = '0x00000000000000000000000000000000021240c8';
-    const amount = 10000;
+    const {
+      tokenAAmount: tokenAAmountString,
+      tokenAId,
+      tokenBAmount: tokenBAmountString,
+      tokenBId,
+    } = createPairData;
+
+    const tokenAAddress = idToAddress(tokenAId);
+    const tokenBAddress = idToAddress(tokenBId);
+
+    const tokenAAmount = Number(tokenAAmountString);
+    const tokenBAmount = Number(tokenBAmountString);
 
     const userAddress = idToAddress(userId);
+    const routerId = addressToId(process.env.REACT_APP_ROUTER_ADDRESS as string);
     const trans = new ContractExecuteTransaction()
       //Set the ID of the router contract
-      .setContractId('0.0.34750635')
+      .setContractId(routerId)
 
       //Set the gas for the contract call
       .setGas(3000000)
@@ -115,12 +154,12 @@ class SDK {
       .setFunction(
         'addLiquidity',
         new ContractFunctionParameters()
-          .addAddress(token0)
-          .addAddress(token1)
-          .addUint256(amount)
-          .addUint256(amount)
-          .addUint256(amount)
-          .addUint256(amount)
+          .addAddress(tokenAAddress)
+          .addAddress(tokenBAddress)
+          .addUint256(tokenAAmount)
+          .addUint256(tokenBAmount)
+          .addUint256(tokenAAmount)
+          .addUint256(tokenBAmount)
           .addAddress(userAddress)
           .addUint256(deadline),
       );
@@ -135,6 +174,8 @@ class SDK {
       userId as string,
       false,
     );
+
+    console.log('response', response);
 
     const responseData: any = {
       response,

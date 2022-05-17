@@ -5,6 +5,12 @@ export interface ITokenData {
   decimals: number;
   totalSupply: string;
   expiryTimestamp: string;
+  type: TokenType;
+}
+
+export enum TokenType {
+  HTS,
+  ECR20,
 }
 
 export interface IUserToken {

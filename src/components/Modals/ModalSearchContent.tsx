@@ -54,18 +54,6 @@ const ModalSearchContent = ({
         setFoundTokenData(result);
       } else {
         console.error('[Error on token search] Token id not found');
-
-        // Let's assume that token is ECR20
-        const resultObject = {
-          decimals: 0,
-          expiryTimestamp: '',
-          name: 'Some ERC20 token',
-          symbol: 'ERC20',
-          tokenId: searchInputValue,
-          totalSupply: '0',
-        };
-
-        setFoundTokenData(resultObject);
       }
     } catch (err) {
       console.error('[Error on token search request]', err);
@@ -147,6 +135,55 @@ const ModalSearchContent = ({
                 <li>
                   0.0.34741685 - WBTC{' '}
                   <span className="cursor-pointer" onClick={() => copyAddress('0.0.34741685')}>
+                    📝
+                  </span>
+                </li>
+
+                <li>
+                  0.0.34752777 - ERC20 Test Token 1{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34752777')}>
+                    📝
+                  </span>
+                </li>
+
+                <li>
+                  0.0.34752779 - ERC20 Test Token 2{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34752779')}>
+                    📝
+                  </span>
+                </li>
+
+                <li>
+                  0.0.34819794 - ERC20 Test Token 3{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34819794')}>
+                    📝
+                  </span>
+                </li>
+
+                <li>
+                  0.0.34819803 - ERC20 Test Token 4{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34819803')}>
+                    📝
+                  </span>
+                </li>
+
+                <li>
+                  0.0.34827526 - ERC20 Test Token 5{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34827526')}>
+                    📝
+                  </span>
+                </li>
+
+                <li>
+                  0.0.34827620 - ERC20 Test Token 11{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34827620')}>
+                    📝
+                  </span>
+                </li>
+
+                <li>
+                  0.0.34827624 - ERC20 Test Token 22{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34827624')}>
                     📝
                   </span>
                 </li>
