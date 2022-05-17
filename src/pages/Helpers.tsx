@@ -4,14 +4,24 @@ import { addressToId, idToAddress } from '../utils/tokenUtils';
 import ERC20 from '../abi/ERC20';
 import Button from '../components/Button';
 
+export const getConnectedWallet = () => {
+  if (process.env.REACT_APP_ACCOUNT_ID && process.env.REACT_APP_ACCOUNT_KEY) {
+    const provider = hethers.providers.getDefaultProvider(process.env.REACT_APP_NETWORK_TYPE);
+    const eoaAccount = {
+      account: process.env.REACT_APP_ACCOUNT_ID,
+      privateKey: process.env.REACT_APP_ACCOUNT_KEY,
+    };
+    const walletEoaAccount = new hethers.Wallet(eoaAccount as any, provider as any);
+    const connectedWallet = walletEoaAccount.connect(provider as any);
+
+    return connectedWallet;
+  } else {
+    return false;
+  }
+};
+
 const Helpers = () => {
-  const provider = hethers.providers.getDefaultProvider(process.env.REACT_APP_NETWORK_TYPE);
-  const eoaAccount = {
-    account: process.env.REACT_APP_ACCOUNT_ID,
-    privateKey: process.env.REACT_APP_ACCOUNT_KEY,
-  };
-  const walletEoaAccount = new hethers.Wallet(eoaAccount as any, provider as any);
-  const connectedWallet = walletEoaAccount.connect(provider as any);
+  const connectedWallet = getConnectedWallet();
 
   const [tokenAddress, setTokenAddress] = useState('');
   const [walletAddress, setWalletAddress] = useState('0x0000000000000000000000000000000002099e42');
@@ -48,7 +58,11 @@ const Helpers = () => {
   };
 
   const handleGetContractClick = () => {
-    const erc20 = hethers.ContractFactory.getContract(tokenAddress, ERC20.abi, connectedWallet);
+    const erc20 = hethers.ContractFactory.getContract(
+      tokenAddress,
+      ERC20.abi,
+      connectedWallet as any,
+    );
     setTokenContract(erc20 as any);
   };
 

@@ -2,24 +2,19 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { IPairData } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
-import { hethers } from '@hashgraph/hethers';
 
 import { useQuery } from '@apollo/client';
 import { GET_POOLS } from '../GraphQL/Queries';
 import Loader from '../components/Loader';
 import { idToAddress } from '../utils/tokenUtils';
+import { getConnectedWallet } from './Helpers';
 
 const PairDetails = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
-  const { userId, hashconnectConnectorInstance } = connection;
-  const provider = hethers.providers.getDefaultProvider(process.env.REACT_APP_NETWORK_TYPE);
-  const eoaAccount = {
-    account: process.env.REACT_APP_ACCOUNT_ID,
-    privateKey: process.env.REACT_APP_ACCOUNT_KEY,
-  };
-  const walletEoaAccount = new hethers.Wallet(eoaAccount as any, provider as any);
-  const connectedWallet = walletEoaAccount.connect(provider as any);
+  const { userId } = connection;
+
+  const connectedWallet = getConnectedWallet();
 
   const { address } = useParams();
 
@@ -39,19 +34,22 @@ const PairDetails = () => {
 
   useEffect(() => {
     const getBalance = async () => {
-      const userAddress = idToAddress(userId);
-      const balanceBN = await sdk.checkBalance(pairData.pairAddress, userAddress, connectedWallet);
+      if (connectedWallet) {
+        const userAddress = idToAddress(userId);
+        const balanceBN = await sdk.checkBalance(
+          pairData.pairAddress,
+          userAddress,
+          connectedWallet,
+        );
 
-      Number(balanceBN.toString()) > 0 && setUserBalance(balanceBN.toString());
+        Number(balanceBN.toString()) > 0 && setUserBalance(balanceBN.toString());
+      } else {
+        setUserBalance('0.00');
+      }
     };
 
-    userId &&
-      connectedWallet &&
-      sdk &&
-      Object.keys(pairData).length > 0 &&
-      hashconnectConnectorInstance &&
-      getBalance();
-  }, [pairData, hashconnectConnectorInstance, sdk, userId, connectedWallet]);
+    userId && connectedWallet && sdk && Object.keys(pairData).length > 0 && getBalance();
+  }, [pairData, sdk, userId, connectedWallet]);
 
   const hasUserProvided = Number(userBalance) > 0;
 
