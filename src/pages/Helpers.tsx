@@ -1,20 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { hethers } from '@hashgraph/hethers';
-import {
-  ContractExecuteTransaction,
-  ContractFunctionParameters,
-  TransactionReceipt,
-} from '@hashgraph/sdk';
 import { addressToId, idToAddress } from '../utils/tokenUtils';
 import ERC20 from '../abi/ERC20';
 import Button from '../components/Button';
-import { GlobalContext } from '../providers/Global';
 
 const Helpers = () => {
-  const contextValue = useContext(GlobalContext);
-  const { connection, sdk } = contextValue;
-  const { userId, hashconnectConnectorInstance } = connection;
-
   const provider = hethers.providers.getDefaultProvider(process.env.REACT_APP_NETWORK_TYPE);
   const eoaAccount = {
     account: process.env.REACT_APP_ACCOUNT_ID,

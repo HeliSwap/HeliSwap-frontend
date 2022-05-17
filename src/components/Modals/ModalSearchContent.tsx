@@ -54,18 +54,6 @@ const ModalSearchContent = ({
         setFoundTokenData(result);
       } else {
         console.error('[Error on token search] Token id not found');
-
-        // Let's assume that token is ECR20
-        const resultObject = {
-          decimals: 0,
-          expiryTimestamp: '',
-          name: 'Some ERC20 token',
-          symbol: 'ERC20',
-          tokenId: searchInputValue,
-          totalSupply: '0',
-        };
-
-        setFoundTokenData(resultObject);
       }
     } catch (err) {
       console.error('[Error on token search request]', err);
