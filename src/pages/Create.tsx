@@ -105,6 +105,23 @@ const Create = () => {
       if (!success) {
         setError(true);
         setErrorMessage(error);
+      } else {
+        setTokensData({
+          tokenA: {} as ITokenData,
+          tokenB: {} as ITokenData,
+        });
+
+        setPairsData({
+          tokenA: [],
+          tokenB: [],
+        });
+
+        setCreatePairData({
+          tokenAAmount: '0',
+          tokenBAmount: '0',
+          tokenAId: '',
+          tokenBId: '',
+        });
       }
     } catch (err) {
       console.error(err);
