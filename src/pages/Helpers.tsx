@@ -69,18 +69,20 @@ const Helpers = () => {
   const handleShowBalanceClick = async () => {
     if (tokenContract) {
       // @ts-ignore
-      const balance = await tokenContract.balanceOf(walletAddress, {
+      const balanceBN = await tokenContract.balanceOf(walletAddress, {
         gasLimit: 3000000,
       });
 
-      console.log('balance', balance.toString());
+      const balanceStr = hethers.utils.formatUnits(balanceBN, 18);
+
+      console.log('balance', balanceStr);
     }
   };
 
   const handleShowAllowanceClick = async () => {
     if (tokenContract) {
       // @ts-ignore
-      const allowance = await tokenContract.allowance(
+      const allowanceBN = await tokenContract.allowance(
         walletAddress,
         process.env.REACT_APP_ROUTER_ADDRESS as string,
         {
@@ -88,7 +90,9 @@ const Helpers = () => {
         },
       );
 
-      console.log('allowance', allowance.toString());
+      const allowanceSrt = hethers.utils.formatUnits(allowanceBN, 18);
+
+      console.log('allowance', allowanceSrt);
     }
   };
 

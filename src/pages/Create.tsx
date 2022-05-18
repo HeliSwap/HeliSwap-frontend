@@ -12,6 +12,7 @@ import { IPairData } from '../interfaces/tokens';
 import errorMessages from '../content/errors';
 import { idToAddress } from '../utils/tokenUtils';
 import { getConnectedWallet } from './Helpers';
+import { hethers } from '@hashgraph/hethers';
 
 interface ITokensData {
   tokenA: ITokenData;
@@ -138,14 +139,17 @@ const Create = () => {
       if (connectedWallet) {
         const tokenAddress = idToAddress(tokenId);
         const userAddress = idToAddress(userId);
-        const result = await sdk.checkAllowance(
+        const resultBN = await sdk.checkAllowance(
           tokenAddress,
           userAddress,
           process.env.REACT_APP_ROUTER_ADDRESS as string,
           connectedWallet,
         );
 
-        setApproved(prev => ({ ...prev, [index]: Number(result.toString()) > 0 }));
+        const resultStr = hethers.utils.formatUnits(resultBN, 18);
+        const resultNum = Number(resultStr);
+
+        setApproved(prev => ({ ...prev, [index]: resultNum >= 1000 }));
       } else {
         setApproved(prev => ({ ...prev, [index]: false }));
       }
