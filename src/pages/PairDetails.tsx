@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
+import { hethers } from '@hashgraph/hethers';
 import { useParams } from 'react-router-dom';
 import { IPairData } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
@@ -20,7 +21,11 @@ const PairDetails = () => {
 
   const { error, loading, data } = useQuery(GET_POOLS);
   const [pairData, setPairData] = useState<IPairData>({} as IPairData);
-  const [userBalance, setUserBalance] = useState('0.00');
+  const [pairDataContracts, setPairDataContracts] = useState({
+    balance: '0.0',
+    token0: '0.0',
+    token1: '0.0',
+  });
 
   useEffect(() => {
     if (data && data.pools.length > 0) {
@@ -33,7 +38,7 @@ const PairDetails = () => {
   }, [data, address]);
 
   useEffect(() => {
-    const getBalance = async () => {
+    const getPairDataContracts = async () => {
       if (connectedWallet) {
         const userAddress = idToAddress(userId);
         const balanceBN = await sdk.checkBalance(
@@ -42,16 +47,29 @@ const PairDetails = () => {
           connectedWallet,
         );
 
-        Number(balanceBN.toString()) > 0 && setUserBalance(balanceBN.toString());
-      } else {
-        setUserBalance('0.00');
+        const [token0BN, token1BN] = await sdk.getReserves(pairData.pairAddress, connectedWallet);
+
+        const balanceStr = hethers.utils.formatUnits(balanceBN, 18);
+        const token0Str = hethers.utils.formatUnits(token0BN, 18);
+        const token1Str = hethers.utils.formatUnits(token1BN, 18);
+
+        const balanceNum = Number(balanceStr);
+        // const token0Num = Number(token0Str);
+        // const token1Num = Number(token1Str);
+
+        balanceNum > 0 &&
+          setPairDataContracts({
+            balance: balanceStr,
+            token0: token0Str,
+            token1: token1Str,
+          });
       }
     };
 
-    userId && connectedWallet && sdk && Object.keys(pairData).length > 0 && getBalance();
+    userId && connectedWallet && sdk && Object.keys(pairData).length > 0 && getPairDataContracts();
   }, [pairData, sdk, userId, connectedWallet]);
 
-  const hasUserProvided = Number(userBalance) > 0;
+  const hasUserProvided = Number(pairDataContracts.balance) > 0;
 
   return (
     <div className="d-flex justify-content-center">
@@ -85,7 +103,17 @@ const PairDetails = () => {
               <div className="col-6">
                 <div className="p-3 rounded border border-primary">
                   <p>LP tokens:</p>
-                  <p className="text-title">{userBalance}</p>
+                  <p className="text-title">{pairDataContracts.balance}</p>
+                  <div className="row mt-3">
+                    <div className="col-6">
+                      <p>Token0:</p>
+                      <p className="text-title">{pairDataContracts.token0}</p>
+                    </div>
+                    <div className="col-6">
+                      <p>Token1:</p>
+                      <p className="text-title">{pairDataContracts.token1}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : null}

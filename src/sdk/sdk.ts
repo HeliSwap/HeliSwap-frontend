@@ -8,7 +8,10 @@ import {
 import Hashconnect from '../connectors/hashconnect';
 import { ICreatePairData } from '../interfaces/comon';
 import { addressToId, idToAddress } from '../utils/tokenUtils';
+import { formatNumberToBigNumber } from '../utils/numberUtils';
+
 import ERC20 from '../abi/ERC20';
+import PairV2 from '../abi/PairV2';
 
 class SDK {
   async createPair(
@@ -81,6 +84,16 @@ class SDK {
     return balance;
   }
 
+  async getReserves(poolAddess: string, connectedWallet: any) {
+    const pairV2 = hethers.ContractFactory.getContract(poolAddess, PairV2.abi, connectedWallet);
+
+    const reserves = await pairV2.getReserves({
+      gasLimit: 3000000,
+    });
+
+    return reserves;
+  }
+
   // Works only for erc20 tokens
   async approveToken(
     hashconnectConnectorInstance: Hashconnect,
@@ -88,6 +101,8 @@ class SDK {
     tokenId: string | ContractId,
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
+
+    const amountToApproveBN = formatNumberToBigNumber(1000000000);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
@@ -100,7 +115,7 @@ class SDK {
         'approve',
         new ContractFunctionParameters()
           .addAddress(routerContractAddress)
-          .addUint256(1000000000000000000),
+          .addUint256(amountToApproveBN),
       );
 
     const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
@@ -142,8 +157,11 @@ class SDK {
     const tokenAAddress = idToAddress(tokenAId);
     const tokenBAddress = idToAddress(tokenBId);
 
-    const tokenAAmount = Number(tokenAAmountString);
-    const tokenBAmount = Number(tokenBAmountString);
+    const tokenAAmountNumber = Number(tokenAAmountString);
+    const tokenBAmountNumber = Number(tokenBAmountString);
+
+    const tokenAAmount = formatNumberToBigNumber(tokenAAmountNumber);
+    const tokenBAmount = formatNumberToBigNumber(tokenBAmountNumber);
 
     const userAddress = idToAddress(userId);
     const routerId = addressToId(process.env.REACT_APP_ROUTER_ADDRESS as string);
@@ -178,8 +196,6 @@ class SDK {
       userId as string,
       false,
     );
-
-    console.log('response', response);
 
     const responseData: any = {
       response,

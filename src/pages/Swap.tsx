@@ -6,8 +6,8 @@ import { GlobalContext } from '../providers/Global';
 
 import errorMessages from '../content/errors';
 
-import { useQuery, useLazyQuery } from '@apollo/client';
-import { GET_SWAP_RATE, GET_TOKENS } from '../GraphQL/Queries';
+import { useQuery } from '@apollo/client';
+import { GET_TOKENS } from '../GraphQL/Queries';
 
 import Button from '../components/Button';
 import Loader from '../components/Loader';
@@ -35,13 +35,6 @@ const Swap = () => {
   const [swapData, setSwapData] = useState(initialSwapData);
 
   const { error: errorGT, loading, data } = useQuery(GET_TOKENS);
-  const [getSwapRate] = useLazyQuery(GET_SWAP_RATE, {
-    variables: {
-      amountIn: swapData.amountIn,
-      tokenIdIn: swapData.tokenIdIn,
-      tokenIdOut: swapData.tokenIdOut,
-    },
-  });
 
   function onInputChange(tokenData: IStringToString) {
     setSwapData(prev => ({ ...prev, ...tokenData }));
