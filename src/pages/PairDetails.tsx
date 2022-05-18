@@ -10,11 +10,12 @@ import Loader from '../components/Loader';
 import { idToAddress } from '../utils/tokenUtils';
 import { getConnectedWallet } from './Helpers';
 import Button from '../components/Button';
+import { ContractId } from '@hashgraph/sdk';
 
 const PairDetails = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
-  const { userId } = connection;
+  const { userId, hashconnectConnectorInstance } = connection;
 
   const connectedWallet = getConnectedWallet();
 
@@ -29,6 +30,9 @@ const PairDetails = () => {
     token1: '0.0',
   });
 
+  const [lpApproved, setLpApproved] = useState(false);
+  const [lpInputValue, setLpInputValue] = useState('');
+
   useEffect(() => {
     if (data && data.pools.length > 0) {
       const foundPool = data.pools.find((pool: IPairData) => pool.pairAddress === address);
@@ -38,6 +42,28 @@ const PairDetails = () => {
       }
     }
   }, [data, address]);
+
+  useEffect(() => {
+    const getApproved = async () => {
+      if (connectedWallet) {
+        const resultBN = await sdk.checkAllowance(
+          pairData.pairAddress,
+          idToAddress(userId),
+          process.env.REACT_APP_ROUTER_ADDRESS as string,
+          connectedWallet,
+        );
+
+        const resultStr = hethers.utils.formatUnits(resultBN, 18);
+        const resultNum = Number(resultStr);
+
+        console.log('resultNum', resultNum);
+
+        setLpApproved(resultNum > 10000);
+      }
+    };
+
+    pairData && pairData.pairAddress && userId && getApproved();
+  }, [pairData, connectedWallet, sdk, userId]);
 
   const getPairDataContracts = async () => {
     if (connectedWallet) {
@@ -56,14 +82,44 @@ const PairDetails = () => {
       // const token0Num = Number(token0Str);
       // const token1Num = Number(token1Str);
 
-      balanceNum > 0 &&
+      if (balanceNum > 0) {
         setPairDataContracts({
           balance: balanceStr,
           totalSupply: totalSupplyStr,
           token0: token0Str,
           token1: token1Str,
         });
+        setLpInputValue(balanceStr);
+      }
     }
+  };
+
+  const hanleApproveLPClick = async () => {
+    try {
+      const contractId = ContractId.fromEvmAddress(0, 0, pairData.pairAddress);
+      const result = await sdk.approveToken(hashconnectConnectorInstance, userId, contractId);
+      setLpApproved(true);
+    } catch (e) {
+      console.error(e);
+    } finally {
+    }
+  };
+
+  const hanleRemoveLPClick = async () => {
+    try {
+      const contractId = ContractId.fromEvmAddress(0, 0, pairData.pairAddress);
+      const result = await sdk.removeLiquidity(hashconnectConnectorInstance, userId);
+      setLpApproved(true);
+    } catch (e) {
+      console.error(e);
+    } finally {
+    }
+  };
+
+  const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+
+    setLpInputValue(value);
   };
 
   const hasUserProvided = Number(pairDataContracts.balance) > 0;
@@ -93,6 +149,31 @@ const PairDetails = () => {
                 {pairData.token1Amount} {pairData.token1Symbol}
               </p>
             </div>
+
+            {connectedWallet && hasUserProvided && (
+              <div className="p-3 rounded border border-primary mt-4">
+                <h3>Remove liquidity</h3>
+                <div className="mt-4">
+                  {lpApproved ? (
+                    <div>
+                      <label htmlFor="">LP tokens</label>
+                      <input
+                        value={lpInputValue}
+                        onChange={hanleLpInputChange}
+                        type="text"
+                        name=""
+                        className="form-control mt-2"
+                      />
+                      <Button className="mt-3" onClick={hanleRemoveLPClick}>
+                        Remove LP
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button onClick={hanleApproveLPClick}>Approve LP</Button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {connectedWallet ? (
