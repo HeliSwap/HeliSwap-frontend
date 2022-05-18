@@ -94,6 +94,16 @@ class SDK {
     return reserves;
   }
 
+  async getTotalSupply(poolAddess: string, connectedWallet: any) {
+    const pairV2 = hethers.ContractFactory.getContract(poolAddess, PairV2.abi, connectedWallet);
+
+    const totalSupply = await pairV2.totalSupply({
+      gasLimit: 3000000,
+    });
+
+    return totalSupply;
+  }
+
   // Works only for erc20 tokens
   async approveToken(
     hashconnectConnectorInstance: Hashconnect,
