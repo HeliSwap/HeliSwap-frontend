@@ -9,6 +9,7 @@ import { GET_POOLS } from '../GraphQL/Queries';
 import Loader from '../components/Loader';
 import { idToAddress } from '../utils/tokenUtils';
 import { getConnectedWallet } from './Helpers';
+import Button from '../components/Button';
 
 const PairDetails = () => {
   const contextValue = useContext(GlobalContext);
@@ -37,37 +38,29 @@ const PairDetails = () => {
     }
   }, [data, address]);
 
-  useEffect(() => {
-    const getPairDataContracts = async () => {
-      if (connectedWallet) {
-        const userAddress = idToAddress(userId);
-        const balanceBN = await sdk.checkBalance(
-          pairData.pairAddress,
-          userAddress,
-          connectedWallet,
-        );
+  const getPairDataContracts = async () => {
+    if (connectedWallet) {
+      const userAddress = idToAddress(userId);
+      const balanceBN = await sdk.checkBalance(pairData.pairAddress, userAddress, connectedWallet);
 
-        const [token0BN, token1BN] = await sdk.getReserves(pairData.pairAddress, connectedWallet);
+      const [token0BN, token1BN] = await sdk.getReserves(pairData.pairAddress, connectedWallet);
 
-        const balanceStr = hethers.utils.formatUnits(balanceBN, 18);
-        const token0Str = hethers.utils.formatUnits(token0BN, 18);
-        const token1Str = hethers.utils.formatUnits(token1BN, 18);
+      const balanceStr = hethers.utils.formatUnits(balanceBN, 18);
+      const token0Str = hethers.utils.formatUnits(token0BN, 18);
+      const token1Str = hethers.utils.formatUnits(token1BN, 18);
 
-        const balanceNum = Number(balanceStr);
-        // const token0Num = Number(token0Str);
-        // const token1Num = Number(token1Str);
+      const balanceNum = Number(balanceStr);
+      // const token0Num = Number(token0Str);
+      // const token1Num = Number(token1Str);
 
-        balanceNum > 0 &&
-          setPairDataContracts({
-            balance: balanceStr,
-            token0: token0Str,
-            token1: token1Str,
-          });
-      }
-    };
-
-    userId && connectedWallet && sdk && Object.keys(pairData).length > 0 && getPairDataContracts();
-  }, [pairData, sdk, userId, connectedWallet]);
+      balanceNum > 0 &&
+        setPairDataContracts({
+          balance: balanceStr,
+          token0: token0Str,
+          token1: token1Str,
+        });
+    }
+  };
 
   const hasUserProvided = Number(pairDataContracts.balance) > 0;
 
@@ -81,26 +74,26 @@ const PairDetails = () => {
 
       {loading ? <Loader loadingText="Loading pool data..." /> : null}
 
-      {pairData ? (
-        <div className="container-swap">
-          <h2 className="text-display">{pairData.pairSymbol} Pair</h2>
-          <p className="text-small mt-2">{pairData.pairAddress}</p>
+      <div className="container-swap">
+        <h2 className="text-display">{pairData.pairSymbol} Pair</h2>
+        <p className="text-small mt-2">{pairData.pairAddress}</p>
 
-          <div className="row mt-5">
-            <div className="col-6">
-              <div className="p-3 rounded border border-primary">
-                <p>Pooled tokens:</p>
-                <p className="text-title">
-                  {pairData.token0Amount} {pairData.token0Symbol}
-                </p>
-                <p className="text-title">
-                  {pairData.token1Amount} {pairData.token1Symbol}
-                </p>
-              </div>
+        <div className="row mt-5">
+          <div className="col-6">
+            <div className="p-3 rounded border border-primary">
+              <p>Pooled tokens:</p>
+              <p className="text-title">
+                {pairData.token0Amount} {pairData.token0Symbol}
+              </p>
+              <p className="text-title">
+                {pairData.token1Amount} {pairData.token1Symbol}
+              </p>
             </div>
+          </div>
 
-            {hasUserProvided ? (
-              <div className="col-6">
+          {connectedWallet ? (
+            <div className="col-6">
+              {hasUserProvided ? (
                 <div className="p-3 rounded border border-primary">
                   <p>LP tokens:</p>
                   <p className="text-title">{pairDataContracts.balance}</p>
@@ -115,11 +108,13 @@ const PairDetails = () => {
                     </div>
                   </div>
                 </div>
-              </div>
-            ) : null}
-          </div>
+              ) : (
+                <Button onClick={getPairDataContracts}>Show contract data</Button>
+              )}
+            </div>
+          ) : null}
         </div>
-      ) : null}
+      </div>
     </div>
   );
 };
