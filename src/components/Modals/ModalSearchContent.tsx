@@ -115,75 +115,54 @@ const ModalSearchContent = ({
             <div className="bg-slate p-3 rounded mb-4">
               <ul>
                 <li>
-                  0.0.447200 - HEX{' '}
+                  0.0.447200 - HEX [HTS]{' '}
                   <span className="cursor-pointer" onClick={() => copyAddress('0.0.447200')}>
                     📝
                   </span>
                 </li>
                 <li>
-                  0.0.34741585 - USDT{' '}
+                  0.0.34741585 - USDT [HTS]{' '}
                   <span className="cursor-pointer" onClick={() => copyAddress('0.0.34741585')}>
                     📝
                   </span>
                 </li>
                 <li>
-                  0.0.34741650 - WETH{' '}
+                  0.0.34741650 - WETH [HTS]{' '}
                   <span className="cursor-pointer" onClick={() => copyAddress('0.0.34741650')}>
                     📝
                   </span>
                 </li>
                 <li>
-                  0.0.34741685 - WBTC{' '}
+                  0.0.34741685 - WBTC [HTS]{' '}
                   <span className="cursor-pointer" onClick={() => copyAddress('0.0.34741685')}>
                     📝
                   </span>
                 </li>
 
                 <li>
-                  0.0.34752777 - ERC20 Test Token 1{' '}
-                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34752777')}>
+                  0.0.34838032 - USDT [ERC20]{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34838032')}>
                     📝
                   </span>
                 </li>
 
                 <li>
-                  0.0.34752779 - ERC20 Test Token 2{' '}
-                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34752779')}>
+                  0.0.34838105 - WETH [ERC20]{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34838105')}>
                     📝
                   </span>
                 </li>
 
                 <li>
-                  0.0.34819794 - ERC20 Test Token 3{' '}
-                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34819794')}>
+                  0.0.34838117 - WBTC [ERC20]{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34838117')}>
                     📝
                   </span>
                 </li>
 
                 <li>
-                  0.0.34819803 - ERC20 Test Token 4{' '}
-                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34819803')}>
-                    📝
-                  </span>
-                </li>
-
-                <li>
-                  0.0.34827526 - ERC20 Test Token 5{' '}
-                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34827526')}>
-                    📝
-                  </span>
-                </li>
-
-                <li>
-                  0.0.34827620 - ERC20 Test Token 11{' '}
-                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34827620')}>
-                    📝
-                  </span>
-                </li>
-
-                <li>
-                  0.0.34827624 - ERC20 Test Token 22{' '}
-                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34827624')}>
+                  0.0.34838123 - DOB [ERC20]{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34838123')}>
                     📝
                   </span>
                 </li>

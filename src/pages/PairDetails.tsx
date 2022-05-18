@@ -87,12 +87,10 @@ const PairDetails = () => {
             <div className="p-3 rounded border border-primary">
               <p>Pooled tokens:</p>
               <p className="text-title">
-                {pairData.token0Amount && hethers.utils.formatUnits(pairData.token0Amount, 18)}{' '}
-                {pairData.token0Symbol}
+                {pairData.token0Amount} {pairData.token0Symbol}
               </p>
               <p className="text-title">
-                {pairData.token1Amount && hethers.utils.formatUnits(pairData.token1Amount, 18)}{' '}
-                {pairData.token1Symbol}
+                {pairData.token1Amount} {pairData.token1Symbol}
               </p>
             </div>
           </div>
