@@ -2,6 +2,7 @@ import { hethers } from '@hashgraph/hethers';
 import {
   ContractExecuteTransaction,
   ContractFunctionParameters,
+  ContractId,
   TransactionReceipt,
 } from '@hashgraph/sdk';
 import Hashconnect from '../connectors/hashconnect';
@@ -81,13 +82,16 @@ class SDK {
   }
 
   // Works only for erc20 tokens
-  async approveToken(hashconnectConnectorInstance: Hashconnect, userId: string, tokenId: string) {
+  async approveToken(
+    hashconnectConnectorInstance: Hashconnect,
+    userId: string,
+    tokenId: string | ContractId,
+  ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(tokenId)
-
       //Set the gas for the contract call
       .setGas(3000000)
 
@@ -197,10 +201,11 @@ class SDK {
     amountIn: string,
     amountMinOut: string,
   ) {
-    const routerContractAddress = '0x000000000000000000000000000000000212272e';
+    const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
     const tokenInAddress = idToAddress(tokenInId);
     const tokenOutAddress = idToAddress(tokenOutId);
     const userAddress = idToAddress(userId);
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
@@ -213,8 +218,62 @@ class SDK {
       .setFunction(
         'swapExactTokensForTokens',
         new ContractFunctionParameters()
+          .addUint256(100000000000000000) //amountIn
+          .addUint256(90000000000000000) //amountMinOut
           .addAddressArray([tokenInAddress, tokenOutAddress])
-          .addAddress(userAddress),
+          .addAddress(userAddress)
+          .addUint256(deadline),
+      );
+
+    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
+      trans,
+      userId as string,
+    );
+
+    const response = await hashconnectConnectorInstance?.sendTransaction(
+      transactionBytes as Uint8Array,
+      userId as string,
+      false,
+    );
+
+    const responseData: any = {
+      response,
+      receipt: null,
+    };
+
+    if (response?.success) {
+      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
+    }
+
+    return responseData;
+  }
+
+  async removeLiquidity(hashconnectConnectorInstance: Hashconnect, userId: string) {
+    const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
+    //TODO: get tokens from params
+    const tokenInAddress = '0x00000000000000000000000000000000021385a7';
+    const tokenOutAddress = '0x00000000000000000000000000000000021385af';
+    const userAddress = idToAddress(userId);
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
+
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(routerContractAddress))
+
+      //Set the gas for the contract call
+      .setGas(3000000)
+
+      //Set the contract function to call
+      .setFunction(
+        'removeLiquidity',
+        new ContractFunctionParameters()
+          .addAddress(tokenInAddress)
+          .addAddress(tokenOutAddress)
+          .addUint256(1000000000000000000)
+          .addUint256(1000000000000000000)
+          .addUint256(999999999999999000)
+          .addAddress(userAddress)
+          .addUint256(deadline),
       );
 
     const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
