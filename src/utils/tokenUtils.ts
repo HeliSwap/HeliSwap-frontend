@@ -2,14 +2,15 @@ import axios from 'axios';
 import { hethers } from '@hashgraph/hethers';
 
 import { ITokenData, IWalletBalance, TokenType } from '../interfaces/tokens';
+import { ContractId } from '@hashgraph/sdk';
 
-export const getTokenInfo = async (tokenId: string): Promise<ITokenData> => {
+export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
   const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/tokens/${tokenId}`;
 
   try {
     const {
       data: {
-        token_id: tokenId,
+        token_id: hederaId,
         name,
         symbol,
         decimals,
@@ -19,7 +20,7 @@ export const getTokenInfo = async (tokenId: string): Promise<ITokenData> => {
     } = await axios(url);
 
     const tokenInfo = {
-      tokenId,
+      hederaId,
       name,
       symbol,
       decimals: Number(decimals),
@@ -31,20 +32,11 @@ export const getTokenInfo = async (tokenId: string): Promise<ITokenData> => {
     return tokenInfo;
   } catch (e) {
     console.error(e);
-    // Let's assume that token is ECR20
-    return {
-      decimals: 0,
-      expiryTimestamp: '',
-      name: 'Some ERC20 token',
-      symbol: 'ERC20',
-      tokenId,
-      totalSupply: '0',
-      type: TokenType.ECR20,
-    } as ITokenData;
+    return {} as ITokenData;
   }
 };
 
-export const getTokensWalletBalance = async (userId: string): Promise<IWalletBalance> => {
+export const getHTSTokensWalletBalance = async (userId: string): Promise<IWalletBalance> => {
   const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/balances?order=asc&account.id=${userId}`;
 
   try {
@@ -71,4 +63,8 @@ export const addressToId = (tokenAddress: string) => {
 
 export const idToAddress = (tokenId: string) => {
   return hethers.utils.getAddressFromAccount(tokenId);
+};
+
+export const addressToContractId = (tokenAddress: string) => {
+  return ContractId.fromEvmAddress(0, 0, tokenAddress);
 };

@@ -8,7 +8,7 @@ import {
 import Hashconnect from '../connectors/hashconnect';
 import { ICreatePairData } from '../interfaces/comon';
 import { addressToId, idToAddress } from '../utils/tokenUtils';
-import { formatNumberToBigNumber } from '../utils/numberUtils';
+import { formatStringToBigNumberWei } from '../utils/numberUtils';
 
 import ERC20 from '../abi/ERC20';
 import PairV2 from '../abi/PairV2';
@@ -69,7 +69,7 @@ class SDK {
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
 
-    const amountToApproveBN = formatNumberToBigNumber(1000000000);
+    const amountToApproveBN = formatStringToBigNumberWei('1000000000');
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
@@ -124,11 +124,8 @@ class SDK {
     const tokenAAddress = idToAddress(tokenAId);
     const tokenBAddress = idToAddress(tokenBId);
 
-    const tokenAAmountNumber = Number(tokenAAmountString);
-    const tokenBAmountNumber = Number(tokenBAmountString);
-
-    const tokenAAmount = formatNumberToBigNumber(tokenAAmountNumber);
-    const tokenBAmount = formatNumberToBigNumber(tokenBAmountNumber);
+    const tokenAAmount = formatStringToBigNumberWei(tokenAAmountString);
+    const tokenBAmount = formatStringToBigNumberWei(tokenBAmountString);
 
     const userAddress = idToAddress(userId);
     const routerId = addressToId(process.env.REACT_APP_ROUTER_ADDRESS as string);
@@ -176,13 +173,22 @@ class SDK {
     return responseData;
   }
 
-  async removeLiquidity(hashconnectConnectorInstance: Hashconnect, userId: string) {
+  async removeLiquidity(
+    hashconnectConnectorInstance: Hashconnect,
+    userId: string,
+    tokenInAddress: string,
+    tokenOutAddress: string,
+    tokensLpAmount: string,
+    tokens0Amount: string,
+    tokens1Amount: string,
+  ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
-    //TODO: get tokens from params
-    const tokenInAddress = '0x00000000000000000000000000000000021385a7';
-    const tokenOutAddress = '0x00000000000000000000000000000000021385af';
     const userAddress = idToAddress(userId);
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
+
+    const tokensLpAmountBN = formatStringToBigNumberWei(tokensLpAmount);
+    const tokenAAmountBN = formatStringToBigNumberWei(tokens0Amount);
+    const tokenBAmountBN = formatStringToBigNumberWei(tokens1Amount);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
@@ -197,9 +203,9 @@ class SDK {
         new ContractFunctionParameters()
           .addAddress(tokenInAddress)
           .addAddress(tokenOutAddress)
-          .addUint256(1000000000000000000)
-          .addUint256(1000000000000000000)
-          .addUint256(999999999999999000)
+          .addUint256(tokensLpAmountBN)
+          .addUint256(tokenAAmountBN)
+          .addUint256(tokenBAmountBN)
           .addAddress(userAddress)
           .addUint256(deadline),
       );

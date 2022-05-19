@@ -13,6 +13,7 @@ import errorMessages from '../content/errors';
 import { idToAddress } from '../utils/tokenUtils';
 import { getConnectedWallet } from './Helpers';
 import { hethers } from '@hashgraph/hethers';
+import BigNumber from 'bignumber.js';
 
 interface ITokensData {
   tokenA: ITokenData;
@@ -44,6 +45,8 @@ const Create = () => {
     tokenB: [],
   });
 
+  const [poolData, setPoolData] = useState<IPairData>();
+
   const [createPairData, setCreatePairData] = useState<ICreatePairData>({
     tokenAAmount: '0',
     tokenBAmount: '0',
@@ -65,14 +68,22 @@ const Create = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
 
+    if (tokensInSamePool) {
+      const token0AmountBN = new BigNumber(poolData?.token0Amount as any);
+      const token1AmountBN = new BigNumber(poolData?.token1Amount as any);
+      const ratioBN = token0AmountBN.div(token1AmountBN);
+
+      console.log('ratioBN.toString()', ratioBN.toString());
+    }
+
     setCreatePairData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleApproveClick = async (key: string) => {
-    const { tokenId } = tokensData[key];
+    const { hederaId } = tokensData[key];
 
     try {
-      const receipt = await sdk.approveToken(hashconnectConnectorInstance, userId, tokenId);
+      const receipt = await sdk.approveToken(hashconnectConnectorInstance, userId, hederaId);
       const {
         response: { success, error },
       } = receipt;
@@ -156,16 +167,17 @@ const Create = () => {
     };
 
     const { tokenA, tokenB } = tokensData;
-    const newPairData = { tokenAId: tokenA.tokenId, tokenBId: tokenB.tokenId };
+    const newPairData = { tokenAId: tokenA.hederaId, tokenBId: tokenB.hederaId };
 
-    tokenA.tokenId && tokenA.type === TokenType.ECR20 && getApproved(tokenA.tokenId, 'tokenA');
-    tokenB.tokenId && tokenB.type === TokenType.ECR20 && getApproved(tokenB.tokenId, 'tokenB');
+    tokenA.hederaId && tokenA.type === TokenType.ERC20 && getApproved(tokenA.hederaId, 'tokenA');
+    tokenB.hederaId && tokenB.type === TokenType.ERC20 && getApproved(tokenB.hederaId, 'tokenB');
 
     setCreatePairData(prev => ({ ...prev, ...newPairData }));
   }, [tokensData, sdk, userId]);
 
   useEffect(() => {
     let inSamePool = false;
+    let poolAddress;
     const { tokenA, tokenB } = pairsData;
 
     // Check for same pool
@@ -173,10 +185,13 @@ const Create = () => {
       tokenB.forEach(elementB => {
         if (elementA.pairAddress === elementB.pairAddress) {
           inSamePool = true;
+          poolAddress = elementA.pairAddress;
+          setPoolData(elementA);
         }
       });
     });
 
+    console.log('poolAddress', poolAddress);
     setTokensInSamePool(inSamePool);
   }, [pairsData]);
 

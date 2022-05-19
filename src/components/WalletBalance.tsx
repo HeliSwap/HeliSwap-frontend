@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ITokenData, IUserToken } from '../interfaces/tokens';
-import { getTokensWalletBalance } from '../utils/tokenUtils';
+import { getHTSTokensWalletBalance } from '../utils/tokenUtils';
 
 interface IWalletBalance {
   userId: string;
@@ -14,7 +14,7 @@ const WalletBalance = ({ userId, tokenData, setMaxNumber }: IWalletBalance) => {
 
   useEffect(() => {
     const getUserTokensData = async () => {
-      const { tokens } = await getTokensWalletBalance(userId);
+      const { tokens } = await getHTSTokensWalletBalance(userId);
       setUserTokenList(tokens);
     };
 
@@ -25,7 +25,7 @@ const WalletBalance = ({ userId, tokenData, setMaxNumber }: IWalletBalance) => {
 
   useEffect(() => {
     const getTokenBalance = () => {
-      const tokenFound = userTokenList.find(item => item.tokenId === tokenData.tokenId);
+      const tokenFound = userTokenList.find(item => item.hederaId === tokenData.hederaId);
       const tokenDecimals = tokenData.decimals || 2;
       const tokenBalance = tokenFound
         ? (tokenFound.balance / Math.pow(10, tokenDecimals)).toFixed(tokenDecimals)
