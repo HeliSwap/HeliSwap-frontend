@@ -24,7 +24,7 @@ const PairDetails = () => {
 
   const { address } = useParams();
 
-  const { error, loading, data } = useQuery(GET_POOLS);
+  const { error, loading, data, refetch } = useQuery(GET_POOLS);
   const [pairData, setPairData] = useState<IPairData>({} as IPairData);
   const [pairDataContracts, setPairDataContracts] = useState({
     balance: '0.0',
@@ -182,6 +182,14 @@ const PairDetails = () => {
       tokens0ToRemoveStr,
       tokens1ToRemoveStr,
     );
+
+    setPairDataContracts({
+      balance: '0.0',
+      totalSupply: '0.0',
+      token0: '0.0',
+      token1: '0.0',
+    });
+    refetch();
   };
 
   const hasUserProvided = Number(pairDataContracts.balance) > 0;
