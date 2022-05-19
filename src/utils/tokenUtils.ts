@@ -26,6 +26,7 @@ export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
       decimals: Number(decimals),
       totalSupply,
       expiryTimestamp,
+      address: idToAddress(hederaId),
       type: TokenType.HTS,
     };
 

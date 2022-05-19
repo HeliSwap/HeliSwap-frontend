@@ -2,6 +2,7 @@ export interface ITokenData {
   hederaId: string;
   name: string;
   symbol: string;
+  address: string;
   decimals: number;
   totalSupply: string;
   expiryTimestamp: string;

@@ -71,12 +71,26 @@ const Create = () => {
     if (tokensInSamePool) {
       const token0AmountBN = new BigNumber(poolData?.token0Amount as any);
       const token1AmountBN = new BigNumber(poolData?.token1Amount as any);
-      const ratioBN = token0AmountBN.div(token1AmountBN);
+      const ratioBN =
+        name === 'tokenAAmount'
+          ? token1AmountBN.div(token0AmountBN)
+          : token0AmountBN.div(token1AmountBN);
+
+      console.log('name', name);
+      const valueBN = new BigNumber(value);
+      const valueToUpdate = valueBN.times(ratioBN);
 
       console.log('ratioBN.toString()', ratioBN.toString());
-    }
+      console.log('valueToUpdate.toString()', valueToUpdate.toString());
 
-    setCreatePairData(prev => ({ ...prev, [name]: value }));
+      setCreatePairData(prev => ({
+        ...prev,
+        tokenBAmount: valueToUpdate.toString(),
+        [name]: value,
+      }));
+    } else {
+      setCreatePairData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleApproveClick = async (key: string) => {
@@ -177,7 +191,6 @@ const Create = () => {
 
   useEffect(() => {
     let inSamePool = false;
-    let poolAddress;
     const { tokenA, tokenB } = pairsData;
 
     // Check for same pool
@@ -185,13 +198,11 @@ const Create = () => {
       tokenB.forEach(elementB => {
         if (elementA.pairAddress === elementB.pairAddress) {
           inSamePool = true;
-          poolAddress = elementA.pairAddress;
           setPoolData(elementA);
         }
       });
     });
 
-    console.log('poolAddress', poolAddress);
     setTokensInSamePool(inSamePool);
   }, [pairsData]);
 
