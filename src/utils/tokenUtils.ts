@@ -4,7 +4,7 @@ import { hethers } from '@hashgraph/hethers';
 import { ITokenData, IWalletBalance, TokenType } from '../interfaces/tokens';
 import { ContractId } from '@hashgraph/sdk';
 
-export const getTokenInfo = async (tokenId: string): Promise<ITokenData> => {
+export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
   const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/tokens/${tokenId}`;
 
   try {
@@ -32,20 +32,11 @@ export const getTokenInfo = async (tokenId: string): Promise<ITokenData> => {
     return tokenInfo;
   } catch (e) {
     console.error(e);
-    // Let's assume that token is ERC20
-    return {
-      decimals: 0,
-      expiryTimestamp: '',
-      name: 'Some ERC20 token',
-      symbol: 'ERC20',
-      hederaId: tokenId,
-      totalSupply: '0',
-      type: TokenType.ERC20,
-    } as ITokenData;
+    return {} as ITokenData;
   }
 };
 
-export const getTokensWalletBalance = async (userId: string): Promise<IWalletBalance> => {
+export const getHTSTokensWalletBalance = async (userId: string): Promise<IWalletBalance> => {
   const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/balances?order=asc&account.id=${userId}`;
 
   try {
