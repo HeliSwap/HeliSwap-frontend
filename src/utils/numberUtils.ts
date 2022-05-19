@@ -8,3 +8,7 @@ export const formatStringToPrice = (stringToFormat: string) => {
 export const formatNumberToBigNumber = (numberToFormat: number, decimals: number = 18) => {
   return new BigNumber(numberToFormat * Math.pow(10, decimals));
 };
+
+export const formatBigNumberToNumber = (numberToFormat: number, decimals: number = 18) => {
+  return numberToFormat / Math.pow(10, decimals);
+};

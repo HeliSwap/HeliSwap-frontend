@@ -176,11 +176,13 @@ class SDK {
     return responseData;
   }
 
-  async removeLiquidity(hashconnectConnectorInstance: Hashconnect, userId: string) {
+  async removeLiquidity(
+    hashconnectConnectorInstance: Hashconnect,
+    userId: string,
+    tokenInAddress: string,
+    tokenOutAddress: string,
+  ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
-    //TODO: get tokens from params
-    const tokenInAddress = '0x00000000000000000000000000000000021385a7';
-    const tokenOutAddress = '0x00000000000000000000000000000000021385af';
     const userAddress = idToAddress(userId);
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
 

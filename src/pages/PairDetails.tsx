@@ -1,16 +1,18 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import { useParams } from 'react-router-dom';
-import { IPairData } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
 import { useQuery } from '@apollo/client';
 import { GET_POOLS } from '../GraphQL/Queries';
-import Loader from '../components/Loader';
-import { idToAddress } from '../utils/tokenUtils';
+
+import { IPairData } from '../interfaces/tokens';
+
+import { idToAddress, addressToContractId } from '../utils/tokenUtils';
+import { formatBigNumberToNumber } from '../utils/numberUtils';
 import { getConnectedWallet } from './Helpers';
+import Loader from '../components/Loader';
 import Button from '../components/Button';
-import { ContractId } from '@hashgraph/sdk';
 
 const PairDetails = () => {
   const contextValue = useContext(GlobalContext);
@@ -78,7 +80,7 @@ const PairDetails = () => {
       const token1Str = hethers.utils.formatUnits(token1BN, 18);
 
       const balanceNum = Number(balanceStr);
-      const totalSupplyNum = Number(totalSupplyStr);
+      // const totalSupplyNum = Number(totalSupplyStr);
       // const token0Num = Number(token0Str);
       // const token1Num = Number(token1Str);
 
@@ -96,8 +98,8 @@ const PairDetails = () => {
 
   const hanleApproveLPClick = async () => {
     try {
-      const contractId = ContractId.fromEvmAddress(0, 0, pairData.pairAddress);
-      const result = await sdk.approveToken(hashconnectConnectorInstance, userId, contractId);
+      const contractId = addressToContractId(pairData.pairAddress);
+      await sdk.approveToken(hashconnectConnectorInstance, userId, contractId);
       setLpApproved(true);
     } catch (e) {
       console.error(e);
@@ -107,9 +109,12 @@ const PairDetails = () => {
 
   const hanleRemoveLPClick = async () => {
     try {
-      const contractId = ContractId.fromEvmAddress(0, 0, pairData.pairAddress);
-      const result = await sdk.removeLiquidity(hashconnectConnectorInstance, userId);
-      setLpApproved(true);
+      await sdk.removeLiquidity(
+        hashconnectConnectorInstance,
+        userId,
+        pairData.token0,
+        pairData.token1,
+      );
     } catch (e) {
       console.error(e);
     } finally {
@@ -126,15 +131,15 @@ const PairDetails = () => {
 
   return (
     <div className="d-flex justify-content-center">
-      {error ? (
-        <div className="alert alert-danger mb-5" role="alert">
-          <strong>Something went wrong!</strong> Cannot get pair data...
-        </div>
-      ) : null}
-
-      {loading ? <Loader loadingText="Loading pool data..." /> : null}
-
       <div className="container-swap">
+        {error ? (
+          <div className="alert alert-danger mb-5" role="alert">
+            <strong>Something went wrong!</strong> Cannot get pair data...
+          </div>
+        ) : null}
+
+        {loading ? <Loader loadingText="Loading pool data..." /> : null}
+
         <h2 className="text-display">{pairData.pairSymbol} Pair</h2>
         <p className="text-small mt-2">{pairData.pairAddress}</p>
 
@@ -143,10 +148,10 @@ const PairDetails = () => {
             <div className="p-3 rounded border border-primary">
               <p>Pooled tokens:</p>
               <p className="text-title">
-                {pairData.token0Amount} {pairData.token0Symbol}
+                {formatBigNumberToNumber(pairData.token0Amount)} {pairData.token0Symbol}
               </p>
               <p className="text-title">
-                {pairData.token1Amount} {pairData.token1Symbol}
+                {formatBigNumberToNumber(pairData.token1Amount)} {pairData.token1Symbol}
               </p>
             </div>
 

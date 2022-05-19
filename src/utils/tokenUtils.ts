@@ -2,6 +2,7 @@ import axios from 'axios';
 import { hethers } from '@hashgraph/hethers';
 
 import { ITokenData, IWalletBalance, TokenType } from '../interfaces/tokens';
+import { ContractId } from '@hashgraph/sdk';
 
 export const getTokenInfo = async (tokenId: string): Promise<ITokenData> => {
   const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/tokens/${tokenId}`;
@@ -71,4 +72,8 @@ export const addressToId = (tokenAddress: string) => {
 
 export const idToAddress = (tokenId: string) => {
   return hethers.utils.getAddressFromAccount(tokenId);
+};
+
+export const addressToContractId = (tokenAddress: string) => {
+  return ContractId.fromEvmAddress(0, 0, tokenAddress);
 };
