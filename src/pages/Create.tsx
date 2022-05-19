@@ -76,16 +76,13 @@ const Create = () => {
           ? token1AmountBN.div(token0AmountBN)
           : token0AmountBN.div(token1AmountBN);
 
-      console.log('name', name);
       const valueBN = new BigNumber(value);
       const valueToUpdate = valueBN.times(ratioBN);
-
-      console.log('ratioBN.toString()', ratioBN.toString());
-      console.log('valueToUpdate.toString()', valueToUpdate.toString());
+      const keyToUpdate = name === 'tokenAAmount' ? 'tokenBAmount' : 'tokenAAmount';
 
       setCreatePairData(prev => ({
         ...prev,
-        tokenBAmount: valueToUpdate.toString(),
+        [keyToUpdate]: valueToUpdate.toString(),
         [name]: value,
       }));
     } else {
