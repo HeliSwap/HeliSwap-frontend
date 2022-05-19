@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getTokenInfo, addressToId } from '../utils/tokenUtils';
-import { ITokenData, IPairData } from '../interfaces/tokens';
+import { ITokenData } from '../interfaces/tokens';
 
 import { useQuery } from '@apollo/client';
 import { GET_TOKENS } from '../GraphQL/Queries';
@@ -8,41 +7,15 @@ import Loader from '../components/Loader';
 
 const Tokens = () => {
   const { error, loading, data } = useQuery(GET_TOKENS);
-  const [loadingGeneral, setLoadingGeneral] = useState(false);
   const [tokenData, setTokenData] = useState<ITokenData[]>([]);
-  const [tokenList, setTokenList] = useState<string[]>([]);
 
   useEffect(() => {
     if (data) {
-      const { pools } = data;
-      const tokens = pools.reduce((acc: any, item: IPairData) => {
-        const item0Id = addressToId(item.token0);
-        const item1Id = addressToId(item.token1);
+      const { getTokensData } = data;
 
-        if (!acc.includes(item0Id)) acc.push(item0Id);
-        if (!acc.includes(item1Id)) acc.push(item1Id);
-
-        return acc;
-      }, []);
-
-      setTokenList(tokens);
+      getTokensData.length > 0 && setTokenData(getTokensData);
     }
   }, [data]);
-
-  useEffect(() => {
-    const getTokensDada = async (tokenList: string[]) => {
-      setLoadingGeneral(true);
-      const arrayPromises = tokenList.map(tokenId => getTokenInfo(tokenId));
-      const result = await Promise.all(arrayPromises);
-
-      setTokenData(result);
-      setLoadingGeneral(false);
-    };
-
-    if (tokenList.length > 0) {
-      getTokensDada(tokenList);
-    }
-  }, [tokenList]);
 
   const haveTokens = tokenData.length > 0;
 
@@ -54,7 +27,7 @@ const Tokens = () => {
             <strong>Something went wrong!</strong> Cannot get pairs...
           </div>
         ) : null}
-        {loading || loadingGeneral ? (
+        {loading ? (
           <Loader loadingText="Loading tokens..." />
         ) : haveTokens ? (
           <div className="container-table">

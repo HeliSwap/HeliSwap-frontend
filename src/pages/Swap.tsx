@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { getTokenInfo, addressToId } from '../utils/tokenUtils';
-import { ITokenData, ISwapTokenData, IPairData } from '../interfaces/tokens';
+import { ITokenData, ISwapTokenData } from '../interfaces/tokens';
 import { IStringToString } from '../interfaces/comon';
 import { GlobalContext } from '../providers/Global';
 
@@ -28,7 +27,6 @@ const Swap = () => {
     amountOut: '',
   };
 
-  const [tokenList, setTokenList] = useState<string[]>([]);
   const [tokenDataList, setTokenDataList] = useState<ITokenData[]>([]);
   const [tokenApproved, setTokenApproved] = useState(false);
 
@@ -79,33 +77,10 @@ const Swap = () => {
 
   useEffect(() => {
     if (data) {
-      const { pools } = data;
-      const tokens = pools.reduce((acc: any, item: IPairData) => {
-        const item0Id = addressToId(item.token0);
-        const item1Id = addressToId(item.token1);
-
-        if (!acc.includes(item0Id)) acc.push(item0Id);
-        if (!acc.includes(item1Id)) acc.push(item1Id);
-
-        return acc;
-      }, []);
-
-      setTokenList(tokens);
+      const { getTokensData } = data;
+      getTokensData.length > 0 && setTokenDataList(getTokensData);
     }
   }, [data]);
-
-  useEffect(() => {
-    const getTokensDada = async (tokenList: string[]) => {
-      const arrayPromises = tokenList.map(tokenId => getTokenInfo(tokenId));
-      const result = await Promise.all(arrayPromises);
-
-      setTokenDataList(result);
-    };
-
-    if (tokenList.length > 0) {
-      getTokensDada(tokenList);
-    }
-  }, [tokenList]);
 
   return (
     <div className="d-flex justify-content-center">

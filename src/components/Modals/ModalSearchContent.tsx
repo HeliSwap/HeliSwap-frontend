@@ -86,7 +86,7 @@ const ModalSearchContent = ({
   };
 
   useEffect(() => {
-    Object.keys(foundTokenData).length > 0 && setCurrentToken(idToAddress(foundTokenData.tokenId));
+    Object.keys(foundTokenData).length > 0 && setCurrentToken(idToAddress(foundTokenData.hederaId));
   }, [foundTokenData]);
 
   const hasTokenData = Object.keys(foundTokenData).length > 0;

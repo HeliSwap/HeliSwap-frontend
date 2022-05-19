@@ -60,7 +60,7 @@ const TokenInputSelector = ({
 
   useEffect(() => {
     if (tokenDataList.length > 0) {
-      setSelectValue(tokenDataList[0].tokenId);
+      setSelectValue(tokenDataList[0].hederaId);
     }
   }, [tokenDataList]);
 
@@ -94,7 +94,7 @@ const TokenInputSelector = ({
             className="form-control"
           >
             {tokenDataList.map(item => (
-              <option key={item.tokenId} value={item.tokenId}>
+              <option key={item.hederaId} value={item.hederaId}>
                 {item.symbol}
               </option>
             ))}
@@ -106,7 +106,7 @@ const TokenInputSelector = ({
             setMaxNumber={setMaxNumber}
             userId={userId}
             tokenData={
-              tokenDataList.find(item => item.tokenId === selectValue) || ({} as ITokenData)
+              tokenDataList.find(item => item.hederaId === selectValue) || ({} as ITokenData)
             }
           />
         ) : null}

@@ -25,7 +25,7 @@ const WalletBalance = ({ userId, tokenData, setMaxNumber }: IWalletBalance) => {
 
   useEffect(() => {
     const getTokenBalance = () => {
-      const tokenFound = userTokenList.find(item => item.tokenId === tokenData.tokenId);
+      const tokenFound = userTokenList.find(item => item.hederaId === tokenData.hederaId);
       const tokenDecimals = tokenData.decimals || 2;
       const tokenBalance = tokenFound
         ? (tokenFound.balance / Math.pow(10, tokenDecimals)).toFixed(tokenDecimals)

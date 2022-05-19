@@ -10,7 +10,7 @@ export const getTokenInfo = async (tokenId: string): Promise<ITokenData> => {
   try {
     const {
       data: {
-        token_id: tokenId,
+        token_id: hederaId,
         name,
         symbol,
         decimals,
@@ -20,7 +20,7 @@ export const getTokenInfo = async (tokenId: string): Promise<ITokenData> => {
     } = await axios(url);
 
     const tokenInfo = {
-      tokenId,
+      hederaId,
       name,
       symbol,
       decimals: Number(decimals),
@@ -38,7 +38,7 @@ export const getTokenInfo = async (tokenId: string): Promise<ITokenData> => {
       expiryTimestamp: '',
       name: 'Some ERC20 token',
       symbol: 'ERC20',
-      tokenId,
+      hederaId: tokenId,
       totalSupply: '0',
       type: TokenType.ECR20,
     } as ITokenData;

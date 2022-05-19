@@ -80,10 +80,10 @@ const Create = () => {
   };
 
   const handleApproveClick = async (key: string) => {
-    const { tokenId } = tokensData[key];
+    const { hederaId } = tokensData[key];
 
     try {
-      const receipt = await sdk.approveToken(hashconnectConnectorInstance, userId, tokenId);
+      const receipt = await sdk.approveToken(hashconnectConnectorInstance, userId, hederaId);
       const {
         response: { success, error },
       } = receipt;
@@ -167,10 +167,10 @@ const Create = () => {
     };
 
     const { tokenA, tokenB } = tokensData;
-    const newPairData = { tokenAId: tokenA.tokenId, tokenBId: tokenB.tokenId };
+    const newPairData = { tokenAId: tokenA.hederaId, tokenBId: tokenB.hederaId };
 
-    tokenA.tokenId && tokenA.type === TokenType.ECR20 && getApproved(tokenA.tokenId, 'tokenA');
-    tokenB.tokenId && tokenB.type === TokenType.ECR20 && getApproved(tokenB.tokenId, 'tokenB');
+    tokenA.hederaId && tokenA.type === TokenType.ECR20 && getApproved(tokenA.hederaId, 'tokenA');
+    tokenB.hederaId && tokenB.type === TokenType.ECR20 && getApproved(tokenB.hederaId, 'tokenB');
 
     setCreatePairData(prev => ({ ...prev, ...newPairData }));
   }, [tokensData, sdk, userId]);

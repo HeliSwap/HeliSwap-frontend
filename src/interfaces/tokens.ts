@@ -1,5 +1,5 @@
 export interface ITokenData {
-  tokenId: string;
+  hederaId: string;
   name: string;
   symbol: string;
   decimals: number;
@@ -14,7 +14,7 @@ export enum TokenType {
 }
 
 export interface IUserToken {
-  tokenId: string;
+  hederaId: string;
   balance: number;
 }
 
