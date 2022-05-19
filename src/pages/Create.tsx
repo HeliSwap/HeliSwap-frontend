@@ -13,6 +13,7 @@ import errorMessages from '../content/errors';
 import { idToAddress } from '../utils/tokenUtils';
 import { getConnectedWallet } from './Helpers';
 import { hethers } from '@hashgraph/hethers';
+import BigNumber from 'bignumber.js';
 
 interface ITokensData {
   tokenA: ITokenData;
@@ -44,6 +45,8 @@ const Create = () => {
     tokenB: [],
   });
 
+  const [poolData, setPoolData] = useState<IPairData>();
+
   const [createPairData, setCreatePairData] = useState<ICreatePairData>({
     tokenAAmount: '0',
     tokenBAmount: '0',
@@ -64,6 +67,14 @@ const Create = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
+
+    if (tokensInSamePool) {
+      const token0AmountBN = new BigNumber(poolData?.token0Amount as any);
+      const token1AmountBN = new BigNumber(poolData?.token1Amount as any);
+      const ratioBN = token0AmountBN.div(token1AmountBN);
+
+      console.log('ratioBN.toString()', ratioBN.toString());
+    }
 
     setCreatePairData(prev => ({ ...prev, [name]: value }));
   };
@@ -166,6 +177,7 @@ const Create = () => {
 
   useEffect(() => {
     let inSamePool = false;
+    let poolAddress;
     const { tokenA, tokenB } = pairsData;
 
     // Check for same pool
@@ -173,6 +185,8 @@ const Create = () => {
       tokenB.forEach(elementB => {
         if (elementA.pairAddress === elementB.pairAddress) {
           inSamePool = true;
+          poolAddress = elementA.pairAddress;
+          setPoolData(elementA);
         }
       });
     });
