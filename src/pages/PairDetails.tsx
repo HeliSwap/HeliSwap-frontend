@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import { useParams } from 'react-router-dom';
 import { GlobalContext } from '../providers/Global';
+import BigNumber from 'bignumber.js';
 
 import { useQuery } from '@apollo/client';
 import { GET_POOLS } from '../GraphQL/Queries';
@@ -39,6 +40,8 @@ const PairDetails = () => {
     if (data && data.pools.length > 0) {
       const foundPool = data.pools.find((pool: IPairData) => pool.pairAddress === address);
 
+      console.log('foundPool', foundPool);
+
       if (foundPool) {
         setPairData(foundPool);
       }
@@ -58,8 +61,6 @@ const PairDetails = () => {
         const resultStr = hethers.utils.formatUnits(resultBN, 18);
         const resultNum = Number(resultStr);
 
-        console.log('resultNum', resultNum);
-
         setLpApproved(resultNum > 10000);
       }
     };
@@ -73,6 +74,9 @@ const PairDetails = () => {
       const balanceBN = await sdk.checkBalance(pairData.pairAddress, userAddress, connectedWallet);
       const totalSupplyBN = await sdk.getTotalSupply(pairData.pairAddress, connectedWallet);
       const [token0BN, token1BN] = await sdk.getReserves(pairData.pairAddress, connectedWallet);
+
+      console.log('balanceBN', balanceBN.toString());
+      console.log('totalSupplyBN', totalSupplyBN.toString());
 
       const balanceStr = hethers.utils.formatUnits(balanceBN, 18);
       const totalSupplyStr = hethers.utils.formatUnits(totalSupplyBN, 18);
@@ -107,24 +111,77 @@ const PairDetails = () => {
     }
   };
 
-  const hanleRemoveLPClick = async () => {
-    try {
-      await sdk.removeLiquidity(
-        hashconnectConnectorInstance,
-        userId,
-        pairData.token0,
-        pairData.token1,
-      );
-    } catch (e) {
-      console.error(e);
-    } finally {
-    }
-  };
+  // const hanleRemoveLPClick = async () => {
+  //   try {
+  //     await sdk.removeLiquidity(
+  //       hashconnectConnectorInstance,
+  //       userId,
+  //       pairData.token0,
+  //       pairData.token1,
+  //     );
+  //   } catch (e) {
+  //     console.error(e);
+  //   } finally {
+  //   }
+  // };
 
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
     setLpInputValue(value);
+  };
+
+  const hanleCalculateClick = () => {
+    calculateTokensAmount();
+  };
+
+  const calculateTokensAmount = async () => {
+    // Convert amounts to BN
+    const tokensLPToRemoveBN = new BigNumber(lpInputValue);
+    const totalSupplyTokensLPBN = new BigNumber(pairDataContracts.totalSupply);
+    const token0BN = new BigNumber(pairDataContracts.token0);
+    const token1BN = new BigNumber(pairDataContracts.token1);
+
+    // Get LP token ratio - LP tokens to remove / Total amount ot LP tokens
+    const ratioBN = tokensLPToRemoveBN.div(totalSupplyTokensLPBN);
+
+    // Calculate reserves token amounts
+    const tokens0ToRemoveBN = token0BN.times(ratioBN);
+    const tokens1ToRemoveBN = token1BN.times(ratioBN);
+
+    // Convent to string and numbers
+    const tokensLPToRemoveStr = tokensLPToRemoveBN.toString();
+    const totalSupplyTokensLPStr = totalSupplyTokensLPBN.toString();
+
+    const tokens0ToRemoveStrRaw = tokens0ToRemoveBN.toString();
+    const tokens0ToRemoveStrArr = tokens0ToRemoveStrRaw.split('.');
+    tokens0ToRemoveStrArr[1] = tokens0ToRemoveStrArr[1].slice(0, 18);
+    const tokens0ToRemoveStr = tokens0ToRemoveStrArr.join('.');
+
+    const tokens1ToRemoveStrRaw = tokens1ToRemoveBN.toString();
+    const tokens1ToRemoveStrArr = tokens1ToRemoveStrRaw.split('.');
+    tokens1ToRemoveStrArr[1] = tokens1ToRemoveStrArr[1].slice(0, 18);
+    const tokens1ToRemoveStr = tokens1ToRemoveStrArr.join('.');
+
+    const ratioStr = ratioBN.toString();
+
+    console.log('tokensLPToRemoveStr', tokensLPToRemoveStr);
+    console.log('totalSupplyTokensLPStr', totalSupplyTokensLPStr);
+    console.log('ratioStr', ratioStr);
+    console.log('tokens0ToRemoveStrRaw', tokens0ToRemoveStrRaw);
+    console.log('tokens0ToRemoveStr', tokens0ToRemoveStr);
+    console.log('tokens1ToRemoveStrRaw', tokens1ToRemoveStrRaw);
+    console.log('tokens1ToRemoveStr', tokens1ToRemoveStr);
+
+    await sdk.removeLiquidity(
+      hashconnectConnectorInstance,
+      userId,
+      pairData.token0,
+      pairData.token1,
+      tokensLPToRemoveStr,
+      tokens0ToRemoveStr,
+      tokens1ToRemoveStr,
+    );
   };
 
   const hasUserProvided = Number(pairDataContracts.balance) > 0;
@@ -145,7 +202,7 @@ const PairDetails = () => {
 
         <div className="row mt-5">
           <div className="col-6">
-            <div className="p-3 rounded border border-primary">
+            <div className="p-4 rounded border border-primary">
               <p>Pooled tokens:</p>
               <p className="text-title">
                 {formatBigNumberToNumber(pairData.token0Amount)} {pairData.token0Symbol}
@@ -156,7 +213,7 @@ const PairDetails = () => {
             </div>
 
             {connectedWallet && hasUserProvided && (
-              <div className="p-3 rounded border border-primary mt-4">
+              <div className="p-4 rounded border border-primary mt-4">
                 <h3>Remove liquidity</h3>
                 <div className="mt-4">
                   {lpApproved ? (
@@ -169,9 +226,14 @@ const PairDetails = () => {
                         name=""
                         className="form-control mt-2"
                       />
-                      <Button className="mt-3" onClick={hanleRemoveLPClick}>
-                        Remove LP
-                      </Button>
+                      <div className="d-flex align-items-center">
+                        <Button className="mt-4" onClick={hanleCalculateClick}>
+                          Calculate and remove
+                        </Button>
+                        {/* <Button className="mt-4" onClick={hanleRemoveLPClick}>
+                          Remove LP
+                        </Button> */}
+                      </div>
                     </div>
                   ) : (
                     <Button onClick={hanleApproveLPClick}>Approve LP</Button>
@@ -184,7 +246,7 @@ const PairDetails = () => {
           {connectedWallet ? (
             <div className="col-6">
               {hasUserProvided ? (
-                <div className="p-3 rounded border border-primary">
+                <div className="p-4 rounded border border-primary">
                   <p>User LP tokens:</p>
                   <p className="text-title">{pairDataContracts.balance}</p>
                   <p className="mt-3">LP total supply:</p>
