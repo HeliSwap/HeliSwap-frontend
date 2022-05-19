@@ -10,7 +10,7 @@ import { GET_POOLS } from '../GraphQL/Queries';
 import { IPairData } from '../interfaces/tokens';
 
 import { idToAddress, addressToContractId } from '../utils/tokenUtils';
-import { formatBigNumberToNumber } from '../utils/numberUtils';
+import { formatBigNumberToNumber, formatBigNumberToStringPrecision } from '../utils/numberUtils';
 import { getConnectedWallet } from './Helpers';
 import Loader from '../components/Loader';
 import Button from '../components/Button';
@@ -129,16 +129,8 @@ const PairDetails = () => {
 
     // Convent to string and numbers
     const tokensLPToRemoveStr = tokensLPToRemoveBN.toString();
-
-    const tokens0ToRemoveStrRaw = tokens0ToRemoveBN.toString();
-    const tokens0ToRemoveStrArr = tokens0ToRemoveStrRaw.split('.');
-    tokens0ToRemoveStrArr[1] = tokens0ToRemoveStrArr[1].slice(0, 18);
-    const tokens0ToRemoveStr = tokens0ToRemoveStrArr.join('.');
-
-    const tokens1ToRemoveStrRaw = tokens1ToRemoveBN.toString();
-    const tokens1ToRemoveStrArr = tokens1ToRemoveStrRaw.split('.');
-    tokens1ToRemoveStrArr[1] = tokens1ToRemoveStrArr[1].slice(0, 18);
-    const tokens1ToRemoveStr = tokens1ToRemoveStrArr.join('.');
+    const tokens0ToRemoveStr = formatBigNumberToStringPrecision(tokens0ToRemoveBN);
+    const tokens1ToRemoveStr = formatBigNumberToStringPrecision(tokens1ToRemoveBN);
 
     await sdk.removeLiquidity(
       hashconnectConnectorInstance,
