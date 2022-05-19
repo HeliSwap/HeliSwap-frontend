@@ -40,8 +40,6 @@ const PairDetails = () => {
     if (data && data.pools.length > 0) {
       const foundPool = data.pools.find((pool: IPairData) => pool.pairAddress === address);
 
-      console.log('foundPool', foundPool);
-
       if (foundPool) {
         setPairData(foundPool);
       }
@@ -75,18 +73,12 @@ const PairDetails = () => {
       const totalSupplyBN = await sdk.getTotalSupply(pairData.pairAddress, connectedWallet);
       const [token0BN, token1BN] = await sdk.getReserves(pairData.pairAddress, connectedWallet);
 
-      console.log('balanceBN', balanceBN.toString());
-      console.log('totalSupplyBN', totalSupplyBN.toString());
-
       const balanceStr = hethers.utils.formatUnits(balanceBN, 18);
       const totalSupplyStr = hethers.utils.formatUnits(totalSupplyBN, 18);
       const token0Str = hethers.utils.formatUnits(token0BN, 18);
       const token1Str = hethers.utils.formatUnits(token1BN, 18);
 
       const balanceNum = Number(balanceStr);
-      // const totalSupplyNum = Number(totalSupplyStr);
-      // const token0Num = Number(token0Str);
-      // const token1Num = Number(token1Str);
 
       if (balanceNum > 0) {
         setPairDataContracts({
@@ -110,20 +102,6 @@ const PairDetails = () => {
     } finally {
     }
   };
-
-  // const hanleRemoveLPClick = async () => {
-  //   try {
-  //     await sdk.removeLiquidity(
-  //       hashconnectConnectorInstance,
-  //       userId,
-  //       pairData.token0,
-  //       pairData.token1,
-  //     );
-  //   } catch (e) {
-  //     console.error(e);
-  //   } finally {
-  //   }
-  // };
 
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -151,7 +129,6 @@ const PairDetails = () => {
 
     // Convent to string and numbers
     const tokensLPToRemoveStr = tokensLPToRemoveBN.toString();
-    const totalSupplyTokensLPStr = totalSupplyTokensLPBN.toString();
 
     const tokens0ToRemoveStrRaw = tokens0ToRemoveBN.toString();
     const tokens0ToRemoveStrArr = tokens0ToRemoveStrRaw.split('.');
@@ -162,16 +139,6 @@ const PairDetails = () => {
     const tokens1ToRemoveStrArr = tokens1ToRemoveStrRaw.split('.');
     tokens1ToRemoveStrArr[1] = tokens1ToRemoveStrArr[1].slice(0, 18);
     const tokens1ToRemoveStr = tokens1ToRemoveStrArr.join('.');
-
-    const ratioStr = ratioBN.toString();
-
-    console.log('tokensLPToRemoveStr', tokensLPToRemoveStr);
-    console.log('totalSupplyTokensLPStr', totalSupplyTokensLPStr);
-    console.log('ratioStr', ratioStr);
-    console.log('tokens0ToRemoveStrRaw', tokens0ToRemoveStrRaw);
-    console.log('tokens0ToRemoveStr', tokens0ToRemoveStr);
-    console.log('tokens1ToRemoveStrRaw', tokens1ToRemoveStrRaw);
-    console.log('tokens1ToRemoveStr', tokens1ToRemoveStr);
 
     await sdk.removeLiquidity(
       hashconnectConnectorInstance,
@@ -238,9 +205,6 @@ const PairDetails = () => {
                         <Button className="mt-4" onClick={hanleCalculateClick}>
                           Calculate and remove
                         </Button>
-                        {/* <Button className="mt-4" onClick={hanleRemoveLPClick}>
-                          Remove LP
-                        </Button> */}
                       </div>
                     </div>
                   ) : (
