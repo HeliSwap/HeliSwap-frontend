@@ -32,7 +32,7 @@ export const getTokenInfo = async (tokenId: string): Promise<ITokenData> => {
     return tokenInfo;
   } catch (e) {
     console.error(e);
-    // Let's assume that token is ECR20
+    // Let's assume that token is ERC20
     return {
       decimals: 0,
       expiryTimestamp: '',
@@ -40,7 +40,7 @@ export const getTokenInfo = async (tokenId: string): Promise<ITokenData> => {
       symbol: 'ERC20',
       hederaId: tokenId,
       totalSupply: '0',
-      type: TokenType.ECR20,
+      type: TokenType.ERC20,
     } as ITokenData;
   }
 };

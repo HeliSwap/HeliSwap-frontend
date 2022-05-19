@@ -10,7 +10,7 @@ export interface ITokenData {
 
 export enum TokenType {
   HTS,
-  ECR20,
+  ERC20,
 }
 
 export interface IUserToken {

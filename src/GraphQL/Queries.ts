@@ -53,6 +53,19 @@ export const GET_TOKENS = gql`
   }
 `;
 
+export const GET_TOKEN_INFO = gql`
+  query getTokenByAddressOrId($id: String!) {
+    getTokenInfo(tokenIdOrAddress: $id) {
+      id
+      address
+      hederaId
+      symbol
+      name
+      decimals
+    }
+  }
+`;
+
 export const GET_SWAP_RATE = gql`
   query {
     getSwapRate {

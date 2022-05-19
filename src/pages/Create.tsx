@@ -169,8 +169,8 @@ const Create = () => {
     const { tokenA, tokenB } = tokensData;
     const newPairData = { tokenAId: tokenA.hederaId, tokenBId: tokenB.hederaId };
 
-    tokenA.hederaId && tokenA.type === TokenType.ECR20 && getApproved(tokenA.hederaId, 'tokenA');
-    tokenB.hederaId && tokenB.type === TokenType.ECR20 && getApproved(tokenB.hederaId, 'tokenB');
+    tokenA.hederaId && tokenA.type === TokenType.ERC20 && getApproved(tokenA.hederaId, 'tokenA');
+    tokenB.hederaId && tokenB.type === TokenType.ERC20 && getApproved(tokenB.hederaId, 'tokenB');
 
     setCreatePairData(prev => ({ ...prev, ...newPairData }));
   }, [tokensData, sdk, userId]);
@@ -191,6 +191,7 @@ const Create = () => {
       });
     });
 
+    console.log('poolAddress', poolAddress);
     setTokensInSamePool(inSamePool);
   }, [pairsData]);
 

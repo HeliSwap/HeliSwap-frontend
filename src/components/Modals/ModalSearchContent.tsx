@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { getTokenInfo, idToAddress } from '../../utils/tokenUtils';
-import { ITokenData, IPairData } from '../../interfaces/tokens';
+import { IPairData, TokenType } from '../../interfaces/tokens';
 
 import { useLazyQuery } from '@apollo/client';
-import { GET_POOL_BY_TOKEN } from '../../GraphQL/Queries';
+import { GET_POOL_BY_TOKEN, GET_TOKEN_INFO } from '../../GraphQL/Queries';
 
 import Button from '../../components/Button';
 
@@ -23,13 +22,12 @@ const ModalSearchContent = ({
   modalTitle,
 }: IModalProps) => {
   const [searchInputValue, setSearchInputValue] = useState('');
-  const [findTokenLoading, setFindTokenLoading] = useState(false);
-  const [foundTokenData, setFoundTokenData] = useState<ITokenData>({} as ITokenData);
-
   const [currentToken, setCurrentToken] = useState('');
-  const [getPoolByToken, { data: dataPBT }] = useLazyQuery(GET_POOL_BY_TOKEN, {
-    variables: { token: currentToken },
-  });
+
+  const [getTokenByAddressOrId, { data: dataTBI, loading: loadingTBI }] =
+    useLazyQuery(GET_TOKEN_INFO);
+
+  const [getPoolByToken, { data: dataPBT, loading: loadingPBT }] = useLazyQuery(GET_POOL_BY_TOKEN);
 
   const onSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -38,38 +36,26 @@ const ModalSearchContent = ({
   };
 
   const handleSearchButtonClick = async () => {
-    setFoundTokenData({} as ITokenData);
-
     // TODO Make proper check for token id format
     if (!searchInputValue) return;
 
-    setFindTokenLoading(true);
-    getPoolByToken();
+    setCurrentToken(prev => searchInputValue);
 
-    try {
-      const result = await getTokenInfo(searchInputValue);
-      const hasResults = Object.keys(result).length > 0;
-
-      if (hasResults) {
-        setFoundTokenData(result);
-      } else {
-        console.error('[Error on token search] Token id not found');
-      }
-    } catch (err) {
-      console.error('[Error on token search request]', err);
-    } finally {
-      setFindTokenLoading(false);
-    }
+    getTokenByAddressOrId({
+      variables: { id: searchInputValue },
+    });
   };
 
   const resetModalState = () => {
     setSearchInputValue('');
-    setFoundTokenData({} as ITokenData);
     setCurrentToken('');
   };
 
   const handleSaveButton = () => {
-    setTokensData((prev: any) => ({ ...prev, [tokenFieldId]: foundTokenData }));
+    setTokensData((prev: any) => ({
+      ...prev,
+      [tokenFieldId]: { ...dataTBI.getTokenInfo, type: TokenType.ERC20 },
+    }));
     setPairsData((prev: any) => ({ ...prev, [tokenFieldId]: dataPBT.poolsByToken }));
 
     resetModalState();
@@ -86,10 +72,18 @@ const ModalSearchContent = ({
   };
 
   useEffect(() => {
-    Object.keys(foundTokenData).length > 0 && setCurrentToken(idToAddress(foundTokenData.hederaId));
-  }, [foundTokenData]);
+    dataTBI &&
+      Object.keys(dataTBI.getTokenInfo).length > 0 &&
+      setCurrentToken(dataTBI.getTokenInfo.address);
+  }, [dataTBI]);
 
-  const hasTokenData = Object.keys(foundTokenData).length > 0;
+  useEffect(() => {
+    getPoolByToken({
+      variables: { token: currentToken },
+    });
+  }, [currentToken, getPoolByToken]);
+
+  const hasTokenData = dataTBI && Object.keys(dataTBI.getTokenInfo).length > 0;
   const hasPools = dataPBT && dataPBT.poolsByToken.length > 0;
 
   return (
@@ -180,7 +174,7 @@ const ModalSearchContent = ({
               />
               <Button
                 loadingText={' '}
-                loading={findTokenLoading}
+                loading={loadingPBT || loadingTBI}
                 onClick={handleSearchButtonClick}
               >
                 Search
@@ -192,7 +186,7 @@ const ModalSearchContent = ({
               <p className="mt-4">Token data:</p>
               <div className="mt-2 bg-slate p-3 rounded">
                 <p>
-                  {foundTokenData.name} ({foundTokenData.symbol})
+                  {dataTBI.getTokenInfo.name} ({dataTBI.getTokenInfo.symbol})
                 </p>
               </div>
             </>
@@ -222,7 +216,7 @@ const ModalSearchContent = ({
           Close
         </button>
         <button
-          disabled={!hasTokenData}
+          disabled={!hasTokenData || !hasPools}
           onClick={handleSaveButton}
           type="button"
           className="btn btn-primary"
