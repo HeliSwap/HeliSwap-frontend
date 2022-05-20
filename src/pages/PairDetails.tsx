@@ -215,15 +215,13 @@ const PairDetails = () => {
                   <p className="text-title">{pairDataContracts.balance}</p>
                   <p className="mt-3">LP total supply:</p>
                   <p className="text-title">{pairDataContracts.totalSupply}</p>
-                  <div className="row mt-3">
-                    <div className="col-6">
-                      <p>Token0:</p>
-                      <p className="text-title">{pairDataContracts.token0}</p>
-                    </div>
-                    <div className="col-6">
-                      <p>Token1:</p>
-                      <p className="text-title">{pairDataContracts.token1}</p>
-                    </div>
+                  <div className="mt-3">
+                    <p>Token0:</p>
+                    <p className="text-title">{pairDataContracts.token0}</p>
+                  </div>
+                  <div className="mt-3">
+                    <p>Token1:</p>
+                    <p className="text-title">{pairDataContracts.token1}</p>
                   </div>
                 </div>
               ) : (
