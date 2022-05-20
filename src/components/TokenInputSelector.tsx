@@ -12,6 +12,8 @@ interface ITokenInputSelector {
   selectName: string;
   onInputChange?: (tokenData: IStringToString) => void;
   onSelectChange?: (tokenData: IStringToString) => void;
+  inputValue: string;
+  setInputValue: (value: string) => void;
 }
 
 const TokenInputSelector = ({
@@ -20,12 +22,13 @@ const TokenInputSelector = ({
   selectName,
   onInputChange,
   onSelectChange,
+  inputValue,
+  setInputValue,
 }: ITokenInputSelector) => {
   const contextValue = useContext(GlobalContext);
   const { connection } = contextValue;
   const { userId } = connection;
 
-  const [inputValue, setInputValue] = useState('0');
   const [selectValue, setSelectValue] = useState('0');
   const [maxNumber, setMaxNumber] = useState('0.00');
 

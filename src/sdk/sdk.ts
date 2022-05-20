@@ -1,4 +1,4 @@
-import { hethers } from '@hashgraph/hethers';
+import { hethers, BigNumber } from '@hashgraph/hethers';
 import {
   ContractExecuteTransaction,
   ContractFunctionParameters,
@@ -12,8 +12,99 @@ import { formatStringToBigNumberWei } from '../utils/numberUtils';
 
 import ERC20 from '../abi/ERC20';
 import PairV2 from '../abi/PairV2';
+// import router from '../abi/router';
+import BN from 'bignumber.js';
 
 class SDK {
+  getSwapAmountOut(
+    poolAddess: string,
+    amountIn: string,
+    amountInRes: string,
+    amountOutRes: string,
+    connectedWallet: any,
+  ) {
+    // const routerContract = hethers.ContractFactory.getContract(
+    //   poolAddess,
+    //   router.abi,
+    //   connectedWallet,
+    // );
+
+    const tenPowDecS = new BN(10).pow(18);
+    const amountInBN = new BN(amountIn).times(tenPowDecS);
+
+    const amountInBNStr = amountInBN.toString();
+    const amountInBNStrHethers = BigNumber.from(amountInBNStr);
+
+    const amountInResBNStr = amountInRes.toString();
+    const amountInResBNStrHethers = BigNumber.from(amountInResBNStr);
+
+    const amountOutResBNStr = amountOutRes.toString();
+    const amountOutResBNStrHethers = BigNumber.from(amountOutResBNStr);
+
+    // const totalSupply = await routerContract.getSwapAmountOut(
+    //   amountInBNStrHethers,
+    //   amountInResBNStrHethers,
+    //   amountOutResBNStrHethers,
+    //   {
+    //     gasLimit: 3000000,
+    //   },
+    // );
+    // console.log('totalSupply', totalSupply.toString());
+
+    // const amountInPar = BigNumber.from('100');
+
+    // const amountsOut = await routerContract.getAmountsOut(
+    //   BigNumber.from(amountIn).mul(tenPowDec),
+    //   ['0x00000000000000000000000000000000021385a7', '0x00000000000000000000000000000000021385af'],
+    //   {
+    //     gasLimit: 3000000,
+    //   },
+    // );
+
+    // console.log(amountsOut[0].toString(), amountsOut[1].toString());
+
+    const amountInWithFee = amountInBNStrHethers.mul(997);
+    const numerator = amountInWithFee.mul(amountOutResBNStrHethers);
+    const denominator = amountInResBNStrHethers.mul(1000).add(amountInWithFee);
+    const amountOut = numerator.div(denominator);
+    console.log('amountOut', hethers.utils.formatUnits(amountOut, 18).toString());
+
+    return hethers.utils.formatUnits(amountOut, 18).toString();
+  }
+
+  getSwapAmountIn(
+    poolAddess: string,
+    amountOut: string,
+    amountInRes: string,
+    amountOutRes: string,
+    connectedWallet: any,
+  ) {
+    // const routerContract = hethers.ContractFactory.getContract(
+    //   poolAddess,
+    //   router.abi,
+    //   connectedWallet,
+    // );
+
+    const tenPowDecS = new BN(10).pow(18);
+    const amountoutBN = new BN(amountOut).times(tenPowDecS);
+
+    const amountOutBNStr = amountoutBN.toString();
+    const amountOutBNStrHethers = BigNumber.from(amountOutBNStr);
+
+    const amountInResBNStr = amountInRes.toString();
+    const amountInResBNStrHethers = BigNumber.from(amountInResBNStr);
+
+    const amountOutResBNStr = amountOutRes.toString();
+    const amountOutResBNStrHethers = BigNumber.from(amountOutResBNStr);
+
+    const numerator = amountInResBNStrHethers.mul(amountOutBNStrHethers).mul(1000);
+    const denominator = amountOutResBNStrHethers.sub(amountOutBNStrHethers).mul(997);
+    const amountIn = numerator.div(denominator).add(1);
+    console.log('amountIn', hethers.utils.formatUnits(amountIn, 18).toString());
+
+    return hethers.utils.formatUnits(amountIn, 18).toString();
+  }
+
   /* Hethers contract calls - To be removed! */
   async checkAllowance(
     tokenAddress: string,
@@ -246,6 +337,9 @@ class SDK {
     const userAddress = idToAddress(userId);
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
 
+    const tokenInAmount = formatStringToBigNumberWei(amountIn);
+    const tokenOutMinAmount = formatStringToBigNumberWei(amountMinOut);
+
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(routerContractAddress))
@@ -257,8 +351,8 @@ class SDK {
       .setFunction(
         'swapExactTokensForTokens',
         new ContractFunctionParameters()
-          .addUint256(100000000000000000) //amountIn
-          .addUint256(90000000000000000) //amountMinOut
+          .addUint256(tokenInAmount) //amountIn
+          .addUint256(tokenOutMinAmount) //amountMinOut
           .addAddressArray([tokenInAddress, tokenOutAddress])
           .addAddress(userAddress)
           .addUint256(deadline),
