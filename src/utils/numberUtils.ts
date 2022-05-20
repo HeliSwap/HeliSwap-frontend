@@ -25,3 +25,10 @@ export const formatBigNumberToStringPrecision = (
 
   return numberToFormatArr.join('.');
 };
+
+export const formatNumberToStringPrecision = (numberToFormat: number, decimals: number = 18) => {
+  const numberToFormatArr = numberToFormat.toString().split('.');
+  numberToFormatArr[1] = numberToFormatArr[1].slice(0, decimals);
+
+  return numberToFormatArr.join('.');
+};

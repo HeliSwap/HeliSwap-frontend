@@ -3,9 +3,10 @@ import { GlobalContext } from '../providers/Global';
 
 import { useLazyQuery } from '@apollo/client';
 import { GET_POOLS_BY_USER } from '../GraphQL/Queries';
-import { formatBigNumberToNumber } from '../utils/numberUtils';
 import { IPairData } from '../interfaces/tokens';
 import { idToAddress } from '../utils/tokenUtils';
+
+import PoolInfo from '../components/PoolInfo';
 
 const Pairs = () => {
   const contextValue = useContext(GlobalContext);
@@ -41,21 +42,7 @@ const Pairs = () => {
         ) : havePairs ? (
           <div>
             {pairData.map((item, index) => (
-              <div className="mt-4 rounded border border-primary p-4" key={index}>
-                <h3 className="text-title">{item.pairSymbol}</h3>
-                <div className="d-flex justify-content-between align-items-center mt-4">
-                  <p>Your total LP tokens:</p>
-                  <p>{formatBigNumberToNumber(item.lpShares as number).toFixed(4)}</p>
-                </div>
-                <div className="d-flex justify-content-between align-items-center mt-2">
-                  <p>Pooled {item.token0Symbol}:</p>
-                  <p>{formatBigNumberToNumber(item.token0Amount as number).toFixed(4)}</p>
-                </div>
-                <div className="d-flex justify-content-between align-items-center mt-2">
-                  <p>Pooled {item.token1Symbol}:</p>
-                  <p>{formatBigNumberToNumber(item.token1Amount as number).toFixed(4)}</p>
-                </div>
-              </div>
+              <PoolInfo key={index} pairData={item} />
             ))}
           </div>
         ) : (

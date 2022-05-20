@@ -7,6 +7,7 @@ export const GET_POOLS = gql`
       pairName
       pairSymbol
       pairAddress
+      pairSupply
       token0
       token0Name
       token0Amount
@@ -47,6 +48,7 @@ export const GET_POOLS_BY_USER = gql`
       pairName
       pairSymbol
       pairAddress
+      pairSupply
       token0
       token0Name
       token0Symbol

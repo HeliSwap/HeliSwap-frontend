@@ -35,6 +35,7 @@ export interface IPairData {
   pairName: string;
   pairAddress: string;
   pairSymbol: string;
+  pairSupply: number;
   token0: string;
   token0Name: string;
   token0Amount: number;
