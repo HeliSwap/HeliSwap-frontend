@@ -7,6 +7,7 @@ import { getApolloClient } from '../utils/apolloUtils';
 
 import Swap from '../pages/Swap';
 import Create from '../pages/Create';
+import MyPools from '../pages/MyPools';
 import Pairs from '../pages/Pairs';
 import PairDetails from '../pages/PairDetails';
 import Tokens from '../pages/Tokens';
@@ -30,6 +31,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Swap />} />
                   <Route path="create" element={<Create />} />
+                  <Route path="my-pools" element={<MyPools />} />
                   <Route path="pairs" element={<Pairs />} />
                   <Route path="pairs/:address" element={<PairDetails />} />
                   <Route path="tokens" element={<Tokens />} />
