@@ -22,6 +22,7 @@ const Swap = () => {
 
   const { loading: loadingPool, data: dataPool, refetch } = useQuery(GET_POOLS);
   const [pairData, setPairData] = useState<any>({});
+  const [poolsData, setPoolsData] = useState<any>([]);
   const { address } = useParams();
 
   const contextValue = useContext(GlobalContext);
@@ -40,67 +41,44 @@ const Swap = () => {
     amountIn: '',
     amountOut: '',
   };
-  //to be removed
+
   useEffect(() => {
     if (dataPool && dataPool.pools.length > 0) {
-      const foundPool = dataPool.pools.find(
-        (pool: IPairData) => pool.pairAddress === '0x70A02c915ae8e264C5b3201869A12e9232c1E9C6',
-      );
-
-      if (foundPool) {
-        setPairData(foundPool);
-      }
+      setPoolsData(dataPool.pools);
     }
   }, [dataPool, address]);
-  //to be removed
-  const [pairDataContracts, setPairDataContracts] = useState({
-    balance: '0.0',
-    totalSupply: '0.0',
-    token0: '0.0',
-    token1: '0.0',
-  });
-  //To be removed
-  const getPairDataContracts = async () => {
-    if (connectedWallet) {
-      const userAddress = idToAddress(userId);
-      const balanceBN = await sdk.checkBalance(pairData.pairAddress, userAddress, connectedWallet);
-      const totalSupplyBN = await sdk.getTotalSupply(pairData.pairAddress, connectedWallet);
-      const [token0BN, token1BN] = await sdk.getReserves(pairData.pairAddress, connectedWallet);
-
-      const balanceStr = hethers.utils.formatUnits(balanceBN, 18);
-      const totalSupplyStr = hethers.utils.formatUnits(totalSupplyBN, 18);
-      const token0Str = hethers.utils.formatUnits(token0BN, 18);
-      const token1Str = hethers.utils.formatUnits(token1BN, 18);
-
-      const balanceNum = Number(balanceStr);
-
-      if (balanceNum > 0) {
-        setPairDataContracts({
-          balance: balanceStr,
-          totalSupply: totalSupplyStr,
-          token0: token0Str,
-          token1: token1Str,
-        });
-      }
-
-      setPoolReserves({ tokenIn: token0BN.toString(), tokenOut: token1BN.toString() });
-    }
-  };
 
   const [tokenDataList, setTokenDataList] = useState<ITokenData[]>([]);
   const [tokenApproved, setTokenApproved] = useState(false);
 
   const [swapData, setSwapData] = useState(initialSwapData);
+  useEffect(() => {
+    if (swapData.tokenIdIn && swapData.tokenIdOut && poolsData.length > 0) {
+      const tokenInAddress = idToAddress(swapData.tokenIdIn);
+      const tokenOutAddress = idToAddress(swapData.tokenIdOut);
+      const newPairData = poolsData
+        .filter((pool: any) => {
+          return pool.token0 === tokenInAddress || pool.token1 === tokenInAddress;
+        })
+        .filter((pool: any) => {
+          return pool.token0 === tokenOutAddress || pool.token1 === tokenOutAddress;
+        });
 
+      setPairData(newPairData[0]);
+    }
+  }, [poolsData, swapData]);
   const { error: errorGT, loading, data } = useQuery(GET_TOKENS);
 
   async function onInputChange(tokenData: IStringToString) {
+    const { token0Amount, token1Amount } = pairData;
+    console.log(tokenData);
+
     if (tokenData.tokenIdIn) {
       const swapAmountOut = sdk.getSwapAmountOut(
         process.env.REACT_APP_ROUTER_ADDRESS as string,
         tokenData.amountIn,
-        poolReserves.tokenIn,
-        poolReserves.tokenOut,
+        token0Amount,
+        token1Amount,
         connectedWallet,
       );
 
@@ -110,8 +88,8 @@ const Swap = () => {
       const swapAmountIn = sdk.getSwapAmountIn(
         process.env.REACT_APP_ROUTER_ADDRESS as string,
         tokenData.amountOut,
-        poolReserves.tokenIn,
-        poolReserves.tokenOut,
+        token0Amount,
+        token1Amount,
         connectedWallet,
       );
 
@@ -211,8 +189,6 @@ const Swap = () => {
         />
 
         <div className="mt-5 d-flex justify-content-center">
-          <Button onClick={getPairDataContracts}>Show contract data</Button>
-
           {loading ? (
             <Loader />
           ) : tokenApproved ? (
@@ -221,30 +197,6 @@ const Swap = () => {
             <Button onClick={() => handleApproveClick()}>Approve</Button>
           )}
         </div>
-        {connectedWallet ? (
-          <div className="col-6">
-            {true ? (
-              <div className="p-4 rounded border border-primary">
-                <p>User LP tokens:</p>
-                <p className="text-title">{pairDataContracts.balance}</p>
-                <p className="mt-3">LP total supply:</p>
-                <p className="text-title">{pairDataContracts.totalSupply}</p>
-                <div className="row mt-3">
-                  <div className="col-6">
-                    <p>Token0:</p>
-                    <p className="text-title">{pairDataContracts.token0}</p>
-                  </div>
-                  <div className="col-6">
-                    <p>Token1:</p>
-                    <p className="text-title">{pairDataContracts.token1}</p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <Button onClick={getPairDataContracts}>Show contract data</Button>
-            )}
-          </div>
-        ) : null}
       </div>
     </div>
   );
