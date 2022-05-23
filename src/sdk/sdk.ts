@@ -35,11 +35,11 @@ class SDK {
     const amountInBNStr = amountInBN.toString();
     const amountInBNStrHethers = BigNumber.from(amountInBNStr);
 
-    const amountInResBNStr = amountInRes.toString();
-    const amountInResBNStrHethers = BigNumber.from(amountInResBNStr);
+    // const amountInResBNStr = amountInRes.toString();
+    const amountInResBNStrHethers = BigNumber.from(amountInRes);
 
-    const amountOutResBNStr = amountOutRes.toString();
-    const amountOutResBNStrHethers = BigNumber.from(amountOutResBNStr);
+    // const amountOutResBNStr = amountOutRes.toString();
+    const amountOutResBNStrHethers = BigNumber.from(amountOutRes);
 
     // const totalSupply = await routerContract.getSwapAmountOut(
     //   amountInBNStrHethers,
@@ -91,11 +91,11 @@ class SDK {
     const amountOutBNStr = amountoutBN.toString();
     const amountOutBNStrHethers = BigNumber.from(amountOutBNStr);
 
-    const amountInResBNStr = amountInRes.toString();
-    const amountInResBNStrHethers = BigNumber.from(amountInResBNStr);
+    // const amountInResBNStr = amountInRes.toString();
+    const amountInResBNStrHethers = BigNumber.from(amountInRes);
 
-    const amountOutResBNStr = amountOutRes.toString();
-    const amountOutResBNStrHethers = BigNumber.from(amountOutResBNStr);
+    // const amountOutResBNStr = amountOutRes.toString();
+    const amountOutResBNStrHethers = BigNumber.from(amountOutRes);
 
     const numerator = amountInResBNStrHethers.mul(amountOutBNStrHethers).mul(1000);
     const denominator = amountOutResBNStrHethers.sub(amountOutBNStrHethers).mul(997);
