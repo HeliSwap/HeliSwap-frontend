@@ -350,14 +350,14 @@ const Create = () => {
         ) : null}
 
         <div className="mt-5 d-flex justify-content-center">
-          {tokensData.tokenA.symbol && !approved.tokenA ? (
+          {tokensData.tokenA.hederaId && !approved.tokenA ? (
             <Button
               onClick={() => handleApproveClick('tokenA')}
               className="mx-2"
             >{`Approve ${tokensData.tokenA.symbol}`}</Button>
           ) : null}
 
-          {tokensData.tokenB.symbol && !approved.tokenB ? (
+          {tokensData.tokenB.hederaId && !approved.tokenB ? (
             <Button
               onClick={() => handleApproveClick('tokenB')}
               className="mx-2"

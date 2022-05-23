@@ -3,21 +3,16 @@ import BigNumber from 'bignumber.js';
 import { GlobalContext } from '../providers/Global';
 
 import { IPairData } from '../interfaces/tokens';
-import {
-  formatBigNumberToNumber,
-  formatBigNumberToStringPrecision,
-  formatNumberToStringPrecision,
-} from '../utils/numberUtils';
+import { formatStringWeiToStringEther } from '../utils/numberUtils';
 
 import Button from './Button';
 import { addressToContractId } from '../utils/tokenUtils';
 
 interface IPoolInfoProps {
   pairData: IPairData;
-  key: number;
 }
 
-const PoolInfo = ({ pairData, key }: IPoolInfoProps) => {
+const PoolInfo = ({ pairData }: IPoolInfoProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
@@ -26,7 +21,7 @@ const PoolInfo = ({ pairData, key }: IPoolInfoProps) => {
 
   const [lpApproved, setLpApproved] = useState(false);
   const [lpInputValue, setLpInputValue] = useState(
-    formatBigNumberToNumber(pairData.lpShares as number).toFixed(4),
+    formatStringWeiToStringEther(pairData.lpShares as string),
   );
 
   const [removeLpData, setRemoveLpData] = useState({
@@ -44,30 +39,11 @@ const PoolInfo = ({ pairData, key }: IPoolInfoProps) => {
   };
 
   const calculateTokensAmount = async () => {
-    // Temp convert cause numbers in DB, should be BN
-    const totalSupplyTokensFormatted = formatNumberToStringPrecision(
-      formatBigNumberToNumber(pairData.pairSupply),
-      15,
-    );
-    const token0AmountFormatted = formatNumberToStringPrecision(
-      formatBigNumberToNumber(pairData.token0Amount),
-      15,
-    );
-    const token1AmountFormatted = formatNumberToStringPrecision(
-      formatBigNumberToNumber(pairData.token1Amount),
-      15,
-    );
-
     // Convert amounts to BN
-    const tokensLPToRemoveBN = new BigNumber(lpInputValue);
-    // const totalSupplyTokensLPBN = new BigNumber(formatBigNumberToNumber(pairData.pairSupply));
-    // const token0BN = new BigNumber(formatBigNumberToNumber(pairData.token0Amount));
-    // const token1BN = new BigNumber(formatBigNumberToNumber(pairData.token1Amount));
-    const totalSupplyTokensLPBN = new BigNumber(totalSupplyTokensFormatted);
-    const token0BN = new BigNumber(token0AmountFormatted);
-    const token1BN = new BigNumber(token1AmountFormatted);
-
-    console.log('totalSupplyTokensLPBN', totalSupplyTokensLPBN.toString());
+    const tokensLPToRemoveBN = new BigNumber(lpInputValue as string);
+    const totalSupplyTokensLPBN = new BigNumber(formatStringWeiToStringEther(pairData.pairSupply));
+    const token0BN = new BigNumber(formatStringWeiToStringEther(pairData.token0Amount));
+    const token1BN = new BigNumber(formatStringWeiToStringEther(pairData.token1Amount));
 
     // Get LP token ratio - LP tokens to remove / Total amount ot LP tokens
     const ratioBN = tokensLPToRemoveBN.div(totalSupplyTokensLPBN);
@@ -78,12 +54,8 @@ const PoolInfo = ({ pairData, key }: IPoolInfoProps) => {
 
     // Convent to string and numbers
     const tokensLPToRemoveStr = tokensLPToRemoveBN.toString();
-    const tokens0ToRemoveStr = formatBigNumberToStringPrecision(tokens0ToRemoveBN);
-    const tokens1ToRemoveStr = formatBigNumberToStringPrecision(tokens1ToRemoveBN);
-
-    console.log('ratioBN', ratioBN.toString());
-    console.log('tokens0ToRemoveStr', tokens0ToRemoveStr);
-    console.log('tokens1ToRemoveStr', tokens1ToRemoveStr);
+    const tokens0ToRemoveStr = tokens0ToRemoveBN.toString();
+    const tokens1ToRemoveStr = tokens1ToRemoveBN.toString();
 
     setRemoveLpData({
       tokenInAddress: pairData.token0,
@@ -120,19 +92,19 @@ const PoolInfo = ({ pairData, key }: IPoolInfoProps) => {
   const canRemove = lpApproved && removeLpData.tokenInAddress !== '';
 
   return (
-    <div className="mt-4 rounded border border-primary p-4" key={key}>
+    <div className="mt-4 rounded border border-primary p-4">
       <h3 className="text-title">{pairData.pairSymbol}</h3>
       <div className="d-flex justify-content-between align-items-center mt-4">
         <p>Your total LP tokens:</p>
-        <p>{formatBigNumberToNumber(pairData.lpShares as number).toFixed(4)}</p>
+        <p>{formatStringWeiToStringEther(pairData.lpShares as string)}</p>
       </div>
       <div className="d-flex justify-content-between align-items-center mt-2">
         <p>Pooled {pairData.token0Symbol}:</p>
-        <p>{formatBigNumberToNumber(pairData.token0Amount as number).toFixed(4)}</p>
+        <p>{formatStringWeiToStringEther(pairData.token0Amount as string)}</p>
       </div>
       <div className="d-flex justify-content-between align-items-center mt-2">
         <p>Pooled {pairData.token1Symbol}:</p>
-        <p>{formatBigNumberToNumber(pairData.token1Amount as number).toFixed(4)}</p>
+        <p>{formatStringWeiToStringEther(pairData.token1Amount as string)}</p>
       </div>
       <hr />
       <div className="mt-4 row">

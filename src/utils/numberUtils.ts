@@ -12,8 +12,18 @@ export const formatStringToBigNumberWei = (numberToFormat: string, decimals: num
   return numberToFormatBN.times(tenPowDec);
 };
 
-export const formatBigNumberToNumber = (numberToFormat: number, decimals: number = 18) => {
-  return numberToFormat / Math.pow(10, decimals);
+export const formatBigNumberToNumber = (numberToFormat: string, decimals: number = 18) => {
+  const numberToFormatBN = new BigNumber(numberToFormat);
+  const tenPowDec = new BigNumber(10).pow(decimals);
+
+  return numberToFormatBN.div(tenPowDec);
+};
+
+export const formatStringWeiToStringEther = (numberToFormat: string, decimals: number = 18) => {
+  const numberToFormatBN = new BigNumber(numberToFormat);
+  const tenPowDec = new BigNumber(10).pow(decimals);
+
+  return numberToFormatBN.div(tenPowDec).toString();
 };
 
 export const formatBigNumberToStringPrecision = (
