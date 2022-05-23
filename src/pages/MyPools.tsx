@@ -35,6 +35,7 @@ const Pairs = () => {
         {error ? (
           <div className="alert alert-danger mt-5" role="alert">
             <strong>Something went wrong!</strong> Cannot get pairs...
+            <p>{error.message}</p>
           </div>
         ) : null}
         {loading ? (
