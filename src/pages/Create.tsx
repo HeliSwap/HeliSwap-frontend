@@ -11,10 +11,9 @@ import { IPairData } from '../interfaces/tokens';
 
 import errorMessages from '../content/errors';
 import { idToAddress } from '../utils/tokenUtils';
+import { formatStringToBigNumberEthersWei } from '../utils/numberUtils';
 import { getConnectedWallet } from './Helpers';
 import { hethers } from '@hashgraph/hethers';
-import BigNumber from 'bignumber.js';
-import { formatStringToBigNumberEthersWei } from '../utils/numberUtils';
 
 interface ITokensData {
   tokenA: ITokenData;

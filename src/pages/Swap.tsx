@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { ITokenData, ISwapTokenData, IPairData } from '../interfaces/tokens';
+import { ITokenData, ISwapTokenData } from '../interfaces/tokens';
 import { IStringToString } from '../interfaces/comon';
 import { GlobalContext } from '../providers/Global';
 
@@ -20,7 +20,7 @@ import { useParams } from 'react-router-dom';
 const Swap = () => {
   const connectedWallet = getConnectedWallet();
 
-  const { loading: loadingPool, data: dataPool, refetch } = useQuery(GET_POOLS);
+  const { data: dataPool } = useQuery(GET_POOLS);
   const [pairData, setPairData] = useState<any>({});
   const [poolsData, setPoolsData] = useState<any>([]);
   const { address } = useParams();
