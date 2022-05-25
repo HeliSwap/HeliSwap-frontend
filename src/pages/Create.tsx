@@ -14,6 +14,7 @@ import { idToAddress } from '../utils/tokenUtils';
 import { getConnectedWallet } from './Helpers';
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
+import { formatStringToBigNumberEthersWei } from '../utils/numberUtils';
 
 interface ITokensData {
   tokenA: ITokenData;
@@ -69,20 +70,19 @@ const Create = () => {
     const { value, name } = e.target;
 
     if (tokensInSamePool) {
-      const token0AmountBN = new BigNumber(poolData?.token0Amount as any);
-      const token1AmountBN = new BigNumber(poolData?.token1Amount as any);
-      const ratioBN =
-        name === 'tokenAAmount'
-          ? token1AmountBN.div(token0AmountBN)
-          : token0AmountBN.div(token1AmountBN);
+      const token0Amount = poolData?.token0Amount as string;
+      const token1Amount = poolData?.token1Amount as string;
 
-      const valueBN = new BigNumber(value);
-      const valueToUpdate = valueBN.times(ratioBN);
+      const token0AmountBN = formatStringToBigNumberEthersWei(token0Amount);
+      const token1AmountBN = formatStringToBigNumberEthersWei(token1Amount);
+
+      const valueBN = formatStringToBigNumberEthersWei(value);
       const keyToUpdate = name === 'tokenAAmount' ? 'tokenBAmount' : 'tokenAAmount';
+      const valueToUpdate = valueBN.mul(token1AmountBN).div(token0AmountBN);
 
       setCreatePairData(prev => ({
         ...prev,
-        [keyToUpdate]: valueToUpdate.toString(),
+        [keyToUpdate]: hethers.utils.formatUnits(valueToUpdate, 18).toString(),
         [name]: value,
       }));
     } else {

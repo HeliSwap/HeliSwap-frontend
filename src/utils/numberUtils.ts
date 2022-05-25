@@ -19,7 +19,7 @@ export const formatStringToBigNumberEthersWei = (numberToFormat: string, decimal
   const tenPowDec = new BigNumber(10).pow(decimals);
 
   const numberToFormatBNPowed = numberToFormatBN.times(tenPowDec);
-  const numberToFormatBNPowedStr = numberToFormatBNPowed.toString();
+  const numberToFormatBNPowedStr = numberToFormatBNPowed.toFixed();
   const numberToFormatBNHethersPowed = hethers.BigNumber.from(numberToFormatBNPowedStr);
 
   return numberToFormatBNHethersPowed;
