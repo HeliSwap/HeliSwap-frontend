@@ -152,11 +152,11 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
       </div>
       <div className="d-flex justify-content-between align-items-center mt-2">
         <p>Pooled {pairData.token0Symbol}:</p>
-        <p>{formatStringWeiToStringEther(pairData.token0Amount as string)}</p>
+        <p>{formatStringWeiToStringEther(pairData.token0Shares as string)}</p>
       </div>
       <div className="d-flex justify-content-between align-items-center mt-2">
         <p>Pooled {pairData.token1Symbol}:</p>
-        <p>{formatStringWeiToStringEther(pairData.token1Amount as string)}</p>
+        <p>{formatStringWeiToStringEther(pairData.token1Shares as string)}</p>
       </div>
       <hr />
       <div className="mt-4 row">
