@@ -190,6 +190,7 @@ const Create = () => {
     const { tokenA, tokenB } = pairsData;
 
     // Check for same pool
+    // TODO - To be optimized
     tokenA.forEach(elementA => {
       tokenB.forEach(elementB => {
         if (elementA.pairAddress === elementB.pairAddress) {
