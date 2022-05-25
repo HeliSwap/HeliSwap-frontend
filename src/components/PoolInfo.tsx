@@ -1,4 +1,5 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { hethers } from '@hashgraph/hethers';
 import { GlobalContext } from '../providers/Global';
 
 import { IPairData } from '../interfaces/tokens';
@@ -8,8 +9,9 @@ import {
 } from '../utils/numberUtils';
 
 import Button from './Button';
-import { addressToContractId } from '../utils/tokenUtils';
-import { hethers } from '@hashgraph/hethers';
+import { addressToContractId, idToAddress } from '../utils/tokenUtils';
+
+import { getConnectedWallet } from '../pages/Helpers';
 
 interface IPoolInfoProps {
   pairData: IPairData;
@@ -20,7 +22,11 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
 
+  const connectedWallet = getConnectedWallet();
+
   const [showRemoveContainer, setShowRemoveContainer] = useState(false);
+  const [loadingRemove, setLoadingRemove] = useState(false);
+  const [errorRemove, setErrorRemove] = useState(false);
 
   const [lpApproved, setLpApproved] = useState(false);
   const [lpInputValue, setLpInputValue] = useState(
@@ -31,9 +37,29 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
     tokenInAddress: '',
     tokenOutAddress: '',
     tokensLpAmount: '',
-    tokens0Amount: '',
-    tokens1Amount: '',
+    tokens0Amount: '0.0',
+    tokens1Amount: '0.0',
   });
+
+  useEffect(() => {
+    const getApproved = async () => {
+      if (connectedWallet) {
+        const resultBN = await sdk.checkAllowance(
+          pairData.pairAddress,
+          idToAddress(userId),
+          process.env.REACT_APP_ROUTER_ADDRESS as string,
+          connectedWallet,
+        );
+
+        const resultStr = hethers.utils.formatUnits(resultBN, 18);
+        const resultNum = Number(resultStr);
+
+        setLpApproved(resultNum > 10000);
+      }
+    };
+
+    pairData && pairData.pairAddress && userId && getApproved();
+  }, [pairData, connectedWallet, sdk, userId]);
 
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -67,15 +93,41 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
   };
 
   const handleRemoveLPButtonClick = async () => {
-    await sdk.removeLiquidity(
-      hashconnectConnectorInstance,
-      userId,
-      removeLpData.tokenInAddress,
-      removeLpData.tokenOutAddress,
-      removeLpData.tokensLpAmount,
-      removeLpData.tokens0Amount,
-      removeLpData.tokens1Amount,
-    );
+    setLoadingRemove(true);
+    setErrorRemove(false);
+
+    try {
+      const responseData = await sdk.removeLiquidity(
+        hashconnectConnectorInstance,
+        userId,
+        removeLpData.tokenInAddress,
+        removeLpData.tokenOutAddress,
+        removeLpData.tokensLpAmount,
+        removeLpData.tokens0Amount,
+        removeLpData.tokens1Amount,
+      );
+
+      const { response } = responseData;
+      const { success } = response;
+
+      if (success) {
+        setRemoveLpData({
+          tokenInAddress: '',
+          tokenOutAddress: '',
+          tokensLpAmount: '',
+          tokens0Amount: '0.0',
+          tokens1Amount: '0.0',
+        });
+        setShowRemoveContainer(false);
+      } else {
+        setErrorRemove(true);
+      }
+    } catch (e) {
+      console.error(e);
+      setErrorRemove(true);
+    } finally {
+      setLoadingRemove(false);
+    }
   };
 
   const hanleApproveLPClick = async () => {
@@ -118,6 +170,11 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
 
           {showRemoveContainer ? (
             <div className="mt-4 rounded border border-secondary p-4">
+              {errorRemove ? (
+                <div className="alert alert-danger mb-5" role="alert">
+                  <strong>Something went wrong!</strong>
+                </div>
+              ) : null}
               <input
                 value={lpInputValue}
                 onChange={hanleLpInputChange}
@@ -129,7 +186,12 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
                 <Button disabled={lpApproved} onClick={hanleApproveLPClick}>
                   Approve
                 </Button>
-                <Button disabled={!canRemove} className="ms-3" onClick={handleRemoveLPButtonClick}>
+                <Button
+                  loading={loadingRemove}
+                  disabled={!canRemove}
+                  className="ms-3"
+                  onClick={handleRemoveLPButtonClick}
+                >
                   Remove
                 </Button>
                 <Button className="ms-3" onClick={calculateTokensAmount}>
