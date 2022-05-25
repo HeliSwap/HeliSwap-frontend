@@ -186,10 +186,6 @@ class SDK {
     const userAddress = idToAddress(userId);
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
 
-    const tokensLpAmountBN = formatStringToBigNumberWei(tokensLpAmount);
-    const tokenAAmountBN = formatStringToBigNumberWei(tokens0Amount);
-    const tokenBAmountBN = formatStringToBigNumberWei(tokens1Amount);
-
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(routerContractAddress))
@@ -203,9 +199,12 @@ class SDK {
         new ContractFunctionParameters()
           .addAddress(tokenInAddress)
           .addAddress(tokenOutAddress)
-          .addUint256(tokensLpAmountBN)
-          .addUint256(tokenAAmountBN)
-          .addUint256(tokenBAmountBN)
+          // @ts-ignore
+          .addUint256(tokensLpAmount)
+          // @ts-ignore
+          .addUint256(tokens0Amount)
+          // @ts-ignore
+          .addUint256(tokens1Amount)
           .addAddress(userAddress)
           .addUint256(deadline),
       );

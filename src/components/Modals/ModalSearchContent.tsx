@@ -49,7 +49,7 @@ const ModalSearchContent = ({
     if (!result.data) {
       setTokensData((prev: any) => ({
         ...prev,
-        [tokenFieldId]: { hederaId: searchInputValue, type: TokenType.ERC20 },
+        [tokenFieldId]: { hederaId: searchInputValue, type: TokenType.ERC20, symbol: 'ERC20' },
       }));
     }
   };

@@ -2,7 +2,6 @@ import React, { useEffect, useState, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import { useParams } from 'react-router-dom';
 import { GlobalContext } from '../providers/Global';
-import BigNumber from 'bignumber.js';
 
 import { useQuery } from '@apollo/client';
 import { GET_POOLS } from '../GraphQL/Queries';
@@ -11,7 +10,7 @@ import { IPairData } from '../interfaces/tokens';
 
 import { idToAddress, addressToContractId } from '../utils/tokenUtils';
 import {
-  formatBigNumberToStringPrecision,
+  formatStringToBigNumberEthersWei,
   formatStringWeiToStringEther,
 } from '../utils/numberUtils';
 import { getConnectedWallet } from './Helpers';
@@ -34,6 +33,9 @@ const PairDetails = () => {
     totalSupply: '0.0',
     token0: '0.0',
     token1: '0.0',
+    totalSupplyBN: hethers.BigNumber.from(0),
+    token0BN: hethers.BigNumber.from(0),
+    token1BN: hethers.BigNumber.from(0),
   });
 
   const [lpApproved, setLpApproved] = useState(false);
@@ -89,6 +91,9 @@ const PairDetails = () => {
           totalSupply: totalSupplyStr,
           token0: token0Str,
           token1: token1Str,
+          totalSupplyBN,
+          token0BN,
+          token1BN,
         });
         setLpInputValue(balanceStr);
       }
@@ -117,23 +122,17 @@ const PairDetails = () => {
   };
 
   const calculateTokensAmount = async () => {
-    // Convert amounts to BN
-    const tokensLPToRemoveBN = new BigNumber(lpInputValue);
-    const totalSupplyTokensLPBN = new BigNumber(pairDataContracts.totalSupply);
-    const token0BN = new BigNumber(pairDataContracts.token0);
-    const token1BN = new BigNumber(pairDataContracts.token1);
+    const tokensLPToRemoveHBN = formatStringToBigNumberEthersWei(lpInputValue);
 
-    // Get LP token ratio - LP tokens to remove / Total amount ot LP tokens
-    const ratioBN = tokensLPToRemoveBN.div(totalSupplyTokensLPBN);
+    const tokens0MulByAmount = pairDataContracts.token0BN.mul(tokensLPToRemoveHBN);
+    const tokens1MulByAmount = pairDataContracts.token1BN.mul(tokensLPToRemoveHBN);
 
-    // Calculate reserves token amounts
-    const tokens0ToRemoveBN = token0BN.times(ratioBN);
-    const tokens1ToRemoveBN = token1BN.times(ratioBN);
+    const tokens0ToRemoveHBN = tokens0MulByAmount.div(pairDataContracts.totalSupplyBN);
+    const tokens1ToRemoveHBN = tokens1MulByAmount.div(pairDataContracts.totalSupplyBN);
 
-    // Convent to string and numbers
-    const tokensLPToRemoveStr = tokensLPToRemoveBN.toString();
-    const tokens0ToRemoveStr = formatBigNumberToStringPrecision(tokens0ToRemoveBN);
-    const tokens1ToRemoveStr = formatBigNumberToStringPrecision(tokens1ToRemoveBN);
+    const tokensLPToRemoveStr = tokensLPToRemoveHBN.toString();
+    const tokens0ToRemoveStr = tokens0ToRemoveHBN.toString();
+    const tokens1ToRemoveStr = tokens1ToRemoveHBN.toString();
 
     await sdk.removeLiquidity(
       hashconnectConnectorInstance,
@@ -150,6 +149,9 @@ const PairDetails = () => {
       totalSupply: '0.0',
       token0: '0.0',
       token1: '0.0',
+      totalSupplyBN: hethers.BigNumber.from(0),
+      token0BN: hethers.BigNumber.from(0),
+      token1BN: hethers.BigNumber.from(0),
     });
     refetch();
   };
