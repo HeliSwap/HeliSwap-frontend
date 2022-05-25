@@ -32,8 +32,6 @@ const Swap = () => {
   const [error, setError] = useState(false);
   const [poolReserves, setPoolReserves] = useState({ tokenIn: '0', tokenOut: '0' });
   const [errorMessage, setErrorMessage] = useState('');
-  const [tokenInInputValue, setTokenInInputValue] = useState('0');
-  const [tokenOutInputValue, setTokenOutInputValue] = useState('0');
 
   const initialSwapData: ISwapTokenData = {
     tokenIdIn: '',
@@ -106,7 +104,6 @@ const Swap = () => {
   //use BE when it is ready
   // async function onInputChange(tokenData: IStringToString) {
   //   const { token0Amount, token1Amount } = pairData;
-  //   console.log(tokenData);
 
   //   if (tokenData.tokenIdIn) {
   //     const swapAmountOut = sdk.getSwapAmountOut(
@@ -142,7 +139,6 @@ const Swap = () => {
         poolReserves.tokenOut,
       );
 
-      setTokenOutInputValue(swapAmountOut);
       setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
     } else if (tokenData.tokenIdOut) {
       const swapAmountIn = sdk.getSwapAmountIn(
@@ -151,7 +147,6 @@ const Swap = () => {
         poolReserves.tokenOut,
       );
 
-      setTokenInInputValue(swapAmountIn);
       setSwapData(prev => ({ ...prev, ...tokenData, amountIn: swapAmountIn.toString() }));
     }
   }
@@ -200,6 +195,16 @@ const Swap = () => {
     }
   }, [data]);
 
+  useEffect(() => {
+    if (tokenDataList.length > 0 && !swapData.tokenIdIn && !swapData.tokenIdOut) {
+      setSwapData({
+        ...swapData,
+        //Set the first token to the first one in the token list. This will be probably set to WHBAR in future
+        tokenIdIn: tokenDataList[0].hederaId,
+      });
+    }
+  }, [tokenDataList]);
+
   return (
     <div className="d-flex justify-content-center">
       <div className="container-swap">
@@ -222,8 +227,8 @@ const Swap = () => {
         </div>
 
         <TokenInputSelector
-          inputValue={tokenInInputValue}
-          setInputValue={setTokenInInputValue}
+          inputValue={swapData.amountIn}
+          selectValue={swapData.tokenIdIn}
           inputName="amountIn"
           selectName="tokenIdIn"
           tokenDataList={tokenDataList}
@@ -237,8 +242,8 @@ const Swap = () => {
         </div>
 
         <TokenInputSelector
-          inputValue={tokenOutInputValue}
-          setInputValue={setTokenOutInputValue}
+          inputValue={swapData.amountOut}
+          selectValue={swapData.tokenIdOut}
           inputName="amountOut"
           selectName="tokenIdOut"
           tokenDataList={tokenDataList}

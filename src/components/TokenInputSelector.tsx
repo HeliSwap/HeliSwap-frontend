@@ -13,7 +13,7 @@ interface ITokenInputSelector {
   onInputChange?: (tokenData: IStringToString) => void;
   onSelectChange?: (tokenData: IStringToString) => void;
   inputValue: string;
-  setInputValue: (value: string) => void;
+  selectValue: string;
 }
 
 const TokenInputSelector = ({
@@ -23,19 +23,16 @@ const TokenInputSelector = ({
   onInputChange,
   onSelectChange,
   inputValue,
-  setInputValue,
+  selectValue,
 }: ITokenInputSelector) => {
   const contextValue = useContext(GlobalContext);
   const { connection } = contextValue;
   const { userId } = connection;
 
-  const [selectValue, setSelectValue] = useState('0');
   const [maxNumber, setMaxNumber] = useState('0.00');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
-
-    setInputValue(value);
 
     const tokenData = {
       [selectName]: selectValue,
@@ -48,24 +45,12 @@ const TokenInputSelector = ({
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value, name } = e.target;
 
-    setSelectValue(value);
-
     const tokenData = {
       [name]: value,
     };
 
     onSelectChange && onSelectChange(tokenData);
   };
-
-  const handleMaxNumClick = () => {
-    setInputValue(maxNumber);
-  };
-
-  useEffect(() => {
-    if (tokenDataList.length > 0) {
-      setSelectValue(tokenDataList[0].hederaId);
-    }
-  }, [tokenDataList]);
 
   const hasTokens = tokenDataList.length > 0;
 
@@ -80,39 +65,38 @@ const TokenInputSelector = ({
             type="text"
             className="form-control mt-2"
           />
-          <span onClick={() => handleMaxNumClick()} className="link-primary text-link-input">
-            Max
-          </span>
+          <span className="link-primary text-link-input">Max</span>
         </div>
         <p className="text-success mt-3">$0.00</p>
       </div>
 
       <div className="col-4">
-        {hasTokens && selectValue ? (
-          <select
-            value={selectValue}
-            onChange={handleSelectChange}
-            name={selectName}
-            id=""
-            className="form-control"
-          >
-            {tokenDataList.map(item => (
-              <option key={item.hederaId} value={item.hederaId}>
-                {item.symbol}
-              </option>
-            ))}
-          </select>
-        ) : null}
+        <select
+          onChange={handleSelectChange}
+          name={selectName}
+          id=""
+          className="form-control"
+          defaultValue=""
+        >
+          {selectValue ? null : (
+            <option value="" disabled hidden>
+              Choose token
+            </option>
+          )}
+          {tokenDataList.map(item => (
+            <option key={item.hederaId} value={item.hederaId}>
+              {item.symbol}
+            </option>
+          ))}
+        </select>
 
-        {hasTokens ? (
-          <WalletBalance
-            setMaxNumber={setMaxNumber}
-            userId={userId}
-            tokenData={
-              tokenDataList.find(item => item.hederaId === selectValue) || ({} as ITokenData)
-            }
-          />
-        ) : null}
+        <WalletBalance
+          setMaxNumber={setMaxNumber}
+          userId={userId}
+          tokenData={
+            tokenDataList.find(item => item.hederaId === selectValue) || ({} as ITokenData)
+          }
+        />
       </div>
     </div>
   );
