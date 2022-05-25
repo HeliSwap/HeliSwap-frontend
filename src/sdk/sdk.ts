@@ -8,7 +8,7 @@ import {
 import Hashconnect from '../connectors/hashconnect';
 import { ICreatePairData } from '../interfaces/comon';
 import { addressToId, idToAddress } from '../utils/tokenUtils';
-import { formatStringToBigNumberWei } from '../utils/numberUtils';
+import { formatStringToBigNumberEthersWei, formatStringToBigNumberWei } from '../utils/numberUtils';
 
 import ERC20 from '../abi/ERC20';
 import PairV2 from '../abi/PairV2';
@@ -16,53 +16,13 @@ import PairV2 from '../abi/PairV2';
 import BN from 'bignumber.js';
 
 class SDK {
-  getSwapAmountOut(
-    poolAddess: string,
-    amountIn: string,
-    amountInRes: string,
-    amountOutRes: string,
-    connectedWallet: any,
-  ) {
-    // const routerContract = hethers.ContractFactory.getContract(
-    //   poolAddess,
-    //   router.abi,
-    //   connectedWallet,
-    // );
-
-    const tenPowDecS = new BN(10).pow(18);
-    const amountInBN = new BN(amountIn).times(tenPowDecS);
-
-    const amountInBNStr = amountInBN.toString();
-    const amountInBNStrHethers = BigNumber.from(amountInBNStr);
-
-    // const amountInResBNStr = amountInRes.toString();
+  getSwapAmountOut(amountIn: string, amountInRes: string, amountOutRes: string) {
+    //get values in hethers big number
+    const amountInBNStrHethers = formatStringToBigNumberEthersWei(amountIn);
     const amountInResBNStrHethers = BigNumber.from(amountInRes);
-
-    // const amountOutResBNStr = amountOutRes.toString();
     const amountOutResBNStrHethers = BigNumber.from(amountOutRes);
 
-    // const totalSupply = await routerContract.getSwapAmountOut(
-    //   amountInBNStrHethers,
-    //   amountInResBNStrHethers,
-    //   amountOutResBNStrHethers,
-    //   {
-    //     gasLimit: 3000000,
-    //   },
-    // );
-    // console.log('totalSupply', totalSupply.toString());
-
-    // const amountInPar = BigNumber.from('100');
-
-    // const amountsOut = await routerContract.getAmountsOut(
-    //   BigNumber.from(amountIn).mul(tenPowDec),
-    //   ['0x00000000000000000000000000000000021385a7', '0x00000000000000000000000000000000021385af'],
-    //   {
-    //     gasLimit: 3000000,
-    //   },
-    // );
-
-    // console.log(amountsOut[0].toString(), amountsOut[1].toString());
-
+    //replicate contract calculations
     const amountInWithFee = amountInBNStrHethers.mul(997);
     const numerator = amountInWithFee.mul(amountOutResBNStrHethers);
     const denominator = amountInResBNStrHethers.mul(1000).add(amountInWithFee);
@@ -72,31 +32,13 @@ class SDK {
     return hethers.utils.formatUnits(amountOut, 18).toString();
   }
 
-  getSwapAmountIn(
-    poolAddess: string,
-    amountOut: string,
-    amountInRes: string,
-    amountOutRes: string,
-    connectedWallet: any,
-  ) {
-    // const routerContract = hethers.ContractFactory.getContract(
-    //   poolAddess,
-    //   router.abi,
-    //   connectedWallet,
-    // );
-
-    const tenPowDecS = new BN(10).pow(18);
-    const amountoutBN = new BN(amountOut).times(tenPowDecS);
-
-    const amountOutBNStr = amountoutBN.toString();
-    const amountOutBNStrHethers = BigNumber.from(amountOutBNStr);
-
-    // const amountInResBNStr = amountInRes.toString();
+  getSwapAmountIn(amountOut: string, amountInRes: string, amountOutRes: string) {
+    //get values in hethers big number
+    const amountOutBNStrHethers = formatStringToBigNumberEthersWei(amountOut);
     const amountInResBNStrHethers = BigNumber.from(amountInRes);
-
-    // const amountOutResBNStr = amountOutRes.toString();
     const amountOutResBNStrHethers = BigNumber.from(amountOutRes);
 
+    //replicate contract calculations
     const numerator = amountInResBNStrHethers.mul(amountOutBNStrHethers).mul(1000);
     const denominator = amountOutResBNStrHethers.sub(amountOutBNStrHethers).mul(997);
     const amountIn = numerator.div(denominator).add(1);

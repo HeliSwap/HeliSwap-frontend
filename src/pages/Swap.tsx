@@ -42,23 +42,12 @@ const Swap = () => {
     amountOut: '',
   };
 
-  // useEffect(() => {
-  //   if (dataPool && dataPool.pools.length > 0) {
-  //     setPoolsData(dataPool.pools);
-  //   }
-  // }, [dataPool, address]);
-  //to be removed
   useEffect(() => {
     if (dataPool && dataPool.pools.length > 0) {
-      const foundPool = dataPool.pools.find(
-        (pool: IPairData) => pool.pairAddress === '0x2e9a6fb8406c741FA4B1557204ce39337B6E66ef',
-      );
-
-      if (foundPool) {
-        setPairData(foundPool);
-      }
+      setPoolsData(dataPool.pools);
     }
   }, [dataPool, address]);
+
   //to be removed
   const [pairDataContracts, setPairDataContracts] = useState({
     balance: '0.0',
@@ -114,7 +103,7 @@ const Swap = () => {
     }
   }, [poolsData, swapData]);
   const { error: errorGT, loading, data } = useQuery(GET_TOKENS);
-  //use BE
+  //use BE when it is ready
   // async function onInputChange(tokenData: IStringToString) {
   //   const { token0Amount, token1Amount } = pairData;
   //   console.log(tokenData);
@@ -143,25 +132,23 @@ const Swap = () => {
   //     setSwapData(prev => ({ ...prev, ...tokenData, amountIn: swapAmountIn.toString() }));
   //   }
   // }
+
+  // currently using the data comming from the contract itself until BE is ready
   async function onInputChange(tokenData: IStringToString) {
     if (tokenData.tokenIdIn) {
       const swapAmountOut = sdk.getSwapAmountOut(
-        process.env.REACT_APP_ROUTER_ADDRESS as string,
         tokenData.amountIn,
         poolReserves.tokenIn,
         poolReserves.tokenOut,
-        connectedWallet,
       );
 
       setTokenOutInputValue(swapAmountOut);
       setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
     } else if (tokenData.tokenIdOut) {
       const swapAmountIn = sdk.getSwapAmountIn(
-        process.env.REACT_APP_ROUTER_ADDRESS as string,
         tokenData.amountOut,
         poolReserves.tokenIn,
         poolReserves.tokenOut,
-        connectedWallet,
       );
 
       setTokenInInputValue(swapAmountIn);
@@ -270,6 +257,7 @@ const Swap = () => {
             <Button onClick={() => handleApproveClick()}>Approve</Button>
           )}
         </div>
+        {/* TO BE removed */}
         {connectedWallet ? (
           <div className="col-6">
             {true ? (
