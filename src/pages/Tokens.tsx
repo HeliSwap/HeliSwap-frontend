@@ -35,7 +35,8 @@ const Tokens = () => {
               <div>#</div>
               <div>Token</div>
               <div>Symbol</div>
-              <div className="text-end">Total supply</div>
+              <div className="text-end">Decimals</div>
+              <div className="text-end">Hedera Id</div>
             </div>
             {tokenData.map((item, index) => (
               <div key={index} className="container-table-row">
@@ -44,7 +45,10 @@ const Tokens = () => {
                   <span className="ms-3">{item.name}</span>
                 </div>
                 <div>{item.symbol}</div>
-                <div className="text-end">{item.totalSupply}</div>
+                <div className="text-end">{item.decimals}</div>
+                <div className="text-end">
+                  <p>{item.hederaId}</p>
+                </div>
               </div>
             ))}
           </div>

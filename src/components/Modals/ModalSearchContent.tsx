@@ -41,9 +41,17 @@ const ModalSearchContent = ({
 
     setCurrentToken(prev => searchInputValue);
 
-    getTokenByAddressOrId({
+    const result = await getTokenByAddressOrId({
       variables: { id: searchInputValue },
     });
+
+    // Temp check for not found tokend
+    if (!result.data) {
+      setTokensData((prev: any) => ({
+        ...prev,
+        [tokenFieldId]: { hederaId: searchInputValue, type: TokenType.ERC20, symbol: 'ERC20' },
+      }));
+    }
   };
 
   const resetModalState = () => {
@@ -52,11 +60,13 @@ const ModalSearchContent = ({
   };
 
   const handleSaveButton = () => {
-    setTokensData((prev: any) => ({
-      ...prev,
-      [tokenFieldId]: { ...dataTBI.getTokenInfo, type: TokenType.ERC20 },
-    }));
-    setPairsData((prev: any) => ({ ...prev, [tokenFieldId]: dataPBT.poolsByToken }));
+    if (hasTokenData && hasPools) {
+      setTokensData((prev: any) => ({
+        ...prev,
+        [tokenFieldId]: { ...dataTBI.getTokenInfo, type: TokenType.ERC20 },
+      }));
+      setPairsData((prev: any) => ({ ...prev, [tokenFieldId]: dataPBT.poolsByToken }));
+    }
 
     resetModalState();
     closeModal();
@@ -216,7 +226,7 @@ const ModalSearchContent = ({
           Close
         </button>
         <button
-          disabled={!hasTokenData || !hasPools}
+          // disabled={!hasTokenData || !hasPools}
           onClick={handleSaveButton}
           type="button"
           className="btn btn-primary"

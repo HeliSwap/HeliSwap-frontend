@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { hethers } from '@hashgraph/hethers';
 import { ITokenData, TokenType } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
@@ -11,9 +12,8 @@ import { IPairData } from '../interfaces/tokens';
 
 import errorMessages from '../content/errors';
 import { idToAddress } from '../utils/tokenUtils';
+import { formatStringToBigNumberEthersWei } from '../utils/numberUtils';
 import { getConnectedWallet } from './Helpers';
-import { hethers } from '@hashgraph/hethers';
-import BigNumber from 'bignumber.js';
 
 interface ITokensData {
   tokenA: ITokenData;
@@ -69,14 +69,24 @@ const Create = () => {
     const { value, name } = e.target;
 
     if (tokensInSamePool) {
-      const token0AmountBN = new BigNumber(poolData?.token0Amount as any);
-      const token1AmountBN = new BigNumber(poolData?.token1Amount as any);
-      const ratioBN = token0AmountBN.div(token1AmountBN);
+      const token0Amount = poolData?.token0Amount as string;
+      const token1Amount = poolData?.token1Amount as string;
 
-      console.log('ratioBN.toString()', ratioBN.toString());
+      const token0AmountBN = formatStringToBigNumberEthersWei(token0Amount);
+      const token1AmountBN = formatStringToBigNumberEthersWei(token1Amount);
+
+      const valueBN = formatStringToBigNumberEthersWei(value);
+      const keyToUpdate = name === 'tokenAAmount' ? 'tokenBAmount' : 'tokenAAmount';
+      const valueToUpdate = valueBN.mul(token1AmountBN).div(token0AmountBN);
+
+      setCreatePairData(prev => ({
+        ...prev,
+        [keyToUpdate]: hethers.utils.formatUnits(valueToUpdate, 18).toString(),
+        [name]: value,
+      }));
+    } else {
+      setCreatePairData(prev => ({ ...prev, [name]: value }));
     }
-
-    setCreatePairData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleApproveClick = async (key: string) => {
@@ -177,21 +187,19 @@ const Create = () => {
 
   useEffect(() => {
     let inSamePool = false;
-    let poolAddress;
     const { tokenA, tokenB } = pairsData;
 
     // Check for same pool
+    // TODO - To be optimized
     tokenA.forEach(elementA => {
       tokenB.forEach(elementB => {
         if (elementA.pairAddress === elementB.pairAddress) {
           inSamePool = true;
-          poolAddress = elementA.pairAddress;
           setPoolData(elementA);
         }
       });
     });
 
-    console.log('poolAddress', poolAddress);
     setTokensInSamePool(inSamePool);
   }, [pairsData]);
 
@@ -342,14 +350,14 @@ const Create = () => {
         ) : null}
 
         <div className="mt-5 d-flex justify-content-center">
-          {tokensData.tokenA.symbol && !approved.tokenA ? (
+          {tokensData.tokenA.hederaId && !approved.tokenA ? (
             <Button
               onClick={() => handleApproveClick('tokenA')}
               className="mx-2"
             >{`Approve ${tokensData.tokenA.symbol}`}</Button>
           ) : null}
 
-          {tokensData.tokenB.symbol && !approved.tokenB ? (
+          {tokensData.tokenB.hederaId && !approved.tokenB ? (
             <Button
               onClick={() => handleApproveClick('tokenB')}
               className="mx-2"

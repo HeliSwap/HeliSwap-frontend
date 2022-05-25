@@ -2,7 +2,6 @@ import React, { useEffect, useState, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import { useParams } from 'react-router-dom';
 import { GlobalContext } from '../providers/Global';
-import BigNumber from 'bignumber.js';
 
 import { useQuery } from '@apollo/client';
 import { GET_POOLS } from '../GraphQL/Queries';
@@ -10,7 +9,10 @@ import { GET_POOLS } from '../GraphQL/Queries';
 import { IPairData } from '../interfaces/tokens';
 
 import { idToAddress, addressToContractId } from '../utils/tokenUtils';
-import { formatBigNumberToNumber, formatBigNumberToStringPrecision } from '../utils/numberUtils';
+import {
+  formatStringToBigNumberEthersWei,
+  formatStringWeiToStringEther,
+} from '../utils/numberUtils';
 import { getConnectedWallet } from './Helpers';
 import Loader from '../components/Loader';
 import Button from '../components/Button';
@@ -31,6 +33,9 @@ const PairDetails = () => {
     totalSupply: '0.0',
     token0: '0.0',
     token1: '0.0',
+    totalSupplyBN: hethers.BigNumber.from(0),
+    token0BN: hethers.BigNumber.from(0),
+    token1BN: hethers.BigNumber.from(0),
   });
 
   const [lpApproved, setLpApproved] = useState(false);
@@ -86,6 +91,9 @@ const PairDetails = () => {
           totalSupply: totalSupplyStr,
           token0: token0Str,
           token1: token1Str,
+          totalSupplyBN,
+          token0BN,
+          token1BN,
         });
         setLpInputValue(balanceStr);
       }
@@ -114,23 +122,17 @@ const PairDetails = () => {
   };
 
   const calculateTokensAmount = async () => {
-    // Convert amounts to BN
-    const tokensLPToRemoveBN = new BigNumber(lpInputValue);
-    const totalSupplyTokensLPBN = new BigNumber(pairDataContracts.totalSupply);
-    const token0BN = new BigNumber(pairDataContracts.token0);
-    const token1BN = new BigNumber(pairDataContracts.token1);
+    const tokensLPToRemoveHBN = formatStringToBigNumberEthersWei(lpInputValue);
 
-    // Get LP token ratio - LP tokens to remove / Total amount ot LP tokens
-    const ratioBN = tokensLPToRemoveBN.div(totalSupplyTokensLPBN);
+    const tokens0MulByAmount = pairDataContracts.token0BN.mul(tokensLPToRemoveHBN);
+    const tokens1MulByAmount = pairDataContracts.token1BN.mul(tokensLPToRemoveHBN);
 
-    // Calculate reserves token amounts
-    const tokens0ToRemoveBN = token0BN.times(ratioBN);
-    const tokens1ToRemoveBN = token1BN.times(ratioBN);
+    const tokens0ToRemoveHBN = tokens0MulByAmount.div(pairDataContracts.totalSupplyBN);
+    const tokens1ToRemoveHBN = tokens1MulByAmount.div(pairDataContracts.totalSupplyBN);
 
-    // Convent to string and numbers
-    const tokensLPToRemoveStr = tokensLPToRemoveBN.toString();
-    const tokens0ToRemoveStr = formatBigNumberToStringPrecision(tokens0ToRemoveBN);
-    const tokens1ToRemoveStr = formatBigNumberToStringPrecision(tokens1ToRemoveBN);
+    const tokensLPToRemoveStr = tokensLPToRemoveHBN.toString();
+    const tokens0ToRemoveStr = tokens0ToRemoveHBN.toString();
+    const tokens1ToRemoveStr = tokens1ToRemoveHBN.toString();
 
     await sdk.removeLiquidity(
       hashconnectConnectorInstance,
@@ -147,6 +149,9 @@ const PairDetails = () => {
       totalSupply: '0.0',
       token0: '0.0',
       token1: '0.0',
+      totalSupplyBN: hethers.BigNumber.from(0),
+      token0BN: hethers.BigNumber.from(0),
+      token1BN: hethers.BigNumber.from(0),
     });
     refetch();
   };
@@ -170,12 +175,27 @@ const PairDetails = () => {
         <div className="row mt-5">
           <div className="col-6">
             <div className="p-4 rounded border border-primary">
-              <p>Pooled tokens:</p>
+              <h3 className="text-headline">Backend data:</h3>
+              <hr />
+              <p>LP total supply:</p>
+              <p className="text-title">{pairData.pairSupply} wei</p>
               <p className="text-title">
-                {formatBigNumberToNumber(pairData.token0Amount)} {pairData.token0Symbol}
+                {formatStringWeiToStringEther(pairData.pairSupply)} ether
+              </p>
+              <p className="mt-3">Pooled tokens:</p>
+              <p className="text-title">
+                {formatStringWeiToStringEther(pairData.token0Amount)} {pairData.token0Symbol}{' '}
+                <span className="text-small">(formatted)</span>
               </p>
               <p className="text-title">
-                {formatBigNumberToNumber(pairData.token1Amount)} {pairData.token1Symbol}
+                {pairData.token0Amount} {pairData.token0Symbol}
+              </p>
+              <p className="text-title">
+                {formatStringWeiToStringEther(pairData.token1Amount)} {pairData.token1Symbol}{' '}
+                <span className="text-small">(formatted)</span>
+              </p>
+              <p className="text-title">
+                {pairData.token1Amount} {pairData.token1Symbol}
               </p>
             </div>
 
@@ -211,19 +231,19 @@ const PairDetails = () => {
             <div className="col-6">
               {hasUserProvided ? (
                 <div className="p-4 rounded border border-primary">
+                  <h3 className="text-headline">Contract data:</h3>
+                  <hr />
+                  <p>LP total supply:</p>
+                  <p className="text-title">{pairDataContracts.totalSupply}</p>
                   <p>User LP tokens:</p>
                   <p className="text-title">{pairDataContracts.balance}</p>
-                  <p className="mt-3">LP total supply:</p>
-                  <p className="text-title">{pairDataContracts.totalSupply}</p>
-                  <div className="row mt-3">
-                    <div className="col-6">
-                      <p>Token0:</p>
-                      <p className="text-title">{pairDataContracts.token0}</p>
-                    </div>
-                    <div className="col-6">
-                      <p>Token1:</p>
-                      <p className="text-title">{pairDataContracts.token1}</p>
-                    </div>
+                  <div className="mt-3">
+                    <p>Token0:</p>
+                    <p className="text-title">{pairDataContracts.token0}</p>
+                  </div>
+                  <div className="mt-3">
+                    <p>Token1:</p>
+                    <p className="text-title">{pairDataContracts.token1}</p>
                   </div>
                 </div>
               ) : (

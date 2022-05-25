@@ -1,4 +1,4 @@
-import { hethers } from '@hashgraph/hethers';
+import { hethers, BigNumber } from '@hashgraph/hethers';
 import {
   ContractExecuteTransaction,
   ContractFunctionParameters,
@@ -8,12 +8,41 @@ import {
 import Hashconnect from '../connectors/hashconnect';
 import { ICreatePairData } from '../interfaces/comon';
 import { addressToId, idToAddress } from '../utils/tokenUtils';
-import { formatStringToBigNumberWei } from '../utils/numberUtils';
+import { formatStringToBigNumberEthersWei, formatStringToBigNumberWei } from '../utils/numberUtils';
 
 import ERC20 from '../abi/ERC20';
 import PairV2 from '../abi/PairV2';
 
 class SDK {
+  getSwapAmountOut(amountIn: string, amountInRes: string, amountOutRes: string) {
+    //get values in hethers big number
+    const amountInBNStrHethers = formatStringToBigNumberEthersWei(amountIn);
+    const amountInResBNStrHethers = BigNumber.from(amountInRes);
+    const amountOutResBNStrHethers = BigNumber.from(amountOutRes);
+
+    //replicate contract calculations
+    const amountInWithFee = amountInBNStrHethers.mul(997);
+    const numerator = amountInWithFee.mul(amountOutResBNStrHethers);
+    const denominator = amountInResBNStrHethers.mul(1000).add(amountInWithFee);
+    const amountOut = numerator.div(denominator);
+
+    return hethers.utils.formatUnits(amountOut, 18).toString();
+  }
+
+  getSwapAmountIn(amountOut: string, amountInRes: string, amountOutRes: string) {
+    //get values in hethers big number
+    const amountOutBNStrHethers = formatStringToBigNumberEthersWei(amountOut);
+    const amountInResBNStrHethers = BigNumber.from(amountInRes);
+    const amountOutResBNStrHethers = BigNumber.from(amountOutRes);
+
+    //replicate contract calculations
+    const numerator = amountInResBNStrHethers.mul(amountOutBNStrHethers).mul(1000);
+    const denominator = amountOutResBNStrHethers.sub(amountOutBNStrHethers).mul(997);
+    const amountIn = numerator.div(denominator).add(1);
+
+    return hethers.utils.formatUnits(amountIn, 18).toString();
+  }
+
   /* Hethers contract calls - To be removed! */
   async checkAllowance(
     tokenAddress: string,
@@ -186,10 +215,6 @@ class SDK {
     const userAddress = idToAddress(userId);
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
 
-    const tokensLpAmountBN = formatStringToBigNumberWei(tokensLpAmount);
-    const tokenAAmountBN = formatStringToBigNumberWei(tokens0Amount);
-    const tokenBAmountBN = formatStringToBigNumberWei(tokens1Amount);
-
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(routerContractAddress))
@@ -203,9 +228,12 @@ class SDK {
         new ContractFunctionParameters()
           .addAddress(tokenInAddress)
           .addAddress(tokenOutAddress)
-          .addUint256(tokensLpAmountBN)
-          .addUint256(tokenAAmountBN)
-          .addUint256(tokenBAmountBN)
+          // @ts-ignore
+          .addUint256(tokensLpAmount)
+          // @ts-ignore
+          .addUint256(tokens0Amount)
+          // @ts-ignore
+          .addUint256(tokens1Amount)
           .addAddress(userAddress)
           .addUint256(deadline),
       );
@@ -247,6 +275,9 @@ class SDK {
     const userAddress = idToAddress(userId);
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
 
+    const tokenInAmount = formatStringToBigNumberWei(amountIn);
+    const tokenOutMinAmount = formatStringToBigNumberWei(amountMinOut);
+
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(routerContractAddress))
@@ -258,8 +289,8 @@ class SDK {
       .setFunction(
         'swapExactTokensForTokens',
         new ContractFunctionParameters()
-          .addUint256(100000000000000000) //amountIn
-          .addUint256(90000000000000000) //amountMinOut
+          .addUint256(tokenInAmount) //amountIn
+          .addUint256(tokenOutMinAmount) //amountMinOut
           .addAddressArray([tokenInAddress, tokenOutAddress])
           .addAddress(userAddress)
           .addUint256(deadline),

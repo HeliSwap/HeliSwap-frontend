@@ -7,6 +7,7 @@ export const GET_POOLS = gql`
       pairName
       pairSymbol
       pairAddress
+      pairSupply
       token0
       token0Name
       token0Amount
@@ -36,6 +37,31 @@ export const GET_POOL_BY_TOKEN = gql`
       token1Name
       token1Amount
       token1Decimals
+    }
+  }
+`;
+
+export const GET_POOLS_BY_USER = gql`
+  query getPoolsByUser($address: String!) {
+    getPoolsByUser(eoaAddress: $address) {
+      id
+      pairName
+      pairSymbol
+      pairAddress
+      pairSupply
+      token0
+      token0Name
+      token0Symbol
+      token0Amount
+      token0Decimals
+      token1
+      token1Name
+      token1Symbol
+      token1Amount
+      token1Decimals
+      token0Shares
+      token1Shares
+      lpShares
     }
   }
 `;

@@ -20,6 +20,7 @@ Before running the project please create `.env` or use the example one.
 REACT_APP_MIRROR_NODE_URL = <LINK_TO_MIRROR_NODE>
 REACT_APP_NETWORK_TYPE = <NETWORK_TYPE>
 REACT_APP_GRAPHQL_URI = <LINK_TO_GRAPHQL_ENDPOINT>
+REACT_APP_ROUTER_ADDRESS = <ROUTER_ADDRESS>
 ```
 
 ## 🚀 Available Scripts
