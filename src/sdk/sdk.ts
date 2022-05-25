@@ -27,7 +27,6 @@ class SDK {
     const numerator = amountInWithFee.mul(amountOutResBNStrHethers);
     const denominator = amountInResBNStrHethers.mul(1000).add(amountInWithFee);
     const amountOut = numerator.div(denominator);
-    console.log('amountOut', hethers.utils.formatUnits(amountOut, 18).toString());
 
     return hethers.utils.formatUnits(amountOut, 18).toString();
   }
@@ -42,7 +41,6 @@ class SDK {
     const numerator = amountInResBNStrHethers.mul(amountOutBNStrHethers).mul(1000);
     const denominator = amountOutResBNStrHethers.sub(amountOutBNStrHethers).mul(997);
     const amountIn = numerator.div(denominator).add(1);
-    console.log('amountIn', hethers.utils.formatUnits(amountIn, 18).toString());
 
     return hethers.utils.formatUnits(amountIn, 18).toString();
   }
