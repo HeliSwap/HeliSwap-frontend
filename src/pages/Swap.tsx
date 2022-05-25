@@ -189,13 +189,13 @@ const Swap = () => {
       const tokenOutAddress = idToAddress(swapData.tokenIdOut);
 
       // TODO - To be optimized
-      const selectedPoolData = poolsData
-        .filter((pool: any) => {
-          return pool.token0 === tokenInAddress || pool.token1 === tokenInAddress;
-        })
-        .filter((pool: any) => {
-          return pool.token0 === tokenOutAddress || pool.token1 === tokenOutAddress;
-        });
+      const selectedPoolData = poolsData.filter((pool: any) => {
+        return (
+          //Both tokens are in the same pool
+          (pool.token0 === tokenInAddress || pool.token1 === tokenInAddress) &&
+          (pool.token0 === tokenOutAddress || pool.token1 === tokenOutAddress)
+        );
+      });
 
       setSelectedPoolData(selectedPoolData[0]);
     }
