@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { hethers } from '@hashgraph/hethers';
 import { ITokenData, TokenType } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
@@ -13,7 +14,6 @@ import errorMessages from '../content/errors';
 import { idToAddress } from '../utils/tokenUtils';
 import { formatStringToBigNumberEthersWei } from '../utils/numberUtils';
 import { getConnectedWallet } from './Helpers';
-import { hethers } from '@hashgraph/hethers';
 
 interface ITokensData {
   tokenA: ITokenData;

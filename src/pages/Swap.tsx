@@ -1,37 +1,27 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { hethers } from '@hashgraph/hethers';
+import { useParams } from 'react-router-dom';
 import { ITokenData, ISwapTokenData } from '../interfaces/tokens';
 import { IStringToString } from '../interfaces/comon';
 import { GlobalContext } from '../providers/Global';
 
-import errorMessages from '../content/errors';
-
 import { useQuery } from '@apollo/client';
-import { GET_TOKENS } from '../GraphQL/Queries';
+import { GET_TOKENS, GET_POOLS } from '../GraphQL/Queries';
 
 import Button from '../components/Button';
 import Loader from '../components/Loader';
 import TokenInputSelector from '../components/TokenInputSelector';
-import { getConnectedWallet } from './Helpers';
+
+import errorMessages from '../content/errors';
 import { idToAddress } from '../utils/tokenUtils';
-import { hethers } from '@hashgraph/hethers';
-import { GET_POOLS } from '../GraphQL/Queries';
-import { useParams } from 'react-router-dom';
+import { getConnectedWallet } from './Helpers';
 
 const Swap = () => {
   const connectedWallet = getConnectedWallet();
-
-  const { data: dataPool } = useQuery(GET_POOLS);
-  const [pairData, setPairData] = useState<any>({});
-  const [poolsData, setPoolsData] = useState<any>([]);
-  const { address } = useParams();
-
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
-
-  const [error, setError] = useState(false);
-  const [poolReserves, setPoolReserves] = useState({ tokenIn: '0', tokenOut: '0' });
-  const [errorMessage, setErrorMessage] = useState('');
+  const { address } = useParams();
 
   const initialSwapData: ISwapTokenData = {
     tokenIdIn: '',
@@ -40,11 +30,20 @@ const Swap = () => {
     amountOut: '',
   };
 
-  useEffect(() => {
-    if (dataPool && dataPool.pools.length > 0) {
-      setPoolsData(dataPool.pools);
-    }
-  }, [dataPool, address]);
+  const { data: dataPool } = useQuery(GET_POOLS);
+  const { error: errorGT, loading, data } = useQuery(GET_TOKENS);
+
+  const [pairData, setPairData] = useState<any>({});
+  const [poolsData, setPoolsData] = useState<any>([]);
+
+  const [error, setError] = useState(false);
+  const [poolReserves, setPoolReserves] = useState({ tokenIn: '0', tokenOut: '0' });
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const [tokenDataList, setTokenDataList] = useState<ITokenData[]>([]);
+  const [tokenApproved, setTokenApproved] = useState(false);
+
+  const [swapData, setSwapData] = useState(initialSwapData);
 
   //to be removed
   const [pairDataContracts, setPairDataContracts] = useState({
@@ -53,6 +52,7 @@ const Swap = () => {
     token0: '0.0',
     token1: '0.0',
   });
+
   //To be removed
   const getPairDataContracts = async () => {
     if (connectedWallet) {
@@ -81,26 +81,6 @@ const Swap = () => {
     }
   };
 
-  const [tokenDataList, setTokenDataList] = useState<ITokenData[]>([]);
-  const [tokenApproved, setTokenApproved] = useState(false);
-
-  const [swapData, setSwapData] = useState(initialSwapData);
-  useEffect(() => {
-    if (swapData.tokenIdIn && swapData.tokenIdOut && poolsData.length > 0) {
-      const tokenInAddress = idToAddress(swapData.tokenIdIn);
-      const tokenOutAddress = idToAddress(swapData.tokenIdOut);
-      const newPairData = poolsData
-        .filter((pool: any) => {
-          return pool.token0 === tokenInAddress || pool.token1 === tokenInAddress;
-        })
-        .filter((pool: any) => {
-          return pool.token0 === tokenOutAddress || pool.token1 === tokenOutAddress;
-        });
-
-      setPairData(newPairData[0]);
-    }
-  }, [poolsData, swapData]);
-  const { error: errorGT, loading, data } = useQuery(GET_TOKENS);
   //use BE when it is ready
   // async function onInputChange(tokenData: IStringToString) {
   //   const { token0Amount, token1Amount } = pairData;
@@ -189,6 +169,28 @@ const Swap = () => {
   }
 
   useEffect(() => {
+    if (dataPool && dataPool.pools.length > 0) {
+      setPoolsData(dataPool.pools);
+    }
+  }, [dataPool, address]);
+
+  useEffect(() => {
+    if (swapData.tokenIdIn && swapData.tokenIdOut && poolsData.length > 0) {
+      const tokenInAddress = idToAddress(swapData.tokenIdIn);
+      const tokenOutAddress = idToAddress(swapData.tokenIdOut);
+      const newPairData = poolsData
+        .filter((pool: any) => {
+          return pool.token0 === tokenInAddress || pool.token1 === tokenInAddress;
+        })
+        .filter((pool: any) => {
+          return pool.token0 === tokenOutAddress || pool.token1 === tokenOutAddress;
+        });
+
+      setPairData(newPairData[0]);
+    }
+  }, [poolsData, swapData]);
+
+  useEffect(() => {
     if (data) {
       const { getTokensData } = data;
       getTokensData.length > 0 && setTokenDataList(getTokensData);
@@ -203,7 +205,7 @@ const Swap = () => {
         tokenIdIn: tokenDataList[0].hederaId,
       });
     }
-  }, [tokenDataList]);
+  }, [tokenDataList, swapData]);
 
   return (
     <div className="d-flex justify-content-center">

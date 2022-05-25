@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { ITokenData } from '../interfaces/tokens';
 // TODO Interfaces to be combined into comon export
 import { IStringToString } from '../interfaces/comon';
@@ -29,7 +29,9 @@ const TokenInputSelector = ({
   const { connection } = contextValue;
   const { userId } = connection;
 
+  /*eslint-disable */
   const [maxNumber, setMaxNumber] = useState('0.00');
+  /*eslint-enable */
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
@@ -51,8 +53,6 @@ const TokenInputSelector = ({
 
     onSelectChange && onSelectChange(tokenData);
   };
-
-  const hasTokens = tokenDataList.length > 0;
 
   return (
     <div className="row justify-content-between align-items-end mt-3">
