@@ -80,7 +80,7 @@ const TokenInputSelector = ({
         >
           {selectValue ? null : (
             <option value="" disabled hidden>
-              Choose token
+              Select token
             </option>
           )}
           {tokenDataList.map(item => (

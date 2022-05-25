@@ -40,7 +40,6 @@ const Swap = () => {
 
   const [poolReserves, setPoolReserves] = useState({ tokenIn: '0', tokenOut: '0' });
 
-  const [tokenApproved, setTokenApproved] = useState(false);
   const [swapData, setSwapData] = useState(initialSwapData);
 
   //to be removed
@@ -138,10 +137,6 @@ const Swap = () => {
 
   function onSelectChange(tokenData: IStringToString) {
     setSwapData(prev => ({ ...prev, ...tokenData }));
-  }
-
-  function handleApproveClick() {
-    setTokenApproved(true);
   }
 
   async function handleSwapClick() {
@@ -265,10 +260,8 @@ const Swap = () => {
         <div className="mt-5 d-flex justify-content-center">
           {loadingTokens || loadingPools ? (
             <Loader />
-          ) : tokenApproved ? (
-            <Button onClick={() => handleSwapClick()}>Swap</Button>
           ) : (
-            <Button onClick={() => handleApproveClick()}>Approve</Button>
+            <Button onClick={() => handleSwapClick()}>Swap</Button>
           )}
         </div>
         {/* TO BE removed */}
