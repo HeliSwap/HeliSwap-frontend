@@ -252,8 +252,6 @@ const Swap = () => {
         />
 
         <div className="mt-5 d-flex justify-content-center">
-          <Button onClick={getPairDataContracts}>Show contract data</Button>
-
           {loading ? (
             <Loader />
           ) : tokenApproved ? (
@@ -264,29 +262,26 @@ const Swap = () => {
         </div>
         {/* TO BE removed */}
         {connectedWallet ? (
-          <div className="col-6">
-            {true ? (
-              <div className="p-4 rounded border border-primary">
-                <p>User LP tokens:</p>
-                <p className="text-title">{pairDataContracts.balance}</p>
-                <p className="mt-3">LP total supply:</p>
-                <p className="text-title">{pairDataContracts.totalSupply}</p>
-                <div className="row mt-3">
-                  <div className="col-6">
-                    <p>Token0:</p>
-                    <p className="text-title">{pairDataContracts.token0}</p>
-                  </div>
-                  <div className="col-6">
-                    <p>Token1:</p>
-                    <p className="text-title">{pairDataContracts.token1}</p>
-                  </div>
-                </div>
+          <div className="p-4 rounded border border-primary mt-5">
+            <Button onClick={getPairDataContracts}>Show contract data</Button>
+            <p className="mt-4">User LP tokens:</p>
+            <p className="text-title">{pairDataContracts.balance}</p>
+            <p className="mt-3">LP total supply:</p>
+            <p className="text-title">{pairDataContracts.totalSupply}</p>
+            <div className="row mt-3">
+              <div className="col-6">
+                <p>Token0:</p>
+                <p className="text-title">{pairDataContracts.token0}</p>
               </div>
-            ) : (
-              <Button onClick={getPairDataContracts}>Show contract data</Button>
-            )}
+              <div className="col-6">
+                <p>Token1:</p>
+                <p className="text-title">{pairDataContracts.token1}</p>
+              </div>
+            </div>
           </div>
-        ) : null}
+        ) : (
+          <Button onClick={getPairDataContracts}>Show contract data</Button>
+        )}
       </div>
     </div>
   );
