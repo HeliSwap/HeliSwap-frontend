@@ -91,8 +91,6 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
 
   const canRemove = lpApproved && removeLpData.tokenInAddress !== '';
 
-  console.log('pairData', pairData);
-
   return (
     <div className="mt-4 rounded border border-primary p-4">
       <h3 className="text-title">{pairData.pairSymbol}</h3>
@@ -142,11 +140,11 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
                 You will receive:
                 <div className="d-flex justify-content-between align-items-center mt-2">
                   <p>Pooled {pairData.token0Symbol}:</p>
-                  <p>{removeLpData.tokens0Amount}</p>
+                  <p>{formatStringWeiToStringEther(removeLpData.tokens0Amount)}</p>
                 </div>
                 <div className="d-flex justify-content-between align-items-center mt-2">
                   <p>Pooled {pairData.token1Symbol}:</p>
-                  <p>{removeLpData.tokens1Amount}</p>
+                  <p>{formatStringWeiToStringEther(removeLpData.tokens1Amount)}</p>
                 </div>
               </div>
             </div>
