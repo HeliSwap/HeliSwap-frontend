@@ -1,12 +1,15 @@
 import React, { useState, useContext } from 'react';
-import BigNumber from 'bignumber.js';
 import { GlobalContext } from '../providers/Global';
 
 import { IPairData } from '../interfaces/tokens';
-import { formatStringWeiToStringEther } from '../utils/numberUtils';
+import {
+  formatStringToBigNumberEthersWei,
+  formatStringWeiToStringEther,
+} from '../utils/numberUtils';
 
 import Button from './Button';
 import { addressToContractId } from '../utils/tokenUtils';
+import { hethers } from '@hashgraph/hethers';
 
 interface IPoolInfoProps {
   pairData: IPairData;
@@ -39,23 +42,20 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
   };
 
   const calculateTokensAmount = async () => {
-    // Convert amounts to BN
-    const tokensLPToRemoveBN = new BigNumber(lpInputValue as string);
-    const totalSupplyTokensLPBN = new BigNumber(formatStringWeiToStringEther(pairData.pairSupply));
-    const token0BN = new BigNumber(formatStringWeiToStringEther(pairData.token0Amount));
-    const token1BN = new BigNumber(formatStringWeiToStringEther(pairData.token1Amount));
+    const tokensLPToRemoveHBN = formatStringToBigNumberEthersWei(lpInputValue);
+    const token0HBN = hethers.BigNumber.from(pairData.token0Amount);
+    const token1HBN = hethers.BigNumber.from(pairData.token1Amount);
+    const totalSupplyHBN = hethers.BigNumber.from(pairData.pairSupply);
 
-    // Get LP token ratio - LP tokens to remove / Total amount ot LP tokens
-    const ratioBN = tokensLPToRemoveBN.div(totalSupplyTokensLPBN);
+    const tokens0MulByAmount = token0HBN.mul(tokensLPToRemoveHBN);
+    const tokens1MulByAmount = token1HBN.mul(tokensLPToRemoveHBN);
 
-    // Calculate reserves token amounts
-    const tokens0ToRemoveBN = token0BN.times(ratioBN);
-    const tokens1ToRemoveBN = token1BN.times(ratioBN);
+    const tokens0ToRemoveHBN = tokens0MulByAmount.div(totalSupplyHBN);
+    const tokens1ToRemoveHBN = tokens1MulByAmount.div(totalSupplyHBN);
 
-    // Convent to string and numbers
-    const tokensLPToRemoveStr = tokensLPToRemoveBN.toString();
-    const tokens0ToRemoveStr = tokens0ToRemoveBN.toString();
-    const tokens1ToRemoveStr = tokens1ToRemoveBN.toString();
+    const tokensLPToRemoveStr = tokensLPToRemoveHBN.toString();
+    const tokens0ToRemoveStr = tokens0ToRemoveHBN.toString();
+    const tokens1ToRemoveStr = tokens1ToRemoveHBN.toString();
 
     setRemoveLpData({
       tokenInAddress: pairData.token0,
@@ -90,6 +90,8 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
   };
 
   const canRemove = lpApproved && removeLpData.tokenInAddress !== '';
+
+  console.log('pairData', pairData);
 
   return (
     <div className="mt-4 rounded border border-primary p-4">

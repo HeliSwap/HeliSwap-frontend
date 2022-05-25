@@ -31,13 +31,3 @@ export const formatStringWeiToStringEther = (numberToFormat: string, decimals: n
 
   return numberToFormatBN.div(tenPowDec).toString();
 };
-
-export const formatBigNumberToStringPrecision = (
-  numberToFormat: BigNumber,
-  decimals: number = 18,
-) => {
-  const numberToFormatArr = numberToFormat.toString().split('.');
-  numberToFormatArr[1] = numberToFormatArr[1].slice(0, decimals);
-
-  return numberToFormatArr.join('.');
-};
