@@ -4,8 +4,6 @@ export interface ITokenData {
   symbol: string;
   address: string;
   decimals: number;
-  totalSupply: string;
-  expiryTimestamp: string;
   type: TokenType;
 }
 
@@ -16,7 +14,7 @@ export enum TokenType {
 }
 
 export interface IUserToken {
-  hederaId: string;
+  tokenId: string;
   balance: number;
 }
 

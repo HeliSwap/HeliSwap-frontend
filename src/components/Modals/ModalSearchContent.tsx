@@ -5,6 +5,7 @@ import { useLazyQuery, useQuery } from '@apollo/client';
 import { GET_POOL_BY_TOKEN, GET_TOKEN_INFO, GET_TOKENS } from '../../GraphQL/Queries';
 
 import Button from '../../components/Button';
+import { idToAddress } from '../../utils/tokenUtils';
 
 interface IModalProps {
   modalTitle?: string;
@@ -22,7 +23,7 @@ const ModalSearchContent = ({
   modalTitle,
 }: IModalProps) => {
   const [searchInputValue, setSearchInputValue] = useState('');
-  const [currentToken, setCurrentToken] = useState('');
+  const [currentToken, setCurrentToken] = useState<ITokenData>({} as ITokenData);
   const [tokenDataList, setTokenDataList] = useState<ITokenData[]>();
 
   const [getTokenByAddressOrId, { data: dataTBI, loading: loadingTBI }] =
@@ -40,42 +41,42 @@ const ModalSearchContent = ({
     // TODO Make proper check for token id format
     if (!searchInputValue) return;
 
-    setCurrentToken(prev => searchInputValue);
-
     const result = await getTokenByAddressOrId({
       variables: { id: searchInputValue },
     });
 
     // Temp check for not found tokend
     if (!result.data) {
-      setTokensData((prev: any) => ({
-        ...prev,
-        [tokenFieldId]: { hederaId: searchInputValue, type: TokenType.ERC20, symbol: 'ERC20' },
+      setCurrentToken((prev: any) => ({
+        hederaId: searchInputValue,
+        type: TokenType.ERC20,
+        symbol: 'ERC20',
+        name: 'Possible ERC20 Token',
+        decimals: 18,
+        address: idToAddress(searchInputValue),
       }));
     }
   };
 
   const handleTokenListClick = (token: ITokenData) => {
-    setTokensData((prev: any) => ({
-      ...prev,
-      [tokenFieldId]: token,
-    }));
+    setCurrentToken(token);
   };
 
   const resetModalState = () => {
     setSearchInputValue('');
-    setCurrentToken('');
+    setCurrentToken({} as ITokenData);
   };
 
   const handleSaveButton = () => {
     if (hasTokenData) {
-      const tokenInfo = { ...dataTBI.getTokenInfo, type: TokenType.ERC20 };
-
       setTokensData((prev: any) => ({
         ...prev,
-        [tokenFieldId]: tokenInfo,
+        [tokenFieldId]: currentToken,
       }));
-      setPairsData((prev: any) => ({ ...prev, [tokenFieldId]: dataPBT.poolsByToken }));
+
+      dataPBT &&
+        dataPBT.poolsByToken.length > 0 &&
+        setPairsData((prev: any) => ({ ...prev, [tokenFieldId]: dataPBT.poolsByToken }));
     }
 
     resetModalState();
@@ -128,17 +129,22 @@ const ModalSearchContent = ({
   useEffect(() => {
     if (dataTBI) {
       const { getTokenInfo } = dataTBI;
-      Object.keys(getTokenInfo).length > 0 && setCurrentToken(getTokenInfo.address);
+      if (Object.keys(getTokenInfo).length > 0) {
+        setCurrentToken({
+          ...getTokenInfo,
+          type: getTokenInfo.isHTS ? TokenType.HTS : TokenType.ERC20,
+        });
+      }
     }
   }, [dataTBI]);
 
   useEffect(() => {
     getPoolByToken({
-      variables: { token: currentToken },
+      variables: { token: currentToken.address },
     });
   }, [currentToken, getPoolByToken]);
 
-  const hasTokenData = dataTBI && Object.keys(dataTBI.getTokenInfo).length > 0;
+  const hasTokenData = Object.keys(currentToken).length > 0;
   const hasPools = dataPBT && dataPBT.poolsByToken.length > 0;
   const hasTokenList = tokenDataList && tokenDataList.length > 0;
 
@@ -242,7 +248,7 @@ const ModalSearchContent = ({
               <p className="mt-4">Token data:</p>
               <div className="mt-2 bg-slate p-3 rounded">
                 <p>
-                  {dataTBI.getTokenInfo.name} ({dataTBI.getTokenInfo.symbol})
+                  [{currentToken.type}]{currentToken.name} ({currentToken.symbol})
                 </p>
               </div>
             </>
