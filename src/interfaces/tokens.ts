@@ -14,7 +14,7 @@ export enum TokenType {
 }
 
 export interface IUserToken {
-  hederaId: string;
+  tokenId: string;
   balance: number;
 }
 

@@ -26,7 +26,7 @@ const WalletBalance = ({ userId, tokenData, setMaxNumber }: IWalletBalance) => {
 
   useEffect(() => {
     const getTokenBalance = async () => {
-      const tokenFound = userTokenList.find(item => item.hederaId === tokenData.hederaId);
+      const tokenFound = userTokenList.find(item => item.tokenId === tokenData.hederaId);
       const { type } = tokenData;
       let tokenBalance = '0.00';
 
