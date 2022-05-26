@@ -10,8 +10,9 @@ export interface ITokenData {
 }
 
 export enum TokenType {
-  HTS,
-  ERC20,
+  HTS = 'HTS',
+  ERC20 = 'ERC20',
+  HBAR = 'HBAR',
 }
 
 export interface IUserToken {
