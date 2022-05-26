@@ -68,10 +68,12 @@ const ModalSearchContent = ({
   };
 
   const handleSaveButton = () => {
-    if (hasTokenData && hasPools) {
+    if (hasTokenData) {
+      const tokenInfo = { ...dataTBI.getTokenInfo, type: TokenType.ERC20 };
+
       setTokensData((prev: any) => ({
         ...prev,
-        [tokenFieldId]: { ...dataTBI.getTokenInfo, type: TokenType.ERC20 },
+        [tokenFieldId]: tokenInfo,
       }));
       setPairsData((prev: any) => ({ ...prev, [tokenFieldId]: dataPBT.poolsByToken }));
     }
@@ -105,7 +107,18 @@ const ModalSearchContent = ({
       };
 
       if (getTokensData.length > 0) {
-        setTokenDataList([nativeToken, ...getTokensData]);
+        const foundTokenDataList = getTokensData.map((item: any) => ({
+          hederaId: item.hederaId,
+          name: item.name,
+          symbol: item.symbol,
+          address: item.address,
+          decimals: item.decimals,
+          totalSupply: '',
+          expiryTimestamp: '',
+          type: item.isHTS ? TokenType.HTS : TokenType.ERC20,
+        }));
+
+        setTokenDataList([nativeToken, ...foundTokenDataList]);
       } else {
         setTokenDataList([nativeToken]);
       }
@@ -258,7 +271,7 @@ const ModalSearchContent = ({
                     className="cursor-pointer"
                     key={index}
                   >
-                    {token.symbol}
+                    [{token.type}] {token.symbol}
                   </p>
                 ))}
               </div>
