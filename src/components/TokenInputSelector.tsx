@@ -76,7 +76,7 @@ const TokenInputSelector = ({
           name={selectName}
           id=""
           className="form-control"
-          value=""
+          value={selectValue}
         >
           {selectValue ? null : (
             <option value="" disabled hidden>

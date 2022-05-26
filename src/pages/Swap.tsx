@@ -89,7 +89,9 @@ const Swap = () => {
   async function onInputChange(tokenData: IStringToString) {
     const { tokenIdIn, amountIn, tokenIdOut, amountOut } = tokenData;
     //Use these amounts instead of poolReserves after BE is ready
-    // const { token0Amount, token1Amount } = pairData;
+    // const { token0Amount, token1Amount } = selectedPoolData;
+    if (Object.keys(selectedPoolData).length === 0) return;
+
     if (tokenIdIn) {
       const swapAmountOut = sdk.getSwapAmountOut(
         amountIn,
@@ -162,7 +164,6 @@ const Swap = () => {
       const tokenInAddress = idToAddress(swapData.tokenIdIn);
       const tokenOutAddress = idToAddress(swapData.tokenIdOut);
 
-      // TODO - To be optimized
       const selectedPoolData = poolsData.filter((pool: any) => {
         return (
           //Both tokens are in the same pool
@@ -172,6 +173,8 @@ const Swap = () => {
       });
 
       setSelectedPoolData(selectedPoolData[0]);
+    } else {
+      setSelectedPoolData({} as IPairData);
     }
   }, [poolsData, swapData]);
 
