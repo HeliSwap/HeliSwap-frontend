@@ -85,48 +85,22 @@ const Swap = () => {
     }
   };
 
-  //use BE when it is ready
-  // async function onInputChange(tokenData: IStringToString) {
-  //   const { token0Amount, token1Amount } = pairData;
-
-  //   if (tokenData.tokenIdIn) {
-  //     const swapAmountOut = sdk.getSwapAmountOut(
-  //       process.env.REACT_APP_ROUTER_ADDRESS as string,
-  //       tokenData.amountIn,
-  //       token0Amount,
-  //       token1Amount,
-  //       connectedWallet,
-  //     );
-
-  //     setTokenOutInputValue(swapAmountOut);
-  //     setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
-  //   } else if (tokenData.tokenIdOut) {
-  //     const swapAmountIn = sdk.getSwapAmountIn(
-  //       process.env.REACT_APP_ROUTER_ADDRESS as string,
-  //       tokenData.amountOut,
-  //       token0Amount,
-  //       token1Amount,
-  //       connectedWallet,
-  //     );
-
-  //     setTokenInInputValue(swapAmountIn);
-  //     setSwapData(prev => ({ ...prev, ...tokenData, amountIn: swapAmountIn.toString() }));
-  //   }
-  // }
-
   // currently using the data comming from the contract itself until BE is ready
   async function onInputChange(tokenData: IStringToString) {
-    if (tokenData.tokenIdIn) {
+    const { tokenIdIn, amountIn, tokenIdOut, amountOut } = tokenData;
+    //Use these amounts instead of poolReserves after BE is ready
+    // const { token0Amount, token1Amount } = pairData;
+    if (tokenIdIn) {
       const swapAmountOut = sdk.getSwapAmountOut(
-        tokenData.amountIn,
+        amountIn,
         poolReserves.tokenIn,
         poolReserves.tokenOut,
       );
 
       setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
-    } else if (tokenData.tokenIdOut) {
+    } else if (tokenIdOut) {
       const swapAmountIn = sdk.getSwapAmountIn(
-        tokenData.amountOut,
+        amountOut,
         poolReserves.tokenIn,
         poolReserves.tokenOut,
       );
