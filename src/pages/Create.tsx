@@ -119,6 +119,7 @@ const Create = () => {
     setErrorMessage('');
 
     try {
+      //TODO add logic for adding native liquidity
       const receipt = await sdk.addLiquidity(hashconnectConnectorInstance, userId, createPairData);
       const {
         response: { success, error },
@@ -350,7 +351,7 @@ const Create = () => {
         ) : null}
 
         <div className="mt-5 d-flex justify-content-center">
-          {tokensData.tokenA.hederaId && !approved.tokenA ? (
+          {true || (tokensData.tokenA.hederaId && !approved.tokenA) ? (
             <Button
               onClick={() => handleApproveClick('tokenA')}
               className="mx-2"
@@ -364,7 +365,7 @@ const Create = () => {
             >{`Approve ${tokensData.tokenB.symbol}`}</Button>
           ) : null}
 
-          {approved.tokenA && approved.tokenB ? (
+          {true || (approved.tokenA && approved.tokenB) ? (
             tokensInSamePool ? (
               <Button
                 loading={isProvideLoading}
@@ -376,7 +377,7 @@ const Create = () => {
             ) : (
               <Button
                 loading={isProvideLoading}
-                disabled={!readyToProvide}
+                // disabled={!readyToProvide}
                 onClick={handleCreateClick}
               >
                 Create

@@ -137,6 +137,69 @@ class SDK {
     return responseData;
   }
 
+  async addNativeLiquidity(
+    hashconnectConnectorInstance: Hashconnect,
+    userId: string,
+    createPairData: ICreatePairData,
+  ) {
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
+    const {
+      tokenAAmount: tokenAAmountString,
+      tokenBAmount: tokenBAmountString,
+      tokenBId,
+    } = createPairData;
+
+    const tokenBAddress = idToAddress(tokenBId);
+
+    const tokenHBARAmount = formatStringToBigNumberWei(tokenAAmountString, 0);
+    const tokenBAmount = formatStringToBigNumberWei(tokenBAmountString);
+
+    const userAddress = idToAddress(userId);
+    const routerId = addressToId(process.env.REACT_APP_ROUTER_ADDRESS as string);
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the router contract
+      .setContractId(routerId)
+
+      //Set the gas for the contract call
+      .setGas(3000000)
+      //Amount of HBAR we want to provide
+      .setPayableAmount(tokenHBARAmount)
+
+      //Set the contract function to call
+      .setFunction(
+        'addLiquidityETH',
+        new ContractFunctionParameters()
+          .addAddress(tokenBAddress)
+          .addUint256(tokenBAmount)
+          .addUint256(tokenBAmount)
+          .addUint256(tokenHBARAmount)
+          .addAddress(userAddress)
+          .addUint256(deadline),
+      );
+
+    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
+      trans,
+      userId as string,
+    );
+
+    const response = await hashconnectConnectorInstance?.sendTransaction(
+      transactionBytes as Uint8Array,
+      userId as string,
+      false,
+    );
+
+    const responseData: any = {
+      response,
+      receipt: null,
+    };
+
+    if (response?.success) {
+      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
+    }
+
+    return responseData;
+  }
+
   async addLiquidity(
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
