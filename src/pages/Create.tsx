@@ -119,6 +119,7 @@ const Create = () => {
     setErrorMessage('');
 
     try {
+      //TODO add logic for adding native liquidity
       const receipt = await sdk.addLiquidity(hashconnectConnectorInstance, userId, createPairData);
       const {
         response: { success, error },
