@@ -233,7 +233,7 @@ const Create = () => {
     }
 
     setReadyToProvide(isReady);
-  }, [createPairData]);
+  }, [createPairData, provideNative]);
 
   return (
     <div className="d-flex justify-content-center">
