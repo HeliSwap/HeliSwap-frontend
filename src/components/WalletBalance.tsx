@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ITokenData, IUserToken } from '../interfaces/tokens';
+import { hethers } from '@hashgraph/hethers';
+import { ITokenData, IUserToken, TokenType } from '../interfaces/tokens';
 import { getHTSTokensWalletBalance } from '../utils/tokenUtils';
 
 interface IWalletBalance {
@@ -24,19 +25,29 @@ const WalletBalance = ({ userId, tokenData, setMaxNumber }: IWalletBalance) => {
   }, [userId]);
 
   useEffect(() => {
-    const getTokenBalance = () => {
+    const getTokenBalance = async () => {
       const tokenFound = userTokenList.find(item => item.hederaId === tokenData.hederaId);
-      const tokenDecimals = tokenData.decimals || 2;
-      const tokenBalance = tokenFound
-        ? (tokenFound.balance / Math.pow(10, tokenDecimals)).toFixed(tokenDecimals)
-        : '0.00';
+      const { type } = tokenData;
+      let tokenBalance = '0.00';
+
+      // Check for native token (HBAR)
+      if (type === TokenType.HBAR) {
+        const provider = hethers.providers.getDefaultProvider(process.env.REACT_APP_NETWORK_TYPE);
+        const userBalanceBN = await provider.getBalance(userId);
+        tokenBalance = hethers.utils.formatHbar(userBalanceBN);
+      } else {
+        const tokenDecimals = tokenData.decimals || 2;
+        tokenBalance = tokenFound
+          ? (tokenFound.balance / Math.pow(10, tokenDecimals)).toFixed(tokenDecimals)
+          : '0.00';
+      }
 
       setTokenBalance(tokenBalance);
       setMaxNumber && setMaxNumber(tokenBalance);
     };
 
     tokenData && getTokenBalance();
-  }, [userTokenList, tokenData, setMaxNumber]);
+  }, [userTokenList, tokenData, setMaxNumber, userId]);
 
   return <p className="text-steel mt-3 text-end">Wallet balance: {tokenBalance}</p>;
 };

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { IPairData, TokenType } from '../../interfaces/tokens';
+import { IPairData, ITokenData, TokenType } from '../../interfaces/tokens';
 
-import { useLazyQuery } from '@apollo/client';
-import { GET_POOL_BY_TOKEN, GET_TOKEN_INFO } from '../../GraphQL/Queries';
+import { useLazyQuery, useQuery } from '@apollo/client';
+import { GET_POOL_BY_TOKEN, GET_TOKEN_INFO, GET_TOKENS } from '../../GraphQL/Queries';
 
 import Button from '../../components/Button';
 
@@ -23,11 +23,12 @@ const ModalSearchContent = ({
 }: IModalProps) => {
   const [searchInputValue, setSearchInputValue] = useState('');
   const [currentToken, setCurrentToken] = useState('');
+  const [tokenDataList, setTokenDataList] = useState<ITokenData[]>();
 
   const [getTokenByAddressOrId, { data: dataTBI, loading: loadingTBI }] =
     useLazyQuery(GET_TOKEN_INFO);
-
   const [getPoolByToken, { data: dataPBT, loading: loadingPBT }] = useLazyQuery(GET_POOL_BY_TOKEN);
+  const { data: dataGT, loading: loadingGT } = useQuery(GET_TOKENS);
 
   const onSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -54,16 +55,25 @@ const ModalSearchContent = ({
     }
   };
 
+  const handleTokenListClick = (token: ITokenData) => {
+    setTokensData((prev: any) => ({
+      ...prev,
+      [tokenFieldId]: token,
+    }));
+  };
+
   const resetModalState = () => {
     setSearchInputValue('');
     setCurrentToken('');
   };
 
   const handleSaveButton = () => {
-    if (hasTokenData && hasPools) {
+    if (hasTokenData) {
+      const tokenInfo = { ...dataTBI.getTokenInfo, type: TokenType.ERC20 };
+
       setTokensData((prev: any) => ({
         ...prev,
-        [tokenFieldId]: { ...dataTBI.getTokenInfo, type: TokenType.ERC20 },
+        [tokenFieldId]: tokenInfo,
       }));
       setPairsData((prev: any) => ({ ...prev, [tokenFieldId]: dataPBT.poolsByToken }));
     }
@@ -82,9 +92,44 @@ const ModalSearchContent = ({
   };
 
   useEffect(() => {
-    dataTBI &&
-      Object.keys(dataTBI.getTokenInfo).length > 0 &&
-      setCurrentToken(dataTBI.getTokenInfo.address);
+    if (dataGT) {
+      const { getTokensData } = dataGT;
+
+      const nativeToken = {
+        hederaId: '',
+        name: 'HBAR',
+        symbol: 'HBAR',
+        address: '',
+        decimals: 18,
+        totalSupply: '',
+        expiryTimestamp: '',
+        type: TokenType.HBAR,
+      };
+
+      if (getTokensData.length > 0) {
+        const foundTokenDataList = getTokensData.map((item: any) => ({
+          hederaId: item.hederaId,
+          name: item.name,
+          symbol: item.symbol,
+          address: item.address,
+          decimals: item.decimals,
+          totalSupply: '',
+          expiryTimestamp: '',
+          type: item.isHTS ? TokenType.HTS : TokenType.ERC20,
+        }));
+
+        setTokenDataList([nativeToken, ...foundTokenDataList]);
+      } else {
+        setTokenDataList([nativeToken]);
+      }
+    }
+  }, [dataGT]);
+
+  useEffect(() => {
+    if (dataTBI) {
+      const { getTokenInfo } = dataTBI;
+      Object.keys(getTokenInfo).length > 0 && setCurrentToken(getTokenInfo.address);
+    }
   }, [dataTBI]);
 
   useEffect(() => {
@@ -95,6 +140,7 @@ const ModalSearchContent = ({
 
   const hasTokenData = dataTBI && Object.keys(dataTBI.getTokenInfo).length > 0;
   const hasPools = dataPBT && dataPBT.poolsByToken.length > 0;
+  const hasTokenList = tokenDataList && tokenDataList.length > 0;
 
   return (
     <>
@@ -184,7 +230,7 @@ const ModalSearchContent = ({
               />
               <Button
                 loadingText={' '}
-                loading={loadingPBT || loadingTBI}
+                loading={loadingPBT || loadingTBI || loadingGT}
                 onClick={handleSearchButtonClick}
               >
                 Search
@@ -213,6 +259,23 @@ const ModalSearchContent = ({
                 ))}
               </div>
             </>
+          ) : null}
+
+          {hasTokenList ? (
+            <div className="mt-4">
+              <h3 className="text-title">Token list:</h3>
+              <div className="mt-3 rounded border border-warning p-3">
+                {tokenDataList.map((token: ITokenData, index: number) => (
+                  <p
+                    onClick={() => handleTokenListClick(token)}
+                    className="cursor-pointer"
+                    key={index}
+                  >
+                    [{token.type}] {token.symbol}
+                  </p>
+                ))}
+              </div>
+            </div>
           ) : null}
         </div>
       </div>
