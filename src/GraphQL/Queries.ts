@@ -75,6 +75,7 @@ export const GET_TOKENS = gql`
       symbol
       name
       decimals
+      isHTS
     }
   }
 `;
@@ -88,6 +89,7 @@ export const GET_TOKEN_INFO = gql`
       symbol
       name
       decimals
+      isHTS
     }
   }
 `;

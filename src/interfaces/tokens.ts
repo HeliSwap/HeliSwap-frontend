@@ -4,8 +4,6 @@ export interface ITokenData {
   symbol: string;
   address: string;
   decimals: number;
-  totalSupply: string;
-  expiryTimestamp: string;
   type: TokenType;
 }
 
