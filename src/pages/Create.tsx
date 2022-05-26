@@ -61,6 +61,7 @@ const Create = () => {
 
   const [readyToProvide, setReadyToProvide] = useState(false);
   const [tokensInSamePool, setTokensInSamePool] = useState(false);
+  const [provideNative, setProvideNative] = useState(false);
 
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -120,7 +121,9 @@ const Create = () => {
 
     try {
       //TODO add logic for adding native liquidity
-      const receipt = await sdk.addLiquidity(hashconnectConnectorInstance, userId, createPairData);
+      const receipt = provideNative
+        ? await sdk.addNativeLiquidity(hashconnectConnectorInstance, userId, createPairData)
+        : await sdk.addLiquidity(hashconnectConnectorInstance, userId, createPairData);
       const {
         response: { success, error },
       } = receipt;
@@ -180,38 +183,54 @@ const Create = () => {
     const { tokenA, tokenB } = tokensData;
     const newPairData = { tokenAId: tokenA.hederaId, tokenBId: tokenB.hederaId };
 
-    tokenA.hederaId && tokenA.type === TokenType.ERC20 && getApproved(tokenA.hederaId, 'tokenA');
-    tokenB.hederaId && tokenB.type === TokenType.ERC20 && getApproved(tokenB.hederaId, 'tokenB');
+    if (tokenA.type === TokenType.HBAR) {
+      setApproved(prev => ({ ...prev, tokenA: true }));
+    } else {
+      tokenA.type === TokenType.ERC20 && tokenA.hederaId && getApproved(tokenA.hederaId, 'tokenA');
+    }
+
+    if (tokenB.type === TokenType.HBAR) {
+      setApproved(prev => ({ ...prev, tokenB: true }));
+    } else {
+      tokenB.type === TokenType.ERC20 && tokenB.hederaId && getApproved(tokenB.hederaId, 'tokenB');
+    }
 
     setCreatePairData(prev => ({ ...prev, ...newPairData }));
   }, [tokensData, sdk, userId]);
 
   useEffect(() => {
     let inSamePool = false;
-    const { tokenA, tokenB } = pairsData;
+    const { tokenA: pairsTokenA, tokenB: pairsTokenB } = pairsData;
+    const { tokenA, tokenB } = tokensData;
+
+    const provideNative = tokenA.type === TokenType.HBAR || tokenB.type === TokenType.HBAR;
 
     // Check for same pool
     // TODO - To be optimized
-    tokenA.forEach(elementA => {
-      tokenB.forEach(elementB => {
-        if (elementA.pairAddress === elementB.pairAddress) {
+    pairsTokenA.forEach(poolA => {
+      pairsTokenB.forEach(poolB => {
+        if (poolA.pairAddress === poolB.pairAddress) {
           inSamePool = true;
-          setPoolData(elementA);
+          setPoolData(poolA);
         }
       });
     });
 
+    setProvideNative(provideNative);
     setTokensInSamePool(inSamePool);
-  }, [pairsData]);
+  }, [pairsData, tokensData]);
 
   useEffect(() => {
     let isReady = true;
 
-    Object.values(createPairData).forEach(item => {
-      if (item === '0' || item === '' || typeof item === 'undefined') {
-        isReady = false;
-      }
-    });
+    // TODO - Stupid check, to be improved!!
+    if (!provideNative) {
+      Object.values(createPairData).forEach(item => {
+        if (item === '0' || item === '' || typeof item === 'undefined') {
+          isReady = false;
+        }
+      });
+    }
 
     setReadyToProvide(isReady);
   }, [createPairData]);
