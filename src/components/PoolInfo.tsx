@@ -70,36 +70,24 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
 
   const handleCalculateButtonClick = async () => {
     const tokensLPToRemoveHBN = formatStringToBigNumberEthersWei(lpInputValue);
-    const token0HBN = hethers.BigNumber.from(pairData.token0Amount);
-    const token1HBN = hethers.BigNumber.from(pairData.token1Amount);
-    const totalSupplyHBN = hethers.BigNumber.from(pairData.pairSupply);
+    const tokensLpAmount = tokensLPToRemoveHBN.toString();
 
-    const { reserve0ShareStr, reserve1ShareStr } = calculateReserves(
+    const { reserve0ShareHBN, reserve1ShareHBN } = calculateReserves(
       formatStringToStringWei(lpInputValue),
       pairData.pairSupply,
       pairData.token0Amount,
       pairData.token1Amount,
     );
 
-    console.log('reserve0ShareStr', reserve0ShareStr);
-    console.log('reserve1ShareStr', reserve1ShareStr);
-
-    const tokens0MulByAmount = token0HBN.mul(tokensLPToRemoveHBN);
-    const tokens1MulByAmount = token1HBN.mul(tokensLPToRemoveHBN);
-
-    const tokens0ToRemoveHBN = tokens0MulByAmount.div(totalSupplyHBN);
-    const tokens1ToRemoveHBN = tokens1MulByAmount.div(totalSupplyHBN);
-
-    const tokensLPToRemoveStr = tokensLPToRemoveHBN.toString();
-    const tokens0ToRemoveStr = tokens0ToRemoveHBN.toString();
-    const tokens1ToRemoveStr = tokens1ToRemoveHBN.toString();
+    const tokens0Amount = reserve0ShareHBN.toString();
+    const tokens1Amount = reserve1ShareHBN.toString();
 
     setRemoveLpData({
       tokenInAddress: pairData.token0,
       tokenOutAddress: pairData.token1,
-      tokensLpAmount: tokensLPToRemoveStr,
-      tokens0Amount: tokens0ToRemoveStr,
-      tokens1Amount: tokens1ToRemoveStr,
+      tokensLpAmount,
+      tokens0Amount,
+      tokens1Amount,
     });
   };
 
