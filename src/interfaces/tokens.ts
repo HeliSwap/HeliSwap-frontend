@@ -45,8 +45,6 @@ export interface IPairData {
   token1Amount: string;
   token1Symbol: string;
   token1Decimals: number;
-  token0Shares?: string;
-  token1Shares?: string;
   lpShares?: string;
   tvl: string;
   volume24h: string;

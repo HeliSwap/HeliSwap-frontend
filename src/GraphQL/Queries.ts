@@ -59,8 +59,6 @@ export const GET_POOLS_BY_USER = gql`
       token1Symbol
       token1Amount
       token1Decimals
-      token0Shares
-      token1Shares
       lpShares
     }
   }
