@@ -69,3 +69,40 @@ export const idToAddress = (tokenId: string) => {
 export const addressToContractId = (tokenAddress: string) => {
   return ContractId.fromEvmAddress(0, 0, tokenAddress);
 };
+
+/**
+ * Calucate reserves based on total amount ot LP
+ * @public
+ * @param {string} lpAmount - LP amount share in wei
+ * @param {string} lpAmountTotal - LP total amount in wei
+ * @param {string} reserve0 - Total amount of token0 reserves in wei
+ * @param {string} reserve1 - Total amount of token1 reserves in wei
+ * @return {object} - Reserves amounts in BigNumber in wei and converted into ethers strings
+ */
+export const calculateReserves = (
+  lpAmount: string,
+  lpAmountTotal: string,
+  reserve0: string,
+  reserve1: string,
+  reserve0Decimals: number = 18,
+  reserve1Decimals: number = 18,
+) => {
+  // Convert string values (wei) into Hethers Big Number
+  const lpAmountHBN = hethers.BigNumber.from(lpAmount); // HBN | wei
+  const lpAmountTotalHBN = hethers.BigNumber.from(lpAmountTotal); // HBN | wei
+  const reserve0HBN = hethers.BigNumber.from(reserve0); // HBN | wei
+  const reserve1HBN = hethers.BigNumber.from(reserve1); // HBN | wei
+
+  const reserve0ShareHBN = reserve0HBN.mul(lpAmountHBN).div(lpAmountTotalHBN); // HBN | wei
+  const reserve1ShareHBN = reserve1HBN.mul(lpAmountHBN).div(lpAmountTotalHBN); // HBN | wei
+
+  const reserve0ShareStr = hethers.utils.formatUnits(reserve0ShareHBN, reserve0Decimals); // String | ether
+  const reserve1ShareStr = hethers.utils.formatUnits(reserve1ShareHBN, reserve1Decimals); // String | ether
+
+  return {
+    reserve0ShareHBN,
+    reserve1ShareHBN,
+    reserve0ShareStr,
+    reserve1ShareStr,
+  };
+};
