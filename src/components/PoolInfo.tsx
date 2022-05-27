@@ -5,11 +5,12 @@ import { GlobalContext } from '../providers/Global';
 import { IPairData } from '../interfaces/tokens';
 import {
   formatStringToBigNumberEthersWei,
+  formatStringToStringWei,
   formatStringWeiToStringEther,
 } from '../utils/numberUtils';
 
 import Button from './Button';
-import { addressToContractId, idToAddress } from '../utils/tokenUtils';
+import { addressToContractId, idToAddress, calculateReserves } from '../utils/tokenUtils';
 
 import { getConnectedWallet } from '../pages/Helpers';
 
@@ -67,11 +68,21 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
     setLpInputValue(value);
   };
 
-  const calculateTokensAmount = async () => {
+  const handleCalculateButtonClick = async () => {
     const tokensLPToRemoveHBN = formatStringToBigNumberEthersWei(lpInputValue);
     const token0HBN = hethers.BigNumber.from(pairData.token0Amount);
     const token1HBN = hethers.BigNumber.from(pairData.token1Amount);
     const totalSupplyHBN = hethers.BigNumber.from(pairData.pairSupply);
+
+    const { reserve0ShareStr, reserve1ShareStr } = calculateReserves(
+      formatStringToStringWei(lpInputValue),
+      pairData.pairSupply,
+      pairData.token0Amount,
+      pairData.token1Amount,
+    );
+
+    console.log('reserve0ShareStr', reserve0ShareStr);
+    console.log('reserve1ShareStr', reserve1ShareStr);
 
     const tokens0MulByAmount = token0HBN.mul(tokensLPToRemoveHBN);
     const tokens1MulByAmount = token1HBN.mul(tokensLPToRemoveHBN);
@@ -142,6 +153,12 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
   };
 
   const canRemove = lpApproved && removeLpData.tokenInAddress !== '';
+  const { reserve0ShareStr, reserve1ShareStr } = calculateReserves(
+    pairData.lpShares as string,
+    pairData.pairSupply,
+    pairData.token0Amount,
+    pairData.token1Amount,
+  );
 
   return (
     <div className="mt-4 rounded border border-primary p-4">
@@ -152,11 +169,11 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
       </div>
       <div className="d-flex justify-content-between align-items-center mt-2">
         <p>Pooled {pairData.token0Symbol}:</p>
-        <p>{formatStringWeiToStringEther(pairData.token0Shares as string)}</p>
+        <p>{reserve0ShareStr}</p>
       </div>
       <div className="d-flex justify-content-between align-items-center mt-2">
         <p>Pooled {pairData.token1Symbol}:</p>
-        <p>{formatStringWeiToStringEther(pairData.token1Shares as string)}</p>
+        <p>{reserve1ShareStr}</p>
       </div>
       <hr />
       <div className="mt-4 row">
@@ -194,7 +211,7 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
                 >
                   Remove
                 </Button>
-                <Button className="ms-3" onClick={calculateTokensAmount}>
+                <Button className="ms-3" onClick={handleCalculateButtonClick}>
                   Calculate
                 </Button>
               </div>

@@ -25,6 +25,17 @@ export const formatStringToBigNumberEthersWei = (numberToFormat: string, decimal
   return numberToFormatBNHethersPowed;
 };
 
+// Used to format values (string | ETH) into String / wei
+export const formatStringToStringWei = (numberToFormat: string, decimals: number = 18) => {
+  const numberToFormatBN = new BigNumber(numberToFormat);
+  const tenPowDec = new BigNumber(10).pow(decimals);
+
+  const numberToFormatBNPowed = numberToFormatBN.times(tenPowDec);
+  const numberToFormatBNPowedStr = numberToFormatBNPowed.toFixed();
+
+  return numberToFormatBNPowedStr;
+};
+
 // Used to convert values (string | wei) into string / ether
 export const formatStringWeiToStringEther = (numberToFormat: string, decimals: number = 18) => {
   const numberToFormatBN = new BigNumber(numberToFormat);
