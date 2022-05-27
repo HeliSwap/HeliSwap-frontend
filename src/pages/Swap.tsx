@@ -12,7 +12,7 @@ import Loader from '../components/Loader';
 import TokenInputSelector from '../components/TokenInputSelector';
 
 import errorMessages from '../content/errors';
-import { idToAddress } from '../utils/tokenUtils';
+import { addressToContractId, addressToId, idToAddress } from '../utils/tokenUtils';
 import { getConnectedWallet } from './Helpers';
 
 const Swap = () => {
@@ -49,6 +49,8 @@ const Swap = () => {
     token0: '0.0',
     token1: '0.0',
   });
+
+  console.log('selectedPoolData', selectedPoolData);
 
   //To be removed
   const getPairDataContracts = async () => {
@@ -91,20 +93,52 @@ const Swap = () => {
     //Use these amounts instead of poolReserves after BE is ready
     // const { token0Amount, token1Amount } = selectedPoolData;
     if (Object.keys(selectedPoolData).length === 0) return;
-
+    let resIn;
+    let resOut;
+    let decIn;
+    let decOut;
     if (tokenIdIn) {
+      if (addressToId(selectedPoolData.token0) === tokenIdIn) {
+        resIn = poolReserves.tokenIn;
+        resOut = poolReserves.tokenOut;
+        decIn = selectedPoolData.token0Decimals;
+        decOut = selectedPoolData.token1Decimals;
+      } else {
+        resIn = poolReserves.tokenOut;
+        resOut = poolReserves.tokenIn;
+        decIn = selectedPoolData.token1Decimals;
+        decOut = selectedPoolData.token0Decimals;
+      }
+
       const swapAmountOut = sdk.getSwapAmountOut(
         amountIn,
-        poolReserves.tokenIn,
-        poolReserves.tokenOut,
+        resIn,
+        resOut,
+        decIn,
+        decOut,
+        connectedWallet,
       );
 
       setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
     } else if (tokenIdOut) {
+      if (addressToId(selectedPoolData.token0) === tokenIdOut) {
+        resIn = poolReserves.tokenOut;
+        resOut = poolReserves.tokenIn;
+        decIn = selectedPoolData.token1Decimals;
+        decOut = selectedPoolData.token0Decimals;
+      } else {
+        resIn = poolReserves.tokenIn;
+        resOut = poolReserves.tokenOut;
+        decIn = selectedPoolData.token0Decimals;
+        decOut = selectedPoolData.token1Decimals;
+      }
       const swapAmountIn = sdk.getSwapAmountIn(
         amountOut,
-        poolReserves.tokenIn,
-        poolReserves.tokenOut,
+        resIn,
+        resOut,
+        decIn,
+        decOut,
+        connectedWallet,
       );
 
       setSwapData(prev => ({ ...prev, ...tokenData, amountIn: swapAmountIn.toString() }));
@@ -117,6 +151,16 @@ const Swap = () => {
 
   async function handleSwapClick() {
     const { tokenIdIn, tokenIdOut, amountIn, amountOut } = swapData;
+    let decIn;
+    let decOut;
+
+    if (tokenIdIn === addressToId(selectedPoolData.token0)) {
+      decIn = selectedPoolData.token0Decimals;
+      decOut = selectedPoolData.token1Decimals;
+    } else {
+      decIn = selectedPoolData.token1Decimals;
+      decOut = selectedPoolData.token0Decimals;
+    }
 
     try {
       const receipt = await sdk.swapTokens(
@@ -126,6 +170,8 @@ const Swap = () => {
         tokenIdOut,
         amountIn,
         amountOut,
+        decIn,
+        decOut,
       );
 
       const {
