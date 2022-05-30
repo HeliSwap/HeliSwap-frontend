@@ -21,7 +21,6 @@ class SDK {
     amountOutRes: string,
     decIn: number,
     decOut: number,
-    connectedWallet: any,
   ) {
     //get values in hethers big number
     const amountInBNStrHethers = formatStringToBigNumberEthersWei(amountIn, decIn);
@@ -34,22 +33,6 @@ class SDK {
     const denominator = amountInResBNStrHethers.mul(1000).add(amountInWithFee);
     const amountOut = numerator.div(denominator);
 
-    // const routerContract = hethers.ContractFactory.getContract(
-    //   '0x000000000000000000000000000000000214d6f1',
-    //   routerABI.abi,
-    //   connectedWallet,
-    // );
-
-    // const amountOutContract = await routerContract.getAmountOut(
-    //   amountInBNStrHethers,
-    //   amountInResBNStrHethers,
-    //   amountOutResBNStrHethers,
-    //   {
-    //     gasLimit: 3000000,
-    //   },
-    // );
-    // console.log('contract', amountOutContract.toString());
-    console.log('calculated', hethers.utils.formatUnits(amountOut, decOut).toString());
     return hethers.utils.formatUnits(amountOut, decOut).toString();
   }
 
@@ -59,7 +42,6 @@ class SDK {
     amountOutRes: string,
     decIn: number,
     decOut: number,
-    connectedWallet: any,
   ) {
     //get values in hethers big number
     const amountOutBNStrHethers = formatStringToBigNumberEthersWei(amountOut, decOut);
@@ -70,23 +52,6 @@ class SDK {
     const numerator = amountInResBNStrHethers.mul(amountOutBNStrHethers).mul(1000);
     const denominator = amountOutResBNStrHethers.sub(amountOutBNStrHethers).mul(997);
     const amountIn = numerator.div(denominator).add(1);
-
-    // const routerContract = hethers.ContractFactory.getContract(
-    //   '0x000000000000000000000000000000000214d6f1',
-    //   routerABI.abi,
-    //   connectedWallet,
-    // );
-
-    // const amountOutContract = await routerContract.getAmountIn(
-    //   amountOutBNStrHethers,
-    //   amountInResBNStrHethers,
-    //   amountOutResBNStrHethers,
-    //   {
-    //     gasLimit: 3000000,
-    //   },
-    // );
-    // console.log('contract', amountOutContract.toString());
-    // console.log('contracp', amountIn.toString());
 
     return hethers.utils.formatUnits(amountIn, decIn).toString();
   }

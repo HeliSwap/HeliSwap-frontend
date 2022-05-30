@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { hethers } from '@hashgraph/hethers';
 import { ITokenData, ISwapTokenData, IPairData } from '../interfaces/tokens';
 import { IStringToString } from '../interfaces/comon';
 import { GlobalContext } from '../providers/Global';
@@ -12,7 +11,7 @@ import Loader from '../components/Loader';
 import TokenInputSelector from '../components/TokenInputSelector';
 
 import errorMessages from '../content/errors';
-import { addressToContractId, addressToId, idToAddress } from '../utils/tokenUtils';
+import { addressToId, idToAddress } from '../utils/tokenUtils';
 import { getConnectedWallet } from './Helpers';
 
 const Swap = () => {
@@ -38,108 +37,42 @@ const Swap = () => {
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const [poolReserves, setPoolReserves] = useState({ tokenIn: '0', tokenOut: '0' });
-
   const [swapData, setSwapData] = useState(initialSwapData);
 
-  //to be removed
-  const [pairDataContracts, setPairDataContracts] = useState({
-    balance: '0.0',
-    totalSupply: '0.0',
-    token0: '0.0',
-    token1: '0.0',
-  });
-
-  console.log('selectedPoolData', selectedPoolData);
-
-  //To be removed
-  const getPairDataContracts = async () => {
-    if (connectedWallet) {
-      const userAddress = idToAddress(userId);
-      const balanceBN = await sdk.checkBalance(
-        selectedPoolData.pairAddress,
-        userAddress,
-        connectedWallet,
-      );
-      const totalSupplyBN = await sdk.getTotalSupply(selectedPoolData.pairAddress, connectedWallet);
-      const [token0BN, token1BN] = await sdk.getReserves(
-        selectedPoolData.pairAddress,
-        connectedWallet,
-      );
-
-      const balanceStr = hethers.utils.formatUnits(balanceBN, 18);
-      const totalSupplyStr = hethers.utils.formatUnits(totalSupplyBN, 18);
-      const token0Str = hethers.utils.formatUnits(token0BN, 18);
-      const token1Str = hethers.utils.formatUnits(token1BN, 18);
-
-      const balanceNum = Number(balanceStr);
-
-      if (balanceNum > 0) {
-        setPairDataContracts({
-          balance: balanceStr,
-          totalSupply: totalSupplyStr,
-          token0: token0Str,
-          token1: token1Str,
-        });
-      }
-
-      setPoolReserves({ tokenIn: token0BN.toString(), tokenOut: token1BN.toString() });
-    }
-  };
-
-  // currently using the data comming from the contract itself until BE is ready
   async function onInputChange(tokenData: IStringToString) {
     const { tokenIdIn, amountIn, tokenIdOut, amountOut } = tokenData;
-    //Use these amounts instead of poolReserves after BE is ready
-    // const { token0Amount, token1Amount } = selectedPoolData;
+    const { token0Amount, token1Amount, token0Decimals, token1Decimals } = selectedPoolData;
     if (Object.keys(selectedPoolData).length === 0) return;
-    let resIn;
-    let resOut;
-    let decIn;
-    let decOut;
-    if (tokenIdIn) {
-      if (addressToId(selectedPoolData.token0) === tokenIdIn) {
-        resIn = poolReserves.tokenIn;
-        resOut = poolReserves.tokenOut;
-        decIn = selectedPoolData.token0Decimals;
-        decOut = selectedPoolData.token1Decimals;
-      } else {
-        resIn = poolReserves.tokenOut;
-        resOut = poolReserves.tokenIn;
-        decIn = selectedPoolData.token1Decimals;
-        decOut = selectedPoolData.token0Decimals;
-      }
+    let resIn, resOut, decIn, decOut;
 
-      const swapAmountOut = sdk.getSwapAmountOut(
-        amountIn,
-        resIn,
-        resOut,
-        decIn,
-        decOut,
-        connectedWallet,
-      );
+    if (addressToId(selectedPoolData.token0) === tokenIdIn) {
+      resIn = token0Amount;
+      resOut = token1Amount;
+      decIn = token0Decimals;
+      decOut = token1Decimals;
+    } else {
+      resIn = token1Amount;
+      resOut = token0Amount;
+      decIn = token1Decimals;
+      decOut = token0Decimals;
+    }
+    if (tokenIdIn) {
+      const swapAmountOut = sdk.getSwapAmountOut(amountIn, resIn, resOut, decIn, decOut);
 
       setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
     } else if (tokenIdOut) {
       if (addressToId(selectedPoolData.token0) === tokenIdOut) {
-        resIn = poolReserves.tokenOut;
-        resOut = poolReserves.tokenIn;
-        decIn = selectedPoolData.token1Decimals;
-        decOut = selectedPoolData.token0Decimals;
+        resIn = token1Amount;
+        resOut = token0Amount;
+        decIn = token1Decimals;
+        decOut = token0Decimals;
       } else {
-        resIn = poolReserves.tokenIn;
-        resOut = poolReserves.tokenOut;
-        decIn = selectedPoolData.token0Decimals;
-        decOut = selectedPoolData.token1Decimals;
+        resIn = token0Amount;
+        resOut = token1Amount;
+        decIn = token0Decimals;
+        decOut = token1Decimals;
       }
-      const swapAmountIn = sdk.getSwapAmountIn(
-        amountOut,
-        resIn,
-        resOut,
-        decIn,
-        decOut,
-        connectedWallet,
-      );
+      const swapAmountIn = sdk.getSwapAmountIn(amountOut, resIn, resOut, decIn, decOut);
 
       setSwapData(prev => ({ ...prev, ...tokenData, amountIn: swapAmountIn.toString() }));
     }
@@ -242,19 +175,16 @@ const Swap = () => {
             <strong>Something went wrong!</strong> Cannot get pairs...
           </div>
         ) : null}
-
         {error ? (
           <div className="alert alert-danger my-5" role="alert">
             <strong>Something went wrong!</strong>
             <p>{errorMessages[errorMessage]}</p>
           </div>
         ) : null}
-
         <div className="d-flex justify-content-between">
           <span className="badge bg-primary text-uppercase">From</span>
           <span></span>
         </div>
-
         <TokenInputSelector
           inputValue={swapData.amountIn}
           selectValue={swapData.tokenIdIn}
@@ -264,12 +194,10 @@ const Swap = () => {
           onInputChange={onInputChange}
           onSelectChange={onSelectChange}
         />
-
         <div className="d-flex justify-content-between mt-5">
           <span className="badge bg-info text-uppercase">To</span>
           <span></span>
         </div>
-
         <TokenInputSelector
           inputValue={swapData.amountOut}
           selectValue={swapData.tokenIdOut}
@@ -279,7 +207,6 @@ const Swap = () => {
           onInputChange={onInputChange}
           onSelectChange={onSelectChange}
         />
-
         <div className="mt-5 d-flex justify-content-center">
           {loadingTokens || loadingPools ? (
             <Loader />
@@ -287,28 +214,6 @@ const Swap = () => {
             <Button onClick={() => handleSwapClick()}>Swap</Button>
           )}
         </div>
-        {/* TO BE removed */}
-        {connectedWallet ? (
-          <div className="p-4 rounded border border-primary mt-5">
-            <Button onClick={getPairDataContracts}>Show contract data</Button>
-            <p className="mt-4">User LP tokens:</p>
-            <p className="text-title">{pairDataContracts.balance}</p>
-            <p className="mt-3">LP total supply:</p>
-            <p className="text-title">{pairDataContracts.totalSupply}</p>
-            <div className="row mt-3">
-              <div className="col-6">
-                <p>Token0:</p>
-                <p className="text-title">{pairDataContracts.token0}</p>
-              </div>
-              <div className="col-6">
-                <p>Token1:</p>
-                <p className="text-title">{pairDataContracts.token1}</p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <Button onClick={getPairDataContracts}>Show contract data</Button>
-        )}
       </div>
     </div>
   );
