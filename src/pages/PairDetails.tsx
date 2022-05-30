@@ -80,8 +80,8 @@ const PairDetails = () => {
 
       const balanceStr = hethers.utils.formatUnits(balanceBN, 18);
       const totalSupplyStr = hethers.utils.formatUnits(totalSupplyBN, 18);
-      const token0Str = hethers.utils.formatUnits(token0BN, 18);
-      const token1Str = hethers.utils.formatUnits(token1BN, 18);
+      const token0Str = hethers.utils.formatUnits(token0BN, pairData.token0Decimals);
+      const token1Str = hethers.utils.formatUnits(token1BN, pairData.token1Decimals);
 
       const balanceNum = Number(balanceStr);
 
@@ -184,15 +184,15 @@ const PairDetails = () => {
               </p>
               <p className="mt-3">Pooled tokens:</p>
               <p className="text-title">
-                {formatStringWeiToStringEther(pairData.token0Amount)} {pairData.token0Symbol}{' '}
-                <span className="text-small">(formatted)</span>
+                {formatStringWeiToStringEther(pairData.token0Amount, pairData.token0Decimals)}{' '}
+                {pairData.token0Symbol} <span className="text-small">(formatted)</span>
               </p>
               <p className="text-title">
                 {pairData.token0Amount} {pairData.token0Symbol}
               </p>
               <p className="text-title">
-                {formatStringWeiToStringEther(pairData.token1Amount)} {pairData.token1Symbol}{' '}
-                <span className="text-small">(formatted)</span>
+                {formatStringWeiToStringEther(pairData.token1Amount, pairData.token1Decimals)}{' '}
+                {pairData.token1Symbol} <span className="text-small">(formatted)</span>
               </p>
               <p className="text-title">
                 {pairData.token1Amount} {pairData.token1Symbol}
