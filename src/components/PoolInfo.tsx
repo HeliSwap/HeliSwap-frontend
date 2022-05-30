@@ -3,11 +3,7 @@ import { hethers } from '@hashgraph/hethers';
 import { GlobalContext } from '../providers/Global';
 
 import { IPairData } from '../interfaces/tokens';
-import {
-  formatStringToBigNumberEthersWei,
-  formatStringToStringWei,
-  formatStringWeiToStringEther,
-} from '../utils/numberUtils';
+import { formatStringToStringWei, formatStringWeiToStringEther } from '../utils/numberUtils';
 
 import Button from './Button';
 import { addressToContractId, idToAddress, calculateReserves } from '../utils/tokenUtils';
@@ -76,16 +72,18 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
       token0: tokenInAddress,
       token1: tokenOutAddress,
     } = pairData;
-    const tokensLPToRemoveHBN = formatStringToBigNumberEthersWei(lpInputValue);
-    const tokensLpAmount = tokensLPToRemoveHBN.toString();
+    const tokensLPToRemove = formatStringToStringWei(lpInputValue);
 
     const { reserve0ShareHBN, reserve1ShareHBN } = calculateReserves(
-      formatStringToStringWei(lpInputValue),
+      tokensLPToRemove,
       pairSupply,
       token0Amount,
       token1Amount,
+      pairData.token0Decimals,
+      pairData.token1Decimals
     );
 
+    const tokensLpAmount = tokensLPToRemove.toString();
     const tokens0Amount = reserve0ShareHBN.toString();
     const tokens1Amount = reserve1ShareHBN.toString();
 
@@ -153,6 +151,8 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
     pairData.pairSupply,
     pairData.token0Amount,
     pairData.token1Amount,
+    pairData.token0Decimals,
+    pairData.token1Decimals,
   );
 
   return (
@@ -214,11 +214,21 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
                 You will receive:
                 <div className="d-flex justify-content-between align-items-center mt-2">
                   <p>Pooled {pairData.token0Symbol}:</p>
-                  <p>{formatStringWeiToStringEther(removeLpData.tokens0Amount)}</p>
+                  <p>
+                    {formatStringWeiToStringEther(
+                      removeLpData.tokens0Amount,
+                      pairData.token0Decimals,
+                    )}
+                  </p>
                 </div>
                 <div className="d-flex justify-content-between align-items-center mt-2">
                   <p>Pooled {pairData.token1Symbol}:</p>
-                  <p>{formatStringWeiToStringEther(removeLpData.tokens1Amount)}</p>
+                  <p>
+                    {formatStringWeiToStringEther(
+                      removeLpData.tokens1Amount,
+                      pairData.token1Decimals,
+                    )}
+                  </p>
                 </div>
               </div>
             </div>

@@ -52,6 +52,7 @@ const ModalSearchContent = ({
         type: TokenType.ERC20,
         symbol: 'ERC20',
         name: 'Possible ERC20 Token',
+        // TODO to be taken from input field
         decimals: 18,
         address: idToAddress(searchInputValue),
       }));
@@ -101,7 +102,7 @@ const ModalSearchContent = ({
         name: 'HBAR',
         symbol: 'HBAR',
         address: '',
-        decimals: 18,
+        decimals: 8,
         totalSupply: '',
         expiryTimestamp: '',
         type: TokenType.HBAR,
