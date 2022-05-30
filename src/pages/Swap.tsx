@@ -12,10 +12,8 @@ import TokenInputSelector from '../components/TokenInputSelector';
 
 import errorMessages from '../content/errors';
 import { addressToId, idToAddress } from '../utils/tokenUtils';
-import { getConnectedWallet } from './Helpers';
 
 const Swap = () => {
-  const connectedWallet = getConnectedWallet();
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
