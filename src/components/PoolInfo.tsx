@@ -76,16 +76,16 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
       token0: tokenInAddress,
       token1: tokenOutAddress,
     } = pairData;
-    const tokensLPToRemoveHBN = formatStringToBigNumberEthersWei(lpInputValue);
-    const tokensLpAmount = tokensLPToRemoveHBN.toString();
+    const tokensLPToRemove = formatStringToStringWei(lpInputValue);
 
     const { reserve0ShareHBN, reserve1ShareHBN } = calculateReserves(
-      formatStringToStringWei(lpInputValue),
+      tokensLPToRemove,
       pairSupply,
       token0Amount,
       token1Amount,
     );
 
+    const tokensLpAmount = tokensLPToRemove.toString();
     const tokens0Amount = reserve0ShareHBN.toString();
     const tokens1Amount = reserve1ShareHBN.toString();
 
