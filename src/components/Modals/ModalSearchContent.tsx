@@ -223,6 +223,13 @@ const ModalSearchContent = ({
                     📝
                   </span>
                 </li>
+
+                <li>
+                  0.0.34948327 - EIGHT [ERC20]{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34948327')}>
+                    📝
+                  </span>
+                </li>
               </ul>
             </div>
             <label className="mb-2" htmlFor="">
