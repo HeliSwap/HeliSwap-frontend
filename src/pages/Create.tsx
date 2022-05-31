@@ -186,13 +186,13 @@ const Create = () => {
     if (tokenA.type === TokenType.HBAR) {
       setApproved(prev => ({ ...prev, tokenA: true }));
     } else {
-      tokenA.type === TokenType.ERC20 && tokenA.hederaId && getApproved(tokenA.hederaId, 'tokenA');
+      tokenA.hederaId && getApproved(tokenA.hederaId, 'tokenA');
     }
 
     if (tokenB.type === TokenType.HBAR) {
       setApproved(prev => ({ ...prev, tokenB: true }));
     } else {
-      tokenB.type === TokenType.ERC20 && tokenB.hederaId && getApproved(tokenB.hederaId, 'tokenB');
+      tokenB.hederaId && getApproved(tokenB.hederaId, 'tokenB');
     }
 
     setCreatePairData(prev => ({ ...prev, ...newPairData }));
