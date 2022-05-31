@@ -52,6 +52,8 @@ const Create = () => {
     tokenBAmount: '0',
     tokenAId: '',
     tokenBId: '',
+    tokenADecimals: 18,
+    tokenBDecimals: 18,
   });
 
   const [approved, setApproved] = useState({
@@ -82,7 +84,9 @@ const Create = () => {
 
       setCreatePairData(prev => ({
         ...prev,
-        [keyToUpdate]: hethers.utils.formatUnits(valueToUpdate, 18).toString(),
+        [keyToUpdate]: hethers.utils
+          .formatUnits(valueToUpdate, poolData?.token1Decimals)
+          .toString(),
         [name]: value,
       }));
     } else {
@@ -147,6 +151,8 @@ const Create = () => {
           tokenBAmount: '0',
           tokenAId: '',
           tokenBId: '',
+          tokenADecimals: 18,
+          tokenBDecimals: 18,
         });
       }
     } catch (err) {
@@ -181,7 +187,12 @@ const Create = () => {
     };
 
     const { tokenA, tokenB } = tokensData;
-    const newPairData = { tokenAId: tokenA.hederaId, tokenBId: tokenB.hederaId };
+    const newPairData = {
+      tokenAId: tokenA.hederaId,
+      tokenBId: tokenB.hederaId,
+      tokenADecimals: tokenA.decimals,
+      tokenBDecimals: tokenB.decimals,
+    };
 
     if (tokenA.type === TokenType.HBAR) {
       setApproved(prev => ({ ...prev, tokenA: true }));

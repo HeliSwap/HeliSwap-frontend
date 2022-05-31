@@ -159,12 +159,13 @@ class SDK {
       tokenAAmount: tokenAAmountString,
       tokenBAmount: tokenBAmountString,
       tokenBId,
+      tokenBDecimals,
     } = createPairData;
 
     const tokenBAddress = idToAddress(tokenBId);
 
     const tokenHBARAmount = formatStringToBigNumberWei(tokenAAmountString, 0);
-    const tokenBAmount = formatStringToBigNumberWei(tokenBAmountString);
+    const tokenBAmount = formatStringToBigNumberWei(tokenBAmountString, tokenBDecimals);
 
     const userAddress = idToAddress(userId);
     const routerId = addressToId(process.env.REACT_APP_ROUTER_ADDRESS as string);
@@ -223,13 +224,15 @@ class SDK {
       tokenAId,
       tokenBAmount: tokenBAmountString,
       tokenBId,
+      tokenADecimals,
+      tokenBDecimals,
     } = createPairData;
 
     const tokenAAddress = idToAddress(tokenAId);
     const tokenBAddress = idToAddress(tokenBId);
 
-    const tokenAAmount = formatStringToBigNumberWei(tokenAAmountString);
-    const tokenBAmount = formatStringToBigNumberWei(tokenBAmountString);
+    const tokenAAmount = formatStringToBigNumberWei(tokenAAmountString, tokenADecimals);
+    const tokenBAmount = formatStringToBigNumberWei(tokenBAmountString, tokenBDecimals);
 
     const userAddress = idToAddress(userId);
     const routerId = addressToId(process.env.REACT_APP_ROUTER_ADDRESS as string);
