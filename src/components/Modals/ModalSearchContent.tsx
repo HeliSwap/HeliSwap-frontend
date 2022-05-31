@@ -197,8 +197,8 @@ const ModalSearchContent = ({
                 </li>
 
                 <li>
-                  0.0.34838032 - USDT [ERC20]{' '}
-                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34838032')}>
+                  0.0.34947702 - USDT [ERC20]{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34947702')}>
                     📝
                   </span>
                 </li>
@@ -220,6 +220,13 @@ const ModalSearchContent = ({
                 <li>
                   0.0.34838123 - DOB [ERC20]{' '}
                   <span className="cursor-pointer" onClick={() => copyAddress('0.0.34838123')}>
+                    📝
+                  </span>
+                </li>
+
+                <li>
+                  0.0.34948327 - EIGHT [ERC20]{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34948327')}>
                     📝
                   </span>
                 </li>

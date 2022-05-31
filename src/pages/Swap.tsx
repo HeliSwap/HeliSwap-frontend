@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { hethers } from '@hashgraph/hethers';
 import { ITokenData, ISwapTokenData, IPairData } from '../interfaces/tokens';
 import { IStringToString } from '../interfaces/comon';
 import { GlobalContext } from '../providers/Global';
@@ -12,11 +11,9 @@ import Loader from '../components/Loader';
 import TokenInputSelector from '../components/TokenInputSelector';
 
 import errorMessages from '../content/errors';
-import { idToAddress } from '../utils/tokenUtils';
-import { getConnectedWallet } from './Helpers';
+import { addressToId, idToAddress } from '../utils/tokenUtils';
 
 const Swap = () => {
-  const connectedWallet = getConnectedWallet();
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
@@ -38,85 +35,54 @@ const Swap = () => {
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const [poolReserves, setPoolReserves] = useState({ tokenIn: '0', tokenOut: '0' });
-
   const [swapData, setSwapData] = useState(initialSwapData);
 
-  //to be removed
-  const [pairDataContracts, setPairDataContracts] = useState({
-    balance: '0.0',
-    totalSupply: '0.0',
-    token0: '0.0',
-    token1: '0.0',
-  });
+  const onInputChange = async (tokenData: IStringToString) => {
+    const { tokenIdIn, amountIn, tokenIdOut, amountOut } = tokenData;
+    const { token0Amount, token1Amount, token0Decimals, token1Decimals } = selectedPoolData;
 
-  //To be removed
-  const getPairDataContracts = async () => {
-    if (connectedWallet) {
-      const userAddress = idToAddress(userId);
-      const balanceBN = await sdk.checkBalance(
-        selectedPoolData.pairAddress,
-        userAddress,
-        connectedWallet,
-      );
-      const totalSupplyBN = await sdk.getTotalSupply(selectedPoolData.pairAddress, connectedWallet);
-      const [token0BN, token1BN] = await sdk.getReserves(
-        selectedPoolData.pairAddress,
-        connectedWallet,
-      );
+    if (Object.keys(selectedPoolData).length === 0) return;
 
-      const balanceStr = hethers.utils.formatUnits(balanceBN, 18);
-      const totalSupplyStr = hethers.utils.formatUnits(totalSupplyBN, 18);
-      const token0Str = hethers.utils.formatUnits(token0BN, 18);
-      const token1Str = hethers.utils.formatUnits(token1BN, 18);
+    const tokenInFirstAtPool = addressToId(selectedPoolData.token0) === tokenIdIn;
+    const tokenOutFirstAtPool = addressToId(selectedPoolData.token0) === tokenIdOut;
 
-      const balanceNum = Number(balanceStr);
+    let resIn, resOut, decIn, decOut;
 
-      if (balanceNum > 0) {
-        setPairDataContracts({
-          balance: balanceStr,
-          totalSupply: totalSupplyStr,
-          token0: token0Str,
-          token1: token1Str,
-        });
-      }
+    if (tokenIdIn && amountIn) {
+      resIn = tokenInFirstAtPool ? token0Amount : token1Amount;
+      resOut = tokenInFirstAtPool ? token1Amount : token0Amount;
+      decIn = tokenInFirstAtPool ? token0Decimals : token1Decimals;
+      decOut = tokenInFirstAtPool ? token1Decimals : token0Decimals;
 
-      setPoolReserves({ tokenIn: token0BN.toString(), tokenOut: token1BN.toString() });
+      const swapAmountOut = sdk.getSwapAmountOut(amountIn, resIn, resOut, decIn, decOut);
+
+      setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
+    } else if (tokenIdOut && amountOut) {
+      resIn = tokenOutFirstAtPool ? token1Amount : token0Amount;
+      resOut = tokenOutFirstAtPool ? token0Amount : token1Amount;
+      decIn = tokenOutFirstAtPool ? token1Decimals : token0Decimals;
+      decOut = tokenOutFirstAtPool ? token0Decimals : token1Decimals;
+
+      const swapAmountIn = sdk.getSwapAmountIn(amountOut, resIn, resOut, decIn, decOut);
+
+      setSwapData(prev => ({ ...prev, ...tokenData, amountIn: swapAmountIn.toString() }));
+    } else {
+      setSwapData(prev => ({ ...prev, amountIn: '', amountOut: '' }));
     }
   };
 
-  // currently using the data comming from the contract itself until BE is ready
-  async function onInputChange(tokenData: IStringToString) {
-    const { tokenIdIn, amountIn, tokenIdOut, amountOut } = tokenData;
-    //Use these amounts instead of poolReserves after BE is ready
-    // const { token0Amount, token1Amount } = selectedPoolData;
-    if (Object.keys(selectedPoolData).length === 0) return;
-
-    if (tokenIdIn) {
-      const swapAmountOut = sdk.getSwapAmountOut(
-        amountIn,
-        poolReserves.tokenIn,
-        poolReserves.tokenOut,
-      );
-
-      setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
-    } else if (tokenIdOut) {
-      const swapAmountIn = sdk.getSwapAmountIn(
-        amountOut,
-        poolReserves.tokenIn,
-        poolReserves.tokenOut,
-      );
-
-      setSwapData(prev => ({ ...prev, ...tokenData, amountIn: swapAmountIn.toString() }));
-    }
-  }
-
-  function onSelectChange(tokenData: IStringToString) {
+  const onSelectChange = (tokenData: IStringToString) => {
     setSwapData(prev => ({ ...prev, ...tokenData }));
-  }
+  };
 
-  async function handleSwapClick() {
+  const handleSwapClick = async () => {
     const { tokenIdIn, tokenIdOut, amountIn, amountOut } = swapData;
+    const { token0, token0Decimals, token1Decimals } = selectedPoolData;
+
+    const tokenInSamePool = tokenIdIn === addressToId(token0);
+
+    const decIn = tokenInSamePool ? token0Decimals : token1Decimals;
+    const decOut = tokenInSamePool ? token1Decimals : token0Decimals;
 
     try {
       const receipt = await sdk.swapTokens(
@@ -126,6 +92,8 @@ const Swap = () => {
         tokenIdOut,
         amountIn,
         amountOut,
+        decIn,
+        decOut,
       );
 
       const {
@@ -143,7 +111,7 @@ const Swap = () => {
       setError(true);
     } finally {
     }
-  }
+  };
 
   useEffect(() => {
     if (dataPool) {
@@ -196,19 +164,16 @@ const Swap = () => {
             <strong>Something went wrong!</strong> Cannot get pairs...
           </div>
         ) : null}
-
         {error ? (
           <div className="alert alert-danger my-5" role="alert">
             <strong>Something went wrong!</strong>
             <p>{errorMessages[errorMessage]}</p>
           </div>
         ) : null}
-
         <div className="d-flex justify-content-between">
           <span className="badge bg-primary text-uppercase">From</span>
           <span></span>
         </div>
-
         <TokenInputSelector
           inputValue={swapData.amountIn}
           selectValue={swapData.tokenIdIn}
@@ -218,12 +183,10 @@ const Swap = () => {
           onInputChange={onInputChange}
           onSelectChange={onSelectChange}
         />
-
         <div className="d-flex justify-content-between mt-5">
           <span className="badge bg-info text-uppercase">To</span>
           <span></span>
         </div>
-
         <TokenInputSelector
           inputValue={swapData.amountOut}
           selectValue={swapData.tokenIdOut}
@@ -233,7 +196,6 @@ const Swap = () => {
           onInputChange={onInputChange}
           onSelectChange={onSelectChange}
         />
-
         <div className="mt-5 d-flex justify-content-center">
           {loadingTokens || loadingPools ? (
             <Loader />
@@ -241,28 +203,6 @@ const Swap = () => {
             <Button onClick={() => handleSwapClick()}>Swap</Button>
           )}
         </div>
-        {/* TO BE removed */}
-        {connectedWallet ? (
-          <div className="p-4 rounded border border-primary mt-5">
-            <Button onClick={getPairDataContracts}>Show contract data</Button>
-            <p className="mt-4">User LP tokens:</p>
-            <p className="text-title">{pairDataContracts.balance}</p>
-            <p className="mt-3">LP total supply:</p>
-            <p className="text-title">{pairDataContracts.totalSupply}</p>
-            <div className="row mt-3">
-              <div className="col-6">
-                <p>Token0:</p>
-                <p className="text-title">{pairDataContracts.token0}</p>
-              </div>
-              <div className="col-6">
-                <p>Token1:</p>
-                <p className="text-title">{pairDataContracts.token1}</p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <Button onClick={getPairDataContracts}>Show contract data</Button>
-        )}
       </div>
     </div>
   );

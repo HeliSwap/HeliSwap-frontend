@@ -14,9 +14,15 @@ import ERC20 from '../abi/ERC20';
 import PairV2 from '../abi/PairV2';
 
 class SDK {
-  getSwapAmountOut(amountIn: string, amountInRes: string, amountOutRes: string) {
+  getSwapAmountOut(
+    amountIn: string,
+    amountInRes: string,
+    amountOutRes: string,
+    decIn: number,
+    decOut: number,
+  ) {
     //get values in hethers big number
-    const amountInBNStrHethers = formatStringToBigNumberEthersWei(amountIn);
+    const amountInBNStrHethers = formatStringToBigNumberEthersWei(amountIn, decIn);
     const amountInResBNStrHethers = BigNumber.from(amountInRes);
     const amountOutResBNStrHethers = BigNumber.from(amountOutRes);
 
@@ -26,12 +32,18 @@ class SDK {
     const denominator = amountInResBNStrHethers.mul(1000).add(amountInWithFee);
     const amountOut = numerator.div(denominator);
 
-    return hethers.utils.formatUnits(amountOut, 18).toString();
+    return hethers.utils.formatUnits(amountOut, decOut).toString();
   }
 
-  getSwapAmountIn(amountOut: string, amountInRes: string, amountOutRes: string) {
+  getSwapAmountIn(
+    amountOut: string,
+    amountInRes: string,
+    amountOutRes: string,
+    decIn: number,
+    decOut: number,
+  ) {
     //get values in hethers big number
-    const amountOutBNStrHethers = formatStringToBigNumberEthersWei(amountOut);
+    const amountOutBNStrHethers = formatStringToBigNumberEthersWei(amountOut, decOut);
     const amountInResBNStrHethers = BigNumber.from(amountInRes);
     const amountOutResBNStrHethers = BigNumber.from(amountOutRes);
 
@@ -40,7 +52,7 @@ class SDK {
     const denominator = amountOutResBNStrHethers.sub(amountOutBNStrHethers).mul(997);
     const amountIn = numerator.div(denominator).add(1);
 
-    return hethers.utils.formatUnits(amountIn, 18).toString();
+    return hethers.utils.formatUnits(amountIn, decIn).toString();
   }
 
   /* Hethers contract calls - To be removed! */
@@ -147,12 +159,13 @@ class SDK {
       tokenAAmount: tokenAAmountString,
       tokenBAmount: tokenBAmountString,
       tokenBId,
+      tokenBDecimals,
     } = createPairData;
 
     const tokenBAddress = idToAddress(tokenBId);
 
     const tokenHBARAmount = formatStringToBigNumberWei(tokenAAmountString, 0);
-    const tokenBAmount = formatStringToBigNumberWei(tokenBAmountString);
+    const tokenBAmount = formatStringToBigNumberWei(tokenBAmountString, tokenBDecimals);
 
     const userAddress = idToAddress(userId);
     const routerId = addressToId(process.env.REACT_APP_ROUTER_ADDRESS as string);
@@ -211,13 +224,15 @@ class SDK {
       tokenAId,
       tokenBAmount: tokenBAmountString,
       tokenBId,
+      tokenADecimals,
+      tokenBDecimals,
     } = createPairData;
 
     const tokenAAddress = idToAddress(tokenAId);
     const tokenBAddress = idToAddress(tokenBId);
 
-    const tokenAAmount = formatStringToBigNumberWei(tokenAAmountString);
-    const tokenBAmount = formatStringToBigNumberWei(tokenBAmountString);
+    const tokenAAmount = formatStringToBigNumberWei(tokenAAmountString, tokenADecimals);
+    const tokenBAmount = formatStringToBigNumberWei(tokenBAmountString, tokenBDecimals);
 
     const userAddress = idToAddress(userId);
     const routerId = addressToId(process.env.REACT_APP_ROUTER_ADDRESS as string);
@@ -330,7 +345,9 @@ class SDK {
     tokenInId: string,
     tokenOutId: string,
     amountIn: string,
-    amountMinOut: string,
+    amountMinOut: any,
+    decIn: number,
+    decOut: number,
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
     const tokenInAddress = idToAddress(tokenInId);
@@ -338,8 +355,8 @@ class SDK {
     const userAddress = idToAddress(userId);
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
 
-    const tokenInAmount = formatStringToBigNumberWei(amountIn);
-    const tokenOutMinAmount = formatStringToBigNumberWei(amountMinOut);
+    const tokenInAmount = formatStringToBigNumberWei(amountIn, decIn);
+    const tokenOutMinAmount = formatStringToBigNumberWei(amountMinOut, decOut);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract

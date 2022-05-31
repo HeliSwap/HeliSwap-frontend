@@ -7,4 +7,6 @@ export interface ICreatePairData {
   tokenBAmount: string;
   tokenAId: string;
   tokenBId: string;
+  tokenADecimals: number;
+  tokenBDecimals: number;
 }

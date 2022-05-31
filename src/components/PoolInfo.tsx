@@ -71,6 +71,8 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
       token1Amount,
       token0: tokenInAddress,
       token1: tokenOutAddress,
+      token0Decimals,
+      token1Decimals,
     } = pairData;
     const tokensLPToRemove = formatStringToStringWei(lpInputValue);
 
@@ -79,8 +81,8 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
       pairSupply,
       token0Amount,
       token1Amount,
-      pairData.token0Decimals,
-      pairData.token1Decimals
+      token0Decimals,
+      token1Decimals,
     );
 
     const tokensLpAmount = tokensLPToRemove.toString();
