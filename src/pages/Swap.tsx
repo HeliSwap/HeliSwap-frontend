@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { hethers } from '@hashgraph/hethers';
 import { ITokenData, ISwapTokenData, IPairData } from '../interfaces/tokens';
 import { IStringToString } from '../interfaces/comon';
 import { GlobalContext } from '../providers/Global';
@@ -12,6 +13,7 @@ import TokenInputSelector from '../components/TokenInputSelector';
 
 import errorMessages from '../content/errors';
 import { addressToId, idToAddress } from '../utils/tokenUtils';
+import { getConnectedWallet } from './Helpers';
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
@@ -36,6 +38,8 @@ const Swap = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const [swapData, setSwapData] = useState(initialSwapData);
+
+  const [approved, setApproved] = useState(false);
 
   const onInputChange = async (tokenData: IStringToString) => {
     const { tokenIdIn, amountIn, tokenIdOut, amountOut } = tokenData;
@@ -73,6 +77,29 @@ const Swap = () => {
 
   const onSelectChange = (tokenData: IStringToString) => {
     setSwapData(prev => ({ ...prev, ...tokenData }));
+  };
+
+  const handleApproveClick = async () => {
+    const hederaId = swapData.tokenIdIn;
+
+    try {
+      const receipt = await sdk.approveToken(hashconnectConnectorInstance, userId, hederaId);
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (!success) {
+        setError(true);
+        setErrorMessage(error);
+      } else {
+        setApproved(true);
+      }
+    } catch (err) {
+      console.error(err);
+      setError(true);
+      setErrorMessage('Error on create');
+    } finally {
+    }
   };
 
   const handleSwapClick = async () => {
@@ -156,6 +183,33 @@ const Swap = () => {
     }
   }, [tokenDataList, swapData]);
 
+  useEffect(() => {
+    const getApproved = async (tokenId: string) => {
+      const connectedWallet = getConnectedWallet();
+      if (connectedWallet) {
+        const tokenAddress = idToAddress(tokenId);
+        const userAddress = idToAddress(userId);
+        const resultBN = await sdk.checkAllowance(
+          tokenAddress,
+          userAddress,
+          process.env.REACT_APP_ROUTER_ADDRESS as string,
+          connectedWallet,
+        );
+
+        const resultStr = hethers.utils.formatUnits(resultBN, 18);
+        const resultNum = Number(resultStr);
+
+        setApproved(resultNum >= 1000);
+      } else {
+        setApproved(false);
+      }
+    };
+
+    if (swapData && swapData.tokenIdIn !== '' && userId) {
+      getApproved(swapData.tokenIdIn);
+    }
+  }, [swapData, userId, sdk]);
+
   return (
     <div className="d-flex justify-content-center">
       <div className="container-swap">
@@ -199,8 +253,10 @@ const Swap = () => {
         <div className="mt-5 d-flex justify-content-center">
           {loadingTokens || loadingPools ? (
             <Loader />
-          ) : (
+          ) : approved ? (
             <Button onClick={() => handleSwapClick()}>Swap</Button>
+          ) : (
+            <Button onClick={() => handleApproveClick()}>Approve</Button>
           )}
         </div>
       </div>
