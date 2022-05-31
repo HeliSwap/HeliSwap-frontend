@@ -26,6 +26,9 @@ const ModalSearchContent = ({
   const [currentToken, setCurrentToken] = useState<ITokenData>({} as ITokenData);
   const [tokenDataList, setTokenDataList] = useState<ITokenData[]>();
 
+  const [decimals, setDecimals] = useState(18);
+  const [showDecimalsField, setShowDecimalsField] = useState(false);
+
   const [getTokenByAddressOrId, { data: dataTBI, loading: loadingTBI }] =
     useLazyQuery(GET_TOKEN_INFO);
   const [getPoolByToken, { data: dataPBT, loading: loadingPBT }] = useLazyQuery(GET_POOL_BY_TOKEN);
@@ -35,6 +38,15 @@ const ModalSearchContent = ({
     const { value } = e.target;
 
     setSearchInputValue(value);
+  };
+
+  const handleDecimalsInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    const valueNum = Number(value);
+
+    if (!valueNum || isNaN(valueNum)) return;
+
+    setDecimals(valueNum);
   };
 
   const handleSearchButtonClick = async () => {
@@ -47,13 +59,13 @@ const ModalSearchContent = ({
 
     // Temp check for not found tokend
     if (!result.data) {
+      setShowDecimalsField(true);
       setCurrentToken((prev: any) => ({
         hederaId: searchInputValue,
         type: TokenType.ERC20,
         symbol: 'ERC20',
         name: 'Possible ERC20 Token',
-        // TODO to be taken from input field
-        decimals: 18,
+        decimals,
         address: idToAddress(searchInputValue),
       }));
     }
@@ -145,7 +157,14 @@ const ModalSearchContent = ({
     });
   }, [currentToken, getPoolByToken]);
 
-  const hasTokenData = Object.keys(currentToken).length > 0;
+  useEffect(() => {
+    setCurrentToken((prev: any) => ({
+      ...prev,
+      decimals,
+    }));
+  }, [decimals]);
+
+  const hasTokenData = currentToken.address;
   const hasPools = dataPBT && dataPBT.poolsByToken.length > 0;
   const hasTokenList = tokenDataList && tokenDataList.length > 0;
 
@@ -254,10 +273,20 @@ const ModalSearchContent = ({
           {hasTokenData ? (
             <>
               <p className="mt-4">Token data:</p>
-              <div className="mt-2 bg-slate p-3 rounded">
-                <p>
+              <div className="mt-2 bg-slate p-3 rounded d-flex align-items-center">
+                <p className="flex-1">
                   [{currentToken.type}]{currentToken.name} ({currentToken.symbol})
                 </p>
+                {showDecimalsField ? (
+                  <div className="flex-1">
+                    <input
+                      onChange={handleDecimalsInputChange}
+                      type="number"
+                      value={decimals}
+                      className="form-control"
+                    />
+                  </div>
+                ) : null}
               </div>
             </>
           ) : null}
