@@ -164,7 +164,7 @@ const ModalSearchContent = ({
     }));
   }, [decimals]);
 
-  const hasTokenData = currentToken.address;
+  const hasTokenData = currentToken.type;
   const hasPools = dataPBT && dataPBT.poolsByToken.length > 0;
   const hasTokenList = tokenDataList && tokenDataList.length > 0;
 
