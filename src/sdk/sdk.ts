@@ -110,7 +110,7 @@ class SDK {
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
 
-    const amountToApproveBN = formatStringToBigNumberWei('1000000000');
+    const amountToApproveBN = formatStringToBigNumberWei('10000');
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
@@ -158,14 +158,18 @@ class SDK {
     const {
       tokenAAmount: tokenAAmountString,
       tokenBAmount: tokenBAmountString,
+      tokenAId,
       tokenBId,
+      tokenADecimals,
       tokenBDecimals,
     } = createPairData;
+    const tokenId = tokenAId ? tokenAId : tokenBId;
+    const tokenDecimals = tokenAId ? tokenADecimals : tokenBDecimals;
+    const tokenAmountString = tokenAId ? tokenAAmountString : tokenBAmountString;
+    const tokenAddress = idToAddress(tokenId);
 
-    const tokenBAddress = idToAddress(tokenBId);
-
-    const tokenHBARAmount = formatStringToBigNumberWei(tokenAAmountString, 0);
-    const tokenBAmount = formatStringToBigNumberWei(tokenBAmountString, tokenBDecimals);
+    const HBARAmount = formatStringToBigNumberWei(tokenAAmountString, 0);
+    const tokenAmount = formatStringToBigNumberWei(tokenAmountString, tokenDecimals);
 
     const userAddress = idToAddress(userId);
     const routerId = addressToId(process.env.REACT_APP_ROUTER_ADDRESS as string);
@@ -176,16 +180,16 @@ class SDK {
       //Set the gas for the contract call
       .setGas(3000000)
       //Amount of HBAR we want to provide
-      .setPayableAmount(tokenHBARAmount)
+      .setPayableAmount(HBARAmount)
 
       //Set the contract function to call
       .setFunction(
         'addLiquidityETH',
         new ContractFunctionParameters()
-          .addAddress(tokenBAddress)
-          .addUint256(tokenBAmount)
-          .addUint256(tokenBAmount)
-          .addUint256(tokenHBARAmount)
+          .addAddress(tokenAddress)
+          .addUint256(tokenAmount)
+          .addUint256(tokenAmount)
+          .addUint256(HBARAmount)
           .addAddress(userAddress)
           .addUint256(deadline),
       );
