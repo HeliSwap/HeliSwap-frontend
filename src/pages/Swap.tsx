@@ -48,7 +48,7 @@ const Swap = () => {
 
     let resIn, resOut, decIn, decOut;
 
-    if (tokenIdIn) {
+    if (tokenIdIn && amountIn) {
       resIn = tokenInFirstAtPool ? token0Amount : token1Amount;
       resOut = tokenInFirstAtPool ? token1Amount : token0Amount;
       decIn = tokenInFirstAtPool ? token0Decimals : token1Decimals;
@@ -57,7 +57,7 @@ const Swap = () => {
       const swapAmountOut = sdk.getSwapAmountOut(amountIn, resIn, resOut, decIn, decOut);
 
       setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
-    } else if (tokenIdOut) {
+    } else if (tokenIdOut && amountOut) {
       resIn = tokenOutFirstAtPool ? token1Amount : token0Amount;
       resOut = tokenOutFirstAtPool ? token0Amount : token1Amount;
       decIn = tokenOutFirstAtPool ? token1Decimals : token0Decimals;
@@ -66,6 +66,8 @@ const Swap = () => {
       const swapAmountIn = sdk.getSwapAmountIn(amountOut, resIn, resOut, decIn, decOut);
 
       setSwapData(prev => ({ ...prev, ...tokenData, amountIn: swapAmountIn.toString() }));
+    } else {
+      setSwapData(prev => ({ ...prev, amountIn: '', amountOut: '' }));
     }
   };
 

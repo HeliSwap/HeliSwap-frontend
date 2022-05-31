@@ -12,7 +12,6 @@ import { formatStringToBigNumberEthersWei, formatStringToBigNumberWei } from '..
 
 import ERC20 from '../abi/ERC20';
 import PairV2 from '../abi/PairV2';
-import routerABI from '../abi/router';
 
 class SDK {
   getSwapAmountOut(
