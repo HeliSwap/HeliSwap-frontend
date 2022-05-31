@@ -37,10 +37,12 @@ const Swap = () => {
 
   const [swapData, setSwapData] = useState(initialSwapData);
 
-  async function onInputChange(tokenData: IStringToString) {
+  const onInputChange = async (tokenData: IStringToString) => {
     const { tokenIdIn, amountIn, tokenIdOut, amountOut } = tokenData;
     const { token0Amount, token1Amount, token0Decimals, token1Decimals } = selectedPoolData;
+
     if (Object.keys(selectedPoolData).length === 0) return;
+
     let resIn, resOut, decIn, decOut;
 
     if (addressToId(selectedPoolData.token0) === tokenIdIn) {
@@ -54,6 +56,7 @@ const Swap = () => {
       decIn = token1Decimals;
       decOut = token0Decimals;
     }
+
     if (tokenIdIn) {
       const swapAmountOut = sdk.getSwapAmountOut(amountIn, resIn, resOut, decIn, decOut);
 
@@ -70,28 +73,25 @@ const Swap = () => {
         decIn = token0Decimals;
         decOut = token1Decimals;
       }
+
       const swapAmountIn = sdk.getSwapAmountIn(amountOut, resIn, resOut, decIn, decOut);
 
       setSwapData(prev => ({ ...prev, ...tokenData, amountIn: swapAmountIn.toString() }));
     }
-  }
+  };
 
-  function onSelectChange(tokenData: IStringToString) {
+  const onSelectChange = (tokenData: IStringToString) => {
     setSwapData(prev => ({ ...prev, ...tokenData }));
-  }
+  };
 
-  async function handleSwapClick() {
+  const handleSwapClick = async () => {
     const { tokenIdIn, tokenIdOut, amountIn, amountOut } = swapData;
-    let decIn;
-    let decOut;
+    const { token0, token0Decimals, token1Decimals } = selectedPoolData;
 
-    if (tokenIdIn === addressToId(selectedPoolData.token0)) {
-      decIn = selectedPoolData.token0Decimals;
-      decOut = selectedPoolData.token1Decimals;
-    } else {
-      decIn = selectedPoolData.token1Decimals;
-      decOut = selectedPoolData.token0Decimals;
-    }
+    const tokenInSamePool = tokenIdIn === addressToId(token0);
+
+    const decIn = tokenInSamePool ? token0Decimals : token1Decimals;
+    const decOut = tokenInSamePool ? token1Decimals : token0Decimals;
 
     try {
       const receipt = await sdk.swapTokens(
@@ -120,7 +120,7 @@ const Swap = () => {
       setError(true);
     } finally {
     }
-  }
+  };
 
   useEffect(() => {
     if (dataPool) {
