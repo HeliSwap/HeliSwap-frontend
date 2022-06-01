@@ -36,7 +36,7 @@ const Pairs = () => {
           <p className="text-info">Loading pairs...</p>
         ) : havePairs ? (
           <div className="container-table">
-            <div className="container-table-row">
+            <div className="container-table-row with-cols-5">
               <div>#</div>
               <div>Pair</div>
               <div className="text-end">TVL</div>
@@ -44,10 +44,10 @@ const Pairs = () => {
               <div className="text-end">Volume 7D</div>
             </div>
             {pairData.map((item, index) => (
-              <div key={index} className="container-table-row">
+              <div key={index} className="container-table-row with-cols-5">
                 <div>{index + 1}</div>
                 <div className="d-flex align-items-center">
-                  {formatIcons(item.icons)}
+                  {formatIcons([item.token0Symbol, item.token1Symbol])}
                   <span className="ms-3">
                     <Link className="link-primary" to={`${item.pairAddress}`}>
                       {item.pairSymbol}

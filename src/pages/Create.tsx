@@ -290,7 +290,15 @@ const Create = () => {
           <div className="col-5">
             <div className="container-token-selector d-flex justify-content-between align-items-center">
               {tokensData?.tokenA.symbol ? (
-                <span className="me-2">{tokensData?.tokenA.symbol}</span>
+                <div className="d-flex align-items-center">
+                  <img
+                    className="me-2"
+                    width={24}
+                    src={`/icons/${tokensData.tokenA.symbol}.png`}
+                    alt=""
+                  />
+                  <span className="me-2">{tokensData.tokenA.symbol}</span>
+                </div>
               ) : (
                 <span>N/A</span>
               )}
@@ -334,7 +342,15 @@ const Create = () => {
           <div className="col-5">
             <div className="container-token-selector d-flex justify-content-between align-items-center">
               {tokensData?.tokenB.symbol ? (
-                <span className="me-2">{tokensData?.tokenB.symbol}</span>
+                <div className="d-flex align-items-center">
+                  <img
+                    className="me-2"
+                    width={24}
+                    src={`/icons/${tokensData.tokenB.symbol}.png`}
+                    alt=""
+                  />
+                  <span className="me-2">{tokensData?.tokenB.symbol}</span>
+                </div>
               ) : (
                 <span>N/A</span>
               )}

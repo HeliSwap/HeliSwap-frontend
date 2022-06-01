@@ -25,9 +25,16 @@
     display: grid;
     gap: 1em;
     align-items: center;
-    grid-template-columns: 20px 3.5fr repeat(3, 1fr);
     padding: 8px;
     border-bottom: 1px solid rgb(31, 33, 40);
+
+    &.with-cols-5 {
+      grid-template-columns: 20px 3.5fr repeat(3, 1fr);
+    }
+
+    &.with-cols-6 {
+      grid-template-columns: 20px 3.5fr repeat(4, 1fr);
+    }
 
     &:hover {
       background-color: $darker;
@@ -53,4 +60,13 @@
   border: 1px solid $input-border-color;
   border-radius: $border-radius;
   font-size: $input-font-size;
+}
+
+.list-token-item {
+  &:hover {
+    background-color: $dark;
+  }
+  &.is-selected {
+    background-color: $darkest;
+  }
 }

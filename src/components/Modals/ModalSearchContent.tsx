@@ -29,6 +29,8 @@ const ModalSearchContent = ({
   const [decimals, setDecimals] = useState(18);
   const [showDecimalsField, setShowDecimalsField] = useState(false);
 
+  const [showAddresses, setShowAddresses] = useState(false);
+
   const [getTokenByAddressOrId, { data: dataTBI, loading: loadingTBI }] =
     useLazyQuery(GET_TOKEN_INFO);
   const [getPoolByToken, { data: dataPBT, loading: loadingPBT }] = useLazyQuery(GET_POOL_BY_TOKEN);
@@ -101,9 +103,15 @@ const ModalSearchContent = ({
     closeModal();
   };
 
+  /* Helper functions - to be removed */
   const copyAddress = (address: string) => {
     setSearchInputValue(address);
   };
+
+  const handleToggleAddressesButtonClick = () => {
+    setShowAddresses(prev => !prev);
+  };
+  /* Helper functions - to be removed */
 
   useEffect(() => {
     if (dataGT) {
@@ -115,8 +123,6 @@ const ModalSearchContent = ({
         symbol: 'HBAR',
         address: '',
         decimals: 8,
-        totalSupply: '',
-        expiryTimestamp: '',
         type: TokenType.HBAR,
       };
 
@@ -127,8 +133,6 @@ const ModalSearchContent = ({
           symbol: item.symbol,
           address: item.address,
           decimals: item.decimals,
-          totalSupply: '',
-          expiryTimestamp: '',
           type: item.isHTS ? TokenType.HTS : TokenType.ERC20,
         }));
 
@@ -188,8 +192,14 @@ const ModalSearchContent = ({
         ></button>
       </div>
       <div className="modal-body">
-        <div className="p-4">
-          <div>
+        {/* Helper - to be removed */}
+        <div className="py-2">
+          <Button className="btn-sm" onClick={handleToggleAddressesButtonClick}>
+            Show addresses
+          </Button>
+        </div>
+        {showAddresses ? (
+          <div className="my-4">
             <div className="bg-slate p-3 rounded mb-4">
               <ul>
                 <li>
@@ -272,57 +282,64 @@ const ModalSearchContent = ({
               </Button>
             </div>
           </div>
-          {hasTokenData ? (
-            <>
-              <p className="mt-4">Token data:</p>
-              <div className="mt-2 bg-slate p-3 rounded d-flex align-items-center">
-                <p className="flex-1">
-                  [{currentToken.type}]{currentToken.name} ({currentToken.symbol})
+        ) : null}
+        {/* Helper - to be removed */}
+
+        {hasTokenList ? (
+          <div>
+            <h3 className="text-title">Token list:</h3>
+            <div className="mt-3 rounded border border-info p-3">
+              {tokenDataList.map((token: ITokenData, index: number) => (
+                <p
+                  onClick={() => handleTokenListClick(token)}
+                  className={`cursor-pointer rounded list-token-item py-2 px-3 d-flex align-items-center ${
+                    currentToken.name === token.name ? 'is-selected' : ''
+                  }`}
+                  key={index}
+                >
+                  <img key={index} width={20} src={`/icons/${token.symbol}.png`} alt="" />{' '}
+                  <span className="ms-2">
+                    {token.symbol} [{token.type}]
+                  </span>
                 </p>
-                {showDecimalsField ? (
-                  <div className="flex-1">
-                    <input
-                      onChange={handleDecimalsInputChange}
-                      type="number"
-                      value={decimals}
-                      className="form-control"
-                    />
-                  </div>
-                ) : null}
-              </div>
-            </>
-          ) : null}
-
-          {hasPools ? (
-            <>
-              <p className="mt-4">Token in pools:</p>
-              <div className="mt-2 bg-slate p-3 rounded">
-                {dataPBT.poolsByToken.map((pool: IPairData, index: number) => (
-                  <p key={index}>
-                    {pool.pairName} ({pool.pairSymbol})
-                  </p>
-                ))}
-              </div>
-            </>
-          ) : null}
-
-          {hasTokenList ? (
-            <div className="mt-4">
-              <h3 className="text-title">Token list:</h3>
-              <div className="mt-3 rounded border border-warning p-3">
-                {tokenDataList.map((token: ITokenData, index: number) => (
-                  <p
-                    onClick={() => handleTokenListClick(token)}
-                    className="cursor-pointer"
-                    key={index}
-                  >
-                    [{token.type}] {token.symbol}
-                  </p>
-                ))}
-              </div>
+              ))}
             </div>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
+
+        {hasTokenData ? (
+          <>
+            <p className="mt-4">Token data:</p>
+            <div className="mt-2 bg-slate p-3 rounded d-flex align-items-center">
+              <p className="flex-1">
+                [{currentToken.type}]{currentToken.name} ({currentToken.symbol})
+              </p>
+              {showDecimalsField ? (
+                <div className="flex-1">
+                  <input
+                    onChange={handleDecimalsInputChange}
+                    type="number"
+                    value={decimals}
+                    className="form-control"
+                  />
+                </div>
+              ) : null}
+            </div>
+          </>
+        ) : null}
+
+        {hasPools ? (
+          <>
+            <p className="mt-4">Token in pools:</p>
+            <div className="mt-2 bg-slate p-3 rounded">
+              {dataPBT.poolsByToken.map((pool: IPairData, index: number) => (
+                <p key={index}>
+                  {pool.pairName} ({pool.pairSymbol})
+                </p>
+              ))}
+            </div>
+          </>
+        ) : null}
       </div>
       <div className="modal-footer">
         <button
