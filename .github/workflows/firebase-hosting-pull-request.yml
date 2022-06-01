@@ -6,6 +6,7 @@ env:
   CI: false
   REACT_APP_MIRROR_NODE_URL: https://testnet.mirrornode.hedera.com
   REACT_APP_NETWORK_TYPE: testnet
+  REACT_APP_ROUTER_ADDRESS: 0x000000000000000000000000000000000215467c
 'on': pull_request
 jobs:
   build_and_preview:
@@ -14,4 +15,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build
-        run: npm ci && npm run build
+        run: yarn install --frozen-lockfile && yarn run build
