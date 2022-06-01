@@ -107,10 +107,11 @@ class SDK {
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
     tokenId: string | ContractId,
+    amount: string,
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
 
-    const amountToApproveBN = formatStringToBigNumberWei('10000');
+    const amountToApproveBN = formatStringToBigNumberWei(amount);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract

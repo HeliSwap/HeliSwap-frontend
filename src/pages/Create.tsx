@@ -97,9 +97,16 @@ const Create = () => {
 
   const handleApproveClick = async (key: string) => {
     const { hederaId } = tokensData[key];
+    const keyAmount = `${key}Amount` as keyof ICreatePairData;
+    const amount = createPairData[keyAmount] as string;
 
     try {
-      const receipt = await sdk.approveToken(hashconnectConnectorInstance, userId, hederaId);
+      const receipt = await sdk.approveToken(
+        hashconnectConnectorInstance,
+        userId,
+        hederaId,
+        amount,
+      );
       const {
         response: { success, error },
       } = receipt;
