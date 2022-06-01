@@ -56,7 +56,7 @@ const TokenInputSelector = ({
 
   return (
     <div className="row justify-content-between align-items-end mt-3">
-      <div className="col-8">
+      <div className="col-7">
         <div className="input-container">
           <input
             value={inputValue}
@@ -70,7 +70,7 @@ const TokenInputSelector = ({
         <p className="text-success mt-3">$0.00</p>
       </div>
 
-      <div className="col-4">
+      <div className="col-5">
         <select
           onChange={handleSelectChange}
           name={selectName}
