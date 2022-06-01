@@ -115,8 +115,6 @@ const ModalSearchContent = ({
         symbol: 'HBAR',
         address: '',
         decimals: 8,
-        totalSupply: '',
-        expiryTimestamp: '',
         type: TokenType.HBAR,
       };
 
@@ -127,8 +125,6 @@ const ModalSearchContent = ({
           symbol: item.symbol,
           address: item.address,
           decimals: item.decimals,
-          totalSupply: '',
-          expiryTimestamp: '',
           type: item.isHTS ? TokenType.HTS : TokenType.ERC20,
         }));
 

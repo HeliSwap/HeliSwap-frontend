@@ -161,9 +161,17 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
     pairData.token1Decimals,
   );
 
+  const formatIcons = (icons: string[]) =>
+    icons &&
+    icons.length > 0 &&
+    icons.map((item, index) => <img key={index} width={20} src={`/icons/${item}.png`} alt="" />);
+
   return (
     <div className="mt-4 rounded border border-primary p-4">
-      <h3 className="text-title">{pairData.pairSymbol}</h3>
+      <div className="d-flex align-items-center">
+        {formatIcons([pairData.token0Symbol, pairData.token1Symbol])}
+        <h3 className="text-title ms-2">{pairData.pairSymbol}</h3>
+      </div>
       <div className="d-flex justify-content-between align-items-center mt-4">
         <p>Your total LP tokens:</p>
         <p>{formatStringWeiToStringEther(pairData.lpShares as string)}</p>
