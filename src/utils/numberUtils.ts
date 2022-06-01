@@ -6,6 +6,7 @@ export const formatStringToPrice = (stringToFormat: string) => {
   return `$${numeral(stringToFormat).format('0.0a')}`;
 };
 
+// Used to format values (string | ETH) into BN / wei (used for native contract calls)
 export const formatStringToBigNumberWei = (numberToFormat: string, decimals: number = 18) => {
   const numberToFormatBN = new BigNumber(numberToFormat);
   const tenPowDec = new BigNumber(10).pow(decimals);

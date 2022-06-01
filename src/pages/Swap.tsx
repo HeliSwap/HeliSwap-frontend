@@ -83,7 +83,12 @@ const Swap = () => {
     const hederaId = swapData.tokenIdIn;
 
     try {
-      const receipt = await sdk.approveToken(hashconnectConnectorInstance, userId, hederaId);
+      const receipt = await sdk.approveToken(
+        hashconnectConnectorInstance,
+        userId,
+        hederaId,
+        swapData.amountIn,
+      );
       const {
         response: { success, error },
       } = receipt;
