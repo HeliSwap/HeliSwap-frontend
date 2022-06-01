@@ -226,14 +226,24 @@ const Create = () => {
     // const { tokenA: pairsTokenA, tokenB: pairsTokenB } = pairsData;
     const { tokenA, tokenB } = tokensData;
 
-    const provideNative = tokenA.type === TokenType.HBAR || tokenB.type === TokenType.HBAR;
+    const tokenAIsNative = tokenA.type === TokenType.HBAR;
+    const tokenBIsNative = tokenB.type === TokenType.HBAR;
+    const provideNative = tokenAIsNative || tokenBIsNative;
+    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
 
     const selectedPoolData = poolsData.filter((pool: any) => {
-      return (
+      const poolContainsToken = (tokenAddres: string) => {
+        return pool.token0 === tokenAddres || pool.token1 === tokenAddres;
+      };
+      if (provideNative) {
+        return (
+          poolContainsToken(WHBARAddress) &&
+          (poolContainsToken(tokenA.address) || poolContainsToken(tokenB.address))
+        );
+      } else {
         //Both tokens are in the same pool
-        (pool.token0 === tokenA.address || pool.token1 === tokenA.address) &&
-        (pool.token0 === tokenB.address || pool.token1 === tokenB.address)
-      );
+        poolContainsToken(tokenA.address) && poolContainsToken(tokenB.address);
+      }
     });
     setPoolData(selectedPoolData[0]);
 
