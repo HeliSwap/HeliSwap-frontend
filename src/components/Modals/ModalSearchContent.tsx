@@ -152,9 +152,11 @@ const ModalSearchContent = ({
   }, [dataTBI]);
 
   useEffect(() => {
-    getPoolByToken({
-      variables: { token: currentToken.address },
-    });
+    currentToken &&
+      currentToken.address &&
+      getPoolByToken({
+        variables: { token: currentToken.address },
+      });
   }, [currentToken, getPoolByToken]);
 
   useEffect(() => {
