@@ -7,17 +7,19 @@ env:
   REACT_APP_MIRROR_NODE_URL: https://testnet.mirrornode.hedera.com
   REACT_APP_NETWORK_TYPE: testnet
   REACT_APP_GRAPHQL_URI: https://heliswap-backend-mock.herokuapp.com/graphql
+  REACT_APP_ROUTER_ADDRESS: 0x000000000000000000000000000000000215467c
 'on':
   push:
     branches:
       - develop
+      - cicd
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Build
-        run: npm ci && npm run build
+        run: yarn install --frozen-lockfile && yarn run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
