@@ -178,76 +178,86 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
       </div>
       <div className="d-flex justify-content-between align-items-center mt-2">
         <p>Pooled {pairData.token0Symbol}:</p>
-        <p>{reserve0ShareStr}</p>
+        <p className="d-flex align-items-center">
+          <span className="me-2">{reserve0ShareStr}</span>
+          <img width={20} src={`/icons/${pairData.token0Symbol}.png`} alt="" />
+        </p>
       </div>
       <div className="d-flex justify-content-between align-items-center mt-2">
         <p>Pooled {pairData.token1Symbol}:</p>
-        <p>{reserve1ShareStr}</p>
+        <p className="d-flex align-items-center">
+          <span className="me-2">{reserve1ShareStr}</span>
+          <img width={20} src={`/icons/${pairData.token1Symbol}.png`} alt="" />
+        </p>
       </div>
       <hr />
-      <div className="mt-4 row">
-        <div className="col-md-7">
-          <div className="d-flex">
-            <Button>Add Liquidity</Button>
-            <Button onClick={() => setShowRemoveContainer(prev => !prev)} className="ms-3">
-              Remove Liquidity
-            </Button>
-          </div>
+      <div className="mt-4">
+        <div className="d-flex">
+          <Button>Add Liquidity</Button>
+          <Button onClick={() => setShowRemoveContainer(prev => !prev)} className="ms-3">
+            Remove Liquidity
+          </Button>
+        </div>
 
-          {showRemoveContainer ? (
-            <div className="mt-4 rounded border border-secondary p-4">
-              {errorRemove ? (
-                <div className="alert alert-danger mb-5" role="alert">
-                  <strong>Something went wrong!</strong>
-                </div>
-              ) : null}
-              <input
-                value={lpInputValue}
-                onChange={hanleLpInputChange}
-                type="text"
-                name=""
-                className="form-control mt-2"
-              />
-              <div className="mt-4 d-flex">
-                <Button disabled={lpApproved} onClick={hanleApproveLPClick}>
-                  Approve
-                </Button>
-                <Button
-                  loading={loadingRemove}
-                  disabled={!canRemove}
-                  className="ms-3"
-                  onClick={handleRemoveLPButtonClick}
-                >
-                  Remove
-                </Button>
-                <Button className="ms-3" onClick={handleCalculateButtonClick}>
-                  Calculate
-                </Button>
+        {showRemoveContainer ? (
+          <div className="mt-4 rounded border border-secondary p-4">
+            {errorRemove ? (
+              <div className="alert alert-danger mb-4" role="alert">
+                <strong>Something went wrong!</strong>
               </div>
-              <div className="mt-4">
-                You will receive:
-                <div className="d-flex justify-content-between align-items-center mt-2">
-                  <p>Pooled {pairData.token0Symbol}:</p>
-                  <p>
+            ) : null}
+            <input
+              value={lpInputValue}
+              onChange={hanleLpInputChange}
+              type="text"
+              name=""
+              className="form-control mt-2"
+            />
+            <div className="mt-4 d-flex">
+              <Button disabled={lpApproved} onClick={hanleApproveLPClick}>
+                Approve
+              </Button>
+              <Button
+                loading={loadingRemove}
+                disabled={!canRemove}
+                className="ms-3"
+                onClick={handleRemoveLPButtonClick}
+              >
+                Remove
+              </Button>
+              <Button className="ms-3" onClick={handleCalculateButtonClick}>
+                Calculate
+              </Button>
+            </div>
+            <div className="mt-4">
+              You will receive:
+              <div className="d-flex justify-content-between align-items-center mt-2">
+                <p>Pooled {pairData.token0Symbol}:</p>
+                <p className="d-flex align-items-center">
+                  <span className="me-2">
                     {formatStringWeiToStringEther(
                       removeLpData.tokens0Amount,
                       pairData.token0Decimals,
                     )}
-                  </p>
-                </div>
-                <div className="d-flex justify-content-between align-items-center mt-2">
-                  <p>Pooled {pairData.token1Symbol}:</p>
-                  <p>
+                  </span>
+                  <img width={20} src={`/icons/${pairData.token0Symbol}.png`} alt="" />
+                </p>
+              </div>
+              <div className="d-flex justify-content-between align-items-center mt-2">
+                <p>Pooled {pairData.token1Symbol}:</p>
+                <p className="d-flex align-items-center">
+                  <span className="me-2">
                     {formatStringWeiToStringEther(
                       removeLpData.tokens1Amount,
                       pairData.token1Decimals,
                     )}
-                  </p>
-                </div>
+                  </span>
+                  <img width={20} src={`/icons/${pairData.token1Symbol}.png`} alt="" />
+                </p>
               </div>
             </div>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );
