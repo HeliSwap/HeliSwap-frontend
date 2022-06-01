@@ -6,6 +6,7 @@ env:
   CI: false
   REACT_APP_MIRROR_NODE_URL: https://testnet.mirrornode.hedera.com
   REACT_APP_NETWORK_TYPE: testnet
+  REACT_APP_GRAPHQL_URI: https://heliswap-backend-mock.herokuapp.com/graphql
   REACT_APP_ROUTER_ADDRESS: 0x000000000000000000000000000000000215467c
 'on': pull_request
 jobs:
