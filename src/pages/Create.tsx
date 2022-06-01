@@ -75,7 +75,6 @@ const Create = () => {
       const token0Amount = poolData?.token0Amount as string;
       const token1Amount = poolData?.token1Amount as string;
       const token0Decimals = poolData?.token0Decimals;
-      const token1Decimals = poolData?.token1Decimals;
 
       const token0AmountBN = formatStringToBigNumberEthersWei(token0Amount);
       const token1AmountBN = formatStringToBigNumberEthersWei(token1Amount);
