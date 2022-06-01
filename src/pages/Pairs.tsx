@@ -7,7 +7,10 @@ import { formatStringToPrice } from '../utils/numberUtils';
 import { IPairData } from '../interfaces/tokens';
 
 const Pairs = () => {
-  const { error, loading, data } = useQuery(GET_POOLS);
+  const { error, loading, data } = useQuery(GET_POOLS, {
+    fetchPolicy: 'network-only',
+    pollInterval: 10000,
+  });
   const [pairData, setPairData] = useState<IPairData[]>([]);
 
   useEffect(() => {

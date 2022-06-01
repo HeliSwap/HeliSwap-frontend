@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
+import { IPairData } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
-import { IPairData } from '../interfaces/tokens';
-import { formatStringToStringWei, formatStringWeiToStringEther } from '../utils/numberUtils';
-
 import Button from './Button';
-import { addressToContractId, idToAddress, calculateReserves } from '../utils/tokenUtils';
 
+import { formatStringToStringWei, formatStringWeiToStringEther } from '../utils/numberUtils';
+import { addressToContractId, idToAddress, calculateReserves } from '../utils/tokenUtils';
 import { getConnectedWallet } from '../pages/Helpers';
 
 interface IPoolInfoProps {
@@ -37,26 +36,6 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
     tokens0Amount: '0.0',
     tokens1Amount: '0.0',
   });
-
-  useEffect(() => {
-    const getApproved = async () => {
-      if (connectedWallet) {
-        const resultBN = await sdk.checkAllowance(
-          pairData.pairAddress,
-          idToAddress(userId),
-          process.env.REACT_APP_ROUTER_ADDRESS as string,
-          connectedWallet,
-        );
-
-        const resultStr = hethers.utils.formatUnits(resultBN, 18);
-        const resultNum = Number(resultStr);
-
-        setLpApproved(resultNum > 10000);
-      }
-    };
-
-    pairData && pairData.pairAddress && userId && getApproved();
-  }, [pairData, connectedWallet, sdk, userId]);
 
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -146,6 +125,26 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
     } finally {
     }
   };
+
+  useEffect(() => {
+    const getApproved = async () => {
+      if (connectedWallet) {
+        const resultBN = await sdk.checkAllowance(
+          pairData.pairAddress,
+          idToAddress(userId),
+          process.env.REACT_APP_ROUTER_ADDRESS as string,
+          connectedWallet,
+        );
+
+        const resultStr = hethers.utils.formatUnits(resultBN, 18);
+        const resultNum = Number(resultStr);
+
+        setLpApproved(resultNum > 10000);
+      }
+    };
+
+    pairData && pairData.pairAddress && userId && getApproved();
+  }, [pairData, connectedWallet, sdk, userId]);
 
   const canRemove = lpApproved && removeLpData.tokenInAddress !== '';
   const { reserve0ShareStr, reserve1ShareStr } = calculateReserves(
