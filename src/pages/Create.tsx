@@ -235,13 +235,17 @@ const Create = () => {
   useEffect(() => {
     let isReady = true;
 
-    // TODO - Stupid check, to be improved!!
+    const { tokenAAmount, tokenAId, tokenBAmount, tokenBId } = createPairData;
+
+    if (tokenAAmount === '0' || tokenBAmount === '0') {
+      isReady = false;
+    }
+
+    // Not safe enough
     if (!provideNative) {
-      Object.values(createPairData).forEach(item => {
-        if (item === '0' || item === '' || typeof item === 'undefined') {
-          isReady = false;
-        }
-      });
+      if (tokenAId === '' || tokenBId === '') {
+        isReady = false;
+      }
     }
 
     setReadyToProvide(isReady);
