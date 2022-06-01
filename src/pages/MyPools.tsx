@@ -20,6 +20,8 @@ const Pairs = () => {
     userId &&
       getPoolsByUser({
         variables: { address: idToAddress(userId) },
+        pollInterval: 10000,
+        fetchPolicy: 'network-only',
       });
   }, [userId, getPoolsByUser]);
 

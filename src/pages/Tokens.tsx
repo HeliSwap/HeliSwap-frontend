@@ -6,7 +6,10 @@ import { GET_TOKENS } from '../GraphQL/Queries';
 import Loader from '../components/Loader';
 
 const Tokens = () => {
-  const { error, loading, data } = useQuery(GET_TOKENS);
+  const { error, loading, data } = useQuery(GET_TOKENS, {
+    fetchPolicy: 'network-only',
+    pollInterval: 10000,
+  });
   const [tokenData, setTokenData] = useState<ITokenData[]>([]);
 
   useEffect(() => {
