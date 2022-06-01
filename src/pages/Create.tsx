@@ -14,6 +14,8 @@ import errorMessages from '../content/errors';
 import { idToAddress } from '../utils/tokenUtils';
 import { formatStringToBigNumberEthersWei } from '../utils/numberUtils';
 import { getConnectedWallet } from './Helpers';
+import { useQuery } from '@apollo/client';
+import { GET_POOLS } from '../GraphQL/Queries';
 
 interface ITokensData {
   tokenA: ITokenData;
@@ -29,6 +31,8 @@ const Create = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
+
+  const { loading: loadingPools, data: dataPool } = useQuery(GET_POOLS);
 
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
@@ -46,6 +50,7 @@ const Create = () => {
   });
 
   const [poolData, setPoolData] = useState<IPairData>();
+  const [poolsData, setPoolsData] = useState<IPairData[]>([]);
 
   const [createPairData, setCreatePairData] = useState<ICreatePairData>({
     tokenAAmount: '0',
@@ -218,26 +223,23 @@ const Create = () => {
   }, [tokensData, sdk, userId]);
 
   useEffect(() => {
-    let inSamePool = false;
-    const { tokenA: pairsTokenA, tokenB: pairsTokenB } = pairsData;
+    // const { tokenA: pairsTokenA, tokenB: pairsTokenB } = pairsData;
     const { tokenA, tokenB } = tokensData;
 
     const provideNative = tokenA.type === TokenType.HBAR || tokenB.type === TokenType.HBAR;
 
-    // Check for same pool
-    // TODO - To be optimized
-    pairsTokenA.forEach(poolA => {
-      pairsTokenB.forEach(poolB => {
-        if (poolA.pairAddress === poolB.pairAddress) {
-          inSamePool = true;
-          setPoolData(poolA);
-        }
-      });
+    const selectedPoolData = poolsData.filter((pool: any) => {
+      return (
+        //Both tokens are in the same pool
+        (pool.token0 === tokenA.address || pool.token1 === tokenA.address) &&
+        (pool.token0 === tokenB.address || pool.token1 === tokenB.address)
+      );
     });
+    setPoolData(selectedPoolData[0]);
 
     setProvideNative(provideNative);
-    setTokensInSamePool(inSamePool);
-  }, [pairsData, tokensData]);
+    setTokensInSamePool(selectedPoolData.length !== 0);
+  }, [pairsData, tokensData, poolsData]);
 
   useEffect(() => {
     let isReady = true;
@@ -257,6 +259,13 @@ const Create = () => {
 
     setReadyToProvide(isReady);
   }, [createPairData, provideNative]);
+
+  useEffect(() => {
+    if (dataPool) {
+      const { pools } = dataPool;
+      pools.length > 0 && setPoolsData(pools);
+    }
+  }, [dataPool]);
 
   return (
     <div className="d-flex justify-content-center">
