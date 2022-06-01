@@ -47,7 +47,7 @@ const Pairs = () => {
               <div key={index} className="container-table-row">
                 <div>{index + 1}</div>
                 <div className="d-flex align-items-center">
-                  {formatIcons(item.icons)}
+                  {formatIcons([item.token0Symbol, item.token1Symbol])}
                   <span className="ms-3">
                     <Link className="link-primary" to={`${item.pairAddress}`}>
                       {item.pairSymbol}

@@ -45,6 +45,7 @@ const Tokens = () => {
               <div key={index} className="container-table-row">
                 <div>{index + 1}</div>
                 <div className="d-flex align-items-center">
+                  <img key={index} width={20} src={`/icons/${item.symbol}.png`} alt="" />
                   <span className="ms-3">{item.name}</span>
                 </div>
                 <div>{item.symbol}</div>
