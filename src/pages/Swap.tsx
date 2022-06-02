@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
-import { ITokenData, ISwapTokenData, IPairData } from '../interfaces/tokens';
+import { ITokenData, ISwapTokenData, IPairData, TokenType } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
 import Button from '../components/Button';
@@ -10,7 +10,7 @@ import ModalSearchContent from '../components/Modals/ModalSearchContent';
 import WalletBalance from '../components/WalletBalance';
 
 import errorMessages from '../content/errors';
-import { addressToId, idToAddress } from '../utils/tokenUtils';
+import { addressToId, idToAddress, NATIVE_TOKEN } from '../utils/tokenUtils';
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
 
@@ -19,11 +19,6 @@ interface ITokensData {
   tokenB: ITokenData;
   [key: string]: ITokenData;
 }
-interface ITokensPairData {
-  tokenA: IPairData[];
-  tokenB: IPairData[];
-}
-
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
@@ -33,21 +28,16 @@ const Swap = () => {
   const [showModalB, setShowModalB] = useState(false);
 
   const [tokensData, setTokensData] = useState<ITokensData>({
-    tokenA: {} as ITokenData,
+    tokenA: NATIVE_TOKEN,
     tokenB: {} as ITokenData,
   });
 
-  const [pairsData, setPairsData] = useState<ITokensPairData>({
-    tokenA: [],
-    tokenB: [],
-  });
-
   const initialSwapData: ISwapTokenData = {
-    tokenIdIn: '0.0.34922631', // WHBAR
+    tokenIdIn: '',
     tokenIdOut: '',
     amountIn: '',
     amountOut: '',
-    tokenInDecimals: 8,
+    tokenInDecimals: 0,
     tokenOutDecimals: 0,
   };
 
@@ -63,7 +53,7 @@ const Swap = () => {
 
   const [swapData, setSwapData] = useState(initialSwapData);
 
-  const [approved, setApproved] = useState(false);
+  const [approved, setApproved] = useState(true);
 
   const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
@@ -213,10 +203,15 @@ const Swap = () => {
       }
     };
 
-    if (swapData && swapData.tokenIdIn !== '' && userId) {
+    if (
+      tokensData.tokenA.type !== TokenType.HBAR &&
+      swapData &&
+      swapData.tokenIdIn !== '' &&
+      userId
+    ) {
       getApproved(swapData.tokenIdIn);
     }
-  }, [swapData, userId, sdk]);
+  }, [swapData, userId, sdk, tokensData]);
 
   useEffect(() => {
     const { tokenA, tokenB } = tokensData;
@@ -293,11 +288,11 @@ const Swap = () => {
                 modalTitle="Select token"
                 tokenFieldId="tokenA"
                 setTokensData={setTokensData}
-                setPairsData={setPairsData}
                 closeModal={() => setShowModalA(false)}
+                defaultToken={NATIVE_TOKEN}
               />
             </Modal>
-            {tokensData?.tokenA ? (
+            {userId && tokensData?.tokenA ? (
               <WalletBalance userId={userId} tokenData={tokensData.tokenA} />
             ) : null}
           </div>
@@ -345,7 +340,6 @@ const Swap = () => {
                 modalTitle="Select token"
                 tokenFieldId="tokenB"
                 setTokensData={setTokensData}
-                setPairsData={setPairsData}
                 closeModal={() => setShowModalB(false)}
               />
             </Modal>

@@ -13,8 +13,9 @@ interface IModalProps {
   modalTitle?: string;
   closeModal: () => void;
   setTokensData: (prev: any) => void;
-  setPairsData: (prev: any) => void;
+  setPairsData?: (prev: any) => void;
   tokenFieldId: string;
+  defaultToken?: ITokenData;
 }
 
 const ModalSearchContent = ({
@@ -23,9 +24,10 @@ const ModalSearchContent = ({
   setPairsData,
   tokenFieldId,
   modalTitle,
+  defaultToken,
 }: IModalProps) => {
   const [searchInputValue, setSearchInputValue] = useState('');
-  const [currentToken, setCurrentToken] = useState<ITokenData>({} as ITokenData);
+  const [currentToken, setCurrentToken] = useState<ITokenData>(defaultToken!);
 
   const [decimals, setDecimals] = useState(18);
   const [showDecimalsField, setShowDecimalsField] = useState(false);
@@ -94,7 +96,8 @@ const ModalSearchContent = ({
         [tokenFieldId]: currentToken,
       }));
 
-      dataPBT &&
+      setPairsData &&
+        dataPBT &&
         dataPBT.poolsByToken.length > 0 &&
         setPairsData((prev: any) => ({ ...prev, [tokenFieldId]: dataPBT.poolsByToken }));
     }
@@ -145,7 +148,7 @@ const ModalSearchContent = ({
     }));
   }, [decimals]);
 
-  const hasTokenData = currentToken.type;
+  const hasTokenData = currentToken?.type;
   const hasPools = dataPBT && dataPBT.poolsByToken.length > 0;
   const hasTokenList = tokenDataList && tokenDataList.length > 0;
 
