@@ -43,11 +43,11 @@ const Swap = () => {
   });
 
   const initialSwapData: ISwapTokenData = {
-    tokenIdIn: '',
+    tokenIdIn: '0.0.34922631', // WHBAR
     tokenIdOut: '',
     amountIn: '',
     amountOut: '',
-    tokenInDecimals: 0,
+    tokenInDecimals: 8,
     tokenOutDecimals: 0,
   };
 
@@ -220,16 +220,21 @@ const Swap = () => {
 
   useEffect(() => {
     const { tokenA, tokenB } = tokensData;
-    const newSwapData = {
-      tokenIdIn: tokenA.hederaId,
-      tokenIdOut: tokenB.hederaId,
-      tokenInDecimals: tokenA.decimals,
-      tokenOutDecimals: tokenB.decimals,
-    };
-    setSwapData(prev => ({ ...prev, ...newSwapData }));
-  }, [tokensData]);
 
-  console.log('swapData', swapData);
+    if (
+      (tokenA && typeof tokenA.hederaId !== 'undefined') ||
+      (tokenB && typeof tokenB.hederaId !== 'undefined')
+    ) {
+      const newSwapData = {
+        tokenIdIn: tokenA.hederaId,
+        tokenIdOut: tokenB.hederaId,
+        tokenInDecimals: tokenA.decimals,
+        tokenOutDecimals: tokenB.decimals,
+      };
+
+      setSwapData(prev => ({ ...prev, ...newSwapData }));
+    }
+  }, [tokensData]);
 
   return (
     <div className="d-flex justify-content-center">
