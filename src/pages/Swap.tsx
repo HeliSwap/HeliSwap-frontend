@@ -231,6 +231,8 @@ const Swap = () => {
     }
   }, [tokensData]);
 
+  const canSwap = swapData.amountIn !== '' && swapData.amountOut !== '';
+
   return (
     <div className="d-flex justify-content-center">
       <div className="container-swap">
@@ -352,11 +354,13 @@ const Swap = () => {
         <div className="mt-5 d-flex justify-content-center">
           {loadingPools ? (
             <Loader />
-          ) : approved ? (
-            <Button onClick={() => handleSwapClick()}>Swap</Button>
-          ) : (
-            <Button onClick={() => handleApproveClick()}>Approve</Button>
-          )}
+          ) : canSwap ? (
+            approved ? (
+              <Button onClick={() => handleSwapClick()}>Swap</Button>
+            ) : (
+              <Button onClick={() => handleApproveClick()}>Approve</Button>
+            )
+          ) : null}
         </div>
       </div>
     </div>
