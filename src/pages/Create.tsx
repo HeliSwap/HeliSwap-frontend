@@ -268,7 +268,7 @@ const Create = () => {
           </div>
         ) : null}
 
-        <div className="d-flex justify-content-between">
+        <div className="d-flex justify-content-between mt-5">
           <span className="badge bg-primary text-uppercase">Token A</span>
           <span></span>
         </div>
