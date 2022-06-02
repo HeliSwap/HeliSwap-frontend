@@ -1,28 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
+import usePools from '../hooks/usePools';
 
-import { useQuery } from '@apollo/client';
-import { GET_POOLS } from '../GraphQL/Queries';
 import { formatStringToPrice } from '../utils/numberUtils';
-import { IPairData } from '../interfaces/tokens';
 
 const Pairs = () => {
-  const { error, loading, data } = useQuery(GET_POOLS, {
+  const { pools, error, loading } = usePools({
     fetchPolicy: 'network-only',
     pollInterval: 10000,
   });
-  const [pairData, setPairData] = useState<IPairData[]>([]);
-
-  useEffect(() => {
-    data && setPairData(data.pools);
-  }, [data]);
 
   const formatIcons = (icons: string[]) =>
     icons &&
     icons.length > 0 &&
     icons.map((item, index) => <img key={index} width={20} src={`/icons/${item}.png`} alt="" />);
 
-  const havePairs = pairData.length > 0;
+  const havePairs = pools && pools.length > 0;
 
   return (
     <div className="d-flex justify-content-center">
@@ -43,7 +36,7 @@ const Pairs = () => {
               <div className="text-end">Volume 24H</div>
               <div className="text-end">Volume 7D</div>
             </div>
-            {pairData.map((item, index) => (
+            {pools.map((item, index) => (
               <div key={index} className="container-table-row with-cols-5">
                 <div>{index + 1}</div>
                 <div className="d-flex align-items-center">
