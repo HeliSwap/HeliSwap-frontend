@@ -1,45 +1,28 @@
-import React, { useEffect, useState } from 'react';
-import { ITokenData, TokenType } from '../interfaces/tokens';
-
-import { useQuery } from '@apollo/client';
-import { GET_TOKENS } from '../GraphQL/Queries';
+import React from 'react';
+import useTokens from '../hooks/useTokens';
 import Loader from '../components/Loader';
 
 const Tokens = () => {
-  const { error, loading, data } = useQuery(GET_TOKENS, {
+  const {
+    tokens,
+    error: errorTokens,
+    loading: loadingTokens,
+  } = useTokens({
     fetchPolicy: 'network-only',
     pollInterval: 10000,
   });
-  const [tokenData, setTokenData] = useState<ITokenData[]>([]);
 
-  useEffect(() => {
-    if (data) {
-      const { getTokensData } = data;
-
-      const tokensData = getTokensData.map((item: any) => ({
-        hederaId: item.hederaId,
-        name: item.name,
-        symbol: item.symbol,
-        address: item.address,
-        decimals: item.decimals,
-        type: item.isHTS ? TokenType.HTS : TokenType.ERC20,
-      }));
-
-      getTokensData.length > 0 && setTokenData(tokensData);
-    }
-  }, [data]);
-
-  const haveTokens = tokenData.length > 0;
+  const haveTokens = tokens && tokens.length > 0;
 
   return (
     <div className="d-flex justify-content-center">
       <div className="container-pairs">
-        {error ? (
+        {errorTokens ? (
           <div className="alert alert-danger mt-5" role="alert">
             <strong>Something went wrong!</strong> Cannot get pairs...
           </div>
         ) : null}
-        {loading ? (
+        {loadingTokens ? (
           <Loader loadingText="Loading tokens..." />
         ) : haveTokens ? (
           <div className="container-table">
@@ -51,7 +34,7 @@ const Tokens = () => {
               <div className="text-end">Decimals</div>
               <div className="text-end">Hedera Id</div>
             </div>
-            {tokenData.map((item, index) => (
+            {tokens!.map((item, index) => (
               <div key={index} className="container-table-row with-cols-6">
                 <div>{index + 1}</div>
                 <div className="d-flex align-items-center">
