@@ -1,37 +1,51 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
-import { ITokenData, ISwapTokenData, IPairData } from '../interfaces/tokens';
-import { IStringToString } from '../interfaces/comon';
+import { ITokenData, ISwapTokenData, IPairData, TokenType } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
-
-import { useQuery } from '@apollo/client';
-import { GET_TOKENS, GET_POOLS } from '../GraphQL/Queries';
 
 import Button from '../components/Button';
 import Loader from '../components/Loader';
-import TokenInputSelector from '../components/TokenInputSelector';
+import Modal from '../components/Modal';
+import ModalSearchContent from '../components/Modals/ModalSearchContent';
+import WalletBalance from '../components/WalletBalance';
 
 import errorMessages from '../content/errors';
-import { addressToId, idToAddress } from '../utils/tokenUtils';
+import { addressToId, idToAddress, NATIVE_TOKEN } from '../utils/tokenUtils';
 import { getConnectedWallet } from './Helpers';
+import usePools from '../hooks/usePools';
 
+interface ITokensData {
+  tokenA: ITokenData;
+  tokenB: ITokenData;
+  [key: string]: ITokenData;
+}
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
+
+  const [showModalA, setShowModalA] = useState(false);
+  const [showModalB, setShowModalB] = useState(false);
+
+  const [tokensData, setTokensData] = useState<ITokensData>({
+    tokenA: NATIVE_TOKEN,
+    tokenB: {} as ITokenData,
+  });
 
   const initialSwapData: ISwapTokenData = {
     tokenIdIn: '',
     tokenIdOut: '',
     amountIn: '',
     amountOut: '',
+    tokenInDecimals: 0,
+    tokenOutDecimals: 0,
   };
 
-  const { loading: loadingPools, data: dataPool } = useQuery(GET_POOLS);
-  const { error: errorGT, loading: loadingTokens, data: dataTokens } = useQuery(GET_TOKENS);
+  const { pools: poolsData, loading: loadingPools } = usePools({
+    fetchPolicy: 'network-only',
+    pollInterval: 10000,
+  });
 
-  const [poolsData, setPoolsData] = useState<IPairData[]>([]);
-  const [tokenDataList, setTokenDataList] = useState<ITokenData[]>([]);
   const [selectedPoolData, setSelectedPoolData] = useState<IPairData>({} as IPairData);
 
   const [error, setError] = useState(false);
@@ -39,10 +53,17 @@ const Swap = () => {
 
   const [swapData, setSwapData] = useState(initialSwapData);
 
-  const [approved, setApproved] = useState(false);
+  const [approved, setApproved] = useState(true);
 
-  const onInputChange = async (tokenData: IStringToString) => {
-    const { tokenIdIn, amountIn, tokenIdOut, amountOut } = tokenData;
+  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, name } = e.target;
+
+    const tokenData = {
+      [name]: value,
+    };
+
+    const { amountIn, amountOut } = tokenData;
+    const { tokenIdIn, tokenIdOut } = swapData;
     const { token0Amount, token1Amount, token0Decimals, token1Decimals } = selectedPoolData;
 
     if (Object.keys(selectedPoolData).length === 0) return;
@@ -73,10 +94,6 @@ const Swap = () => {
     } else {
       setSwapData(prev => ({ ...prev, amountIn: '', amountOut: '' }));
     }
-  };
-
-  const onSelectChange = (tokenData: IStringToString) => {
-    setSwapData(prev => ({ ...prev, ...tokenData }));
   };
 
   const handleApproveClick = async () => {
@@ -146,21 +163,7 @@ const Swap = () => {
   };
 
   useEffect(() => {
-    if (dataPool) {
-      const { pools } = dataPool;
-      pools.length > 0 && setPoolsData(pools);
-    }
-  }, [dataPool]);
-
-  useEffect(() => {
-    if (dataTokens) {
-      const { getTokensData } = dataTokens;
-      getTokensData.length > 0 && setTokenDataList(getTokensData);
-    }
-  }, [dataTokens]);
-
-  useEffect(() => {
-    if (swapData.tokenIdIn && swapData.tokenIdOut && poolsData.length > 0) {
+    if (swapData.tokenIdIn && swapData.tokenIdOut && poolsData && poolsData.length > 0) {
       const tokenInAddress = idToAddress(swapData.tokenIdIn);
       const tokenOutAddress = idToAddress(swapData.tokenIdOut);
 
@@ -177,16 +180,6 @@ const Swap = () => {
       setSelectedPoolData({} as IPairData);
     }
   }, [poolsData, swapData]);
-
-  useEffect(() => {
-    if (tokenDataList.length > 0 && !swapData.tokenIdIn && !swapData.tokenIdOut) {
-      setSwapData({
-        ...swapData,
-        //Set the first token to the first one in the token list. This will be probably set to WHBAR in future
-        tokenIdIn: tokenDataList[0].hederaId,
-      });
-    }
-  }, [tokenDataList, swapData]);
 
   useEffect(() => {
     const getApproved = async (tokenId: string) => {
@@ -210,59 +203,164 @@ const Swap = () => {
       }
     };
 
-    if (swapData && swapData.tokenIdIn !== '' && userId) {
+    if (
+      tokensData.tokenA.type !== TokenType.HBAR &&
+      swapData &&
+      swapData.tokenIdIn !== '' &&
+      userId
+    ) {
       getApproved(swapData.tokenIdIn);
     }
-  }, [swapData, userId, sdk]);
+  }, [swapData, userId, sdk, tokensData]);
+
+  useEffect(() => {
+    const { tokenA, tokenB } = tokensData;
+
+    if (
+      (tokenA && typeof tokenA.hederaId !== 'undefined') ||
+      (tokenB && typeof tokenB.hederaId !== 'undefined')
+    ) {
+      const newSwapData = {
+        tokenIdIn: tokenA.hederaId,
+        tokenIdOut: tokenB.hederaId,
+        tokenInDecimals: tokenA.decimals,
+        tokenOutDecimals: tokenB.decimals,
+      };
+
+      setSwapData(prev => ({ ...prev, ...newSwapData }));
+    }
+  }, [tokensData]);
+
+  const canSwap = swapData.amountIn !== '' && swapData.amountOut !== '';
 
   return (
     <div className="d-flex justify-content-center">
       <div className="container-swap">
-        {errorGT ? (
+        {/* {errorGT ? (
           <div className="alert alert-danger mb-5" role="alert">
             <strong>Something went wrong!</strong> Cannot get pairs...
           </div>
-        ) : null}
+        ) : null} */}
         {error ? (
           <div className="alert alert-danger my-5" role="alert">
             <strong>Something went wrong!</strong>
             <p>{errorMessages[errorMessage]}</p>
           </div>
         ) : null}
-        <div className="d-flex justify-content-between">
+
+        <div className="d-flex justify-content-between mt-5">
           <span className="badge bg-primary text-uppercase">From</span>
           <span></span>
         </div>
-        <TokenInputSelector
-          inputValue={swapData.amountIn}
-          selectValue={swapData.tokenIdIn}
-          inputName="amountIn"
-          selectName="tokenIdIn"
-          tokenDataList={tokenDataList}
-          onInputChange={onInputChange}
-          onSelectChange={onSelectChange}
-        />
+
+        <div className="row justify-content-between align-items-end mt-3">
+          <div className="col-7">
+            <div className="input-container">
+              <input
+                value={swapData.amountIn}
+                name="amountIn"
+                onChange={handleInputChange}
+                type="text"
+                className="form-control mt-2"
+              />
+            </div>
+            <p className="text-success mt-3">$0.00</p>
+          </div>
+
+          <div className="col-5">
+            <div className="container-token-selector d-flex justify-content-between align-items-center">
+              {tokensData?.tokenA.symbol ? (
+                <div className="d-flex align-items-center">
+                  <img
+                    className="me-2"
+                    width={24}
+                    src={`/icons/${tokensData.tokenA.symbol}.png`}
+                    alt=""
+                  />
+                  <span className="me-2">{tokensData.tokenA.symbol}</span>
+                </div>
+              ) : (
+                <span>N/A</span>
+              )}
+
+              <Button onClick={() => setShowModalA(true)}>Select token</Button>
+            </div>
+            <Modal show={showModalA}>
+              <ModalSearchContent
+                modalTitle="Select token"
+                tokenFieldId="tokenA"
+                setTokensData={setTokensData}
+                closeModal={() => setShowModalA(false)}
+                defaultToken={NATIVE_TOKEN}
+              />
+            </Modal>
+            {userId && tokensData?.tokenA ? (
+              <WalletBalance userId={userId} tokenData={tokensData.tokenA} />
+            ) : null}
+          </div>
+        </div>
+
         <div className="d-flex justify-content-between mt-5">
           <span className="badge bg-info text-uppercase">To</span>
           <span></span>
         </div>
-        <TokenInputSelector
-          inputValue={swapData.amountOut}
-          selectValue={swapData.tokenIdOut}
-          inputName="amountOut"
-          selectName="tokenIdOut"
-          tokenDataList={tokenDataList}
-          onInputChange={onInputChange}
-          onSelectChange={onSelectChange}
-        />
+
+        <div className="row justify-content-between align-items-end mt-3">
+          <div className="col-7">
+            <div className="input-container">
+              <input
+                value={swapData.amountOut}
+                name="amountOut"
+                onChange={handleInputChange}
+                type="text"
+                className="form-control mt-2"
+              />
+            </div>
+            <p className="text-success mt-3">$0.00</p>
+          </div>
+
+          <div className="col-5">
+            <div className="container-token-selector d-flex justify-content-between align-items-center">
+              {tokensData?.tokenB.symbol ? (
+                <div className="d-flex align-items-center">
+                  <img
+                    className="me-2"
+                    width={24}
+                    src={`/icons/${tokensData.tokenB.symbol}.png`}
+                    alt=""
+                  />
+                  <span className="me-2">{tokensData.tokenB.symbol}</span>
+                </div>
+              ) : (
+                <span>N/A</span>
+              )}
+
+              <Button onClick={() => setShowModalB(true)}>Select token</Button>
+            </div>
+            <Modal show={showModalB}>
+              <ModalSearchContent
+                modalTitle="Select token"
+                tokenFieldId="tokenB"
+                setTokensData={setTokensData}
+                closeModal={() => setShowModalB(false)}
+              />
+            </Modal>
+            {tokensData?.tokenB ? (
+              <WalletBalance userId={userId} tokenData={tokensData.tokenB} />
+            ) : null}
+          </div>
+        </div>
+
         <div className="mt-5 d-flex justify-content-center">
-          {loadingTokens || loadingPools ? (
+          {loadingPools ? (
             <Loader />
-          ) : approved ? (
-            <Button onClick={() => handleSwapClick()}>Swap</Button>
-          ) : (
-            <Button onClick={() => handleApproveClick()}>Approve</Button>
-          )}
+          ) : canSwap ? (
+            approved ? (
+              <Button onClick={() => handleSwapClick()}>Swap</Button>
+            ) : (
+              <Button onClick={() => handleApproveClick()}>Approve</Button>
+            )
+          ) : null}
         </div>
       </div>
     </div>

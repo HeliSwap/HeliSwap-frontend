@@ -106,3 +106,12 @@ export const calculateReserves = (
     reserve1ShareStr,
   };
 };
+
+export const NATIVE_TOKEN = {
+  hederaId: '',
+  name: 'HBAR',
+  symbol: 'HBAR',
+  address: '',
+  decimals: 8,
+  type: TokenType.HBAR,
+};

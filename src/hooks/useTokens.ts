@@ -3,6 +3,7 @@ import { ITokenData, TokenType } from '../interfaces/tokens';
 
 import { QueryHookOptions, useQuery } from '@apollo/client';
 import { GET_TOKENS } from '../GraphQL/Queries';
+import { NATIVE_TOKEN } from '../utils/tokenUtils';
 
 const useTokens = (useQueryOptions: QueryHookOptions = {}) => {
   const [tokens, setTokens] = useState<ITokenData[]>();
@@ -12,15 +13,6 @@ const useTokens = (useQueryOptions: QueryHookOptions = {}) => {
   useEffect(() => {
     if (data) {
       const { getTokensData } = data;
-
-      const nativeToken = {
-        hederaId: '',
-        name: 'HBAR',
-        symbol: 'HBAR',
-        address: '',
-        decimals: 8,
-        type: TokenType.HBAR,
-      };
 
       if (getTokensData.length > 0) {
         const foundTokenDataList = getTokensData.map(
@@ -34,9 +26,9 @@ const useTokens = (useQueryOptions: QueryHookOptions = {}) => {
           }),
         );
 
-        setTokens([nativeToken, ...foundTokenDataList]);
+        setTokens([NATIVE_TOKEN, ...foundTokenDataList]);
       } else {
-        setTokens([nativeToken]);
+        setTokens([NATIVE_TOKEN]);
       }
     }
   }, [data]);
