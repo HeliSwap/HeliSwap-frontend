@@ -232,18 +232,22 @@ const Create = () => {
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
 
     const selectedPoolData = poolsData.filter((pool: any) => {
+      let poolMatchedBothTokens = false;
+
       const poolContainsToken = (tokenAddres: string) => {
         return pool.token0 === tokenAddres || pool.token1 === tokenAddres;
       };
+
       if (provideNative) {
-        return (
+        poolMatchedBothTokens =
           poolContainsToken(WHBARAddress) &&
-          (poolContainsToken(tokenA.address) || poolContainsToken(tokenB.address))
-        );
+          (poolContainsToken(tokenA.address) || poolContainsToken(tokenB.address));
       } else {
         //Both tokens are in the same pool
-        poolContainsToken(tokenA.address) && poolContainsToken(tokenB.address);
+        poolMatchedBothTokens =
+          poolContainsToken(tokenA.address) && poolContainsToken(tokenB.address);
       }
+      return poolMatchedBothTokens;
     });
     setPoolData(selectedPoolData[0]);
 
