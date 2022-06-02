@@ -167,9 +167,10 @@ class SDK {
     const tokenId = tokenAId ? tokenAId : tokenBId;
     const tokenDecimals = tokenAId ? tokenADecimals : tokenBDecimals;
     const tokenAmountString = tokenAId ? tokenAAmountString : tokenBAmountString;
+    const HBARAmountString = tokenAId ? tokenBAmountString : tokenAAmountString;
     const tokenAddress = idToAddress(tokenId);
 
-    const HBARAmount = formatStringToBigNumberWei(tokenAAmountString, 0);
+    const HBARAmount = formatStringToBigNumberWei(HBARAmountString, 0);
     const tokenAmount = formatStringToBigNumberWei(tokenAmountString, tokenDecimals);
 
     const userAddress = idToAddress(userId);
