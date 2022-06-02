@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { IPairData, ITokenData, TokenType } from '../../interfaces/tokens';
 
-import { useLazyQuery, useQuery } from '@apollo/client';
-import { GET_POOL_BY_TOKEN, GET_TOKEN_INFO, GET_TOKENS } from '../../GraphQL/Queries';
+import { useLazyQuery } from '@apollo/client';
+import { GET_POOL_BY_TOKEN, GET_TOKEN_INFO } from '../../GraphQL/Queries';
+
+import useTokens from '../../hooks/useTokens';
 
 import Button from '../../components/Button';
 import { idToAddress } from '../../utils/tokenUtils';
@@ -24,7 +26,6 @@ const ModalSearchContent = ({
 }: IModalProps) => {
   const [searchInputValue, setSearchInputValue] = useState('');
   const [currentToken, setCurrentToken] = useState<ITokenData>({} as ITokenData);
-  const [tokenDataList, setTokenDataList] = useState<ITokenData[]>();
 
   const [decimals, setDecimals] = useState(18);
   const [showDecimalsField, setShowDecimalsField] = useState(false);
@@ -34,7 +35,11 @@ const ModalSearchContent = ({
   const [getTokenByAddressOrId, { data: dataTBI, loading: loadingTBI }] =
     useLazyQuery(GET_TOKEN_INFO);
   const [getPoolByToken, { data: dataPBT, loading: loadingPBT }] = useLazyQuery(GET_POOL_BY_TOKEN);
-  const { data: dataGT, loading: loadingGT } = useQuery(GET_TOKENS);
+
+  const { tokens: tokenDataList, loading: loadingGT } = useTokens({
+    fetchPolicy: 'network-only',
+    pollInterval: 10000,
+  });
 
   const onSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -112,36 +117,6 @@ const ModalSearchContent = ({
     setShowAddresses(prev => !prev);
   };
   /* Helper functions - to be removed */
-
-  useEffect(() => {
-    if (dataGT) {
-      const { getTokensData } = dataGT;
-
-      const nativeToken = {
-        hederaId: '',
-        name: 'HBAR',
-        symbol: 'HBAR',
-        address: '',
-        decimals: 8,
-        type: TokenType.HBAR,
-      };
-
-      if (getTokensData.length > 0) {
-        const foundTokenDataList = getTokensData.map((item: any) => ({
-          hederaId: item.hederaId,
-          name: item.name,
-          symbol: item.symbol,
-          address: item.address,
-          decimals: item.decimals,
-          type: item.isHTS ? TokenType.HTS : TokenType.ERC20,
-        }));
-
-        setTokenDataList([nativeToken, ...foundTokenDataList]);
-      } else {
-        setTokenDataList([nativeToken]);
-      }
-    }
-  }, [dataGT]);
 
   useEffect(() => {
     if (dataTBI) {
