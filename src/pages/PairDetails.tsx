@@ -142,6 +142,8 @@ const PairDetails = () => {
       tokensLPToRemoveStr,
       tokens0ToRemoveStr,
       tokens1ToRemoveStr,
+      pairData.token0Decimals,
+      pairData.token1Decimals,
     );
 
     setPairDataContracts({

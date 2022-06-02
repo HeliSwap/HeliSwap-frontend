@@ -223,7 +223,6 @@ const Create = () => {
   }, [tokensData, sdk, userId]);
 
   useEffect(() => {
-    // const { tokenA: pairsTokenA, tokenB: pairsTokenB } = pairsData;
     const { tokenA, tokenB } = tokensData;
 
     const tokenAIsNative = tokenA.type === TokenType.HBAR;

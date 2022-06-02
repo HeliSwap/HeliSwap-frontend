@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { hethers } from '@hashgraph/hethers';
+import { hethers, providers } from '@hashgraph/hethers';
 import { IPairData } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
@@ -35,7 +35,12 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
     tokensLpAmount: '',
     tokens0Amount: '0.0',
     tokens1Amount: '0.0',
+    token0Decimals: 0,
+    token1Decimals: 0,
   });
+
+  const [removeNative, setRemoveNative] = useState(false);
+  const [hasWrappedHBAR, setHasWrappedHBAR] = useState(false);
 
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -64,9 +69,9 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
       token1Decimals,
     );
 
-    const tokensLpAmount = tokensLPToRemove.toString();
-    const tokens0Amount = reserve0ShareHBN.toString();
-    const tokens1Amount = reserve1ShareHBN.toString();
+    const tokensLpAmount = hethers.utils.formatUnits(tokensLPToRemove, 18).toString();
+    const tokens0Amount = hethers.utils.formatUnits(reserve0ShareHBN, token0Decimals).toString();
+    const tokens1Amount = hethers.utils.formatUnits(reserve1ShareHBN, token1Decimals).toString();
 
     setRemoveLpData({
       tokenInAddress,
@@ -74,6 +79,8 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
       tokensLpAmount,
       tokens0Amount,
       tokens1Amount,
+      token0Decimals,
+      token1Decimals,
     });
   };
 
@@ -82,15 +89,31 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
     setErrorRemove(false);
 
     try {
-      const responseData = await sdk.removeLiquidity(
-        hashconnectConnectorInstance,
-        userId,
-        removeLpData.tokenInAddress,
-        removeLpData.tokenOutAddress,
-        removeLpData.tokensLpAmount,
-        removeLpData.tokens0Amount,
-        removeLpData.tokens1Amount,
-      );
+      let responseData;
+      if (hasWrappedHBAR && removeNative) {
+        responseData = await sdk.removeNativeLiquidity(
+          hashconnectConnectorInstance,
+          userId,
+          removeLpData.tokenInAddress,
+          removeLpData.tokensLpAmount,
+          removeLpData.tokens0Amount,
+          removeLpData.tokens1Amount,
+          removeLpData.token0Decimals,
+          removeLpData.token1Decimals,
+        );
+      } else {
+        responseData = await sdk.removeLiquidity(
+          hashconnectConnectorInstance,
+          userId,
+          removeLpData.tokenInAddress,
+          removeLpData.tokenOutAddress,
+          removeLpData.tokensLpAmount,
+          removeLpData.tokens0Amount,
+          removeLpData.tokens1Amount,
+          removeLpData.token0Decimals,
+          removeLpData.token1Decimals,
+        );
+      }
 
       const { response } = responseData;
       const { success } = response;
@@ -102,6 +125,8 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
           tokensLpAmount: '',
           tokens0Amount: '0.0',
           tokens1Amount: '0.0',
+          token0Decimals: 0,
+          token1Decimals: 0,
         });
         setShowRemoveContainer(false);
       } else {
@@ -149,6 +174,13 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
     };
 
     pairData && pairData.pairAddress && userId && getApproved();
+
+    if (pairData && pairData.pairAddress) {
+      setHasWrappedHBAR(
+        pairData.token0 === process.env.REACT_APP_WHBAR_ADDRESS ||
+          pairData.token1 === process.env.REACT_APP_WHBAR_ADDRESS,
+      );
+    }
   }, [pairData, connectedWallet, sdk, userId]);
 
   const canRemove = lpApproved && removeLpData.tokenInAddress !== '';

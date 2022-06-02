@@ -285,6 +285,68 @@ class SDK {
     return responseData;
   }
 
+  async removeNativeLiquidity(
+    hashconnectConnectorInstance: Hashconnect,
+    userId: string,
+    tokenAddress: string,
+    tokensLpAmount: string,
+    tokenAmount: string,
+    HBARAmount: string,
+    tokenDecimals: number,
+    WHBARDecimal: number,
+  ) {
+    const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
+    const userAddress = idToAddress(userId);
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
+
+    const tokenAmountBN = formatStringToBigNumberWei(tokenAmount, tokenDecimals);
+    const HBARAmountBN = formatStringToBigNumberWei(HBARAmount, WHBARDecimal);
+    const tokensLpAmountBN = formatStringToBigNumberWei(tokensLpAmount, 18);
+
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(routerContractAddress))
+
+      //Set the gas for the contract call
+      .setGas(3000000)
+
+      //Set the contract function to call
+      .setFunction(
+        'removeLiquidityETH',
+        new ContractFunctionParameters()
+          .addAddress(tokenAddress)
+          // @ts-ignore
+          .addUint256(tokensLpAmountBN)
+          // @ts-ignore
+          .addUint256(tokenAmountBN)
+          // @ts-ignore
+          .addUint256(HBARAmountBN)
+          .addAddress(userAddress)
+          .addUint256(deadline),
+      );
+
+    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
+      trans,
+      userId as string,
+    );
+
+    const response = await hashconnectConnectorInstance?.sendTransaction(
+      transactionBytes as Uint8Array,
+      userId as string,
+      false,
+    );
+
+    const responseData: any = {
+      response,
+      receipt: null,
+    };
+
+    if (response?.success) {
+      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
+    }
+
+    return responseData;
+  }
   async removeLiquidity(
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
@@ -293,10 +355,16 @@ class SDK {
     tokensLpAmount: string,
     tokens0Amount: string,
     tokens1Amount: string,
+    token0Decimals: number,
+    token1ecimals: number,
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
     const userAddress = idToAddress(userId);
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
+
+    const tokensLpAmountBN = formatStringToBigNumberWei(tokensLpAmount, 18);
+    const tokens0AmountBN = formatStringToBigNumberWei(tokens0Amount, token0Decimals);
+    const tokens1AmountBN = formatStringToBigNumberWei(tokens1Amount, token1ecimals);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
@@ -312,11 +380,11 @@ class SDK {
           .addAddress(tokenInAddress)
           .addAddress(tokenOutAddress)
           // @ts-ignore
-          .addUint256(tokensLpAmount)
+          .addUint256(tokensLpAmountBN)
           // @ts-ignore
-          .addUint256(tokens0Amount)
+          .addUint256(tokens0AmountBN)
           // @ts-ignore
-          .addUint256(tokens1Amount)
+          .addUint256(tokens1AmountBN)
           .addAddress(userAddress)
           .addUint256(deadline),
       );
