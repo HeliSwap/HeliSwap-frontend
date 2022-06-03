@@ -16,6 +16,7 @@ import { formatStringToBigNumberEthersWei } from '../utils/numberUtils';
 import { getConnectedWallet } from './Helpers';
 import { useQuery } from '@apollo/client';
 import { GET_POOLS } from '../GraphQL/Queries';
+import BigNumber from 'bignumber.js';
 
 interface ITokensData {
   tokenA: ITokenData;
@@ -75,24 +76,39 @@ const Create = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
+    const inputToken = name === 'tokenAAmount' ? tokensData.tokenA : tokensData.tokenB;
+    const inputTokenAddress = inputToken.address
+      ? inputToken.address
+      : (process.env.REACT_APP_WHBAR_ADDRESS as string);
 
     if (tokensInSamePool) {
-      const token0Amount = poolData?.token0Amount as string;
-      const token1Amount = poolData?.token1Amount as string;
-      const token0Decimals = poolData?.token0Decimals;
+      const inputTokenAmount =
+        inputTokenAddress === poolData?.token0
+          ? (poolData?.token0Amount as string)
+          : (poolData?.token1Amount as string);
+      const calculatedTokenAmount =
+        inputTokenAddress === poolData?.token0
+          ? (poolData?.token1Amount as string)
+          : (poolData?.token0Amount as string);
+      const inputTokenDecimals =
+        inputTokenAddress === poolData?.token0
+          ? poolData?.token0Decimals
+          : poolData?.token1Decimals;
+      const calculatedTokenDecimals =
+        inputTokenAddress === poolData?.token0
+          ? poolData?.token1Decimals
+          : poolData?.token0Decimals;
 
-      const token0AmountBN = formatStringToBigNumberEthersWei(token0Amount);
-      const token1AmountBN = formatStringToBigNumberEthersWei(token1Amount);
+      const token0AmountBN = hethers.BigNumber.from(inputTokenAmount);
+      const token1AmountBN = hethers.BigNumber.from(calculatedTokenAmount);
 
-      const valueBN = formatStringToBigNumberEthersWei(value, token0Decimals);
+      const valueBN = formatStringToBigNumberEthersWei(value, inputTokenDecimals);
       const keyToUpdate = name === 'tokenAAmount' ? 'tokenBAmount' : 'tokenAAmount';
       const valueToUpdate = valueBN.mul(token1AmountBN).div(token0AmountBN);
 
       setCreatePairData(prev => ({
         ...prev,
-        [keyToUpdate]: hethers.utils
-          .formatUnits(valueToUpdate, poolData?.token1Decimals)
-          .toString(),
+        [keyToUpdate]: hethers.utils.formatUnits(valueToUpdate, calculatedTokenDecimals).toString(),
         [name]: value,
       }));
     } else {
