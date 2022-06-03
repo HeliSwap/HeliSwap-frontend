@@ -413,7 +413,7 @@ class SDK {
     return responseData;
   }
 
-  async swapTokens(
+  async swapExactTokensForTokens(
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
     tokenInId: string,
@@ -445,6 +445,65 @@ class SDK {
         new ContractFunctionParameters()
           .addUint256(tokenInAmount) //amountIn
           .addUint256(tokenOutMinAmount) //amountMinOut
+          .addAddressArray([tokenInAddress, tokenOutAddress])
+          .addAddress(userAddress)
+          .addUint256(deadline),
+      );
+
+    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
+      trans,
+      userId as string,
+    );
+
+    const response = await hashconnectConnectorInstance?.sendTransaction(
+      transactionBytes as Uint8Array,
+      userId as string,
+      false,
+    );
+
+    const responseData: any = {
+      response,
+      receipt: null,
+    };
+
+    if (response?.success) {
+      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
+    }
+
+    return responseData;
+  }
+  async swapTokensForExactTokens(
+    hashconnectConnectorInstance: Hashconnect,
+    userId: string,
+    tokenInId: string,
+    tokenOutId: string,
+    amountIn: string,
+    amountMinOut: any,
+    decIn: number,
+    decOut: number,
+  ) {
+    const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
+    const tokenInAddress = idToAddress(tokenInId);
+    const tokenOutAddress = idToAddress(tokenOutId);
+    const userAddress = idToAddress(userId);
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
+
+    const tokenInAmount = formatStringToBigNumberWei(amountIn, decIn);
+    const tokenOutMinAmount = formatStringToBigNumberWei(amountMinOut, decOut);
+
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(routerContractAddress))
+
+      //Set the gas for the contract call
+      .setGas(3000000)
+
+      //Set the contract function to call
+      .setFunction(
+        'swapTokensForExactTokens',
+        new ContractFunctionParameters()
+          .addUint256(tokenOutMinAmount) //amountMinOut
+          .addUint256(tokenInAmount) //amountIn
           .addAddressArray([tokenInAddress, tokenOutAddress])
           .addAddress(userAddress)
           .addUint256(deadline),
