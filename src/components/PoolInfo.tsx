@@ -91,15 +91,31 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
     try {
       let responseData;
       if (hasWrappedHBAR && removeNative) {
+        const WHBARAmount =
+          pairData.token0 === process.env.REACT_APP_WHBAR_ADDRESS
+            ? removeLpData.tokens0Amount
+            : removeLpData.tokens1Amount;
+        const WHBARDecimals =
+          pairData.token0 === process.env.REACT_APP_WHBAR_ADDRESS
+            ? removeLpData.token0Decimals
+            : removeLpData.token1Decimals;
+        const tokenAmount =
+          pairData.token0 === process.env.REACT_APP_WHBAR_ADDRESS
+            ? removeLpData.tokens1Amount
+            : removeLpData.tokens0Amount;
+        const tokenDecimals =
+          pairData.token0 === process.env.REACT_APP_WHBAR_ADDRESS
+            ? removeLpData.token1Decimals
+            : removeLpData.token0Decimals;
         responseData = await sdk.removeNativeLiquidity(
           hashconnectConnectorInstance,
           userId,
           removeLpData.tokenInAddress,
           removeLpData.tokensLpAmount,
-          removeLpData.tokens0Amount,
-          removeLpData.tokens1Amount,
-          removeLpData.token0Decimals,
-          removeLpData.token1Decimals,
+          tokenAmount,
+          WHBARAmount,
+          tokenDecimals,
+          WHBARDecimals,
         );
       } else {
         responseData = await sdk.removeLiquidity(
@@ -260,6 +276,16 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
               <Button className="ms-3" onClick={handleCalculateButtonClick}>
                 Calculate
               </Button>
+              {hasWrappedHBAR ? (
+                <div>
+                  <span>Receive HBAR</span>
+                  <input
+                    type="checkbox"
+                    checked={removeNative}
+                    onClick={() => setRemoveNative(!removeNative)}
+                  ></input>
+                </div>
+              ) : null}
             </div>
             <div className="mt-4">
               You will receive:
