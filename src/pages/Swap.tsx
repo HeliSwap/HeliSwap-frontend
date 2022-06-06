@@ -55,6 +55,8 @@ const Swap = () => {
 
   const [approved, setApproved] = useState(true);
 
+  const [tokenInExactAmount, setTokenInExactAmount] = useState(true);
+
   const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
 
@@ -80,7 +82,7 @@ const Swap = () => {
       decOut = tokenInFirstAtPool ? token1Decimals : token0Decimals;
 
       const swapAmountOut = sdk.getSwapAmountOut(amountIn, resIn, resOut, decIn, decOut);
-
+      setTokenInExactAmount(true);
       setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
     } else if (tokenIdOut && amountOut) {
       resIn = tokenOutFirstAtPool ? token1Amount : token0Amount;
@@ -90,6 +92,7 @@ const Swap = () => {
 
       const swapAmountIn = sdk.getSwapAmountIn(amountOut, resIn, resOut, decIn, decOut);
 
+      setTokenInExactAmount(false);
       setSwapData(prev => ({ ...prev, ...tokenData, amountIn: swapAmountIn.toString() }));
     } else {
       setSwapData(prev => ({ ...prev, amountIn: '', amountOut: '' }));
@@ -134,16 +137,30 @@ const Swap = () => {
     const decOut = tokenInSamePool ? token1Decimals : token0Decimals;
 
     try {
-      const receipt = await sdk.swapTokens(
-        hashconnectConnectorInstance,
-        userId,
-        tokenIdIn,
-        tokenIdOut,
-        amountIn,
-        amountOut,
-        decIn,
-        decOut,
-      );
+      let receipt;
+      if (tokenInExactAmount) {
+        receipt = await sdk.swapExactTokensForTokens(
+          hashconnectConnectorInstance,
+          userId,
+          tokenIdIn,
+          tokenIdOut,
+          amountIn,
+          amountOut,
+          decIn,
+          decOut,
+        );
+      } else {
+        receipt = await sdk.swapTokensForExactTokens(
+          hashconnectConnectorInstance,
+          userId,
+          tokenIdIn,
+          tokenIdOut,
+          amountIn,
+          amountOut,
+          decIn,
+          decOut,
+        );
+      }
 
       const {
         response: { success, error },

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import { ITokenData, TokenType } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
+import usePools from '../hooks/usePools';
 
 import Button from '../components/Button';
 import Modal from '../components/Modal';
@@ -29,6 +30,11 @@ const Create = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
+
+  const { pools: poolsData } = usePools({
+    fetchPolicy: 'network-only',
+    pollInterval: 10000,
+  });
 
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
@@ -70,24 +76,40 @@ const Create = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
+    const inputToken = name === 'tokenAAmount' ? tokensData.tokenA : tokensData.tokenB;
+    const inputTokenAddress = inputToken.address
+      ? inputToken.address
+      : (process.env.REACT_APP_WHBAR_ADDRESS as string);
 
     if (tokensInSamePool) {
-      const token0Amount = poolData?.token0Amount as string;
-      const token1Amount = poolData?.token1Amount as string;
-      const token0Decimals = poolData?.token0Decimals;
+      const isInputAddressFirstInPool = inputTokenAddress === poolData?.token0;
 
-      const token0AmountBN = formatStringToBigNumberEthersWei(token0Amount);
-      const token1AmountBN = formatStringToBigNumberEthersWei(token1Amount);
+      const inputTokenAmount = isInputAddressFirstInPool
+        ? (poolData?.token0Amount as string)
+        : (poolData?.token1Amount as string);
 
-      const valueBN = formatStringToBigNumberEthersWei(value, token0Decimals);
+      const calculatedTokenAmount = isInputAddressFirstInPool
+        ? (poolData?.token1Amount as string)
+        : (poolData?.token0Amount as string);
+
+      const inputTokenDecimals = isInputAddressFirstInPool
+        ? poolData?.token0Decimals
+        : poolData?.token1Decimals;
+
+      const calculatedTokenDecimals = isInputAddressFirstInPool
+        ? poolData?.token1Decimals
+        : poolData?.token0Decimals;
+
+      const token0AmountBN = hethers.BigNumber.from(inputTokenAmount);
+      const token1AmountBN = hethers.BigNumber.from(calculatedTokenAmount);
+
+      const valueBN = formatStringToBigNumberEthersWei(value, inputTokenDecimals);
       const keyToUpdate = name === 'tokenAAmount' ? 'tokenBAmount' : 'tokenAAmount';
       const valueToUpdate = valueBN.mul(token1AmountBN).div(token0AmountBN);
 
       setCreatePairData(prev => ({
         ...prev,
-        [keyToUpdate]: hethers.utils
-          .formatUnits(valueToUpdate, poolData?.token1Decimals)
-          .toString(),
+        [keyToUpdate]: hethers.utils.formatUnits(valueToUpdate, calculatedTokenDecimals).toString(),
         [name]: value,
       }));
     } else {
@@ -218,26 +240,42 @@ const Create = () => {
   }, [tokensData, sdk, userId]);
 
   useEffect(() => {
-    let inSamePool = false;
-    const { tokenA: pairsTokenA, tokenB: pairsTokenB } = pairsData;
     const { tokenA, tokenB } = tokensData;
 
-    const provideNative = tokenA.type === TokenType.HBAR || tokenB.type === TokenType.HBAR;
+    const tokenAIsNative = tokenA.type === TokenType.HBAR;
+    const tokenBIsNative = tokenB.type === TokenType.HBAR;
+    const provideNative = tokenAIsNative || tokenBIsNative;
+    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
 
-    // Check for same pool
-    // TODO - To be optimized
-    pairsTokenA.forEach(poolA => {
-      pairsTokenB.forEach(poolB => {
-        if (poolA.pairAddress === poolB.pairAddress) {
-          inSamePool = true;
-          setPoolData(poolA);
-        }
-      });
-    });
+    const selectedPoolData =
+      (poolsData &&
+        poolsData.length > 0 &&
+        poolsData.filter((pool: any) => {
+          let poolMatchedBothTokens = false;
+
+          const poolContainsToken = (tokenAddres: string) => {
+            return pool.token0 === tokenAddres || pool.token1 === tokenAddres;
+          };
+
+          if (provideNative) {
+            poolMatchedBothTokens =
+              poolContainsToken(WHBARAddress) &&
+              (poolContainsToken(tokenA.address) || poolContainsToken(tokenB.address));
+          } else {
+            //Both tokens are in the same pool
+            poolMatchedBothTokens =
+              poolContainsToken(tokenA.address) && poolContainsToken(tokenB.address);
+          }
+
+          return poolMatchedBothTokens;
+        })) ||
+      [];
+
+    setPoolData(selectedPoolData[0]);
 
     setProvideNative(provideNative);
-    setTokensInSamePool(inSamePool);
-  }, [pairsData, tokensData]);
+    setTokensInSamePool(selectedPoolData && selectedPoolData.length !== 0);
+  }, [pairsData, tokensData, poolsData]);
 
   useEffect(() => {
     let isReady = true;

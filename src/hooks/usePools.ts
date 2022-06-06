@@ -4,7 +4,7 @@ import { IPairData } from '../interfaces/tokens';
 import { QueryHookOptions, useQuery } from '@apollo/client';
 import { GET_POOLS } from '../GraphQL/Queries';
 
-const useTokens = (useQueryOptions: QueryHookOptions = {}) => {
+const usePools = (useQueryOptions: QueryHookOptions = {}) => {
   const [pools, setPools] = useState<IPairData[]>();
 
   const { data, loading, error } = useQuery(GET_POOLS, useQueryOptions);
@@ -22,4 +22,4 @@ const useTokens = (useQueryOptions: QueryHookOptions = {}) => {
   return { pools, loading, error };
 };
 
-export default useTokens;
+export default usePools;

@@ -8,6 +8,7 @@ env:
   REACT_APP_NETWORK_TYPE: testnet
   REACT_APP_GRAPHQL_URI: https://heliswap-backend-mock.herokuapp.com/graphql
   REACT_APP_ROUTER_ADDRESS: 0x000000000000000000000000000000000215467c
+  REACT_APP_WHBAR_ADDRESS: 0x000000000000000000000000000000000214e087
 'on': pull_request
 jobs:
   build_and_preview:
