@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
-import { ITokenData, TokenType, IPairData } from '../interfaces/tokens';
-import { ICreatePairData } from '../interfaces/comon';
+import {
+  ITokenData,
+  TokenType,
+  IPairData,
+  ICreatePairData,
+  ITokensData,
+} from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
 import Button from '../components/Button';
@@ -14,12 +19,6 @@ import { idToAddress } from '../utils/tokenUtils';
 import { formatStringToBigNumberEthersWei } from '../utils/numberUtils';
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
-
-interface ITokensData {
-  tokenA: ITokenData;
-  tokenB: ITokenData;
-  [key: string]: ITokenData;
-}
 
 const Create = () => {
   const contextValue = useContext(GlobalContext);

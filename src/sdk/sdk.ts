@@ -6,7 +6,7 @@ import {
   TransactionReceipt,
 } from '@hashgraph/sdk';
 import Hashconnect from '../connectors/hashconnect';
-import { ICreatePairData } from '../interfaces/comon';
+import { ICreatePairData } from '../interfaces/tokens';
 import { addressToId, idToAddress } from '../utils/tokenUtils';
 import { formatStringToBigNumberEthersWei, formatStringToBigNumberWei } from '../utils/numberUtils';
 
@@ -348,6 +348,7 @@ class SDK {
 
     return responseData;
   }
+
   async removeLiquidity(
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
@@ -472,6 +473,7 @@ class SDK {
 
     return responseData;
   }
+
   async swapTokensForExactTokens(
     hashconnectConnectorInstance: Hashconnect,
     userId: string,

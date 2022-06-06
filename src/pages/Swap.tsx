@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
-import { ITokenData, ISwapTokenData, IPairData, TokenType } from '../interfaces/tokens';
+import {
+  ITokenData,
+  ISwapTokenData,
+  IPairData,
+  TokenType,
+  ITokensData,
+} from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
 import Button from '../components/Button';
@@ -13,12 +19,6 @@ import errorMessages from '../content/errors';
 import { addressToId, idToAddress, NATIVE_TOKEN } from '../utils/tokenUtils';
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
-
-interface ITokensData {
-  tokenA: ITokenData;
-  tokenB: ITokenData;
-  [key: string]: ITokenData;
-}
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
