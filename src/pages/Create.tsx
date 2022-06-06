@@ -1,76 +1,74 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
-import { ITokenData, TokenType } from '../interfaces/tokens';
+import {
+  ITokenData,
+  TokenType,
+  IPairData,
+  ICreatePairData,
+  ITokensData,
+} from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
-import usePools from '../hooks/usePools';
 
 import Button from '../components/Button';
 import Modal from '../components/Modal';
 import ModalSearchContent from '../components/Modals/ModalSearchContent';
 import WalletBalance from '../components/WalletBalance';
-import { ICreatePairData } from '../interfaces/comon';
-import { IPairData } from '../interfaces/tokens';
 
 import errorMessages from '../content/errors';
 import { idToAddress } from '../utils/tokenUtils';
 import { formatStringToBigNumberEthersWei } from '../utils/numberUtils';
 import { getConnectedWallet } from './Helpers';
-
-interface ITokensData {
-  tokenA: ITokenData;
-  tokenB: ITokenData;
-  [key: string]: ITokenData;
-}
-interface ITokensPairData {
-  tokenA: IPairData[];
-  tokenB: IPairData[];
-}
+import usePools from '../hooks/usePools';
 
 const Create = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
 
-  const { pools: poolsData } = usePools({
-    fetchPolicy: 'network-only',
-    pollInterval: 10000,
-  });
-
+  // State for modals
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
 
-  const [isProvideLoading, setProvideLoading] = useState(false);
-
+  // State for token inputs
   const [tokensData, setTokensData] = useState<ITokensData>({
     tokenA: {} as ITokenData,
     tokenB: {} as ITokenData,
   });
 
-  const [pairsData, setPairsData] = useState<ITokensPairData>({
-    tokenA: [],
-    tokenB: [],
+  // State for pools
+  const { pools: poolsData } = usePools({
+    fetchPolicy: 'network-only',
+    pollInterval: 10000,
   });
 
-  const [poolData, setPoolData] = useState<IPairData>();
-
-  const [createPairData, setCreatePairData] = useState<ICreatePairData>({
+  const initialCreateData: ICreatePairData = {
     tokenAAmount: '0',
     tokenBAmount: '0',
     tokenAId: '',
     tokenBId: '',
     tokenADecimals: 18,
     tokenBDecimals: 18,
-  });
+  };
 
+  // State for Create/Provide
+  const [createPairData, setCreatePairData] = useState<ICreatePairData>(initialCreateData);
+
+  // State for approved
   const [approved, setApproved] = useState({
     tokenA: false,
     tokenB: false,
   });
 
+  // State for common pool data
+  const [selectedPoolData, setSelectedPoolData] = useState<IPairData>({} as IPairData);
+
+  // Additional states for Providing/Creating pairs
+  const [isProvideLoading, setProvideLoading] = useState(false);
   const [readyToProvide, setReadyToProvide] = useState(false);
   const [tokensInSamePool, setTokensInSamePool] = useState(false);
   const [provideNative, setProvideNative] = useState(false);
 
+  // State for general error
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -82,23 +80,23 @@ const Create = () => {
       : (process.env.REACT_APP_WHBAR_ADDRESS as string);
 
     if (tokensInSamePool) {
-      const isInputAddressFirstInPool = inputTokenAddress === poolData?.token0;
+      const isInputAddressFirstInPool = inputTokenAddress === selectedPoolData?.token0;
 
       const inputTokenAmount = isInputAddressFirstInPool
-        ? (poolData?.token0Amount as string)
-        : (poolData?.token1Amount as string);
+        ? (selectedPoolData?.token0Amount as string)
+        : (selectedPoolData?.token1Amount as string);
 
       const calculatedTokenAmount = isInputAddressFirstInPool
-        ? (poolData?.token1Amount as string)
-        : (poolData?.token0Amount as string);
+        ? (selectedPoolData?.token1Amount as string)
+        : (selectedPoolData?.token0Amount as string);
 
       const inputTokenDecimals = isInputAddressFirstInPool
-        ? poolData?.token0Decimals
-        : poolData?.token1Decimals;
+        ? selectedPoolData?.token0Decimals
+        : selectedPoolData?.token1Decimals;
 
       const calculatedTokenDecimals = isInputAddressFirstInPool
-        ? poolData?.token1Decimals
-        : poolData?.token0Decimals;
+        ? selectedPoolData?.token1Decimals
+        : selectedPoolData?.token0Decimals;
 
       const token0AmountBN = hethers.BigNumber.from(inputTokenAmount);
       const token1AmountBN = hethers.BigNumber.from(calculatedTokenAmount);
@@ -169,11 +167,6 @@ const Create = () => {
         setTokensData({
           tokenA: {} as ITokenData,
           tokenB: {} as ITokenData,
-        });
-
-        setPairsData({
-          tokenA: [],
-          tokenB: [],
         });
 
         setCreatePairData({
@@ -271,11 +264,11 @@ const Create = () => {
         })) ||
       [];
 
-    setPoolData(selectedPoolData[0]);
+    setSelectedPoolData(selectedPoolData[0]);
 
     setProvideNative(provideNative);
     setTokensInSamePool(selectedPoolData && selectedPoolData.length !== 0);
-  }, [pairsData, tokensData, poolsData]);
+  }, [tokensData, poolsData]);
 
   useEffect(() => {
     let isReady = true;
@@ -348,7 +341,6 @@ const Create = () => {
                 modalTitle="Select token"
                 tokenFieldId="tokenA"
                 setTokensData={setTokensData}
-                setPairsData={setPairsData}
                 closeModal={() => setShowModalA(false)}
               />
             </Modal>
@@ -400,7 +392,6 @@ const Create = () => {
                 modalTitle="Select token"
                 tokenFieldId="tokenB"
                 setTokensData={setTokensData}
-                setPairsData={setPairsData}
                 closeModal={() => setShowModalB(false)}
               />
             </Modal>
@@ -447,14 +438,14 @@ const Create = () => {
         ) : null}
 
         <div className="mt-5 d-flex justify-content-center">
-          {tokensData.tokenA.hederaId && !approved.tokenA ? (
+          {tokensData.tokenA.hederaId && !approved.tokenA && createPairData.tokenAAmount !== '0' ? (
             <Button
               onClick={() => handleApproveClick('tokenA')}
               className="mx-2"
             >{`Approve ${tokensData.tokenA.symbol}`}</Button>
           ) : null}
 
-          {tokensData.tokenB.hederaId && !approved.tokenB ? (
+          {tokensData.tokenB.hederaId && !approved.tokenB && createPairData.tokenBAmount !== '0' ? (
             <Button
               onClick={() => handleApproveClick('tokenB')}
               className="mx-2"

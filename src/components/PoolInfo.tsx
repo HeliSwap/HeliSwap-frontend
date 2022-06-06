@@ -188,7 +188,7 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
         const resultStr = hethers.utils.formatUnits(resultBN, 18);
         const resultNum = Number(resultStr);
 
-        setLpApproved(resultNum > 10000);
+        setLpApproved(resultNum >= Number(removeLpData.tokensLpAmount));
       }
     };
 
@@ -200,7 +200,7 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
           pairData.token1 === process.env.REACT_APP_WHBAR_ADDRESS,
       );
     }
-  }, [pairData, connectedWallet, sdk, userId]);
+  }, [pairData, connectedWallet, removeLpData, sdk, userId]);
 
   const canRemove = lpApproved && removeLpData.tokenInAddress !== '';
   const { reserve0ShareStr, reserve1ShareStr } = calculateReserves(
@@ -279,18 +279,20 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
               <Button className="ms-3" onClick={handleCalculateButtonClick}>
                 Calculate
               </Button>
-              {hasWrappedHBAR ? (
-                <div>
-                  <span>Receive HBAR</span>
-                  <input
-                    type="checkbox"
-                    checked={removeNative}
-                    onClick={() => setRemoveNative(!removeNative)}
-                  ></input>
-                </div>
-              ) : null}
             </div>
             <div className="mt-4">
+              {hasWrappedHBAR ? (
+                <div>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={removeNative}
+                      onClick={() => setRemoveNative(!removeNative)}
+                    />
+                    <span className="ms-2">Receive HBAR</span>
+                  </label>
+                </div>
+              ) : null}
               You will receive:
               <div className="d-flex justify-content-between align-items-center mt-2">
                 <p>Pooled {pairData.token0Symbol}:</p>

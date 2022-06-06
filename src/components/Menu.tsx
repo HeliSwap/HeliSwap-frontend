@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Menu = () => {
+  const isLocalDev = process.env.REACT_APP_LOCAL_DEV === 'true';
+
   return (
     <div className="d-flex justify-content-between align-items-center">
       <Link className="link-menu" to="/">
@@ -19,9 +21,11 @@ const Menu = () => {
       <Link className="link-menu" to="/tokens">
         Tokens
       </Link>
-      <Link className="link-menu" to="/helpers">
-        Helpers
-      </Link>
+      {isLocalDev ? (
+        <Link className="link-menu" to="/helpers">
+          Helpers
+        </Link>
+      ) : null}
     </div>
   );
 };
