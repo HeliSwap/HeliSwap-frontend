@@ -19,6 +19,7 @@ interface ITokensData {
   tokenB: ITokenData;
   [key: string]: ITokenData;
 }
+
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;

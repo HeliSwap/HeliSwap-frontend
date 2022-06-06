@@ -13,7 +13,6 @@ interface IModalProps {
   modalTitle?: string;
   closeModal: () => void;
   setTokensData: (prev: any) => void;
-  setPairsData?: (prev: any) => void;
   tokenFieldId: string;
   defaultToken?: ITokenData;
 }
@@ -21,7 +20,6 @@ interface IModalProps {
 const ModalSearchContent = ({
   closeModal,
   setTokensData,
-  setPairsData,
   tokenFieldId,
   modalTitle,
   defaultToken,
@@ -95,11 +93,6 @@ const ModalSearchContent = ({
         ...prev,
         [tokenFieldId]: currentToken,
       }));
-
-      setPairsData &&
-        dataPBT &&
-        dataPBT.poolsByToken.length > 0 &&
-        setPairsData((prev: any) => ({ ...prev, [tokenFieldId]: dataPBT.poolsByToken }));
     }
 
     resetModalState();

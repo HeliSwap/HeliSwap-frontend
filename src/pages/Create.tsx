@@ -1,29 +1,24 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
-import { ITokenData, TokenType } from '../interfaces/tokens';
+import { ITokenData, TokenType, IPairData } from '../interfaces/tokens';
+import { ICreatePairData } from '../interfaces/comon';
 import { GlobalContext } from '../providers/Global';
-import usePools from '../hooks/usePools';
 
 import Button from '../components/Button';
 import Modal from '../components/Modal';
 import ModalSearchContent from '../components/Modals/ModalSearchContent';
 import WalletBalance from '../components/WalletBalance';
-import { ICreatePairData } from '../interfaces/comon';
-import { IPairData } from '../interfaces/tokens';
 
 import errorMessages from '../content/errors';
 import { idToAddress } from '../utils/tokenUtils';
 import { formatStringToBigNumberEthersWei } from '../utils/numberUtils';
 import { getConnectedWallet } from './Helpers';
+import usePools from '../hooks/usePools';
 
 interface ITokensData {
   tokenA: ITokenData;
   tokenB: ITokenData;
   [key: string]: ITokenData;
-}
-interface ITokensPairData {
-  tokenA: IPairData[];
-  tokenB: IPairData[];
 }
 
 const Create = () => {
@@ -44,11 +39,6 @@ const Create = () => {
   const [tokensData, setTokensData] = useState<ITokensData>({
     tokenA: {} as ITokenData,
     tokenB: {} as ITokenData,
-  });
-
-  const [pairsData, setPairsData] = useState<ITokensPairData>({
-    tokenA: [],
-    tokenB: [],
   });
 
   const [poolData, setPoolData] = useState<IPairData>();
@@ -171,11 +161,6 @@ const Create = () => {
           tokenB: {} as ITokenData,
         });
 
-        setPairsData({
-          tokenA: [],
-          tokenB: [],
-        });
-
         setCreatePairData({
           tokenAAmount: '0',
           tokenBAmount: '0',
@@ -275,7 +260,7 @@ const Create = () => {
 
     setProvideNative(provideNative);
     setTokensInSamePool(selectedPoolData && selectedPoolData.length !== 0);
-  }, [pairsData, tokensData, poolsData]);
+  }, [tokensData, poolsData]);
 
   useEffect(() => {
     let isReady = true;
@@ -348,7 +333,6 @@ const Create = () => {
                 modalTitle="Select token"
                 tokenFieldId="tokenA"
                 setTokensData={setTokensData}
-                setPairsData={setPairsData}
                 closeModal={() => setShowModalA(false)}
               />
             </Modal>
@@ -400,7 +384,6 @@ const Create = () => {
                 modalTitle="Select token"
                 tokenFieldId="tokenB"
                 setTokensData={setTokensData}
-                setPairsData={setPairsData}
                 closeModal={() => setShowModalB(false)}
               />
             </Modal>
