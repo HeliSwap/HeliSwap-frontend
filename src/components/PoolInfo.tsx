@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { hethers, providers } from '@hashgraph/hethers';
+import { hethers } from '@hashgraph/hethers';
 import { IPairData } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 

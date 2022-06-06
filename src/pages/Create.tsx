@@ -16,7 +16,6 @@ import { formatStringToBigNumberEthersWei } from '../utils/numberUtils';
 import { getConnectedWallet } from './Helpers';
 import { useQuery } from '@apollo/client';
 import { GET_POOLS } from '../GraphQL/Queries';
-import BigNumber from 'bignumber.js';
 
 interface ITokensData {
   tokenA: ITokenData;
@@ -33,7 +32,7 @@ const Create = () => {
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
 
-  const { loading: loadingPools, data: dataPool } = useQuery(GET_POOLS);
+  const { data: dataPool } = useQuery(GET_POOLS);
 
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
