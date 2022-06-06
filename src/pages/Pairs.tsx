@@ -5,6 +5,8 @@ import usePools from '../hooks/usePools';
 import { formatStringToPrice } from '../utils/numberUtils';
 
 const Pairs = () => {
+  const isLocalDev = process.env.REACT_APP_LOCAL_DEV === 'true';
+
   const { pools, error, loading } = usePools({
     fetchPolicy: 'network-only',
     pollInterval: 10000,
@@ -42,9 +44,13 @@ const Pairs = () => {
                 <div className="d-flex align-items-center">
                   {formatIcons([item.token0Symbol, item.token1Symbol])}
                   <span className="ms-3">
-                    <Link className="link-primary" to={`${item.pairAddress}`}>
-                      {item.pairSymbol}
-                    </Link>
+                    {isLocalDev ? (
+                      <Link className="link-primary" to={`${item.pairAddress}`}>
+                        {item.pairSymbol}
+                      </Link>
+                    ) : (
+                      <p>{item.pairSymbol}</p>
+                    )}
                   </span>
                 </div>
                 <div className="text-end">{formatStringToPrice(item.tvl)}</div>
