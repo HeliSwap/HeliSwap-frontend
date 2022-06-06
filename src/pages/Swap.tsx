@@ -168,7 +168,24 @@ const Swap = () => {
       if (tokenInExactAmount) {
         if (tokenInIsNative) {
           //swapExactETHForToken
+          receipt = await sdk.swapExactHBARForTokens(
+            hashconnectConnectorInstance,
+            userId,
+            tokenIdOut,
+            amountIn,
+            amountOut,
+            decOut,
+          );
         } else if (tokenOutIsNative) {
+          receipt = await sdk.swapExactTokensForHBAR(
+            hashconnectConnectorInstance,
+            userId,
+            tokenIdIn,
+            amountIn,
+            amountOut,
+            decIn,
+            decOut,
+          );
           //swapExactTokenForETH
         } else {
           receipt = await sdk.swapExactTokensForTokens(

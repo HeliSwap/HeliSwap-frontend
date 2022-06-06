@@ -473,6 +473,138 @@ class SDK {
 
     return responseData;
   }
+  async swapExactHBARForTokens(
+    hashconnectConnectorInstance: Hashconnect,
+    userId: string,
+    tokenOutId: string,
+    amountIn: string,
+    amountOut: any,
+    decOut: number,
+  ) {
+    const tokenDecimals = decOut;
+    const tokenAmountString = amountOut;
+    const tokenAddress = idToAddress(tokenOutId);
+
+    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
+    const HBARAmountString = amountIn;
+
+    const HBARAmount = formatStringToBigNumberWei(HBARAmountString, 0);
+    const tokenAmount = formatStringToBigNumberWei(tokenAmountString, tokenDecimals);
+
+    const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
+
+    const userAddress = idToAddress(userId);
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
+
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(routerContractAddress))
+
+      //Set the gas for the contract call
+      .setGas(3000000)
+      //Amount of HBAR we want to provide
+      .setPayableAmount(HBARAmount)
+
+      //Set the contract function to call
+      .setFunction(
+        'swapExactETHForTokens',
+        new ContractFunctionParameters()
+          .addUint256(tokenAmount) //amountMinOut
+          .addAddressArray([WHBARAddress, tokenAddress])
+          .addAddress(userAddress)
+          .addUint256(deadline),
+      );
+
+    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
+      trans,
+      userId as string,
+    );
+
+    const response = await hashconnectConnectorInstance?.sendTransaction(
+      transactionBytes as Uint8Array,
+      userId as string,
+      false,
+    );
+
+    const responseData: any = {
+      response,
+      receipt: null,
+    };
+
+    if (response?.success) {
+      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
+    }
+
+    return responseData;
+  }
+
+  async swapExactTokensForHBAR(
+    hashconnectConnectorInstance: Hashconnect,
+    userId: string,
+    tokenInId: string,
+    amountIn: string,
+    amountHBAROut: any,
+    decIn: number,
+    WHBARDec: number,
+  ) {
+    const tokenDecimals = decIn;
+    const tokenAmountString = amountIn;
+    const tokenAddress = idToAddress(tokenInId);
+
+    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
+    const HBARAmountString = amountHBAROut;
+
+    const HBARAmount = formatStringToBigNumberWei(HBARAmountString, WHBARDec);
+    const tokenAmount = formatStringToBigNumberWei(tokenAmountString, tokenDecimals);
+
+    const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
+
+    const userAddress = idToAddress(userId);
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
+
+    // function swapExactTokensForETH(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
+
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(routerContractAddress))
+
+      //Set the gas for the contract call
+      .setGas(3000000)
+      //Amount of HBAR we want to provide
+
+      //Set the contract function to call
+      .setFunction(
+        'swapExactTokensForETH',
+        new ContractFunctionParameters()
+          .addUint256(tokenAmount) //amountIn
+          .addUint256(HBARAmount) //amountHBAROutMin
+          .addAddressArray([tokenAddress, WHBARAddress])
+          .addAddress(userAddress)
+          .addUint256(deadline),
+      );
+
+    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
+      trans,
+      userId as string,
+    );
+
+    const response = await hashconnectConnectorInstance?.sendTransaction(
+      transactionBytes as Uint8Array,
+      userId as string,
+      false,
+    );
+
+    const responseData: any = {
+      response,
+      receipt: null,
+    };
+
+    if (response?.success) {
+      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
+    }
+
+    return responseData;
+  }
 
   async swapTokensForExactTokens(
     hashconnectConnectorInstance: Hashconnect,
