@@ -25,41 +25,50 @@ const Create = () => {
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
 
-  const { pools: poolsData } = usePools({
-    fetchPolicy: 'network-only',
-    pollInterval: 10000,
-  });
-
+  // State for modals
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
 
-  const [isProvideLoading, setProvideLoading] = useState(false);
-
+  // State for token inputs
   const [tokensData, setTokensData] = useState<ITokensData>({
     tokenA: {} as ITokenData,
     tokenB: {} as ITokenData,
   });
 
-  const [poolData, setPoolData] = useState<IPairData>();
+  // State for pools
+  const { pools: poolsData } = usePools({
+    fetchPolicy: 'network-only',
+    pollInterval: 10000,
+  });
 
-  const [createPairData, setCreatePairData] = useState<ICreatePairData>({
+  const initialCreateData: ICreatePairData = {
     tokenAAmount: '0',
     tokenBAmount: '0',
     tokenAId: '',
     tokenBId: '',
     tokenADecimals: 18,
     tokenBDecimals: 18,
-  });
+  };
 
+  // State for Create/Provide
+  const [createPairData, setCreatePairData] = useState<ICreatePairData>(initialCreateData);
+
+  // State for approved
   const [approved, setApproved] = useState({
     tokenA: false,
     tokenB: false,
   });
 
+  // State for common pool data
+  const [selectedPoolData, setSelectedPoolData] = useState<IPairData>({} as IPairData);
+
+  // Additional states for Providing/Creating pairs
+  const [isProvideLoading, setProvideLoading] = useState(false);
   const [readyToProvide, setReadyToProvide] = useState(false);
   const [tokensInSamePool, setTokensInSamePool] = useState(false);
   const [provideNative, setProvideNative] = useState(false);
 
+  // State for general error
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -71,23 +80,23 @@ const Create = () => {
       : (process.env.REACT_APP_WHBAR_ADDRESS as string);
 
     if (tokensInSamePool) {
-      const isInputAddressFirstInPool = inputTokenAddress === poolData?.token0;
+      const isInputAddressFirstInPool = inputTokenAddress === selectedPoolData?.token0;
 
       const inputTokenAmount = isInputAddressFirstInPool
-        ? (poolData?.token0Amount as string)
-        : (poolData?.token1Amount as string);
+        ? (selectedPoolData?.token0Amount as string)
+        : (selectedPoolData?.token1Amount as string);
 
       const calculatedTokenAmount = isInputAddressFirstInPool
-        ? (poolData?.token1Amount as string)
-        : (poolData?.token0Amount as string);
+        ? (selectedPoolData?.token1Amount as string)
+        : (selectedPoolData?.token0Amount as string);
 
       const inputTokenDecimals = isInputAddressFirstInPool
-        ? poolData?.token0Decimals
-        : poolData?.token1Decimals;
+        ? selectedPoolData?.token0Decimals
+        : selectedPoolData?.token1Decimals;
 
       const calculatedTokenDecimals = isInputAddressFirstInPool
-        ? poolData?.token1Decimals
-        : poolData?.token0Decimals;
+        ? selectedPoolData?.token1Decimals
+        : selectedPoolData?.token0Decimals;
 
       const token0AmountBN = hethers.BigNumber.from(inputTokenAmount);
       const token1AmountBN = hethers.BigNumber.from(calculatedTokenAmount);
@@ -255,7 +264,7 @@ const Create = () => {
         })) ||
       [];
 
-    setPoolData(selectedPoolData[0]);
+    setSelectedPoolData(selectedPoolData[0]);
 
     setProvideNative(provideNative);
     setTokensInSamePool(selectedPoolData && selectedPoolData.length !== 0);

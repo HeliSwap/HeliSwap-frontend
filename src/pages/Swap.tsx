@@ -25,12 +25,20 @@ const Swap = () => {
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
 
+  // State for modals
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
 
+  // State for token inputs
   const [tokensData, setTokensData] = useState<ITokensData>({
     tokenA: NATIVE_TOKEN,
     tokenB: {} as ITokenData,
+  });
+
+  // State for pools
+  const { pools: poolsData, loading: loadingPools } = usePools({
+    fetchPolicy: 'network-only',
+    pollInterval: 10000,
   });
 
   const initialSwapData: ISwapTokenData = {
@@ -42,21 +50,21 @@ const Swap = () => {
     tokenOutDecimals: 0,
   };
 
-  const { pools: poolsData, loading: loadingPools } = usePools({
-    fetchPolicy: 'network-only',
-    pollInterval: 10000,
-  });
-
-  const [selectedPoolData, setSelectedPoolData] = useState<IPairData>({} as IPairData);
-
-  const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-
+  // State for Swap
   const [swapData, setSwapData] = useState(initialSwapData);
 
+  // State for approved
   const [approved, setApproved] = useState(true);
 
+  // State for common pool data
+  const [selectedPoolData, setSelectedPoolData] = useState<IPairData>({} as IPairData);
+
+  // Additional states for Swaps
   const [tokenInExactAmount, setTokenInExactAmount] = useState(true);
+
+  // State for general error
+  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
