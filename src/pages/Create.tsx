@@ -447,14 +447,14 @@ const Create = () => {
         ) : null}
 
         <div className="mt-5 d-flex justify-content-center">
-          {tokensData.tokenA.hederaId && !approved.tokenA ? (
+          {tokensData.tokenA.hederaId && !approved.tokenA && createPairData.tokenAAmount !== '0' ? (
             <Button
               onClick={() => handleApproveClick('tokenA')}
               className="mx-2"
             >{`Approve ${tokensData.tokenA.symbol}`}</Button>
           ) : null}
 
-          {tokensData.tokenB.hederaId && !approved.tokenB ? (
+          {tokensData.tokenB.hederaId && !approved.tokenB && createPairData.tokenBAmount !== '0' ? (
             <Button
               onClick={() => handleApproveClick('tokenB')}
               className="mx-2"
