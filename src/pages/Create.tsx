@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import { ITokenData, TokenType } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
+import usePools from '../hooks/usePools';
 
 import Button from '../components/Button';
 import Modal from '../components/Modal';
@@ -14,8 +15,6 @@ import errorMessages from '../content/errors';
 import { idToAddress } from '../utils/tokenUtils';
 import { formatStringToBigNumberEthersWei } from '../utils/numberUtils';
 import { getConnectedWallet } from './Helpers';
-import { useQuery } from '@apollo/client';
-import { GET_POOLS } from '../GraphQL/Queries';
 
 interface ITokensData {
   tokenA: ITokenData;
@@ -32,7 +31,10 @@ const Create = () => {
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
 
-  const { data: dataPool } = useQuery(GET_POOLS);
+  const { pools: poolsData } = usePools({
+    fetchPolicy: 'network-only',
+    pollInterval: 10000,
+  });
 
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
@@ -50,7 +52,6 @@ const Create = () => {
   });
 
   const [poolData, setPoolData] = useState<IPairData>();
-  const [poolsData, setPoolsData] = useState<IPairData[]>([]);
 
   const [createPairData, setCreatePairData] = useState<ICreatePairData>({
     tokenAAmount: '0',
@@ -246,28 +247,34 @@ const Create = () => {
     const provideNative = tokenAIsNative || tokenBIsNative;
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
 
-    const selectedPoolData = poolsData.filter((pool: any) => {
-      let poolMatchedBothTokens = false;
+    const selectedPoolData =
+      (poolsData &&
+        poolsData.length > 0 &&
+        poolsData.filter((pool: any) => {
+          let poolMatchedBothTokens = false;
 
-      const poolContainsToken = (tokenAddres: string) => {
-        return pool.token0 === tokenAddres || pool.token1 === tokenAddres;
-      };
+          const poolContainsToken = (tokenAddres: string) => {
+            return pool.token0 === tokenAddres || pool.token1 === tokenAddres;
+          };
 
-      if (provideNative) {
-        poolMatchedBothTokens =
-          poolContainsToken(WHBARAddress) &&
-          (poolContainsToken(tokenA.address) || poolContainsToken(tokenB.address));
-      } else {
-        //Both tokens are in the same pool
-        poolMatchedBothTokens =
-          poolContainsToken(tokenA.address) && poolContainsToken(tokenB.address);
-      }
-      return poolMatchedBothTokens;
-    });
+          if (provideNative) {
+            poolMatchedBothTokens =
+              poolContainsToken(WHBARAddress) &&
+              (poolContainsToken(tokenA.address) || poolContainsToken(tokenB.address));
+          } else {
+            //Both tokens are in the same pool
+            poolMatchedBothTokens =
+              poolContainsToken(tokenA.address) && poolContainsToken(tokenB.address);
+          }
+
+          return poolMatchedBothTokens;
+        })) ||
+      [];
+
     setPoolData(selectedPoolData[0]);
 
     setProvideNative(provideNative);
-    setTokensInSamePool(selectedPoolData.length !== 0);
+    setTokensInSamePool(selectedPoolData && selectedPoolData.length !== 0);
   }, [pairsData, tokensData, poolsData]);
 
   useEffect(() => {
@@ -288,13 +295,6 @@ const Create = () => {
 
     setReadyToProvide(isReady);
   }, [createPairData, provideNative]);
-
-  useEffect(() => {
-    if (dataPool) {
-      const { pools } = dataPool;
-      pools.length > 0 && setPoolsData(pools);
-    }
-  }, [dataPool]);
 
   return (
     <div className="d-flex justify-content-center">
