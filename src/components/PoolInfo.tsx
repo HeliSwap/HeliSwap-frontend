@@ -90,23 +90,26 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
 
     try {
       let responseData;
+
       if (hasWrappedHBAR && removeNative) {
-        const WHBARAmount =
-          pairData.token0 === process.env.REACT_APP_WHBAR_ADDRESS
-            ? removeLpData.tokens0Amount
-            : removeLpData.tokens1Amount;
-        const WHBARDecimals =
-          pairData.token0 === process.env.REACT_APP_WHBAR_ADDRESS
-            ? removeLpData.token0Decimals
-            : removeLpData.token1Decimals;
-        const tokenAmount =
-          pairData.token0 === process.env.REACT_APP_WHBAR_ADDRESS
-            ? removeLpData.tokens1Amount
-            : removeLpData.tokens0Amount;
-        const tokenDecimals =
-          pairData.token0 === process.env.REACT_APP_WHBAR_ADDRESS
-            ? removeLpData.token1Decimals
-            : removeLpData.token0Decimals;
+        const isFirstTokenWHBAR = pairData.token0 === process.env.REACT_APP_WHBAR_ADDRESS;
+
+        const WHBARAmount = isFirstTokenWHBAR
+          ? removeLpData.tokens0Amount
+          : removeLpData.tokens1Amount;
+
+        const WHBARDecimals = isFirstTokenWHBAR
+          ? removeLpData.token0Decimals
+          : removeLpData.token1Decimals;
+
+        const tokenAmount = isFirstTokenWHBAR
+          ? removeLpData.tokens1Amount
+          : removeLpData.tokens0Amount;
+
+        const tokenDecimals = isFirstTokenWHBAR
+          ? removeLpData.token1Decimals
+          : removeLpData.token0Decimals;
+
         responseData = await sdk.removeNativeLiquidity(
           hashconnectConnectorInstance,
           userId,

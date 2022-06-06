@@ -81,22 +81,23 @@ const Create = () => {
       : (process.env.REACT_APP_WHBAR_ADDRESS as string);
 
     if (tokensInSamePool) {
-      const inputTokenAmount =
-        inputTokenAddress === poolData?.token0
-          ? (poolData?.token0Amount as string)
-          : (poolData?.token1Amount as string);
-      const calculatedTokenAmount =
-        inputTokenAddress === poolData?.token0
-          ? (poolData?.token1Amount as string)
-          : (poolData?.token0Amount as string);
-      const inputTokenDecimals =
-        inputTokenAddress === poolData?.token0
-          ? poolData?.token0Decimals
-          : poolData?.token1Decimals;
-      const calculatedTokenDecimals =
-        inputTokenAddress === poolData?.token0
-          ? poolData?.token1Decimals
-          : poolData?.token0Decimals;
+      const isInputAddressFirstInPool = inputTokenAddress === poolData?.token0;
+
+      const inputTokenAmount = isInputAddressFirstInPool
+        ? (poolData?.token0Amount as string)
+        : (poolData?.token1Amount as string);
+
+      const calculatedTokenAmount = isInputAddressFirstInPool
+        ? (poolData?.token1Amount as string)
+        : (poolData?.token0Amount as string);
+
+      const inputTokenDecimals = isInputAddressFirstInPool
+        ? poolData?.token0Decimals
+        : poolData?.token1Decimals;
+
+      const calculatedTokenDecimals = isInputAddressFirstInPool
+        ? poolData?.token1Decimals
+        : poolData?.token0Decimals;
 
       const token0AmountBN = hethers.BigNumber.from(inputTokenAmount);
       const token1AmountBN = hethers.BigNumber.from(calculatedTokenAmount);
