@@ -264,7 +264,7 @@ const Create = () => {
         })) ||
       [];
 
-    setSelectedPoolData(selectedPoolData[0]);
+    setSelectedPoolData(selectedPoolData[0] || {});
 
     setProvideNative(provideNative);
     setTokensInSamePool(selectedPoolData && selectedPoolData.length !== 0);

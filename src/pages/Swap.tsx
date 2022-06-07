@@ -29,14 +29,20 @@ const Swap = () => {
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
 
-  // State for token inputs
-  const [tokensData, setTokensData] = useState<ITokensData>({
+  const initialTokensData: ITokensData = {
     tokenA: NATIVE_TOKEN,
     tokenB: {} as ITokenData,
-  });
+  };
+
+  // State for token inputs
+  const [tokensData, setTokensData] = useState<ITokensData>(initialTokensData);
 
   // State for pools
-  const { pools: poolsData, loading: loadingPools } = usePools({
+  const {
+    pools: poolsData,
+    loading: loadingPools,
+    refetch,
+  } = usePools({
     fetchPolicy: 'network-only',
     pollInterval: 10000,
   });
@@ -76,10 +82,10 @@ const Swap = () => {
 
     const { amountIn, amountOut } = tokenData;
     const { tokenIdIn, tokenIdOut } = swapData;
-    const { token0Amount, token1Amount, token0Decimals, token1Decimals } = selectedPoolData;
 
     if (Object.keys(selectedPoolData).length === 0) return;
 
+    const { token0Amount, token1Amount, token0Decimals, token1Decimals } = selectedPoolData;
     const tokenInFirstAtPool = addressToId(selectedPoolData.token0) === tokenIdIn;
     const tokenOutFirstAtPool = addressToId(selectedPoolData.token0) === tokenIdOut;
 
@@ -184,6 +190,10 @@ const Swap = () => {
         setErrorMessage(error);
       } else {
         setSwapData(initialSwapData);
+        setSelectedPoolData({} as IPairData);
+        setTokensData(initialTokensData);
+        setApproved(false);
+        refetch();
       }
     } catch (err) {
       console.error(`[Error on swap]: ${err}`);
@@ -193,6 +203,7 @@ const Swap = () => {
   };
 
   useEffect(() => {
+    refetch();
     if (swapData.tokenIdIn && swapData.tokenIdOut && poolsData && poolsData.length > 0) {
       const tokenInAddress = idToAddress(swapData.tokenIdIn);
       const tokenOutAddress = idToAddress(swapData.tokenIdOut);
@@ -205,11 +216,11 @@ const Swap = () => {
         );
       });
 
-      setSelectedPoolData(selectedPoolData[0]);
+      setSelectedPoolData(selectedPoolData[0] || {});
     } else {
       setSelectedPoolData({} as IPairData);
     }
-  }, [poolsData, swapData]);
+  }, [poolsData, swapData, refetch]);
 
   useEffect(() => {
     const getApproved = async (tokenId: string) => {
