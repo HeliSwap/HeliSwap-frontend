@@ -7,7 +7,7 @@ import { GET_POOLS } from '../GraphQL/Queries';
 const usePools = (useQueryOptions: QueryHookOptions = {}) => {
   const [pools, setPools] = useState<IPairData[]>();
 
-  const { data, loading, error } = useQuery(GET_POOLS, useQueryOptions);
+  const { data, loading, error, refetch } = useQuery(GET_POOLS, useQueryOptions);
 
   useEffect(() => {
     if (data) {
@@ -19,7 +19,7 @@ const usePools = (useQueryOptions: QueryHookOptions = {}) => {
     }
   }, [data]);
 
-  return { pools, loading, error };
+  return { pools, loading, error, refetch };
 };
 
 export default usePools;

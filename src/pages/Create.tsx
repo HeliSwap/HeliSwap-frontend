@@ -202,13 +202,33 @@ const Create = () => {
 
         const resultStr = hethers.utils.formatUnits(resultBN, 18);
         const resultNum = Number(resultStr);
+        const key = `${index}Amount`;
 
-        setApproved(prev => ({ ...prev, [index]: resultNum >= 1000 }));
+        setApproved(prev => ({
+          ...prev,
+          [index]: resultNum >= Number(createPairData[key as keyof ICreatePairData]),
+        }));
       } else {
         setApproved(prev => ({ ...prev, [index]: false }));
       }
     };
 
+    const { tokenA, tokenB } = tokensData;
+
+    if (tokenA.type === TokenType.HBAR) {
+      setApproved(prev => ({ ...prev, tokenA: true }));
+    } else if (tokenA.type === TokenType.ERC20) {
+      tokenA.hederaId && getApproved(tokenA.hederaId, 'tokenA');
+    }
+
+    if (tokenB.type === TokenType.HBAR) {
+      setApproved(prev => ({ ...prev, tokenB: true }));
+    } else if (tokenB.type === TokenType.ERC20) {
+      tokenB.hederaId && getApproved(tokenB.hederaId, 'tokenB');
+    }
+  }, [tokensData, sdk, userId, createPairData]);
+
+  useEffect(() => {
     const { tokenA, tokenB } = tokensData;
     const newPairData = {
       tokenAId: tokenA.hederaId,
@@ -216,21 +236,8 @@ const Create = () => {
       tokenADecimals: tokenA.decimals,
       tokenBDecimals: tokenB.decimals,
     };
-
-    if (tokenA.type === TokenType.HBAR) {
-      setApproved(prev => ({ ...prev, tokenA: true }));
-    } else {
-      tokenA.hederaId && getApproved(tokenA.hederaId, 'tokenA');
-    }
-
-    if (tokenB.type === TokenType.HBAR) {
-      setApproved(prev => ({ ...prev, tokenB: true }));
-    } else {
-      tokenB.hederaId && getApproved(tokenB.hederaId, 'tokenB');
-    }
-
     setCreatePairData(prev => ({ ...prev, ...newPairData }));
-  }, [tokensData, sdk, userId]);
+  }, [tokensData]);
 
   useEffect(() => {
     const { tokenA, tokenB } = tokensData;
@@ -264,7 +271,7 @@ const Create = () => {
         })) ||
       [];
 
-    setSelectedPoolData(selectedPoolData[0]);
+    setSelectedPoolData(selectedPoolData[0] || {});
 
     setProvideNative(provideNative);
     setTokensInSamePool(selectedPoolData && selectedPoolData.length !== 0);
@@ -406,6 +413,28 @@ const Create = () => {
             {tokensInSamePool ? (
               <div>
                 <p>Prices and pool share</p>
+                <div className="mt-3 d-flex justify-content-around rounded border border-success p-2">
+                  <div className="text-center">
+                    <p>
+                      <span className="text-title">
+                        {Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount)}
+                      </span>
+                    </p>
+                    <p>
+                      {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p>
+                      <span className="text-title">
+                        {Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount)}
+                      </span>
+                    </p>
+                    <p>
+                      {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}
+                    </p>
+                  </div>
+                </div>
               </div>
             ) : (
               <div>

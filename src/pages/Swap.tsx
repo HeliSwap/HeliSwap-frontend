@@ -29,14 +29,20 @@ const Swap = () => {
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
 
-  // State for token inputs
-  const [tokensData, setTokensData] = useState<ITokensData>({
+  const initialTokensData: ITokensData = {
     tokenA: NATIVE_TOKEN,
     tokenB: {} as ITokenData,
-  });
+  };
+
+  // State for token inputs
+  const [tokensData, setTokensData] = useState<ITokensData>(initialTokensData);
 
   // State for pools
-  const { pools: poolsData, loading: loadingPools } = usePools({
+  const {
+    pools: poolsData,
+    loading: loadingPools,
+    refetch,
+  } = usePools({
     fetchPolicy: 'network-only',
     pollInterval: 10000,
   });
@@ -44,8 +50,8 @@ const Swap = () => {
   const initialSwapData: ISwapTokenData = {
     tokenIdIn: '',
     tokenIdOut: '',
-    amountIn: '',
-    amountOut: '',
+    amountIn: '0',
+    amountOut: '0',
     tokenInDecimals: 0,
     tokenOutDecimals: 0,
   };
@@ -54,12 +60,13 @@ const Swap = () => {
   const [swapData, setSwapData] = useState(initialSwapData);
 
   // State for approved
-  const [approved, setApproved] = useState(true);
+  const [approved, setApproved] = useState(false);
 
   // State for common pool data
   const [selectedPoolData, setSelectedPoolData] = useState<IPairData>({} as IPairData);
 
   // Additional states for Swaps
+  const [readyToSwap, setReadyToSwap] = useState(false);
   const [tokenInExactAmount, setTokenInExactAmount] = useState(true);
 
   // State for general error
@@ -75,16 +82,16 @@ const Swap = () => {
 
     const { amountIn, amountOut } = tokenData;
     const { tokenIdIn, tokenIdOut } = swapData;
-    const { token0Amount, token1Amount, token0Decimals, token1Decimals } = selectedPoolData;
 
     if (Object.keys(selectedPoolData).length === 0) return;
 
+    const { token0Amount, token1Amount, token0Decimals, token1Decimals } = selectedPoolData;
     const tokenInFirstAtPool = addressToId(selectedPoolData.token0) === tokenIdIn;
     const tokenOutFirstAtPool = addressToId(selectedPoolData.token0) === tokenIdOut;
 
     let resIn, resOut, decIn, decOut;
 
-    if (tokenIdIn && amountIn) {
+    if (tokenIdIn && amountIn !== '0') {
       resIn = tokenInFirstAtPool ? token0Amount : token1Amount;
       resOut = tokenInFirstAtPool ? token1Amount : token0Amount;
       decIn = tokenInFirstAtPool ? token0Decimals : token1Decimals;
@@ -93,7 +100,7 @@ const Swap = () => {
       const swapAmountOut = sdk.getSwapAmountOut(amountIn, resIn, resOut, decIn, decOut);
       setTokenInExactAmount(true);
       setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
-    } else if (tokenIdOut && amountOut) {
+    } else if (tokenIdOut && amountOut !== '0') {
       resIn = tokenOutFirstAtPool ? token1Amount : token0Amount;
       resOut = tokenOutFirstAtPool ? token0Amount : token1Amount;
       decIn = tokenOutFirstAtPool ? token1Decimals : token0Decimals;
@@ -104,7 +111,7 @@ const Swap = () => {
       setTokenInExactAmount(false);
       setSwapData(prev => ({ ...prev, ...tokenData, amountIn: swapAmountIn.toString() }));
     } else {
-      setSwapData(prev => ({ ...prev, amountIn: '', amountOut: '' }));
+      setSwapData(prev => ({ ...prev, amountIn: '0', amountOut: '0' }));
     }
   };
 
@@ -145,6 +152,9 @@ const Swap = () => {
     const decIn = tokenInSamePool ? token0Decimals : token1Decimals;
     const decOut = tokenInSamePool ? token1Decimals : token0Decimals;
 
+    setError(false);
+    setErrorMessage('');
+
     try {
       let receipt;
       if (tokenInExactAmount) {
@@ -180,6 +190,10 @@ const Swap = () => {
         setErrorMessage(error);
       } else {
         setSwapData(initialSwapData);
+        setSelectedPoolData({} as IPairData);
+        setTokensData(initialTokensData);
+        setApproved(false);
+        refetch();
       }
     } catch (err) {
       console.error(`[Error on swap]: ${err}`);
@@ -189,6 +203,7 @@ const Swap = () => {
   };
 
   useEffect(() => {
+    refetch();
     if (swapData.tokenIdIn && swapData.tokenIdOut && poolsData && poolsData.length > 0) {
       const tokenInAddress = idToAddress(swapData.tokenIdIn);
       const tokenOutAddress = idToAddress(swapData.tokenIdOut);
@@ -201,15 +216,16 @@ const Swap = () => {
         );
       });
 
-      setSelectedPoolData(selectedPoolData[0]);
+      setSelectedPoolData(selectedPoolData[0] || {});
     } else {
       setSelectedPoolData({} as IPairData);
     }
-  }, [poolsData, swapData]);
+  }, [poolsData, swapData, refetch]);
 
   useEffect(() => {
     const getApproved = async (tokenId: string) => {
       const connectedWallet = getConnectedWallet();
+
       if (connectedWallet) {
         const tokenAddress = idToAddress(tokenId);
         const userAddress = idToAddress(userId);
@@ -220,17 +236,17 @@ const Swap = () => {
           connectedWallet,
         );
 
-        const resultStr = hethers.utils.formatUnits(resultBN, 18);
+        const resultStr = hethers.utils.formatUnits(resultBN, swapData.tokenInDecimals);
         const resultNum = Number(resultStr);
 
-        setApproved(resultNum >= 1000);
+        setApproved(resultNum >= Number(swapData.amountIn));
       } else {
         setApproved(false);
       }
     };
 
     if (
-      tokensData.tokenA.type !== TokenType.HBAR &&
+      tokensData.tokenA.type === TokenType.ERC20 &&
       swapData &&
       swapData.tokenIdIn !== '' &&
       userId
@@ -257,16 +273,27 @@ const Swap = () => {
     }
   }, [tokensData]);
 
-  const canSwap = swapData.amountIn !== '' && swapData.amountOut !== '';
+  useEffect(() => {
+    let ready = true;
+
+    // First token needs to be approved
+    if (!approved) {
+      ready = false;
+    }
+
+    // Token amounts need to be gt 0
+    if (swapData.amountIn === '0' || swapData.amountOut === '0') {
+      ready = false;
+    }
+
+    setReadyToSwap(ready);
+  }, [swapData, approved]);
+
+  const readyToApprove = Number(swapData.amountIn) > 0 && Number(swapData.amountOut);
 
   return (
     <div className="d-flex justify-content-center">
       <div className="container-swap">
-        {/* {errorGT ? (
-          <div className="alert alert-danger mb-5" role="alert">
-            <strong>Something went wrong!</strong> Cannot get pairs...
-          </div>
-        ) : null} */}
         {error ? (
           <div className="alert alert-danger my-5" role="alert">
             <strong>Something went wrong!</strong>
@@ -380,11 +407,18 @@ const Swap = () => {
         <div className="mt-5 d-flex justify-content-center">
           {loadingPools ? (
             <Loader />
-          ) : canSwap ? (
+          ) : readyToApprove ? (
             approved ? (
-              <Button onClick={() => handleSwapClick()}>Swap</Button>
+              <Button disabled={!readyToSwap} onClick={() => handleSwapClick()}>
+                Swap
+              </Button>
             ) : (
-              <Button onClick={() => handleApproveClick()}>Approve</Button>
+              <Button
+                disabled={Number(swapData.amountIn) <= 0}
+                onClick={() => handleApproveClick()}
+              >
+                Approve
+              </Button>
             )
           ) : null}
         </div>
