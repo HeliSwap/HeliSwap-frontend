@@ -214,12 +214,6 @@ const Create = () => {
     };
 
     const { tokenA, tokenB } = tokensData;
-    const newPairData = {
-      tokenAId: tokenA.hederaId,
-      tokenBId: tokenB.hederaId,
-      tokenADecimals: tokenA.decimals,
-      tokenBDecimals: tokenB.decimals,
-    };
 
     if (tokenA.type === TokenType.HBAR) {
       setApproved(prev => ({ ...prev, tokenA: true }));
@@ -232,9 +226,18 @@ const Create = () => {
     } else if (tokenB.type === TokenType.ERC20) {
       tokenB.hederaId && getApproved(tokenB.hederaId, 'tokenB');
     }
-
-    setCreatePairData(prev => ({ ...prev, ...newPairData }));
   }, [tokensData, sdk, userId, createPairData]);
+
+  useEffect(() => {
+    const { tokenA, tokenB } = tokensData;
+    const newPairData = {
+      tokenAId: tokenA.hederaId,
+      tokenBId: tokenB.hederaId,
+      tokenADecimals: tokenA.decimals,
+      tokenBDecimals: tokenB.decimals,
+    };
+    setCreatePairData(prev => ({ ...prev, ...newPairData }));
+  }, [tokensData]);
 
   useEffect(() => {
     const { tokenA, tokenB } = tokensData;
