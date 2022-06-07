@@ -234,7 +234,7 @@ const Create = () => {
     }
 
     setCreatePairData(prev => ({ ...prev, ...newPairData }));
-  }, [tokensData, sdk, userId]);
+  }, [tokensData, sdk, userId, createPairData]);
 
   useEffect(() => {
     const { tokenA, tokenB } = tokensData;
@@ -410,6 +410,28 @@ const Create = () => {
             {tokensInSamePool ? (
               <div>
                 <p>Prices and pool share</p>
+                <div className="mt-3 d-flex justify-content-around rounded border border-success p-2">
+                  <div className="text-center">
+                    <p>
+                      <span className="text-title">
+                        {Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount)}
+                      </span>
+                    </p>
+                    <p>
+                      {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p>
+                      <span className="text-title">
+                        {Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount)}
+                      </span>
+                    </p>
+                    <p>
+                      {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}
+                    </p>
+                  </div>
+                </div>
               </div>
             ) : (
               <div>
