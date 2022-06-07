@@ -202,8 +202,12 @@ const Create = () => {
 
         const resultStr = hethers.utils.formatUnits(resultBN, 18);
         const resultNum = Number(resultStr);
+        const key = `${index}Amount`;
 
-        setApproved(prev => ({ ...prev, [index]: resultNum >= 1000 }));
+        setApproved(prev => ({
+          ...prev,
+          [index]: resultNum >= Number(createPairData[key as keyof ICreatePairData]),
+        }));
       } else {
         setApproved(prev => ({ ...prev, [index]: false }));
       }
@@ -219,13 +223,13 @@ const Create = () => {
 
     if (tokenA.type === TokenType.HBAR) {
       setApproved(prev => ({ ...prev, tokenA: true }));
-    } else {
+    } else if (tokenA.type === TokenType.ERC20) {
       tokenA.hederaId && getApproved(tokenA.hederaId, 'tokenA');
     }
 
     if (tokenB.type === TokenType.HBAR) {
       setApproved(prev => ({ ...prev, tokenB: true }));
-    } else {
+    } else if (tokenB.type === TokenType.ERC20) {
       tokenB.hederaId && getApproved(tokenB.hederaId, 'tokenB');
     }
 
