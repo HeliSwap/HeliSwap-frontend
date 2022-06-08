@@ -167,6 +167,7 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
         userId,
         contractId,
         removeLpData.tokensLpAmount,
+        18, //LP tokens should have 18 decimals
       );
       setLpApproved(true);
     } catch (e) {

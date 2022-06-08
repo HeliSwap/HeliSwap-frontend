@@ -116,7 +116,7 @@ const Create = () => {
   };
 
   const handleApproveClick = async (key: string) => {
-    const { hederaId } = tokensData[key];
+    const { hederaId, decimals } = tokensData[key];
     const keyAmount = `${key}Amount` as keyof ICreatePairData;
     const amount = createPairData[keyAmount] as string;
 
@@ -126,6 +126,7 @@ const Create = () => {
         userId,
         hederaId,
         amount,
+        decimals,
       );
       const {
         response: { success, error },

@@ -103,7 +103,7 @@ const PairDetails = () => {
   const hanleApproveLPClick = async () => {
     try {
       const contractId = addressToContractId(pairData.pairAddress);
-      await sdk.approveToken(hashconnectConnectorInstance, userId, contractId, '1000000');
+      await sdk.approveToken(hashconnectConnectorInstance, userId, contractId, '1000000', 18);
       setLpApproved(true);
     } catch (e) {
       console.error(e);
