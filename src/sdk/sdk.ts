@@ -159,6 +159,7 @@ class SDK {
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
     createPairData: ICreatePairData,
+    slippage: number,
   ) {
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
     const {
@@ -177,25 +178,25 @@ class SDK {
 
     const HBARAmount = formatStringToBigNumberWei(HBARAmountString, 0);
     const tokenAmount = formatStringToBigNumberWei(tokenAmountString, tokenDecimals);
+    const HBARAmountMin = getAmountWithSlippage(HBARAmountString, 8, slippage, true);
+    const tokenAmountMin = getAmountWithSlippage(tokenAmountString, tokenDecimals, slippage, true);
 
     const userAddress = idToAddress(userId);
     const routerId = addressToId(process.env.REACT_APP_ROUTER_ADDRESS as string);
     const trans = new ContractExecuteTransaction()
       //Set the ID of the router contract
       .setContractId(routerId)
-
       //Set the gas for the contract call
       .setGas(3000000)
       //Amount of HBAR we want to provide
       .setPayableAmount(HBARAmount)
-
       .setFunction(
         'addLiquidityETH',
         new ContractFunctionParameters()
           .addAddress(tokenAddress)
           .addUint256(tokenAmount)
-          .addUint256(tokenAmount)
-          .addUint256(HBARAmount)
+          .addUint256(tokenAmountMin)
+          .addUint256(HBARAmountMin)
           .addAddress(userAddress)
           .addUint256(deadline),
       );
@@ -227,6 +228,7 @@ class SDK {
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
     createPairData: ICreatePairData,
+    slippage: number,
   ) {
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
     const {
@@ -243,6 +245,18 @@ class SDK {
 
     const tokenAAmount = formatStringToBigNumberWei(tokenAAmountString, tokenADecimals);
     const tokenBAmount = formatStringToBigNumberWei(tokenBAmountString, tokenBDecimals);
+    const tokenAAmountMin = getAmountWithSlippage(
+      tokenAAmountString,
+      tokenADecimals,
+      slippage,
+      true,
+    );
+    const tokenBAmountMin = getAmountWithSlippage(
+      tokenBAmountString,
+      tokenBDecimals,
+      slippage,
+      true,
+    );
 
     const userAddress = idToAddress(userId);
     const routerId = addressToId(process.env.REACT_APP_ROUTER_ADDRESS as string);
@@ -259,8 +273,8 @@ class SDK {
           .addAddress(tokenBAddress)
           .addUint256(tokenAAmount)
           .addUint256(tokenBAmount)
-          .addUint256(tokenAAmount)
-          .addUint256(tokenBAmount)
+          .addUint256(tokenAAmountMin)
+          .addUint256(tokenBAmountMin)
           .addAddress(userAddress)
           .addUint256(deadline),
       );

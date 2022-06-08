@@ -20,6 +20,8 @@ import { formatStringToBigNumberEthersWei } from '../utils/numberUtils';
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
 
+const INITIAL_SLIPPAGE_TOLERANCE = 0.1;
+
 const Create = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
@@ -66,6 +68,7 @@ const Create = () => {
   const [readyToProvide, setReadyToProvide] = useState(false);
   const [tokensInSamePool, setTokensInSamePool] = useState(false);
   const [provideNative, setProvideNative] = useState(false);
+  const [slippage, setSlippage] = useState(INITIAL_SLIPPAGE_TOLERANCE);
 
   // State for general error
   const [error, setError] = useState(false);
@@ -158,8 +161,13 @@ const Create = () => {
     try {
       //TODO add logic for adding native liquidity
       const receipt = provideNative
-        ? await sdk.addNativeLiquidity(hashconnectConnectorInstance, userId, createPairData)
-        : await sdk.addLiquidity(hashconnectConnectorInstance, userId, createPairData);
+        ? await sdk.addNativeLiquidity(
+            hashconnectConnectorInstance,
+            userId,
+            createPairData,
+            slippage,
+          )
+        : await sdk.addLiquidity(hashconnectConnectorInstance, userId, createPairData, slippage);
       const {
         response: { success, error },
       } = receipt;
