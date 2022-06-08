@@ -313,16 +313,9 @@ const Swap = () => {
       }
     };
 
-    if (tokensData.tokenA.type === TokenType.HBAR) {
-      setApproved(true);
-    }
+    setApproved(tokensData.tokenA.type === TokenType.HBAR);
 
-    if (
-      tokensData.tokenA.type === TokenType.ERC20 &&
-      swapData &&
-      swapData.tokenIdIn !== '' &&
-      userId
-    ) {
+    if (tokensData.tokenA.type === TokenType.ERC20 && swapData && userId) {
       getApproved(swapData.tokenIdIn);
     }
   }, [swapData, userId, sdk, tokensData]);
