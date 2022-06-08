@@ -108,10 +108,11 @@ class SDK {
     userId: string,
     tokenId: string | ContractId,
     amount: string,
+    dec: number,
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
 
-    const amountToApproveBN = formatStringToBigNumberWei(amount);
+    const amountToApproveBN = formatStringToBigNumberWei(amount, dec);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
