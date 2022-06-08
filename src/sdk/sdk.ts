@@ -249,10 +249,8 @@ class SDK {
     const trans = new ContractExecuteTransaction()
       //Set the ID of the router contract
       .setContractId(routerId)
-
       //Set the gas for the contract call
       .setGas(3000000)
-
       //Set the contract function to call
       .setFunction(
         'addLiquidity',
@@ -299,33 +297,29 @@ class SDK {
     HBARAmount: string,
     tokenDecimals: number,
     WHBARDecimal: number,
+    slippage: number,
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
     const userAddress = idToAddress(userId);
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
 
-    const tokenAmountBN = formatStringToBigNumberWei(tokenAmount, tokenDecimals);
-    const HBARAmountBN = formatStringToBigNumberWei(HBARAmount, WHBARDecimal);
+    const tokenAmountMin = getAmountWithSlippage(tokenAmount, tokenDecimals, slippage, true);
+    const HBARAmountMin = getAmountWithSlippage(HBARAmount, WHBARDecimal, slippage, true);
     const tokensLpAmountBN = formatStringToBigNumberWei(tokensLpAmount, 18);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(routerContractAddress))
-
       //Set the gas for the contract call
       .setGas(3000000)
-
       //Set the contract function to call
       .setFunction(
         'removeLiquidityETH',
         new ContractFunctionParameters()
           .addAddress(tokenAddress)
-          // @ts-ignore
           .addUint256(tokensLpAmountBN)
-          // @ts-ignore
-          .addUint256(tokenAmountBN)
-          // @ts-ignore
-          .addUint256(HBARAmountBN)
+          .addUint256(tokenAmountMin)
+          .addUint256(HBARAmountMin)
           .addAddress(userAddress)
           .addUint256(deadline),
       );
@@ -363,34 +357,31 @@ class SDK {
     tokens1Amount: string,
     token0Decimals: number,
     token1ecimals: number,
+    slippage: number,
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
     const userAddress = idToAddress(userId);
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
 
     const tokensLpAmountBN = formatStringToBigNumberWei(tokensLpAmount, 18);
-    const tokens0AmountBN = formatStringToBigNumberWei(tokens0Amount, token0Decimals);
-    const tokens1AmountBN = formatStringToBigNumberWei(tokens1Amount, token1ecimals);
+
+    const tokens0AmountMin = getAmountWithSlippage(tokens0Amount, token0Decimals, slippage, true);
+    const tokens1AmountMin = getAmountWithSlippage(tokens1Amount, token1ecimals, slippage, true);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(routerContractAddress))
-
       //Set the gas for the contract call
       .setGas(3000000)
-
       //Set the contract function to call
       .setFunction(
         'removeLiquidity',
         new ContractFunctionParameters()
           .addAddress(tokenInAddress)
           .addAddress(tokenOutAddress)
-          // @ts-ignore
           .addUint256(tokensLpAmountBN)
-          // @ts-ignore
-          .addUint256(tokens0AmountBN)
-          // @ts-ignore
-          .addUint256(tokens1AmountBN)
+          .addUint256(tokens0AmountMin)
+          .addUint256(tokens1AmountMin)
           .addAddress(userAddress)
           .addUint256(deadline),
       );
@@ -436,21 +427,19 @@ class SDK {
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
 
     const tokenInAmount = formatStringToBigNumberWei(amountIn, decIn);
-    const tokenOutMinAmount = getAmountWithSlippage(amountMinOut, decOut, 0.1, true);
+    const tokenOutMinAmount = getAmountWithSlippage(amountMinOut, decOut, slippage, true);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(routerContractAddress))
-
       //Set the gas for the contract call
       .setGas(3000000)
-
       //Set the contract function to call
       .setFunction(
         'swapExactTokensForTokens',
         new ContractFunctionParameters()
-          .addUint256(tokenInAmount) //amountIn
-          .addUint256(tokenOutMinAmount) //amountMinOut
+          .addUint256(tokenInAmount)
+          .addUint256(tokenOutMinAmount)
           .addAddressArray([tokenInAddress, tokenOutAddress])
           .addAddress(userAddress)
           .addUint256(deadline),
@@ -502,12 +491,10 @@ class SDK {
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(routerContractAddress))
-
       //Set the gas for the contract call
       .setGas(3000000)
       //Amount of HBAR we want to provide
       .setPayableAmount(HBARAmount)
-
       //Set the contract function to call
       .setFunction(
         'swapExactETHForTokens',
@@ -566,11 +553,8 @@ class SDK {
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(routerContractAddress))
-
       //Set the gas for the contract call
       .setGas(3000000)
-      //Amount of HBAR we want to provide
-
       //Set the contract function to call
       .setFunction(
         'swapExactTokensForETH',
@@ -688,10 +672,8 @@ class SDK {
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(routerContractAddress))
-
       //Set the gas for the contract call
       .setGas(3000000)
-
       //Set the contract function to call
       .setFunction(
         'swapTokensForExactETH',
@@ -749,12 +731,10 @@ class SDK {
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(routerContractAddress))
-
       //Set the gas for the contract call
       .setGas(3000000)
       //Amount of HBAR we want to provide
       .setPayableAmount(HBARMaxInAmount)
-
       //Set the contract function to call
       .setFunction(
         'swapETHForExactTokens',

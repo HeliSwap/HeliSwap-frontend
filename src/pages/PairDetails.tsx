@@ -17,6 +17,8 @@ import { getConnectedWallet } from './Helpers';
 import Loader from '../components/Loader';
 import Button from '../components/Button';
 
+const INITIAL_SLIPPAGE_TOLERANCE = 0.1;
+
 const PairDetails = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
@@ -40,6 +42,7 @@ const PairDetails = () => {
 
   const [lpApproved, setLpApproved] = useState(false);
   const [lpInputValue, setLpInputValue] = useState('');
+  const [slippage, setSlippage] = useState(INITIAL_SLIPPAGE_TOLERANCE);
 
   useEffect(() => {
     if (data && data.pools.length > 0) {
@@ -144,6 +147,7 @@ const PairDetails = () => {
       tokens1ToRemoveStr,
       pairData.token0Decimals,
       pairData.token1Decimals,
+      slippage,
     );
 
     setPairDataContracts({

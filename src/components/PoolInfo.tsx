@@ -9,6 +9,8 @@ import { formatStringToStringWei, formatStringWeiToStringEther } from '../utils/
 import { addressToContractId, idToAddress, calculateReserves } from '../utils/tokenUtils';
 import { getConnectedWallet } from '../pages/Helpers';
 
+const INITIAL_SLIPPAGE_TOLERANCE = 0.1;
+
 interface IPoolInfoProps {
   pairData: IPairData;
 }
@@ -41,6 +43,7 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
 
   const [removeNative, setRemoveNative] = useState(false);
   const [hasWrappedHBAR, setHasWrappedHBAR] = useState(false);
+  const [slippage, setSlippage] = useState(INITIAL_SLIPPAGE_TOLERANCE);
 
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -121,6 +124,7 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
           WHBARAmount,
           tokenDecimals,
           WHBARDecimals,
+          slippage,
         );
       } else {
         responseData = await sdk.removeLiquidity(
@@ -133,6 +137,7 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
           removeLpData.tokens1Amount,
           removeLpData.token0Decimals,
           removeLpData.token1Decimals,
+          slippage,
         );
       }
 
