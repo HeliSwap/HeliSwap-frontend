@@ -740,8 +740,7 @@ class SDK {
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
 
-    const HBARAmount = getAmountWithSlippage(HBARMaxIn, 0, slippage, false, true);
-    const HBARAmountOld = formatStringToBigNumberWei(HBARMaxIn, 0);
+    const HBARMaxInAmount = getAmountWithSlippage(HBARMaxIn, 0, slippage, false, true);
     const tokenAmountOut = formatStringToBigNumberWei(tokenAmountString, decOut);
 
     const userAddress = idToAddress(userId);
@@ -754,7 +753,7 @@ class SDK {
       //Set the gas for the contract call
       .setGas(3000000)
       //Amount of HBAR we want to provide
-      .setPayableAmount(HBARAmount)
+      .setPayableAmount(HBARMaxInAmount)
 
       //Set the contract function to call
       .setFunction(
