@@ -20,6 +20,8 @@ import { addressToId, idToAddress, NATIVE_TOKEN } from '../utils/tokenUtils';
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
 
+const INITIAL_SLIPPAGE_TOLERANCE = 0.1;
+
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
@@ -70,6 +72,8 @@ const Swap = () => {
   // Additional states for Swaps
   const [readyToSwap, setReadyToSwap] = useState(false);
   const [tokenInExactAmount, setTokenInExactAmount] = useState(true);
+  //TODO: set slippage tolerance
+  const [slippage, setSlippage] = useState(INITIAL_SLIPPAGE_TOLERANCE);
 
   // State for general error
   const [error, setError] = useState(false);
@@ -103,7 +107,7 @@ const Swap = () => {
 
     let resIn, resOut, decIn, decOut;
 
-    if ((tokenIdIn || tokenInIsNative) && amountIn !== '0') {
+    if (name === 'amountIn' && amountIn !== '0') {
       resIn = tokenInFirstAtPool ? token0Amount : token1Amount;
       resOut = tokenInFirstAtPool ? token1Amount : token0Amount;
       decIn = tokenInFirstAtPool ? token0Decimals : token1Decimals;
@@ -112,7 +116,7 @@ const Swap = () => {
       const swapAmountOut = sdk.getSwapAmountOut(amountIn, resIn, resOut, decIn, decOut);
       setTokenInExactAmount(true);
       setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
-    } else if ((tokenIdOut || tokenOutIsNative) && amountOut !== '0') {
+    } else if (name === 'amountOut' && amountOut !== '0') {
       resIn = tokenOutFirstAtPool ? token1Amount : token0Amount;
       resOut = tokenOutFirstAtPool ? token0Amount : token1Amount;
       decIn = tokenOutFirstAtPool ? token1Decimals : token0Decimals;
@@ -188,6 +192,7 @@ const Swap = () => {
             amountIn,
             amountOut,
             decOut,
+            slippage,
           );
         } else if (tokenOutIsNative) {
           receipt = await sdk.swapExactTokensForHBAR(
@@ -198,6 +203,7 @@ const Swap = () => {
             amountOut,
             decIn,
             decOut,
+            slippage,
           );
         } else {
           receipt = await sdk.swapExactTokensForTokens(
@@ -209,6 +215,7 @@ const Swap = () => {
             amountOut,
             decIn,
             decOut,
+            slippage,
           );
         }
       } else {
@@ -220,6 +227,7 @@ const Swap = () => {
             amountIn,
             amountOut,
             decOut,
+            slippage,
           );
         } else if (tokenOutIsNative) {
           receipt = await sdk.swapTokensForExactHBAR(
@@ -230,6 +238,7 @@ const Swap = () => {
             amountOut,
             decIn,
             decOut,
+            slippage,
           );
         } else {
           receipt = await sdk.swapTokensForExactTokens(
@@ -241,6 +250,7 @@ const Swap = () => {
             amountOut,
             decIn,
             decOut,
+            slippage,
           );
         }
       }

@@ -8,7 +8,11 @@ import {
 import Hashconnect from '../connectors/hashconnect';
 import { ICreatePairData } from '../interfaces/tokens';
 import { addressToId, idToAddress } from '../utils/tokenUtils';
-import { formatStringToBigNumberEthersWei, formatStringToBigNumberWei } from '../utils/numberUtils';
+import {
+  getAmountWithSlippage,
+  formatStringToBigNumberEthersWei,
+  formatStringToBigNumberWei,
+} from '../utils/numberUtils';
 
 import ERC20 from '../abi/ERC20';
 import PairV2 from '../abi/PairV2';
@@ -423,6 +427,7 @@ class SDK {
     amountMinOut: any,
     decIn: number,
     decOut: number,
+    slippage: number,
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
     const tokenInAddress = idToAddress(tokenInId);
@@ -431,7 +436,7 @@ class SDK {
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
 
     const tokenInAmount = formatStringToBigNumberWei(amountIn, decIn);
-    const tokenOutMinAmount = formatStringToBigNumberWei(amountMinOut, decOut);
+    const tokenOutMinAmount = getAmountWithSlippage(amountMinOut, decOut, 0.1, true);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
@@ -478,18 +483,16 @@ class SDK {
     userId: string,
     tokenOutId: string,
     amountIn: string,
-    amountOut: string,
+    amountMinOut: string,
     decOut: number,
+    slippage: number,
   ) {
-    const tokenDecimals = decOut;
-    const tokenAmountString = amountOut;
     const tokenAddress = idToAddress(tokenOutId);
 
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
-    const HBARAmountString = amountIn;
 
-    const HBARAmount = formatStringToBigNumberWei(HBARAmountString, 0);
-    const tokenAmount = formatStringToBigNumberWei(tokenAmountString, tokenDecimals);
+    const HBARAmount = formatStringToBigNumberWei(amountIn, 0);
+    const tokenMinOutAmount = getAmountWithSlippage(amountMinOut, decOut, slippage, true);
 
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
 
@@ -509,7 +512,7 @@ class SDK {
       .setFunction(
         'swapExactETHForTokens',
         new ContractFunctionParameters()
-          .addUint256(tokenAmount) //amountMinOut
+          .addUint256(tokenMinOutAmount)
           .addAddressArray([WHBARAddress, tokenAddress])
           .addAddress(userAddress)
           .addUint256(deadline),
@@ -543,26 +546,22 @@ class SDK {
     userId: string,
     tokenInId: string,
     amountIn: string,
-    amountHBAROut: string,
+    amountMinHBAROut: string,
     decIn: number,
     WHBARDec: number,
+    slippage: number,
   ) {
-    const tokenDecimals = decIn;
-    const tokenAmountString = amountIn;
     const tokenAddress = idToAddress(tokenInId);
 
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
-    const HBARAmountString = amountHBAROut;
 
-    const HBARAmount = formatStringToBigNumberWei(HBARAmountString, WHBARDec);
-    const tokenAmount = formatStringToBigNumberWei(tokenAmountString, tokenDecimals);
+    const tokenInAmount = formatStringToBigNumberWei(amountIn, decIn);
+    const HBARAmountMinOut = getAmountWithSlippage(amountMinHBAROut, WHBARDec, slippage, true);
 
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
 
     const userAddress = idToAddress(userId);
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
-
-    // function swapExactTokensForETH(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
@@ -576,8 +575,8 @@ class SDK {
       .setFunction(
         'swapExactTokensForETH',
         new ContractFunctionParameters()
-          .addUint256(tokenAmount) //amountIn
-          .addUint256(HBARAmount) //amountHBAROutMin
+          .addUint256(tokenInAmount)
+          .addUint256(HBARAmountMinOut)
           .addAddressArray([tokenAddress, WHBARAddress])
           .addAddress(userAddress)
           .addUint256(deadline),
@@ -611,33 +610,33 @@ class SDK {
     userId: string,
     tokenInId: string,
     tokenOutId: string,
-    amountIn: string,
-    amountMinOut: string,
+    amountMaxIn: string,
+    amountOut: string,
     decIn: number,
     decOut: number,
+    slippage: number,
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
+
     const tokenInAddress = idToAddress(tokenInId);
     const tokenOutAddress = idToAddress(tokenOutId);
     const userAddress = idToAddress(userId);
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
 
-    const tokenInAmount = formatStringToBigNumberWei(amountIn, decIn);
-    const tokenOutMinAmount = formatStringToBigNumberWei(amountMinOut, decOut);
+    const tokenOutAmount = formatStringToBigNumberWei(amountOut, decOut);
+    const tokenInMaxAmount = getAmountWithSlippage(amountMaxIn, decIn, slippage, false);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(routerContractAddress))
-
       //Set the gas for the contract call
       .setGas(3000000)
-
       //Set the contract function to call
       .setFunction(
         'swapTokensForExactTokens',
         new ContractFunctionParameters()
-          .addUint256(tokenOutMinAmount) //amountMinOut
-          .addUint256(tokenInAmount) //amountIn
+          .addUint256(tokenOutAmount)
+          .addUint256(tokenInMaxAmount) //amountIn
           .addAddressArray([tokenInAddress, tokenOutAddress])
           .addAddress(userAddress)
           .addUint256(deadline),
@@ -670,19 +669,21 @@ class SDK {
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
     tokenId: string,
-    amountIn: string,
+    amountMaxIn: string,
     amountHBAROut: string,
     decIn: number,
     HBARDec: number,
+    slippage: number,
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
+
     const tokenAddress = idToAddress(tokenId);
     const userAddress = idToAddress(userId);
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
 
-    const tokenAmount = formatStringToBigNumberWei(amountIn, decIn);
-    const tokenOutAmount = formatStringToBigNumberWei(amountHBAROut, HBARDec);
+    const tokenMaxInAmount = getAmountWithSlippage(amountMaxIn, decIn, slippage, false);
+    const HBAROutAmount = formatStringToBigNumberWei(amountHBAROut, HBARDec);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
@@ -695,8 +696,8 @@ class SDK {
       .setFunction(
         'swapTokensForExactETH',
         new ContractFunctionParameters()
-          .addUint256(tokenOutAmount) //amountOut
-          .addUint256(tokenAmount) //amountInMax
+          .addUint256(HBAROutAmount)
+          .addUint256(tokenMaxInAmount)
           .addAddressArray([tokenAddress, WHBARAddress])
           .addAddress(userAddress)
           .addUint256(deadline),
@@ -724,26 +725,24 @@ class SDK {
 
     return responseData;
   }
-  // function swapETHForExactTokens(uint amountOut, address[] calldata path, address to, uint deadline)
   async swapHBARForExactTokens(
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
     tokenOutId: string,
-    amountIn: string,
+    HBARMaxIn: string,
     amountOut: string,
     decOut: number,
+    slippage: number,
   ) {
-    const tokenDecimals = decOut;
     const tokenAmountString = amountOut;
     const tokenAddress = idToAddress(tokenOutId);
 
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
-    const HBARAmountString = amountIn;
-
-    const HBARAmount = formatStringToBigNumberWei(HBARAmountString, 0);
-    const tokenAmount = formatStringToBigNumberWei(tokenAmountString, tokenDecimals);
-
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
+
+    const HBARAmount = getAmountWithSlippage(HBARMaxIn, 0, slippage, false);
+    // const HBARAmount = formatStringToBigNumberWei(HBARMaxIn, 0);
+    const tokenAmountOut = formatStringToBigNumberWei(tokenAmountString, decOut);
 
     const userAddress = idToAddress(userId);
     const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
@@ -761,7 +760,7 @@ class SDK {
       .setFunction(
         'swapETHForExactTokens',
         new ContractFunctionParameters()
-          .addUint256(tokenAmount) //amountOut
+          .addUint256(tokenAmountOut)
           .addAddressArray([WHBARAddress, tokenAddress])
           .addAddress(userAddress)
           .addUint256(deadline),
