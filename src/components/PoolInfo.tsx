@@ -10,6 +10,7 @@ import { addressToContractId, idToAddress, calculateReserves } from '../utils/to
 import { getConnectedWallet } from '../pages/Helpers';
 
 const INITIAL_SLIPPAGE_TOLERANCE = 0.1;
+const INITIAL_EXPIRATION_TIME = 60;
 
 interface IPoolInfoProps {
   pairData: IPairData;
@@ -44,6 +45,7 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
   const [removeNative, setRemoveNative] = useState(false);
   const [hasWrappedHBAR, setHasWrappedHBAR] = useState(false);
   const [slippage, setSlippage] = useState(INITIAL_SLIPPAGE_TOLERANCE);
+  const [transactionExpiration, setTransactionExpiration] = useState(INITIAL_EXPIRATION_TIME);
 
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -125,6 +127,7 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
           tokenDecimals,
           WHBARDecimals,
           slippage,
+          transactionExpiration,
         );
       } else {
         responseData = await sdk.removeLiquidity(
@@ -138,6 +141,7 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
           removeLpData.token0Decimals,
           removeLpData.token1Decimals,
           slippage,
+          transactionExpiration,
         );
       }
 

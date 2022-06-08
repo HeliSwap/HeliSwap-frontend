@@ -21,6 +21,7 @@ import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
 
 const INITIAL_SLIPPAGE_TOLERANCE = 0.1;
+const INITIAL_EXPIRATION_TIME = 60;
 
 const Create = () => {
   const contextValue = useContext(GlobalContext);
@@ -69,6 +70,7 @@ const Create = () => {
   const [tokensInSamePool, setTokensInSamePool] = useState(false);
   const [provideNative, setProvideNative] = useState(false);
   const [slippage, setSlippage] = useState(INITIAL_SLIPPAGE_TOLERANCE);
+  const [transactionExpiration, setTransactionExpiration] = useState(INITIAL_EXPIRATION_TIME);
 
   // State for general error
   const [error, setError] = useState(false);
@@ -166,8 +168,15 @@ const Create = () => {
             userId,
             createPairData,
             slippage,
+            transactionExpiration,
           )
-        : await sdk.addLiquidity(hashconnectConnectorInstance, userId, createPairData, slippage);
+        : await sdk.addLiquidity(
+            hashconnectConnectorInstance,
+            userId,
+            createPairData,
+            slippage,
+            transactionExpiration,
+          );
       const {
         response: { success, error },
       } = receipt;

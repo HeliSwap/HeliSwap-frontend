@@ -12,6 +12,7 @@ import {
   getAmountWithSlippage,
   formatStringToBigNumberEthersWei,
   formatStringToBigNumberWei,
+  getExpirationTime,
 } from '../utils/numberUtils';
 
 import ERC20 from '../abi/ERC20';
@@ -160,8 +161,8 @@ class SDK {
     userId: string,
     createPairData: ICreatePairData,
     slippage: number,
+    expiresAfter: number,
   ) {
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
     const {
       tokenAAmount: tokenAAmountString,
       tokenBAmount: tokenBAmountString,
@@ -198,7 +199,7 @@ class SDK {
           .addUint256(tokenAmountMin)
           .addUint256(HBARAmountMin)
           .addAddress(userAddress)
-          .addUint256(deadline),
+          .addUint256(getExpirationTime(expiresAfter)),
       );
 
     const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
@@ -229,8 +230,8 @@ class SDK {
     userId: string,
     createPairData: ICreatePairData,
     slippage: number,
+    expiresAfter: number,
   ) {
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
     const {
       tokenAAmount: tokenAAmountString,
       tokenAId,
@@ -276,7 +277,7 @@ class SDK {
           .addUint256(tokenAAmountMin)
           .addUint256(tokenBAmountMin)
           .addAddress(userAddress)
-          .addUint256(deadline),
+          .addUint256(getExpirationTime(expiresAfter)),
       );
 
     const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
@@ -312,10 +313,10 @@ class SDK {
     tokenDecimals: number,
     WHBARDecimal: number,
     slippage: number,
+    expiresAfter: number,
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
     const userAddress = idToAddress(userId);
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
 
     const tokenAmountMin = getAmountWithSlippage(tokenAmount, tokenDecimals, slippage, true);
     const HBARAmountMin = getAmountWithSlippage(HBARAmount, WHBARDecimal, slippage, true);
@@ -335,7 +336,7 @@ class SDK {
           .addUint256(tokenAmountMin)
           .addUint256(HBARAmountMin)
           .addAddress(userAddress)
-          .addUint256(deadline),
+          .addUint256(getExpirationTime(expiresAfter)),
       );
 
     const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
@@ -372,10 +373,10 @@ class SDK {
     token0Decimals: number,
     token1ecimals: number,
     slippage: number,
+    expiresAfter: number,
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
     const userAddress = idToAddress(userId);
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
 
     const tokensLpAmountBN = formatStringToBigNumberWei(tokensLpAmount, 18);
 
@@ -397,7 +398,7 @@ class SDK {
           .addUint256(tokens0AmountMin)
           .addUint256(tokens1AmountMin)
           .addAddress(userAddress)
-          .addUint256(deadline),
+          .addUint256(getExpirationTime(expiresAfter)),
       );
 
     const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
@@ -433,12 +434,12 @@ class SDK {
     decIn: number,
     decOut: number,
     slippage: number,
+    expiresAfter: number,
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
     const tokenInAddress = idToAddress(tokenInId);
     const tokenOutAddress = idToAddress(tokenOutId);
     const userAddress = idToAddress(userId);
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
 
     const tokenInAmount = formatStringToBigNumberWei(amountIn, decIn);
     const tokenOutMinAmount = getAmountWithSlippage(amountMinOut, decOut, slippage, true);
@@ -456,7 +457,7 @@ class SDK {
           .addUint256(tokenOutMinAmount)
           .addAddressArray([tokenInAddress, tokenOutAddress])
           .addAddress(userAddress)
-          .addUint256(deadline),
+          .addUint256(getExpirationTime(expiresAfter)),
       );
 
     const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
@@ -489,6 +490,7 @@ class SDK {
     amountMinOut: string,
     decOut: number,
     slippage: number,
+    expiresAfter: number,
   ) {
     const tokenAddress = idToAddress(tokenOutId);
 
@@ -500,7 +502,6 @@ class SDK {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
 
     const userAddress = idToAddress(userId);
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
@@ -516,7 +517,7 @@ class SDK {
           .addUint256(tokenMinOutAmount)
           .addAddressArray([WHBARAddress, tokenAddress])
           .addAddress(userAddress)
-          .addUint256(deadline),
+          .addUint256(getExpirationTime(expiresAfter)),
       );
 
     const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
@@ -551,6 +552,7 @@ class SDK {
     decIn: number,
     WHBARDec: number,
     slippage: number,
+    expiresAfter: number,
   ) {
     const tokenAddress = idToAddress(tokenInId);
 
@@ -562,7 +564,6 @@ class SDK {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
 
     const userAddress = idToAddress(userId);
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
@@ -577,7 +578,7 @@ class SDK {
           .addUint256(HBARAmountMinOut)
           .addAddressArray([tokenAddress, WHBARAddress])
           .addAddress(userAddress)
-          .addUint256(deadline),
+          .addUint256(getExpirationTime(expiresAfter)),
       );
 
     const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
@@ -613,13 +614,13 @@ class SDK {
     decIn: number,
     decOut: number,
     slippage: number,
+    expiresAfter: number,
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
 
     const tokenInAddress = idToAddress(tokenInId);
     const tokenOutAddress = idToAddress(tokenOutId);
     const userAddress = idToAddress(userId);
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
 
     const tokenOutAmount = formatStringToBigNumberWei(amountOut, decOut);
     const tokenInMaxAmount = getAmountWithSlippage(amountMaxIn, decIn, slippage, false);
@@ -637,7 +638,7 @@ class SDK {
           .addUint256(tokenInMaxAmount) //amountIn
           .addAddressArray([tokenInAddress, tokenOutAddress])
           .addAddress(userAddress)
-          .addUint256(deadline),
+          .addUint256(getExpirationTime(expiresAfter)),
       );
 
     const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
@@ -672,13 +673,13 @@ class SDK {
     decIn: number,
     HBARDec: number,
     slippage: number,
+    expiresAfter: number,
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
 
     const tokenAddress = idToAddress(tokenId);
     const userAddress = idToAddress(userId);
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
 
     const tokenMaxInAmount = getAmountWithSlippage(amountMaxIn, decIn, slippage, false);
     const HBAROutAmount = formatStringToBigNumberWei(amountHBAROut, HBARDec);
@@ -696,7 +697,7 @@ class SDK {
           .addUint256(tokenMaxInAmount)
           .addAddressArray([tokenAddress, WHBARAddress])
           .addAddress(userAddress)
-          .addUint256(deadline),
+          .addUint256(getExpirationTime(expiresAfter)),
       );
 
     const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
@@ -729,6 +730,7 @@ class SDK {
     amountOut: string,
     decOut: number,
     slippage: number,
+    expiresAfter: number,
   ) {
     const tokenAmountString = amountOut;
     const tokenAddress = idToAddress(tokenOutId);
@@ -740,7 +742,6 @@ class SDK {
     const tokenAmountOut = formatStringToBigNumberWei(tokenAmountString, decOut);
 
     const userAddress = idToAddress(userId);
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 60;
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
@@ -756,7 +757,7 @@ class SDK {
           .addUint256(tokenAmountOut)
           .addAddressArray([WHBARAddress, tokenAddress])
           .addAddress(userAddress)
-          .addUint256(deadline),
+          .addUint256(getExpirationTime(expiresAfter)),
       );
 
     const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(

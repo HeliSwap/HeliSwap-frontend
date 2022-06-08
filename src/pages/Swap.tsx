@@ -21,6 +21,7 @@ import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
 
 const INITIAL_SLIPPAGE_TOLERANCE = 0.1;
+const INITIAL_EXPIRATION_TIME = 60;
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
@@ -72,8 +73,8 @@ const Swap = () => {
   // Additional states for Swaps
   const [readyToSwap, setReadyToSwap] = useState(false);
   const [tokenInExactAmount, setTokenInExactAmount] = useState(true);
-  //TODO: set slippage tolerance
   const [slippage, setSlippage] = useState(INITIAL_SLIPPAGE_TOLERANCE);
+  const [transactionExpiration, setTransactionExpiration] = useState(INITIAL_EXPIRATION_TIME);
 
   // State for general error
   const [error, setError] = useState(false);
@@ -193,6 +194,7 @@ const Swap = () => {
             amountOut,
             decOut,
             slippage,
+            transactionExpiration,
           );
         } else if (tokenOutIsNative) {
           receipt = await sdk.swapExactTokensForHBAR(
@@ -204,6 +206,7 @@ const Swap = () => {
             decIn,
             decOut,
             slippage,
+            transactionExpiration,
           );
         } else {
           receipt = await sdk.swapExactTokensForTokens(
@@ -216,6 +219,7 @@ const Swap = () => {
             decIn,
             decOut,
             slippage,
+            transactionExpiration,
           );
         }
       } else {
@@ -228,6 +232,7 @@ const Swap = () => {
             amountOut,
             decOut,
             slippage,
+            transactionExpiration,
           );
         } else if (tokenOutIsNative) {
           receipt = await sdk.swapTokensForExactHBAR(
@@ -239,6 +244,7 @@ const Swap = () => {
             decIn,
             decOut,
             slippage,
+            transactionExpiration,
           );
         } else {
           receipt = await sdk.swapTokensForExactTokens(
@@ -251,6 +257,7 @@ const Swap = () => {
             decIn,
             decOut,
             slippage,
+            transactionExpiration,
           );
         }
       }

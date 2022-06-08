@@ -65,3 +65,8 @@ export const getAmountWithSlippage = (
 
   return isNative ? amountWithSlippage.decimalPlaces(8) : amountWithSlippage.decimalPlaces(0, 1);
 };
+
+// Used to calculate the deadline of certain transactions
+export const getExpirationTime = (minutes: number) => {
+  return Math.floor(Date.now() / 1000) + 60 * minutes;
+};
