@@ -36,6 +36,8 @@ const Swap = () => {
 
   // State for token inputs
   const [tokensData, setTokensData] = useState<ITokensData>(initialTokensData);
+  const [tokenInIsNative, setTokenInIsNative] = useState(false);
+  const [tokenOutIsNative, setTokenOutIsNative] = useState(false);
 
   // State for pools
   const {
@@ -82,16 +84,22 @@ const Swap = () => {
 
     const { amountIn, amountOut } = tokenData;
     const { tokenIdIn, tokenIdOut } = swapData;
+    const { token0Amount, token1Amount, token0Decimals, token1Decimals } = selectedPoolData;
 
     if (Object.keys(selectedPoolData).length === 0) return;
 
-    const { token0Amount, token1Amount, token0Decimals, token1Decimals } = selectedPoolData;
-    const tokenInFirstAtPool = addressToId(selectedPoolData.token0) === tokenIdIn;
-    const tokenOutFirstAtPool = addressToId(selectedPoolData.token0) === tokenIdOut;
+    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS;
+
+    const tokenInFirstAtPool = tokenInIsNative
+      ? selectedPoolData.token0 === WHBARAddress
+      : addressToId(selectedPoolData.token0) === tokenIdIn;
+    const tokenOutFirstAtPool = tokenOutIsNative
+      ? selectedPoolData.token0 === WHBARAddress
+      : addressToId(selectedPoolData.token0) === tokenIdOut;
 
     let resIn, resOut, decIn, decOut;
 
-    if (tokenIdIn && amountIn !== '0') {
+    if ((tokenIdIn || tokenInIsNative) && amountIn !== '0') {
       resIn = tokenInFirstAtPool ? token0Amount : token1Amount;
       resOut = tokenInFirstAtPool ? token1Amount : token0Amount;
       decIn = tokenInFirstAtPool ? token0Decimals : token1Decimals;
@@ -100,7 +108,7 @@ const Swap = () => {
       const swapAmountOut = sdk.getSwapAmountOut(amountIn, resIn, resOut, decIn, decOut);
       setTokenInExactAmount(true);
       setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
-    } else if (tokenIdOut && amountOut !== '0') {
+    } else if ((tokenIdOut || tokenOutIsNative) && amountOut !== '0') {
       resIn = tokenOutFirstAtPool ? token1Amount : token0Amount;
       resOut = tokenOutFirstAtPool ? token0Amount : token1Amount;
       decIn = tokenOutFirstAtPool ? token1Decimals : token0Decimals;
@@ -158,27 +166,69 @@ const Swap = () => {
     try {
       let receipt;
       if (tokenInExactAmount) {
-        receipt = await sdk.swapExactTokensForTokens(
-          hashconnectConnectorInstance,
-          userId,
-          tokenIdIn,
-          tokenIdOut,
-          amountIn,
-          amountOut,
-          decIn,
-          decOut,
-        );
+        if (tokenInIsNative) {
+          receipt = await sdk.swapExactHBARForTokens(
+            hashconnectConnectorInstance,
+            userId,
+            tokenIdOut,
+            amountIn,
+            amountOut,
+            decOut,
+          );
+        } else if (tokenOutIsNative) {
+          receipt = await sdk.swapExactTokensForHBAR(
+            hashconnectConnectorInstance,
+            userId,
+            tokenIdIn,
+            amountIn,
+            amountOut,
+            decIn,
+            decOut,
+          );
+        } else {
+          receipt = await sdk.swapExactTokensForTokens(
+            hashconnectConnectorInstance,
+            userId,
+            tokenIdIn,
+            tokenIdOut,
+            amountIn,
+            amountOut,
+            decIn,
+            decOut,
+          );
+        }
       } else {
-        receipt = await sdk.swapTokensForExactTokens(
-          hashconnectConnectorInstance,
-          userId,
-          tokenIdIn,
-          tokenIdOut,
-          amountIn,
-          amountOut,
-          decIn,
-          decOut,
-        );
+        if (tokenInIsNative) {
+          receipt = await sdk.swapHBARForExactTokens(
+            hashconnectConnectorInstance,
+            userId,
+            tokenIdOut,
+            amountIn,
+            amountOut,
+            decOut,
+          );
+        } else if (tokenOutIsNative) {
+          receipt = await sdk.swapTokensForExactHBAR(
+            hashconnectConnectorInstance,
+            userId,
+            tokenIdIn,
+            amountIn,
+            amountOut,
+            decIn,
+            decOut,
+          );
+        } else {
+          receipt = await sdk.swapTokensForExactTokens(
+            hashconnectConnectorInstance,
+            userId,
+            tokenIdIn,
+            tokenIdOut,
+            amountIn,
+            amountOut,
+            decIn,
+            decOut,
+          );
+        }
       }
 
       const {
@@ -204,23 +254,41 @@ const Swap = () => {
 
   useEffect(() => {
     refetch();
-    if (swapData.tokenIdIn && swapData.tokenIdOut && poolsData && poolsData.length > 0) {
-      const tokenInAddress = idToAddress(swapData.tokenIdIn);
-      const tokenOutAddress = idToAddress(swapData.tokenIdOut);
+    const { tokenA, tokenB } = tokensData;
+
+    const tokenInIsNative = tokenA.type === TokenType.HBAR;
+    const tokenOutIsNative = tokenB.type === TokenType.HBAR;
+    setTokenInIsNative(tokenInIsNative);
+    setTokenOutIsNative(tokenOutIsNative);
+
+    if (poolsData && poolsData.length > 0) {
+      const provideNative = tokenInIsNative || tokenOutIsNative;
+      const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
 
       const selectedPoolData = poolsData.filter((pool: any) => {
-        return (
+        let poolMatchedBothTokens = false;
+
+        const poolContainsToken = (tokenAddres: string) => {
+          return pool.token0 === tokenAddres || pool.token1 === tokenAddres;
+        };
+
+        if (provideNative) {
+          poolMatchedBothTokens =
+            poolContainsToken(WHBARAddress) &&
+            (poolContainsToken(tokenA.address) || poolContainsToken(tokenB.address));
+        } else {
           //Both tokens are in the same pool
-          (pool.token0 === tokenInAddress || pool.token1 === tokenInAddress) &&
-          (pool.token0 === tokenOutAddress || pool.token1 === tokenOutAddress)
-        );
+          poolMatchedBothTokens =
+            poolContainsToken(tokenA.address) && poolContainsToken(tokenB.address);
+        }
+        return poolMatchedBothTokens;
       });
 
       setSelectedPoolData(selectedPoolData[0] || {});
     } else {
       setSelectedPoolData({} as IPairData);
     }
-  }, [poolsData, swapData, refetch]);
+  }, [poolsData, tokensData, refetch]);
 
   useEffect(() => {
     const getApproved = async (tokenId: string) => {
@@ -244,6 +312,10 @@ const Swap = () => {
         setApproved(false);
       }
     };
+
+    if (tokensData.tokenA.type === TokenType.HBAR) {
+      setApproved(true);
+    }
 
     if (
       tokensData.tokenA.type === TokenType.ERC20 &&
