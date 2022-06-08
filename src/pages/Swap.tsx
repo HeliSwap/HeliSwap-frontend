@@ -313,6 +313,10 @@ const Swap = () => {
       }
     };
 
+    if (tokensData.tokenA.type === TokenType.HBAR) {
+      setApproved(true);
+    }
+
     if (
       tokensData.tokenA.type === TokenType.ERC20 &&
       swapData &&
