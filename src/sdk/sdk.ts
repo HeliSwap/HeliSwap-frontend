@@ -740,8 +740,8 @@ class SDK {
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
 
-    const HBARAmount = getAmountWithSlippage(HBARMaxIn, 0, slippage, false);
-    // const HBARAmount = formatStringToBigNumberWei(HBARMaxIn, 0);
+    const HBARAmount = getAmountWithSlippage(HBARMaxIn, 0, slippage, false, true);
+    const HBARAmountOld = formatStringToBigNumberWei(HBARMaxIn, 0);
     const tokenAmountOut = formatStringToBigNumberWei(tokenAmountString, decOut);
 
     const userAddress = idToAddress(userId);

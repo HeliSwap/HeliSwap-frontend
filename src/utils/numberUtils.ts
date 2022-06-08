@@ -51,6 +51,7 @@ export const getAmountWithSlippage = (
   amountDecimals: number,
   slippagePercentage: number,
   isMinAmount: boolean,
+  isNative: boolean = false,
 ) => {
   const amountWei = formatStringToBigNumberWei(amount, amountDecimals);
   const slippage = slippagePercentage / 100;
@@ -62,5 +63,5 @@ export const getAmountWithSlippage = (
     amountWithSlippage = amountWei.plus(amountWei.times(slippage));
   }
 
-  return amountWithSlippage.decimalPlaces(0, 1);
+  return isNative ? amountWithSlippage.decimalPlaces(8) : amountWithSlippage.decimalPlaces(0, 1);
 };
