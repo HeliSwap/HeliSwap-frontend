@@ -197,6 +197,12 @@ const ModalSearchContent = ({
                     📝
                   </span>
                 </li>
+                <li>
+                  0.0.45906586 - HELI [HTS]{' '}
+                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.45906586')}>
+                    📝
+                  </span>
+                </li>
 
                 <li>
                   0.0.34947702 - USDT [ERC20]{' '}

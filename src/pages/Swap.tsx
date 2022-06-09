@@ -76,6 +76,8 @@ const Swap = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [successSwap, setSuccessSwap] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [loadingSwap, setLoadingSwap] = useState(false);
+  const [loadingApprove, setLoadingApprove] = useState(false);
 
   const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
@@ -128,6 +130,8 @@ const Swap = () => {
   const handleApproveClick = async () => {
     const { tokenA } = tokensData;
 
+    setLoadingApprove(true);
+
     try {
       const receipt = await sdk.approveToken(
         hashconnectConnectorInstance,
@@ -151,6 +155,7 @@ const Swap = () => {
       setError(true);
       setErrorMessage('Error on create');
     } finally {
+      setLoadingApprove(false);
     }
   };
 
@@ -167,6 +172,7 @@ const Swap = () => {
     setErrorMessage('');
     setSuccessSwap(false);
     setSuccessMessage('');
+    setLoadingSwap(true);
 
     try {
       let receipt;
@@ -258,6 +264,7 @@ const Swap = () => {
       console.error(`[Error on swap]: ${err}`);
       setError(true);
     } finally {
+      setLoadingSwap(false);
     }
   };
 
@@ -498,11 +505,16 @@ const Swap = () => {
             <Loader />
           ) : readyToApprove ? (
             approved ? (
-              <Button disabled={!readyToSwap} onClick={() => handleSwapClick()}>
+              <Button
+                loading={loadingSwap}
+                disabled={!readyToSwap}
+                onClick={() => handleSwapClick()}
+              >
                 Swap
               </Button>
             ) : (
               <Button
+                loading={loadingApprove}
                 disabled={Number(swapData.amountIn) <= 0}
                 onClick={() => handleApproveClick()}
               >
