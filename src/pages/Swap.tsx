@@ -74,6 +74,8 @@ const Swap = () => {
   // State for general error
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [successSwap, setSuccessSwap] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
@@ -163,6 +165,8 @@ const Swap = () => {
 
     setError(false);
     setErrorMessage('');
+    setSuccessSwap(false);
+    setSuccessMessage('');
 
     try {
       let receipt;
@@ -240,10 +244,14 @@ const Swap = () => {
         setError(true);
         setErrorMessage(error);
       } else {
+        const successMessage = `Swap exactly ${swapData.amountIn} ${tokensData.tokenA.symbol} for ${swapData.amountOut} ${tokensData.tokenB.symbol}`;
+
         setSwapData(initialSwapData);
         setSelectedPoolData({} as IPairData);
         setTokensData(initialTokensData);
         setApproved(false);
+        setSuccessSwap(true);
+        setSuccessMessage(successMessage);
         refetch();
       }
     } catch (err) {
@@ -255,6 +263,7 @@ const Swap = () => {
 
   useEffect(() => {
     refetch();
+
     const { tokenA, tokenB } = tokensData;
 
     const tokenInIsNative = tokenA.type === TokenType.HBAR;
@@ -469,6 +478,20 @@ const Swap = () => {
             ) : null}
           </div>
         </div>
+
+        {successSwap ? (
+          <div className="alert alert-success alert-dismissible my-5" role="alert">
+            <strong>Success swap!</strong>
+            <p>{successMessage}</p>
+            <button
+              onClick={() => setSuccessSwap(false)}
+              type="button"
+              className="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+            ></button>
+          </div>
+        ) : null}
 
         <div className="mt-5 d-flex justify-content-center">
           {loadingPools ? (
