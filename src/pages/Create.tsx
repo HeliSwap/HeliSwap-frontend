@@ -63,7 +63,6 @@ const Create = () => {
   const [selectedPoolData, setSelectedPoolData] = useState<IPairData>({} as IPairData);
 
   // Additional states for Providing/Creating pairs
-  const [isProvideLoading, setProvideLoading] = useState(false);
   const [readyToProvide, setReadyToProvide] = useState(false);
   const [tokensInSamePool, setTokensInSamePool] = useState(false);
   const [provideNative, setProvideNative] = useState(false);
@@ -71,6 +70,8 @@ const Create = () => {
   // State for general error
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [loadingCreate, setLoadingCreate] = useState(false);
+  const [loadingApprove, setLoadingApprove] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
@@ -120,6 +121,8 @@ const Create = () => {
     const keyAmount = `${key}Amount` as keyof ICreatePairData;
     const amount = createPairData[keyAmount] as string;
 
+    setLoadingApprove(true);
+
     try {
       const receipt = await sdk.approveToken(
         hashconnectConnectorInstance,
@@ -143,12 +146,12 @@ const Create = () => {
       setError(true);
       setErrorMessage('Error on create');
     } finally {
-      setProvideLoading(false);
+      setLoadingApprove(false);
     }
   };
 
   const handleCreateClick = async () => {
-    setProvideLoading(true);
+    setLoadingCreate(true);
     setError(false);
     setErrorMessage('');
 
@@ -184,7 +187,7 @@ const Create = () => {
       setError(true);
       setErrorMessage('Error on create');
     } finally {
-      setProvideLoading(false);
+      setLoadingCreate(false);
     }
   };
 
@@ -470,6 +473,7 @@ const Create = () => {
         <div className="mt-5 d-flex justify-content-center">
           {tokensData.tokenA.hederaId && !approved.tokenA && createPairData.tokenAAmount !== '0' ? (
             <Button
+              loading={loadingApprove}
               onClick={() => handleApproveClick('tokenA')}
               className="mx-2"
             >{`Approve ${tokensData.tokenA.symbol}`}</Button>
@@ -477,6 +481,7 @@ const Create = () => {
 
           {tokensData.tokenB.hederaId && !approved.tokenB && createPairData.tokenBAmount !== '0' ? (
             <Button
+              loading={loadingApprove}
               onClick={() => handleApproveClick('tokenB')}
               className="mx-2"
             >{`Approve ${tokensData.tokenB.symbol}`}</Button>
@@ -485,7 +490,7 @@ const Create = () => {
           {approved.tokenA && approved.tokenB ? (
             tokensInSamePool ? (
               <Button
-                loading={isProvideLoading}
+                loading={loadingCreate}
                 disabled={!readyToProvide}
                 onClick={handleCreateClick}
               >
@@ -493,7 +498,7 @@ const Create = () => {
               </Button>
             ) : (
               <Button
-                loading={isProvideLoading}
+                loading={loadingCreate}
                 disabled={!readyToProvide}
                 onClick={handleCreateClick}
               >
