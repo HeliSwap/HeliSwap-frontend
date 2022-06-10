@@ -19,9 +19,8 @@ import errorMessages from '../content/errors';
 import { addressToId, idToAddress, NATIVE_TOKEN } from '../utils/tokenUtils';
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
-
-const INITIAL_SLIPPAGE_TOLERANCE = 0.1;
-const INITIAL_EXPIRATION_TIME = 60;
+import TransactionSettingsModalContent from '../components/Modals/TransactionSettingsModalContent';
+import { getTransactionSettings, INITIAL_SWAP_SLIPPAGE_TOLERANCE, setSlippageTolerance, setTransactionDeadline } from '../utils/transactionUtils';
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
@@ -31,6 +30,7 @@ const Swap = () => {
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
+  const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
 
   const initialTokensData: ITokensData = {
     tokenA: NATIVE_TOKEN,
@@ -73,8 +73,6 @@ const Swap = () => {
   // Additional states for Swaps
   const [readyToSwap, setReadyToSwap] = useState(false);
   const [tokenInExactAmount, setTokenInExactAmount] = useState(true);
-  const [slippage, setSlippage] = useState(INITIAL_SLIPPAGE_TOLERANCE);
-  const [transactionExpiration, setTransactionExpiration] = useState(INITIAL_EXPIRATION_TIME);
 
   // State for general error
   const [error, setError] = useState(false);
@@ -182,6 +180,8 @@ const Swap = () => {
     setSuccessMessage('');
     setLoadingSwap(true);
 
+    const { swapSlippage, transactionExpiration} = getTransactionSettings();
+
     try {
       let receipt;
       if (tokenInExactAmount) {
@@ -193,7 +193,7 @@ const Swap = () => {
             amountIn,
             amountOut,
             decOut,
-            slippage,
+            swapSlippage,
             transactionExpiration,
           );
         } else if (tokenOutIsNative) {
@@ -205,7 +205,7 @@ const Swap = () => {
             amountOut,
             decIn,
             decOut,
-            slippage,
+            swapSlippage,
             transactionExpiration,
           );
         } else {
@@ -218,7 +218,7 @@ const Swap = () => {
             amountOut,
             decIn,
             decOut,
-            slippage,
+            swapSlippage,
             transactionExpiration,
           );
         }
@@ -231,7 +231,7 @@ const Swap = () => {
             amountIn,
             amountOut,
             decOut,
-            slippage,
+            swapSlippage,
             transactionExpiration,
           );
         } else if (tokenOutIsNative) {
@@ -243,7 +243,7 @@ const Swap = () => {
             amountOut,
             decIn,
             decOut,
-            slippage,
+            swapSlippage,
             transactionExpiration,
           );
         } else {
@@ -256,7 +256,7 @@ const Swap = () => {
             amountOut,
             decIn,
             decOut,
-            slippage,
+            swapSlippage,
             transactionExpiration,
           );
         }
@@ -287,6 +287,11 @@ const Swap = () => {
       setLoadingSwap(false);
     }
   };
+
+  const handleSaveTransactionSettings = (setDefaultSlippage: boolean, slippage: number, expiration: number) => {
+    setSlippageTolerance(slippage, setDefaultSlippage);
+    setTransactionDeadline(expiration);
+  }
 
   useEffect(() => {
     refetch();
@@ -396,6 +401,26 @@ const Swap = () => {
   return (
     <div className="d-flex justify-content-center">
       <div className="container-swap">
+        <img
+          className="me-2"
+          width={24}
+          src={`/icons/settings2.png`}
+          alt=""
+          onClick={() => setShowModalTransactionSettings(true)}
+        />
+        {showModalTransactionSettings ? (
+          <Modal show={showModalTransactionSettings}>
+            <TransactionSettingsModalContent
+              modalTitle="Transaction settings"
+              closeModal={() => setShowModalTransactionSettings(false)}
+              slippage={getTransactionSettings().swapSlippage}
+              expiration={getTransactionSettings().transactionExpiration}
+              saveChanges={handleSaveTransactionSettings}
+              defaultSlippageValue={INITIAL_SWAP_SLIPPAGE_TOLERANCE}
+            />
+          </Modal>
+        ) : null}
+
         {error ? (
           <div className="alert alert-danger my-5" role="alert">
             <strong>Something went wrong!</strong>
