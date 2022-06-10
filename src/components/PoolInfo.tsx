@@ -108,10 +108,14 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
           ? removeLpData.token1Decimals
           : removeLpData.token0Decimals;
 
+          const tokenAddress = isFirstTokenWHBAR
+          ? removeLpData.tokenOutAddress
+          : removeLpData.tokenInAddress;
+
         responseData = await sdk.removeNativeLiquidity(
           hashconnectConnectorInstance,
           userId,
-          removeLpData.tokenInAddress,
+          tokenAddress,
           removeLpData.tokensLpAmount,
           tokenAmount,
           WHBARAmount,
