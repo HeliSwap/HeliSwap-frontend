@@ -60,7 +60,7 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
     } = pairData;
     const tokensLPToRemove = formatStringToStringWei(lpInputValue);
 
-    const { reserve0ShareHBN, reserve1ShareHBN } = calculateReserves(
+    const { reserve0ShareStr: tokens0Amount, reserve1ShareStr: tokens1Amount } = calculateReserves(
       tokensLPToRemove,
       pairSupply,
       token0Amount,
@@ -70,8 +70,6 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
     );
 
     const tokensLpAmount = hethers.utils.formatUnits(tokensLPToRemove, 18).toString();
-    const tokens0Amount = hethers.utils.formatUnits(reserve0ShareHBN, token0Decimals).toString();
-    const tokens1Amount = hethers.utils.formatUnits(reserve1ShareHBN, token1Decimals).toString();
 
     setRemoveLpData({
       tokenInAddress,
@@ -204,6 +202,7 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
   }, [pairData, connectedWallet, removeLpData, sdk, userId]);
 
   const canRemove = lpApproved && removeLpData.tokenInAddress !== '';
+
   const { reserve0ShareStr, reserve1ShareStr } = calculateReserves(
     pairData.lpShares as string,
     pairData.pairSupply,
@@ -298,24 +297,14 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
               <div className="d-flex justify-content-between align-items-center mt-2">
                 <p>Pooled {pairData.token0Symbol}:</p>
                 <p className="d-flex align-items-center">
-                  <span className="me-2">
-                    {formatStringWeiToStringEther(
-                      removeLpData.tokens0Amount,
-                      pairData.token0Decimals,
-                    )}
-                  </span>
+                  <span className="me-2">{removeLpData.tokens0Amount}</span>
                   <img width={20} src={`/icons/${pairData.token0Symbol}.png`} alt="" />
                 </p>
               </div>
               <div className="d-flex justify-content-between align-items-center mt-2">
                 <p>Pooled {pairData.token1Symbol}:</p>
                 <p className="d-flex align-items-center">
-                  <span className="me-2">
-                    {formatStringWeiToStringEther(
-                      removeLpData.tokens1Amount,
-                      pairData.token1Decimals,
-                    )}
-                  </span>
+                  <span className="me-2">{removeLpData.tokens1Amount}</span>
                   <img width={20} src={`/icons/${pairData.token1Symbol}.png`} alt="" />
                 </p>
               </div>
