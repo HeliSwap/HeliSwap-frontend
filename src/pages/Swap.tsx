@@ -163,10 +163,13 @@ const Swap = () => {
     const { tokenIdIn, tokenIdOut, amountIn, amountOut } = swapData;
     const { token0, token0Decimals, token1Decimals } = selectedPoolData;
 
-    const tokenInSamePool = tokenIdIn === addressToId(token0);
+    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS;
+    const tokenInFirstAtPool = tokenInIsNative
+    ? token0 === WHBARAddress
+    : addressToId(token0) === tokenIdIn;
 
-    const decIn = tokenInSamePool ? token0Decimals : token1Decimals;
-    const decOut = tokenInSamePool ? token1Decimals : token0Decimals;
+    const decIn = tokenInFirstAtPool ? token0Decimals : token1Decimals;
+    const decOut = tokenInFirstAtPool ? token1Decimals : token0Decimals;
 
     setError(false);
     setErrorMessage('');
