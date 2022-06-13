@@ -14,13 +14,17 @@ import Loader from '../components/Loader';
 import Modal from '../components/Modal';
 import ModalSearchContent from '../components/Modals/ModalSearchContent';
 import WalletBalance from '../components/WalletBalance';
+import TransactionSettingsModalContent from '../components/Modals/TransactionSettingsModalContent';
 
 import errorMessages from '../content/errors';
 import { addressToId, idToAddress, NATIVE_TOKEN } from '../utils/tokenUtils';
+import {
+  getTransactionSettings,
+  INITIAL_SWAP_SLIPPAGE_TOLERANCE,
+  handleSaveTransactionSettings,
+} from '../utils/transactionUtils';
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
-import TransactionSettingsModalContent from '../components/Modals/TransactionSettingsModalContent';
-import { getTransactionSettings, INITIAL_SWAP_SLIPPAGE_TOLERANCE, setSlippageTolerance, setTransactionDeadline } from '../utils/transactionUtils';
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
@@ -168,8 +172,8 @@ const Swap = () => {
 
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS;
     const tokenInFirstAtPool = tokenInIsNative
-    ? token0 === WHBARAddress
-    : addressToId(token0) === tokenIdIn;
+      ? token0 === WHBARAddress
+      : addressToId(token0) === tokenIdIn;
 
     const decIn = tokenInFirstAtPool ? token0Decimals : token1Decimals;
     const decOut = tokenInFirstAtPool ? token1Decimals : token0Decimals;
@@ -180,7 +184,7 @@ const Swap = () => {
     setSuccessMessage('');
     setLoadingSwap(true);
 
-    const { swapSlippage, transactionExpiration} = getTransactionSettings();
+    const { swapSlippage, transactionExpiration } = getTransactionSettings();
 
     try {
       let receipt;
@@ -287,11 +291,6 @@ const Swap = () => {
       setLoadingSwap(false);
     }
   };
-
-  const handleSaveTransactionSettings = (setDefaultSlippage: boolean, slippage: number, expiration: number) => {
-    setSlippageTolerance(slippage, setDefaultSlippage);
-    setTransactionDeadline(expiration);
-  }
 
   useEffect(() => {
     refetch();

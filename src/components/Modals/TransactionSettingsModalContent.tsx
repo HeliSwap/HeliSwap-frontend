@@ -15,7 +15,7 @@ const TransactionSettingsModalContent = ({
   slippage,
   expiration,
   saveChanges,
-  defaultSlippageValue
+  defaultSlippageValue,
 }: IModalProps) => {
   const [slippageTollerance, setSlippageTollerance] = useState(slippage);
   const [deadline, setDeadline] = useState(expiration);
@@ -24,22 +24,22 @@ const TransactionSettingsModalContent = ({
   const handleSlippageToleranceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setSlippageTollerance(parseFloat(value));
-  }
+  };
 
   const handleSetDefaultSlippage = () => {
     setDefaultSlippage(true);
     setSlippageTollerance(defaultSlippageValue);
-  }
+  };
 
   const handleExpirationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    setDeadline(parseFloat(value))
-  }
+    setDeadline(parseFloat(value));
+  };
 
   const handleSaveChanges = () => {
     saveChanges(defaultSlippage, slippageTollerance, deadline);
     closeModal();
-  }
+  };
 
   return (
     <>
@@ -69,7 +69,11 @@ const TransactionSettingsModalContent = ({
             Auto
           </button>
           <span>Slippage tolerance</span>
-          <input type={'number'} value={slippageTollerance} onChange={handleSlippageToleranceChange}></input>
+          <input
+            type={'number'}
+            value={slippageTollerance}
+            onChange={handleSlippageToleranceChange}
+          ></input>
           <span>%</span>
         </div>
         <div>

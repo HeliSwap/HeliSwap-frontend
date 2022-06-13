@@ -7,6 +7,7 @@ import Button from './Button';
 
 import { formatStringToStringWei, formatStringWeiToStringEther } from '../utils/numberUtils';
 import { addressToContractId, idToAddress, calculateReserves } from '../utils/tokenUtils';
+import { getTransactionSettings } from '../utils/transactionUtils';
 import { getConnectedWallet } from '../pages/Helpers';
 
 const INITIAL_SLIPPAGE_TOLERANCE = 0.1;
@@ -44,8 +45,6 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
 
   const [removeNative, setRemoveNative] = useState(false);
   const [hasWrappedHBAR, setHasWrappedHBAR] = useState(false);
-  const [slippage, setSlippage] = useState(INITIAL_SLIPPAGE_TOLERANCE);
-  const [transactionExpiration, setTransactionExpiration] = useState(INITIAL_EXPIRATION_TIME);
 
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -93,6 +92,7 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
 
     try {
       let responseData;
+      const { removeSlippage, transactionExpiration } = getTransactionSettings();
 
       if (hasWrappedHBAR && removeNative) {
         const isFirstTokenWHBAR = pairData.token0 === process.env.REACT_APP_WHBAR_ADDRESS;
@@ -113,7 +113,7 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
           ? removeLpData.token1Decimals
           : removeLpData.token0Decimals;
 
-          const tokenAddress = isFirstTokenWHBAR
+        const tokenAddress = isFirstTokenWHBAR
           ? removeLpData.tokenOutAddress
           : removeLpData.tokenInAddress;
 
@@ -126,7 +126,7 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
           WHBARAmount,
           tokenDecimals,
           WHBARDecimals,
-          slippage,
+          removeSlippage,
           transactionExpiration,
         );
       } else {
@@ -140,7 +140,7 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
           removeLpData.tokens1Amount,
           removeLpData.token0Decimals,
           removeLpData.token1Decimals,
-          slippage,
+          removeSlippage,
           transactionExpiration,
         );
       }
