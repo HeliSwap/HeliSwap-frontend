@@ -326,7 +326,7 @@ const Create = () => {
         <img
           className="me-2"
           width={24}
-          src={`/icons/settings2.png`}
+          src={`/icons/settings.png`}
           alt=""
           onClick={() => setShowModalTransactionSettings(true)}
         />
