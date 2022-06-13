@@ -6,6 +6,7 @@ import {
   IPairData,
   ICreatePairData,
   ITokensData,
+  IAllowanceData,
 } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
@@ -16,8 +17,12 @@ import WalletBalance from '../components/WalletBalance';
 import TransactionSettingsModalContent from '../components/Modals/TransactionSettingsModalContent';
 
 import errorMessages from '../content/errors';
-import { idToAddress } from '../utils/tokenUtils';
-import { formatStringToBigNumberEthersWei } from '../utils/numberUtils';
+import { addressToId, getTokenAllowance, idToAddress } from '../utils/tokenUtils';
+import {
+  formatNumberToBigNumber,
+  formatStringToBigNumberEthersWei,
+  formatStringToBigNumberWei,
+} from '../utils/numberUtils';
 import {
   getTransactionSettings,
   INITIAL_PROVIDE_SLIPPAGE_TOLERANCE,
@@ -124,20 +129,12 @@ const Create = () => {
   };
 
   const handleApproveClick = async (key: string) => {
-    const { hederaId, decimals } = tokensData[key];
-    const keyAmount = `${key}Amount` as keyof ICreatePairData;
-    const amount = createPairData[keyAmount] as string;
+    const { hederaId } = tokensData[key];
 
     setLoadingApprove(true);
 
     try {
-      const receipt = await sdk.approveToken(
-        hashconnectConnectorInstance,
-        userId,
-        hederaId,
-        amount,
-        decimals,
-      );
+      const receipt = await sdk.approveToken(hashconnectConnectorInstance, userId, hederaId);
       const {
         response: { success, error },
       } = receipt;
@@ -211,7 +208,7 @@ const Create = () => {
   };
 
   useEffect(() => {
-    const getApproved = async (tokenId: string, index: string) => {
+    const getAllowanceERC20 = async (tokenId: string, index: string) => {
       const connectedWallet = getConnectedWallet();
       if (connectedWallet) {
         const tokenAddress = idToAddress(tokenId);
@@ -236,18 +233,51 @@ const Create = () => {
       }
     };
 
+    const getAllowanceHTS = async (userId: string, token: ITokenData, index: string) => {
+      const spenderId = addressToId(process.env.REACT_APP_ROUTER_ADDRESS as string);
+      const allowances = await getTokenAllowance(userId);
+      const key = `${index}Amount`;
+
+      const allowancesBySpender = allowances.filter(
+        (item: IAllowanceData) => item.spender === spenderId,
+      );
+
+      const allowancesByToken = allowancesBySpender.filter(
+        (item: IAllowanceData) => item.token_id === token.hederaId,
+      );
+
+      if (allowancesByToken.length > 0) {
+        const currentAllowance = allowancesByToken[0].amount_granted;
+        const currentAllowanceBN = formatNumberToBigNumber(currentAllowance);
+        console.log('currentAllowanceBN.toString()', currentAllowanceBN.toString());
+        const amountToSpend = createPairData[key as keyof ICreatePairData] as string;
+        const amountToSpendBN = formatStringToBigNumberWei(amountToSpend, token.decimals);
+        console.log('amountToSpendBN.toString()', amountToSpendBN.toString());
+
+        const canSpend = amountToSpendBN.lte(currentAllowanceBN);
+
+        console.log('canSpend', canSpend);
+
+        setApproved(prev => ({ ...prev, [index]: canSpend }));
+      }
+    };
+
     const { tokenA, tokenB } = tokensData;
 
     if (tokenA.type === TokenType.HBAR) {
       setApproved(prev => ({ ...prev, tokenA: true }));
     } else if (tokenA.type === TokenType.ERC20) {
-      tokenA.hederaId && getApproved(tokenA.hederaId, 'tokenA');
+      getAllowanceERC20(tokenA.hederaId, 'tokenA');
+    } else {
+      userId && getAllowanceHTS(userId, tokenA, 'tokenA');
     }
 
     if (tokenB.type === TokenType.HBAR) {
       setApproved(prev => ({ ...prev, tokenB: true }));
     } else if (tokenB.type === TokenType.ERC20) {
-      tokenB.hederaId && getApproved(tokenB.hederaId, 'tokenB');
+      getAllowanceERC20(tokenB.hederaId, 'tokenB');
+    } else {
+      userId && getAllowanceHTS(userId, tokenB, 'tokenB');
     }
   }, [tokensData, sdk, userId, createPairData]);
 

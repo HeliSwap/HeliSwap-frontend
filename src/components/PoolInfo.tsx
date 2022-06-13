@@ -170,13 +170,7 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
   const hanleApproveLPClick = async () => {
     try {
       const contractId = addressToContractId(pairData.pairAddress);
-      await sdk.approveToken(
-        hashconnectConnectorInstance,
-        userId,
-        contractId,
-        removeLpData.tokensLpAmount,
-        18, //LP tokens should have 18 decimals
-      );
+      await sdk.approveToken(hashconnectConnectorInstance, userId, contractId);
       setLpApproved(true);
     } catch (e) {
       console.error(e);

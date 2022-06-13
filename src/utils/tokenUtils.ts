@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { hethers } from '@hashgraph/hethers';
 
-import { ITokenData, IWalletBalance, TokenType } from '../interfaces/tokens';
+import { IAllowanceData, ITokenData, IWalletBalance, TokenType } from '../interfaces/tokens';
 import { ContractId } from '@hashgraph/sdk';
 
 export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
@@ -55,6 +55,21 @@ export const getHTSTokensWalletBalance = async (userId: string): Promise<IWallet
   } catch (e) {
     console.error(e);
     return {} as IWalletBalance;
+  }
+};
+
+export const getTokenAllowance = async (accountId: string): Promise<IAllowanceData[]> => {
+  const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/accounts/${accountId}/allowances/tokens`;
+
+  try {
+    const {
+      data: { allowances },
+    } = await axios(url);
+
+    return allowances;
+  } catch (e) {
+    console.error(e);
+    return [];
   }
 };
 

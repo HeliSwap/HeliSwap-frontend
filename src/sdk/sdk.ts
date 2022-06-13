@@ -10,9 +10,10 @@ import { ICreatePairData } from '../interfaces/tokens';
 import { addressToId, idToAddress } from '../utils/tokenUtils';
 import {
   getAmountWithSlippage,
+  getExpirationTime,
   formatStringToBigNumberEthersWei,
   formatStringToBigNumberWei,
-  getExpirationTime,
+  formatStringToBigNumber,
 } from '../utils/numberUtils';
 
 import ERC20 from '../abi/ERC20';
@@ -112,12 +113,12 @@ class SDK {
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
     tokenId: string | ContractId,
-    amount: string,
-    dec: number,
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
 
-    const amountToApproveBN = formatStringToBigNumberWei(amount, dec);
+    console.log('hethers.constants.MaxUint256.toString()', hethers.constants.MaxUint256.toString());
+
+    const amountToApproveBN = formatStringToBigNumber(hethers.constants.MaxUint256.toString());
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract

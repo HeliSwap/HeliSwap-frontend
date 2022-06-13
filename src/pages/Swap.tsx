@@ -140,13 +140,7 @@ const Swap = () => {
     setLoadingApprove(true);
 
     try {
-      const receipt = await sdk.approveToken(
-        hashconnectConnectorInstance,
-        userId,
-        tokenA.hederaId,
-        swapData.amountIn,
-        tokenA.decimals,
-      );
+      const receipt = await sdk.approveToken(hashconnectConnectorInstance, userId, tokenA.hederaId);
       const {
         response: { success, error },
       } = receipt;
