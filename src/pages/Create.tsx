@@ -164,7 +164,6 @@ const Create = () => {
     setErrorMessage('');
 
     try {
-      //TODO add logic for adding native liquidity
       const receipt = provideNative
         ? await sdk.addNativeLiquidity(
             hashconnectConnectorInstance,
