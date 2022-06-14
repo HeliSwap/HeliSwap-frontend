@@ -41,11 +41,13 @@ const Create = () => {
   const [showModalB, setShowModalB] = useState(false);
   const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
 
-  // State for token inputs
-  const [tokensData, setTokensData] = useState<ITokensData>({
+  const initialTokensData = {
     tokenA: {} as ITokenData,
     tokenB: {} as ITokenData,
-  });
+  };
+
+  // State for token inputs
+  const [tokensData, setTokensData] = useState<ITokensData>(initialTokensData);
 
   // State for pools
   const { pools: poolsData } = usePools({
@@ -65,11 +67,13 @@ const Create = () => {
   // State for Create/Provide
   const [createPairData, setCreatePairData] = useState<ICreatePairData>(initialCreateData);
 
-  // State for approved
-  const [approved, setApproved] = useState({
+  const initialApproveData = {
     tokenA: false,
     tokenB: false,
-  });
+  };
+
+  // State for approved
+  const [approved, setApproved] = useState(initialApproveData);
 
   // State for common pool data
   const [selectedPoolData, setSelectedPoolData] = useState<IPairData>({} as IPairData);
@@ -82,6 +86,8 @@ const Create = () => {
   // State for general error
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [successCreate, setSuccessCreate] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
 
@@ -156,9 +162,12 @@ const Create = () => {
 
   const handleCreateClick = async () => {
     const { provideSlippage, transactionExpiration } = getTransactionSettings();
-    setLoadingCreate(true);
+
     setError(false);
     setErrorMessage('');
+    setSuccessCreate(false);
+    setSuccessMessage('');
+    setLoadingCreate(true);
 
     try {
       const receipt = provideNative
@@ -184,19 +193,14 @@ const Create = () => {
         setError(true);
         setErrorMessage(error);
       } else {
-        setTokensData({
-          tokenA: {} as ITokenData,
-          tokenB: {} as ITokenData,
-        });
+        const successMessage = `Provided exactly ${createPairData.tokenAAmount} ${tokensData.tokenA.symbol} and ${createPairData.tokenBAmount} ${tokensData.tokenB.symbol}`;
 
-        setCreatePairData({
-          tokenAAmount: '0',
-          tokenBAmount: '0',
-          tokenAId: '',
-          tokenBId: '',
-          tokenADecimals: 18,
-          tokenBDecimals: 18,
-        });
+        setCreatePairData(initialCreateData);
+        setTokensData(initialTokensData);
+        setSelectedPoolData({} as IPairData);
+        setApproved(initialApproveData);
+        setSuccessCreate(true);
+        setSuccessMessage(successMessage);
       }
     } catch (err) {
       console.error(err);
@@ -479,6 +483,20 @@ const Create = () => {
             ) : null}
           </div>
         </div>
+
+        {successCreate ? (
+          <div className="alert alert-success alert-dismissible my-5" role="alert">
+            <strong>Success provide!</strong>
+            <p>{successMessage}</p>
+            <button
+              onClick={() => setSuccessCreate(false)}
+              type="button"
+              className="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+            ></button>
+          </div>
+        ) : null}
 
         {readyToProvide ? (
           <div className="bg-slate rounded p-4 my-4">
