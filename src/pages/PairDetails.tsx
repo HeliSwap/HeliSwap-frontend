@@ -9,6 +9,7 @@ import { GET_POOLS } from '../GraphQL/Queries';
 import { IPairData } from '../interfaces/tokens';
 
 import { idToAddress, addressToContractId } from '../utils/tokenUtils';
+import { INITIAL_EXPIRATION_TIME, INITIAL_SLIPPAGE_TOLERANCE } from '../utils/transactionUtils';
 import {
   formatStringToBigNumberEthersWei,
   formatStringWeiToStringEther,
@@ -16,9 +17,6 @@ import {
 import { getConnectedWallet } from './Helpers';
 import Loader from '../components/Loader';
 import Button from '../components/Button';
-
-const INITIAL_SLIPPAGE_TOLERANCE = 0.1;
-const INITIAL_EXPIRATION_TIME = 60;
 
 const PairDetails = () => {
   const contextValue = useContext(GlobalContext);

@@ -1,6 +1,7 @@
 export const INITIAL_PROVIDE_SLIPPAGE_TOLERANCE = 0.5;
 export const INITIAL_SWAP_SLIPPAGE_TOLERANCE = 0.1;
 export const INITIAL_REMOVE_SLIPPAGE_TOLERANCE = 5;
+export const INITIAL_SLIPPAGE_TOLERANCE = 0.1;
 export const INITIAL_EXPIRATION_TIME = 60;
 
 export const getTransactionSettings = () => {
