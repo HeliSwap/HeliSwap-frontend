@@ -400,13 +400,12 @@ const Swap = () => {
   return (
     <div className="d-flex justify-content-center">
       <div className="container-swap">
-        <img
-          className="me-2"
-          width={24}
-          src={`/icons/settings.png`}
-          alt=""
-          onClick={() => setShowModalTransactionSettings(true)}
-        />
+        <div className="d-flex justify-content-end">
+          <span className="cursor-pointer" onClick={() => setShowModalTransactionSettings(true)}>
+            <img className="me-2" width={24} src={`/icons/settings.png`} alt="" />
+          </span>
+        </div>
+
         {showModalTransactionSettings ? (
           <Modal show={showModalTransactionSettings}>
             <TransactionSettingsModalContent
@@ -427,7 +426,7 @@ const Swap = () => {
           </div>
         ) : null}
 
-        <div className="d-flex justify-content-between mt-5">
+        <div className="d-flex justify-content-between mt-3">
           <span className="badge bg-primary text-uppercase">From</span>
           <span></span>
         </div>
