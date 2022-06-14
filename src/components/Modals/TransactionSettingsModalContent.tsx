@@ -60,25 +60,35 @@ const TransactionSettingsModalContent = ({
       </div>
       <div className="modal-body">
         <div>
-          <button
-            onClick={handleSetDefaultSlippage}
-            type="button"
-            className="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            Auto
-          </button>
-          <span>Slippage tolerance</span>
-          <input
-            type={'number'}
-            value={slippageTollerance}
-            onChange={handleSlippageToleranceChange}
-          ></input>
-          <span>%</span>
+          <p>Slippage tolerance</p>
+
+          <div className="d-flex align-items-center mt-3">
+            <button
+              onClick={handleSetDefaultSlippage}
+              type="button"
+              className="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Auto
+            </button>
+            <input
+              type={'number'}
+              value={slippageTollerance}
+              onChange={handleSlippageToleranceChange}
+              className="form-control ms-3"
+            ></input>
+            <span className="ms-2">%</span>
+          </div>
         </div>
-        <div>
-          <span>Transaction deadline</span>
-          <input type={'number'} defaultValue={deadline} onChange={handleExpirationChange}></input>
+
+        <div className="mt-4">
+          <p>Transaction deadline</p>
+          <input
+            className="form-control mt-3"
+            type={'number'}
+            defaultValue={deadline}
+            onChange={handleExpirationChange}
+          ></input>
         </div>
       </div>
       <div className="modal-footer">
