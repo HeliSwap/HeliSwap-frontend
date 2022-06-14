@@ -208,10 +208,10 @@ const Create = () => {
   };
 
   useEffect(() => {
-    const getAllowanceERC20 = async (tokenId: string, index: string) => {
+    const getAllowanceERC20 = async (token: ITokenData, index: string) => {
       const connectedWallet = getConnectedWallet();
       if (connectedWallet) {
-        const tokenAddress = idToAddress(tokenId);
+        const tokenAddress = idToAddress(token.hederaId);
         const userAddress = idToAddress(userId);
         const resultBN = await sdk.checkAllowance(
           tokenAddress,
@@ -220,7 +220,7 @@ const Create = () => {
           connectedWallet,
         );
 
-        const resultStr = hethers.utils.formatUnits(resultBN, 18);
+        const resultStr = hethers.utils.formatUnits(resultBN, token.decimals);
         const resultNum = Number(resultStr);
         const key = `${index}Amount`;
 
@@ -267,7 +267,7 @@ const Create = () => {
     if (tokenA.type === TokenType.HBAR) {
       setApproved(prev => ({ ...prev, tokenA: true }));
     } else if (tokenA.type === TokenType.ERC20) {
-      getAllowanceERC20(tokenA.hederaId, 'tokenA');
+      getAllowanceERC20(tokenA, 'tokenA');
     } else {
       userId && getAllowanceHTS(userId, tokenA, 'tokenA');
     }
@@ -275,7 +275,7 @@ const Create = () => {
     if (tokenB.type === TokenType.HBAR) {
       setApproved(prev => ({ ...prev, tokenB: true }));
     } else if (tokenB.type === TokenType.ERC20) {
-      getAllowanceERC20(tokenB.hederaId, 'tokenB');
+      getAllowanceERC20(tokenB, 'tokenB');
     } else {
       userId && getAllowanceHTS(userId, tokenB, 'tokenB');
     }
