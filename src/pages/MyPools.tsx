@@ -42,13 +42,12 @@ const Pairs = () => {
   return (
     <div className="d-flex justify-content-center">
       <div className="container-swap">
-        <img
-          className="me-2"
-          width={24}
-          src={`/icons/settings.png`}
-          alt=""
-          onClick={() => setShowModalTransactionSettings(true)}
-        />
+        <div className="d-flex justify-content-end">
+          <span className="cursor-pointer" onClick={() => setShowModalTransactionSettings(true)}>
+            <img className="me-2" width={24} src={`/icons/settings.png`} alt="" />
+          </span>
+        </div>
+
         {showModalTransactionSettings ? (
           <Modal show={showModalTransactionSettings}>
             <TransactionSettingsModalContent
@@ -61,12 +60,14 @@ const Pairs = () => {
             />
           </Modal>
         ) : null}
+
         {error ? (
           <div className="alert alert-danger mt-5" role="alert">
             <strong>Something went wrong!</strong> Cannot get pairs...
             <p>{error.message}</p>
           </div>
         ) : null}
+
         {loading ? (
           <p className="text-info">Loading pairs...</p>
         ) : havePairs ? (
