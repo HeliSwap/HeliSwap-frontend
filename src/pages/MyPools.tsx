@@ -84,6 +84,3 @@ const Pairs = () => {
 };
 
 export default Pairs;
-function setShowModalTransactionSettings(arg0: boolean): void {
-  throw new Error('Function not implemented.');
-}

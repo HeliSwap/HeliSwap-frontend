@@ -10,9 +10,6 @@ import { addressToContractId, idToAddress, calculateReserves } from '../utils/to
 import { getTransactionSettings } from '../utils/transactionUtils';
 import { getConnectedWallet } from '../pages/Helpers';
 
-const INITIAL_SLIPPAGE_TOLERANCE = 0.1;
-const INITIAL_EXPIRATION_TIME = 60;
-
 interface IPoolInfoProps {
   pairData: IPairData;
 }

@@ -43,8 +43,6 @@ const PairDetails = () => {
 
   const [lpApproved, setLpApproved] = useState(false);
   const [lpInputValue, setLpInputValue] = useState('');
-  const [slippage, setSlippage] = useState(INITIAL_SLIPPAGE_TOLERANCE);
-  const [transactionExpiration, setTransactionExpiration] = useState(INITIAL_EXPIRATION_TIME);
 
   useEffect(() => {
     if (data && data.pools.length > 0) {
@@ -149,8 +147,8 @@ const PairDetails = () => {
       tokens1ToRemoveStr,
       pairData.token0Decimals,
       pairData.token1Decimals,
-      slippage,
-      transactionExpiration,
+      INITIAL_SLIPPAGE_TOLERANCE,
+      INITIAL_EXPIRATION_TIME,
     );
 
     setPairDataContracts({
