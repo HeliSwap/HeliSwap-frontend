@@ -44,3 +44,29 @@ export const formatStringWeiToStringEther = (numberToFormat: string, decimals: n
 
   return numberToFormatBN.div(tenPowDec).toString();
 };
+
+// Used to calculate token min/max amount including slippage
+export const getAmountWithSlippage = (
+  amount: string,
+  amountDecimals: number,
+  slippagePercentage: number,
+  isMinAmount: boolean,
+  isNative: boolean = false,
+) => {
+  const amountWei = formatStringToBigNumberWei(amount, amountDecimals);
+  const slippage = slippagePercentage / 100;
+  let amountWithSlippage;
+
+  if (isMinAmount) {
+    amountWithSlippage = amountWei.minus(amountWei.times(slippage));
+  } else {
+    amountWithSlippage = amountWei.plus(amountWei.times(slippage));
+  }
+
+  return isNative ? amountWithSlippage.decimalPlaces(8) : amountWithSlippage.decimalPlaces(0, 1);
+};
+
+// Used to calculate the deadline of certain transactions
+export const getExpirationTime = (minutes: number) => {
+  return Math.floor(Date.now() / 1000) + 60 * minutes;
+};

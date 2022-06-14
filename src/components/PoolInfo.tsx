@@ -7,6 +7,7 @@ import Button from './Button';
 
 import { formatStringToStringWei, formatStringWeiToStringEther } from '../utils/numberUtils';
 import { addressToContractId, idToAddress, calculateReserves } from '../utils/tokenUtils';
+import { getTransactionSettings } from '../utils/transactionUtils';
 import { getConnectedWallet } from '../pages/Helpers';
 
 interface IPoolInfoProps {
@@ -88,6 +89,7 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
 
     try {
       let responseData;
+      const { removeSlippage, transactionExpiration } = getTransactionSettings();
 
       if (hasWrappedHBAR && removeNative) {
         const isFirstTokenWHBAR = pairData.token0 === process.env.REACT_APP_WHBAR_ADDRESS;
@@ -108,7 +110,7 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
           ? removeLpData.token1Decimals
           : removeLpData.token0Decimals;
 
-          const tokenAddress = isFirstTokenWHBAR
+        const tokenAddress = isFirstTokenWHBAR
           ? removeLpData.tokenOutAddress
           : removeLpData.tokenInAddress;
 
@@ -121,6 +123,8 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
           WHBARAmount,
           tokenDecimals,
           WHBARDecimals,
+          removeSlippage,
+          transactionExpiration,
         );
       } else {
         responseData = await sdk.removeLiquidity(
@@ -133,6 +137,8 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
           removeLpData.tokens1Amount,
           removeLpData.token0Decimals,
           removeLpData.token1Decimals,
+          removeSlippage,
+          transactionExpiration,
         );
       }
 

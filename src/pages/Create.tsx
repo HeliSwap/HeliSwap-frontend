@@ -13,10 +13,16 @@ import Button from '../components/Button';
 import Modal from '../components/Modal';
 import ModalSearchContent from '../components/Modals/ModalSearchContent';
 import WalletBalance from '../components/WalletBalance';
+import TransactionSettingsModalContent from '../components/Modals/TransactionSettingsModalContent';
 
 import errorMessages from '../content/errors';
 import { idToAddress } from '../utils/tokenUtils';
 import { formatStringToBigNumberEthersWei } from '../utils/numberUtils';
+import {
+  getTransactionSettings,
+  INITIAL_PROVIDE_SLIPPAGE_TOLERANCE,
+  handleSaveTransactionSettings,
+} from '../utils/transactionUtils';
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
 
@@ -28,6 +34,7 @@ const Create = () => {
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
+  const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
 
   // State for token inputs
   const [tokensData, setTokensData] = useState<ITokensData>({
@@ -151,15 +158,27 @@ const Create = () => {
   };
 
   const handleCreateClick = async () => {
+    const { provideSlippage, transactionExpiration } = getTransactionSettings();
     setLoadingCreate(true);
     setError(false);
     setErrorMessage('');
 
     try {
-      //TODO add logic for adding native liquidity
       const receipt = provideNative
-        ? await sdk.addNativeLiquidity(hashconnectConnectorInstance, userId, createPairData)
-        : await sdk.addLiquidity(hashconnectConnectorInstance, userId, createPairData);
+        ? await sdk.addNativeLiquidity(
+            hashconnectConnectorInstance,
+            userId,
+            createPairData,
+            provideSlippage,
+            transactionExpiration,
+          )
+        : await sdk.addLiquidity(
+            hashconnectConnectorInstance,
+            userId,
+            createPairData,
+            provideSlippage,
+            transactionExpiration,
+          );
       const {
         response: { success, error },
       } = receipt;
@@ -303,6 +322,25 @@ const Create = () => {
   return (
     <div className="d-flex justify-content-center">
       <div className="container-swap">
+        <div className="d-flex justify-content-end">
+          <span className="cursor-pointer" onClick={() => setShowModalTransactionSettings(true)}>
+            <img className="me-2" width={24} src={`/icons/settings.png`} alt="" />
+          </span>
+        </div>
+
+        {showModalTransactionSettings ? (
+          <Modal show={showModalTransactionSettings}>
+            <TransactionSettingsModalContent
+              modalTitle="Transaction settings"
+              closeModal={() => setShowModalTransactionSettings(false)}
+              slippage={getTransactionSettings().provideSlippage}
+              expiration={getTransactionSettings().transactionExpiration}
+              saveChanges={handleSaveTransactionSettings}
+              defaultSlippageValue={INITIAL_PROVIDE_SLIPPAGE_TOLERANCE}
+            />
+          </Modal>
+        ) : null}
+
         {error ? (
           <div className="alert alert-danger my-5" role="alert">
             <strong>Something went wrong!</strong>
@@ -310,7 +348,7 @@ const Create = () => {
           </div>
         ) : null}
 
-        <div className="d-flex justify-content-between mt-5">
+        <div className="d-flex justify-content-between mt-3">
           <span className="badge bg-primary text-uppercase">Token A</span>
           <span></span>
         </div>

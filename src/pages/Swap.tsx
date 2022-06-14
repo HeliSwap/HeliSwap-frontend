@@ -14,9 +14,15 @@ import Loader from '../components/Loader';
 import Modal from '../components/Modal';
 import ModalSearchContent from '../components/Modals/ModalSearchContent';
 import WalletBalance from '../components/WalletBalance';
+import TransactionSettingsModalContent from '../components/Modals/TransactionSettingsModalContent';
 
 import errorMessages from '../content/errors';
 import { addressToId, idToAddress, NATIVE_TOKEN } from '../utils/tokenUtils';
+import {
+  getTransactionSettings,
+  INITIAL_SWAP_SLIPPAGE_TOLERANCE,
+  handleSaveTransactionSettings,
+} from '../utils/transactionUtils';
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
 
@@ -28,6 +34,7 @@ const Swap = () => {
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
+  const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
 
   const initialTokensData: ITokensData = {
     tokenA: NATIVE_TOKEN,
@@ -103,7 +110,7 @@ const Swap = () => {
 
     let resIn, resOut, decIn, decOut;
 
-    if ((tokenIdIn || tokenInIsNative) && amountIn !== '0') {
+    if (name === 'amountIn' && amountIn !== '0') {
       resIn = tokenInFirstAtPool ? token0Amount : token1Amount;
       resOut = tokenInFirstAtPool ? token1Amount : token0Amount;
       decIn = tokenInFirstAtPool ? token0Decimals : token1Decimals;
@@ -112,7 +119,7 @@ const Swap = () => {
       const swapAmountOut = sdk.getSwapAmountOut(amountIn, resIn, resOut, decIn, decOut);
       setTokenInExactAmount(true);
       setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
-    } else if ((tokenIdOut || tokenOutIsNative) && amountOut !== '0') {
+    } else if (name === 'amountOut' && amountOut !== '0') {
       resIn = tokenOutFirstAtPool ? token1Amount : token0Amount;
       resOut = tokenOutFirstAtPool ? token0Amount : token1Amount;
       decIn = tokenOutFirstAtPool ? token1Decimals : token0Decimals;
@@ -165,8 +172,8 @@ const Swap = () => {
 
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS;
     const tokenInFirstAtPool = tokenInIsNative
-    ? token0 === WHBARAddress
-    : addressToId(token0) === tokenIdIn;
+      ? token0 === WHBARAddress
+      : addressToId(token0) === tokenIdIn;
 
     const decIn = tokenInFirstAtPool ? token0Decimals : token1Decimals;
     const decOut = tokenInFirstAtPool ? token1Decimals : token0Decimals;
@@ -176,6 +183,8 @@ const Swap = () => {
     setSuccessSwap(false);
     setSuccessMessage('');
     setLoadingSwap(true);
+
+    const { swapSlippage, transactionExpiration } = getTransactionSettings();
 
     try {
       let receipt;
@@ -188,6 +197,8 @@ const Swap = () => {
             amountIn,
             amountOut,
             decOut,
+            swapSlippage,
+            transactionExpiration,
           );
         } else if (tokenOutIsNative) {
           receipt = await sdk.swapExactTokensForHBAR(
@@ -198,6 +209,8 @@ const Swap = () => {
             amountOut,
             decIn,
             decOut,
+            swapSlippage,
+            transactionExpiration,
           );
         } else {
           receipt = await sdk.swapExactTokensForTokens(
@@ -209,6 +222,8 @@ const Swap = () => {
             amountOut,
             decIn,
             decOut,
+            swapSlippage,
+            transactionExpiration,
           );
         }
       } else {
@@ -220,6 +235,8 @@ const Swap = () => {
             amountIn,
             amountOut,
             decOut,
+            swapSlippage,
+            transactionExpiration,
           );
         } else if (tokenOutIsNative) {
           receipt = await sdk.swapTokensForExactHBAR(
@@ -230,6 +247,8 @@ const Swap = () => {
             amountOut,
             decIn,
             decOut,
+            swapSlippage,
+            transactionExpiration,
           );
         } else {
           receipt = await sdk.swapTokensForExactTokens(
@@ -241,6 +260,8 @@ const Swap = () => {
             amountOut,
             decIn,
             decOut,
+            swapSlippage,
+            transactionExpiration,
           );
         }
       }
@@ -379,6 +400,25 @@ const Swap = () => {
   return (
     <div className="d-flex justify-content-center">
       <div className="container-swap">
+        <div className="d-flex justify-content-end">
+          <span className="cursor-pointer" onClick={() => setShowModalTransactionSettings(true)}>
+            <img className="me-2" width={24} src={`/icons/settings.png`} alt="" />
+          </span>
+        </div>
+
+        {showModalTransactionSettings ? (
+          <Modal show={showModalTransactionSettings}>
+            <TransactionSettingsModalContent
+              modalTitle="Transaction settings"
+              closeModal={() => setShowModalTransactionSettings(false)}
+              slippage={getTransactionSettings().swapSlippage}
+              expiration={getTransactionSettings().transactionExpiration}
+              saveChanges={handleSaveTransactionSettings}
+              defaultSlippageValue={INITIAL_SWAP_SLIPPAGE_TOLERANCE}
+            />
+          </Modal>
+        ) : null}
+
         {error ? (
           <div className="alert alert-danger my-5" role="alert">
             <strong>Something went wrong!</strong>
@@ -386,7 +426,7 @@ const Swap = () => {
           </div>
         ) : null}
 
-        <div className="d-flex justify-content-between mt-5">
+        <div className="d-flex justify-content-between mt-3">
           <span className="badge bg-primary text-uppercase">From</span>
           <span></span>
         </div>

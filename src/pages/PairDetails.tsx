@@ -9,6 +9,7 @@ import { GET_POOLS } from '../GraphQL/Queries';
 import { IPairData } from '../interfaces/tokens';
 
 import { idToAddress, addressToContractId } from '../utils/tokenUtils';
+import { INITIAL_EXPIRATION_TIME, INITIAL_SLIPPAGE_TOLERANCE } from '../utils/transactionUtils';
 import {
   formatStringToBigNumberEthersWei,
   formatStringWeiToStringEther,
@@ -144,6 +145,8 @@ const PairDetails = () => {
       tokens1ToRemoveStr,
       pairData.token0Decimals,
       pairData.token1Decimals,
+      INITIAL_SLIPPAGE_TOLERANCE,
+      INITIAL_EXPIRATION_TIME,
     );
 
     setPairDataContracts({
