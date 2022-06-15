@@ -17,7 +17,7 @@ import WalletBalance from '../components/WalletBalance';
 import TransactionSettingsModalContent from '../components/Modals/TransactionSettingsModalContent';
 
 import errorMessages from '../content/errors';
-import { addressToId, idToAddress, NATIVE_TOKEN } from '../utils/tokenUtils';
+import { addressToId, checkAllowanceHTS, idToAddress, NATIVE_TOKEN } from '../utils/tokenUtils';
 import {
   getTransactionSettings,
   INITIAL_SWAP_SLIPPAGE_TOLERANCE,
@@ -25,6 +25,7 @@ import {
 } from '../utils/transactionUtils';
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
+import { MAX_UINT_ERC20, MAX_UINT_HTS } from '../constants';
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
@@ -137,15 +138,17 @@ const Swap = () => {
   const handleApproveClick = async () => {
     const { tokenA } = tokensData;
 
+    const amount =
+      tokenA.type === TokenType.ERC20 ? MAX_UINT_ERC20.toString() : MAX_UINT_HTS.toString();
+
     setLoadingApprove(true);
 
     try {
       const receipt = await sdk.approveToken(
         hashconnectConnectorInstance,
+        amount,
         userId,
         tokenA.hederaId,
-        swapData.amountIn,
-        tokenA.decimals,
       );
       const {
         response: { success, error },
@@ -332,11 +335,11 @@ const Swap = () => {
   }, [poolsData, tokensData, refetch]);
 
   useEffect(() => {
-    const getApproved = async (tokenId: string) => {
+    const getAllowanceERC20 = async (swapData: ISwapTokenData) => {
       const connectedWallet = getConnectedWallet();
 
       if (connectedWallet) {
-        const tokenAddress = idToAddress(tokenId);
+        const tokenAddress = idToAddress(swapData.tokenIdIn);
         const userAddress = idToAddress(userId);
         const resultBN = await sdk.checkAllowance(
           tokenAddress,
@@ -354,10 +357,32 @@ const Swap = () => {
       }
     };
 
+    const getAllowanceHTS = async (userId: string) => {
+      const amountToSpend = swapData.amountIn;
+      const tokenAData: ITokenData = {
+        hederaId: swapData.tokenIdIn,
+        name: '',
+        symbol: '',
+        decimals: swapData.tokenInDecimals,
+        address: '',
+        type: tokensData.tokenA.type,
+      };
+
+      const canSpend = await checkAllowanceHTS(userId, tokenAData, amountToSpend);
+
+      setApproved(canSpend);
+    };
+
     setApproved(tokensData.tokenA.type === TokenType.HBAR);
 
-    if (tokensData.tokenA.type === TokenType.ERC20 && swapData && userId) {
-      getApproved(swapData.tokenIdIn);
+    const hasTokenAData = swapData.tokenIdIn && swapData.amountIn !== '0';
+
+    if (tokensData.tokenA.type === TokenType.ERC20 && hasTokenAData && userId) {
+      getAllowanceERC20(swapData);
+    }
+
+    if (tokensData.tokenA.type === TokenType.HTS && hasTokenAData && userId) {
+      getAllowanceHTS(userId);
     }
   }, [swapData, userId, sdk, tokensData]);
 

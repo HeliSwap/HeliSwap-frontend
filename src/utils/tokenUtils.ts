@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { hethers } from '@hashgraph/hethers';
 
-import { ITokenData, IWalletBalance, TokenType } from '../interfaces/tokens';
+import { IAllowanceData, ITokenData, IWalletBalance, TokenType } from '../interfaces/tokens';
 import { ContractId } from '@hashgraph/sdk';
+import { formatNumberToBigNumber, formatStringToBigNumberWei } from './numberUtils';
 
 export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
   const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/tokens/${tokenId}`;
@@ -55,6 +56,50 @@ export const getHTSTokensWalletBalance = async (userId: string): Promise<IWallet
   } catch (e) {
     console.error(e);
     return {} as IWalletBalance;
+  }
+};
+
+export const getTokenAllowance = async (accountId: string): Promise<IAllowanceData[]> => {
+  const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/accounts/${accountId}/allowances/tokens`;
+
+  try {
+    const {
+      data: { allowances },
+    } = await axios(url);
+
+    return allowances;
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+};
+
+export const checkAllowanceHTS = async (
+  userId: string,
+  token: ITokenData,
+  amountToSpend: string,
+) => {
+  const spenderId = addressToId(process.env.REACT_APP_ROUTER_ADDRESS as string);
+  const allowances = await getTokenAllowance(userId);
+
+  const allowancesBySpender = allowances.filter(
+    (item: IAllowanceData) => item.spender === spenderId,
+  );
+
+  const allowancesByToken = allowancesBySpender.filter(
+    (item: IAllowanceData) => item.token_id === token.hederaId,
+  );
+
+  if (allowancesByToken.length > 0) {
+    const currentAllowance = allowancesByToken[0].amount_granted;
+    const currentAllowanceBN = formatNumberToBigNumber(currentAllowance);
+    const amountToSpendBN = formatStringToBigNumberWei(amountToSpend, token.decimals);
+
+    const canSpend = amountToSpendBN.lte(currentAllowanceBN);
+
+    return canSpend;
+  } else {
+    return false;
   }
 };
 

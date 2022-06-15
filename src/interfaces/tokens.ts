@@ -68,3 +68,10 @@ export interface ICreatePairData {
   tokenADecimals: number;
   tokenBDecimals: number;
 }
+
+export interface IAllowanceData {
+  owner: string;
+  spender: string;
+  amount_granted: number;
+  token_id: string;
+}

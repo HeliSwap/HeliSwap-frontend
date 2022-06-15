@@ -16,7 +16,7 @@ import WalletBalance from '../components/WalletBalance';
 import TransactionSettingsModalContent from '../components/Modals/TransactionSettingsModalContent';
 
 import errorMessages from '../content/errors';
-import { idToAddress } from '../utils/tokenUtils';
+import { checkAllowanceHTS, idToAddress } from '../utils/tokenUtils';
 import { formatStringToBigNumberEthersWei } from '../utils/numberUtils';
 import {
   getTransactionSettings,
@@ -25,6 +25,7 @@ import {
 } from '../utils/transactionUtils';
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
+import { MAX_UINT_ERC20, MAX_UINT_HTS } from '../constants';
 
 const Create = () => {
   const contextValue = useContext(GlobalContext);
@@ -36,11 +37,13 @@ const Create = () => {
   const [showModalB, setShowModalB] = useState(false);
   const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
 
-  // State for token inputs
-  const [tokensData, setTokensData] = useState<ITokensData>({
+  const initialTokensData = {
     tokenA: {} as ITokenData,
     tokenB: {} as ITokenData,
-  });
+  };
+
+  // State for token inputs
+  const [tokensData, setTokensData] = useState<ITokensData>(initialTokensData);
 
   // State for pools
   const { pools: poolsData } = usePools({
@@ -60,11 +63,13 @@ const Create = () => {
   // State for Create/Provide
   const [createPairData, setCreatePairData] = useState<ICreatePairData>(initialCreateData);
 
-  // State for approved
-  const [approved, setApproved] = useState({
+  const initialApproveData = {
     tokenA: false,
     tokenB: false,
-  });
+  };
+
+  // State for approved
+  const [approved, setApproved] = useState(initialApproveData);
 
   // State for common pool data
   const [selectedPoolData, setSelectedPoolData] = useState<IPairData>({} as IPairData);
@@ -77,6 +82,8 @@ const Create = () => {
   // State for general error
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [successCreate, setSuccessCreate] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
 
@@ -124,19 +131,17 @@ const Create = () => {
   };
 
   const handleApproveClick = async (key: string) => {
-    const { hederaId, decimals } = tokensData[key];
-    const keyAmount = `${key}Amount` as keyof ICreatePairData;
-    const amount = createPairData[keyAmount] as string;
+    const { hederaId, type } = tokensData[key];
+    const amount = type === TokenType.ERC20 ? MAX_UINT_ERC20.toString() : MAX_UINT_HTS.toString();
 
     setLoadingApprove(true);
 
     try {
       const receipt = await sdk.approveToken(
         hashconnectConnectorInstance,
+        amount,
         userId,
         hederaId,
-        amount,
-        decimals,
       );
       const {
         response: { success, error },
@@ -159,9 +164,12 @@ const Create = () => {
 
   const handleCreateClick = async () => {
     const { provideSlippage, transactionExpiration } = getTransactionSettings();
-    setLoadingCreate(true);
+
     setError(false);
     setErrorMessage('');
+    setSuccessCreate(false);
+    setSuccessMessage('');
+    setLoadingCreate(true);
 
     try {
       const receipt = provideNative
@@ -187,19 +195,14 @@ const Create = () => {
         setError(true);
         setErrorMessage(error);
       } else {
-        setTokensData({
-          tokenA: {} as ITokenData,
-          tokenB: {} as ITokenData,
-        });
+        const successMessage = `Provided exactly ${createPairData.tokenAAmount} ${tokensData.tokenA.symbol} and ${createPairData.tokenBAmount} ${tokensData.tokenB.symbol}`;
 
-        setCreatePairData({
-          tokenAAmount: '0',
-          tokenBAmount: '0',
-          tokenAId: '',
-          tokenBId: '',
-          tokenADecimals: 18,
-          tokenBDecimals: 18,
-        });
+        setCreatePairData(initialCreateData);
+        setTokensData(initialTokensData);
+        setSelectedPoolData({} as IPairData);
+        setApproved(initialApproveData);
+        setSuccessCreate(true);
+        setSuccessMessage(successMessage);
       }
     } catch (err) {
       console.error(err);
@@ -211,10 +214,10 @@ const Create = () => {
   };
 
   useEffect(() => {
-    const getApproved = async (tokenId: string, index: string) => {
+    const getAllowanceERC20 = async (token: ITokenData, index: string) => {
       const connectedWallet = getConnectedWallet();
       if (connectedWallet) {
-        const tokenAddress = idToAddress(tokenId);
+        const tokenAddress = idToAddress(token.hederaId);
         const userAddress = idToAddress(userId);
         const resultBN = await sdk.checkAllowance(
           tokenAddress,
@@ -223,7 +226,7 @@ const Create = () => {
           connectedWallet,
         );
 
-        const resultStr = hethers.utils.formatUnits(resultBN, 18);
+        const resultStr = hethers.utils.formatUnits(resultBN, token.decimals);
         const resultNum = Number(resultStr);
         const key = `${index}Amount`;
 
@@ -236,30 +239,46 @@ const Create = () => {
       }
     };
 
+    const getAllowanceHTS = async (userId: string, token: ITokenData, index: string) => {
+      const key = `${index}Amount`;
+      const amountToSpend = createPairData[key as keyof ICreatePairData] as string;
+      const canSpend = await checkAllowanceHTS(userId, token, amountToSpend);
+
+      setApproved(prev => ({ ...prev, [index]: canSpend }));
+    };
+
     const { tokenA, tokenB } = tokensData;
 
     if (tokenA.type === TokenType.HBAR) {
       setApproved(prev => ({ ...prev, tokenA: true }));
     } else if (tokenA.type === TokenType.ERC20) {
-      tokenA.hederaId && getApproved(tokenA.hederaId, 'tokenA');
+      getAllowanceERC20(tokenA, 'tokenA');
+    } else {
+      userId && getAllowanceHTS(userId, tokenA, 'tokenA');
     }
 
     if (tokenB.type === TokenType.HBAR) {
       setApproved(prev => ({ ...prev, tokenB: true }));
     } else if (tokenB.type === TokenType.ERC20) {
-      tokenB.hederaId && getApproved(tokenB.hederaId, 'tokenB');
+      getAllowanceERC20(tokenB, 'tokenB');
+    } else {
+      userId && getAllowanceHTS(userId, tokenB, 'tokenB');
     }
   }, [tokensData, sdk, userId, createPairData]);
 
   useEffect(() => {
     const { tokenA, tokenB } = tokensData;
-    const newPairData = {
+    const newPairData: ICreatePairData = {
       tokenAId: tokenA.hederaId,
       tokenBId: tokenB.hederaId,
       tokenADecimals: tokenA.decimals,
       tokenBDecimals: tokenB.decimals,
+      tokenAAmount: '0',
+      tokenBAmount: '0',
     };
+
     setCreatePairData(prev => ({ ...prev, ...newPairData }));
+    setApproved({ tokenA: false, tokenB: false });
   }, [tokensData]);
 
   useEffect(() => {
@@ -449,6 +468,20 @@ const Create = () => {
             ) : null}
           </div>
         </div>
+
+        {successCreate ? (
+          <div className="alert alert-success alert-dismissible my-5" role="alert">
+            <strong>Success provide!</strong>
+            <p>{successMessage}</p>
+            <button
+              onClick={() => setSuccessCreate(false)}
+              type="button"
+              className="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+            ></button>
+          </div>
+        ) : null}
 
         {readyToProvide ? (
           <div className="bg-slate rounded p-4 my-4">

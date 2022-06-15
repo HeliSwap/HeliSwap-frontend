@@ -10,9 +10,10 @@ import { ICreatePairData } from '../interfaces/tokens';
 import { addressToId, idToAddress } from '../utils/tokenUtils';
 import {
   getAmountWithSlippage,
+  getExpirationTime,
   formatStringToBigNumberEthersWei,
   formatStringToBigNumberWei,
-  getExpirationTime,
+  formatStringToBigNumber,
 } from '../utils/numberUtils';
 
 import ERC20 from '../abi/ERC20';
@@ -107,17 +108,15 @@ class SDK {
   }
   /* Hethers contract calls - To be removed! */
 
-  // Works only for erc20 tokens
   async approveToken(
     hashconnectConnectorInstance: Hashconnect,
+    amount: string,
     userId: string,
     tokenId: string | ContractId,
-    amount: string,
-    dec: number,
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
 
-    const amountToApproveBN = formatStringToBigNumberWei(amount, dec);
+    const amountToApproveBN = formatStringToBigNumber(amount);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
