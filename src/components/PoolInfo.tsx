@@ -5,7 +5,12 @@ import { GlobalContext } from '../providers/Global';
 
 import Button from './Button';
 
-import { formatStringToStringWei, formatStringWeiToStringEther } from '../utils/numberUtils';
+import {
+  formatStringToBigNumber,
+  formatStringToBigNumberWei,
+  formatStringToStringWei,
+  formatStringWeiToStringEther,
+} from '../utils/numberUtils';
 import { addressToContractId, idToAddress, calculateReserves } from '../utils/tokenUtils';
 import { getTransactionSettings } from '../utils/transactionUtils';
 import { getConnectedWallet } from '../pages/Helpers';
@@ -191,10 +196,13 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
           connectedWallet,
         );
 
-        const resultStr = hethers.utils.formatUnits(resultBN, 18);
-        const resultNum = Number(resultStr);
+        const currentAllowanceBN = formatStringToBigNumber(resultBN.toString());
+        const amountToSpend = removeLpData.tokensLpAmount;
+        const amountToSpendBN = formatStringToBigNumberWei(amountToSpend);
 
-        setLpApproved(resultNum >= Number(removeLpData.tokensLpAmount));
+        const canSpend = amountToSpendBN.lte(currentAllowanceBN);
+
+        setLpApproved(canSpend);
       }
     };
 
