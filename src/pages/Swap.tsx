@@ -17,7 +17,13 @@ import WalletBalance from '../components/WalletBalance';
 import TransactionSettingsModalContent from '../components/Modals/TransactionSettingsModalContent';
 
 import errorMessages from '../content/errors';
-import { addressToId, checkAllowanceHTS, idToAddress, NATIVE_TOKEN } from '../utils/tokenUtils';
+import {
+  addressToId,
+  checkAllowanceHTS,
+  getUserAssociatedTokens,
+  idToAddress,
+  NATIVE_TOKEN,
+} from '../utils/tokenUtils';
 import {
   getTransactionSettings,
   INITIAL_SWAP_SLIPPAGE_TOLERANCE,
@@ -46,6 +52,7 @@ const Swap = () => {
   const [tokensData, setTokensData] = useState<ITokensData>(initialTokensData);
   const [tokenInIsNative, setTokenInIsNative] = useState(false);
   const [tokenOutIsNative, setTokenOutIsNative] = useState(false);
+  const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
 
   // State for pools
   const {
@@ -373,9 +380,15 @@ const Swap = () => {
       setApproved(canSpend);
     };
 
+    const checkTokenAssociation = () => {
+      const foundToken = userAssociatedTokens?.includes(tokensData.tokenB.hederaId);
+      console.log('foundToken', foundToken);
+    };
+
     setApproved(tokensData.tokenA.type === TokenType.HBAR);
 
     const hasTokenAData = swapData.tokenIdIn && swapData.amountIn !== '0';
+    const hasTokenBData = swapData.tokenIdOut && swapData.amountOut !== '0';
 
     if (tokensData.tokenA.type === TokenType.ERC20 && hasTokenAData && userId) {
       getAllowanceERC20(swapData);
@@ -384,7 +397,16 @@ const Swap = () => {
     if (tokensData.tokenA.type === TokenType.HTS && hasTokenAData && userId) {
       getAllowanceHTS(userId);
     }
-  }, [swapData, userId, sdk, tokensData]);
+
+    if (
+      tokensData.tokenB.type === TokenType.HTS &&
+      hasTokenBData &&
+      userId &&
+      userAssociatedTokens
+    ) {
+      checkTokenAssociation();
+    }
+  }, [swapData, userId, sdk, tokensData, userAssociatedTokens]);
 
   useEffect(() => {
     const { tokenA, tokenB } = tokensData;
@@ -419,6 +441,15 @@ const Swap = () => {
 
     setReadyToSwap(ready);
   }, [swapData, approved]);
+
+  useEffect(() => {
+    const checkTokenAssociation = async (userId: string) => {
+      const tokens = await getUserAssociatedTokens(userId);
+      setUserAssociatedTokens(tokens);
+    };
+
+    userId && checkTokenAssociation(userId);
+  }, [userId]);
 
   const readyToApprove = Number(swapData.amountIn) > 0 && Number(swapData.amountOut);
 

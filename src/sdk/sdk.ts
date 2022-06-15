@@ -481,6 +481,7 @@ class SDK {
 
     return responseData;
   }
+
   async swapExactHBARForTokens(
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
@@ -721,6 +722,7 @@ class SDK {
 
     return responseData;
   }
+
   async swapHBARForExactTokens(
     hashconnectConnectorInstance: Hashconnect,
     userId: string,

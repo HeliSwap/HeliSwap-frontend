@@ -2,7 +2,7 @@ import axios from 'axios';
 import { hethers } from '@hashgraph/hethers';
 
 import { IAllowanceData, ITokenData, IWalletBalance, TokenType } from '../interfaces/tokens';
-import { ContractId } from '@hashgraph/sdk';
+import { Client, ContractId, AccountBalanceQuery } from '@hashgraph/sdk';
 import { formatNumberToBigNumber, formatStringToBigNumberWei } from './numberUtils';
 
 export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
@@ -57,6 +57,17 @@ export const getHTSTokensWalletBalance = async (userId: string): Promise<IWallet
     console.error(e);
     return {} as IWalletBalance;
   }
+};
+
+export const getUserAssociatedTokens = async (userId: string): Promise<string[]> => {
+  const networkType = process.env.REACT_APP_NETWORK_TYPE as string;
+  const client = networkType === 'testnet' ? Client.forTestnet() : Client.forMainnet();
+  const { tokens } = await new AccountBalanceQuery().setAccountId(userId).execute(client);
+
+  const keys: string[] = [];
+  tokens?._map.forEach((_, key) => keys.push(key));
+
+  return keys;
 };
 
 export const getTokenAllowance = async (accountId: string): Promise<IAllowanceData[]> => {
