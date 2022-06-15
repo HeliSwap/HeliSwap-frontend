@@ -6,7 +6,6 @@ import {
   IPairData,
   ICreatePairData,
   ITokensData,
-  IAllowanceData,
 } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
@@ -17,12 +16,8 @@ import WalletBalance from '../components/WalletBalance';
 import TransactionSettingsModalContent from '../components/Modals/TransactionSettingsModalContent';
 
 import errorMessages from '../content/errors';
-import { addressToId, getTokenAllowance, idToAddress } from '../utils/tokenUtils';
-import {
-  formatNumberToBigNumber,
-  formatStringToBigNumberEthersWei,
-  formatStringToBigNumberWei,
-} from '../utils/numberUtils';
+import { checkAllowanceHTS, idToAddress } from '../utils/tokenUtils';
+import { formatStringToBigNumberEthersWei } from '../utils/numberUtils';
 import {
   getTransactionSettings,
   INITIAL_PROVIDE_SLIPPAGE_TOLERANCE,
@@ -245,28 +240,11 @@ const Create = () => {
     };
 
     const getAllowanceHTS = async (userId: string, token: ITokenData, index: string) => {
-      const spenderId = addressToId(process.env.REACT_APP_ROUTER_ADDRESS as string);
-      const allowances = await getTokenAllowance(userId);
       const key = `${index}Amount`;
+      const amountToSpend = createPairData[key as keyof ICreatePairData] as string;
+      const canSpend = await checkAllowanceHTS(userId, token, amountToSpend);
 
-      const allowancesBySpender = allowances.filter(
-        (item: IAllowanceData) => item.spender === spenderId,
-      );
-
-      const allowancesByToken = allowancesBySpender.filter(
-        (item: IAllowanceData) => item.token_id === token.hederaId,
-      );
-
-      if (allowancesByToken.length > 0) {
-        const currentAllowance = allowancesByToken[0].amount_granted;
-        const currentAllowanceBN = formatNumberToBigNumber(currentAllowance);
-        const amountToSpend = createPairData[key as keyof ICreatePairData] as string;
-        const amountToSpendBN = formatStringToBigNumberWei(amountToSpend, token.decimals);
-
-        const canSpend = amountToSpendBN.lte(currentAllowanceBN);
-
-        setApproved(prev => ({ ...prev, [index]: canSpend }));
-      }
+      setApproved(prev => ({ ...prev, [index]: canSpend }));
     };
 
     const { tokenA, tokenB } = tokensData;

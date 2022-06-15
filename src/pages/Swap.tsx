@@ -6,7 +6,6 @@ import {
   IPairData,
   TokenType,
   ITokensData,
-  IAllowanceData,
 } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
@@ -18,8 +17,7 @@ import WalletBalance from '../components/WalletBalance';
 import TransactionSettingsModalContent from '../components/Modals/TransactionSettingsModalContent';
 
 import errorMessages from '../content/errors';
-import { addressToId, getTokenAllowance, idToAddress, NATIVE_TOKEN } from '../utils/tokenUtils';
-import { formatNumberToBigNumber, formatStringToBigNumberWei } from '../utils/numberUtils';
+import { addressToId, checkAllowanceHTS, idToAddress, NATIVE_TOKEN } from '../utils/tokenUtils';
 import {
   getTransactionSettings,
   INITIAL_SWAP_SLIPPAGE_TOLERANCE,
@@ -359,28 +357,20 @@ const Swap = () => {
       }
     };
 
-    const getAllowanceHTS = async (userId: string, swapData: ISwapTokenData) => {
-      const spenderId = addressToId(process.env.REACT_APP_ROUTER_ADDRESS as string);
-      const allowances = await getTokenAllowance(userId);
+    const getAllowanceHTS = async (userId: string) => {
+      const amountToSpend = swapData.amountIn;
+      const tokenAData: ITokenData = {
+        hederaId: swapData.tokenIdIn,
+        name: '',
+        symbol: '',
+        decimals: swapData.tokenInDecimals,
+        address: '',
+        type: tokensData.tokenA.type,
+      };
 
-      const allowancesBySpender = allowances.filter(
-        (item: IAllowanceData) => item.spender === spenderId,
-      );
+      const canSpend = await checkAllowanceHTS(userId, tokenAData, amountToSpend);
 
-      const allowancesByToken = allowancesBySpender.filter(
-        (item: IAllowanceData) => item.token_id === swapData.tokenIdIn,
-      );
-
-      if (allowancesByToken.length > 0) {
-        const currentAllowance = allowancesByToken[0].amount_granted;
-        const currentAllowanceBN = formatNumberToBigNumber(currentAllowance);
-        const amountToSpend = swapData.amountIn;
-        const amountToSpendBN = formatStringToBigNumberWei(amountToSpend, swapData.tokenInDecimals);
-
-        const canSpend = amountToSpendBN.lte(currentAllowanceBN);
-
-        setApproved(canSpend);
-      }
+      setApproved(canSpend);
     };
 
     setApproved(tokensData.tokenA.type === TokenType.HBAR);
@@ -392,7 +382,7 @@ const Swap = () => {
     }
 
     if (tokensData.tokenA.type === TokenType.HTS && hasTokenAData && userId) {
-      getAllowanceHTS(userId, swapData);
+      getAllowanceHTS(userId);
     }
   }, [swapData, userId, sdk, tokensData]);
 
