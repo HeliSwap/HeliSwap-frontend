@@ -9,6 +9,7 @@ import { formatStringToStringWei, formatStringWeiToStringEther } from '../utils/
 import { addressToContractId, idToAddress, calculateReserves } from '../utils/tokenUtils';
 import { getTransactionSettings } from '../utils/transactionUtils';
 import { getConnectedWallet } from '../pages/Helpers';
+import { MAX_UINT_ERC20 } from '../constants';
 
 interface IPoolInfoProps {
   pairData: IPairData;
@@ -168,9 +169,11 @@ const PoolInfo = ({ pairData }: IPoolInfoProps) => {
   };
 
   const hanleApproveLPClick = async () => {
+    const amount = MAX_UINT_ERC20.toString();
+
     try {
       const contractId = addressToContractId(pairData.pairAddress);
-      await sdk.approveToken(hashconnectConnectorInstance, userId, contractId);
+      await sdk.approveToken(hashconnectConnectorInstance, amount, userId, contractId);
       setLpApproved(true);
     } catch (e) {
       console.error(e);

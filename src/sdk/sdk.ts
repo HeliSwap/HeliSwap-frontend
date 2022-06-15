@@ -108,17 +108,15 @@ class SDK {
   }
   /* Hethers contract calls - To be removed! */
 
-  // Works only for erc20 tokens
   async approveToken(
     hashconnectConnectorInstance: Hashconnect,
+    amount: string,
     userId: string,
     tokenId: string | ContractId,
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
 
-    console.log('hethers.constants.MaxUint256.toString()', hethers.constants.MaxUint256.toString());
-
-    const amountToApproveBN = formatStringToBigNumber(hethers.constants.MaxUint256.toString());
+    const amountToApproveBN = formatStringToBigNumber(amount);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract

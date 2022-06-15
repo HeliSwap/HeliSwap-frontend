@@ -102,9 +102,11 @@ const PairDetails = () => {
   };
 
   const hanleApproveLPClick = async () => {
+    const amount = hethers.constants.MaxUint256.toString();
+
     try {
       const contractId = addressToContractId(pairData.pairAddress);
-      await sdk.approveToken(hashconnectConnectorInstance, userId, contractId);
+      await sdk.approveToken(hashconnectConnectorInstance, amount, userId, contractId);
       setLpApproved(true);
     } catch (e) {
       console.error(e);

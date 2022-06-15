@@ -30,6 +30,7 @@ import {
 } from '../utils/transactionUtils';
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
+import { MAX_UINT_ERC20, MAX_UINT_HTS } from '../constants';
 
 const Create = () => {
   const contextValue = useContext(GlobalContext);
@@ -135,12 +136,18 @@ const Create = () => {
   };
 
   const handleApproveClick = async (key: string) => {
-    const { hederaId } = tokensData[key];
+    const { hederaId, type } = tokensData[key];
+    const amount = type === TokenType.ERC20 ? MAX_UINT_ERC20.toString() : MAX_UINT_HTS.toString();
 
     setLoadingApprove(true);
 
     try {
-      const receipt = await sdk.approveToken(hashconnectConnectorInstance, userId, hederaId);
+      const receipt = await sdk.approveToken(
+        hashconnectConnectorInstance,
+        amount,
+        userId,
+        hederaId,
+      );
       const {
         response: { success, error },
       } = receipt;
@@ -253,14 +260,10 @@ const Create = () => {
       if (allowancesByToken.length > 0) {
         const currentAllowance = allowancesByToken[0].amount_granted;
         const currentAllowanceBN = formatNumberToBigNumber(currentAllowance);
-        console.log('currentAllowanceBN.toString()', currentAllowanceBN.toString());
         const amountToSpend = createPairData[key as keyof ICreatePairData] as string;
         const amountToSpendBN = formatStringToBigNumberWei(amountToSpend, token.decimals);
-        console.log('amountToSpendBN.toString()', amountToSpendBN.toString());
 
         const canSpend = amountToSpendBN.lte(currentAllowanceBN);
-
-        console.log('canSpend', canSpend);
 
         setApproved(prev => ({ ...prev, [index]: canSpend }));
       }
