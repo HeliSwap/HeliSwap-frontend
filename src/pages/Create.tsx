@@ -268,13 +268,17 @@ const Create = () => {
 
   useEffect(() => {
     const { tokenA, tokenB } = tokensData;
-    const newPairData = {
+    const newPairData: ICreatePairData = {
       tokenAId: tokenA.hederaId,
       tokenBId: tokenB.hederaId,
       tokenADecimals: tokenA.decimals,
       tokenBDecimals: tokenB.decimals,
+      tokenAAmount: '0',
+      tokenBAmount: '0',
     };
+
     setCreatePairData(prev => ({ ...prev, ...newPairData }));
+    setApproved({ tokenA: false, tokenB: false });
   }, [tokensData]);
 
   useEffect(() => {
