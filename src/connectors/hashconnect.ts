@@ -6,17 +6,20 @@ class Hashconnect {
     setLoading: (loading: boolean) => void,
     setExtensionFound: (loading: boolean) => void,
     setConnected: (loading: boolean) => void,
+    setUserId: (userId: string) => void,
   ) {
     this.hashconnect = new HashConnect();
     this.setLoading = setLoading;
     this.setExtensionFound = setExtensionFound;
     this.setConnected = setConnected;
+    this.setUserId = setUserId;
   }
 
   hashconnect: HashConnect;
   status: string = 'Initializing';
 
   setLoading: (loading: boolean) => void;
+  setUserId: (userId: string) => void;
   setExtensionFound: (loading: boolean) => void;
   setConnected: (loading: boolean) => void;
 
@@ -88,7 +91,10 @@ class Hashconnect {
       this.saveData.pairedWalletData = data.metadata;
 
       data.accountIds.forEach(id => {
-        if (this.saveData.pairedAccounts.indexOf(id) === -1) this.saveData.pairedAccounts.push(id);
+        if (this.saveData.pairedAccounts.indexOf(id) === -1) {
+          this.saveData.pairedAccounts.push(id);
+          this.setUserId(id);
+        }
       });
 
       this.saveDataInLocalstorage();
