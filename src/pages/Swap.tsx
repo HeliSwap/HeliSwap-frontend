@@ -320,6 +320,7 @@ const Swap = () => {
         setSelectedPoolData({} as IPairData);
         setTokensData(initialTokensData);
         setApproved(false);
+        setAssociated(false);
         setSuccessSwap(true);
         setSuccessMessage(successMessage);
         refetch();
@@ -416,6 +417,9 @@ const Swap = () => {
     };
 
     setApproved(tokensData.tokenA.type === TokenType.HBAR);
+    setAssociated(
+      tokensData.tokenB.type === TokenType.HBAR || tokensData.tokenB.type === TokenType.ERC20,
+    );
 
     const hasTokenAData = swapData.tokenIdIn && swapData.amountIn !== '0';
     const hasTokenBData = swapData.tokenIdOut && swapData.amountOut !== '0';
@@ -637,7 +641,7 @@ const Swap = () => {
             approved ? (
               <Button
                 loading={loadingSwap}
-                disabled={!readyToSwap}
+                disabled={!readyToSwap || !associated}
                 onClick={() => handleSwapClick()}
               >
                 Swap
@@ -657,7 +661,7 @@ const Swap = () => {
             <Button
               className="mx-2"
               loading={loadingSwap}
-              disabled={!readyToApprove}
+              disabled={!readyToAssociate}
               onClick={() => handleAssociateClick()}
             >
               Associate token
