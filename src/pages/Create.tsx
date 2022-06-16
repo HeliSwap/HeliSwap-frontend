@@ -254,7 +254,7 @@ const Create = () => {
     } else if (tokenA.type === TokenType.ERC20) {
       getAllowanceERC20(tokenA, 'tokenA');
     } else {
-      userId && getAllowanceHTS(userId, tokenA, 'tokenA');
+      userId && tokenA.hederaId && getAllowanceHTS(userId, tokenA, 'tokenA');
     }
 
     if (tokenB.type === TokenType.HBAR) {
@@ -262,7 +262,7 @@ const Create = () => {
     } else if (tokenB.type === TokenType.ERC20) {
       getAllowanceERC20(tokenB, 'tokenB');
     } else {
-      userId && getAllowanceHTS(userId, tokenB, 'tokenB');
+      userId && tokenB.hederaId && getAllowanceHTS(userId, tokenB, 'tokenB');
     }
   }, [tokensData, sdk, userId, createPairData]);
 
