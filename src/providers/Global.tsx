@@ -35,6 +35,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
 
   const disconnectWallet = () => {
     hashconnectConnectorInstance?.disconnect();
+    setUserId('');
   };
 
   const connection = {
@@ -54,6 +55,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
         setIsConnectionLoading,
         setExtensionFound,
         setConnected,
+        setUserId,
       );
 
       await hashconnectConnector.initHashconnect();
