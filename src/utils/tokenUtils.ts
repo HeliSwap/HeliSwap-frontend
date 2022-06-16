@@ -2,7 +2,7 @@ import axios from 'axios';
 import { hethers } from '@hashgraph/hethers';
 
 import { IAllowanceData, ITokenData, IWalletBalance, TokenType } from '../interfaces/tokens';
-import { ContractId } from '@hashgraph/sdk';
+import { Client, ContractId, AccountBalanceQuery } from '@hashgraph/sdk';
 import { formatNumberToBigNumber, formatStringToBigNumberWei } from './numberUtils';
 
 export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
@@ -59,8 +59,23 @@ export const getHTSTokensWalletBalance = async (userId: string): Promise<IWallet
   }
 };
 
-export const getTokenAllowance = async (accountId: string): Promise<IAllowanceData[]> => {
-  const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/accounts/${accountId}/allowances/tokens`;
+export const getUserAssociatedTokens = async (userId: string): Promise<string[]> => {
+  const networkType = process.env.REACT_APP_NETWORK_TYPE as string;
+  const client = networkType === 'testnet' ? Client.forTestnet() : Client.forMainnet();
+  const { tokens } = await new AccountBalanceQuery().setAccountId(userId).execute(client);
+
+  const keys: string[] = [];
+  tokens?._map.forEach((_, key) => keys.push(key));
+
+  return keys;
+};
+
+export const getTokenAllowance = async (
+  accountId: string,
+  spenderId: string,
+  tokenId: string,
+): Promise<IAllowanceData[]> => {
+  const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/accounts/${accountId}/allowances/tokens?spender.id=${spenderId}&token.id=${tokenId}`;
 
   try {
     const {
@@ -80,18 +95,10 @@ export const checkAllowanceHTS = async (
   amountToSpend: string,
 ) => {
   const spenderId = addressToId(process.env.REACT_APP_ROUTER_ADDRESS as string);
-  const allowances = await getTokenAllowance(userId);
+  const allowances = await getTokenAllowance(userId, spenderId, token.hederaId);
 
-  const allowancesBySpender = allowances.filter(
-    (item: IAllowanceData) => item.spender === spenderId,
-  );
-
-  const allowancesByToken = allowancesBySpender.filter(
-    (item: IAllowanceData) => item.token_id === token.hederaId,
-  );
-
-  if (allowancesByToken.length > 0) {
-    const currentAllowance = allowancesByToken[0].amount_granted;
+  if (allowances.length > 0) {
+    const currentAllowance = allowances[0].amount_granted;
     const currentAllowanceBN = formatNumberToBigNumber(currentAllowance);
     const amountToSpendBN = formatStringToBigNumberWei(amountToSpend, token.decimals);
 

@@ -17,7 +17,13 @@ import WalletBalance from '../components/WalletBalance';
 import TransactionSettingsModalContent from '../components/Modals/TransactionSettingsModalContent';
 
 import errorMessages from '../content/errors';
-import { addressToId, checkAllowanceHTS, idToAddress, NATIVE_TOKEN } from '../utils/tokenUtils';
+import {
+  addressToId,
+  checkAllowanceHTS,
+  getUserAssociatedTokens,
+  idToAddress,
+  NATIVE_TOKEN,
+} from '../utils/tokenUtils';
 import {
   getTransactionSettings,
   INITIAL_SWAP_SLIPPAGE_TOLERANCE,
@@ -46,6 +52,7 @@ const Swap = () => {
   const [tokensData, setTokensData] = useState<ITokensData>(initialTokensData);
   const [tokenInIsNative, setTokenInIsNative] = useState(false);
   const [tokenOutIsNative, setTokenOutIsNative] = useState(false);
+  const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
 
   // State for pools
   const {
@@ -71,6 +78,9 @@ const Swap = () => {
 
   // State for approved
   const [approved, setApproved] = useState(false);
+
+  // State for associated
+  const [associated, setAssociated] = useState(false);
 
   // State for common pool data
   const [selectedPoolData, setSelectedPoolData] = useState<IPairData>({} as IPairData);
@@ -132,6 +142,33 @@ const Swap = () => {
       setSwapData(prev => ({ ...prev, ...tokenData, amountIn: swapAmountIn.toString() }));
     } else {
       setSwapData(prev => ({ ...prev, amountIn: '0', amountOut: '0' }));
+    }
+  };
+
+  const handleAssociateClick = async () => {
+    const { tokenB } = tokensData;
+
+    try {
+      const receipt = await sdk.associateToken(
+        hashconnectConnectorInstance,
+        userId,
+        tokenB.hederaId,
+      );
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (!success) {
+        setError(true);
+        setErrorMessage(error);
+      } else {
+        setAssociated(true);
+      }
+    } catch (err) {
+      console.error(err);
+      setError(true);
+      setErrorMessage('Error on associate');
+    } finally {
     }
   };
 
@@ -283,6 +320,7 @@ const Swap = () => {
         setSelectedPoolData({} as IPairData);
         setTokensData(initialTokensData);
         setApproved(false);
+        setAssociated(false);
         setSuccessSwap(true);
         setSuccessMessage(successMessage);
         refetch();
@@ -373,9 +411,18 @@ const Swap = () => {
       setApproved(canSpend);
     };
 
+    const checkTokenAssociation = () => {
+      const foundToken = userAssociatedTokens?.includes(tokensData.tokenB.hederaId);
+      setAssociated(foundToken);
+    };
+
     setApproved(tokensData.tokenA.type === TokenType.HBAR);
+    setAssociated(
+      tokensData.tokenB.type === TokenType.HBAR || tokensData.tokenB.type === TokenType.ERC20,
+    );
 
     const hasTokenAData = swapData.tokenIdIn && swapData.amountIn !== '0';
+    const hasTokenBData = swapData.tokenIdOut && swapData.amountOut !== '0';
 
     if (tokensData.tokenA.type === TokenType.ERC20 && hasTokenAData && userId) {
       getAllowanceERC20(swapData);
@@ -384,7 +431,16 @@ const Swap = () => {
     if (tokensData.tokenA.type === TokenType.HTS && hasTokenAData && userId) {
       getAllowanceHTS(userId);
     }
-  }, [swapData, userId, sdk, tokensData]);
+
+    if (
+      tokensData.tokenB.type === TokenType.HTS &&
+      hasTokenBData &&
+      userId &&
+      userAssociatedTokens
+    ) {
+      checkTokenAssociation();
+    }
+  }, [swapData, userId, sdk, tokensData, userAssociatedTokens]);
 
   useEffect(() => {
     const { tokenA, tokenB } = tokensData;
@@ -420,7 +476,17 @@ const Swap = () => {
     setReadyToSwap(ready);
   }, [swapData, approved]);
 
+  useEffect(() => {
+    const checkTokenAssociation = async (userId: string) => {
+      const tokens = await getUserAssociatedTokens(userId);
+      setUserAssociatedTokens(tokens);
+    };
+
+    userId && checkTokenAssociation(userId);
+  }, [userId]);
+
   const readyToApprove = Number(swapData.amountIn) > 0 && Number(swapData.amountOut);
+  const readyToAssociate = Number(swapData.amountOut) > 0 && swapData.tokenIdOut;
 
   return (
     <div className="d-flex justify-content-center">
@@ -575,7 +641,7 @@ const Swap = () => {
             approved ? (
               <Button
                 loading={loadingSwap}
-                disabled={!readyToSwap}
+                disabled={!readyToSwap || !associated}
                 onClick={() => handleSwapClick()}
               >
                 Swap
@@ -589,6 +655,17 @@ const Swap = () => {
                 Approve
               </Button>
             )
+          ) : null}
+
+          {readyToAssociate && !associated ? (
+            <Button
+              className="mx-2"
+              loading={loadingSwap}
+              disabled={!readyToAssociate}
+              onClick={() => handleAssociateClick()}
+            >
+              Associate token
+            </Button>
           ) : null}
         </div>
       </div>
