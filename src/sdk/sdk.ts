@@ -4,6 +4,7 @@ import {
   ContractFunctionParameters,
   ContractId,
   TransactionReceipt,
+  TokenAssociateTransaction,
 } from '@hashgraph/sdk';
 import Hashconnect from '../connectors/hashconnect';
 import { ICreatePairData } from '../interfaces/tokens';
@@ -107,6 +108,39 @@ class SDK {
     return totalSupply;
   }
   /* Hethers contract calls - To be removed! */
+
+  async associateToken(
+    hashconnectConnectorInstance: Hashconnect,
+    userId: string,
+    tokenId: string | ContractId,
+  ) {
+    const trans = await new TokenAssociateTransaction();
+
+    trans.setTokenIds([tokenId]);
+    trans.setAccountId(userId);
+
+    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
+      trans,
+      userId as string,
+    );
+
+    const response = await hashconnectConnectorInstance?.sendTransaction(
+      transactionBytes as Uint8Array,
+      userId as string,
+      false,
+    );
+
+    const responseData: any = {
+      response,
+      receipt: null,
+    };
+
+    if (response?.success) {
+      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
+    }
+
+    return responseData;
+  }
 
   async approveToken(
     hashconnectConnectorInstance: Hashconnect,

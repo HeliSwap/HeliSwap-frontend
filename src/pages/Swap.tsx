@@ -79,6 +79,9 @@ const Swap = () => {
   // State for approved
   const [approved, setApproved] = useState(false);
 
+  // State for associated
+  const [associated, setAssociated] = useState(false);
+
   // State for common pool data
   const [selectedPoolData, setSelectedPoolData] = useState<IPairData>({} as IPairData);
 
@@ -139,6 +142,33 @@ const Swap = () => {
       setSwapData(prev => ({ ...prev, ...tokenData, amountIn: swapAmountIn.toString() }));
     } else {
       setSwapData(prev => ({ ...prev, amountIn: '0', amountOut: '0' }));
+    }
+  };
+
+  const handleAssociateClick = async () => {
+    const { tokenB } = tokensData;
+
+    try {
+      const receipt = await sdk.associateToken(
+        hashconnectConnectorInstance,
+        userId,
+        tokenB.hederaId,
+      );
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (!success) {
+        setError(true);
+        setErrorMessage(error);
+      } else {
+        setAssociated(true);
+      }
+    } catch (err) {
+      console.error(err);
+      setError(true);
+      setErrorMessage('Error on associate');
+    } finally {
     }
   };
 
@@ -382,7 +412,7 @@ const Swap = () => {
 
     const checkTokenAssociation = () => {
       const foundToken = userAssociatedTokens?.includes(tokensData.tokenB.hederaId);
-      console.log('foundToken', foundToken);
+      setAssociated(foundToken);
     };
 
     setApproved(tokensData.tokenA.type === TokenType.HBAR);
@@ -452,6 +482,7 @@ const Swap = () => {
   }, [userId]);
 
   const readyToApprove = Number(swapData.amountIn) > 0 && Number(swapData.amountOut);
+  const readyToAssociate = Number(swapData.amountOut) > 0 && swapData.tokenIdOut;
 
   return (
     <div className="d-flex justify-content-center">
@@ -620,6 +651,17 @@ const Swap = () => {
                 Approve
               </Button>
             )
+          ) : null}
+
+          {readyToAssociate && !associated ? (
+            <Button
+              className="mx-2"
+              loading={loadingSwap}
+              disabled={!readyToApprove}
+              onClick={() => handleAssociateClick()}
+            >
+              Associate token
+            </Button>
           ) : null}
         </div>
       </div>
