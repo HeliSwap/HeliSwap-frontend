@@ -109,9 +109,17 @@ const Swap = () => {
       [name]: value,
     };
 
+    if (
+      !value ||
+      isNaN(Number(value)) ||
+      Object.keys(tokensData.tokenA).length === 0 ||
+      Object.keys(tokensData.tokenB).length === 0
+    )
+      return;
+
     const { amountIn, amountOut } = tokenData;
 
-    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS;
+    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS || '';
     const tokenInAddress = tokenInIsNative ? WHBARAddress : tokensData.tokenA.address;
     const tokenOutAddress = tokenOutIsNative ? WHBARAddress : tokensData.tokenB.address;
 
@@ -119,13 +127,13 @@ const Swap = () => {
       const trades = getPossibleTradesExactIn(
         poolsData || [],
         amountIn,
-        tokenInAddress as string,
-        tokenOutAddress as string,
+        tokenInAddress,
+        tokenOutAddress,
       );
 
-      const sortedTrades = trades.sort(tradeComparator);
-      console.log('sorted trades', sortedTrades);
+      if (trades.length === 0) return;
 
+      const sortedTrades = trades.sort(tradeComparator);
       const bestTrade = sortedTrades[0];
       setBestPath(bestTrade.path);
       setTokenInExactAmount(true);
@@ -134,12 +142,13 @@ const Swap = () => {
       const trades = getPossibleTradesExactOut(
         poolsData || [],
         amountOut,
-        tokenInAddress as string,
-        tokenOutAddress as string,
+        tokenInAddress,
+        tokenOutAddress,
       );
-      const sortedTrades = trades.sort(tradeComparator);
-      console.log('sorted trades', sortedTrades);
 
+      if (trades.length === 0) return;
+
+      const sortedTrades = trades.sort(tradeComparator);
       const bestTrade = sortedTrades[0];
       setBestPath(bestTrade.path);
       setTokenInExactAmount(false);
