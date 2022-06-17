@@ -1,4 +1,4 @@
-import { IPairData, ITokenData } from '../interfaces/tokens';
+import { IPairData } from '../interfaces/tokens';
 import { formatStringToBigNumberEthersWei } from './numberUtils';
 import { hethers, BigNumber } from '@hashgraph/hethers';
 import BN from 'bignumber.js';

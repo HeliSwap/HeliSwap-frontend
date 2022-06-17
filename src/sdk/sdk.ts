@@ -21,47 +21,6 @@ import ERC20 from '../abi/ERC20';
 import PairV2 from '../abi/PairV2';
 
 class SDK {
-  getSwapAmountOut(
-    amountIn: string,
-    amountInRes: string,
-    amountOutRes: string,
-    decIn: number,
-    decOut: number,
-  ) {
-    //get values in hethers big number
-    const amountInBNStrHethers = formatStringToBigNumberEthersWei(amountIn, decIn);
-    const amountInResBNStrHethers = BigNumber.from(amountInRes);
-    const amountOutResBNStrHethers = BigNumber.from(amountOutRes);
-
-    //replicate contract calculations
-    const amountInWithFee = amountInBNStrHethers.mul(997);
-    const numerator = amountInWithFee.mul(amountOutResBNStrHethers);
-    const denominator = amountInResBNStrHethers.mul(1000).add(amountInWithFee);
-    const amountOut = numerator.div(denominator);
-
-    return hethers.utils.formatUnits(amountOut, decOut).toString();
-  }
-
-  getSwapAmountIn(
-    amountOut: string,
-    amountInRes: string,
-    amountOutRes: string,
-    decIn: number,
-    decOut: number,
-  ) {
-    //get values in hethers big number
-    const amountOutBNStrHethers = formatStringToBigNumberEthersWei(amountOut, decOut);
-    const amountInResBNStrHethers = BigNumber.from(amountInRes);
-    const amountOutResBNStrHethers = BigNumber.from(amountOutRes);
-
-    //replicate contract calculations
-    const numerator = amountInResBNStrHethers.mul(amountOutBNStrHethers).mul(1000);
-    const denominator = amountOutResBNStrHethers.sub(amountOutBNStrHethers).mul(997);
-    const amountIn = numerator.div(denominator).add(1);
-
-    return hethers.utils.formatUnits(amountIn, decIn).toString();
-  }
-
   /* Hethers contract calls - To be removed! */
   async checkAllowance(
     tokenAddress: string,
