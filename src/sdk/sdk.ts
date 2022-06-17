@@ -460,18 +460,15 @@ class SDK {
   async swapExactTokensForTokens(
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
-    tokenInId: string,
-    tokenOutId: string,
     amountIn: string,
     amountMinOut: any,
     decIn: number,
     decOut: number,
     slippage: number,
     expiresAfter: number,
+    path: string[],
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
-    const tokenInAddress = idToAddress(tokenInId);
-    const tokenOutAddress = idToAddress(tokenOutId);
     const userAddress = idToAddress(userId);
 
     const tokenInAmount = formatStringToBigNumberWei(amountIn, decIn);
@@ -488,7 +485,7 @@ class SDK {
         new ContractFunctionParameters()
           .addUint256(tokenInAmount)
           .addUint256(tokenOutMinAmount)
-          .addAddressArray([tokenInAddress, tokenOutAddress])
+          .addAddressArray(path)
           .addAddress(userAddress)
           .addUint256(getExpirationTime(expiresAfter)),
       );
@@ -519,17 +516,13 @@ class SDK {
   async swapExactHBARForTokens(
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
-    tokenOutId: string,
     amountIn: string,
     amountMinOut: string,
     decOut: number,
     slippage: number,
     expiresAfter: number,
+    path: string[],
   ) {
-    const tokenAddress = idToAddress(tokenOutId);
-
-    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
-
     const HBARAmount = formatStringToBigNumberWei(amountIn, 0);
     const tokenMinOutAmount = getAmountWithSlippage(amountMinOut, decOut, slippage, true);
 
@@ -549,7 +542,7 @@ class SDK {
         'swapExactETHForTokens',
         new ContractFunctionParameters()
           .addUint256(tokenMinOutAmount)
-          .addAddressArray([WHBARAddress, tokenAddress])
+          .addAddressArray(path)
           .addAddress(userAddress)
           .addUint256(getExpirationTime(expiresAfter)),
       );
@@ -580,18 +573,14 @@ class SDK {
   async swapExactTokensForHBAR(
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
-    tokenInId: string,
     amountIn: string,
     amountMinHBAROut: string,
     decIn: number,
     WHBARDec: number,
     slippage: number,
     expiresAfter: number,
+    path: string[],
   ) {
-    const tokenAddress = idToAddress(tokenInId);
-
-    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
-
     const tokenInAmount = formatStringToBigNumberWei(amountIn, decIn);
     const HBARAmountMinOut = getAmountWithSlippage(amountMinHBAROut, WHBARDec, slippage, true);
 
@@ -610,7 +599,7 @@ class SDK {
         new ContractFunctionParameters()
           .addUint256(tokenInAmount)
           .addUint256(HBARAmountMinOut)
-          .addAddressArray([tokenAddress, WHBARAddress])
+          .addAddressArray(path)
           .addAddress(userAddress)
           .addUint256(getExpirationTime(expiresAfter)),
       );
@@ -641,19 +630,15 @@ class SDK {
   async swapTokensForExactTokens(
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
-    tokenInId: string,
-    tokenOutId: string,
     amountMaxIn: string,
     amountOut: string,
     decIn: number,
     decOut: number,
     slippage: number,
     expiresAfter: number,
+    path: string[],
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
-
-    const tokenInAddress = idToAddress(tokenInId);
-    const tokenOutAddress = idToAddress(tokenOutId);
     const userAddress = idToAddress(userId);
 
     const tokenOutAmount = formatStringToBigNumberWei(amountOut, decOut);
@@ -670,7 +655,7 @@ class SDK {
         new ContractFunctionParameters()
           .addUint256(tokenOutAmount)
           .addUint256(tokenInMaxAmount) //amountIn
-          .addAddressArray([tokenInAddress, tokenOutAddress])
+          .addAddressArray(path)
           .addAddress(userAddress)
           .addUint256(getExpirationTime(expiresAfter)),
       );
@@ -701,18 +686,15 @@ class SDK {
   async swapTokensForExactHBAR(
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
-    tokenId: string,
     amountMaxIn: string,
     amountHBAROut: string,
     decIn: number,
     HBARDec: number,
     slippage: number,
     expiresAfter: number,
+    path: string[],
   ) {
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
-    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
-
-    const tokenAddress = idToAddress(tokenId);
     const userAddress = idToAddress(userId);
 
     const tokenMaxInAmount = getAmountWithSlippage(amountMaxIn, decIn, slippage, false);
@@ -729,7 +711,7 @@ class SDK {
         new ContractFunctionParameters()
           .addUint256(HBAROutAmount)
           .addUint256(tokenMaxInAmount)
-          .addAddressArray([tokenAddress, WHBARAddress])
+          .addAddressArray(path)
           .addAddress(userAddress)
           .addUint256(getExpirationTime(expiresAfter)),
       );
@@ -760,17 +742,14 @@ class SDK {
   async swapHBARForExactTokens(
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
-    tokenOutId: string,
     HBARMaxIn: string,
     amountOut: string,
     decOut: number,
     slippage: number,
     expiresAfter: number,
+    path: string[],
   ) {
     const tokenAmountString = amountOut;
-    const tokenAddress = idToAddress(tokenOutId);
-
-    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
 
     const HBARMaxInAmount = getAmountWithSlippage(HBARMaxIn, 0, slippage, false, true);
@@ -790,7 +769,7 @@ class SDK {
         'swapETHForExactTokens',
         new ContractFunctionParameters()
           .addUint256(tokenAmountOut)
-          .addAddressArray([WHBARAddress, tokenAddress])
+          .addAddressArray(path)
           .addAddress(userAddress)
           .addUint256(getExpirationTime(expiresAfter)),
       );

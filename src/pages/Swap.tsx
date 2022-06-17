@@ -18,7 +18,6 @@ import TransactionSettingsModalContent from '../components/Modals/TransactionSet
 
 import errorMessages from '../content/errors';
 import {
-  addressToId,
   checkAllowanceHTS,
   getUserAssociatedTokens,
   idToAddress,
@@ -29,6 +28,11 @@ import {
   INITIAL_SWAP_SLIPPAGE_TOLERANCE,
   handleSaveTransactionSettings,
 } from '../utils/transactionUtils';
+import {
+  getPossibleTradesExactIn,
+  getPossibleTradesExactOut,
+  tradeComparator,
+} from '../utils/tradeUtils';
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
 import { MAX_UINT_ERC20, MAX_UINT_HTS } from '../constants';
@@ -88,6 +92,7 @@ const Swap = () => {
   // Additional states for Swaps
   const [readyToSwap, setReadyToSwap] = useState(false);
   const [tokenInExactAmount, setTokenInExactAmount] = useState(true);
+  const [bestPath, setBestPath] = useState<string[]>([]);
 
   // State for general error
   const [error, setError] = useState(false);
@@ -105,43 +110,40 @@ const Swap = () => {
     };
 
     const { amountIn, amountOut } = tokenData;
-    const { tokenIdIn, tokenIdOut } = swapData;
-    const { token0Amount, token1Amount, token0Decimals, token1Decimals } = selectedPoolData;
-
-    if (Object.keys(selectedPoolData).length === 0) return;
 
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS;
-
-    const tokenInFirstAtPool = tokenInIsNative
-      ? selectedPoolData.token0 === WHBARAddress
-      : addressToId(selectedPoolData.token0) === tokenIdIn;
-    const tokenOutFirstAtPool = tokenOutIsNative
-      ? selectedPoolData.token0 === WHBARAddress
-      : addressToId(selectedPoolData.token0) === tokenIdOut;
-
-    let resIn, resOut, decIn, decOut;
+    const tokenInAddress = tokenInIsNative ? WHBARAddress : tokensData.tokenA.address;
+    const tokenOutAddress = tokenOutIsNative ? WHBARAddress : tokensData.tokenB.address;
 
     if (name === 'amountIn' && amountIn !== '0') {
-      resIn = tokenInFirstAtPool ? token0Amount : token1Amount;
-      resOut = tokenInFirstAtPool ? token1Amount : token0Amount;
-      decIn = tokenInFirstAtPool ? token0Decimals : token1Decimals;
-      decOut = tokenInFirstAtPool ? token1Decimals : token0Decimals;
+      const trades = getPossibleTradesExactIn(
+        poolsData || [],
+        amountIn,
+        tokenInAddress as string,
+        tokenOutAddress as string,
+      );
 
-      const swapAmountOut = sdk.getSwapAmountOut(amountIn, resIn, resOut, decIn, decOut);
+      const sortedTrades = trades.sort(tradeComparator);
+      console.log('sorted trades', sortedTrades);
+
+      const bestTrade = sortedTrades[0];
+      setBestPath(bestTrade.path);
       setTokenInExactAmount(true);
-      setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
+      setSwapData(prev => ({ ...prev, ...tokenData, amountOut: bestTrade.amountOut }));
     } else if (name === 'amountOut' && amountOut !== '0') {
-      resIn = tokenOutFirstAtPool ? token1Amount : token0Amount;
-      resOut = tokenOutFirstAtPool ? token0Amount : token1Amount;
-      decIn = tokenOutFirstAtPool ? token1Decimals : token0Decimals;
-      decOut = tokenOutFirstAtPool ? token0Decimals : token1Decimals;
+      const trades = getPossibleTradesExactOut(
+        poolsData || [],
+        amountOut,
+        tokenInAddress as string,
+        tokenOutAddress as string,
+      );
+      const sortedTrades = trades.sort(tradeComparator);
+      console.log('sorted trades', sortedTrades);
 
-      const swapAmountIn = sdk.getSwapAmountIn(amountOut, resIn, resOut, decIn, decOut);
-
+      const bestTrade = sortedTrades[0];
+      setBestPath(bestTrade.path);
       setTokenInExactAmount(false);
-      setSwapData(prev => ({ ...prev, ...tokenData, amountIn: swapAmountIn.toString() }));
-    } else {
-      setSwapData(prev => ({ ...prev, amountIn: '0', amountOut: '0' }));
+      setSwapData(prev => ({ ...prev, ...tokenData, amountIn: bestTrade.amountIn }));
     }
   };
 
@@ -207,16 +209,8 @@ const Swap = () => {
   };
 
   const handleSwapClick = async () => {
-    const { tokenIdIn, tokenIdOut, amountIn, amountOut } = swapData;
-    const { token0, token0Decimals, token1Decimals } = selectedPoolData;
-
-    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS;
-    const tokenInFirstAtPool = tokenInIsNative
-      ? token0 === WHBARAddress
-      : addressToId(token0) === tokenIdIn;
-
-    const decIn = tokenInFirstAtPool ? token0Decimals : token1Decimals;
-    const decOut = tokenInFirstAtPool ? token1Decimals : token0Decimals;
+    const { tokenIdIn, tokenIdOut, amountIn, amountOut, tokenInDecimals, tokenOutDecimals } =
+      swapData;
 
     setError(false);
     setErrorMessage('');
@@ -225,6 +219,7 @@ const Swap = () => {
     setLoadingSwap(true);
 
     const { swapSlippage, transactionExpiration } = getTransactionSettings();
+    console.log(bestPath);
 
     try {
       let receipt;
@@ -233,37 +228,36 @@ const Swap = () => {
           receipt = await sdk.swapExactHBARForTokens(
             hashconnectConnectorInstance,
             userId,
-            tokenIdOut,
             amountIn,
             amountOut,
-            decOut,
+            tokenOutDecimals,
             swapSlippage,
             transactionExpiration,
+            bestPath,
           );
         } else if (tokenOutIsNative) {
           receipt = await sdk.swapExactTokensForHBAR(
             hashconnectConnectorInstance,
             userId,
-            tokenIdIn,
             amountIn,
             amountOut,
-            decIn,
-            decOut,
+            tokenInDecimals,
+            tokenOutDecimals,
             swapSlippage,
             transactionExpiration,
+            bestPath,
           );
         } else {
           receipt = await sdk.swapExactTokensForTokens(
             hashconnectConnectorInstance,
             userId,
-            tokenIdIn,
-            tokenIdOut,
             amountIn,
             amountOut,
-            decIn,
-            decOut,
+            tokenInDecimals,
+            tokenOutDecimals,
             swapSlippage,
             transactionExpiration,
+            bestPath,
           );
         }
       } else {
@@ -271,37 +265,36 @@ const Swap = () => {
           receipt = await sdk.swapHBARForExactTokens(
             hashconnectConnectorInstance,
             userId,
-            tokenIdOut,
             amountIn,
             amountOut,
-            decOut,
+            tokenOutDecimals,
             swapSlippage,
             transactionExpiration,
+            bestPath,
           );
         } else if (tokenOutIsNative) {
           receipt = await sdk.swapTokensForExactHBAR(
             hashconnectConnectorInstance,
             userId,
-            tokenIdIn,
             amountIn,
             amountOut,
-            decIn,
-            decOut,
+            tokenInDecimals,
+            tokenOutDecimals,
             swapSlippage,
             transactionExpiration,
+            bestPath,
           );
         } else {
           receipt = await sdk.swapTokensForExactTokens(
             hashconnectConnectorInstance,
             userId,
-            tokenIdIn,
-            tokenIdOut,
             amountIn,
             amountOut,
-            decIn,
-            decOut,
+            tokenInDecimals,
+            tokenOutDecimals,
             swapSlippage,
             transactionExpiration,
+            bestPath,
           );
         }
       }
@@ -365,8 +358,6 @@ const Swap = () => {
         }
         return poolMatchedBothTokens;
       });
-
-      setSelectedPoolData(selectedPoolData[0] || {});
     } else {
       setSelectedPoolData({} as IPairData);
     }
