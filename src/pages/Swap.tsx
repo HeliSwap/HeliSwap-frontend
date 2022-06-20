@@ -50,6 +50,8 @@ const Swap = () => {
   const [tokensData, setTokensData] = useState<ITokensData>(initialTokensData);
   const [tokenInIsNative, setTokenInIsNative] = useState(false);
   const [tokenOutIsNative, setTokenOutIsNative] = useState(false);
+  const [willWrapTokens, setWillWrapTokens] = useState(false);
+  const [willUnwrapTokens, setWillUnwrapTokens] = useState(false);
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
 
   // State for pools
@@ -329,11 +331,18 @@ const Swap = () => {
     refetch();
 
     const { tokenA, tokenB } = tokensData;
+    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
 
     const tokenInIsNative = tokenA.type === TokenType.HBAR;
     const tokenOutIsNative = tokenB.type === TokenType.HBAR;
+
+    const tokenInWrappedHBAR = tokenA.address === WHBARAddress;
+    const tokenOutWrappedHBAR = tokenB.address === WHBARAddress;
+
     setTokenInIsNative(tokenInIsNative);
     setTokenOutIsNative(tokenOutIsNative);
+    setWillWrapTokens(tokenInIsNative && tokenOutWrappedHBAR);
+    setWillUnwrapTokens(tokenOutIsNative && tokenInWrappedHBAR);
   }, [poolsData, tokensData, refetch]);
 
   useEffect(() => {
