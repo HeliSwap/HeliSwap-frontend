@@ -754,6 +754,82 @@ class SDK {
 
     return responseData;
   }
+
+  async wrapHBAR(hashconnectConnectorInstance: Hashconnect, userId: string, HBARIn: string) {
+    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
+    const HBARInBN = formatStringToBigNumberWei(HBARIn, 8);
+
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(WHBARAddress))
+      //Set the gas for the contract call
+      .setGas(3000000)
+      //Amount of HBAR we want to provide
+      .setPayableAmount(HBARInBN)
+      //Set the contract function to call
+      .setFunction('deposit', new ContractFunctionParameters());
+
+    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
+      trans,
+      userId as string,
+    );
+
+    const response = await hashconnectConnectorInstance?.sendTransaction(
+      transactionBytes as Uint8Array,
+      userId as string,
+      false,
+    );
+
+    const responseData: any = {
+      response,
+      receipt: null,
+    };
+
+    if (response?.success) {
+      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
+    }
+
+    return responseData;
+  }
+
+  async unwrapHBAR(
+    hashconnectConnectorInstance: Hashconnect,
+    userId: string,
+    tokenAmountOut: string,
+  ) {
+    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
+    const tokenAmountOutBN = formatStringToBigNumberWei(tokenAmountOut, 8);
+
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(WHBARAddress))
+      //Set the gas for the contract call
+      .setGas(3000000)
+      //Set the contract function to call
+      .setFunction('withdraw', new ContractFunctionParameters().addUint256(tokenAmountOutBN));
+
+    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
+      trans,
+      userId as string,
+    );
+
+    const response = await hashconnectConnectorInstance?.sendTransaction(
+      transactionBytes as Uint8Array,
+      userId as string,
+      false,
+    );
+
+    const responseData: any = {
+      response,
+      receipt: null,
+    };
+
+    if (response?.success) {
+      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
+    }
+
+    return responseData;
+  }
 }
 
 export default SDK;

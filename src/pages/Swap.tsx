@@ -119,35 +119,49 @@ const Swap = () => {
     const tokenInAddress = tokenInIsNative ? WHBARAddress : tokensData.tokenA.address;
     const tokenOutAddress = tokenOutIsNative ? WHBARAddress : tokensData.tokenB.address;
 
-    if (name === 'amountIn' && amountIn !== '0') {
-      const trades = getPossibleTradesExactIn(
-        poolsData || [],
-        amountIn,
-        tokenInAddress,
-        tokenOutAddress,
-      );
+    if (willWrapTokens || willUnwrapTokens) {
+      if (name === 'amountIn' && amountIn !== '0') {
+        const swapAmountOut = amountIn;
 
-      const sortedTrades = trades.sort(tradeComparator);
-      if (sortedTrades.length === 0) return;
+        setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
+      } else if (name === 'amountOut' && amountOut !== '0') {
+        const swapAmountIn = amountOut;
 
-      const bestTrade = sortedTrades[0];
-      setBestPath(bestTrade.path);
-      setTokenInExactAmount(true);
-      setSwapData(prev => ({ ...prev, ...tokenData, amountOut: bestTrade.amountOut }));
-    } else if (name === 'amountOut' && amountOut !== '0') {
-      const trades = getPossibleTradesExactOut(
-        poolsData || [],
-        amountOut,
-        tokenInAddress,
-        tokenOutAddress,
-      );
+        setSwapData(prev => ({ ...prev, ...tokenData, amountIn: swapAmountIn.toString() }));
+      } else {
+        setSwapData(prev => ({ ...prev, amountIn: '0', amountOut: '0' }));
+      }
+    } else {
+      if (name === 'amountIn' && amountIn !== '0') {
+        const trades = getPossibleTradesExactIn(
+          poolsData || [],
+          amountIn,
+          tokenInAddress,
+          tokenOutAddress,
+        );
 
-      const sortedTrades = trades.sort(tradeComparator);
-      if (sortedTrades.length === 0) return;
-      const bestTrade = sortedTrades[0];
-      setBestPath(bestTrade.path);
-      setTokenInExactAmount(false);
-      setSwapData(prev => ({ ...prev, ...tokenData, amountIn: bestTrade.amountIn }));
+        const sortedTrades = trades.sort(tradeComparator);
+        if (sortedTrades.length === 0) return;
+
+        const bestTrade = sortedTrades[0];
+        setBestPath(bestTrade.path);
+        setTokenInExactAmount(true);
+        setSwapData(prev => ({ ...prev, ...tokenData, amountOut: bestTrade.amountOut }));
+      } else if (name === 'amountOut' && amountOut !== '0') {
+        const trades = getPossibleTradesExactOut(
+          poolsData || [],
+          amountOut,
+          tokenInAddress,
+          tokenOutAddress,
+        );
+
+        const sortedTrades = trades.sort(tradeComparator);
+        if (sortedTrades.length === 0) return;
+        const bestTrade = sortedTrades[0];
+        setBestPath(bestTrade.path);
+        setTokenInExactAmount(false);
+        setSwapData(prev => ({ ...prev, ...tokenData, amountIn: bestTrade.amountIn }));
+      }
     }
   };
 
@@ -341,8 +355,11 @@ const Swap = () => {
 
     setTokenInIsNative(tokenInIsNative);
     setTokenOutIsNative(tokenOutIsNative);
-    setWillWrapTokens(tokenInIsNative && tokenOutWrappedHBAR);
-    setWillUnwrapTokens(tokenOutIsNative && tokenInWrappedHBAR);
+    const willWrap = tokenInIsNative && tokenOutWrappedHBAR;
+    const willUnwrap = tokenOutIsNative && tokenInWrappedHBAR;
+
+    setWillWrapTokens(willWrap);
+    setWillUnwrapTokens(willUnwrap);
   }, [poolsData, tokensData, refetch]);
 
   useEffect(() => {
