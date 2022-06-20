@@ -228,7 +228,6 @@ const Swap = () => {
     setLoadingSwap(true);
 
     const { swapSlippage, transactionExpiration } = getTransactionSettings();
-    console.log(bestPath);
 
     try {
       let receipt;
