@@ -89,7 +89,7 @@ export const getPossibleTradesExactOut = (
       ? currentPool.token0Decimals
       : currentPool.token1Decimals;
     const nextAmountOutBN = formatStringToBigNumberWei(nextAmountOut, nextTokenOutDecimals);
-    //Filter out the pool which don't have enough amount
+    //Filter out the pools which don't have enough amount
     if (
       (tokenOutFirstAtPool && nextAmountOutBN.gte(new BN(currentPool.token0Amount))) ||
       (!tokenOutFirstAtPool && nextAmountOutBN.gte(new BN(currentPool.token1Amount)))
