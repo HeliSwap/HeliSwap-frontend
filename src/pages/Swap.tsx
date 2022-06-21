@@ -131,9 +131,9 @@ const Swap = () => {
         tokenOutAddress,
       );
 
-      if (trades.length === 0) return;
-
       const sortedTrades = trades.sort(tradeComparator);
+      if (sortedTrades.length === 0) return;
+
       const bestTrade = sortedTrades[0];
       setBestPath(bestTrade.path);
       setTokenInExactAmount(true);
@@ -146,9 +146,8 @@ const Swap = () => {
         tokenOutAddress,
       );
 
-      if (trades.length === 0) return;
-
       const sortedTrades = trades.sort(tradeComparator);
+      if (sortedTrades.length === 0) return;
       const bestTrade = sortedTrades[0];
       setBestPath(bestTrade.path);
       setTokenInExactAmount(false);

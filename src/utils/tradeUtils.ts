@@ -1,5 +1,5 @@
 import { IPairData } from '../interfaces/tokens';
-import { formatStringToBigNumberEthersWei } from './numberUtils';
+import { formatStringToBigNumberEthersWei, formatStringToBigNumberWei } from './numberUtils';
 import { hethers, BigNumber } from '@hashgraph/hethers';
 import BN from 'bignumber.js';
 
@@ -83,7 +83,18 @@ export const getPossibleTradesExactOut = (
     const currentPool = pools[i];
     if (!(currentPool.token0 === nextCurrencyOut) && !(currentPool.token1 === nextCurrencyOut))
       continue;
+
     const tokenOutFirstAtPool = currentPool.token0 === nextCurrencyOut;
+    const nextTokenOutDecimals = tokenOutFirstAtPool
+      ? currentPool.token0Decimals
+      : currentPool.token1Decimals;
+    const nextAmountOutBN = formatStringToBigNumberWei(nextAmountOut, nextTokenOutDecimals);
+    //Filter out the pool which don't have enough amount
+    if (
+      (tokenOutFirstAtPool && nextAmountOutBN.gte(new BN(currentPool.token0Amount))) ||
+      (!tokenOutFirstAtPool && nextAmountOutBN.gte(new BN(currentPool.token1Amount)))
+    )
+      continue;
     const amountIn = getAmountIn(nextAmountOut, tokenOutFirstAtPool, currentPool);
     const otherTokenInPool = tokenOutFirstAtPool ? currentPool.token1 : currentPool.token0;
 
