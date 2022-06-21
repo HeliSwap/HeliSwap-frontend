@@ -239,30 +239,39 @@ const Swap = () => {
 
     try {
       let receipt;
+
       if (tokenInExactAmount) {
         if (tokenInIsNative) {
-          receipt = await sdk.swapExactHBARForTokens(
-            hashconnectConnectorInstance,
-            userId,
-            amountIn,
-            amountOut,
-            tokenOutDecimals,
-            swapSlippage,
-            transactionExpiration,
-            bestPath,
-          );
+          if (willWrapTokens) {
+            receipt = await sdk.wrapHBAR(hashconnectConnectorInstance, userId, amountIn);
+          } else {
+            receipt = await sdk.swapExactHBARForTokens(
+              hashconnectConnectorInstance,
+              userId,
+              amountIn,
+              amountOut,
+              tokenOutDecimals,
+              swapSlippage,
+              transactionExpiration,
+              bestPath,
+            );
+          }
         } else if (tokenOutIsNative) {
-          receipt = await sdk.swapExactTokensForHBAR(
-            hashconnectConnectorInstance,
-            userId,
-            amountIn,
-            amountOut,
-            tokenInDecimals,
-            tokenOutDecimals,
-            swapSlippage,
-            transactionExpiration,
-            bestPath,
-          );
+          if (willUnwrapTokens) {
+            receipt = await sdk.unwrapHBAR(hashconnectConnectorInstance, userId, amountIn);
+          } else {
+            receipt = await sdk.swapExactTokensForHBAR(
+              hashconnectConnectorInstance,
+              userId,
+              amountIn,
+              amountOut,
+              tokenInDecimals,
+              tokenOutDecimals,
+              swapSlippage,
+              transactionExpiration,
+              bestPath,
+            );
+          }
         } else {
           receipt = await sdk.swapExactTokensForTokens(
             hashconnectConnectorInstance,

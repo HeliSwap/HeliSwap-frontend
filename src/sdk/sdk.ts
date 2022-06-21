@@ -757,7 +757,6 @@ class SDK {
 
   async wrapHBAR(hashconnectConnectorInstance: Hashconnect, userId: string, HBARIn: string) {
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
-    const HBARInBN = formatStringToBigNumberWei(HBARIn, 8);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
@@ -765,7 +764,7 @@ class SDK {
       //Set the gas for the contract call
       .setGas(3000000)
       //Amount of HBAR we want to provide
-      .setPayableAmount(HBARInBN)
+      .setPayableAmount(HBARIn)
       //Set the contract function to call
       .setFunction('deposit', new ContractFunctionParameters());
 
@@ -795,10 +794,10 @@ class SDK {
   async unwrapHBAR(
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
-    tokenAmountOut: string,
+    tokenAmountIn: string,
   ) {
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
-    const tokenAmountOutBN = formatStringToBigNumberWei(tokenAmountOut, 8);
+    const tokenAmountInNum = formatStringToBigNumberWei(tokenAmountIn, 8);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
@@ -806,7 +805,7 @@ class SDK {
       //Set the gas for the contract call
       .setGas(3000000)
       //Set the contract function to call
-      .setFunction('withdraw', new ContractFunctionParameters().addUint256(tokenAmountOutBN));
+      .setFunction('withdraw', new ContractFunctionParameters().addUint256(tokenAmountInNum));
 
     const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
       trans,
