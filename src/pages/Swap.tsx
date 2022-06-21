@@ -1,12 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
-import {
-  ITokenData,
-  ISwapTokenData,
-  IPairData,
-  TokenType,
-  ITokensData,
-} from '../interfaces/tokens';
+import { ITokenData, ISwapTokenData, TokenType, ITokensData } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
 import Button from '../components/Button';
@@ -85,9 +79,6 @@ const Swap = () => {
 
   // State for associated
   const [associated, setAssociated] = useState(false);
-
-  // State for common pool data
-  const [selectedPoolData, setSelectedPoolData] = useState<IPairData>({} as IPairData);
 
   // Additional states for Swaps
   const [readyToSwap, setReadyToSwap] = useState(false);
@@ -220,8 +211,7 @@ const Swap = () => {
   };
 
   const handleSwapClick = async () => {
-    const { tokenIdIn, tokenIdOut, amountIn, amountOut, tokenInDecimals, tokenOutDecimals } =
-      swapData;
+    const { amountIn, amountOut, tokenInDecimals, tokenOutDecimals } = swapData;
 
     setError(false);
     setErrorMessage('');
@@ -320,7 +310,6 @@ const Swap = () => {
         const successMessage = `Swap exactly ${swapData.amountIn} ${tokensData.tokenA.symbol} for ${swapData.amountOut} ${tokensData.tokenB.symbol}`;
 
         setSwapData(initialSwapData);
-        setSelectedPoolData({} as IPairData);
         setTokensData(initialTokensData);
         setApproved(false);
         setAssociated(false);
@@ -345,32 +334,6 @@ const Swap = () => {
     const tokenOutIsNative = tokenB.type === TokenType.HBAR;
     setTokenInIsNative(tokenInIsNative);
     setTokenOutIsNative(tokenOutIsNative);
-
-    if (poolsData && poolsData.length > 0) {
-      const provideNative = tokenInIsNative || tokenOutIsNative;
-      const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
-
-      const selectedPoolData = poolsData.filter((pool: any) => {
-        let poolMatchedBothTokens = false;
-
-        const poolContainsToken = (tokenAddres: string) => {
-          return pool.token0 === tokenAddres || pool.token1 === tokenAddres;
-        };
-
-        if (provideNative) {
-          poolMatchedBothTokens =
-            poolContainsToken(WHBARAddress) &&
-            (poolContainsToken(tokenA.address) || poolContainsToken(tokenB.address));
-        } else {
-          //Both tokens are in the same pool
-          poolMatchedBothTokens =
-            poolContainsToken(tokenA.address) && poolContainsToken(tokenB.address);
-        }
-        return poolMatchedBothTokens;
-      });
-    } else {
-      setSelectedPoolData({} as IPairData);
-    }
   }, [poolsData, tokensData, refetch]);
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { hethers, BigNumber } from '@hashgraph/hethers';
+import { hethers } from '@hashgraph/hethers';
 import {
   ContractExecuteTransaction,
   ContractFunctionParameters,
@@ -12,7 +12,6 @@ import { addressToId, idToAddress } from '../utils/tokenUtils';
 import {
   getAmountWithSlippage,
   getExpirationTime,
-  formatStringToBigNumberEthersWei,
   formatStringToBigNumberWei,
   formatStringToBigNumber,
 } from '../utils/numberUtils';
