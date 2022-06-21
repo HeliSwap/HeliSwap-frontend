@@ -114,8 +114,11 @@ const Swap = () => {
       isNaN(Number(value)) ||
       Object.keys(tokensData.tokenA).length === 0 ||
       Object.keys(tokensData.tokenB).length === 0
-    )
+    ) {
+      setSwapData(prev => ({ ...prev, amountIn: '0', amountOut: '0' }));
+
       return;
+    }
 
     const { amountIn, amountOut } = tokenData;
 
