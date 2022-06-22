@@ -1,12 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
-import {
-  ITokenData,
-  ISwapTokenData,
-  IPairData,
-  TokenType,
-  ITokensData,
-} from '../interfaces/tokens';
+import { ITokenData, ISwapTokenData, TokenType, ITokensData } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
 import Button from '../components/Button';
@@ -18,7 +12,6 @@ import TransactionSettingsModalContent from '../components/Modals/TransactionSet
 
 import errorMessages from '../content/errors';
 import {
-  addressToId,
   checkAllowanceHTS,
   getUserAssociatedTokens,
   idToAddress,
@@ -29,6 +22,11 @@ import {
   INITIAL_SWAP_SLIPPAGE_TOLERANCE,
   handleSaveTransactionSettings,
 } from '../utils/transactionUtils';
+import {
+  getPossibleTradesExactIn,
+  getPossibleTradesExactOut,
+  tradeComparator,
+} from '../utils/tradeUtils';
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
 import { MAX_UINT_ERC20, MAX_UINT_HTS } from '../constants';
@@ -52,6 +50,8 @@ const Swap = () => {
   const [tokensData, setTokensData] = useState<ITokensData>(initialTokensData);
   const [tokenInIsNative, setTokenInIsNative] = useState(false);
   const [tokenOutIsNative, setTokenOutIsNative] = useState(false);
+  const [willWrapTokens, setWillWrapTokens] = useState(false);
+  const [willUnwrapTokens, setWillUnwrapTokens] = useState(false);
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
 
   // State for pools
@@ -82,12 +82,10 @@ const Swap = () => {
   // State for associated
   const [associated, setAssociated] = useState(false);
 
-  // State for common pool data
-  const [selectedPoolData, setSelectedPoolData] = useState<IPairData>({} as IPairData);
-
   // Additional states for Swaps
   const [readyToSwap, setReadyToSwap] = useState(false);
   const [tokenInExactAmount, setTokenInExactAmount] = useState(true);
+  const [bestPath, setBestPath] = useState<string[]>([]);
 
   // State for general error
   const [error, setError] = useState(false);
@@ -99,49 +97,78 @@ const Swap = () => {
 
   const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
+    const { tokenA, tokenB } = tokensData;
 
     const tokenData = {
       [name]: value,
     };
 
-    const { amountIn, amountOut } = tokenData;
-    const { tokenIdIn, tokenIdOut } = swapData;
-    const { token0Amount, token1Amount, token0Decimals, token1Decimals } = selectedPoolData;
+    const invalidInputTokensData =
+      !value ||
+      isNaN(Number(value)) ||
+      Object.keys(tokenA).length === 0 ||
+      Object.keys(tokenB).length === 0;
 
-    if (Object.keys(selectedPoolData).length === 0) return;
-
-    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS;
-
-    const tokenInFirstAtPool = tokenInIsNative
-      ? selectedPoolData.token0 === WHBARAddress
-      : addressToId(selectedPoolData.token0) === tokenIdIn;
-    const tokenOutFirstAtPool = tokenOutIsNative
-      ? selectedPoolData.token0 === WHBARAddress
-      : addressToId(selectedPoolData.token0) === tokenIdOut;
-
-    let resIn, resOut, decIn, decOut;
-
-    if (name === 'amountIn' && amountIn !== '0') {
-      resIn = tokenInFirstAtPool ? token0Amount : token1Amount;
-      resOut = tokenInFirstAtPool ? token1Amount : token0Amount;
-      decIn = tokenInFirstAtPool ? token0Decimals : token1Decimals;
-      decOut = tokenInFirstAtPool ? token1Decimals : token0Decimals;
-
-      const swapAmountOut = sdk.getSwapAmountOut(amountIn, resIn, resOut, decIn, decOut);
-      setTokenInExactAmount(true);
-      setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
-    } else if (name === 'amountOut' && amountOut !== '0') {
-      resIn = tokenOutFirstAtPool ? token1Amount : token0Amount;
-      resOut = tokenOutFirstAtPool ? token0Amount : token1Amount;
-      decIn = tokenOutFirstAtPool ? token1Decimals : token0Decimals;
-      decOut = tokenOutFirstAtPool ? token0Decimals : token1Decimals;
-
-      const swapAmountIn = sdk.getSwapAmountIn(amountOut, resIn, resOut, decIn, decOut);
-
-      setTokenInExactAmount(false);
-      setSwapData(prev => ({ ...prev, ...tokenData, amountIn: swapAmountIn.toString() }));
-    } else {
+    if (invalidInputTokensData) {
       setSwapData(prev => ({ ...prev, amountIn: '0', amountOut: '0' }));
+
+      return;
+    }
+
+    const { amountIn, amountOut } = tokenData;
+
+    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS || '';
+    const tokenInAddress = tokenInIsNative ? WHBARAddress : tokenA.address;
+    const tokenOutAddress = tokenOutIsNative ? WHBARAddress : tokenB.address;
+
+    if (willWrapTokens || willUnwrapTokens) {
+      if (name === 'amountIn' && amountIn !== '0') {
+        const swapAmountOut = amountIn;
+
+        setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
+      } else if (name === 'amountOut' && amountOut !== '0') {
+        const swapAmountIn = amountOut;
+
+        setSwapData(prev => ({ ...prev, ...tokenData, amountIn: swapAmountIn.toString() }));
+      } else {
+        setSwapData(prev => ({ ...prev, amountIn: '0', amountOut: '0' }));
+      }
+    } else {
+      if (name === 'amountIn' && amountIn !== '0') {
+        const trades = getPossibleTradesExactIn(
+          poolsData || [],
+          amountIn,
+          tokenInAddress,
+          tokenOutAddress,
+        );
+
+        const sortedTrades = trades.sort(tradeComparator);
+
+        if (sortedTrades.length === 0) return;
+
+        const bestTrade = sortedTrades[0];
+
+        setBestPath(bestTrade.path);
+        setTokenInExactAmount(true);
+        setSwapData(prev => ({ ...prev, ...tokenData, amountOut: bestTrade.amountOut }));
+      } else if (name === 'amountOut' && amountOut !== '0') {
+        const trades = getPossibleTradesExactOut(
+          poolsData || [],
+          amountOut,
+          tokenInAddress,
+          tokenOutAddress,
+        );
+
+        const sortedTrades = trades.sort(tradeComparator);
+
+        if (sortedTrades.length === 0) return;
+
+        const bestTrade = sortedTrades[0];
+
+        setBestPath(bestTrade.path);
+        setTokenInExactAmount(false);
+        setSwapData(prev => ({ ...prev, ...tokenData, amountIn: bestTrade.amountIn }));
+      }
     }
   };
 
@@ -207,16 +234,7 @@ const Swap = () => {
   };
 
   const handleSwapClick = async () => {
-    const { tokenIdIn, tokenIdOut, amountIn, amountOut } = swapData;
-    const { token0, token0Decimals, token1Decimals } = selectedPoolData;
-
-    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS;
-    const tokenInFirstAtPool = tokenInIsNative
-      ? token0 === WHBARAddress
-      : addressToId(token0) === tokenIdIn;
-
-    const decIn = tokenInFirstAtPool ? token0Decimals : token1Decimals;
-    const decOut = tokenInFirstAtPool ? token1Decimals : token0Decimals;
+    const { amountIn, amountOut, tokenInDecimals, tokenOutDecimals } = swapData;
 
     setError(false);
     setErrorMessage('');
@@ -228,42 +246,50 @@ const Swap = () => {
 
     try {
       let receipt;
+
       if (tokenInExactAmount) {
         if (tokenInIsNative) {
-          receipt = await sdk.swapExactHBARForTokens(
-            hashconnectConnectorInstance,
-            userId,
-            tokenIdOut,
-            amountIn,
-            amountOut,
-            decOut,
-            swapSlippage,
-            transactionExpiration,
-          );
+          if (willWrapTokens) {
+            receipt = await sdk.wrapHBAR(hashconnectConnectorInstance, userId, amountIn);
+          } else {
+            receipt = await sdk.swapExactHBARForTokens(
+              hashconnectConnectorInstance,
+              userId,
+              amountIn,
+              amountOut,
+              tokenOutDecimals,
+              swapSlippage,
+              transactionExpiration,
+              bestPath,
+            );
+          }
         } else if (tokenOutIsNative) {
-          receipt = await sdk.swapExactTokensForHBAR(
-            hashconnectConnectorInstance,
-            userId,
-            tokenIdIn,
-            amountIn,
-            amountOut,
-            decIn,
-            decOut,
-            swapSlippage,
-            transactionExpiration,
-          );
+          if (willUnwrapTokens) {
+            receipt = await sdk.unwrapHBAR(hashconnectConnectorInstance, userId, amountIn);
+          } else {
+            receipt = await sdk.swapExactTokensForHBAR(
+              hashconnectConnectorInstance,
+              userId,
+              amountIn,
+              amountOut,
+              tokenInDecimals,
+              tokenOutDecimals,
+              swapSlippage,
+              transactionExpiration,
+              bestPath,
+            );
+          }
         } else {
           receipt = await sdk.swapExactTokensForTokens(
             hashconnectConnectorInstance,
             userId,
-            tokenIdIn,
-            tokenIdOut,
             amountIn,
             amountOut,
-            decIn,
-            decOut,
+            tokenInDecimals,
+            tokenOutDecimals,
             swapSlippage,
             transactionExpiration,
+            bestPath,
           );
         }
       } else {
@@ -271,37 +297,36 @@ const Swap = () => {
           receipt = await sdk.swapHBARForExactTokens(
             hashconnectConnectorInstance,
             userId,
-            tokenIdOut,
             amountIn,
             amountOut,
-            decOut,
+            tokenOutDecimals,
             swapSlippage,
             transactionExpiration,
+            bestPath,
           );
         } else if (tokenOutIsNative) {
           receipt = await sdk.swapTokensForExactHBAR(
             hashconnectConnectorInstance,
             userId,
-            tokenIdIn,
             amountIn,
             amountOut,
-            decIn,
-            decOut,
+            tokenInDecimals,
+            tokenOutDecimals,
             swapSlippage,
             transactionExpiration,
+            bestPath,
           );
         } else {
           receipt = await sdk.swapTokensForExactTokens(
             hashconnectConnectorInstance,
             userId,
-            tokenIdIn,
-            tokenIdOut,
             amountIn,
             amountOut,
-            decIn,
-            decOut,
+            tokenInDecimals,
+            tokenOutDecimals,
             swapSlippage,
             transactionExpiration,
+            bestPath,
           );
         }
       }
@@ -317,7 +342,6 @@ const Swap = () => {
         const successMessage = `Swap exactly ${swapData.amountIn} ${tokensData.tokenA.symbol} for ${swapData.amountOut} ${tokensData.tokenB.symbol}`;
 
         setSwapData(initialSwapData);
-        setSelectedPoolData({} as IPairData);
         setTokensData(initialTokensData);
         setApproved(false);
         setAssociated(false);
@@ -337,39 +361,21 @@ const Swap = () => {
     refetch();
 
     const { tokenA, tokenB } = tokensData;
+    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
 
     const tokenInIsNative = tokenA.type === TokenType.HBAR;
     const tokenOutIsNative = tokenB.type === TokenType.HBAR;
+
+    const tokenInWrappedHBAR = tokenA.address === WHBARAddress;
+    const tokenOutWrappedHBAR = tokenB.address === WHBARAddress;
+
     setTokenInIsNative(tokenInIsNative);
     setTokenOutIsNative(tokenOutIsNative);
+    const willWrap = tokenInIsNative && tokenOutWrappedHBAR;
+    const willUnwrap = tokenOutIsNative && tokenInWrappedHBAR;
 
-    if (poolsData && poolsData.length > 0) {
-      const provideNative = tokenInIsNative || tokenOutIsNative;
-      const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
-
-      const selectedPoolData = poolsData.filter((pool: any) => {
-        let poolMatchedBothTokens = false;
-
-        const poolContainsToken = (tokenAddres: string) => {
-          return pool.token0 === tokenAddres || pool.token1 === tokenAddres;
-        };
-
-        if (provideNative) {
-          poolMatchedBothTokens =
-            poolContainsToken(WHBARAddress) &&
-            (poolContainsToken(tokenA.address) || poolContainsToken(tokenB.address));
-        } else {
-          //Both tokens are in the same pool
-          poolMatchedBothTokens =
-            poolContainsToken(tokenA.address) && poolContainsToken(tokenB.address);
-        }
-        return poolMatchedBothTokens;
-      });
-
-      setSelectedPoolData(selectedPoolData[0] || {});
-    } else {
-      setSelectedPoolData({} as IPairData);
-    }
+    setWillWrapTokens(willWrap);
+    setWillUnwrapTokens(willUnwrap);
   }, [poolsData, tokensData, refetch]);
 
   useEffect(() => {
