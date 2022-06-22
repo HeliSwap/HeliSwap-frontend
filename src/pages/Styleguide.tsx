@@ -254,28 +254,6 @@ const Styleguide = () => {
 
       <div className="mb-4">
         <div className="row">
-          <div className="col-md-9">
-            <code>.text-hero</code>
-            <h1 className="text-hero mt-3">The quick brown fox jumps over the lazy dog</h1>
-          </div>
-        </div>
-      </div>
-
-      <hr className="mt-6 mb-6" />
-
-      <div className="mb-4">
-        <div className="row">
-          <div className="col-md-6">
-            <code>.text-mega</code>
-            <h2 className="text-mega mt-3">The quick brown fox jumps over the lazy dog</h2>
-          </div>
-        </div>
-      </div>
-
-      <hr className="mt-6 mb-6" />
-
-      <div className="mb-4">
-        <div className="row">
           <div className="col-md-5">
             <code>.text-display</code>
             <h3 className="text-display mt-3">The quick brown fox jumps over the lazy dog</h3>
@@ -312,17 +290,6 @@ const Styleguide = () => {
           <div className="col-md-3">
             <code>.text-subheader</code>
             <h6 className="text-subheader mt-3">The quick brown fox jumps over the lazy dog</h6>
-          </div>
-        </div>
-      </div>
-
-      <hr className="mt-6 mb-6" />
-
-      <div className="mb-4">
-        <div className="row">
-          <div className="col-md-3">
-            <code>.text-lead</code>
-            <p className="text-lead mt-3">The quick brown fox jumps over the lazy dog</p>
           </div>
         </div>
       </div>

@@ -43,8 +43,8 @@ const Tokens = () => {
                 </div>
                 <div>{item.type}</div>
                 <div>{item.symbol}</div>
-                <div className="text-end">{item.decimals}</div>
-                <div className="text-end">
+                <div className="text-end text-numeric">{item.decimals}</div>
+                <div className="text-end text-numeric">
                   <p>{item.hederaId}</p>
                 </div>
               </div>

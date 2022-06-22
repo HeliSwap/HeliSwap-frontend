@@ -10,12 +10,12 @@ $steel: #c8ccd4;
 $pale: #eceff2;
 $snow: #f9fbfd;
 
-$primary: #ed1b6c;
+$primary: #2F18E5;
 $secondary: $grey;
-$success: #23C581;
-$danger: #e24358;
-$warning:#ffb75d;
-$info: #501AC7;
+$success: #0DA048;
+$danger: #EA1548;
+$warning:#F17400;
+$info: #2F18E5;
 $light: $grey;
 
 // Add custom colors to theme-colors map
@@ -140,18 +140,19 @@ $paragraph-margin-bottom: 0;
 $grid-gutter-width: 24px;
 
 // Border radius
-$border-radius: 6px;
+$border-radius: 4px;
 
 // Typography
-$font-family-primary: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
+$font-family-primary: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
   Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+$font-family-numeric: 'Noto Sans Mono', monospace;
 
 $font-family-base: $font-family-primary;
 $font-size-base: 1rem;
 
 $font-weight-light: 300;
 $font-weight-normal: 400;
-$font-weight-semi-bold: 500;
+$font-weight-semi-bold: 600;
 $font-weight-bold: 700;
 $font-weight-bolder: $font-weight-bold;
 
@@ -164,104 +165,74 @@ $headings-font-family: $font-family-primary;
 $headings-font-weight: $font-weight-normal;
 
 $texts: (
-  hero: (
-    default: (
-      font-size: 48px,
-      line-height: 1.3,
-    ),
-    md: (
-      font-size: 72px,
-      line-height: 1.2,
-    ),
-  ),
-  mega: (
-    default: (
-      font-size: 36px,
-      line-height: 1.4,
-    ),
-    md: (
-      font-size: 48px,
-      line-height: 1.25,
-    ),
-  ),
   display: (
     default: (
-      font-size: 28px,
-      line-height: 1.45,
+      font-size: 40px,
+      line-height: 48px,
     ),
     md: (
-      font-size: 36px,
-      line-height: 1.4,
+      font-size: 40px,
+      line-height: 48px,
     ),
   ),
   headline: (
     default: (
-      font-size: 20px,
-      line-height: 1.45,
+      font-size: 32px,
+      line-height: 40px,
     ),
     md: (
-      font-size: 24px,
-      line-height: 1.45,
+      font-size: 32px,
+      line-height: 40px,
     ),
   ),
   title: (
     default: (
-      font-size: 19px,
-      line-height: 1.45,
+      font-size: 28px,
+      line-height: 42px,
     ),
     md: (
-      font-size: 20px,
-      line-height: 1.45,
+      font-size: 28px,
+      line-height: 42px,
     ),
   ),
   subheader: (
     default: (
-      font-size: 16px,
-      line-height: 1.45,
+      font-size: 24px,
+      line-height: 32px,
     ),
     md: (
-      font-size: 18px,
-      line-height: 1.45,
-    ),
-  ),
-  lead: (
-    default: (
-      font-size: 16px,
-      line-height: 1.63,
-    ),
-    md: (
-      font-size: 18px,
-      line-height: 1.44,
+      font-size: 24px,
+      line-height: 32px,
     ),
   ),
   main: (
     default: (
       font-size: 16px,
-      line-height: 1.63,
+      line-height: 22px,
     ),
     md: (
       font-size: 16px,
-      line-height: 1.63,
+      line-height: 22px,
     ),
   ),
   small: (
     default: (
       font-size: 14px,
-      line-height: 1.45,
+      line-height: 22px,
     ),
     md: (
       font-size: 14px,
-      line-height: 1.45,
+      line-height: 22px,
     ),
   ),
   micro: (
     default: (
       font-size: 12px,
-      line-height: 1.45,
+      line-height: 16px,
     ),
     md: (
       font-size: 12px,
-      line-height: 1.45,
+      line-height: 16px,
     ),
   ),
 );
@@ -274,7 +245,7 @@ $btn-padding-x: 30px;
 $btn-padding-y-sm: 6px;
 $btn-padding-x-sm: 16px;
 $btn-line-height: 1.5;
-$btn-font-weight: $font-weight-bold;
+$btn-font-weight: $font-weight-semi-bold;
 $btn-font-size: 16px;
 $btn-border-radius: $border-radius;
 $btn-transition: color 0.15s linear, background-color 0.15s linear, border-color 0.15s linear,
@@ -294,8 +265,8 @@ $input-placeholder-color: $grey;
 $form-group-margin-bottom: 0;
 $input-bg: $darkest;
 $input-padding-y: 14px;
-$input-padding-x: 16px;
-$input-font-size: 25px;
+$input-padding-x: 18px;
+$input-font-size: 16px;
 
 $form-select-indicator: none;
 
