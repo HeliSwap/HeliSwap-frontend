@@ -12,7 +12,7 @@ $neutral-500: #4B4B51;
 $neutral-400: #6F6F77;
 
 $primary: #2F18E5;
-$secondary: #6F6F77;
+$secondary: $neutral-400;
 $success: #0DA048;
 $danger: #EA1548;
 $warning:#F17400;
@@ -233,21 +233,21 @@ $texts: (
 );
 
 // Buttons
-$btn-padding-y-lg: 10px;
-$btn-padding-x-lg: 32px;
-$btn-padding-y: 10px;
-$btn-padding-x: 30px;
-$btn-padding-y-sm: 6px;
-$btn-padding-x-sm: 16px;
-$btn-line-height: 1.5;
+$btn-padding-y: 16px;
+$btn-padding-x: 48px;
+$btn-padding-y-sm: 8px;
+$btn-padding-x-sm: 20px;
+$btn-line-height: 22px;
 $btn-font-weight: $font-weight-semi-bold;
-$btn-font-size: 16px;
+$btn-font-size: 14px;
 $btn-border-radius: $border-radius;
 $btn-transition: color 0.15s linear, background-color 0.15s linear, border-color 0.15s linear,
   box-shadow 0.15s linear;
 $btn-disabled-opacity: 0.5;
 
 $btn-primary-color: $white;
+$btn-primary-disabled-background: #232342;
+$btn-primary-outline-color: $white;
 
 // Forms
 $input-color: #7F89A7;

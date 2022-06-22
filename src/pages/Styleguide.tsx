@@ -372,6 +372,14 @@ const Styleguide = () => {
           </button>
         </div>
         <div className="col-12 mb-4">
+          <button type="button" className="btn btn-sm btn-primary me-3">
+            Primary small
+          </button>
+          <button type="button" className="btn btn-sm btn-secondary me-3">
+            Secondary small
+          </button>
+        </div>
+        <div className="col-12 mb-4">
           <button type="button" className="btn btn-outline-primary me-3">
             Primary outline
           </button>
