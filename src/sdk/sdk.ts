@@ -5,6 +5,7 @@ import {
   ContractId,
   TransactionReceipt,
   TokenAssociateTransaction,
+  Transaction,
 } from '@hashgraph/sdk';
 import Hashconnect from '../connectors/hashconnect';
 import { ICreatePairData } from '../interfaces/tokens';
@@ -77,27 +78,7 @@ class SDK {
     trans.setTokenIds([tokenId]);
     trans.setAccountId(userId);
 
-    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
-      trans,
-      userId as string,
-    );
-
-    const response = await hashconnectConnectorInstance?.sendTransaction(
-      transactionBytes as Uint8Array,
-      userId as string,
-      false,
-    );
-
-    const responseData: any = {
-      response,
-      receipt: null,
-    };
-
-    if (response?.success) {
-      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
-    }
-
-    return responseData;
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
   async approveToken(
@@ -124,27 +105,7 @@ class SDK {
           .addUint256(amountToApproveBN),
       );
 
-    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
-      trans,
-      userId as string,
-    );
-
-    const response = await hashconnectConnectorInstance?.sendTransaction(
-      transactionBytes as Uint8Array,
-      userId as string,
-      false,
-    );
-
-    const responseData: any = {
-      response,
-      receipt: null,
-    };
-
-    if (response?.success) {
-      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
-    }
-
-    return responseData;
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
   async addNativeLiquidity(
@@ -193,27 +154,7 @@ class SDK {
           .addUint256(getExpirationTime(expiresAfter)),
       );
 
-    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
-      trans,
-      userId as string,
-    );
-
-    const response = await hashconnectConnectorInstance?.sendTransaction(
-      transactionBytes as Uint8Array,
-      userId as string,
-      false,
-    );
-
-    const responseData: any = {
-      response,
-      receipt: null,
-    };
-
-    if (response?.success) {
-      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
-    }
-
-    return responseData;
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
   async addLiquidity(
@@ -271,27 +212,7 @@ class SDK {
           .addUint256(getExpirationTime(expiresAfter)),
       );
 
-    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
-      trans,
-      userId as string,
-    );
-
-    const response = await hashconnectConnectorInstance?.sendTransaction(
-      transactionBytes as Uint8Array,
-      userId as string,
-      false,
-    );
-
-    const responseData: any = {
-      response,
-      receipt: null,
-    };
-
-    if (response?.success) {
-      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
-    }
-
-    return responseData;
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
   async removeNativeLiquidity(
@@ -330,27 +251,7 @@ class SDK {
           .addUint256(getExpirationTime(expiresAfter)),
       );
 
-    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
-      trans,
-      userId as string,
-    );
-
-    const response = await hashconnectConnectorInstance?.sendTransaction(
-      transactionBytes as Uint8Array,
-      userId as string,
-      false,
-    );
-
-    const responseData: any = {
-      response,
-      receipt: null,
-    };
-
-    if (response?.success) {
-      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
-    }
-
-    return responseData;
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
   async removeLiquidity(
@@ -392,27 +293,7 @@ class SDK {
           .addUint256(getExpirationTime(expiresAfter)),
       );
 
-    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
-      trans,
-      userId as string,
-    );
-
-    const response = await hashconnectConnectorInstance?.sendTransaction(
-      transactionBytes as Uint8Array,
-      userId as string,
-      false,
-    );
-
-    const responseData: any = {
-      response,
-      receipt: null,
-    };
-
-    if (response?.success) {
-      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
-    }
-
-    return responseData;
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
   async swapExactTokensForTokens(
@@ -448,27 +329,7 @@ class SDK {
           .addUint256(getExpirationTime(expiresAfter)),
       );
 
-    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
-      trans,
-      userId as string,
-    );
-
-    const response = await hashconnectConnectorInstance?.sendTransaction(
-      transactionBytes as Uint8Array,
-      userId as string,
-      false,
-    );
-
-    const responseData: any = {
-      response,
-      receipt: null,
-    };
-
-    if (response?.success) {
-      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
-    }
-
-    return responseData;
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
   async swapExactHBARForTokens(
@@ -505,27 +366,7 @@ class SDK {
           .addUint256(getExpirationTime(expiresAfter)),
       );
 
-    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
-      trans,
-      userId as string,
-    );
-
-    const response = await hashconnectConnectorInstance?.sendTransaction(
-      transactionBytes as Uint8Array,
-      userId as string,
-      false,
-    );
-
-    const responseData: any = {
-      response,
-      receipt: null,
-    };
-
-    if (response?.success) {
-      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
-    }
-
-    return responseData;
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
   async swapExactTokensForHBAR(
@@ -562,27 +403,7 @@ class SDK {
           .addUint256(getExpirationTime(expiresAfter)),
       );
 
-    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
-      trans,
-      userId as string,
-    );
-
-    const response = await hashconnectConnectorInstance?.sendTransaction(
-      transactionBytes as Uint8Array,
-      userId as string,
-      false,
-    );
-
-    const responseData: any = {
-      response,
-      receipt: null,
-    };
-
-    if (response?.success) {
-      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
-    }
-
-    return responseData;
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
   async swapTokensForExactTokens(
@@ -618,27 +439,7 @@ class SDK {
           .addUint256(getExpirationTime(expiresAfter)),
       );
 
-    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
-      trans,
-      userId as string,
-    );
-
-    const response = await hashconnectConnectorInstance?.sendTransaction(
-      transactionBytes as Uint8Array,
-      userId as string,
-      false,
-    );
-
-    const responseData: any = {
-      response,
-      receipt: null,
-    };
-
-    if (response?.success) {
-      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
-    }
-
-    return responseData;
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
   async swapTokensForExactHBAR(
@@ -674,27 +475,7 @@ class SDK {
           .addUint256(getExpirationTime(expiresAfter)),
       );
 
-    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
-      trans,
-      userId as string,
-    );
-
-    const response = await hashconnectConnectorInstance?.sendTransaction(
-      transactionBytes as Uint8Array,
-      userId as string,
-      false,
-    );
-
-    const responseData: any = {
-      response,
-      receipt: null,
-    };
-
-    if (response?.success) {
-      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
-    }
-
-    return responseData;
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
   async swapHBARForExactTokens(
@@ -732,27 +513,7 @@ class SDK {
           .addUint256(getExpirationTime(expiresAfter)),
       );
 
-    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
-      trans,
-      userId as string,
-    );
-
-    const response = await hashconnectConnectorInstance?.sendTransaction(
-      transactionBytes as Uint8Array,
-      userId as string,
-      false,
-    );
-
-    const responseData: any = {
-      response,
-      receipt: null,
-    };
-
-    if (response?.success) {
-      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
-    }
-
-    return responseData;
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
   async wrapHBAR(hashconnectConnectorInstance: Hashconnect, userId: string, HBARIn: string) {
@@ -768,27 +529,7 @@ class SDK {
       //Set the contract function to call
       .setFunction('deposit', new ContractFunctionParameters());
 
-    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
-      trans,
-      userId as string,
-    );
-
-    const response = await hashconnectConnectorInstance?.sendTransaction(
-      transactionBytes as Uint8Array,
-      userId as string,
-      false,
-    );
-
-    const responseData: any = {
-      response,
-      receipt: null,
-    };
-
-    if (response?.success) {
-      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
-    }
-
-    return responseData;
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
   async unwrapHBAR(
@@ -807,14 +548,22 @@ class SDK {
       //Set the contract function to call
       .setFunction('withdraw', new ContractFunctionParameters().addUint256(tokenAmountInNum));
 
-    const transactionBytes: Uint8Array | undefined = await hashconnectConnectorInstance?.makeBytes(
-      trans,
-      userId as string,
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
+  sendTransactionAndGetResponse = async (
+    hashconnectConnectorInstance: Hashconnect,
+    transaction: Transaction,
+    userId: string,
+  ) => {
+    const transactionBytes: Uint8Array = await hashconnectConnectorInstance?.makeBytes(
+      transaction,
+      userId,
     );
 
     const response = await hashconnectConnectorInstance?.sendTransaction(
       transactionBytes as Uint8Array,
-      userId as string,
+      userId,
       false,
     );
 
@@ -826,9 +575,8 @@ class SDK {
     if (response?.success) {
       responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
     }
-
     return responseData;
-  }
+  };
 }
 
 export default SDK;
