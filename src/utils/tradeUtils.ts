@@ -18,6 +18,7 @@ interface Trade {
   amountOut: string;
   path: string[];
 }
+
 export const getPossibleTradesExactIn = (
   pools: IPairData[],
   amountIn: string,
@@ -31,18 +32,20 @@ export const getPossibleTradesExactIn = (
 ) => {
   for (let i = 0; i < pools.length; i++) {
     const currentPool = pools[i];
-    if (!(currentPool.token0 === nextCurrencyIn) && !(currentPool.token1 === nextCurrencyIn))
-      continue;
-    const tokenInFirstAtPool = currentPool.token0 === nextCurrencyIn;
+    const { token0, token1 } = currentPool;
+
+    if (!(token0 === nextCurrencyIn) && !(token1 === nextCurrencyIn)) continue;
+
+    const tokenInFirstAtPool = token0 === nextCurrencyIn;
     const amountOut = getAmountOut(nextAmountIn, tokenInFirstAtPool, currentPool);
-    const otherTokenInPool = tokenInFirstAtPool ? currentPool.token1 : currentPool.token0;
+    const otherTokenInPool = tokenInFirstAtPool ? token1 : token0;
 
     if (otherTokenInPool === currencyOut) {
       possibleTrades.push({
         pools: [...currentPools, currentPool],
-        currencyIn: currencyIn,
-        currencyOut: currencyOut,
-        amountIn: amountIn,
+        currencyIn,
+        currencyOut,
+        amountIn,
         amountOut: amountOut,
         path: getPath([...currentPools, currentPool], currencyIn),
       });
@@ -81,34 +84,37 @@ export const getPossibleTradesExactOut = (
 ) => {
   for (let i = 0; i < pools.length; i++) {
     const currentPool = pools[i];
-    if (!(currentPool.token0 === nextCurrencyOut) && !(currentPool.token1 === nextCurrencyOut))
-      continue;
+    const { token0, token1, token0Decimals, token1Decimals, token0Amount, token1Amount } =
+      currentPool;
 
-    const tokenOutFirstAtPool = currentPool.token0 === nextCurrencyOut;
-    const nextTokenOutDecimals = tokenOutFirstAtPool
-      ? currentPool.token0Decimals
-      : currentPool.token1Decimals;
+    if (!(token0 === nextCurrencyOut) && !(token1 === nextCurrencyOut)) continue;
+
+    const tokenOutFirstAtPool = token0 === nextCurrencyOut;
+    const nextTokenOutDecimals = tokenOutFirstAtPool ? token0Decimals : token1Decimals;
     const nextAmountOutBN = formatStringToBigNumberWei(nextAmountOut, nextTokenOutDecimals);
+
     //Filter out the pools which don't have enough amount
     if (
-      (tokenOutFirstAtPool && nextAmountOutBN.gte(new BN(currentPool.token0Amount))) ||
-      (!tokenOutFirstAtPool && nextAmountOutBN.gte(new BN(currentPool.token1Amount)))
+      (tokenOutFirstAtPool && nextAmountOutBN.gte(new BN(token0Amount))) ||
+      (!tokenOutFirstAtPool && nextAmountOutBN.gte(new BN(token1Amount)))
     )
       continue;
+
     const amountIn = getAmountIn(nextAmountOut, tokenOutFirstAtPool, currentPool);
-    const otherTokenInPool = tokenOutFirstAtPool ? currentPool.token1 : currentPool.token0;
+    const otherTokenInPool = tokenOutFirstAtPool ? token1 : token0;
 
     if (otherTokenInPool === currencyIn) {
       possibleTrades.push({
         pools: [currentPool, ...currentPools],
-        currencyIn: currencyIn,
-        currencyOut: currencyOut,
-        amountIn: amountIn,
-        amountOut: amountOut,
+        currencyIn,
+        currencyOut,
+        amountIn,
+        amountOut,
         path: getPath([currentPool, ...currentPools], currencyIn),
       });
     } else if (maxHops > 1 && pools.length > 1) {
       const poolsExcludingThisPool = pools.slice(0, i).concat(pools.slice(i + 1, pools.length));
+
       getPossibleTradesExactOut(
         poolsExcludingThisPool,
         amountOut,
@@ -125,6 +131,7 @@ export const getPossibleTradesExactOut = (
       );
     }
   }
+
   return possibleTrades;
 };
 
@@ -159,6 +166,7 @@ export const tradeComparator = (a: Trade, b: Trade) => {
   // finally consider the number of hops since each hop costs gas
   return a.path.length - b.path.length;
 };
+
 const inputOutputComparator = (a: Trade, b: Trade): number => {
   const aAmountInBN = new BN(a.amountIn);
   const bAmountInBN = new BN(b.amountIn);

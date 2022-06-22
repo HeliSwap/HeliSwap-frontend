@@ -97,17 +97,19 @@ const Swap = () => {
 
   const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
+    const { tokenA, tokenB } = tokensData;
 
     const tokenData = {
       [name]: value,
     };
 
-    if (
+    const invalidInputTokensData =
       !value ||
       isNaN(Number(value)) ||
-      Object.keys(tokensData.tokenA).length === 0 ||
-      Object.keys(tokensData.tokenB).length === 0
-    ) {
+      Object.keys(tokenA).length === 0 ||
+      Object.keys(tokenB).length === 0;
+
+    if (invalidInputTokensData) {
       setSwapData(prev => ({ ...prev, amountIn: '0', amountOut: '0' }));
 
       return;
@@ -116,8 +118,8 @@ const Swap = () => {
     const { amountIn, amountOut } = tokenData;
 
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS || '';
-    const tokenInAddress = tokenInIsNative ? WHBARAddress : tokensData.tokenA.address;
-    const tokenOutAddress = tokenOutIsNative ? WHBARAddress : tokensData.tokenB.address;
+    const tokenInAddress = tokenInIsNative ? WHBARAddress : tokenA.address;
+    const tokenOutAddress = tokenOutIsNative ? WHBARAddress : tokenB.address;
 
     if (willWrapTokens || willUnwrapTokens) {
       if (name === 'amountIn' && amountIn !== '0') {
@@ -141,9 +143,11 @@ const Swap = () => {
         );
 
         const sortedTrades = trades.sort(tradeComparator);
+
         if (sortedTrades.length === 0) return;
 
         const bestTrade = sortedTrades[0];
+
         setBestPath(bestTrade.path);
         setTokenInExactAmount(true);
         setSwapData(prev => ({ ...prev, ...tokenData, amountOut: bestTrade.amountOut }));
@@ -156,8 +160,11 @@ const Swap = () => {
         );
 
         const sortedTrades = trades.sort(tradeComparator);
+
         if (sortedTrades.length === 0) return;
+
         const bestTrade = sortedTrades[0];
+
         setBestPath(bestTrade.path);
         setTokenInExactAmount(false);
         setSwapData(prev => ({ ...prev, ...tokenData, amountIn: bestTrade.amountIn }));
