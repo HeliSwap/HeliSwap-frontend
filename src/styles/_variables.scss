@@ -1,22 +1,22 @@
 // Colors
-$dark: #2c3243;
+$dark: #101011; //900
 $darker: #1c2230;
-$darkest: #0f131d;
+$darkest: #101011;
+$black: #000000;
 $white: #ffffff;
 
-$slate: #5b6573;
-$grey: #858c9a;
-$steel: #c8ccd4;
-$pale: #eceff2;
-$snow: #f9fbfd;
+$neutral-900: #101011;
+$neutral-700: #29292D;
+$neutral-600: #313135;
+$neutral-500: #4B4B51;
+$neutral-400: #6F6F77;
 
 $primary: #2F18E5;
-$secondary: $grey;
+$secondary: #6F6F77;
 $success: #0DA048;
 $danger: #EA1548;
 $warning:#F17400;
 $info: #2F18E5;
-$light: $grey;
 
 // Add custom colors to theme-colors map
 $theme-colors: (
@@ -26,11 +26,6 @@ $theme-colors: (
   'info': $info,
   'warning': $warning,
   'danger': $danger,
-  'slate': $slate,
-  'grey': $grey,
-  'steel': $steel,
-  'pale': $pale,
-  'snow': $snow,
 );
 
 // Options
@@ -261,7 +256,7 @@ $input-focus-border-color: $primary;
 $input-focus-box-shadow: 0 0 0 1px $primary;
 $input-height: auto;
 $input-line-height: 1.2;
-$input-placeholder-color: $grey;
+$input-placeholder-color: $secondary;
 $form-group-margin-bottom: 0;
 $input-bg: $darkest;
 $input-padding-y: 14px;
