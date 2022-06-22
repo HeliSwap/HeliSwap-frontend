@@ -3,6 +3,49 @@
   letter-spacing: 0.5px;
 }
 
+.bnt-selector {
+  padding: 8px 12px;
+  border-radius: $border-radius;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.15s linear, border-color 0.15s linear;
+
+  &.with-background {
+    background-color: $neutral-700;
+  }
+
+  &.with-border {
+    border: 1px solid $neutral-400;
+  }
+
+  &:hover {
+    background-color: $neutral-500;
+
+    &.with-border {
+      border-color: $neutral-500;
+    }
+  }
+}
+
+.icon {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+
+  &.is-gray {
+    path {
+      fill: $neutral-400;
+    }
+  }
+
+  &.is-gradient {
+    path {
+      fill: linear-gradient(139.83deg, #f32fd7 0%, #3845fb 100%);
+    }
+  }
+}
+
 .container-swap {
   background-color: $darkest;
   border-radius: 15px;

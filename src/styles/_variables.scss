@@ -1,7 +1,7 @@
 // Colors
 $dark: #101011; //900
 $darker: #1c2230;
-$darkest: #101011;
+$darkest: #272727;
 $black: #000000;
 $white: #ffffff;
 
@@ -10,6 +10,7 @@ $neutral-700: #29292D;
 $neutral-600: #313135;
 $neutral-500: #4B4B51;
 $neutral-400: #6F6F77;
+$neutral-100: #F9F9F9;
 
 $primary: #2F18E5;
 $secondary: $neutral-400;
@@ -125,8 +126,8 @@ $spacers: (
 );
 
 // Body
-$body-bg: $darker;
-$body-color: $white;
+$body-bg: $neutral-900;
+$body-color: $neutral-100 ;
 
 // Paragraphs
 $paragraph-margin-bottom: 0;
