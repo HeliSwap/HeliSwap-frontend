@@ -3,7 +3,7 @@
   letter-spacing: 0.5px;
 }
 
-.bnt-selector {
+.btn-selector {
   padding: 8px 12px;
   border-radius: $border-radius;
   display: flex;
@@ -44,6 +44,12 @@
       fill: linear-gradient(139.83deg, #f32fd7 0%, #3845fb 100%);
     }
   }
+}
+
+.icon-token {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
 }
 
 .container-swap {

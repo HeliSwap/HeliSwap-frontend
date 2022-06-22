@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import ButtonSelector from '../components/ButtonSelector';
 
 import Icon from '../components/Icon';
+import IconToken from '../components/IconToken';
 import Modal from '../components/Modal';
 import ModalContent from '../components/Modals/ModalContent';
 
@@ -232,35 +234,40 @@ const Styleguide = () => {
       </div>
 
       <div className="mb-4 d-flex align-items-center">
-        <div className="bnt-selector">
+        <ButtonSelector type="border" selectorText="Select token" />
+      </div>
+
+      <div className="mb-4 d-flex align-items-center">
+        <div className="btn-selector">
           <span className="text-small">Select token</span>
           <Icon name="chevron" className="ms-2" />
         </div>
-
-        <div className="bnt-selector with-background ms-3">
+        <div className="btn-selector with-background ms-3">
           <span className="text-small">Select token</span>
           <Icon name="chevron" className="ms-2" />
         </div>
-
-        <div className="bnt-selector with-border ms-3">
+        <div className="btn-selector with-border ms-3">
           <span className="text-small">Select token</span>
           <Icon name="chevron" className="ms-2" />
         </div>
       </div>
 
       <div className="mb-4 d-flex align-items-center">
-        <div className="bnt-selector">
-          <span className="text-small">Select token</span>
+        <div className="btn-selector">
+          <IconToken symbol="ETH" className="me-3" />
+          <span className="text-small">ETH</span>
           <Icon name="chevron" className="ms-2" />
         </div>
 
-        <div className="bnt-selector with-background ms-3">
-          <span className="text-small">Select token</span>
+        <div className="btn-selector with-background ms-3">
+          <IconToken symbol="HBAR" className="me-3" />
+          <span className="text-small">HBAR</span>
           <Icon name="chevron" className="ms-2" />
         </div>
 
-        <div className="bnt-selector with-border ms-3">
-          <span className="text-small">Select token</span>
+        <div className="btn-selector with-border ms-3">
+          <IconToken symbol="HBAR" className="me-3" />
+          <span className="text-small">HBAR</span>
           <Icon name="chevron" className="ms-2" />
         </div>
       </div>
