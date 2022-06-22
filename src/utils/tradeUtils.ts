@@ -178,18 +178,10 @@ const inputOutputComparator = (a: Trade, b: Trade): number => {
       return 0;
     }
     // trade A requires less input than trade B, so A should come first
-    if (aAmountInBN.lt(bAmountInBN)) {
-      return -1;
-    } else {
-      return 1;
-    }
+    return aAmountInBN.lt(bAmountInBN) ? -1 : 1;
   } else {
     // tradeA has less output than trade B, so should come second
-    if (aAmountOutBN.lt(bAmountOutBN)) {
-      return 1;
-    } else {
-      return -1;
-    }
+    return aAmountOutBN.lt(bAmountOutBN) ? 1 : -1;
   }
 };
 
