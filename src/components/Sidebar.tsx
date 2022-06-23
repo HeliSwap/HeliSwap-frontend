@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 
 import Icon from './Icon';
 
@@ -16,18 +16,24 @@ const Sidebar = () => {
 
       <div className="container-menu">
         <div className="d-flex flex-column">
-          <Link className="link-menu" to="/">
+          <NavLink
+            to="/"
+            className={({ isActive }) => (isActive ? 'link-menu is-active' : 'link-menu')}
+          >
             <span className="icon-menu me-4">
               <Icon color="gray" name="swap" />
             </span>
             <span>Swap</span>
-          </Link>
-          <Link className="link-menu mt-4" to="/create">
+          </NavLink>
+          <NavLink
+            className={({ isActive }) => (isActive ? 'link-menu is-active mt-4' : 'link-menu mt-4')}
+            to="/my-pools"
+          >
             <span className="icon-menu me-4">
               <Icon color="gray" name="pools" />
             </span>
             <span>Pools</span>
-          </Link>
+          </NavLink>
           {/* <Link className="link-menu" to="/my-pools">
             My pools
           </Link>

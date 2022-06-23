@@ -61,12 +61,24 @@
   align-items: center;
   @include transition-link;
 
-  &:hover {
+  &.is-active {
     color: $neutral-100;
 
     .icon-menu {
       background-color: $neutral-500;
+
+      .icon {
+        color: $neutral-100;
+
+        path {
+          fill: $neutral-100;
+        }
+      }
     }
+  }
+
+  &:hover {
+    color: $neutral-100;
 
     .icon {
       color: $neutral-100;
