@@ -34,6 +34,7 @@
   display: inline-flex;
   width: 24px;
   height: 24px;
+  transition: fill 0.15s linear;
 
   &.is-gray {
     path {
@@ -46,6 +47,16 @@
       fill: linear-gradient(139.83deg, #f32fd7 0%, #3845fb 100%);
     }
   }
+}
+
+.icon-menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: $border-radius;
+  transition: background-color 0.15s linear;
 }
 
 .icon-token {

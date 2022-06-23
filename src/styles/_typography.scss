@@ -57,12 +57,24 @@
   padding: 4px 8px;
   color: $neutral-400;
   text-decoration: none;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   @include transition-link;
 
   &:hover {
     color: $neutral-100;
+
+    .icon-menu {
+      background-color: $neutral-500;
+    }
+
+    .icon {
+      color: $neutral-100;
+
+      path {
+        fill: $neutral-100;
+      }
+    }
   }
 }
 

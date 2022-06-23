@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import Icon from './Icon';
 
 const Sidebar = () => {
-  const isLocalDev = process.env.REACT_APP_LOCAL_DEV === 'true';
+  // const isLocalDev = process.env.REACT_APP_LOCAL_DEV === 'true';
 
   return (
     <div className="container-sidebar">
@@ -17,13 +17,18 @@ const Sidebar = () => {
       <div className="container-menu">
         <div className="d-flex flex-column">
           <Link className="link-menu" to="/">
-            <Icon color="gray" name="swap" className="me-4" />
+            <span className="icon-menu me-4">
+              <Icon color="gray" name="swap" />
+            </span>
             <span>Swap</span>
           </Link>
-          <Link className="link-menu" to="/create">
-            Create
+          <Link className="link-menu mt-4" to="/create">
+            <span className="icon-menu me-4">
+              <Icon color="gray" name="pools" />
+            </span>
+            <span>Pools</span>
           </Link>
-          <Link className="link-menu" to="/my-pools">
+          {/* <Link className="link-menu" to="/my-pools">
             My pools
           </Link>
           <Link className="link-menu" to="/pairs">
@@ -36,7 +41,7 @@ const Sidebar = () => {
             <Link className="link-menu" to="/helpers">
               Helpers
             </Link>
-          ) : null}
+          ) : null} */}
         </div>
 
         <div>

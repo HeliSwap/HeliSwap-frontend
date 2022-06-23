@@ -52,7 +52,7 @@ const colorMapping: IColorMapping = {
   gradient: 'is-gradient',
 };
 
-const Icon = ({ name, className, color = 'white' }: IIconProps) => {
+const Icon = ({ name, className = '', color = 'white' }: IIconProps) => {
   const TheIcon = icons[name];
   return (
     <>
