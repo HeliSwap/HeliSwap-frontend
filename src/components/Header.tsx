@@ -1,5 +1,7 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import { hethers } from '@hashgraph/hethers';
 import { GlobalContext } from '../providers/Global';
+import { getHTSTokensWalletBalance } from '../utils/tokenUtils';
 
 const Header = () => {
   const contextValue = useContext(GlobalContext);
@@ -12,6 +14,20 @@ const Header = () => {
     userId,
   } = contextValue.connection;
 
+  const [userBalance, setUserBalance] = useState('0.0');
+
+  useEffect(() => {
+    const getUserTokensData = async () => {
+      const { balance } = await getHTSTokensWalletBalance(userId);
+      const balanceFormatted = hethers.utils.formatUnits(balance, 8);
+      setUserBalance(balanceFormatted);
+    };
+
+    if (userId) {
+      getUserTokensData();
+    }
+  }, [userId]);
+
   return (
     <div className="p-5">
       <div className="d-flex justify-content-end">
@@ -21,7 +37,7 @@ const Header = () => {
               connected ? (
                 <>
                   <div className="container-connected">
-                    <div className="text-small">10 HBAR</div>
+                    <div className="text-small">{userBalance} HBAR</div>
                     <div className="container-address">
                       <div className="text-small">{userId}</div>
                     </div>
