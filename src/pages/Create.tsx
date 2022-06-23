@@ -412,9 +412,8 @@ const Create = () => {
                 closeModal={() => setShowModalA(false)}
               />
             </Modal>
-            {tokensData?.tokenA ? (
-              <WalletBalance />
-            ) : null}
+
+            {/* {tokensData?.tokenA ? <WalletBalance walletBalance={'0.00'} /> : null} */}
           </div>
         </div>
 
@@ -463,9 +462,7 @@ const Create = () => {
                 closeModal={() => setShowModalB(false)}
               />
             </Modal>
-            {tokensData?.tokenB ? (
-              <WalletBalance />
-            ) : null}
+            {/* {tokensData?.tokenB ? <WalletBalance walletBalance={'0.00'} /> : null} */}
           </div>
         </div>
 

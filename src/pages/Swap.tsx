@@ -108,8 +108,7 @@ const Swap = () => {
   const [loadingSwap, setLoadingSwap] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
 
-  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value, name } = e.target;
+  const handleInputChange = async (value: string, name: string) => {
     const { tokenA, tokenB } = tokensData;
 
     const tokenData = {
@@ -563,7 +562,14 @@ const Swap = () => {
       <div className="container-dark">
         <InputTokenSelector
           inputTokenComponent={
-            <InputToken value={swapData.amountIn} onChange={handleInputChange} name="amountIn" />
+            <InputToken
+              value={swapData.amountIn}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const { value, name } = e.target;
+                handleInputChange(value, name);
+              }}
+              name="amountIn"
+            />
           }
           buttonSelectorComponent={
             <ButtonSelector
@@ -572,7 +578,14 @@ const Swap = () => {
               selectorText="Select token"
             />
           }
-          walletBalanceComponent={<WalletBalance walletBalance={tokenBalances.tokenA} />}
+          walletBalanceComponent={
+            <WalletBalance
+              walletBalance={tokenBalances.tokenA}
+              onMaxButtonClick={(maxValue: string) => {
+                handleInputChange(maxValue, 'amountIn');
+              }}
+            />
+          }
         />
 
         <Modal show={showModalA}>
@@ -588,7 +601,14 @@ const Swap = () => {
         <InputTokenSelector
           className="mt-5"
           inputTokenComponent={
-            <InputToken value={swapData.amountOut} onChange={handleInputChange} name="amountOut" />
+            <InputToken
+              value={swapData.amountOut}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const { value, name } = e.target;
+                handleInputChange(value, name);
+              }}
+              name="amountOut"
+            />
           }
           buttonSelectorComponent={
             <ButtonSelector

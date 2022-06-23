@@ -2,13 +2,22 @@ import React from 'react';
 import Icon from './Icon';
 
 interface IWalletBalance {
-  walletBalance?: string;
+  walletBalance: string;
+  onMaxButtonClick?: (maxValue: string) => void;
 }
 
-const WalletBalance = ({ walletBalance }: IWalletBalance) => {
+const WalletBalance = ({ walletBalance, onMaxButtonClick }: IWalletBalance) => {
   return walletBalance ? (
     <p className="text-gray text-small">
       Wallet balance: <span className="text-numeric">{walletBalance}</span>
+      {parseFloat(walletBalance) > 0 && onMaxButtonClick ? (
+        <button
+          className="btn btn-secondary btn-sm"
+          onClick={() => onMaxButtonClick(walletBalance)}
+        >
+          Max
+        </button>
+      ) : null}
     </p>
   ) : (
     <p className="d-flex align-items-center">
