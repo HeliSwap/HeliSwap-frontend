@@ -413,7 +413,7 @@ const Create = () => {
               />
             </Modal>
             {tokensData?.tokenA ? (
-              <WalletBalance userId={userId} tokenData={tokensData.tokenA} />
+              <WalletBalance />
             ) : null}
           </div>
         </div>
@@ -464,7 +464,7 @@ const Create = () => {
               />
             </Modal>
             {tokensData?.tokenB ? (
-              <WalletBalance userId={userId} tokenData={tokensData.tokenB} />
+              <WalletBalance />
             ) : null}
           </div>
         </div>

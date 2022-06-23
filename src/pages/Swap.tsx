@@ -8,6 +8,7 @@ import Loader from '../components/Loader';
 import Modal from '../components/Modal';
 import ModalSearchContent from '../components/Modals/ModalSearchContent';
 import WalletBalance from '../components/WalletBalance';
+import InputTokenSelector from '../components/InputTokenSelector';
 import TransactionSettingsModalContent from '../components/Modals/TransactionSettingsModalContent';
 
 import errorMessages from '../content/errors';
@@ -30,6 +31,8 @@ import {
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
 import { MAX_UINT_ERC20, MAX_UINT_HTS } from '../constants';
+import InputToken from '../components/InputToken';
+import ButtonSelector from '../components/ButtonSelector';
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
@@ -523,105 +526,91 @@ const Swap = () => {
           </div>
         ) : null}
 
-        <div className="d-flex justify-content-between mt-3">
-          <span className="badge bg-primary text-uppercase">From</span>
-          <span></span>
-        </div>
-
-        <div className="row justify-content-between align-items-end mt-3">
-          <div className="col-7">
-            <div className="input-container">
-              <input
-                value={swapData.amountIn}
-                name="amountIn"
-                onChange={handleInputChange}
-                type="text"
-                className="form-control mt-2"
+        <div className="container-dark">
+          <InputTokenSelector
+            inputTokenComponent={
+              <InputToken value={swapData.amountIn} onChange={handleInputChange} name="amountIn" />
+            }
+            buttonSelectorComponent={
+              <ButtonSelector
+                onClick={() => setShowModalA(true)}
+                selectedToken={tokensData?.tokenA.symbol}
+                selectorText="Select token"
               />
-            </div>
-            <p className="text-success mt-3">$0.00</p>
-          </div>
+            }
+            walletBalanceComponent={<WalletBalance />}
+          />
 
-          <div className="col-5">
-            <div className="container-token-selector d-flex justify-content-between align-items-center">
-              {tokensData?.tokenA.symbol ? (
-                <div className="d-flex align-items-center">
-                  <img
-                    className="me-2"
-                    width={24}
-                    src={`/icons/${tokensData.tokenA.symbol}.png`}
-                    alt=""
-                  />
-                  <span className="me-2">{tokensData.tokenA.symbol}</span>
-                </div>
-              ) : (
-                <span>N/A</span>
-              )}
+          <Modal show={showModalA}>
+            <ModalSearchContent
+              modalTitle="Select token"
+              tokenFieldId="tokenA"
+              setTokensData={setTokensData}
+              closeModal={() => setShowModalA(false)}
+              defaultToken={NATIVE_TOKEN}
+            />
+          </Modal>
 
-              <Button onClick={() => setShowModalA(true)}>Select token</Button>
-            </div>
-            <Modal show={showModalA}>
-              <ModalSearchContent
-                modalTitle="Select token"
-                tokenFieldId="tokenA"
-                setTokensData={setTokensData}
-                closeModal={() => setShowModalA(false)}
-                defaultToken={NATIVE_TOKEN}
-              />
-            </Modal>
-            {userId && tokensData?.tokenA ? (
-              <WalletBalance userId={userId} tokenData={tokensData.tokenA} />
-            ) : null}
-          </div>
-        </div>
-
-        <div className="d-flex justify-content-between mt-5">
-          <span className="badge bg-info text-uppercase">To</span>
-          <span></span>
-        </div>
-
-        <div className="row justify-content-between align-items-end mt-3">
-          <div className="col-7">
-            <div className="input-container">
-              <input
+          <InputTokenSelector
+            className="mt-5"
+            inputTokenComponent={
+              <InputToken
                 value={swapData.amountOut}
-                name="amountOut"
                 onChange={handleInputChange}
-                type="text"
-                className="form-control mt-2"
+                name="amountOut"
               />
-            </div>
-            <p className="text-success mt-3">$0.00</p>
-          </div>
+            }
+            buttonSelectorComponent={
+              <ButtonSelector
+                onClick={() => setShowModalB(true)}
+                selectedToken={tokensData?.tokenB.symbol}
+                selectorText="Select token"
+              />
+            }
+            walletBalanceComponent={<WalletBalance />}
+          />
 
-          <div className="col-5">
-            <div className="container-token-selector d-flex justify-content-between align-items-center">
-              {tokensData?.tokenB.symbol ? (
-                <div className="d-flex align-items-center">
-                  <img
-                    className="me-2"
-                    width={24}
-                    src={`/icons/${tokensData.tokenB.symbol}.png`}
-                    alt=""
-                  />
-                  <span className="me-2">{tokensData.tokenB.symbol}</span>
-                </div>
+          <Modal show={showModalB}>
+            <ModalSearchContent
+              modalTitle="Select token"
+              tokenFieldId="tokenB"
+              setTokensData={setTokensData}
+              closeModal={() => setShowModalB(false)}
+            />
+          </Modal>
+
+          <div className="d-grid mt-4">
+            {loadingPools ? (
+              <Loader />
+            ) : readyToApprove ? (
+              approved ? (
+                <Button
+                  loading={loadingSwap}
+                  disabled={!readyToSwap || !associated}
+                  onClick={() => handleSwapClick()}
+                >
+                  Swap
+                </Button>
               ) : (
-                <span>N/A</span>
-              )}
+                <Button
+                  loading={loadingApprove}
+                  disabled={Number(swapData.amountIn) <= 0}
+                  onClick={() => handleApproveClick()}
+                >
+                  Approve
+                </Button>
+              )
+            ) : null}
 
-              <Button onClick={() => setShowModalB(true)}>Select token</Button>
-            </div>
-            <Modal show={showModalB}>
-              <ModalSearchContent
-                modalTitle="Select token"
-                tokenFieldId="tokenB"
-                setTokensData={setTokensData}
-                closeModal={() => setShowModalB(false)}
-              />
-            </Modal>
-            {tokensData?.tokenB ? (
-              <WalletBalance userId={userId} tokenData={tokensData.tokenB} />
+            {readyToAssociate && !associated ? (
+              <Button
+                className="mx-2"
+                loading={loadingSwap}
+                disabled={!readyToAssociate}
+                onClick={() => handleAssociateClick()}
+              >
+                Associate token
+              </Button>
             ) : null}
           </div>
         </div>
@@ -639,41 +628,6 @@ const Swap = () => {
             ></button>
           </div>
         ) : null}
-
-        <div className="mt-5 d-flex justify-content-center">
-          {loadingPools ? (
-            <Loader />
-          ) : readyToApprove ? (
-            approved ? (
-              <Button
-                loading={loadingSwap}
-                disabled={!readyToSwap || !associated}
-                onClick={() => handleSwapClick()}
-              >
-                Swap
-              </Button>
-            ) : (
-              <Button
-                loading={loadingApprove}
-                disabled={Number(swapData.amountIn) <= 0}
-                onClick={() => handleApproveClick()}
-              >
-                Approve
-              </Button>
-            )
-          ) : null}
-
-          {readyToAssociate && !associated ? (
-            <Button
-              className="mx-2"
-              loading={loadingSwap}
-              disabled={!readyToAssociate}
-              onClick={() => handleAssociateClick()}
-            >
-              Associate token
-            </Button>
-          ) : null}
-        </div>
       </div>
     </div>
   );
