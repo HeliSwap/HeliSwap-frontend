@@ -6,18 +6,21 @@ $black: #000000;
 $white: #ffffff;
 
 $neutral-900: #101011;
-$neutral-700: #29292D;
+$neutral-850: #1a1a1c;
+$neutral-700: #29292d;
 $neutral-600: #313135;
-$neutral-500: #4B4B51;
-$neutral-400: #6F6F77;
-$neutral-100: #F9F9F9;
+$neutral-500: #4b4b51;
+$neutral-400: #6f6f77;
+$neutral-300: #9d9daa;
+$neutral-100: #f9f9f9;
 
-$primary: #2F18E5;
+$primary: #2f18e5;
 $secondary: $neutral-400;
-$success: #0DA048;
-$danger: #EA1548;
-$warning:#F17400;
-$info: #2F18E5;
+$success: #0da048;
+$danger: #ea1548;
+$warning: #f17400;
+$info: #2f18e5;
+$gray: $neutral-300;
 
 // Add custom colors to theme-colors map
 $theme-colors: (
@@ -27,6 +30,7 @@ $theme-colors: (
   'info': $info,
   'warning': $warning,
   'danger': $danger,
+  'gray': $gray,
 );
 
 // Options
@@ -126,8 +130,8 @@ $spacers: (
 );
 
 // Body
-$body-bg: $neutral-900;
-$body-color: $neutral-100 ;
+$body-bg: $neutral-850;
+$body-color: $neutral-100;
 
 // Paragraphs
 $paragraph-margin-bottom: 0;
@@ -251,8 +255,8 @@ $btn-primary-disabled-background: #232342;
 $btn-primary-outline-color: $white;
 
 // Forms
-$input-color: #7F89A7;
-$input-border-color:rgba(255, 255, 255, 0.2);
+$input-color: #7f89a7;
+$input-border-color: rgba(255, 255, 255, 0.2);
 $input-focus-border-color: $primary;
 $input-focus-box-shadow: 0 0 0 1px $primary;
 $input-height: auto;

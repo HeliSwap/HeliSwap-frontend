@@ -5,7 +5,7 @@ import { getHTSTokensWalletBalance } from '../utils/tokenUtils';
 
 interface IWalletBalance {
   userId: string;
-  tokenData: ITokenData;
+  tokenData?: ITokenData;
   setMaxNumber?: (maxNum: string) => void;
 }
 
@@ -26,17 +26,16 @@ const WalletBalance = ({ userId, tokenData, setMaxNumber }: IWalletBalance) => {
 
   useEffect(() => {
     const getTokenBalance = async () => {
-      const tokenFound = userTokenList.find(item => item.tokenId === tokenData.hederaId);
-      const { type } = tokenData;
+      const tokenFound = userTokenList.find(item => item.tokenId === tokenData?.hederaId);
       let tokenBalance = '0.00';
 
       // Check for native token (HBAR)
-      if (type === TokenType.HBAR) {
+      if (tokenData?.type === TokenType.HBAR) {
         const provider = hethers.providers.getDefaultProvider(process.env.REACT_APP_NETWORK_TYPE);
         const userBalanceBN = await provider.getBalance(userId);
         tokenBalance = hethers.utils.formatHbar(userBalanceBN);
       } else {
-        const tokenDecimals = tokenData.decimals || 2;
+        const tokenDecimals = tokenData?.decimals || 2;
         tokenBalance = tokenFound
           ? (tokenFound.balance / Math.pow(10, tokenDecimals)).toFixed(tokenDecimals)
           : '0.00';
@@ -49,7 +48,11 @@ const WalletBalance = ({ userId, tokenData, setMaxNumber }: IWalletBalance) => {
     tokenData && getTokenBalance();
   }, [userTokenList, tokenData, setMaxNumber, userId]);
 
-  return <p className="text-steel mt-3 text-end">Wallet balance: {tokenBalance}</p>;
+  return (
+    <p className="text-gray text-small">
+      Wallet balance: <span className="text-numeric">{tokenBalance}</span>
+    </p>
+  );
 };
 
 export default WalletBalance;

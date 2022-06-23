@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import Button from '../components/Button';
 import ButtonSelector from '../components/ButtonSelector';
 
 import Icon from '../components/Icon';
 import IconToken from '../components/IconToken';
 import Modal from '../components/Modal';
 import ModalContent from '../components/Modals/ModalContent';
+import TokenInputSelector from '../components/TokenInputSelector';
+import WalletBalance from '../components/WalletBalance';
+
+import { ITokenData, TokenType } from '../interfaces/tokens';
+import { NATIVE_TOKEN } from '../utils/tokenUtils';
 
 const Styleguide = () => {
   const [showModal, setShowModal] = useState(false);
@@ -19,6 +25,17 @@ const Styleguide = () => {
     document.body.style.overflow = 'visible';
     setShowModal(false);
   };
+
+  const HELI_TOKEN = {
+    hederaId: '0.0.45906586',
+    symbol: 'HELI',
+    address: '0x0000000000000000000000000000000002bc7a9a',
+    name: 'HeliSwap Test Token',
+    decimals: 8,
+    type: TokenType.HTS,
+  };
+
+  const sampleTokenData: ITokenData = NATIVE_TOKEN;
 
   return (
     <>
@@ -273,6 +290,31 @@ const Styleguide = () => {
       </div>
 
       <h3 className="text-headline mb-4">Forms</h3>
+
+      <div className="mb-4 row">
+        <div className="col-6">
+          <div className="container-dark">
+            <TokenInputSelector tokenData={sampleTokenData} />
+            <div className="container-input-token mt-5">
+              <div className="d-flex justify-content-between align-items-center">
+                <input value="0.0123" className="input-token" type="text" />
+                <ButtonSelector selectorText="Select token" />
+              </div>
+
+              <div className="d-flex justify-content-end mt-7">
+                <p className="d-flex align-items-center">
+                  <span className="text-gray text-micro me-3">Balance not viewable</span>{' '}
+                  <Icon color="gray" name="hint" />
+                </p>
+              </div>
+            </div>
+
+            <div className="d-grid mt-4">
+              <Button className="btn-block">Connect Wallet</Button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div className="row mb-4">
         <div className="col-lg-3">
