@@ -74,7 +74,7 @@
     line-height: 40px;
     background-color: $neutral-700;
     border: none;
-    transition: color 0.15s linear;
+    @include transition-link;
 
     &:focus {
       color: $neutral-100;

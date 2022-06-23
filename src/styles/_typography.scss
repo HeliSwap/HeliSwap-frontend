@@ -55,8 +55,15 @@
 
 .link-menu {
   padding: 4px 8px;
-  color: $white;
+  color: $neutral-400;
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  @include transition-link;
+
+  &:hover {
+    color: $neutral-100;
+  }
 }
 
 .cursor-pointer {
