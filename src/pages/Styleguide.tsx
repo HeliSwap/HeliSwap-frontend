@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import ButtonSelector from '../components/ButtonSelector';
 
+import Icon from '../components/Icon';
+import IconToken from '../components/IconToken';
 import Modal from '../components/Modal';
 import ModalContent from '../components/Modals/ModalContent';
 
@@ -20,128 +23,6 @@ const Styleguide = () => {
   return (
     <>
       <h1 className="text-mega">Styleguide</h1>
-
-      <h2 className="text-display mt-10">Grid</h2>
-      <hr className="mt-3 mb-6" />
-
-      <h3 className="text-headline mb-4">Grid width - 1128px</h3>
-
-      <div className="row mb-4">
-        <div className="col-2 col-md-1">
-          <p className="bg-grey text-center text-white p-2" style={{ borderRadius: '2px' }}>
-            Col
-          </p>
-        </div>
-        <div className="col-2 col-md-1">
-          <p className="bg-grey text-center text-white p-2" style={{ borderRadius: '2px' }}>
-            Col
-          </p>
-        </div>
-        <div className="col-2 col-md-1">
-          <p className="bg-grey text-center text-white p-2" style={{ borderRadius: '2px' }}>
-            Col
-          </p>
-        </div>
-        <div className="col-2 col-md-1">
-          <p className="bg-grey text-center text-white p-2" style={{ borderRadius: '2px' }}>
-            Col
-          </p>
-        </div>
-        <div className="col-2 col-md-1">
-          <p className="bg-grey text-center text-white p-2" style={{ borderRadius: '2px' }}>
-            Col
-          </p>
-        </div>
-        <div className="col-2 col-md-1">
-          <p className="bg-grey text-center text-white p-2" style={{ borderRadius: '2px' }}>
-            Col
-          </p>
-        </div>
-        <div className="col-2 col-md-1">
-          <p className="bg-grey text-center text-white p-2" style={{ borderRadius: '2px' }}>
-            Col
-          </p>
-        </div>
-        <div className="col-2 col-md-1">
-          <p className="bg-grey text-center text-white p-2" style={{ borderRadius: '2px' }}>
-            Col
-          </p>
-        </div>
-        <div className="col-2 col-md-1">
-          <p className="bg-grey text-center text-white p-2" style={{ borderRadius: '2px' }}>
-            Col
-          </p>
-        </div>
-        <div className="col-2 col-md-1">
-          <p className="bg-grey text-center text-white p-2" style={{ borderRadius: '2px' }}>
-            Col
-          </p>
-        </div>
-        <div className="col-2 col-md-1">
-          <p className="bg-grey text-center text-white p-2" style={{ borderRadius: '2px' }}>
-            Col
-          </p>
-        </div>
-        <div className="col-2 col-md-1">
-          <p className="bg-grey text-center text-white p-2" style={{ borderRadius: '2px' }}>
-            Col
-          </p>
-        </div>
-      </div>
-
-      <div className="row mb-4">
-        <div className="col-12 col-md-3">
-          <p className="bg-grey text-center text-white p-2" style={{ borderRadius: '2px' }}>
-            Col
-          </p>
-        </div>
-        <div className="col-12 col-md-3">
-          <p className="bg-grey text-center text-white p-2" style={{ borderRadius: '2px' }}>
-            Col
-          </p>
-        </div>
-        <div className="col-12 col-md-3">
-          <p className="bg-grey text-center text-white p-2" style={{ borderRadius: '2px' }}>
-            Col
-          </p>
-        </div>
-        <div className="col-12 col-md-3">
-          <p className="bg-grey text-center text-white p-2" style={{ borderRadius: '2px' }}>
-            Col
-          </p>
-        </div>
-      </div>
-
-      <div className="row mb-4">
-        <div className="col-12 col-md-4">
-          <p className="bg-grey text-center text-white p-2" style={{ borderRadius: '2px' }}>
-            Col
-          </p>
-        </div>
-        <div className="col-12 col-md-4">
-          <p className="bg-grey text-center text-white p-2" style={{ borderRadius: '2px' }}>
-            Col
-          </p>
-        </div>
-        <div className="col-12 col-md-4">
-          <p className="bg-grey text-center text-white p-2" style={{ borderRadius: '2px' }}>
-            Col
-          </p>
-        </div>
-      </div>
-
-      <div className="row mb-4">
-        <div className="col-12 col-md-6">
-          <p className="bg-grey text-center text-white p-2" style={{ borderRadius: '2px' }}>
-            Col
-          </p>
-        </div>
-        <div className="col-12 col-md-6">
-          <p className="bg-grey text-center text-white p-2" style={{ borderRadius: '2px' }}>
-            Col
-          </p>
-        </div>
-      </div>
 
       <h2 className="text-display mt-10">Colors</h2>
       <hr className="mt-3 mb-6" />
@@ -204,75 +85,8 @@ const Styleguide = () => {
         </div>
       </div>
 
-      <h3 className="text-headline mb-4">Grays</h3>
-
-      <div className="row mb-4">
-        <div className="col-12 col-md-2">
-          <div
-            style={{ height: '64px', lineHeight: '64px', borderRadius: '2px' }}
-            className="mb-2 bg-slate text-white text-center"
-          >
-            Slate
-          </div>
-        </div>
-        <div className="col-12 col-md-2">
-          <div
-            style={{ height: '64px', lineHeight: '64px', borderRadius: '2px' }}
-            className="mb-2 bg-grey text-white text-center"
-          >
-            Grey
-          </div>
-        </div>
-        <div className="col-12 col-md-2">
-          <div
-            style={{ height: '64px', lineHeight: '64px', borderRadius: '2px' }}
-            className="mb-2 bg-steel text-center"
-          >
-            Steel
-          </div>
-        </div>
-        <div className="col-12 col-md-2">
-          <div
-            style={{ height: '64px', lineHeight: '64px', borderRadius: '2px' }}
-            className="mb-2 bg-pale text-center"
-          >
-            Pale
-          </div>
-        </div>
-        <div className="col-12 col-md-2">
-          <div
-            style={{ height: '64px', lineHeight: '64px', borderRadius: '2px' }}
-            className="mb-2 bg-snow text-center"
-          >
-            Snow
-          </div>
-        </div>
-      </div>
-
       <h2 className="text-display mt-10">Typography</h2>
       <hr className="mt-3 mb-6" />
-
-      <div className="mb-4">
-        <div className="row">
-          <div className="col-md-9">
-            <code>.text-hero</code>
-            <h1 className="text-hero mt-3">The quick brown fox jumps over the lazy dog</h1>
-          </div>
-        </div>
-      </div>
-
-      <hr className="mt-6 mb-6" />
-
-      <div className="mb-4">
-        <div className="row">
-          <div className="col-md-6">
-            <code>.text-mega</code>
-            <h2 className="text-mega mt-3">The quick brown fox jumps over the lazy dog</h2>
-          </div>
-        </div>
-      </div>
-
-      <hr className="mt-6 mb-6" />
 
       <div className="mb-4">
         <div className="row">
@@ -312,17 +126,6 @@ const Styleguide = () => {
           <div className="col-md-3">
             <code>.text-subheader</code>
             <h6 className="text-subheader mt-3">The quick brown fox jumps over the lazy dog</h6>
-          </div>
-        </div>
-      </div>
-
-      <hr className="mt-6 mb-6" />
-
-      <div className="mb-4">
-        <div className="row">
-          <div className="col-md-3">
-            <code>.text-lead</code>
-            <p className="text-lead mt-3">The quick brown fox jumps over the lazy dog</p>
           </div>
         </div>
       </div>
@@ -405,6 +208,14 @@ const Styleguide = () => {
           </button>
         </div>
         <div className="col-12 mb-4">
+          <button type="button" className="btn btn-sm btn-primary me-3">
+            Primary small
+          </button>
+          <button type="button" className="btn btn-sm btn-secondary me-3">
+            Secondary small
+          </button>
+        </div>
+        <div className="col-12 mb-4">
           <button type="button" className="btn btn-outline-primary me-3">
             Primary outline
           </button>
@@ -419,6 +230,45 @@ const Styleguide = () => {
           <button type="button" className="btn btn-secondary me-3" disabled>
             Secondary disabled
           </button>
+        </div>
+      </div>
+
+      <div className="mb-4 d-flex align-items-center">
+        <ButtonSelector type="border" selectorText="Select token" />
+      </div>
+
+      <div className="mb-4 d-flex align-items-center">
+        <div className="btn-selector">
+          <span className="text-small">Select token</span>
+          <Icon name="chevron" className="ms-2" />
+        </div>
+        <div className="btn-selector with-background ms-3">
+          <span className="text-small">Select token</span>
+          <Icon name="chevron" className="ms-2" />
+        </div>
+        <div className="btn-selector with-border ms-3">
+          <span className="text-small">Select token</span>
+          <Icon name="chevron" className="ms-2" />
+        </div>
+      </div>
+
+      <div className="mb-4 d-flex align-items-center">
+        <div className="btn-selector">
+          <IconToken symbol="ETH" className="me-3" />
+          <span className="text-small">ETH</span>
+          <Icon name="chevron" className="ms-2" />
+        </div>
+
+        <div className="btn-selector with-background ms-3">
+          <IconToken symbol="HBAR" className="me-3" />
+          <span className="text-small">HBAR</span>
+          <Icon name="chevron" className="ms-2" />
+        </div>
+
+        <div className="btn-selector with-border ms-3">
+          <IconToken symbol="HBAR" className="me-3" />
+          <span className="text-small">HBAR</span>
+          <Icon name="chevron" className="ms-2" />
         </div>
       </div>
 
