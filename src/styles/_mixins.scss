@@ -90,7 +90,7 @@
 
 // Transition mixins
 @mixin transition-link {
-  @include transition-link;
+  transition: color 0.15s linear;
 }
 
 @mixin transition-section {
