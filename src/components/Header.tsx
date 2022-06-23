@@ -3,8 +3,14 @@ import { GlobalContext } from '../providers/Global';
 
 const Header = () => {
   const contextValue = useContext(GlobalContext);
-  const { connected, connectWallet, disconnectWallet, extensionFound, isConnectionLoading } =
-    contextValue.connection;
+  const {
+    connected,
+    connectWallet,
+    disconnectWallet,
+    extensionFound,
+    isConnectionLoading,
+    userId,
+  } = contextValue.connection;
 
   return (
     <div className="p-5">
@@ -14,7 +20,12 @@ const Header = () => {
             extensionFound ? (
               connected ? (
                 <>
-                  <p className="text-success mx-2">Connected</p>
+                  <div className="container-connected">
+                    <div className="text-small">10 HBAR</div>
+                    <div className="container-address">
+                      <div className="text-small">{userId}</div>
+                    </div>
+                  </div>
                   <button
                     onClick={() => disconnectWallet()}
                     className="btn btn-sm btn-outline-primary mx-2"

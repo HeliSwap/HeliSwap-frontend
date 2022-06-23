@@ -66,6 +66,21 @@
 }
 
 /* Containers */
+.container-connected {
+  background-color: $neutral-900;
+  border-radius: $border-radius;
+  padding: 3px 3px 3px 12px;
+  display: flex;
+  align-items: center;
+}
+
+.container-address {
+  background-color: $neutral-700;
+  border-radius: 2px;
+  padding: 4px 8px;
+  margin-left: 12px;
+}
+
 .container-dark {
   background-color: $neutral-900;
   box-shadow: 0px 5px 20px rgba(9, 10, 20, 0.45);
