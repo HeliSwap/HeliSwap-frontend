@@ -14,6 +14,7 @@ import TransactionSettingsModalContent from '../components/Modals/TransactionSet
 import errorMessages from '../content/errors';
 import {
   checkAllowanceHTS,
+  getTokenBalance,
   getUserAssociatedTokens,
   idToAddress,
   NATIVE_TOKEN,
@@ -85,7 +86,16 @@ const Swap = () => {
   // State for associated
   const [associated, setAssociated] = useState(false);
 
+  // State for token balances
+  const initialBallanceData = {
+    tokenA: '0.00',
+    tokenB: '0.00',
+  };
+  const [tokenBalances, setTokenBalances] = useState(initialBallanceData);
+
   // Additional states for Swaps
+  const [readyToApprove, setReadyToApprove] = useState(false);
+  const [readyToAssociate, setReadyToAssociate] = useState(false);
   const [readyToSwap, setReadyToSwap] = useState(false);
   const [tokenInExactAmount, setTokenInExactAmount] = useState(true);
   const [bestPath, setBestPath] = useState<string[]>([]);
@@ -452,6 +462,14 @@ const Swap = () => {
   }, [swapData, userId, sdk, tokensData, userAssociatedTokens]);
 
   useEffect(() => {
+    const getTokenBalances = async () => {
+      const tokenABalance = await getTokenBalance(userId, tokenA);
+      const tokenBBalance = await getTokenBalance(userId, tokenB);
+      setTokenBalances({
+        tokenA: tokenABalance,
+        tokenB: tokenBBalance,
+      });
+    };
     const { tokenA, tokenB } = tokensData;
 
     if (
@@ -467,7 +485,9 @@ const Swap = () => {
 
       setSwapData(prev => ({ ...prev, ...newSwapData }));
     }
-  }, [tokensData]);
+
+    if (userId) getTokenBalances();
+  }, [tokensData, userId]);
 
   useEffect(() => {
     let ready = true;
@@ -482,6 +502,15 @@ const Swap = () => {
       ready = false;
     }
 
+    const readyToAssociate =
+      !isNaN(Number(swapData.amountOut)) &&
+      Number(swapData.amountOut) > 0 &&
+      swapData.tokenIdOut !== initialSwapData.tokenIdOut;
+    setReadyToAssociate(readyToAssociate);
+
+    const readyToApprove = !isNaN(Number(swapData.amountIn)) && Number(swapData.amountIn) > 0;
+    setReadyToApprove(readyToApprove);
+
     setReadyToSwap(ready);
   }, [swapData, approved]);
 
@@ -494,12 +523,10 @@ const Swap = () => {
     userId && checkTokenAssociation(userId);
   }, [userId]);
 
-  const readyToApprove = Number(swapData.amountIn) > 0 && Number(swapData.amountOut);
-  const readyToAssociate = Number(swapData.amountOut) > 0 && swapData.tokenIdOut;
-
-  return (
-    <div className="d-flex justify-content-center">
-      <div className="container-swap">
+  //Render methods
+  const getSettings = () => {
+    return (
+      <>
         <div className="d-flex justify-content-end">
           <span className="cursor-pointer" onClick={() => setShowModalTransactionSettings(true)}>
             <img className="me-2" width={24} src={`/icons/settings.png`} alt="" />
@@ -518,116 +545,137 @@ const Swap = () => {
             />
           </Modal>
         ) : null}
+      </>
+    );
+  };
 
-        {error ? (
-          <div className="alert alert-danger my-5" role="alert">
-            <strong>Something went wrong!</strong>
-            <p>{errorMessages[errorMessage]}</p>
-          </div>
+  const getErrorMessage = () => {
+    return error ? (
+      <div className="alert alert-danger my-5" role="alert">
+        <strong>Something went wrong!</strong>
+        <p>{errorMessages[errorMessage]}</p>
+      </div>
+    ) : null;
+  };
+
+  const getSwapSection = () => {
+    return (
+      <div className="container-dark">
+        <InputTokenSelector
+          inputTokenComponent={
+            <InputToken value={swapData.amountIn} onChange={handleInputChange} name="amountIn" />
+          }
+          buttonSelectorComponent={
+            <ButtonSelector
+              onClick={() => setShowModalA(true)}
+              selectedToken={tokensData?.tokenA.symbol}
+              selectorText="Select token"
+            />
+          }
+          walletBalanceComponent={<WalletBalance walletBalance={tokenBalances.tokenA} />}
+        />
+
+        <Modal show={showModalA}>
+          <ModalSearchContent
+            modalTitle="Select token"
+            tokenFieldId="tokenA"
+            setTokensData={setTokensData}
+            closeModal={() => setShowModalA(false)}
+            defaultToken={NATIVE_TOKEN}
+          />
+        </Modal>
+
+        <InputTokenSelector
+          className="mt-5"
+          inputTokenComponent={
+            <InputToken value={swapData.amountOut} onChange={handleInputChange} name="amountOut" />
+          }
+          buttonSelectorComponent={
+            <ButtonSelector
+              onClick={() => setShowModalB(true)}
+              selectedToken={tokensData?.tokenB.symbol}
+              selectorText="Select token"
+            />
+          }
+          walletBalanceComponent={<WalletBalance walletBalance={tokenBalances.tokenB} />}
+        />
+
+        <Modal show={showModalB}>
+          <ModalSearchContent
+            modalTitle="Select token"
+            tokenFieldId="tokenB"
+            setTokensData={setTokensData}
+            closeModal={() => setShowModalB(false)}
+          />
+        </Modal>
+      </div>
+    );
+  };
+
+  const getActionButtons = () => {
+    const swapButtonLabel = willWrapTokens ? 'wrap' : willUnwrapTokens ? 'unwrap' : 'swap';
+    return (
+      <div className="d-grid mt-4">
+        {loadingPools ? (
+          <Loader />
+        ) : readyToApprove ? (
+          approved ? (
+            <Button
+              loading={loadingSwap}
+              disabled={!readyToSwap || !associated}
+              onClick={() => handleSwapClick()}
+            >
+              {swapButtonLabel}
+            </Button>
+          ) : (
+            <Button
+              loading={loadingApprove}
+              disabled={Number(swapData.amountIn) <= 0}
+              onClick={() => handleApproveClick()}
+            >
+              Approve
+            </Button>
+          )
         ) : null}
 
-        <div className="container-dark">
-          <InputTokenSelector
-            inputTokenComponent={
-              <InputToken value={swapData.amountIn} onChange={handleInputChange} name="amountIn" />
-            }
-            buttonSelectorComponent={
-              <ButtonSelector
-                onClick={() => setShowModalA(true)}
-                selectedToken={tokensData?.tokenA.symbol}
-                selectorText="Select token"
-              />
-            }
-            walletBalanceComponent={<WalletBalance />}
-          />
-
-          <Modal show={showModalA}>
-            <ModalSearchContent
-              modalTitle="Select token"
-              tokenFieldId="tokenA"
-              setTokensData={setTokensData}
-              closeModal={() => setShowModalA(false)}
-              defaultToken={NATIVE_TOKEN}
-            />
-          </Modal>
-
-          <InputTokenSelector
-            className="mt-5"
-            inputTokenComponent={
-              <InputToken
-                value={swapData.amountOut}
-                onChange={handleInputChange}
-                name="amountOut"
-              />
-            }
-            buttonSelectorComponent={
-              <ButtonSelector
-                onClick={() => setShowModalB(true)}
-                selectedToken={tokensData?.tokenB.symbol}
-                selectorText="Select token"
-              />
-            }
-            walletBalanceComponent={<WalletBalance />}
-          />
-
-          <Modal show={showModalB}>
-            <ModalSearchContent
-              modalTitle="Select token"
-              tokenFieldId="tokenB"
-              setTokensData={setTokensData}
-              closeModal={() => setShowModalB(false)}
-            />
-          </Modal>
-
-          <div className="d-grid mt-4">
-            {loadingPools ? (
-              <Loader />
-            ) : readyToApprove ? (
-              approved ? (
-                <Button
-                  loading={loadingSwap}
-                  disabled={!readyToSwap || !associated}
-                  onClick={() => handleSwapClick()}
-                >
-                  Swap
-                </Button>
-              ) : (
-                <Button
-                  loading={loadingApprove}
-                  disabled={Number(swapData.amountIn) <= 0}
-                  onClick={() => handleApproveClick()}
-                >
-                  Approve
-                </Button>
-              )
-            ) : null}
-
-            {readyToAssociate && !associated ? (
-              <Button
-                className="mx-2"
-                loading={loadingSwap}
-                disabled={!readyToAssociate}
-                onClick={() => handleAssociateClick()}
-              >
-                Associate token
-              </Button>
-            ) : null}
-          </div>
-        </div>
-
-        {successSwap ? (
-          <div className="alert alert-success alert-dismissible my-5" role="alert">
-            <strong>Success swap!</strong>
-            <p>{successMessage}</p>
-            <button
-              onClick={() => setSuccessSwap(false)}
-              type="button"
-              className="btn-close"
-              data-bs-dismiss="alert"
-              aria-label="Close"
-            ></button>
-          </div>
+        {readyToAssociate && !associated ? (
+          <Button
+            className="mx-2"
+            loading={loadingSwap}
+            disabled={!readyToAssociate}
+            onClick={() => handleAssociateClick()}
+          >
+            Associate token
+          </Button>
         ) : null}
+      </div>
+    );
+  };
+
+  const getSuccessMessage = () => {
+    return successSwap ? (
+      <div className="alert alert-success alert-dismissible my-5" role="alert">
+        <strong>Success swap!</strong>
+        <p>{successMessage}</p>
+        <button
+          onClick={() => setSuccessSwap(false)}
+          type="button"
+          className="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+    ) : null;
+  };
+
+  return (
+    <div className="d-flex justify-content-center">
+      <div className="container-swap">
+        {getSettings()}
+        {getErrorMessage()}
+        {getSwapSection()}
+        {getActionButtons()}
+        {getSuccessMessage()}
       </div>
     </div>
   );
