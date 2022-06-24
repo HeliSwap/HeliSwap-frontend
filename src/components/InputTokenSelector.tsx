@@ -8,7 +8,7 @@ interface IInputTokenSelector {
 }
 
 const InputTokenSelector = ({
-  className,
+  className = '',
   inputTokenComponent,
   buttonSelectorComponent,
   walletBalanceComponent,
