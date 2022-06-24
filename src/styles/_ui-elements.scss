@@ -1,3 +1,4 @@
+/* Buttons */
 .btn {
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -6,7 +7,7 @@
 .btn-selector {
   padding: 8px 12px;
   border-radius: $border-radius;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   cursor: pointer;
   transition: background-color 0.15s linear, border-color 0.15s linear;
@@ -28,6 +29,7 @@
   }
 }
 
+/* Icons */
 .icon {
   display: inline-flex;
   width: 24px;
@@ -52,11 +54,41 @@
   height: 28px;
 }
 
+/* Containers */
+.container-dark {
+  background-color: $neutral-900;
+  box-shadow: 0px 5px 20px rgba(9, 10, 20, 0.45);
+  padding: 16px;
+  border-radius: 6px;
+}
+
+.container-input-token {
+  background-color: $neutral-700;
+  border-radius: $border-radius;
+  padding: 12px;
+
+  .input-token {
+    color: $neutral-300;
+    font-family: $font-family-numeric;
+    font-size: 28px;
+    line-height: 40px;
+    background-color: $neutral-700;
+    border: none;
+    transition: color 0.15s linear;
+
+    &:focus {
+      color: $neutral-100;
+    }
+
+    &:focus-visible {
+      border: none;
+      outline: none;
+    }
+  }
+}
+
+/* Not relevant */
 .container-swap {
-  background-color: $darkest;
-  border-radius: 15px;
-  box-shadow: 3.1033px 3.1033px 18.6198px rgba(0, 0, 0, 0.1);
-  padding: 24px;
   max-width: 820px;
   width: 100%;
 }

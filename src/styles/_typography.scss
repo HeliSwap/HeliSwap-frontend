@@ -23,6 +23,10 @@
   font-family: $font-family-numeric;
 }
 
+.text-bold {
+  font-weight: $font-weight-semi-bold;
+}
+
 // Links
 .link {
   @include custom-underline($body-color);
@@ -37,27 +41,14 @@
 }
 
 .link-primary {
-  @include custom-underline($primary);
   cursor: pointer;
+  transition: color 0.15s linear;
 
-  color: $primary;
+  color: $primary-200;
   text-decoration: none;
 
   &:hover {
     color: $primary;
-    text-decoration: none;
-  }
-}
-
-.link-secondary {
-  @include custom-underline($secondary);
-  cursor: pointer;
-
-  color: $secondary;
-  text-decoration: none;
-
-  &:hover {
-    color: $secondary;
     text-decoration: none;
   }
 }

@@ -3,7 +3,11 @@ import { hethers } from '@hashgraph/hethers';
 
 import { IAllowanceData, ITokenData, IWalletBalance, TokenType } from '../interfaces/tokens';
 import { Client, ContractId, AccountBalanceQuery } from '@hashgraph/sdk';
-import { formatNumberToBigNumber, formatStringToBigNumberWei } from './numberUtils';
+import {
+  formatNumberToBigNumber,
+  formatStringToBigNumberWei,
+  formatStringWeiToStringEther,
+} from './numberUtils';
 
 export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
   const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/tokens/${tokenId}`;
@@ -56,6 +60,26 @@ export const getHTSTokensWalletBalance = async (userId: string): Promise<IWallet
   } catch (e) {
     console.error(e);
     return {} as IWalletBalance;
+  }
+};
+
+export const getHTSTokenWalletBalance = async (
+  userId: string,
+  tokenId: string,
+): Promise<number> => {
+  const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/tokens/${tokenId}/balances?account.id=${userId}&order=desc&limit=2`;
+
+  try {
+    const {
+      data: { balances },
+    } = await axios(url);
+
+    const { balance } = balances[0];
+
+    return balance;
+  } catch (e) {
+    console.error(e);
+    return 0;
   }
 };
 
@@ -157,6 +181,22 @@ export const calculateReserves = (
     reserve0ShareStr,
     reserve1ShareStr,
   };
+};
+
+export const getTokenBalance = async (userId: string, tokenData: ITokenData) => {
+  let tokenBalance;
+
+  if (tokenData.type === TokenType.HBAR && userId) {
+    const provider = hethers.providers.getDefaultProvider(process.env.REACT_APP_NETWORK_TYPE);
+    const userBalanceBN = await provider.getBalance(userId);
+    tokenBalance = hethers.utils.formatHbar(userBalanceBN);
+  } else if (tokenData.type === TokenType.HTS) {
+    const balance = await getHTSTokenWalletBalance(userId, tokenData.hederaId);
+    const tokenDecimals = tokenData?.decimals || 8;
+    tokenBalance = formatStringWeiToStringEther(balance.toString(), tokenDecimals).toString();
+  }
+  // Currently we don't have a way getting the balance of ERC20 tokens
+  return tokenBalance;
 };
 
 export const NATIVE_TOKEN = {

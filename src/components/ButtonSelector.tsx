@@ -1,10 +1,12 @@
 import React from 'react';
 import Icon from '../components/Icon';
+import IconToken from '../components/IconToken';
 
 interface IButtonSelectorProps {
   selectorText: string;
   type?: 'background' | 'border' | 'default';
   className?: string;
+  selectedToken?: string;
   onClick?: () => void;
 }
 
@@ -23,10 +25,16 @@ const ButtonSelector = ({
   type = 'default',
   className,
   onClick,
+  selectedToken,
 }: IButtonSelectorProps) => {
   return (
     <div onClick={onClick} className={`btn-selector ${typeMapping[type]} ${className}`}>
-      <span className="text-small">{selectorText}</span>
+      {selectedToken ? <IconToken symbol={selectedToken} className="me-3" /> : null}
+      {selectedToken ? (
+        <span className="text-main">{selectedToken}</span>
+      ) : (
+        <span className="text-small">{selectorText}</span>
+      )}
       <Icon name="chevron" className="ms-2" />
     </div>
   );
