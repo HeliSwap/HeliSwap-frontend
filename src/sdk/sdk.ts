@@ -328,14 +328,14 @@ class SDK {
 
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
     const userAddress = idToAddress(userId);
-    let tokenInAmount, tokenOutAmount;
-    if (exactAmountIn) {
-      tokenInAmount = formatStringToBigNumberWei(amountIn, decIn);
-      tokenOutAmount = getAmountWithSlippage(amountOut, decOut, slippage, true);
-    } else {
-      tokenInAmount = getAmountWithSlippage(amountIn, decIn, slippage, false);
-      tokenOutAmount = formatStringToBigNumberWei(amountOut, decOut);
-    }
+
+    const tokenInAmount = exactAmountIn
+      ? formatStringToBigNumberWei(amountIn, decIn)
+      : getAmountWithSlippage(amountIn, decIn, slippage, false);
+
+    const tokenOutAmount = exactAmountIn
+      ? getAmountWithSlippage(amountOut, decOut, slippage, true)
+      : formatStringToBigNumberWei(amountOut, decOut);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
