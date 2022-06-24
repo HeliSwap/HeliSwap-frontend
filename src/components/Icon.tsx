@@ -11,6 +11,7 @@ import { ReactComponent as SpeachBubble } from '../icons/system/speech-bubble.sv
 import { ReactComponent as Star } from '../icons/system/star.svg';
 import { ReactComponent as Swap } from '../icons/system/swap.svg';
 import { ReactComponent as Transfer } from '../icons/system/transfer.svg';
+import { ReactComponent as Settings } from '../icons/system/settings.svg';
 
 interface IIconProps {
   name: string;
@@ -44,6 +45,7 @@ const icons: IIconMapping = {
   star: Star,
   swap: Swap,
   transfer: Transfer,
+  settings: Settings,
 };
 
 const colorMapping: IColorMapping = {
@@ -52,7 +54,7 @@ const colorMapping: IColorMapping = {
   gradient: 'is-gradient',
 };
 
-const Icon = ({ name, className, color = 'white' }: IIconProps) => {
+const Icon = ({ name, className = '', color = 'white' }: IIconProps) => {
   const TheIcon = icons[name];
   return (
     <>

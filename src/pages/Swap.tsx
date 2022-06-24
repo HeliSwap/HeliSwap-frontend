@@ -34,6 +34,7 @@ import usePools from '../hooks/usePools';
 import { MAX_UINT_ERC20, MAX_UINT_HTS } from '../constants';
 import InputToken from '../components/InputToken';
 import ButtonSelector from '../components/ButtonSelector';
+import Icon from '../components/Icon';
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
@@ -465,13 +466,18 @@ const Swap = () => {
   }, [userId]);
 
   //Render methods
-  const getSettings = () => {
+  const getTitleAndSettings = () => {
     return (
       <>
-        <div className="d-flex justify-content-end">
-          <span className="cursor-pointer" onClick={() => setShowModalTransactionSettings(true)}>
-            <img className="me-2" width={24} src={`/icons/settings.png`} alt="" />
-          </span>
+        <div className="d-flex justify-content-between align-items-center mb-6">
+          <h1 className="text-subheader">Swap</h1>
+          <div
+            className="d-flex justify-content-end align-items-center cursor-pointer"
+            onClick={() => setShowModalTransactionSettings(true)}
+          >
+            <span className="text-small me-2">Settings</span>
+            <Icon name="settings" />
+          </div>
         </div>
 
         {showModalTransactionSettings ? (
@@ -502,6 +508,8 @@ const Swap = () => {
   const getSwapSection = () => {
     return (
       <div className="container-dark">
+        {getSuccessMessage()}
+
         <InputTokenSelector
           inputTokenComponent={
             <InputToken
@@ -529,7 +537,6 @@ const Swap = () => {
             />
           }
         />
-
         <Modal show={showModalA}>
           <ModalSearchContent
             modalTitle="Select token"
@@ -539,7 +546,6 @@ const Swap = () => {
             defaultToken={NATIVE_TOKEN}
           />
         </Modal>
-
         <InputTokenSelector
           className="mt-5"
           inputTokenComponent={
@@ -561,7 +567,6 @@ const Swap = () => {
           }
           walletBalanceComponent={<WalletBalance walletBalance={tokenBalances.tokenB} />}
         />
-
         <Modal show={showModalB}>
           <ModalSearchContent
             modalTitle="Select token"
@@ -570,6 +575,7 @@ const Swap = () => {
             closeModal={() => setShowModalB(false)}
           />
         </Modal>
+        {getActionButtons()}
       </div>
     );
   };
@@ -616,7 +622,7 @@ const Swap = () => {
 
   const getSuccessMessage = () => {
     return successSwap ? (
-      <div className="alert alert-success alert-dismissible my-5" role="alert">
+      <div className="alert alert-success alert-dismissible mb-5" role="alert">
         <strong>Success swap!</strong>
         <p>{successMessage}</p>
         <button
@@ -633,11 +639,9 @@ const Swap = () => {
   return (
     <div className="d-flex justify-content-center">
       <div className="container-swap">
-        {getSettings()}
+        {getTitleAndSettings()}
         {getErrorMessage()}
         {getSwapSection()}
-        {getActionButtons()}
-        {getSuccessMessage()}
       </div>
     </div>
   );

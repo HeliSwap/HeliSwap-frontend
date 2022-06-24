@@ -1,26 +1,47 @@
-import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useEffect, useState } from 'react';
+import { hethers } from '@hashgraph/hethers';
 import { GlobalContext } from '../providers/Global';
-import Menu from './Menu';
+import { getHTSTokensWalletBalance } from '../utils/tokenUtils';
 
 const Header = () => {
   const contextValue = useContext(GlobalContext);
-  const { connected, connectWallet, disconnectWallet, extensionFound, isConnectionLoading } =
-    contextValue.connection;
+  const {
+    connected,
+    connectWallet,
+    disconnectWallet,
+    extensionFound,
+    isConnectionLoading,
+    userId,
+  } = contextValue.connection;
+
+  const [userBalance, setUserBalance] = useState('0.0');
+
+  useEffect(() => {
+    const getUserTokensData = async () => {
+      const { balance } = await getHTSTokensWalletBalance(userId);
+      const balanceFormatted = hethers.utils.formatUnits(balance, 8);
+      setUserBalance(balanceFormatted);
+    };
+
+    if (userId) {
+      getUserTokensData();
+    }
+  }, [userId]);
 
   return (
-    <div className="container py-3 py-lg-5">
-      <div className="d-flex justify-content-between align-items-center">
-        <Link to="/">
-          <img height={60} src="/logo.png" alt="" />
-        </Link>
-        <Menu />
+    <div className="p-5">
+      <div className="d-flex justify-content-end">
         <div className="d-flex align-items-center">
           {!isConnectionLoading ? (
             extensionFound ? (
               connected ? (
                 <>
-                  <p className="text-success mx-2">Connected</p>
+                  <div className="container-connected">
+                    <div className="text-small">{userBalance} HBAR</div>
+                    <div className="container-address">
+                      <div className="text-small">{userId}</div>
+                    </div>
+                  </div>
                   <button
                     onClick={() => disconnectWallet()}
                     className="btn btn-sm btn-outline-primary mx-2"
@@ -33,7 +54,7 @@ const Header = () => {
                   onClick={() => connectWallet()}
                   className="btn btn-sm btn-outline-primary mx-2"
                 >
-                  Connect to wallet
+                  Connect wallet
                 </button>
               )
             ) : (
@@ -42,8 +63,6 @@ const Header = () => {
           ) : (
             <p className="text-success mx-2">Loading...</p>
           )}
-
-          <button className="btn btn-sm btn-primary mx-2">Bridging</button>
         </div>
       </div>
     </div>

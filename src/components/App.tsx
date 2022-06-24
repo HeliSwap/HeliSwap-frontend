@@ -15,7 +15,7 @@ import Helpers from '../pages/Helpers';
 import Styleguide from '../pages/Styleguide';
 
 import Header from './Header';
-import Footer from './Footer';
+import Sidebar from './Sidebar';
 
 function App() {
   const apolloClient = getApolloClient();
@@ -24,23 +24,25 @@ function App() {
     <BrowserRouter>
       <ApolloProvider client={apolloClient}>
         <GlobalProvider>
-          <div className="wrapper">
-            <Header />
-            <div className="main">
-              <div className="container py-5 py-lg-7">
-                <Routes>
-                  <Route path="/" element={<Swap />} />
-                  <Route path="create" element={<Create />} />
-                  <Route path="my-pools" element={<MyPools />} />
-                  <Route path="pairs" element={<Pairs />} />
-                  <Route path="pairs/:address" element={<PairDetails />} />
-                  <Route path="tokens" element={<Tokens />} />
-                  <Route path="styleguide" element={<Styleguide />} />
-                  <Route path="helpers" element={<Helpers />} />
-                </Routes>
+          <div className="d-flex">
+            <Sidebar />
+            <div className="wrapper flex-1">
+              <div className="main">
+                <Header />
+                <div className="container py-5 py-lg-7">
+                  <Routes>
+                    <Route path="/" element={<Swap />} />
+                    <Route path="create" element={<Create />} />
+                    <Route path="my-pools" element={<MyPools />} />
+                    <Route path="pairs" element={<Pairs />} />
+                    <Route path="pairs/:address" element={<PairDetails />} />
+                    <Route path="tokens" element={<Tokens />} />
+                    <Route path="styleguide" element={<Styleguide />} />
+                    <Route path="helpers" element={<Helpers />} />
+                  </Routes>
+                </div>
               </div>
             </div>
-            <Footer />
           </div>
         </GlobalProvider>
       </ApolloProvider>

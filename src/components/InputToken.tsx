@@ -5,7 +5,7 @@ type IInputTokenProps = {
 } & React.ComponentPropsWithoutRef<'input'>;
 
 const InputToken = (props: IInputTokenProps) => {
-  const { className } = props;
+  const { className = '' } = props;
 
   return <input className={`input-token ${className}`} type="text" {...props} />;
 };

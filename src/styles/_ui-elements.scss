@@ -34,6 +34,7 @@
   display: inline-flex;
   width: 24px;
   height: 24px;
+  transition: fill 0.15s linear;
 
   &.is-gray {
     path {
@@ -48,6 +49,16 @@
   }
 }
 
+.icon-menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: $border-radius;
+  transition: background-color 0.15s linear;
+}
+
 .icon-token {
   display: inline-flex;
   width: 28px;
@@ -55,6 +66,21 @@
 }
 
 /* Containers */
+.container-connected {
+  background-color: $neutral-900;
+  border-radius: $border-radius;
+  padding: 3px 3px 3px 12px;
+  display: flex;
+  align-items: center;
+}
+
+.container-address {
+  background-color: $neutral-700;
+  border-radius: 2px;
+  padding: 4px 8px;
+  margin-left: 12px;
+}
+
 .container-dark {
   background-color: $neutral-900;
   box-shadow: 0px 5px 20px rgba(9, 10, 20, 0.45);
@@ -74,7 +100,9 @@
     line-height: 40px;
     background-color: $neutral-700;
     border: none;
-    transition: color 0.15s linear;
+    max-width: 250px;
+    flex: 0 1 250px;
+    @include transition-link;
 
     &:focus {
       color: $neutral-100;
@@ -89,7 +117,7 @@
 
 /* Not relevant */
 .container-swap {
-  max-width: 820px;
+  max-width: 460px;
   width: 100%;
 }
 
