@@ -296,222 +296,78 @@ class SDK {
     return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
-  async swapExactTokensForTokens(
+  async swap(
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
     amountIn: string,
-    amountMinOut: any,
-    decIn: number,
-    decOut: number,
-    slippage: number,
-    expiresAfter: number,
-    path: string[],
-  ) {
-    const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
-    const userAddress = idToAddress(userId);
-
-    const tokenInAmount = formatStringToBigNumberWei(amountIn, decIn);
-    const tokenOutMinAmount = getAmountWithSlippage(amountMinOut, decOut, slippage, true);
-
-    const trans = new ContractExecuteTransaction()
-      //Set the ID of the contract
-      .setContractId(addressToId(routerContractAddress))
-      //Set the gas for the contract call
-      .setGas(3000000)
-      //Set the contract function to call
-      .setFunction(
-        'swapExactTokensForTokens',
-        new ContractFunctionParameters()
-          .addUint256(tokenInAmount)
-          .addUint256(tokenOutMinAmount)
-          .addAddressArray(path)
-          .addAddress(userAddress)
-          .addUint256(getExpirationTime(expiresAfter)),
-      );
-
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
-  }
-
-  async swapExactHBARForTokens(
-    hashconnectConnectorInstance: Hashconnect,
-    userId: string,
-    amountIn: string,
-    amountMinOut: string,
-    decOut: number,
-    slippage: number,
-    expiresAfter: number,
-    path: string[],
-  ) {
-    const HBARAmount = formatStringToBigNumberWei(amountIn, 0);
-    const tokenMinOutAmount = getAmountWithSlippage(amountMinOut, decOut, slippage, true);
-
-    const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
-
-    const userAddress = idToAddress(userId);
-
-    const trans = new ContractExecuteTransaction()
-      //Set the ID of the contract
-      .setContractId(addressToId(routerContractAddress))
-      //Set the gas for the contract call
-      .setGas(3000000)
-      //Amount of HBAR we want to provide
-      .setPayableAmount(HBARAmount)
-      //Set the contract function to call
-      .setFunction(
-        'swapExactETHForTokens',
-        new ContractFunctionParameters()
-          .addUint256(tokenMinOutAmount)
-          .addAddressArray(path)
-          .addAddress(userAddress)
-          .addUint256(getExpirationTime(expiresAfter)),
-      );
-
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
-  }
-
-  async swapExactTokensForHBAR(
-    hashconnectConnectorInstance: Hashconnect,
-    userId: string,
-    amountIn: string,
-    amountMinHBAROut: string,
-    decIn: number,
-    WHBARDec: number,
-    slippage: number,
-    expiresAfter: number,
-    path: string[],
-  ) {
-    const tokenInAmount = formatStringToBigNumberWei(amountIn, decIn);
-    const HBARAmountMinOut = getAmountWithSlippage(amountMinHBAROut, WHBARDec, slippage, true);
-
-    const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
-
-    const userAddress = idToAddress(userId);
-
-    const trans = new ContractExecuteTransaction()
-      //Set the ID of the contract
-      .setContractId(addressToId(routerContractAddress))
-      //Set the gas for the contract call
-      .setGas(3000000)
-      //Set the contract function to call
-      .setFunction(
-        'swapExactTokensForETH',
-        new ContractFunctionParameters()
-          .addUint256(tokenInAmount)
-          .addUint256(HBARAmountMinOut)
-          .addAddressArray(path)
-          .addAddress(userAddress)
-          .addUint256(getExpirationTime(expiresAfter)),
-      );
-
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
-  }
-
-  async swapTokensForExactTokens(
-    hashconnectConnectorInstance: Hashconnect,
-    userId: string,
-    amountMaxIn: string,
     amountOut: string,
     decIn: number,
     decOut: number,
     slippage: number,
     expiresAfter: number,
     path: string[],
+    tokenInIsNative: boolean,
+    tokenOutIsNative: boolean,
+    exactAmountIn: boolean,
   ) {
+    const getTransactionName = () => {
+      if (exactAmountIn) {
+        return tokenInIsNative
+          ? 'swapExactETHForTokens'
+          : tokenOutIsNative
+          ? 'swapExactTokensForETH'
+          : 'swapExactTokensForTokens';
+      } else {
+        return tokenInIsNative
+          ? 'swapETHForExactTokens'
+          : tokenOutIsNative
+          ? 'swapTokensForExactETH'
+          : 'swapTokensForExactTokens';
+      }
+    };
+
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
     const userAddress = idToAddress(userId);
-
-    const tokenOutAmount = formatStringToBigNumberWei(amountOut, decOut);
-    const tokenInMaxAmount = getAmountWithSlippage(amountMaxIn, decIn, slippage, false);
+    let tokenInAmount, tokenOutAmount;
+    if (exactAmountIn) {
+      tokenInAmount = formatStringToBigNumberWei(amountIn, decIn);
+      tokenOutAmount = getAmountWithSlippage(amountOut, decOut, slippage, true);
+    } else {
+      tokenInAmount = getAmountWithSlippage(amountIn, decIn, slippage, false);
+      tokenOutAmount = formatStringToBigNumberWei(amountOut, decOut);
+    }
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(routerContractAddress))
       //Set the gas for the contract call
-      .setGas(3000000)
-      //Set the contract function to call
-      .setFunction(
-        'swapTokensForExactTokens',
+      .setGas(3000000);
+
+    if (tokenInIsNative) {
+      const HBARAmount = exactAmountIn
+        ? formatStringToBigNumberWei(amountIn, 0)
+        : getAmountWithSlippage(amountIn, 0, slippage, false, true);
+      trans //Amount of HBAR we want to provide
+        .setPayableAmount(HBARAmount)
+        .setFunction(
+          getTransactionName(),
+          new ContractFunctionParameters()
+            .addUint256(tokenOutAmount)
+            .addAddressArray(path)
+            .addAddress(userAddress)
+            .addUint256(getExpirationTime(expiresAfter)),
+        );
+    } else {
+      trans.setFunction(
+        getTransactionName(),
         new ContractFunctionParameters()
-          .addUint256(tokenOutAmount)
-          .addUint256(tokenInMaxAmount) //amountIn
+          .addUint256(exactAmountIn ? tokenInAmount : tokenOutAmount)
+          .addUint256(exactAmountIn ? tokenOutAmount : tokenInAmount)
           .addAddressArray(path)
           .addAddress(userAddress)
           .addUint256(getExpirationTime(expiresAfter)),
       );
-
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
-  }
-
-  async swapTokensForExactHBAR(
-    hashconnectConnectorInstance: Hashconnect,
-    userId: string,
-    amountMaxIn: string,
-    amountHBAROut: string,
-    decIn: number,
-    HBARDec: number,
-    slippage: number,
-    expiresAfter: number,
-    path: string[],
-  ) {
-    const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
-    const userAddress = idToAddress(userId);
-
-    const tokenMaxInAmount = getAmountWithSlippage(amountMaxIn, decIn, slippage, false);
-    const HBAROutAmount = formatStringToBigNumberWei(amountHBAROut, HBARDec);
-
-    const trans = new ContractExecuteTransaction()
-      //Set the ID of the contract
-      .setContractId(addressToId(routerContractAddress))
-      //Set the gas for the contract call
-      .setGas(3000000)
-      //Set the contract function to call
-      .setFunction(
-        'swapTokensForExactETH',
-        new ContractFunctionParameters()
-          .addUint256(HBAROutAmount)
-          .addUint256(tokenMaxInAmount)
-          .addAddressArray(path)
-          .addAddress(userAddress)
-          .addUint256(getExpirationTime(expiresAfter)),
-      );
-
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
-  }
-
-  async swapHBARForExactTokens(
-    hashconnectConnectorInstance: Hashconnect,
-    userId: string,
-    HBARMaxIn: string,
-    amountOut: string,
-    decOut: number,
-    slippage: number,
-    expiresAfter: number,
-    path: string[],
-  ) {
-    const tokenAmountString = amountOut;
-    const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
-
-    const HBARMaxInAmount = getAmountWithSlippage(HBARMaxIn, 0, slippage, false, true);
-    const tokenAmountOut = formatStringToBigNumberWei(tokenAmountString, decOut);
-
-    const userAddress = idToAddress(userId);
-
-    const trans = new ContractExecuteTransaction()
-      //Set the ID of the contract
-      .setContractId(addressToId(routerContractAddress))
-      //Set the gas for the contract call
-      .setGas(3000000)
-      //Amount of HBAR we want to provide
-      .setPayableAmount(HBARMaxInAmount)
-      //Set the contract function to call
-      .setFunction(
-        'swapETHForExactTokens',
-        new ContractFunctionParameters()
-          .addUint256(tokenAmountOut)
-          .addAddressArray(path)
-          .addAddress(userAddress)
-          .addUint256(getExpirationTime(expiresAfter)),
-      );
+    }
 
     return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }

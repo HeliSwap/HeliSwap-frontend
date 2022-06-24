@@ -259,88 +259,25 @@ const Swap = () => {
     try {
       let receipt;
 
-      if (tokenInExactAmount) {
-        if (tokenInIsNative) {
-          if (willWrapTokens) {
-            receipt = await sdk.wrapHBAR(hashconnectConnectorInstance, userId, amountIn);
-          } else {
-            receipt = await sdk.swapExactHBARForTokens(
-              hashconnectConnectorInstance,
-              userId,
-              amountIn,
-              amountOut,
-              tokenOutDecimals,
-              swapSlippage,
-              transactionExpiration,
-              bestPath,
-            );
-          }
-        } else if (tokenOutIsNative) {
-          if (willUnwrapTokens) {
-            receipt = await sdk.unwrapHBAR(hashconnectConnectorInstance, userId, amountIn);
-          } else {
-            receipt = await sdk.swapExactTokensForHBAR(
-              hashconnectConnectorInstance,
-              userId,
-              amountIn,
-              amountOut,
-              tokenInDecimals,
-              tokenOutDecimals,
-              swapSlippage,
-              transactionExpiration,
-              bestPath,
-            );
-          }
-        } else {
-          receipt = await sdk.swapExactTokensForTokens(
-            hashconnectConnectorInstance,
-            userId,
-            amountIn,
-            amountOut,
-            tokenInDecimals,
-            tokenOutDecimals,
-            swapSlippage,
-            transactionExpiration,
-            bestPath,
-          );
-        }
+      if (willWrapTokens) {
+        receipt = await sdk.wrapHBAR(hashconnectConnectorInstance, userId, amountIn);
+      } else if (willUnwrapTokens) {
+        receipt = await sdk.unwrapHBAR(hashconnectConnectorInstance, userId, amountIn);
       } else {
-        if (tokenInIsNative) {
-          receipt = await sdk.swapHBARForExactTokens(
-            hashconnectConnectorInstance,
-            userId,
-            amountIn,
-            amountOut,
-            tokenOutDecimals,
-            swapSlippage,
-            transactionExpiration,
-            bestPath,
-          );
-        } else if (tokenOutIsNative) {
-          receipt = await sdk.swapTokensForExactHBAR(
-            hashconnectConnectorInstance,
-            userId,
-            amountIn,
-            amountOut,
-            tokenInDecimals,
-            tokenOutDecimals,
-            swapSlippage,
-            transactionExpiration,
-            bestPath,
-          );
-        } else {
-          receipt = await sdk.swapTokensForExactTokens(
-            hashconnectConnectorInstance,
-            userId,
-            amountIn,
-            amountOut,
-            tokenInDecimals,
-            tokenOutDecimals,
-            swapSlippage,
-            transactionExpiration,
-            bestPath,
-          );
-        }
+        sdk.swap(
+          hashconnectConnectorInstance,
+          userId,
+          amountIn,
+          amountOut,
+          tokenInDecimals,
+          tokenOutDecimals,
+          swapSlippage,
+          transactionExpiration,
+          bestPath,
+          tokenInIsNative,
+          tokenOutIsNative,
+          tokenInExactAmount,
+        );
       }
 
       const {
