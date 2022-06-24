@@ -9,14 +9,14 @@ interface IWalletBalance {
 const WalletBalance = ({ walletBalance, onMaxButtonClick }: IWalletBalance) => {
   return walletBalance ? (
     <p className="text-gray text-small">
-      Wallet balance: <span className="text-numeric">{walletBalance}</span>
+      Balance: <span className="text-numeric">{walletBalance}</span>
       {parseFloat(walletBalance) > 0 && onMaxButtonClick ? (
-        <button
-          className="btn btn-secondary btn-sm"
+        <span
+          className="link-primary text-bold text-uppercase text-micro ms-2"
           onClick={() => onMaxButtonClick(walletBalance)}
         >
           Max
-        </button>
+        </span>
       ) : null}
     </p>
   ) : (
