@@ -88,10 +88,15 @@ const Swap = () => {
 
   // State for token balances
   const initialBallanceData = {
-    tokenA: '0.00',
-    tokenB: '0.00',
+    tokenA: undefined,
+    tokenB: undefined,
   };
-  const [tokenBalances, setTokenBalances] = useState(initialBallanceData);
+  interface IfaceInitialBalanceData {
+    tokenA: string | undefined;
+    tokenB: string | undefined;
+  }
+
+  const [tokenBalances, setTokenBalances] = useState<IfaceInitialBalanceData>(initialBallanceData);
 
   // Additional states for Swaps
   const [readyToApprove, setReadyToApprove] = useState(false);

@@ -184,7 +184,7 @@ export const calculateReserves = (
 };
 
 export const getTokenBalance = async (userId: string, tokenData: ITokenData) => {
-  let tokenBalance = '0.00';
+  let tokenBalance;
 
   if (tokenData.type === TokenType.HBAR && userId) {
     const provider = hethers.providers.getDefaultProvider(process.env.REACT_APP_NETWORK_TYPE);

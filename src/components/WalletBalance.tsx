@@ -2,7 +2,7 @@ import React from 'react';
 import Icon from './Icon';
 
 interface IWalletBalance {
-  walletBalance: string;
+  walletBalance?: string;
   onMaxButtonClick?: (maxValue: string) => void;
 }
 
