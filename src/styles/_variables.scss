@@ -127,8 +127,10 @@ $spacers: (
   // 27: ($spacer * 12.5), // 200px
   // 28: ($spacer * 13),   // 208px
   // 29: ($spacer * 13.5), // 216px
-  // 30: ($spacer * 14)    // 224px,,,
+  // 30: ($spacer * 14)    // 224px,,,,
 );
+
+$enable-negative-margins: true;
 
 // Body
 $body-bg: $neutral-850;
