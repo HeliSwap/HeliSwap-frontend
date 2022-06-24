@@ -453,7 +453,7 @@ const Swap = () => {
     setReadyToApprove(readyToApprove);
 
     setReadyToSwap(ready);
-  }, [swapData, approved]);
+  }, [swapData, approved, initialSwapData.tokenIdOut]);
 
   useEffect(() => {
     const checkTokenAssociation = async (userId: string) => {
