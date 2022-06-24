@@ -269,7 +269,7 @@ const Swap = () => {
       } else if (willUnwrapTokens) {
         receipt = await sdk.unwrapHBAR(hashconnectConnectorInstance, userId, amountIn);
       } else {
-        sdk.swap(
+        receipt = await sdk.swap(
           hashconnectConnectorInstance,
           userId,
           amountIn,
