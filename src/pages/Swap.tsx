@@ -546,8 +546,12 @@ const Swap = () => {
             defaultToken={NATIVE_TOKEN}
           />
         </Modal>
+
+        <div className="text-center my-4">
+          <Icon name="swap" color="gradient" />
+        </div>
+
         <InputTokenSelector
-          className="mt-5"
           inputTokenComponent={
             <InputToken
               value={swapData.amountOut}
