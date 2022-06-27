@@ -36,6 +36,7 @@ $theme-colors: (
 
 // Options
 $enable-validation-icons: false;
+$enable-negative-margins: true;
 
 // Spacers
 $spacer: 1rem;
@@ -127,10 +128,8 @@ $spacers: (
   // 27: ($spacer * 12.5), // 200px
   // 28: ($spacer * 13),   // 208px
   // 29: ($spacer * 13.5), // 216px
-  // 30: ($spacer * 14)    // 224px,,,,
+  // 30: ($spacer * 14)    // 224px,,,,,,,,,,,,
 );
-
-$enable-negative-margins: true;
 
 // Body
 $body-bg: $neutral-850;
@@ -144,6 +143,10 @@ $grid-gutter-width: 24px;
 
 // Border radius
 $border-radius: 4px;
+$border-radius-lg: 6px;
+
+// Box shadows
+$box-shadow-sm: 0px 5px 20px rgba(9, 10, 20, 0.45);
 
 // Typography
 $font-family-primary: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
@@ -279,7 +282,7 @@ $custom-select-height: auto;
 $custom-select-focus-box-shadow: 0 0 0 1px $primary;
 
 // Modals
-$modal-content-bg: $darker;
+$modal-content-bg: $neutral-900;
 $modal-header-border-color: $dark;
 
 $btn-close-color: $white;

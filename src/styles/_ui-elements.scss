@@ -168,6 +168,11 @@
   }
 }
 
+/* Modals */
+.modal-content {
+  box-shadow: $modal-content-box-shadow-xs;
+}
+
 /* Not relevant */
 
 .container-pairs {
