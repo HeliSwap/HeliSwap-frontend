@@ -77,24 +77,18 @@ const ModalSearchContent = ({
   };
 
   const handleTokenListClick = (token: ITokenData) => {
-    setCurrentToken(token);
+    setTokensData((prev: any) => ({
+      ...prev,
+      [tokenFieldId]: token,
+    }));
+
+    resetModalState();
+    closeModal();
   };
 
   const resetModalState = () => {
     setSearchInputValue('');
     setCurrentToken({} as ITokenData);
-  };
-
-  const handleSaveButton = () => {
-    if (hasTokenData) {
-      setTokensData((prev: any) => ({
-        ...prev,
-        [tokenFieldId]: currentToken,
-      }));
-    }
-
-    resetModalState();
-    closeModal();
   };
 
   const handleCloseClick = () => {
@@ -182,16 +176,6 @@ const ModalSearchContent = ({
             </div>
           </div>
         ) : null}
-      </div>
-      <div className="modal-footer">
-        <button
-          // disabled={!hasTokenData || !hasPools}
-          onClick={handleSaveButton}
-          type="button"
-          className="btn btn-primary"
-        >
-          Save changes
-        </button>
       </div>
     </>
   );
