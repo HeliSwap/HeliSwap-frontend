@@ -126,6 +126,24 @@
   margin: 0 24px;
 }
 
+.container-pool-details {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid $neutral-400;
+
+  &.is-gray {
+    background-color: $neutral-700;
+  }
+}
+
+.container-neutral-500 {
+  background-color: $neutral-500;
+  padding: 18px 12px;
+  border-radius: $border-radius;
+}
+
 /* Tables */
 .table-pools {
   display: grid;

@@ -29,13 +29,13 @@
 
 // Links
 .link {
-  @include custom-underline($body-color);
-
+  cursor: pointer;
   color: $body-color;
   text-decoration: none;
+  transition: color 0.15s linear;
 
   &:hover {
-    color: $body-color;
+    color: $secondary;
     text-decoration: none;
   }
 }
