@@ -48,7 +48,7 @@ import Icon from '../components/Icon';
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
-  const { userId, hashconnectConnectorInstance } = connection;
+  const { userId, hashconnectConnectorInstance, connected, connectWallet } = connection;
 
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
