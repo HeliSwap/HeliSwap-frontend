@@ -525,7 +525,7 @@ const Swap = () => {
             <ButtonSelector
               onClick={() => setShowModalA(true)}
               selectedToken={tokensData?.tokenA.symbol}
-              selectorText="Select token"
+              selectorText="Select a token"
             />
           }
           walletBalanceComponent={
@@ -539,7 +539,7 @@ const Swap = () => {
         />
         <Modal show={showModalA}>
           <ModalSearchContent
-            modalTitle="Select token"
+            modalTitle="Select a token"
             tokenFieldId="tokenA"
             setTokensData={setTokensData}
             closeModal={() => setShowModalA(false)}

@@ -231,9 +231,14 @@
 }
 
 .list-token-item {
+  padding: 4px 8px;
+  border-radius: $border-radius;
+  transition: background-color 0.15s linear;
+
   &:hover {
-    background-color: $dark;
+    background-color: $darkest;
   }
+
   &.is-selected {
     background-color: $darkest;
   }

@@ -128,7 +128,7 @@ $spacers: (
   // 27: ($spacer * 12.5), // 200px
   // 28: ($spacer * 13),   // 208px
   // 29: ($spacer * 13.5), // 216px
-  // 30: ($spacer * 14)    // 224px,,,,,,,,,,,,
+  // 30: ($spacer * 14)    // 224px,
 );
 
 // Body
@@ -261,18 +261,18 @@ $btn-primary-disabled-background: #232342;
 $btn-primary-outline-color: $white;
 
 // Forms
-$input-color: #7f89a7;
-$input-border-color: rgba(255, 255, 255, 0.2);
-$input-focus-border-color: $primary;
-$input-focus-box-shadow: 0 0 0 1px $primary;
+$input-color: $neutral-100;
+$input-border-color: $neutral-700;
+$input-focus-border-color: $neutral-100;
+$input-focus-box-shadow: none;
 $input-height: auto;
-$input-line-height: 1.2;
+$input-line-height: 1.57;
 $input-placeholder-color: $secondary;
 $form-group-margin-bottom: 0;
-$input-bg: $darkest;
-$input-padding-y: 14px;
-$input-padding-x: 18px;
-$input-font-size: 16px;
+$input-bg: $neutral-700;
+$input-padding-y: 15px;
+$input-padding-x: 12px;
+$input-font-size: 14px;
 
 $form-select-indicator: none;
 

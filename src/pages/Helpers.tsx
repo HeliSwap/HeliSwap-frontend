@@ -101,6 +101,48 @@ const Helpers = () => {
       <div className="container-swap">
         <h1>Helpers</h1>
 
+        <div className="my-4">
+          <div className="bg-slate p-3 rounded mb-4">
+            <ul>
+              <li>
+                0.0.447200 - HEX [HTS] <span className="cursor-pointer">📝</span>
+              </li>
+              <li>
+                0.0.34741585 - USDT [HTS] <span className="cursor-pointer">📝</span>
+              </li>
+              <li>
+                0.0.34741650 - WETH [HTS] <span className="cursor-pointer">📝</span>
+              </li>
+              <li>
+                0.0.34741685 - WBTC [HTS] <span className="cursor-pointer">📝</span>
+              </li>
+              <li>
+                0.0.45906586 - HELI [HTS] <span className="cursor-pointer">📝</span>
+              </li>
+
+              <li>
+                0.0.34947702 - USDT [ERC20] <span className="cursor-pointer">📝</span>
+              </li>
+
+              <li>
+                0.0.34838105 - WETH [ERC20] <span className="cursor-pointer">📝</span>
+              </li>
+
+              <li>
+                0.0.34838117 - WBTC [ERC20] <span className="cursor-pointer">📝</span>
+              </li>
+
+              <li>
+                0.0.34838123 - DOB [ERC20] <span className="cursor-pointer">📝</span>
+              </li>
+
+              <li>
+                0.0.34948327 - EIGHT [ERC20] <span className="cursor-pointer">📝</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
         <div className="mt-5">
           <div>
             <label className="mb-2" htmlFor="">
