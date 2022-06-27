@@ -46,11 +46,6 @@ export interface IUserToken {
   balance: number;
 }
 
-export interface IWalletBalance {
-  balance: number;
-  tokens: IUserToken[];
-}
-
 export interface ISwapTokenData {
   tokenIdIn: string;
   tokenIdOut: string;

@@ -41,7 +41,7 @@ const Pairs = () => {
 
   return (
     <div className="d-flex justify-content-center">
-      <div className="container-swap">
+      <div className="container-pools">
         <div className="d-flex justify-content-end">
           <span className="cursor-pointer" onClick={() => setShowModalTransactionSettings(true)}>
             <img className="me-2" width={24} src={`/icons/settings.png`} alt="" />
@@ -69,11 +69,19 @@ const Pairs = () => {
         ) : null}
 
         {loading ? (
-          <p className="text-info">Loading pairs...</p>
+          <p className="text-info">Loading pools...</p>
         ) : havePairs ? (
-          <div>
+          <div className="table-pools">
+            <div className="table-pools-row">
+              <div className="table-pools-cell">
+                <span className="text-small">#</span>
+              </div>
+              <div className="table-pools-cell">
+                <span className="text-small">Pool</span>
+              </div>
+            </div>
             {pairData.map((item, index) => (
-              <PoolInfo key={index} pairData={item} />
+              <PoolInfo index={index} key={index} pairData={item} />
             ))}
           </div>
         ) : (

@@ -8,7 +8,6 @@ import EIGHT from '../icons/tokens/EIGHT.png';
 import HEX from '../icons/tokens/HEX.webp';
 import USDT from '../icons/tokens/USDT.png';
 import WBTC from '../icons/tokens/WBTC.png';
-import WHBAR from '../icons/tokens/WHBAR.png';
 
 interface IIconTokenProps {
   symbol: string;
@@ -29,10 +28,10 @@ const tokenMapping: ITokenMapping = {
   USDT: USDT,
   WBTC: WBTC,
   WETH: ETH,
-  WHBAR: WHBAR,
+  WHBAR: HBAR,
 };
 
-const IconToken = ({ symbol, className }: IIconTokenProps) => {
+const IconToken = ({ symbol, className = '' }: IIconTokenProps) => {
   return <img className={`icon-token ${className}`} src={tokenMapping[symbol]} alt="token-icon" />;
 };
 

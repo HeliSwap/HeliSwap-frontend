@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import { GlobalContext } from '../providers/Global';
-import { getHTSTokensWalletBalance } from '../utils/tokenUtils';
 
 const Header = () => {
   const contextValue = useContext(GlobalContext);
@@ -18,9 +17,11 @@ const Header = () => {
 
   useEffect(() => {
     const getUserTokensData = async () => {
-      const { balance } = await getHTSTokensWalletBalance(userId);
-      const balanceFormatted = hethers.utils.formatUnits(balance, 8);
-      setUserBalance(balanceFormatted);
+      const provider = hethers.providers.getDefaultProvider(process.env.REACT_APP_NETWORK_TYPE);
+      const userBalanceBN = await provider.getBalance(userId);
+      const tokenBalance = hethers.utils.formatHbar(userBalanceBN);
+
+      setUserBalance(tokenBalance);
     };
 
     if (userId) {
