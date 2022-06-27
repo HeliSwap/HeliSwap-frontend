@@ -16,6 +16,7 @@ import ModalSearchContent from '../components/Modals/ModalSearchContent';
 import WalletBalance from '../components/WalletBalance';
 import InputTokenSelector from '../components/InputTokenSelector';
 import TransactionSettingsModalContent from '../components/Modals/TransactionSettingsModalContent';
+import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
 
 import errorMessages from '../content/errors';
 import {
@@ -35,6 +36,8 @@ import {
   getPossibleTradesExactOut,
   tradeComparator,
 } from '../utils/tradeUtils';
+import { formatStringWeiToStringEther, getAmountWithSlippage } from '../utils/numberUtils';
+
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
 import { MAX_UINT_ERC20, MAX_UINT_HTS } from '../constants';
@@ -51,6 +54,7 @@ const Swap = () => {
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
   const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
+  const [showModalConfirmSwap, setShowModalConfirmSwap] = useState(false);
 
   const initialTokensData: ITokensData = {
     tokenA: NATIVE_TOKEN,
@@ -107,6 +111,7 @@ const Swap = () => {
   const [readyToSwap, setReadyToSwap] = useState(false);
   const [tokenInExactAmount, setTokenInExactAmount] = useState(true);
   const [bestPath, setBestPath] = useState<string[]>([]);
+  const [ratioBasedOnTokenOut, setRatioBasedOnTokenOut] = useState(true);
 
   // State for general error
   const [error, setError] = useState(false);
@@ -253,7 +258,11 @@ const Swap = () => {
     }
   };
 
-  const handleSwapClick = async () => {
+  const handleSwapClick = () => {
+    setShowModalConfirmSwap(true);
+  };
+
+  const handleSwapConfirm = async () => {
     const { amountIn, amountOut, tokenInDecimals, tokenOutDecimals } = swapData;
 
     setError(false);
@@ -629,6 +638,41 @@ const Swap = () => {
             </Button>
           </div>
         ) : null}
+
+        {showModalConfirmSwap ? (
+          <Modal show={showModalConfirmSwap}>
+            <ConfirmTransactionModalContent
+              modalTitle="Confirm swap"
+              closeModal={() => setShowModalConfirmSwap(false)}
+              confirmTansaction={handleSwapConfirm}
+              confirmButtonLabel="Confirm swap"
+            >
+              <InputTokenSelector
+                inputTokenComponent={<InputToken value={swapData.amountIn} disabled={true} />}
+                buttonSelectorComponent={
+                  <ButtonSelector
+                    selectedToken={tokensData?.tokenA.symbol}
+                    selectorText="Select token"
+                    disabled={true}
+                  />
+                }
+              />
+              <InputTokenSelector
+                className="mt-5"
+                inputTokenComponent={<InputToken value={swapData.amountOut} disabled={true} />}
+                buttonSelectorComponent={
+                  <ButtonSelector
+                    selectedToken={tokensData?.tokenB.symbol}
+                    selectorText="Select token"
+                    disabled={true}
+                  />
+                }
+              />
+              {getTokensRatio()}
+              {getAdvancedSwapInfo()}
+            </ConfirmTransactionModalContent>
+          </Modal>
+        ) : null}
       </>
     );
   };
@@ -647,6 +691,79 @@ const Swap = () => {
         ></button>
       </div>
     ) : null;
+  };
+
+  const getTokensRatio = () => {
+    const ratio = ratioBasedOnTokenOut
+      ? Number(swapData.amountIn) / Number(swapData.amountOut)
+      : Number(swapData.amountOut) / Number(swapData.amountIn);
+    const baseTokenName = ratioBasedOnTokenOut
+      ? tokensData.tokenB.symbol
+      : tokensData.tokenA.symbol;
+    const secondTokenName = ratioBasedOnTokenOut
+      ? tokensData.tokenA.symbol
+      : tokensData.tokenB.symbol;
+
+    return (
+      <div
+        className="mt-4"
+        onClick={() => setRatioBasedOnTokenOut(!ratioBasedOnTokenOut)}
+      >{`1 ${baseTokenName} = ${ratio} ${secondTokenName}`}</div>
+    );
+  };
+
+  const getAdvancedSwapInfo = () => {
+    const { amountIn, amountOut } = swapData;
+    const { tokenA, tokenB } = tokensData;
+    const slippage = getTransactionSettings().swapSlippage;
+
+    const amountAfterSlippageMessage = tokenInExactAmount
+      ? 'Minimum received after slippage'
+      : 'Maximum sent after slippage';
+
+    const secondTokenDecimals = tokenInExactAmount
+      ? tokensData.tokenB.decimals
+      : tokensData.tokenA.decimals;
+
+    const amountAfterSlippage = tokenInExactAmount
+      ? getAmountWithSlippage(amountOut, tokenB.decimals, slippage, true)
+      : getAmountWithSlippage(amountIn, tokenA.decimals, slippage, false);
+
+    const amountAfterSlippageStr = formatStringWeiToStringEther(
+      amountAfterSlippage.toString(),
+      secondTokenDecimals,
+    );
+
+    const secondTokenName = tokenInExactAmount
+      ? tokensData.tokenB.symbol
+      : tokensData.tokenA.symbol;
+
+    const estimationMessage = tokenInExactAmount
+      ? `Output is estimated. You will receive at least ${amountAfterSlippageStr} ${secondTokenName} or the transaction will revert.`
+      : `Input is estimated. You will sell at most ${amountAfterSlippageStr} ${secondTokenName} or the transaction will revert.`;
+
+    return (
+      <div>
+        <div className="mt-4 border border-secondary">
+          <div className="d-flex justify-content-between m-4">
+            <span>Expected Output:</span>
+            <span>{`${swapData.amountOut} ${tokensData.tokenB.symbol}`}</span>
+          </div>
+          <div className="d-flex justify-content-between m-4">
+            <span>Price Impact:</span>
+            <span>TODO</span>
+          </div>
+          <div className="d-flex justify-content-between border-top border-secondary m-4 text-secondary">
+            <span>
+              {amountAfterSlippageMessage} ({getTransactionSettings().swapSlippage}%)
+            </span>
+
+            <span>{`${amountAfterSlippageStr} ${secondTokenName}`}</span>
+          </div>
+        </div>
+        <span className=" text-secondary">{estimationMessage}</span>
+      </div>
+    );
   };
 
   return (

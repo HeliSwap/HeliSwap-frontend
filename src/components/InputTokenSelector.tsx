@@ -4,7 +4,7 @@ interface IInputTokenSelector {
   className?: string;
   inputTokenComponent: React.ReactNode;
   buttonSelectorComponent: React.ReactNode;
-  walletBalanceComponent: React.ReactNode;
+  walletBalanceComponent?: React.ReactNode;
 }
 
 const InputTokenSelector = ({
