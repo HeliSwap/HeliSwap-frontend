@@ -12,7 +12,6 @@ interface IModalProps {
   closeModal: () => void;
   setTokensData: (prev: any) => void;
   tokenFieldId: string;
-  defaultToken?: ITokenData;
 }
 
 const ModalSearchContent = ({
@@ -20,7 +19,6 @@ const ModalSearchContent = ({
   setTokensData,
   tokenFieldId,
   modalTitle,
-  defaultToken,
 }: IModalProps) => {
   const [searchInputValue, setSearchInputValue] = useState('');
 

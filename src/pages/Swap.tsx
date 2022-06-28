@@ -555,7 +555,6 @@ const Swap = () => {
             tokenFieldId="tokenA"
             setTokensData={setTokensData}
             closeModal={() => setShowModalA(false)}
-            defaultToken={NATIVE_TOKEN}
           />
         </Modal>
 
