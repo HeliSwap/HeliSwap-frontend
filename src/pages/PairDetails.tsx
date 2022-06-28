@@ -167,7 +167,7 @@ const PairDetails = () => {
 
   return (
     <div className="d-flex justify-content-center">
-      <div className="container-swap">
+      <div className="container-action">
         {error ? (
           <div className="alert alert-danger mb-5" role="alert">
             <strong>Something went wrong!</strong> Cannot get pair data...

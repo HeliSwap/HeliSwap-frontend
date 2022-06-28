@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
-import { ITokenData, ISwapTokenData, TokenType, ITokensData } from '../interfaces/tokens';
+import {
+  ITokenData,
+  ISwapTokenData,
+  TokenType,
+  ITokensData,
+  IfaceInitialBalanceData,
+} from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
 import Button from '../components/Button';
@@ -92,10 +98,6 @@ const Swap = () => {
     tokenA: undefined,
     tokenB: undefined,
   };
-  interface IfaceInitialBalanceData {
-    tokenA: string | undefined;
-    tokenB: string | undefined;
-  }
 
   const [tokenBalances, setTokenBalances] = useState<IfaceInitialBalanceData>(initialBallanceData);
 
@@ -412,6 +414,7 @@ const Swap = () => {
         tokenB: tokenBBalance,
       });
     };
+
     const { tokenA, tokenB } = tokensData;
 
     if (
@@ -525,7 +528,7 @@ const Swap = () => {
             <ButtonSelector
               onClick={() => setShowModalA(true)}
               selectedToken={tokensData?.tokenA.symbol}
-              selectorText="Select token"
+              selectorText="Select a token"
             />
           }
           walletBalanceComponent={
@@ -539,7 +542,7 @@ const Swap = () => {
         />
         <Modal show={showModalA}>
           <ModalSearchContent
-            modalTitle="Select token"
+            modalTitle="Select a token"
             tokenFieldId="tokenA"
             setTokensData={setTokensData}
             closeModal={() => setShowModalA(false)}
@@ -587,40 +590,46 @@ const Swap = () => {
   const getActionButtons = () => {
     const swapButtonLabel = willWrapTokens ? 'wrap' : willUnwrapTokens ? 'unwrap' : 'swap';
     return (
-      <div className="d-grid mt-4">
+      <>
         {loadingPools ? (
           <Loader />
         ) : readyToApprove ? (
           approved ? (
-            <Button
-              loading={loadingSwap}
-              disabled={!readyToSwap || !associated}
-              onClick={() => handleSwapClick()}
-            >
-              {swapButtonLabel}
-            </Button>
+            <div className="d-grid mt-4">
+              <Button
+                loading={loadingSwap}
+                disabled={!readyToSwap || !associated}
+                onClick={() => handleSwapClick()}
+              >
+                {swapButtonLabel}
+              </Button>
+            </div>
           ) : (
-            <Button
-              loading={loadingApprove}
-              disabled={Number(swapData.amountIn) <= 0}
-              onClick={() => handleApproveClick()}
-            >
-              Approve
-            </Button>
+            <div className="d-grid mt-4">
+              <Button
+                loading={loadingApprove}
+                disabled={Number(swapData.amountIn) <= 0}
+                onClick={() => handleApproveClick()}
+              >
+                Approve
+              </Button>
+            </div>
           )
         ) : null}
 
         {readyToAssociate && !associated ? (
-          <Button
-            className="mx-2"
-            loading={loadingSwap}
-            disabled={!readyToAssociate}
-            onClick={() => handleAssociateClick()}
-          >
-            Associate token
-          </Button>
+          <div className="d-grid mt-4">
+            <Button
+              className="mx-2"
+              loading={loadingSwap}
+              disabled={!readyToAssociate}
+              onClick={() => handleAssociateClick()}
+            >
+              Associate token
+            </Button>
+          </div>
         ) : null}
-      </div>
+      </>
     );
   };
 
@@ -642,7 +651,7 @@ const Swap = () => {
 
   return (
     <div className="d-flex justify-content-center">
-      <div className="container-swap">
+      <div className="container-action">
         {getTitleAndSettings()}
         {getErrorMessage()}
         {getSwapSection()}

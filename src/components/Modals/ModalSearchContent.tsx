@@ -6,8 +6,8 @@ import { GET_POOL_BY_TOKEN, GET_TOKEN_INFO } from '../../GraphQL/Queries';
 
 import useTokens from '../../hooks/useTokens';
 
-import Button from '../../components/Button';
 import { idToAddress } from '../../utils/tokenUtils';
+import IconToken from '../IconToken';
 
 interface IModalProps {
   modalTitle?: string;
@@ -29,8 +29,6 @@ const ModalSearchContent = ({
 
   const [decimals, setDecimals] = useState(18);
   const [showDecimalsField, setShowDecimalsField] = useState(false);
-
-  const [showAddresses, setShowAddresses] = useState(false);
 
   const [getTokenByAddressOrId, { data: dataTBI, loading: loadingTBI }] =
     useLazyQuery(GET_TOKEN_INFO);
@@ -79,7 +77,13 @@ const ModalSearchContent = ({
   };
 
   const handleTokenListClick = (token: ITokenData) => {
-    setCurrentToken(token);
+    setTokensData((prev: any) => ({
+      ...prev,
+      [tokenFieldId]: token,
+    }));
+
+    resetModalState();
+    closeModal();
   };
 
   const resetModalState = () => {
@@ -87,32 +91,10 @@ const ModalSearchContent = ({
     setCurrentToken({} as ITokenData);
   };
 
-  const handleSaveButton = () => {
-    if (hasTokenData) {
-      setTokensData((prev: any) => ({
-        ...prev,
-        [tokenFieldId]: currentToken,
-      }));
-    }
-
-    resetModalState();
-    closeModal();
-  };
-
   const handleCloseClick = () => {
     resetModalState();
     closeModal();
   };
-
-  /* Helper functions - to be removed */
-  const copyAddress = (address: string) => {
-    setSearchInputValue(address);
-  };
-
-  const handleToggleAddressesButtonClick = () => {
-    setShowAddresses(prev => !prev);
-  };
-  /* Helper functions - to be removed */
 
   useEffect(() => {
     if (dataTBI) {
@@ -142,14 +124,13 @@ const ModalSearchContent = ({
   }, [decimals]);
 
   const hasTokenData = currentToken?.type;
-  const hasPools = dataPBT && dataPBT.poolsByToken.length > 0;
   const hasTokenList = tokenDataList && tokenDataList.length > 0;
 
   return (
     <>
       <div className="modal-header">
         {modalTitle ? (
-          <h5 className="modal-title" id="exampleModalLabel">
+          <h5 className="modal-title text-main text-bold" id="exampleModalLabel">
             {modalTitle}
           </h5>
         ) : null}
@@ -163,178 +144,38 @@ const ModalSearchContent = ({
         ></button>
       </div>
       <div className="modal-body">
-        {/* Helper - to be removed */}
-        <div className="py-2">
-          <Button className="btn-sm" onClick={handleToggleAddressesButtonClick}>
-            Show addresses
-          </Button>
+        <div>
+          <p className="text-small mb-3">Search</p>
+          <input
+            value={searchInputValue}
+            onChange={onSearchInputChange}
+            type="text"
+            className="form-control"
+          />
         </div>
-        {showAddresses ? (
-          <div className="my-4">
-            <div className="bg-slate p-3 rounded mb-4">
-              <ul>
-                <li>
-                  0.0.447200 - HEX [HTS]{' '}
-                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.447200')}>
-                    📝
-                  </span>
-                </li>
-                <li>
-                  0.0.34741585 - USDT [HTS]{' '}
-                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34741585')}>
-                    📝
-                  </span>
-                </li>
-                <li>
-                  0.0.34741650 - WETH [HTS]{' '}
-                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34741650')}>
-                    📝
-                  </span>
-                </li>
-                <li>
-                  0.0.34741685 - WBTC [HTS]{' '}
-                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34741685')}>
-                    📝
-                  </span>
-                </li>
-                <li>
-                  0.0.45906586 - HELI [HTS]{' '}
-                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.45906586')}>
-                    📝
-                  </span>
-                </li>
-
-                <li>
-                  0.0.34947702 - USDT [ERC20]{' '}
-                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34947702')}>
-                    📝
-                  </span>
-                </li>
-
-                <li>
-                  0.0.34838105 - WETH [ERC20]{' '}
-                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34838105')}>
-                    📝
-                  </span>
-                </li>
-
-                <li>
-                  0.0.34838117 - WBTC [ERC20]{' '}
-                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34838117')}>
-                    📝
-                  </span>
-                </li>
-
-                <li>
-                  0.0.34838123 - DOB [ERC20]{' '}
-                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34838123')}>
-                    📝
-                  </span>
-                </li>
-
-                <li>
-                  0.0.34948327 - EIGHT [ERC20]{' '}
-                  <span className="cursor-pointer" onClick={() => copyAddress('0.0.34948327')}>
-                    📝
-                  </span>
-                </li>
-              </ul>
-            </div>
-            <label className="mb-2" htmlFor="">
-              Token id
-            </label>
-            <div className="d-flex align-items-center">
-              <input
-                value={searchInputValue}
-                onChange={onSearchInputChange}
-                type="text"
-                className="form-control me-3"
-              />
-              <Button
-                loadingText={' '}
-                loading={loadingPBT || loadingTBI || loadingGT}
-                onClick={handleSearchButtonClick}
-              >
-                Search
-              </Button>
-            </div>
-          </div>
-        ) : null}
-        {/* Helper - to be removed */}
 
         {hasTokenList ? (
-          <div>
-            <h3 className="text-title">Token list:</h3>
-            <div className="mt-3 rounded border border-info p-3">
+          <div className="mt-7">
+            <h3 className="text-small">Token name</h3>
+            <div className="mt-5">
               {tokenDataList.map((token: ITokenData, index: number) => (
-                <p
+                <div
                   onClick={() => handleTokenListClick(token)}
-                  className={`cursor-pointer rounded list-token-item py-2 px-3 d-flex align-items-center ${
+                  className={`cursor-pointer list-token-item d-flex align-items-center ${
                     currentToken.name === token.name ? 'is-selected' : ''
                   }`}
                   key={index}
                 >
-                  <img key={index} width={20} src={`/icons/${token.symbol}.png`} alt="" />{' '}
-                  <span className="ms-2">
-                    {token.symbol} [{token.type}]
-                  </span>
-                </p>
+                  <IconToken symbol={token.symbol} />
+                  <div className="d-flex flex-column ms-3">
+                    <span className="text-main">{token.symbol}</span>
+                    <span className="text-small text-secondary">{token.name}</span>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
         ) : null}
-
-        {hasTokenData ? (
-          <>
-            <p className="mt-4">Token data:</p>
-            <div className="mt-2 bg-slate p-3 rounded d-flex align-items-center">
-              <p className="flex-1">
-                [{currentToken.type}]{currentToken.name} ({currentToken.symbol})
-              </p>
-              {showDecimalsField ? (
-                <div className="flex-1">
-                  <input
-                    onChange={handleDecimalsInputChange}
-                    type="number"
-                    value={decimals}
-                    className="form-control"
-                  />
-                </div>
-              ) : null}
-            </div>
-          </>
-        ) : null}
-
-        {hasPools ? (
-          <>
-            <p className="mt-4">Token in pools:</p>
-            <div className="mt-2 bg-slate p-3 rounded">
-              {dataPBT.poolsByToken.map((pool: IPairData, index: number) => (
-                <p key={index}>
-                  {pool.pairName} ({pool.pairSymbol})
-                </p>
-              ))}
-            </div>
-          </>
-        ) : null}
-      </div>
-      <div className="modal-footer">
-        <button
-          onClick={handleCloseClick}
-          type="button"
-          className="btn btn-secondary"
-          data-bs-dismiss="modal"
-        >
-          Close
-        </button>
-        <button
-          // disabled={!hasTokenData || !hasPools}
-          onClick={handleSaveButton}
-          type="button"
-          className="btn btn-primary"
-        >
-          Save changes
-        </button>
       </div>
     </>
   );
