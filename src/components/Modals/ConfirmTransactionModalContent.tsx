@@ -1,5 +1,4 @@
-import { printIntrospectionSchema } from 'graphql';
-import React, { useState } from 'react';
+import React from 'react';
 
 interface IModalProps {
   closeModal: () => void;
