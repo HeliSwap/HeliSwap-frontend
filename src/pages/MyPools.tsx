@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { GlobalContext } from '../providers/Global';
+import { Link } from 'react-router-dom';
 
 import { useLazyQuery } from '@apollo/client';
 import { GET_POOLS_BY_USER } from '../GraphQL/Queries';
@@ -42,6 +43,13 @@ const Pairs = () => {
   return (
     <div className="d-flex justify-content-center">
       <div className="container-pools">
+        <div className="d-flex justify-content-between align-items-center mb-6">
+          <h1 className="text-subheader">My positions</h1>
+          <Link className="btn btn-sm btn-primary" to="/create">
+            Create pool
+          </Link>
+        </div>
+
         <div className="d-flex justify-content-end">
           <span className="cursor-pointer" onClick={() => setShowModalTransactionSettings(true)}>
             <img className="me-2" width={24} src={`/icons/settings.png`} alt="" />

@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
-import { ITokenData, ISwapTokenData, TokenType, ITokensData } from '../interfaces/tokens';
+import {
+  ITokenData,
+  ISwapTokenData,
+  TokenType,
+  ITokensData,
+  IfaceInitialBalanceData,
+} from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
 import Button from '../components/Button';
@@ -92,10 +98,6 @@ const Swap = () => {
     tokenA: undefined,
     tokenB: undefined,
   };
-  interface IfaceInitialBalanceData {
-    tokenA: string | undefined;
-    tokenB: string | undefined;
-  }
 
   const [tokenBalances, setTokenBalances] = useState<IfaceInitialBalanceData>(initialBallanceData);
 
@@ -642,7 +644,7 @@ const Swap = () => {
 
   return (
     <div className="d-flex justify-content-center">
-      <div className="container-swap">
+      <div className="container-action">
         {getTitleAndSettings()}
         {getErrorMessage()}
         {getSwapSection()}

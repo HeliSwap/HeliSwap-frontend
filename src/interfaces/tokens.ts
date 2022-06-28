@@ -70,3 +70,8 @@ export interface IAllowanceData {
   amount_granted: number;
   token_id: string;
 }
+
+export interface IfaceInitialBalanceData {
+  tokenA: string | undefined;
+  tokenB: string | undefined;
+}

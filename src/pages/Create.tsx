@@ -6,6 +6,7 @@ import {
   IPairData,
   ICreatePairData,
   ITokensData,
+  IfaceInitialBalanceData,
 } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
@@ -13,9 +14,14 @@ import Button from '../components/Button';
 import Modal from '../components/Modal';
 import ModalSearchContent from '../components/Modals/ModalSearchContent';
 import TransactionSettingsModalContent from '../components/Modals/TransactionSettingsModalContent';
+import InputTokenSelector from '../components/InputTokenSelector';
+import InputToken from '../components/InputToken';
+import ButtonSelector from '../components/ButtonSelector';
+import Icon from '../components/Icon';
+import WalletBalance from '../components/WalletBalance';
 
 import errorMessages from '../content/errors';
-import { checkAllowanceHTS, idToAddress } from '../utils/tokenUtils';
+import { checkAllowanceHTS, idToAddress, NATIVE_TOKEN } from '../utils/tokenUtils';
 import { formatStringToBigNumberEthersWei } from '../utils/numberUtils';
 import {
   getTransactionSettings,
@@ -72,6 +78,14 @@ const Create = () => {
 
   // State for common pool data
   const [selectedPoolData, setSelectedPoolData] = useState<IPairData>({} as IPairData);
+
+  // State for token balances
+  const initialBallanceData = {
+    tokenA: undefined,
+    tokenB: undefined,
+  };
+
+  const [tokenBalances, setTokenBalances] = useState<IfaceInitialBalanceData>(initialBallanceData);
 
   // Additional states for Providing/Creating pairs
   const [readyToProvide, setReadyToProvide] = useState(false);
@@ -339,7 +353,7 @@ const Create = () => {
 
   return (
     <div className="d-flex justify-content-center">
-      <div className="container-swap">
+      <div className="container-action">
         <div className="d-flex justify-content-end">
           <span className="cursor-pointer" onClick={() => setShowModalTransactionSettings(true)}>
             <img className="me-2" width={24} src={`/icons/settings.png`} alt="" />
@@ -359,220 +373,191 @@ const Create = () => {
           </Modal>
         ) : null}
 
-        {error ? (
-          <div className="alert alert-danger my-5" role="alert">
-            <strong>Something went wrong!</strong>
-            <p>{errorMessages[errorMessage]}</p>
-          </div>
-        ) : null}
+        <div className="container-dark">
+          {error ? (
+            <div className="alert alert-danger my-5" role="alert">
+              <strong>Something went wrong!</strong>
+              <p>{errorMessages[errorMessage]}</p>
+            </div>
+          ) : null}
 
-        <div className="d-flex justify-content-between mt-3">
-          <span className="badge bg-primary text-uppercase">Token A</span>
-          <span></span>
-        </div>
+          {successCreate ? (
+            <div className="alert alert-success alert-dismissible my-5" role="alert">
+              <strong>Success provide!</strong>
+              <p>{successMessage}</p>
+              <button
+                onClick={() => setSuccessCreate(false)}
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+            </div>
+          ) : null}
 
-        <div className="row justify-content-between align-items-end mt-3">
-          <div className="col-7">
-            <div className="input-container">
-              <input
+          <InputTokenSelector
+            inputTokenComponent={
+              <InputToken
                 value={createPairData.tokenAAmount}
+                onChange={handleInputChange}
                 name="tokenAAmount"
-                onChange={handleInputChange}
-                type="text"
-                className="form-control mt-2"
               />
-            </div>
-            <p className="text-success mt-3">$0.00</p>
-          </div>
-
-          <div className="col-5">
-            <div className="container-token-selector d-flex justify-content-between align-items-center">
-              {tokensData?.tokenA.symbol ? (
-                <div className="d-flex align-items-center">
-                  <img
-                    className="me-2"
-                    width={24}
-                    src={`/icons/${tokensData.tokenA.symbol}.png`}
-                    alt=""
-                  />
-                  <span className="me-2">{tokensData.tokenA.symbol}</span>
-                </div>
-              ) : (
-                <span>N/A</span>
-              )}
-
-              <Button onClick={() => setShowModalA(true)}>Select token</Button>
-            </div>
-            <Modal show={showModalA}>
-              <ModalSearchContent
-                modalTitle="Select token"
-                tokenFieldId="tokenA"
-                setTokensData={setTokensData}
-                closeModal={() => setShowModalA(false)}
+            }
+            buttonSelectorComponent={
+              <ButtonSelector
+                onClick={() => setShowModalA(true)}
+                selectedToken={tokensData?.tokenA.symbol}
+                selectorText="Select a token"
               />
-            </Modal>
+            }
+            walletBalanceComponent={
+              <WalletBalance
+                walletBalance={tokenBalances.tokenA}
+                onMaxButtonClick={(maxValue: string) => {
+                  // handleInputChange(maxValue);
+                }}
+              />
+            }
+          />
+          <Modal show={showModalA}>
+            <ModalSearchContent
+              modalTitle="Select a token"
+              tokenFieldId="tokenA"
+              setTokensData={setTokensData}
+              closeModal={() => setShowModalA(false)}
+            />
+          </Modal>
 
-            {/* {tokensData?.tokenA ? <WalletBalance walletBalance={'0.00'} /> : null} */}
-          </div>
-        </div>
-
-        <div className="d-flex justify-content-between mt-5">
-          <span className="badge bg-info text-uppercase">Token B</span>
-          <span></span>
-        </div>
-
-        <div className="row justify-content-between align-items-end mt-3">
-          <div className="col-7">
-            <div className="input-container">
-              <input
+          <InputTokenSelector
+            className="mt-4"
+            inputTokenComponent={
+              <InputToken
                 value={createPairData.tokenBAmount}
-                name="tokenBAmount"
                 onChange={handleInputChange}
-                type="text"
-                className="form-control mt-2"
+                name="tokenBAmount"
               />
-            </div>
-            <p className="text-success mt-3">$0.00</p>
-          </div>
+            }
+            buttonSelectorComponent={
+              <ButtonSelector
+                onClick={() => setShowModalB(true)}
+                selectedToken={tokensData?.tokenB.symbol}
+                selectorText="Select token"
+              />
+            }
+            walletBalanceComponent={<WalletBalance walletBalance={tokenBalances.tokenB} />}
+          />
+          <Modal show={showModalB}>
+            <ModalSearchContent
+              modalTitle="Select token"
+              tokenFieldId="tokenB"
+              setTokensData={setTokensData}
+              closeModal={() => setShowModalB(false)}
+            />
+          </Modal>
 
-          <div className="col-5">
-            <div className="container-token-selector d-flex justify-content-between align-items-center">
-              {tokensData?.tokenB.symbol ? (
-                <div className="d-flex align-items-center">
-                  <img
-                    className="me-2"
-                    width={24}
-                    src={`/icons/${tokensData.tokenB.symbol}.png`}
-                    alt=""
-                  />
-                  <span className="me-2">{tokensData?.tokenB.symbol}</span>
+          {readyToProvide ? (
+            <div className="bg-slate rounded p-4 my-4">
+              {tokensInSamePool ? (
+                <div>
+                  <p>Prices and pool share</p>
+                  <div className="mt-3 d-flex justify-content-around rounded border border-success p-2">
+                    <div className="text-center">
+                      <p>
+                        <span className="text-title">
+                          {Number(createPairData.tokenBAmount) /
+                            Number(createPairData.tokenAAmount)}
+                        </span>
+                      </p>
+                      <p>
+                        {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <p>
+                        <span className="text-title">
+                          {Number(createPairData.tokenAAmount) /
+                            Number(createPairData.tokenBAmount)}
+                        </span>
+                      </p>
+                      <p>
+                        {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               ) : (
-                <span>N/A</span>
+                <div>
+                  <p>Initial prices</p>
+                  <div className="mt-3 d-flex justify-content-around rounded border border-success p-2">
+                    <div className="text-center">
+                      <p>
+                        <span className="text-title">
+                          {Number(createPairData.tokenBAmount) /
+                            Number(createPairData.tokenAAmount)}
+                        </span>
+                      </p>
+                      <p>
+                        {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <p>
+                        <span className="text-title">
+                          {Number(createPairData.tokenAAmount) /
+                            Number(createPairData.tokenBAmount)}
+                        </span>
+                      </p>
+                      <p>
+                        {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               )}
-
-              <Button onClick={() => setShowModalB(true)}>Select token</Button>
             </div>
-            <Modal show={showModalB}>
-              <ModalSearchContent
-                modalTitle="Select token"
-                tokenFieldId="tokenB"
-                setTokensData={setTokensData}
-                closeModal={() => setShowModalB(false)}
-              />
-            </Modal>
-            {/* {tokensData?.tokenB ? <WalletBalance walletBalance={'0.00'} /> : null} */}
-          </div>
-        </div>
-
-        {successCreate ? (
-          <div className="alert alert-success alert-dismissible my-5" role="alert">
-            <strong>Success provide!</strong>
-            <p>{successMessage}</p>
-            <button
-              onClick={() => setSuccessCreate(false)}
-              type="button"
-              className="btn-close"
-              data-bs-dismiss="alert"
-              aria-label="Close"
-            ></button>
-          </div>
-        ) : null}
-
-        {readyToProvide ? (
-          <div className="bg-slate rounded p-4 my-4">
-            {tokensInSamePool ? (
-              <div>
-                <p>Prices and pool share</p>
-                <div className="mt-3 d-flex justify-content-around rounded border border-success p-2">
-                  <div className="text-center">
-                    <p>
-                      <span className="text-title">
-                        {Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount)}
-                      </span>
-                    </p>
-                    <p>
-                      {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <p>
-                      <span className="text-title">
-                        {Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount)}
-                      </span>
-                    </p>
-                    <p>
-                      {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <p>Initial prices</p>
-                <div className="mt-3 d-flex justify-content-around rounded border border-success p-2">
-                  <div className="text-center">
-                    <p>
-                      <span className="text-title">
-                        {Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount)}
-                      </span>
-                    </p>
-                    <p>
-                      {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <p>
-                      <span className="text-title">
-                        {Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount)}
-                      </span>
-                    </p>
-                    <p>
-                      {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        ) : null}
-
-        <div className="mt-5 d-flex justify-content-center">
-          {tokensData.tokenA.hederaId && !approved.tokenA && createPairData.tokenAAmount !== '0' ? (
-            <Button
-              loading={loadingApprove}
-              onClick={() => handleApproveClick('tokenA')}
-              className="mx-2"
-            >{`Approve ${tokensData.tokenA.symbol}`}</Button>
           ) : null}
 
-          {tokensData.tokenB.hederaId && !approved.tokenB && createPairData.tokenBAmount !== '0' ? (
-            <Button
-              loading={loadingApprove}
-              onClick={() => handleApproveClick('tokenB')}
-              className="mx-2"
-            >{`Approve ${tokensData.tokenB.symbol}`}</Button>
-          ) : null}
-
-          {approved.tokenA && approved.tokenB ? (
-            tokensInSamePool ? (
+          <div className="mt-5 d-flex justify-content-center">
+            {tokensData.tokenA.hederaId &&
+            !approved.tokenA &&
+            createPairData.tokenAAmount !== '0' ? (
               <Button
-                loading={loadingCreate}
-                disabled={!readyToProvide}
-                onClick={handleCreateClick}
-              >
-                Provide
-              </Button>
-            ) : (
+                loading={loadingApprove}
+                onClick={() => handleApproveClick('tokenA')}
+                className="mx-2"
+              >{`Approve ${tokensData.tokenA.symbol}`}</Button>
+            ) : null}
+
+            {tokensData.tokenB.hederaId &&
+            !approved.tokenB &&
+            createPairData.tokenBAmount !== '0' ? (
               <Button
-                loading={loadingCreate}
-                disabled={!readyToProvide}
-                onClick={handleCreateClick}
-              >
-                Create
-              </Button>
-            )
-          ) : null}
+                loading={loadingApprove}
+                onClick={() => handleApproveClick('tokenB')}
+                className="mx-2"
+              >{`Approve ${tokensData.tokenB.symbol}`}</Button>
+            ) : null}
+
+            {approved.tokenA && approved.tokenB ? (
+              tokensInSamePool ? (
+                <Button
+                  loading={loadingCreate}
+                  disabled={!readyToProvide}
+                  onClick={handleCreateClick}
+                >
+                  Provide
+                </Button>
+              ) : (
+                <Button
+                  loading={loadingCreate}
+                  disabled={!readyToProvide}
+                  onClick={handleCreateClick}
+                >
+                  Create
+                </Button>
+              )
+            ) : null}
+          </div>
         </div>
       </div>
     </div>
