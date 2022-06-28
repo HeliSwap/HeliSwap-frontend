@@ -26,7 +26,7 @@ const ModalSearchContent = ({
   const [readyToImport, setReadyToImport] = useState(false);
   const [readyToImportERC, setReadyToImportERC] = useState(false);
 
-  const { tokens: tokenDataList } = useTokens({
+  const { tokens: tokenDataList, loading: loadingTDL } = useTokens({
     fetchPolicy: 'network-only',
     pollInterval: 10000,
   });
@@ -79,6 +79,8 @@ const ModalSearchContent = ({
 
   const resetModalState = () => {
     setSearchInputValue('');
+    setReadyToImportERC(false);
+    setReadyToImport(false);
     tokenDataList && setTokenList(tokenDataList);
   };
 
@@ -90,7 +92,6 @@ const ModalSearchContent = ({
   const handleImportButtonClick = async () => {
     const result = await getHTSTokenInfo(searchInputValue);
     const hasResults = Object.keys(result).length > 0;
-    console.log('hasResults', hasResults);
     hasResults && setTokenList([result]);
     setReadyToImportERC(!hasResults && searchInputValue !== '');
   };
@@ -99,7 +100,7 @@ const ModalSearchContent = ({
     const found =
       tokenDataList?.find((item: ITokenData) => item.hederaId === searchInputValue) || false;
 
-    if (found) {
+    if (searchInputValue !== '' && found) {
       setTokenList([found]);
     }
 
@@ -111,8 +112,6 @@ const ModalSearchContent = ({
       setTokenList(tokenDataList);
     }
   }, [tokenDataList]);
-
-  console.log('readyToImportERC', readyToImportERC);
 
   const hasTokenList = tokenList && tokenList.length > 0;
 
@@ -166,7 +165,7 @@ const ModalSearchContent = ({
           </div>
         ) : null}
 
-        {hasTokenList ? (
+        {!loadingTDL && hasTokenList ? (
           <div className="mt-7">
             <h3 className="text-small">Token name</h3>
             <div className="mt-5">
