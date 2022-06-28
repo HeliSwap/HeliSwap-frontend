@@ -15,6 +15,8 @@ interface IModalProps {
   setTokensData: (prev: any) => void;
   tokenFieldId: string;
   canImport?: boolean;
+  tokenDataList: ITokenData[];
+  loadingTDL: boolean;
 }
 
 const ModalSearchContent = ({
@@ -23,6 +25,8 @@ const ModalSearchContent = ({
   tokenFieldId,
   modalTitle,
   canImport = true,
+  tokenDataList,
+  loadingTDL,
 }: IModalProps) => {
   const networkType = process.env.REACT_APP_NETWORK_TYPE as string;
   const hashScanUrl = `https://hashscan.io/#/${networkType}/token/`;
@@ -34,11 +38,6 @@ const ModalSearchContent = ({
   const [readyToImport, setReadyToImport] = useState(false);
   const [readyToImportERC, setReadyToImportERC] = useState(false);
   const [warningMessage, setWarningMessage] = useState('');
-
-  const { tokens: tokenDataList, loading: loadingTDL } = useTokens({
-    fetchPolicy: 'network-only',
-    pollInterval: 10000,
-  });
 
   const [tokenList, setTokenList] = useState<ITokenData[]>([]);
 

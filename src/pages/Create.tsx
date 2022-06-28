@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
+import { useParams } from 'react-router-dom';
 import {
   ITokenData,
   TokenType,
@@ -29,17 +30,20 @@ import {
 } from '../utils/transactionUtils';
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
+import useTokens from '../hooks/useTokens';
 import { MAX_UINT_ERC20, MAX_UINT_HTS } from '../constants';
 
 const Create = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
+  const { address } = useParams();
 
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
   const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
+  const [showModalConfirmProvide, setShowModalConfirmProvide] = useState(false);
 
   const initialTokensData = {
     tokenA: {} as ITokenData,
@@ -51,6 +55,11 @@ const Create = () => {
 
   // State for pools
   const { pools: poolsData } = usePools({
+    fetchPolicy: 'network-only',
+    pollInterval: 10000,
+  });
+
+  const { tokens: tokenDataList } = useTokens({
     fetchPolicy: 'network-only',
     pollInterval: 10000,
   });
@@ -98,6 +107,9 @@ const Create = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
+
+  // State for preset tokens from choosen pool
+  const [tokensDerivedFromPool, setTokensDerivedFromPool] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
@@ -217,9 +229,7 @@ const Create = () => {
       } else {
         const successMessage = `Provided exactly ${createPairData.tokenAAmount} ${tokensData.tokenA.symbol} and ${createPairData.tokenBAmount} ${tokensData.tokenB.symbol}`;
 
-        setCreatePairData(initialCreateData);
-        setTokensData(initialTokensData);
-        setSelectedPoolData({} as IPairData);
+        setCreatePairData({ ...createPairData, tokenAAmount: '0', tokenBAmount: '0' });
         setApproved(initialApproveData);
         setSuccessCreate(true);
         setSuccessMessage(successMessage);
@@ -369,6 +379,28 @@ const Create = () => {
     setReadyToProvide(isReady);
   }, [createPairData, provideNative]);
 
+  useEffect(() => {
+    try {
+      if (address && poolsData && tokenDataList && !tokensDerivedFromPool) {
+        console.log('address', address);
+        const chosenPool =
+          poolsData.find((pool: IPairData) => pool.pairAddress === address) || ({} as IPairData);
+        const { token0: token0Address, token1: token1Address } = chosenPool;
+        const tokenA =
+          tokenDataList.find((token: ITokenData) => token.address === token0Address) ||
+          ({} as ITokenData);
+        const tokenB =
+          tokenDataList.find((token: ITokenData) => token.address === token1Address) ||
+          ({} as ITokenData);
+
+        setTokensData({ tokenA, tokenB });
+        setTokensDerivedFromPool(true);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [poolsData, tokenDataList]);
+
   return (
     <div className="d-flex justify-content-center">
       <div className="container-action">
@@ -443,6 +475,7 @@ const Create = () => {
               tokenFieldId="tokenA"
               setTokensData={setTokensData}
               closeModal={() => setShowModalA(false)}
+              tokenDataList={tokenDataList || []}
             />
           </Modal>
 
@@ -470,6 +503,7 @@ const Create = () => {
               tokenFieldId="tokenB"
               setTokensData={setTokensData}
               closeModal={() => setShowModalB(false)}
+              tokenDataList={tokenDataList || []}
             />
           </Modal>
 

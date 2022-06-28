@@ -44,6 +44,8 @@ import {
 
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
+import useTokens from '../hooks/useTokens';
+
 import { MAX_UINT_ERC20, MAX_UINT_HTS } from '../constants';
 import InputToken from '../components/InputToken';
 import ButtonSelector from '../components/ButtonSelector';
@@ -79,6 +81,11 @@ const Swap = () => {
     loading: loadingPools,
     refetch,
   } = usePools({
+    fetchPolicy: 'network-only',
+    pollInterval: 10000,
+  });
+
+  const { loading: loadingTDL, tokens: tokenDataList } = useTokens({
     fetchPolicy: 'network-only',
     pollInterval: 10000,
   });
@@ -563,6 +570,8 @@ const Swap = () => {
             setTokensData={setTokensData}
             closeModal={() => setShowModalA(false)}
             canImport={false}
+            tokenDataList={tokenDataList || []}
+            loadingTDL={loadingTDL}
           />
         </Modal>
 
@@ -598,6 +607,8 @@ const Swap = () => {
             setTokensData={setTokensData}
             closeModal={() => setShowModalB(false)}
             canImport={false}
+            tokenDataList={tokenDataList || []}
+            loadingTDL={loadingTDL}
           />
         </Modal>
         {getActionButtons()}

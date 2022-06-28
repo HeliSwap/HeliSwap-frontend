@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import { IPairData } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
+import { Link } from 'react-router-dom';
 
 import Button from './Button';
 import IconToken from './IconToken';
@@ -303,7 +304,9 @@ const PoolInfo = ({ pairData, index }: IPoolInfoProps) => {
 
             <div>
               <div className="d-flex align-items-center">
-                <Button className="btn-sm">Add Liquidity</Button>
+                <Link className="btn btn-sm btn-primary" to={`/create/${pairData.pairAddress}`}>
+                  Add Liquidity
+                </Link>
                 <Button
                   className="btn-sm ms-3"
                   onClick={() => setShowRemoveContainer(prev => !prev)}
