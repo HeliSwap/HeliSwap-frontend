@@ -712,7 +712,7 @@ const Swap = () => {
 
     return (
       <div
-        className="mt-4"
+        className="text-small mt-4 cursor-pointer"
         onClick={() => setRatioBasedOnTokenOut(!ratioBasedOnTokenOut)}
       >{`1 ${baseTokenName} = ${ratio} ${secondTokenName}`}</div>
     );
@@ -750,24 +750,27 @@ const Swap = () => {
 
     return (
       <div>
-        <div className="mt-4 border border-secondary">
+        <div className="mt-4 rounded border border-secondary">
           <div className="d-flex justify-content-between m-4">
-            <span>Expected Output:</span>
-            <span>{`${swapData.amountOut} ${tokensData.tokenB.symbol}`}</span>
+            <span className="text-small">Expected Output:</span>
+            <span className="text-small text-numeric text-bold">{`${swapData.amountOut} ${tokensData.tokenB.symbol}`}</span>
           </div>
-          <div className="d-flex justify-content-between m-4">
-            <span>Price Impact:</span>
-            <span>TODO</span>
-          </div>
-          <div className="d-flex justify-content-between border-top border-secondary m-4 text-secondary">
-            <span>
+          {/* <div className="d-flex justify-content-between m-4">
+            <span className="text-small">Price Impact:</span>
+            <span className="text-small">TODO</span>
+          </div> */}
+
+          <hr className="my-3 mx-4" />
+
+          <div className="d-flex justify-content-between m-4 text-secondary">
+            <span className="text-small">
               {amountAfterSlippageMessage} ({getTransactionSettings().swapSlippage}%)
             </span>
 
-            <span>{`${amountAfterSlippageStr} ${secondTokenName}`}</span>
+            <span className="text-small text-numeric text-bold">{`${amountAfterSlippageStr} ${secondTokenName}`}</span>
           </div>
         </div>
-        <span className=" text-secondary">{estimationMessage}</span>
+        <p className="text-micro text-secondary mt-5">{estimationMessage}</p>
       </div>
     );
   };

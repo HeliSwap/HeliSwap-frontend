@@ -10,7 +10,7 @@ const ModalContent = ({ closeModal, modalTitle }: IModalProps) => {
     <>
       <div className="modal-header">
         {modalTitle ? (
-          <h5 className="modal-title" id="exampleModalLabel">
+          <h5 className="modal-title text-main text-bold" id="exampleModalLabel">
             {modalTitle}
           </h5>
         ) : null}

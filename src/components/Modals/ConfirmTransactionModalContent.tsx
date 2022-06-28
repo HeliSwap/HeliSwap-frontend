@@ -34,11 +34,14 @@ const ConfirmTransactionModalContent = ({
           aria-label="Close"
         ></button>
       </div>
-      <div className="modal-body">{children}</div>
-      <div className="d-grid mt-4">
-        <button type="button" className="btn btn-primary" onClick={handleConfirmButtonClick}>
-          {confirmButtonLabel}
-        </button>
+      <div className="modal-body">
+        {children}
+
+        <div className="d-grid mt-4">
+          <button type="button" className="btn btn-primary" onClick={handleConfirmButtonClick}>
+            {confirmButtonLabel}
+          </button>
+        </div>
       </div>
     </>
   );
