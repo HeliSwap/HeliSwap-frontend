@@ -32,6 +32,13 @@ import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
 import useTokens from '../hooks/useTokens';
 import { MAX_UINT_ERC20, MAX_UINT_HTS } from '../constants';
+import Icon from '../components/Icon';
+
+enum ADD_LIQUIDITY_TITLES {
+  CREATE_POOL = 'Create pool',
+  PROVIDE_LIQUIDITY = 'Provide liquidity',
+  INCREASE_LIQUIDITY = 'Increase liquidity',
+}
 
 const Create = () => {
   const contextValue = useContext(GlobalContext);
@@ -99,6 +106,7 @@ const Create = () => {
   const [readyToProvide, setReadyToProvide] = useState(false);
   const [tokensInSamePool, setTokensInSamePool] = useState(false);
   const [provideNative, setProvideNative] = useState(false);
+  const [pageTitle, setPageTitle] = useState(ADD_LIQUIDITY_TITLES.CREATE_POOL);
 
   // State for general error
   const [error, setError] = useState(false);
@@ -194,7 +202,11 @@ const Create = () => {
     }
   };
 
-  const handleCreateClick = async () => {
+  const handleProvideClick = () => {
+    setShowModalConfirmProvide(true);
+  };
+
+  const handleCreateConfirm = async () => {
     const { provideSlippage, transactionExpiration } = getTransactionSettings();
 
     setError(false);
@@ -357,7 +369,16 @@ const Create = () => {
     setSelectedPoolData(selectedPoolData[0] || {});
 
     setProvideNative(provideNative);
-    setTokensInSamePool(selectedPoolData && selectedPoolData.length !== 0);
+    const tokensInSamePool = selectedPoolData && selectedPoolData.length !== 0;
+    setTokensInSamePool(tokensInSamePool);
+    const pageTitle = tokensInSamePool
+      ? selectedPoolData[0].lpShares
+        ? ADD_LIQUIDITY_TITLES.INCREASE_LIQUIDITY
+        : ADD_LIQUIDITY_TITLES.PROVIDE_LIQUIDITY
+      : ADD_LIQUIDITY_TITLES.CREATE_POOL;
+
+    setPageTitle(pageTitle);
+    //TODO: Additional request will be needed in order to get info regarding pool shares
   }, [tokensData, poolsData]);
 
   useEffect(() => {
@@ -382,7 +403,6 @@ const Create = () => {
   useEffect(() => {
     try {
       if (address && poolsData && tokenDataList && !tokensDerivedFromPool) {
-        console.log('address', address);
         const chosenPool =
           poolsData.find((pool: IPairData) => pool.pairAddress === address) || ({} as IPairData);
         const { token0: token0Address, token1: token1Address } = chosenPool;
@@ -394,6 +414,7 @@ const Create = () => {
           ({} as ITokenData);
 
         setTokensData({ tokenA, tokenB });
+        //We want to set the tokens from the pool selected just once
         setTokensDerivedFromPool(true);
       }
     } catch (err) {
@@ -401,13 +422,19 @@ const Create = () => {
     }
   }, [poolsData, tokenDataList]);
 
-  return (
-    <div className="d-flex justify-content-center">
-      <div className="container-action">
-        <div className="d-flex justify-content-end">
-          <span className="cursor-pointer" onClick={() => setShowModalTransactionSettings(true)}>
-            <img className="me-2" width={24} src={`/icons/settings.png`} alt="" />
-          </span>
+  //Render methods
+  const getTitleAndSettings = () => {
+    return (
+      <>
+        <div className="d-flex justify-content-between align-items-center mb-6">
+          <h1 className="text-subheader">{pageTitle}</h1>
+          <div
+            className="d-flex justify-content-end align-items-center cursor-pointer"
+            onClick={() => setShowModalTransactionSettings(true)}
+          >
+            <span className="text-small me-2">Settings</span>
+            <Icon name="settings" />
+          </div>
         </div>
 
         {showModalTransactionSettings ? (
@@ -422,205 +449,198 @@ const Create = () => {
             />
           </Modal>
         ) : null}
+      </>
+    );
+  };
 
-        <div className="container-dark">
-          {error ? (
-            <div className="alert alert-danger my-5" role="alert">
-              <strong>Something went wrong!</strong>
-              <p>{errorMessages[errorMessage]}</p>
-            </div>
-          ) : null}
+  const getErrorMessage = () => {
+    return error ? (
+      <div className="alert alert-danger my-5" role="alert">
+        <strong>Something went wrong!</strong>
+        <p>{errorMessages[errorMessage]}</p>
+      </div>
+    ) : null;
+  };
 
-          {successCreate ? (
-            <div className="alert alert-success alert-dismissible my-5" role="alert">
-              <strong>Success provide!</strong>
-              <p>{successMessage}</p>
-              <button
-                onClick={() => setSuccessCreate(false)}
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="alert"
-                aria-label="Close"
-              ></button>
-            </div>
-          ) : null}
-
-          <InputTokenSelector
-            inputTokenComponent={
-              <InputToken
-                value={createPairData.tokenAAmount}
-                onChange={handleInputChange}
-                name="tokenAAmount"
-              />
-            }
-            buttonSelectorComponent={
-              <ButtonSelector
-                onClick={() => setShowModalA(true)}
-                selectedToken={tokensData?.tokenA.symbol}
-                selectorText="Select a token"
-              />
-            }
-            walletBalanceComponent={
-              <WalletBalance
-                walletBalance={tokenBalances.tokenA}
-                onMaxButtonClick={(maxValue: string) => {
-                  // handleInputChange(maxValue);
-                }}
-              />
-            }
-          />
-          <Modal show={showModalA}>
-            <ModalSearchContent
-              modalTitle="Select a token"
-              tokenFieldId="tokenA"
-              setTokensData={setTokensData}
-              closeModal={() => setShowModalA(false)}
-              tokenDataList={tokenDataList || []}
-            />
-          </Modal>
-
-          <InputTokenSelector
-            className="mt-4"
-            inputTokenComponent={
-              <InputToken
-                value={createPairData.tokenBAmount}
-                onChange={handleInputChange}
-                name="tokenBAmount"
-              />
-            }
-            buttonSelectorComponent={
-              <ButtonSelector
-                onClick={() => setShowModalB(true)}
-                selectedToken={tokensData?.tokenB.symbol}
-                selectorText="Select token"
-              />
-            }
-            walletBalanceComponent={<WalletBalance walletBalance={tokenBalances.tokenB} />}
-          />
-          <Modal show={showModalB}>
-            <ModalSearchContent
-              modalTitle="Select token"
-              tokenFieldId="tokenB"
-              setTokensData={setTokensData}
-              closeModal={() => setShowModalB(false)}
-              tokenDataList={tokenDataList || []}
-            />
-          </Modal>
-
-          {readyToProvide ? (
-            <div className="my-4">
-              {tokensInSamePool ? (
-                <div>
-                  <div className="mt-3 d-flex justify-content-around">
-                    <div className="text-center">
-                      <p>
-                        <span className="text-small text-numeric">
-                          {Number(createPairData.tokenBAmount) /
-                            Number(createPairData.tokenAAmount)}
-                        </span>
-                      </p>
-                      <p className="text-micro">
-                        {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
-                      </p>
-                    </div>
-
-                    <div className="text-center">
-                      <p>
-                        <span className="text-small text-numeric">
-                          {Number(createPairData.tokenAAmount) /
-                            Number(createPairData.tokenBAmount)}
-                        </span>
-                      </p>
-                      <p className="text-micro">
-                        {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <div className="mt-3 d-flex justify-content-around">
-                    <div className="text-center">
-                      <p>
-                        <span className="text-small text-numeric">
-                          {Number(createPairData.tokenBAmount) /
-                            Number(createPairData.tokenAAmount)}
-                        </span>
-                      </p>
-                      <p className="text-micro">
-                        {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
-                      </p>
-                    </div>
-
-                    <div className="text-center">
-                      <p>
-                        <span className="text-small text-numeric">
-                          {Number(createPairData.tokenAAmount) /
-                            Number(createPairData.tokenBAmount)}
-                        </span>
-                      </p>
-                      <p className="text-micro">
-                        {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : null}
-
-          <div>
-            {tokensData.tokenA.hederaId &&
-            !approved.tokenA &&
-            createPairData.tokenAAmount !== '0' ? (
-              <div className="d-grid mt-4">
-                <Button
-                  loading={loadingApprove}
-                  onClick={() => handleApproveClick('tokenA')}
-                >{`Approve ${tokensData.tokenA.symbol}`}</Button>
-              </div>
-            ) : null}
-
-            {tokensData.tokenB.hederaId &&
-            !approved.tokenB &&
-            createPairData.tokenBAmount !== '0' ? (
-              <div className="d-grid mt-4">
-                <div className="d-grid mt-4">
-                  {' '}
-                  <Button
-                    loading={loadingApprove}
-                    onClick={() => handleApproveClick('tokenB')}
-                  >{`Approve ${tokensData.tokenB.symbol}`}</Button>
-                </div>
-              </div>
-            ) : null}
-
-            {approved.tokenA && approved.tokenB ? (
-              tokensInSamePool ? (
-                <div className="d-grid mt-4">
-                  <Button
-                    loading={loadingCreate}
-                    disabled={!readyToProvide}
-                    onClick={handleCreateClick}
-                  >
-                    Provide
-                  </Button>
-                </div>
-              ) : (
-                <div className="d-grid mt-4">
-                  {' '}
-                  <Button
-                    loading={loadingCreate}
-                    disabled={!readyToProvide}
-                    onClick={handleCreateClick}
-                  >
-                    Create
-                  </Button>
-                </div>
-              )
-            ) : null}
+  const getProvideSection = () => {
+    return (
+      <div className="container-dark">
+        {successCreate ? (
+          <div className="alert alert-success alert-dismissible my-5" role="alert">
+            <strong>Success provide!</strong>
+            <p>{successMessage}</p>
+            <button
+              onClick={() => setSuccessCreate(false)}
+              type="button"
+              className="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+            ></button>
           </div>
-        </div>
+        ) : null}
+
+        <InputTokenSelector
+          inputTokenComponent={
+            <InputToken
+              value={createPairData.tokenAAmount}
+              onChange={handleInputChange}
+              name="tokenAAmount"
+            />
+          }
+          buttonSelectorComponent={
+            <ButtonSelector
+              onClick={() => setShowModalA(true)}
+              selectedToken={tokensData?.tokenA.symbol}
+              selectorText="Select a token"
+            />
+          }
+          walletBalanceComponent={
+            <WalletBalance
+              walletBalance={tokenBalances.tokenA}
+              onMaxButtonClick={(maxValue: string) => {
+                // handleInputChange(maxValue);
+              }}
+            />
+          }
+        />
+        <Modal show={showModalA}>
+          <ModalSearchContent
+            modalTitle="Select a token"
+            tokenFieldId="tokenA"
+            setTokensData={setTokensData}
+            closeModal={() => setShowModalA(false)}
+            tokenDataList={tokenDataList || []}
+          />
+        </Modal>
+
+        <InputTokenSelector
+          className="mt-4"
+          inputTokenComponent={
+            <InputToken
+              value={createPairData.tokenBAmount}
+              onChange={handleInputChange}
+              name="tokenBAmount"
+            />
+          }
+          buttonSelectorComponent={
+            <ButtonSelector
+              onClick={() => setShowModalB(true)}
+              selectedToken={tokensData?.tokenB.symbol}
+              selectorText="Select token"
+            />
+          }
+          walletBalanceComponent={<WalletBalance walletBalance={tokenBalances.tokenB} />}
+        />
+        <Modal show={showModalB}>
+          <ModalSearchContent
+            modalTitle="Select token"
+            tokenFieldId="tokenB"
+            setTokensData={setTokensData}
+            closeModal={() => setShowModalB(false)}
+            tokenDataList={tokenDataList || []}
+          />
+        </Modal>
+
+        {getTokensRatioSection()}
+        {getActionButtons()}
+      </div>
+    );
+  };
+
+  const getTokensRatioSection = () => {
+    return readyToProvide ? (
+      <div className="my-4">
+        {tokensInSamePool ? (
+          <div>
+            <div className="mt-3 d-flex justify-content-around">
+              <div className="text-center">
+                <p>
+                  <span className="text-small text-numeric">
+                    {Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount)}
+                  </span>
+                </p>
+                <p className="text-micro">
+                  {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
+                </p>
+              </div>
+
+              <div className="text-center">
+                <p>
+                  <span className="text-small text-numeric">
+                    {Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount)}
+                  </span>
+                </p>
+                <p className="text-micro">
+                  {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </div>
+    ) : null;
+  };
+
+  const getActionButtons = () => {
+    return (
+      <div className="mt-5">
+        {tokensData.tokenA.hederaId && !approved.tokenA && createPairData.tokenAAmount !== '0' ? (
+          <div className="d-grid mt-4">
+            <Button
+              loading={loadingApprove}
+              onClick={() => handleApproveClick('tokenA')}
+              className="mx-2"
+            >{`Approve ${tokensData.tokenA.symbol}`}</Button>
+          </div>
+        ) : null}
+
+        {tokensData.tokenB.hederaId && !approved.tokenB && createPairData.tokenBAmount !== '0' ? (
+          <div className="d-grid mt-4">
+            <div className="d-grid mt-4">
+              {' '}
+              <Button
+                loading={loadingApprove}
+                onClick={() => handleApproveClick('tokenB')}
+                className="mx-2"
+              >{`Approve ${tokensData.tokenB.symbol}`}</Button>
+            </div>
+          </div>
+        ) : null}
+
+        {approved.tokenA && approved.tokenB ? (
+          tokensInSamePool ? (
+            <div className="d-grid mt-4">
+              <Button
+                loading={loadingCreate}
+                disabled={!readyToProvide}
+                onClick={handleProvideClick}
+              >
+                Provide
+              </Button>
+            </div>
+          ) : (
+            <div className="d-grid mt-4">
+              {' '}
+              <Button
+                loading={loadingCreate}
+                disabled={!readyToProvide}
+                onClick={handleProvideClick}
+              >
+                Create
+              </Button>
+            </div>
+          )
+        ) : null}
+      </div>
+    );
+  };
+
+  return (
+    <div className="d-flex justify-content-center">
+      <div className="container-action">
+        {getTitleAndSettings()}
+        {getErrorMessage()}
+        {getProvideSection()}
       </div>
     </div>
   );
