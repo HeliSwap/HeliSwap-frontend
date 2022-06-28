@@ -8,6 +8,7 @@ interface IButtonSelectorProps {
   className?: string;
   selectedToken?: string;
   onClick?: () => void;
+  disabled?: boolean;
 }
 
 interface ITypeMapping {
@@ -26,16 +27,23 @@ const ButtonSelector = ({
   className,
   onClick,
   selectedToken,
+  disabled = false,
 }: IButtonSelectorProps) => {
+  const handleClick = () => {
+    if (!disabled && onClick) {
+      onClick();
+    }
+  };
+
   return (
-    <div onClick={onClick} className={`btn-selector ${typeMapping[type]} ${className}`}>
+    <div onClick={handleClick} className={`btn-selector ${typeMapping[type]} ${className}`}>
       {selectedToken ? <IconToken symbol={selectedToken} className="me-3" /> : null}
       {selectedToken ? (
         <span className="text-main">{selectedToken}</span>
       ) : (
         <span className="text-small">{selectorText}</span>
       )}
-      <Icon name="chevron" className="ms-2" />
+      {!disabled ? <Icon name="chevron" className="ms-2" /> : null}
     </div>
   );
 };

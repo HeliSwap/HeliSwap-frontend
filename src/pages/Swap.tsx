@@ -16,6 +16,7 @@ import ModalSearchContent from '../components/Modals/ModalSearchContent';
 import WalletBalance from '../components/WalletBalance';
 import InputTokenSelector from '../components/InputTokenSelector';
 import TransactionSettingsModalContent from '../components/Modals/TransactionSettingsModalContent';
+import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
 
 import errorMessages from '../content/errors';
 import {
@@ -35,6 +36,8 @@ import {
   getPossibleTradesExactOut,
   tradeComparator,
 } from '../utils/tradeUtils';
+import { formatStringWeiToStringEther, getAmountWithSlippage } from '../utils/numberUtils';
+
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
 import { MAX_UINT_ERC20, MAX_UINT_HTS } from '../constants';
@@ -45,12 +48,13 @@ import Icon from '../components/Icon';
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
-  const { userId, hashconnectConnectorInstance } = connection;
+  const { userId, hashconnectConnectorInstance, connected, connectWallet } = connection;
 
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
   const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
+  const [showModalConfirmSwap, setShowModalConfirmSwap] = useState(false);
 
   const initialTokensData: ITokensData = {
     tokenA: NATIVE_TOKEN,
@@ -107,6 +111,7 @@ const Swap = () => {
   const [readyToSwap, setReadyToSwap] = useState(false);
   const [tokenInExactAmount, setTokenInExactAmount] = useState(true);
   const [bestPath, setBestPath] = useState<string[]>([]);
+  const [ratioBasedOnTokenOut, setRatioBasedOnTokenOut] = useState(true);
 
   // State for general error
   const [error, setError] = useState(false);
@@ -253,7 +258,11 @@ const Swap = () => {
     }
   };
 
-  const handleSwapClick = async () => {
+  const handleSwapClick = () => {
+    setShowModalConfirmSwap(true);
+  };
+
+  const handleSwapConfirm = async () => {
     const { amountIn, amountOut, tokenInDecimals, tokenOutDecimals } = swapData;
 
     setError(false);
@@ -589,7 +598,7 @@ const Swap = () => {
 
   const getActionButtons = () => {
     const swapButtonLabel = willWrapTokens ? 'wrap' : willUnwrapTokens ? 'unwrap' : 'swap';
-    return (
+    return connected ? (
       <>
         {loadingPools ? (
           <Loader />
@@ -629,7 +638,48 @@ const Swap = () => {
             </Button>
           </div>
         ) : null}
+
+        {showModalConfirmSwap ? (
+          <Modal show={showModalConfirmSwap}>
+            <ConfirmTransactionModalContent
+              modalTitle="Confirm swap"
+              closeModal={() => setShowModalConfirmSwap(false)}
+              confirmTansaction={handleSwapConfirm}
+              confirmButtonLabel="Confirm swap"
+            >
+              <InputTokenSelector
+                inputTokenComponent={<InputToken value={swapData.amountIn} disabled={true} />}
+                buttonSelectorComponent={
+                  <ButtonSelector
+                    selectedToken={tokensData?.tokenA.symbol}
+                    selectorText="Select token"
+                    disabled={true}
+                  />
+                }
+              />
+              <InputTokenSelector
+                className="mt-5"
+                inputTokenComponent={<InputToken value={swapData.amountOut} disabled={true} />}
+                buttonSelectorComponent={
+                  <ButtonSelector
+                    selectedToken={tokensData?.tokenB.symbol}
+                    selectorText="Select token"
+                    disabled={true}
+                  />
+                }
+              />
+              {getTokensRatio()}
+              {getAdvancedSwapInfo()}
+            </ConfirmTransactionModalContent>
+          </Modal>
+        ) : null}
       </>
+    ) : (
+      <div className="d-grid mt-4">
+        <Button className="mx-2" onClick={() => connectWallet()}>
+          Connect wallet
+        </Button>
+      </div>
     );
   };
 
@@ -647,6 +697,82 @@ const Swap = () => {
         ></button>
       </div>
     ) : null;
+  };
+
+  const getTokensRatio = () => {
+    const ratio = ratioBasedOnTokenOut
+      ? Number(swapData.amountIn) / Number(swapData.amountOut)
+      : Number(swapData.amountOut) / Number(swapData.amountIn);
+    const baseTokenName = ratioBasedOnTokenOut
+      ? tokensData.tokenB.symbol
+      : tokensData.tokenA.symbol;
+    const secondTokenName = ratioBasedOnTokenOut
+      ? tokensData.tokenA.symbol
+      : tokensData.tokenB.symbol;
+
+    return (
+      <div
+        className="text-small mt-4 cursor-pointer"
+        onClick={() => setRatioBasedOnTokenOut(!ratioBasedOnTokenOut)}
+      >{`1 ${baseTokenName} = ${ratio} ${secondTokenName}`}</div>
+    );
+  };
+
+  const getAdvancedSwapInfo = () => {
+    const { amountIn, amountOut } = swapData;
+    const { tokenA, tokenB } = tokensData;
+    const slippage = getTransactionSettings().swapSlippage;
+
+    const amountAfterSlippageMessage = tokenInExactAmount
+      ? 'Minimum received after slippage'
+      : 'Maximum sent after slippage';
+
+    const secondTokenDecimals = tokenInExactAmount
+      ? tokensData.tokenB.decimals
+      : tokensData.tokenA.decimals;
+
+    const amountAfterSlippage = tokenInExactAmount
+      ? getAmountWithSlippage(amountOut, tokenB.decimals, slippage, true)
+      : getAmountWithSlippage(amountIn, tokenA.decimals, slippage, false);
+
+    const amountAfterSlippageStr = formatStringWeiToStringEther(
+      amountAfterSlippage.toString(),
+      secondTokenDecimals,
+    );
+
+    const secondTokenName = tokenInExactAmount
+      ? tokensData.tokenB.symbol
+      : tokensData.tokenA.symbol;
+
+    const estimationMessage = tokenInExactAmount
+      ? `Output is estimated. You will receive at least ${amountAfterSlippageStr} ${secondTokenName} or the transaction will revert.`
+      : `Input is estimated. You will sell at most ${amountAfterSlippageStr} ${secondTokenName} or the transaction will revert.`;
+
+    return (
+      <div>
+        <div className="mt-4 rounded border border-secondary">
+          <div className="d-flex justify-content-between m-4">
+            <span className="text-small">Expected Output:</span>
+            <span className="text-small text-numeric text-bold">{`${swapData.amountOut} ${tokensData.tokenB.symbol}`}</span>
+          </div>
+          {/* <div className="d-flex justify-content-between m-4">
+            <span className="text-small">Price Impact:</span>
+            <span className="text-small">TODO</span>
+          </div> */}
+
+          <hr className="my-3 mx-4" />
+
+          <div className="d-flex justify-content-between m-4 text-secondary">
+            <span className="text-small">
+              {amountAfterSlippageMessage} ({getTransactionSettings().swapSlippage}%)
+            </span>
+
+            <span className="text-small text-numeric text-bold">{`${amountAfterSlippageStr} ${secondTokenName}`}</span>
+          </div>
+        </div>
+        <p className="text-micro text-secondary mt-5">{estimationMessage}</p>
+      </div>
+    );
   };
 
   return (
