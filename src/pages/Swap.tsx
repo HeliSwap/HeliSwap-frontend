@@ -598,7 +598,7 @@ const Swap = () => {
 
   const getActionButtons = () => {
     const swapButtonLabel = willWrapTokens ? 'wrap' : willUnwrapTokens ? 'unwrap' : 'swap';
-    return (
+    return connected ? (
       <>
         {loadingPools ? (
           <Loader />
@@ -674,6 +674,12 @@ const Swap = () => {
           </Modal>
         ) : null}
       </>
+    ) : (
+      <div className="d-grid mt-4">
+        <Button className="mx-2" onClick={() => connectWallet()}>
+          Connect wallet
+        </Button>
+      </div>
     );
   };
 
