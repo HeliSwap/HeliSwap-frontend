@@ -414,6 +414,7 @@ const Swap = () => {
         tokenB: tokenBBalance,
       });
     };
+
     const { tokenA, tokenB } = tokensData;
 
     if (
@@ -589,40 +590,46 @@ const Swap = () => {
   const getActionButtons = () => {
     const swapButtonLabel = willWrapTokens ? 'wrap' : willUnwrapTokens ? 'unwrap' : 'swap';
     return (
-      <div className="d-grid mt-4">
+      <>
         {loadingPools ? (
           <Loader />
         ) : readyToApprove ? (
           approved ? (
-            <Button
-              loading={loadingSwap}
-              disabled={!readyToSwap || !associated}
-              onClick={() => handleSwapClick()}
-            >
-              {swapButtonLabel}
-            </Button>
+            <div className="d-grid mt-4">
+              <Button
+                loading={loadingSwap}
+                disabled={!readyToSwap || !associated}
+                onClick={() => handleSwapClick()}
+              >
+                {swapButtonLabel}
+              </Button>
+            </div>
           ) : (
-            <Button
-              loading={loadingApprove}
-              disabled={Number(swapData.amountIn) <= 0}
-              onClick={() => handleApproveClick()}
-            >
-              Approve
-            </Button>
+            <div className="d-grid mt-4">
+              <Button
+                loading={loadingApprove}
+                disabled={Number(swapData.amountIn) <= 0}
+                onClick={() => handleApproveClick()}
+              >
+                Approve
+              </Button>
+            </div>
           )
         ) : null}
 
         {readyToAssociate && !associated ? (
-          <Button
-            className="mx-2"
-            loading={loadingSwap}
-            disabled={!readyToAssociate}
-            onClick={() => handleAssociateClick()}
-          >
-            Associate token
-          </Button>
+          <div className="d-grid mt-4">
+            <Button
+              className="mx-2"
+              loading={loadingSwap}
+              disabled={!readyToAssociate}
+              onClick={() => handleAssociateClick()}
+            >
+              Associate token
+            </Button>
+          </div>
         ) : null}
-      </div>
+      </>
     );
   };
 

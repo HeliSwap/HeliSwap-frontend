@@ -17,11 +17,10 @@ import TransactionSettingsModalContent from '../components/Modals/TransactionSet
 import InputTokenSelector from '../components/InputTokenSelector';
 import InputToken from '../components/InputToken';
 import ButtonSelector from '../components/ButtonSelector';
-import Icon from '../components/Icon';
 import WalletBalance from '../components/WalletBalance';
 
 import errorMessages from '../content/errors';
-import { checkAllowanceHTS, idToAddress, NATIVE_TOKEN } from '../utils/tokenUtils';
+import { checkAllowanceHTS, getTokenBalance, idToAddress } from '../utils/tokenUtils';
 import { formatStringToBigNumberEthersWei } from '../utils/numberUtils';
 import {
   getTransactionSettings,
@@ -280,6 +279,15 @@ const Create = () => {
   }, [tokensData, sdk, userId, createPairData]);
 
   useEffect(() => {
+    const getTokenBalances = async () => {
+      const tokenABalance = await getTokenBalance(userId, tokenA);
+      const tokenBBalance = await getTokenBalance(userId, tokenB);
+      setTokenBalances({
+        tokenA: tokenABalance,
+        tokenB: tokenBBalance,
+      });
+    };
+
     const { tokenA, tokenB } = tokensData;
     const newPairData: ICreatePairData = {
       tokenAId: tokenA.hederaId,
@@ -292,7 +300,8 @@ const Create = () => {
 
     setCreatePairData(prev => ({ ...prev, ...newPairData }));
     setApproved({ tokenA: false, tokenB: false });
-  }, [tokensData]);
+    if (userId) getTokenBalances();
+  }, [tokensData, userId]);
 
   useEffect(() => {
     const { tokenA, tokenB } = tokensData;
@@ -456,30 +465,30 @@ const Create = () => {
           </Modal>
 
           {readyToProvide ? (
-            <div className="bg-slate rounded p-4 my-4">
+            <div className="my-4">
               {tokensInSamePool ? (
                 <div>
-                  <p>Prices and pool share</p>
-                  <div className="mt-3 d-flex justify-content-around rounded border border-success p-2">
+                  <div className="mt-3 d-flex justify-content-around">
                     <div className="text-center">
                       <p>
-                        <span className="text-title">
+                        <span className="text-small text-numeric">
                           {Number(createPairData.tokenBAmount) /
                             Number(createPairData.tokenAAmount)}
                         </span>
                       </p>
-                      <p>
+                      <p className="text-micro">
                         {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
                       </p>
                     </div>
+
                     <div className="text-center">
                       <p>
-                        <span className="text-title">
+                        <span className="text-small text-numeric">
                           {Number(createPairData.tokenAAmount) /
                             Number(createPairData.tokenBAmount)}
                         </span>
                       </p>
-                      <p>
+                      <p className="text-micro">
                         {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}
                       </p>
                     </div>
@@ -487,27 +496,27 @@ const Create = () => {
                 </div>
               ) : (
                 <div>
-                  <p>Initial prices</p>
-                  <div className="mt-3 d-flex justify-content-around rounded border border-success p-2">
+                  <div className="mt-3 d-flex justify-content-around">
                     <div className="text-center">
                       <p>
-                        <span className="text-title">
+                        <span className="text-small text-numeric">
                           {Number(createPairData.tokenBAmount) /
                             Number(createPairData.tokenAAmount)}
                         </span>
                       </p>
-                      <p>
+                      <p className="text-micro">
                         {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
                       </p>
                     </div>
+
                     <div className="text-center">
                       <p>
-                        <span className="text-title">
+                        <span className="text-small text-numeric">
                           {Number(createPairData.tokenAAmount) /
                             Number(createPairData.tokenBAmount)}
                         </span>
                       </p>
-                      <p>
+                      <p className="text-micro">
                         {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}
                       </p>
                     </div>
@@ -517,44 +526,56 @@ const Create = () => {
             </div>
           ) : null}
 
-          <div className="mt-5 d-flex justify-content-center">
+          <div className="mt-5">
             {tokensData.tokenA.hederaId &&
             !approved.tokenA &&
             createPairData.tokenAAmount !== '0' ? (
-              <Button
-                loading={loadingApprove}
-                onClick={() => handleApproveClick('tokenA')}
-                className="mx-2"
-              >{`Approve ${tokensData.tokenA.symbol}`}</Button>
+              <div className="d-grid mt-4">
+                <Button
+                  loading={loadingApprove}
+                  onClick={() => handleApproveClick('tokenA')}
+                  className="mx-2"
+                >{`Approve ${tokensData.tokenA.symbol}`}</Button>
+              </div>
             ) : null}
 
             {tokensData.tokenB.hederaId &&
             !approved.tokenB &&
             createPairData.tokenBAmount !== '0' ? (
-              <Button
-                loading={loadingApprove}
-                onClick={() => handleApproveClick('tokenB')}
-                className="mx-2"
-              >{`Approve ${tokensData.tokenB.symbol}`}</Button>
+              <div className="d-grid mt-4">
+                <div className="d-grid mt-4">
+                  {' '}
+                  <Button
+                    loading={loadingApprove}
+                    onClick={() => handleApproveClick('tokenB')}
+                    className="mx-2"
+                  >{`Approve ${tokensData.tokenB.symbol}`}</Button>
+                </div>
+              </div>
             ) : null}
 
             {approved.tokenA && approved.tokenB ? (
               tokensInSamePool ? (
-                <Button
-                  loading={loadingCreate}
-                  disabled={!readyToProvide}
-                  onClick={handleCreateClick}
-                >
-                  Provide
-                </Button>
+                <div className="d-grid mt-4">
+                  <Button
+                    loading={loadingCreate}
+                    disabled={!readyToProvide}
+                    onClick={handleCreateClick}
+                  >
+                    Provide
+                  </Button>
+                </div>
               ) : (
-                <Button
-                  loading={loadingCreate}
-                  disabled={!readyToProvide}
-                  onClick={handleCreateClick}
-                >
-                  Create
-                </Button>
+                <div className="d-grid mt-4">
+                  {' '}
+                  <Button
+                    loading={loadingCreate}
+                    disabled={!readyToProvide}
+                    onClick={handleCreateClick}
+                  >
+                    Create
+                  </Button>
+                </div>
               )
             ) : null}
           </div>
