@@ -610,7 +610,9 @@ const Swap = () => {
     return connected ? (
       <>
         {loadingPools ? (
-          <Loader />
+          <div className="d-flex justify-content-center mt-4">
+            <Loader />
+          </div>
         ) : readyToApprove ? (
           approved ? (
             <div className="d-grid mt-4">
@@ -638,7 +640,6 @@ const Swap = () => {
         {readyToAssociate && !associated ? (
           <div className="d-grid mt-4">
             <Button
-              className="mx-2"
               loading={loadingSwap}
               disabled={!readyToAssociate}
               onClick={() => handleAssociateClick()}
@@ -685,9 +686,7 @@ const Swap = () => {
       </>
     ) : (
       <div className="d-grid mt-4">
-        <Button className="mx-2" onClick={() => connectWallet()}>
-          Connect wallet
-        </Button>
+        <Button onClick={() => connectWallet()}>Connect wallet</Button>
       </div>
     );
   };
