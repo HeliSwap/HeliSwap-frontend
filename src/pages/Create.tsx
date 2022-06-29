@@ -66,7 +66,7 @@ const Create = () => {
     pollInterval: 10000,
   });
 
-  const { tokens: tokenDataList } = useTokens({
+  const { loading: loadingTDL, tokens: tokenDataList } = useTokens({
     fetchPolicy: 'network-only',
     pollInterval: 10000,
   });
@@ -510,6 +510,7 @@ const Create = () => {
             setTokensData={setTokensData}
             closeModal={() => setShowModalA(false)}
             tokenDataList={tokenDataList || []}
+            loadingTDL={loadingTDL}
           />
         </Modal>
 
@@ -538,6 +539,7 @@ const Create = () => {
             setTokensData={setTokensData}
             closeModal={() => setShowModalB(false)}
             tokenDataList={tokenDataList || []}
+            loadingTDL={loadingTDL}
           />
         </Modal>
 
