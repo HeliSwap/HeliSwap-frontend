@@ -5,6 +5,7 @@ export interface ITokenData {
   address: string;
   decimals: number;
   type: TokenType;
+  details?: any;
 }
 
 export interface ITokensData {
