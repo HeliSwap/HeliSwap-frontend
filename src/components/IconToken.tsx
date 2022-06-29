@@ -1,6 +1,7 @@
 import React from 'react';
 import HBAR from '../icons/tokens/HBAR.svg';
 import ETH from '../icons/tokens/ETH.svg';
+import unknown from '../icons/tokens/unknown.svg';
 
 import HELI from '../icons/tokens/HELI.png';
 import DOB from '../icons/tokens/DOB.png';
@@ -31,7 +32,7 @@ const tokenMapping: ITokenMapping = {
   WHBAR: HBAR,
 };
 
-const defaultIconToken = HELI;
+const defaultIconToken = unknown;
 
 const IconToken = ({ symbol, className = '' }: IIconTokenProps) => {
   const iconFound = tokenMapping[symbol];

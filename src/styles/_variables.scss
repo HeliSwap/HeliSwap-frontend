@@ -114,22 +114,24 @@ $spacers: (
     (
       $spacer * 6.5,
     ),
-  // 104px
-  // 16: ($spacer * 7),    // 112px
-  // 17: ($spacer * 7.5),  // 120px
-  // 18: ($spacer * 8),    // 128px
-  // 19: ($spacer * 8.5),  // 136px
-  // 20: ($spacer * 9),    // 144px
-  // 21: ($spacer * 9.5),  // 162px
-  // 22: ($spacer * 10),   // 160px
-  // 23: ($spacer * 10.5), // 168px
-  // 24: ($spacer * 11),   // 176px
-  // 25: ($spacer * 11.5), // 184px
-  // 26: ($spacer * 12),   // 192px
-  // 27: ($spacer * 12.5), // 200px
-  // 28: ($spacer * 13),   // 208px
-  // 29: ($spacer * 13.5), // 216px
-  // 30: ($spacer * 14)    // 224px,
+);
+
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px,
+  xxxl: 1600px,
+);
+
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+  xxl: 1320px,
 );
 
 // Body

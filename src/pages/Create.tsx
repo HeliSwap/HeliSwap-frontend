@@ -223,6 +223,7 @@ const Create = () => {
         setApproved(initialApproveData);
         setSuccessCreate(true);
         setSuccessMessage(successMessage);
+        setReadyToProvide(false);
       }
     } catch (err) {
       console.error(err);
@@ -534,7 +535,7 @@ const Create = () => {
             </div>
           ) : null}
 
-          <div className="mt-5">
+          <div>
             {tokensData.tokenA.hederaId &&
             !approved.tokenA &&
             createPairData.tokenAAmount !== '0' ? (
@@ -542,7 +543,6 @@ const Create = () => {
                 <Button
                   loading={loadingApprove}
                   onClick={() => handleApproveClick('tokenA')}
-                  className="mx-2"
                 >{`Approve ${tokensData.tokenA.symbol}`}</Button>
               </div>
             ) : null}
@@ -556,7 +556,6 @@ const Create = () => {
                   <Button
                     loading={loadingApprove}
                     onClick={() => handleApproveClick('tokenB')}
-                    className="mx-2"
                   >{`Approve ${tokensData.tokenB.symbol}`}</Button>
                 </div>
               </div>

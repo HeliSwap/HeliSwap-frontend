@@ -73,9 +73,13 @@ export const getHTSTokenWalletBalance = async (
       data: { balances },
     } = await axios(url);
 
-    const { balance } = balances[0];
+    if (balances.length > 0) {
+      const { balance } = balances[0];
 
-    return balance;
+      return balance;
+    } else {
+      return 0;
+    }
   } catch (e) {
     console.error(e);
     return 0;
