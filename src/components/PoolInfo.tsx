@@ -17,7 +17,7 @@ import {
 import { addressToContractId, idToAddress, calculateReserves } from '../utils/tokenUtils';
 import { getTransactionSettings } from '../utils/transactionUtils';
 import { getConnectedWallet } from '../pages/Helpers';
-import { MAX_UINT_ERC20 } from '../constants';
+import { MAX_UINT_ERC20, POOLS_FEE } from '../constants';
 import { formatIcons } from '../utils/iconUtils';
 
 interface IPoolInfoProps {
@@ -244,7 +244,7 @@ const PoolInfo = ({ pairData, index }: IPoolInfoProps) => {
           <p className="text-small ms-3">
             {pairData.token0Symbol}/{pairData.token1Symbol}
           </p>
-          <span className="text-micro text-numeric badge bg-secondary ms-3">0.3%</span>
+          <span className="text-micro text-numeric badge bg-secondary ms-3">{POOLS_FEE}</span>
         </div>
         <div className="table-pools-cell d-flex justify-content-end">
           <p

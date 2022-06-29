@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ITokenData, TokenType } from '../../interfaces/tokens';
 
-import useTokens from '../../hooks/useTokens';
-
 import { getHTSTokenInfo, idToAddress } from '../../utils/tokenUtils';
 import IconToken from '../IconToken';
 import Button from '../Button';

@@ -31,7 +31,7 @@ import {
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
 import useTokens from '../hooks/useTokens';
-import { MAX_UINT_ERC20, MAX_UINT_HTS } from '../constants';
+import { MAX_UINT_ERC20, MAX_UINT_HTS, POOLS_FEE } from '../constants';
 import Icon from '../components/Icon';
 import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
 import { formatIcons } from '../utils/iconUtils';
@@ -423,7 +423,7 @@ const Create = () => {
     } catch (err) {
       console.error(err);
     }
-  }, [poolsData, tokenDataList]);
+  }, [poolsData, tokenDataList, address, tokensDerivedFromPool]);
 
   //Render methods
   const getTitleAndSettings = () => {
@@ -482,6 +482,8 @@ const Create = () => {
           </div>
         ) : null}
 
+        {getFeesInfo()}
+        <div className="mb-4 text-small text-bold">Enter amount</div>
         <InputTokenSelector
           inputTokenComponent={
             <InputToken
@@ -548,6 +550,15 @@ const Create = () => {
 
         {getTokensRatioSection()}
         {getActionButtons()}
+      </div>
+    );
+  };
+
+  const getFeesInfo = () => {
+    return (
+      <div className="d-flex mb-4 justify-content-between align-items-center border-bottom border-secondary">
+        <span className="mb-4 text-small text-bold">Liquidity provider fee:</span>
+        <span className="mb-4 text-small">{POOLS_FEE}</span>
       </div>
     );
   };
