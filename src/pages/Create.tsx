@@ -244,7 +244,7 @@ const Create = () => {
       } else {
         const successMessage = `Provided exactly ${createPairData.tokenAAmount} ${tokensData.tokenA.symbol} and ${createPairData.tokenBAmount} ${tokensData.tokenB.symbol}`;
 
-        setCreatePairData({ ...createPairData, tokenAAmount: '0', tokenBAmount: '0' });
+        setCreatePairData({ ...createPairData, tokenAAmount: '', tokenBAmount: '' });
         setApproved(initialApproveData);
         setSuccessCreate(true);
         setSuccessMessage(successMessage);
@@ -600,7 +600,7 @@ const Create = () => {
   const getActionButtons = () => {
     return (
       <div className="mt-5">
-        {tokensData.tokenA.hederaId && !approved.tokenA && createPairData.tokenAAmount !== '0' ? (
+        {tokensData.tokenA.hederaId && !approved.tokenA && createPairData.tokenAAmount ? (
           <div className="d-grid mt-4">
             <Button
               loading={loadingApprove}
@@ -610,7 +610,7 @@ const Create = () => {
           </div>
         ) : null}
 
-        {tokensData.tokenB.hederaId && !approved.tokenB && createPairData.tokenBAmount !== '0' ? (
+        {tokensData.tokenB.hederaId && !approved.tokenB && createPairData.tokenBAmount ? (
           <div className="d-grid mt-4">
             <div className="d-grid mt-4">
               {' '}
