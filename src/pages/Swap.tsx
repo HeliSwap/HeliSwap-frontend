@@ -36,7 +36,11 @@ import {
   getPossibleTradesExactOut,
   tradeComparator,
 } from '../utils/tradeUtils';
-import { formatStringWeiToStringEther, getAmountWithSlippage } from '../utils/numberUtils';
+import {
+  formatStringWeiToStringEther,
+  getAmountWithSlippage,
+  stripStringToFixedDecimals,
+} from '../utils/numberUtils';
 
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
@@ -82,8 +86,8 @@ const Swap = () => {
   const initialSwapData: ISwapTokenData = {
     tokenIdIn: '',
     tokenIdOut: '',
-    amountIn: '0',
-    amountOut: '0',
+    amountIn: '',
+    amountOut: '',
     tokenInDecimals: 0,
     tokenOutDecimals: 0,
   };
@@ -135,7 +139,7 @@ const Swap = () => {
       Object.keys(tokenB).length === 0;
 
     if (invalidInputTokensData) {
-      setSwapData(prev => ({ ...prev, amountIn: '0', amountOut: '0' }));
+      setSwapData(prev => ({ ...prev, amountIn: '', amountOut: '' }));
 
       return;
     }
@@ -147,19 +151,19 @@ const Swap = () => {
     const tokenOutAddress = tokenOutIsNative ? WHBARAddress : tokenB.address;
 
     if (willWrapTokens || willUnwrapTokens) {
-      if (name === 'amountIn' && amountIn !== '0') {
+      if (name === 'amountIn') {
         const swapAmountOut = amountIn;
 
         setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
-      } else if (name === 'amountOut' && amountOut !== '0') {
+      } else if (name === 'amountOut') {
         const swapAmountIn = amountOut;
 
         setSwapData(prev => ({ ...prev, ...tokenData, amountIn: swapAmountIn.toString() }));
       } else {
-        setSwapData(prev => ({ ...prev, amountIn: '0', amountOut: '0' }));
+        setSwapData(prev => ({ ...prev, amountIn: '', amountOut: '' }));
       }
     } else {
-      if (name === 'amountIn' && amountIn !== '0') {
+      if (name === 'amountIn') {
         const trades = getPossibleTradesExactIn(
           poolsData || [],
           amountIn,
@@ -176,7 +180,7 @@ const Swap = () => {
         setBestPath(bestTrade.path);
         setTokenInExactAmount(true);
         setSwapData(prev => ({ ...prev, ...tokenData, amountOut: bestTrade.amountOut }));
-      } else if (name === 'amountOut' && amountOut !== '0') {
+      } else if (name === 'amountOut') {
         const trades = getPossibleTradesExactOut(
           poolsData || [],
           amountOut,
@@ -435,6 +439,8 @@ const Swap = () => {
         tokenIdOut: tokenB.hederaId,
         tokenInDecimals: tokenA.decimals,
         tokenOutDecimals: tokenB.decimals,
+        amountIn: '',
+        amountOut: '',
       };
 
       setSwapData(prev => ({ ...prev, ...newSwapData }));
@@ -528,7 +534,8 @@ const Swap = () => {
               value={swapData.amountIn}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const { value, name } = e.target;
-                handleInputChange(value, name);
+                const strippedValue = stripStringToFixedDecimals(value, tokensData.tokenA.decimals);
+                handleInputChange(strippedValue, name);
               }}
               name="amountIn"
             />
@@ -569,7 +576,8 @@ const Swap = () => {
               value={swapData.amountOut}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const { value, name } = e.target;
-                handleInputChange(value, name);
+                const strippedValue = stripStringToFixedDecimals(value, tokensData.tokenB.decimals);
+                handleInputChange(strippedValue, name);
               }}
               name="amountOut"
             />
