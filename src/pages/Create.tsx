@@ -682,47 +682,52 @@ const Create = () => {
               confirmTansaction={handleProvideConfirm}
               confirmButtonLabel="Confirm provide"
             >
-              <>
-                <div className="d-flex m-4">
-                  {formatIcons([selectedPoolData.token0Symbol, selectedPoolData.token1Symbol])}
-                  <p className="text-small ms-3">
-                    {selectedPoolData.token0Symbol}/{selectedPoolData.token1Symbol}
-                  </p>
-                </div>
-                <div className="m-4 rounded border border-secondary justify-content-between ">
-                  <div className="d-flex justify-content-between align-items-center m-4">
-                    <div className="d-flex align-items-center">
-                      <IconToken symbol={selectedPoolData.token0Symbol} />
-                      <span className="text-main text-bold ms-3">
-                        {selectedPoolData.token0Symbol}
-                      </span>
-                    </div>
-
-                    <div className="d-flex justify-content-end align-items-center">
-                      <span className="text-numeric text-main">{createPairData.tokenAAmount}</span>
-                    </div>
-                  </div>
-                  <div className="d-flex justify-content-between align-items-center m-4">
-                    <div className="d-flex align-items-center">
-                      <IconToken symbol={selectedPoolData.token1Symbol} />
-                      <span className="text-main text-bold ms-3">
-                        {selectedPoolData.token1Symbol}
-                      </span>
-                    </div>
-
-                    <div className="d-flex justify-content-end align-items-center">
-                      <span className="text-numeric text-main">{createPairData.tokenBAmount}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="m-4 rounded border border-secondary justify-content-between ">
-                  {getTokensRatioSection()}
-                </div>
-              </>
+              {getProvideConfirmationModalContent()}
             </ConfirmTransactionModalContent>
           </Modal>
         ) : null}
       </div>
+    );
+  };
+
+  const getProvideConfirmationModalContent = () => {
+    const hasSelectedPool = Object.keys(selectedPoolData).length;
+    const token0Symbol = hasSelectedPool ? selectedPoolData.token0Symbol : tokensData.tokenA.symbol;
+    const token1Symbol = hasSelectedPool ? selectedPoolData.token1Symbol : tokensData.tokenB.symbol;
+    return (
+      <>
+        <div className="d-flex m-4">
+          {formatIcons([token0Symbol, token1Symbol])}
+          <p className="text-small ms-3">
+            {token0Symbol}/{token1Symbol}
+          </p>
+        </div>
+        <div className="m-4 rounded border border-secondary justify-content-between ">
+          <div className="d-flex justify-content-between align-items-center m-4">
+            <div className="d-flex align-items-center">
+              <IconToken symbol={token0Symbol} />
+              <span className="text-main text-bold ms-3">{token0Symbol}</span>
+            </div>
+
+            <div className="d-flex justify-content-end align-items-center">
+              <span className="text-numeric text-main">{createPairData.tokenAAmount}</span>
+            </div>
+          </div>
+          <div className="d-flex justify-content-between align-items-center m-4">
+            <div className="d-flex align-items-center">
+              <IconToken symbol={token1Symbol} />
+              <span className="text-main text-bold ms-3">{token1Symbol}</span>
+            </div>
+
+            <div className="d-flex justify-content-end align-items-center">
+              <span className="text-numeric text-main">{createPairData.tokenBAmount}</span>
+            </div>
+          </div>
+        </div>
+        <div className="m-4 rounded border border-secondary justify-content-between ">
+          {getTokensRatioSection()}
+        </div>
+      </>
     );
   };
 
