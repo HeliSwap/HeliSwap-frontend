@@ -592,7 +592,33 @@ const Create = () => {
               </div>
             </div>
           </div>
-        ) : null}
+        ) : (
+          <div>
+            <div className="mt-3 d-flex justify-content-around">
+              <div className="text-center">
+                <p>
+                  <span className="text-small text-numeric">
+                    {Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount)}
+                  </span>
+                </p>
+                <p className="text-micro">
+                  {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
+                </p>
+              </div>
+
+              <div className="text-center">
+                <p>
+                  <span className="text-small text-numeric">
+                    {Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount)}
+                  </span>
+                </p>
+                <p className="text-micro">
+                  {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     ) : null;
   };
