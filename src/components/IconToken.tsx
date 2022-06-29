@@ -31,8 +31,17 @@ const tokenMapping: ITokenMapping = {
   WHBAR: HBAR,
 };
 
+const defaultIconToken = HELI;
+
 const IconToken = ({ symbol, className = '' }: IIconTokenProps) => {
-  return <img className={`icon-token ${className}`} src={tokenMapping[symbol]} alt="token-icon" />;
+  const iconFound = tokenMapping[symbol];
+  return (
+    <img
+      className={`icon-token ${className}`}
+      src={iconFound ? tokenMapping[symbol] : defaultIconToken}
+      alt="token-icon"
+    />
+  );
 };
 
 export default IconToken;

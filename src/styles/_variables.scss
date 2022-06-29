@@ -7,6 +7,7 @@ $white: #ffffff;
 
 $neutral-900: #101011;
 $neutral-850: #1a1a1c;
+$neutral-800: #1e1e21;
 $neutral-700: #29292d;
 $neutral-600: #313135;
 $neutral-500: #4b4b51;
@@ -273,6 +274,8 @@ $input-bg: $neutral-700;
 $input-padding-y: 15px;
 $input-padding-x: 12px;
 $input-font-size: 14px;
+$input-disabled-bg: $neutral-800;
+$input-disabled-border-color: $neutral-500;
 
 $form-select-indicator: none;
 

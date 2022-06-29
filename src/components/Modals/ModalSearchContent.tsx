@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { IPairData, ITokenData, TokenType } from '../../interfaces/tokens';
-
-import { useLazyQuery } from '@apollo/client';
-import { GET_POOL_BY_TOKEN, GET_TOKEN_INFO } from '../../GraphQL/Queries';
+import { ITokenData, TokenType } from '../../interfaces/tokens';
 
 import useTokens from '../../hooks/useTokens';
 
-import { idToAddress } from '../../utils/tokenUtils';
+import { getHTSTokenInfo, idToAddress } from '../../utils/tokenUtils';
 import IconToken from '../IconToken';
+import Button from '../Button';
+
+import search from '../../icons/system/search-gradient.svg';
 
 interface IModalProps {
   modalTitle?: string;
   closeModal: () => void;
   setTokensData: (prev: any) => void;
   tokenFieldId: string;
-  defaultToken?: ITokenData;
+  canImport?: boolean;
 }
 
 const ModalSearchContent = ({
@@ -22,22 +22,24 @@ const ModalSearchContent = ({
   setTokensData,
   tokenFieldId,
   modalTitle,
-  defaultToken,
+  canImport = true,
 }: IModalProps) => {
+  const networkType = process.env.REACT_APP_NETWORK_TYPE as string;
+  const hashScanUrl = `https://hashscan.io/#/${networkType}/token/`;
+
   const [searchInputValue, setSearchInputValue] = useState('');
-  const [currentToken, setCurrentToken] = useState<ITokenData>(defaultToken!);
 
   const [decimals, setDecimals] = useState(18);
-  const [showDecimalsField, setShowDecimalsField] = useState(false);
+  const [showNotFound, setShowNotFound] = useState(false);
+  const [readyToImport, setReadyToImport] = useState(false);
+  const [readyToImportERC, setReadyToImportERC] = useState(false);
 
-  const [getTokenByAddressOrId, { data: dataTBI, loading: loadingTBI }] =
-    useLazyQuery(GET_TOKEN_INFO);
-  const [getPoolByToken, { data: dataPBT, loading: loadingPBT }] = useLazyQuery(GET_POOL_BY_TOKEN);
-
-  const { tokens: tokenDataList, loading: loadingGT } = useTokens({
+  const { tokens: tokenDataList, loading: loadingTDL } = useTokens({
     fetchPolicy: 'network-only',
     pollInterval: 10000,
   });
+
+  const [tokenList, setTokenList] = useState<ITokenData[]>([]);
 
   const onSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -54,28 +56,6 @@ const ModalSearchContent = ({
     setDecimals(valueNum);
   };
 
-  const handleSearchButtonClick = async () => {
-    // TODO Make proper check for token id format
-    if (!searchInputValue) return;
-
-    const result = await getTokenByAddressOrId({
-      variables: { id: searchInputValue },
-    });
-
-    // Temp check for not found tokend
-    if (!result.data) {
-      setShowDecimalsField(true);
-      setCurrentToken((prev: any) => ({
-        hederaId: searchInputValue,
-        type: TokenType.ERC20,
-        symbol: 'ERC20',
-        name: 'Possible ERC20 Token',
-        decimals,
-        address: idToAddress(searchInputValue),
-      }));
-    }
-  };
-
   const handleTokenListClick = (token: ITokenData) => {
     setTokensData((prev: any) => ({
       ...prev,
@@ -86,9 +66,30 @@ const ModalSearchContent = ({
     closeModal();
   };
 
+  const handleImportERC20ButtonClick = () => {
+    const sampleERC20 = {
+      hederaId: searchInputValue,
+      type: TokenType.ERC20,
+      symbol: 'ERC20',
+      name: 'Possible ERC20 Token',
+      decimals,
+      address: idToAddress(searchInputValue),
+    };
+
+    setTokensData((prev: any) => ({
+      ...prev,
+      [tokenFieldId]: sampleERC20,
+    }));
+
+    resetModalState();
+    closeModal();
+  };
+
   const resetModalState = () => {
     setSearchInputValue('');
-    setCurrentToken({} as ITokenData);
+    setReadyToImportERC(false);
+    setReadyToImport(false);
+    tokenDataList && setTokenList(tokenDataList);
   };
 
   const handleCloseClick = () => {
@@ -96,35 +97,48 @@ const ModalSearchContent = ({
     closeModal();
   };
 
+  const handleImportButtonClick = async () => {
+    const result = await getHTSTokenInfo(searchInputValue);
+    const hasResults = Object.keys(result).length > 0;
+    hasResults && setTokenList([result]);
+    setReadyToImport(false);
+    setReadyToImportERC(!hasResults && searchInputValue !== '');
+  };
+
   useEffect(() => {
-    if (dataTBI) {
-      const { getTokenInfo } = dataTBI;
-      if (Object.keys(getTokenInfo).length > 0) {
-        setCurrentToken({
-          ...getTokenInfo,
-          type: getTokenInfo.isHTS ? TokenType.HTS : TokenType.ERC20,
-        });
-      }
+    const inputEmpty = searchInputValue === '';
+    if (inputEmpty) {
+      setReadyToImport(false);
+      setReadyToImportERC(false);
     }
-  }, [dataTBI]);
+
+    const found =
+      tokenDataList?.find((item: ITokenData) => item.hederaId === searchInputValue) || false;
+
+    setShowNotFound(!found);
+
+    if (searchInputValue !== '' && found) {
+      setTokenList([found]);
+    }
+
+    if (searchInputValue === '' && tokenDataList) {
+      setTokenList(tokenDataList);
+    }
+
+    setReadyToImport(!found);
+  }, [searchInputValue, tokenDataList]);
 
   useEffect(() => {
-    currentToken &&
-      currentToken.address &&
-      getPoolByToken({
-        variables: { token: currentToken.address },
-      });
-  }, [currentToken, getPoolByToken]);
+    if (tokenDataList) {
+      setTokenList(tokenDataList);
+    }
+  }, [tokenDataList]);
 
-  useEffect(() => {
-    setCurrentToken((prev: any) => ({
-      ...prev,
-      decimals,
-    }));
-  }, [decimals]);
-
-  const hasTokenData = currentToken?.type;
-  const hasTokenList = tokenDataList && tokenDataList.length > 0;
+  const hasTokenList = tokenList && tokenList.length > 0;
+  const showImportButton = canImport && readyToImport;
+  const showTokenList = canImport
+    ? !loadingTDL && hasTokenList && !showImportButton && !readyToImportERC
+    : !loadingTDL && hasTokenList && !showNotFound;
 
   return (
     <>
@@ -154,16 +168,55 @@ const ModalSearchContent = ({
           />
         </div>
 
-        {hasTokenList ? (
+        {showNotFound ? (
+          <div className="text-center mt-5">
+            <img src={search} alt="" />
+            <h2 className="text-subheader mt-4">Not Found</h2>
+
+            {showImportButton ? (
+              <>
+                <p className="text-micro text-secondary mt-3 mb-5">
+                  Would you like to import{' '}
+                  <a
+                    target="_blank"
+                    rel="noreferrer"
+                    className="link-primary"
+                    href={`${hashScanUrl}${searchInputValue}`}
+                  >
+                    {searchInputValue}
+                  </a>
+                  ?
+                </p>
+                <Button onClick={handleImportButtonClick} type="primary" className="btn-sm">
+                  Import
+                </Button>
+              </>
+            ) : null}
+          </div>
+        ) : null}
+
+        {readyToImportERC ? (
+          <div className="d-flex align-items-center mt-5">
+            <input
+              className="form-control"
+              type="text"
+              value={decimals}
+              onChange={handleDecimalsInputChange}
+            />
+            <Button onClick={handleImportERC20ButtonClick} className="btn btn-sm btn-primary ms-3">
+              Import
+            </Button>
+          </div>
+        ) : null}
+
+        {showTokenList ? (
           <div className="mt-7">
             <h3 className="text-small">Token name</h3>
-            <div className="mt-5">
-              {tokenDataList.map((token: ITokenData, index: number) => (
+            <div className="mt-3">
+              {tokenList.map((token: ITokenData, index: number) => (
                 <div
                   onClick={() => handleTokenListClick(token)}
-                  className={`cursor-pointer list-token-item d-flex align-items-center ${
-                    currentToken.name === token.name ? 'is-selected' : ''
-                  }`}
+                  className="cursor-pointer list-token-item d-flex align-items-center"
                   key={index}
                 >
                   <IconToken symbol={token.symbol} />
