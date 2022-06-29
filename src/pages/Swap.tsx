@@ -631,7 +631,7 @@ const Swap = () => {
                 disabled={Number(swapData.amountIn) <= 0}
                 onClick={() => handleApproveClick()}
               >
-                Approve
+                {`Approve ${tokensData.tokenA.symbol}`}
               </Button>
             </div>
           )
