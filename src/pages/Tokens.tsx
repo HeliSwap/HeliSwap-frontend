@@ -1,6 +1,7 @@
 import React from 'react';
 import useTokens from '../hooks/useTokens';
 import Loader from '../components/Loader';
+import IconToken from '../components/IconToken';
 
 const Tokens = () => {
   const {
@@ -38,7 +39,7 @@ const Tokens = () => {
               <div key={index} className="container-table-row with-cols-6">
                 <div>{index + 1}</div>
                 <div className="d-flex align-items-center">
-                  <img key={index} width={20} src={`/icons/${item.symbol}.png`} alt="" />
+                  <IconToken symbol={item.symbol} />
                   <span className="ms-3">{item.name}</span>
                 </div>
                 <div>{item.type}</div>
