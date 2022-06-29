@@ -82,3 +82,8 @@ export const getAmountWithSlippage = (
 export const getExpirationTime = (minutes: number) => {
   return Math.floor(Date.now() / 1000) + 60 * minutes;
 };
+
+export const stripStringToFixedDecimals = (decimalString: string, decimals: number) => {
+  const decPosition = decimalString.indexOf('.');
+  return decPosition !== -1 ? decimalString.slice(0, decPosition + decimals + 1) : decimalString;
+};

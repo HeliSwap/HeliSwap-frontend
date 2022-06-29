@@ -56,8 +56,8 @@ const Create = () => {
   });
 
   const initialCreateData: ICreatePairData = {
-    tokenAAmount: '0',
-    tokenBAmount: '0',
+    tokenAAmount: '',
+    tokenBAmount: '',
     tokenAId: '',
     tokenBId: '',
     tokenADecimals: 18,
@@ -102,6 +102,14 @@ const Create = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
     const inputToken = name === 'tokenAAmount' ? tokensData.tokenA : tokensData.tokenB;
+
+    const invalidInputTokensData = !value || isNaN(Number(value));
+
+    if (invalidInputTokensData) {
+      setCreatePairData(prev => ({ ...prev, tokenAAmount: '', tokenBAmount: '' }));
+      return;
+    }
+
     const inputTokenAddress = inputToken.address
       ? inputToken.address
       : (process.env.REACT_APP_WHBAR_ADDRESS as string);
@@ -294,8 +302,8 @@ const Create = () => {
       tokenBId: tokenB.hederaId,
       tokenADecimals: tokenA.decimals,
       tokenBDecimals: tokenB.decimals,
-      tokenAAmount: '0',
-      tokenBAmount: '0',
+      tokenAAmount: '',
+      tokenBAmount: '',
     };
 
     setCreatePairData(prev => ({ ...prev, ...newPairData }));
@@ -346,7 +354,7 @@ const Create = () => {
 
     const { tokenAAmount, tokenAId, tokenBAmount, tokenBId } = createPairData;
 
-    if (tokenAAmount === '0' || tokenBAmount === '0') {
+    if (!tokenAAmount || !tokenBAmount) {
       isReady = false;
     }
 
