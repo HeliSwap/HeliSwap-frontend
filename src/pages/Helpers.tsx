@@ -98,7 +98,7 @@ const Helpers = () => {
 
   return (
     <div className="d-flex justify-content-center">
-      <div className="container-action">
+      <div className="container">
         <h1>Helpers</h1>
 
         <div className="my-4">
