@@ -16,6 +16,10 @@ Please follow instruction [here](https://www.freecodecamp.org/news/how-to-set-up
 
 Before running the project please create `.env` or use the example one.
 
+```shell
+cp .env.example .env
+```
+
 ```
 REACT_APP_MIRROR_NODE_URL = <LINK_TO_MIRROR_NODE>
 REACT_APP_NETWORK_TYPE = <NETWORK_TYPE>
