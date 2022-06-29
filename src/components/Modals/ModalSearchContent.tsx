@@ -7,11 +7,14 @@ import { getHTSTokenInfo, idToAddress } from '../../utils/tokenUtils';
 import IconToken from '../IconToken';
 import Button from '../Button';
 
+import search from '../../icons/system/search-gradient.svg';
+
 interface IModalProps {
   modalTitle?: string;
   closeModal: () => void;
   setTokensData: (prev: any) => void;
   tokenFieldId: string;
+  canImport?: boolean;
 }
 
 const ModalSearchContent = ({
@@ -19,7 +22,11 @@ const ModalSearchContent = ({
   setTokensData,
   tokenFieldId,
   modalTitle,
+  canImport = true,
 }: IModalProps) => {
+  const networkType = process.env.REACT_APP_NETWORK_TYPE as string;
+  const hashScanUrl = `https://hashscan.io/#/${networkType}/token/`;
+
   const [searchInputValue, setSearchInputValue] = useState('');
 
   const [decimals, setDecimals] = useState(18);
@@ -93,15 +100,26 @@ const ModalSearchContent = ({
     const result = await getHTSTokenInfo(searchInputValue);
     const hasResults = Object.keys(result).length > 0;
     hasResults && setTokenList([result]);
+    setReadyToImport(false);
     setReadyToImportERC(!hasResults && searchInputValue !== '');
   };
 
   useEffect(() => {
+    const inputEmpty = searchInputValue === '';
+    if (inputEmpty) {
+      setReadyToImport(false);
+      setReadyToImportERC(false);
+    }
+
     const found =
       tokenDataList?.find((item: ITokenData) => item.hederaId === searchInputValue) || false;
 
     if (searchInputValue !== '' && found) {
       setTokenList([found]);
+    }
+
+    if (searchInputValue === '' && tokenDataList) {
+      setTokenList(tokenDataList);
     }
 
     setReadyToImport(!found);
@@ -114,6 +132,8 @@ const ModalSearchContent = ({
   }, [tokenDataList]);
 
   const hasTokenList = tokenList && tokenList.length > 0;
+  const showImportButton = canImport && readyToImport;
+  const showTokenList = !loadingTDL && hasTokenList && !showImportButton && !readyToImportERC;
 
   return (
     <>
@@ -143,8 +163,22 @@ const ModalSearchContent = ({
           />
         </div>
 
-        {readyToImport ? (
+        {showImportButton ? (
           <div className="text-center mt-5">
+            <img src={search} alt="" />
+            <h2 className="text-subheader mt-4">Not Found</h2>
+            <p className="text-micro text-secondary mt-3 mb-5">
+              Would you like to import{' '}
+              <a
+                target="_blank"
+                rel="noreferrer"
+                className="link-primary"
+                href={`${hashScanUrl}${searchInputValue}`}
+              >
+                {searchInputValue}
+              </a>
+              ?
+            </p>
             <Button onClick={handleImportButtonClick} type="primary" className="btn-sm">
               Import
             </Button>
@@ -165,7 +199,7 @@ const ModalSearchContent = ({
           </div>
         ) : null}
 
-        {!loadingTDL && hasTokenList ? (
+        {showTokenList ? (
           <div className="mt-7">
             <h3 className="text-small">Token name</h3>
             <div className="mt-5">

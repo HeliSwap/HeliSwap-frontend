@@ -555,6 +555,7 @@ const Swap = () => {
             tokenFieldId="tokenA"
             setTokensData={setTokensData}
             closeModal={() => setShowModalA(false)}
+            canImport={false}
           />
         </Modal>
 
@@ -588,6 +589,7 @@ const Swap = () => {
             tokenFieldId="tokenB"
             setTokensData={setTokensData}
             closeModal={() => setShowModalB(false)}
+            canImport={false}
           />
         </Modal>
         {getActionButtons()}
