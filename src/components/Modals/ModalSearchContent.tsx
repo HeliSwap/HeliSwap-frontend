@@ -101,13 +101,16 @@ const ModalSearchContent = ({
 
   const handleImportButtonClick = async () => {
     const result = await getHTSTokenInfo(searchInputValue);
-    const { details } = result;
-    const { hasFees } = details;
-
-    setWarningMessage(hasFees ? 'Token has fees!' : '');
-
     const hasResults = Object.keys(result).length > 0;
-    hasResults && setTokenList([result]);
+
+    if (hasResults) {
+      const { details } = result;
+      const { hasFees } = details;
+
+      setWarningMessage(hasFees ? 'Token has fees!' : '');
+      setTokenList([result]);
+    }
+
     setShowNotFound(false);
     setReadyToImport(false);
     setReadyToImportERC(!hasResults && searchInputValue !== '');
