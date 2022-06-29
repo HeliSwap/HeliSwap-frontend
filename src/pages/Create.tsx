@@ -223,6 +223,7 @@ const Create = () => {
         setApproved(initialApproveData);
         setSuccessCreate(true);
         setSuccessMessage(successMessage);
+        setReadyToProvide(false);
       }
     } catch (err) {
       console.error(err);
