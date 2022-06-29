@@ -173,6 +173,10 @@
   box-shadow: $modal-content-box-shadow-xs;
 }
 
+.modal-backdrop {
+  backdrop-filter: blur(4px);
+}
+
 /* Not relevant */
 
 .container-pairs {
