@@ -38,7 +38,11 @@ strong {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding-left: 256px;
+  padding-left: 100px;
+
+  @include media-breakpoint-up(xxxl) {
+    padding-left: 0;
+  }
 }
 
 .main {
@@ -63,7 +67,7 @@ strong {
   position: fixed;
 
   .container-logo {
-    padding: 30px;
+    padding: 28px;
     border-bottom: 1px solid $neutral-600;
   }
 
@@ -72,6 +76,6 @@ strong {
     flex: 1;
     flex-direction: column;
     justify-content: space-between;
-    padding: 30px;
+    padding: 28px;
   }
 }

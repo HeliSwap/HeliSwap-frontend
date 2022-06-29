@@ -9,8 +9,11 @@ const Sidebar = () => {
   return (
     <div className="container-sidebar">
       <div className="container-logo">
-        <Link to="/">
+        <Link className="d-none d-xxxl-inline-block" to="/">
           <img src="/logo-full.svg" alt="" />
+        </Link>
+        <Link className="d-xxxl-none" to="/">
+          <img src="/logo.svg" alt="" />
         </Link>
       </div>
 
@@ -20,19 +23,19 @@ const Sidebar = () => {
             to="/"
             className={({ isActive }) => (isActive ? 'link-menu is-active' : 'link-menu')}
           >
-            <span className="icon-menu me-4">
+            <span className="icon-menu">
               <Icon color="gray" name="swap" />
             </span>
-            <span>Swap</span>
+            <span className="ms-4 d-none d-xxxl-inline-block">Swap</span>
           </NavLink>
           <NavLink
             className={({ isActive }) => (isActive ? 'link-menu is-active mt-4' : 'link-menu mt-4')}
             to="/my-pools"
           >
-            <span className="icon-menu me-4">
+            <span className="icon-menu">
               <Icon color="gray" name="pools" />
             </span>
-            <span>Pools</span>
+            <span className="ms-4 d-none d-xxxl-inline-block">Pools</span>
           </NavLink>
           {/* <Link className="link-menu" to="/my-pools">
             My pools
@@ -52,13 +55,19 @@ const Sidebar = () => {
 
         <div>
           <div className="d-flex align-items-center">
-            <Icon color="gray" name="more" className="me-4" />
-            <span className="text-small text-secondary">More</span>
+            <span className="icon-menu">
+              <Icon color="gray" name="more" />
+            </span>
+            <span className="text-small text-secondary d-none d-xxxl-inline-block ms-4">More</span>
           </div>
 
           <div className="d-flex align-items-center mt-4">
-            <Icon color="gray" name="speach-bubble" className="me-4" />
-            <span className="text-small text-secondary">Support</span>
+            <span className="icon-menu">
+              <Icon color="gray" name="speach-bubble" />
+            </span>
+            <span className="text-small text-secondary d-none d-xxxl-inline-block ms-4">
+              Support
+            </span>
           </div>
         </div>
       </div>
