@@ -33,6 +33,7 @@ const ModalSearchContent = ({
   const [showNotFound, setShowNotFound] = useState(false);
   const [readyToImport, setReadyToImport] = useState(false);
   const [readyToImportERC, setReadyToImportERC] = useState(false);
+  const [warningMessage, setWarningMessage] = useState('');
 
   const { tokens: tokenDataList, loading: loadingTDL } = useTokens({
     fetchPolicy: 'network-only',
@@ -89,6 +90,7 @@ const ModalSearchContent = ({
     setSearchInputValue('');
     setReadyToImportERC(false);
     setReadyToImport(false);
+    setWarningMessage('');
     tokenDataList && setTokenList(tokenDataList);
   };
 
@@ -99,8 +101,14 @@ const ModalSearchContent = ({
 
   const handleImportButtonClick = async () => {
     const result = await getHTSTokenInfo(searchInputValue);
+    const { details } = result;
+    const { hasFees } = details;
+
+    setWarningMessage(hasFees ? 'Token has fees!' : '');
+
     const hasResults = Object.keys(result).length > 0;
     hasResults && setTokenList([result]);
+    setShowNotFound(false);
     setReadyToImport(false);
     setReadyToImportERC(!hasResults && searchInputValue !== '');
   };
@@ -111,6 +119,8 @@ const ModalSearchContent = ({
       setReadyToImport(false);
       setReadyToImportERC(false);
     }
+
+    setWarningMessage('');
 
     const found =
       tokenDataList?.find((item: ITokenData) => item.hederaId === searchInputValue) || false;
@@ -167,6 +177,8 @@ const ModalSearchContent = ({
             className="form-control"
           />
         </div>
+
+        {warningMessage ? <div className="alert alert-warning mt-5">{warningMessage}</div> : null}
 
         {showNotFound ? (
           <div className="text-center mt-5">

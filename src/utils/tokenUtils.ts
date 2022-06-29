@@ -21,8 +21,18 @@ export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
         decimals,
         total_supply: totalSupply,
         expiry_timestamp: expiryTimestamp,
+        admin_key: adminKey,
+        custom_fees: customFees,
+        freeze_key: freezeKey,
+        kyc_key: kycKey,
+        pause_key: pauseKey,
+        supply_key: supplyKey,
+        wipe_key: wipeKey,
       },
     } = await axios(url);
+
+    const { fixed_fees: fixedFees, fractional_fees: fractionalFees } = customFees;
+    const hasFees = fixedFees.length > 0 || fractionalFees.length > 0;
 
     const tokenInfo = {
       hederaId,
@@ -33,6 +43,16 @@ export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
       expiryTimestamp,
       address: idToAddress(hederaId),
       type: TokenType.HTS,
+      details: {
+        hasFees,
+        customFees,
+        adminKey,
+        freezeKey,
+        kycKey,
+        pauseKey,
+        wipeKey,
+        supplyKey,
+      },
     };
 
     return tokenInfo;
