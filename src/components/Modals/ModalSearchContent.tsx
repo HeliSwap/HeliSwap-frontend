@@ -30,6 +30,7 @@ const ModalSearchContent = ({
   const [searchInputValue, setSearchInputValue] = useState('');
 
   const [decimals, setDecimals] = useState(18);
+  const [showNotFound, setShowNotFound] = useState(false);
   const [readyToImport, setReadyToImport] = useState(false);
   const [readyToImportERC, setReadyToImportERC] = useState(false);
 
@@ -114,6 +115,8 @@ const ModalSearchContent = ({
     const found =
       tokenDataList?.find((item: ITokenData) => item.hederaId === searchInputValue) || false;
 
+    setShowNotFound(!found);
+
     if (searchInputValue !== '' && found) {
       setTokenList([found]);
     }
@@ -133,7 +136,9 @@ const ModalSearchContent = ({
 
   const hasTokenList = tokenList && tokenList.length > 0;
   const showImportButton = canImport && readyToImport;
-  const showTokenList = !loadingTDL && hasTokenList && !showImportButton && !readyToImportERC;
+  const showTokenList = canImport
+    ? !loadingTDL && hasTokenList && !showImportButton && !readyToImportERC
+    : !loadingTDL && hasTokenList && !showNotFound;
 
   return (
     <>
@@ -163,25 +168,30 @@ const ModalSearchContent = ({
           />
         </div>
 
-        {showImportButton ? (
+        {showNotFound ? (
           <div className="text-center mt-5">
             <img src={search} alt="" />
             <h2 className="text-subheader mt-4">Not Found</h2>
-            <p className="text-micro text-secondary mt-3 mb-5">
-              Would you like to import{' '}
-              <a
-                target="_blank"
-                rel="noreferrer"
-                className="link-primary"
-                href={`${hashScanUrl}${searchInputValue}`}
-              >
-                {searchInputValue}
-              </a>
-              ?
-            </p>
-            <Button onClick={handleImportButtonClick} type="primary" className="btn-sm">
-              Import
-            </Button>
+
+            {showImportButton ? (
+              <>
+                <p className="text-micro text-secondary mt-3 mb-5">
+                  Would you like to import{' '}
+                  <a
+                    target="_blank"
+                    rel="noreferrer"
+                    className="link-primary"
+                    href={`${hashScanUrl}${searchInputValue}`}
+                  >
+                    {searchInputValue}
+                  </a>
+                  ?
+                </p>
+                <Button onClick={handleImportButtonClick} type="primary" className="btn-sm">
+                  Import
+                </Button>
+              </>
+            ) : null}
           </div>
         ) : null}
 
@@ -194,7 +204,7 @@ const ModalSearchContent = ({
               onChange={handleDecimalsInputChange}
             />
             <Button onClick={handleImportERC20ButtonClick} className="btn btn-sm btn-primary ms-3">
-              Import ERC-20
+              Import
             </Button>
           </div>
         ) : null}
@@ -202,7 +212,7 @@ const ModalSearchContent = ({
         {showTokenList ? (
           <div className="mt-7">
             <h3 className="text-small">Token name</h3>
-            <div className="mt-5">
+            <div className="mt-3">
               {tokenList.map((token: ITokenData, index: number) => (
                 <div
                   onClick={() => handleTokenListClick(token)}
