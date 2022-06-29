@@ -354,7 +354,7 @@ const Create = () => {
 
     const { tokenAAmount, tokenAId, tokenBAmount, tokenBId } = createPairData;
 
-    if (tokenAAmount === '0' || tokenBAmount === '0') {
+    if (!tokenAAmount || !tokenBAmount) {
       isReady = false;
     }
 
