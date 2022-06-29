@@ -18,6 +18,7 @@ import { addressToContractId, idToAddress, calculateReserves } from '../utils/to
 import { getTransactionSettings } from '../utils/transactionUtils';
 import { getConnectedWallet } from '../pages/Helpers';
 import { MAX_UINT_ERC20 } from '../constants';
+import { formatIcons } from '../utils/iconUtils';
 
 interface IPoolInfoProps {
   pairData: IPairData;
@@ -231,13 +232,6 @@ const PoolInfo = ({ pairData, index }: IPoolInfoProps) => {
     pairData.token0Decimals,
     pairData.token1Decimals,
   );
-
-  const formatIcons = (icons: string[]) =>
-    icons &&
-    icons.length > 0 &&
-    icons.map((item, index) => (
-      <IconToken key={index} className={index === 1 ? 'ms-n2' : ''} symbol={item} />
-    ));
 
   return (
     <>

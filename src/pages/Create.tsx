@@ -33,6 +33,9 @@ import usePools from '../hooks/usePools';
 import useTokens from '../hooks/useTokens';
 import { MAX_UINT_ERC20, MAX_UINT_HTS } from '../constants';
 import Icon from '../components/Icon';
+import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
+import { formatIcons } from '../utils/iconUtils';
+import IconToken from '../components/IconToken';
 
 enum ADD_LIQUIDITY_TITLES {
   CREATE_POOL = 'Create pool',
@@ -206,7 +209,7 @@ const Create = () => {
     setShowModalConfirmProvide(true);
   };
 
-  const handleCreateConfirm = async () => {
+  const handleProvideConfirm = async () => {
     const { provideSlippage, transactionExpiration } = getTransactionSettings();
 
     setError(false);
@@ -632,6 +635,55 @@ const Create = () => {
               </Button>
             </div>
           )
+        ) : null}
+
+        {showModalConfirmProvide ? (
+          <Modal show={showModalConfirmProvide}>
+            <ConfirmTransactionModalContent
+              modalTitle={pageTitle}
+              closeModal={() => setShowModalConfirmProvide(false)}
+              confirmTansaction={handleProvideConfirm}
+              confirmButtonLabel="Confirm provide"
+            >
+              <>
+                <div className="d-flex m-4">
+                  {formatIcons([selectedPoolData.token0Symbol, selectedPoolData.token1Symbol])}
+                  <p className="text-small ms-3">
+                    {selectedPoolData.token0Symbol}/{selectedPoolData.token1Symbol}
+                  </p>
+                </div>
+                <div className="m-4 rounded border border-secondary justify-content-between ">
+                  <div className="d-flex justify-content-between align-items-center m-4">
+                    <div className="d-flex align-items-center">
+                      <IconToken symbol={selectedPoolData.token0Symbol} />
+                      <span className="text-main text-bold ms-3">
+                        {selectedPoolData.token0Symbol}
+                      </span>
+                    </div>
+
+                    <div className="d-flex justify-content-end align-items-center">
+                      <span className="text-numeric text-main">{createPairData.tokenAAmount}</span>
+                    </div>
+                  </div>
+                  <div className="d-flex justify-content-between align-items-center m-4">
+                    <div className="d-flex align-items-center">
+                      <IconToken symbol={selectedPoolData.token1Symbol} />
+                      <span className="text-main text-bold ms-3">
+                        {selectedPoolData.token1Symbol}
+                      </span>
+                    </div>
+
+                    <div className="d-flex justify-content-end align-items-center">
+                      <span className="text-numeric text-main">{createPairData.tokenBAmount}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="m-4 rounded border border-secondary justify-content-between ">
+                  {getTokensRatioSection()}
+                </div>
+              </>
+            </ConfirmTransactionModalContent>
+          </Modal>
         ) : null}
       </div>
     );
