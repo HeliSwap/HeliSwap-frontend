@@ -22,6 +22,7 @@ import {
 } from '../utils/numberUtils';
 import { calculateReserves, addressToContractId, idToAddress } from '../utils/tokenUtils';
 import { getTransactionSettings } from '../utils/transactionUtils';
+import { formatIcons } from '../utils/iconUtils';
 
 interface IRemoveLiquidityProps {
   pairData: IPairData;
@@ -55,14 +56,6 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
   const [removeNative, setRemoveNative] = useState(false);
   const [hasWrappedHBAR, setHasWrappedHBAR] = useState(false);
-
-  // TODO To be moved into helpers/utils folder
-  const formatIcons = (icons: string[]) =>
-    icons &&
-    icons.length > 0 &&
-    icons.map((item, index) => (
-      <IconToken key={index} className={index === 1 ? 'ms-n2' : ''} symbol={item} />
-    ));
 
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
