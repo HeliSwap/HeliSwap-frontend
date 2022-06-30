@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
+import BigNumber from 'bignumber.js';
 import { useParams } from 'react-router-dom';
 import {
   ITokenData,
@@ -22,7 +23,11 @@ import WalletBalance from '../components/WalletBalance';
 
 import errorMessages from '../content/errors';
 import { checkAllowanceHTS, getTokenBalance, idToAddress } from '../utils/tokenUtils';
-import { formatStringToBigNumberEthersWei, stripStringToFixedDecimals } from '../utils/numberUtils';
+import {
+  formatStringToBigNumberEthersWei,
+  formatStringToBigNumberWei,
+  stripStringToFixedDecimals,
+} from '../utils/numberUtils';
 import {
   getTransactionSettings,
   INITIAL_PROVIDE_SLIPPAGE_TOLERANCE,
@@ -580,61 +585,58 @@ const Create = () => {
   const getTokensRatioSection = () => {
     return readyToProvide ? (
       <div className="my-4">
-        {tokensInSamePool ? (
-          <div>
-            <div className="mt-3 d-flex justify-content-around">
-              <div className="text-center">
-                <p>
-                  <span className="text-small text-numeric">
-                    {Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount)}
-                  </span>
-                </p>
-                <p className="text-micro">
-                  {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
-                </p>
-              </div>
-
-              <div className="text-center">
-                <p>
-                  <span className="text-small text-numeric">
-                    {Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount)}
-                  </span>
-                </p>
-                <p className="text-micro">
-                  {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}
-                </p>
-              </div>
-            </div>
+        <div className="mt-3 d-flex justify-content-around">
+          <div className="text-center">
+            <p>
+              <span className="text-small text-numeric">
+                {Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount)}
+              </span>
+            </p>
+            <p className="text-micro">
+              {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
+            </p>
           </div>
-        ) : (
-          <div>
-            <div className="mt-3 d-flex justify-content-around">
-              <div className="text-center">
-                <p>
-                  <span className="text-small text-numeric">
-                    {Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount)}
-                  </span>
-                </p>
-                <p className="text-micro">
-                  {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
-                </p>
-              </div>
 
-              <div className="text-center">
-                <p>
-                  <span className="text-small text-numeric">
-                    {Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount)}
-                  </span>
-                </p>
-                <p className="text-micro">
-                  {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}
-                </p>
-              </div>
-            </div>
+          <div className="text-center">
+            <p>
+              <span className="text-small text-numeric">
+                {Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount)}
+              </span>
+            </p>
+            <p className="text-micro">
+              {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}
+            </p>
           </div>
-        )}
+          <div className="text-center">
+            <p>
+              <span className="text-small text-numeric">{`${getPoolShare()}%`}</span>
+            </p>
+            <p className="text-micro">Share of the pool</p>
+          </div>
+        </div>
       </div>
     ) : null;
+  };
+
+  const getPoolShare = () => {
+    if (Object.keys(selectedPoolData).length === 0) return '100';
+
+    //Calculating the pool share using one of the pool's provision tokens as no info for the LP token is available
+    const { token0Amount, token1Amount, token0 } = selectedPoolData;
+    const { tokenAAmount, tokenAId, tokenADecimals } = createPairData;
+
+    const token0Id =
+      provideNative && !tokenAId ? (process.env.REACT_APP_WHBAR_ADDRESS as string) : tokenAId;
+
+    const tokenATotalAmountBN =
+      token0 === idToAddress(token0Id) ? new BigNumber(token0Amount) : new BigNumber(token1Amount);
+
+    const tokenAAmountBN = formatStringToBigNumberWei(tokenAAmount, tokenADecimals);
+
+    return tokenAAmountBN
+      .div(tokenATotalAmountBN.plus(tokenAAmountBN))
+      .times(new BigNumber(100))
+      .toFixed(4);
   };
 
   const getActionButtons = () => {
