@@ -9,6 +9,7 @@ import IconToken from './IconToken';
 import InputTokenSelector from './InputTokenSelector';
 import InputToken from './InputToken';
 import ButtonSelector from './ButtonSelector';
+import InputSlider from './InputSlider';
 
 import { MAX_UINT_ERC20 } from '../constants';
 import { getConnectedWallet } from '../pages/Helpers';
@@ -273,6 +274,8 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
             {pairData.token0Symbol}/{pairData.token1Symbol}
           </p>
         </div>
+
+        <InputSlider />
 
         <p className="text-small text-bold mb-4">Enter LP Token Amount</p>
 
