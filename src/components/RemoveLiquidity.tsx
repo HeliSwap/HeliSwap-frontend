@@ -66,6 +66,15 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
+    // TODO make this common for every token input
+    const invalidInputTokensData = !value || isNaN(Number(value));
+
+    if (invalidInputTokensData) {
+      setLpInputValue(formatStringWeiToStringEther(pairData.lpShares as string));
+
+      return;
+    }
+
     setLpInputValue(value);
   };
 
