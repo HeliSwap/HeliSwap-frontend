@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import { IPairData } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
+import { Link } from 'react-router-dom';
 
 import Button from './Button';
 import IconToken from './IconToken';
@@ -16,7 +17,8 @@ import {
 import { addressToContractId, idToAddress, calculateReserves } from '../utils/tokenUtils';
 import { getTransactionSettings } from '../utils/transactionUtils';
 import { getConnectedWallet } from '../pages/Helpers';
-import { MAX_UINT_ERC20 } from '../constants';
+import { MAX_UINT_ERC20, POOLS_FEE } from '../constants';
+import { formatIcons } from '../utils/iconUtils';
 
 interface IPoolInfoProps {
   pairData: IPairData;
@@ -231,13 +233,6 @@ const PoolInfo = ({ pairData, index }: IPoolInfoProps) => {
     pairData.token1Decimals,
   );
 
-  const formatIcons = (icons: string[]) =>
-    icons &&
-    icons.length > 0 &&
-    icons.map((item, index) => (
-      <IconToken key={index} className={index === 1 ? 'ms-n2' : ''} symbol={item} />
-    ));
-
   return (
     <>
       <div className={`table-pools-row ${index % 2 === 0 ? 'is-gray' : ''}`}>
@@ -249,7 +244,7 @@ const PoolInfo = ({ pairData, index }: IPoolInfoProps) => {
           <p className="text-small ms-3">
             {pairData.token0Symbol}/{pairData.token1Symbol}
           </p>
-          <span className="text-micro text-numeric badge bg-secondary ms-3">0.3%</span>
+          <span className="text-micro text-numeric badge bg-secondary ms-3">{POOLS_FEE}</span>
         </div>
         <div className="table-pools-cell d-flex justify-content-end">
           <p
@@ -303,7 +298,9 @@ const PoolInfo = ({ pairData, index }: IPoolInfoProps) => {
 
             <div>
               <div className="d-flex align-items-center">
-                <Button className="btn-sm">Add Liquidity</Button>
+                <Link className="btn btn-sm btn-primary" to={`/create/${pairData.pairAddress}`}>
+                  Add Liquidity
+                </Link>
                 <Button
                   className="btn-sm ms-3"
                   onClick={() => setShowRemoveContainer(prev => !prev)}

@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
+import BigNumber from 'bignumber.js';
+import { useParams } from 'react-router-dom';
 import {
   ITokenData,
   TokenType,
@@ -21,7 +23,11 @@ import WalletBalance from '../components/WalletBalance';
 
 import errorMessages from '../content/errors';
 import { checkAllowanceHTS, getTokenBalance, idToAddress } from '../utils/tokenUtils';
-import { formatStringToBigNumberEthersWei } from '../utils/numberUtils';
+import {
+  formatStringToBigNumberEthersWei,
+  formatStringToBigNumberWei,
+  stripStringToFixedDecimals,
+} from '../utils/numberUtils';
 import {
   getTransactionSettings,
   INITIAL_PROVIDE_SLIPPAGE_TOLERANCE,
@@ -29,17 +35,30 @@ import {
 } from '../utils/transactionUtils';
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
-import { MAX_UINT_ERC20, MAX_UINT_HTS } from '../constants';
+import useTokens from '../hooks/useTokens';
+import { MAX_UINT_ERC20, MAX_UINT_HTS, POOLS_FEE } from '../constants';
+import Icon from '../components/Icon';
+import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
+import { formatIcons } from '../utils/iconUtils';
+import IconToken from '../components/IconToken';
+
+enum ADD_LIQUIDITY_TITLES {
+  CREATE_POOL = 'Create pool',
+  PROVIDE_LIQUIDITY = 'Provide liquidity',
+  INCREASE_LIQUIDITY = 'Increase liquidity',
+}
 
 const Create = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
+  const { address } = useParams();
 
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
   const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
+  const [showModalConfirmProvide, setShowModalConfirmProvide] = useState(false);
 
   const initialTokensData = {
     tokenA: {} as ITokenData,
@@ -51,6 +70,11 @@ const Create = () => {
 
   // State for pools
   const { pools: poolsData } = usePools({
+    fetchPolicy: 'network-only',
+    pollInterval: 10000,
+  });
+
+  const { loading: loadingTDL, tokens: tokenDataList } = useTokens({
     fetchPolicy: 'network-only',
     pollInterval: 10000,
   });
@@ -90,6 +114,7 @@ const Create = () => {
   const [readyToProvide, setReadyToProvide] = useState(false);
   const [tokensInSamePool, setTokensInSamePool] = useState(false);
   const [provideNative, setProvideNative] = useState(false);
+  const [pageTitle, setPageTitle] = useState(ADD_LIQUIDITY_TITLES.CREATE_POOL);
 
   // State for general error
   const [error, setError] = useState(false);
@@ -99,8 +124,10 @@ const Create = () => {
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value, name } = e.target;
+  // State for preset tokens from choosen pool
+  const [tokensDerivedFromPool, setTokensDerivedFromPool] = useState(false);
+
+  const handleInputChange = (value: string, name: string) => {
     const inputToken = name === 'tokenAAmount' ? tokensData.tokenA : tokensData.tokenB;
 
     const invalidInputTokensData = !value || isNaN(Number(value));
@@ -182,7 +209,11 @@ const Create = () => {
     }
   };
 
-  const handleCreateClick = async () => {
+  const handleProvideClick = () => {
+    setShowModalConfirmProvide(true);
+  };
+
+  const handleProvideConfirm = async () => {
     const { provideSlippage, transactionExpiration } = getTransactionSettings();
 
     setError(false);
@@ -217,9 +248,7 @@ const Create = () => {
       } else {
         const successMessage = `Provided exactly ${createPairData.tokenAAmount} ${tokensData.tokenA.symbol} and ${createPairData.tokenBAmount} ${tokensData.tokenB.symbol}`;
 
-        setCreatePairData(initialCreateData);
-        setTokensData(initialTokensData);
-        setSelectedPoolData({} as IPairData);
+        setCreatePairData({ ...createPairData, tokenAAmount: '', tokenBAmount: '' });
         setApproved(initialApproveData);
         setSuccessCreate(true);
         setSuccessMessage(successMessage);
@@ -347,7 +376,16 @@ const Create = () => {
     setSelectedPoolData(selectedPoolData[0] || {});
 
     setProvideNative(provideNative);
-    setTokensInSamePool(selectedPoolData && selectedPoolData.length !== 0);
+    const tokensInSamePool = selectedPoolData && selectedPoolData.length !== 0;
+    setTokensInSamePool(tokensInSamePool);
+    const pageTitle = tokensInSamePool
+      ? selectedPoolData[0].lpShares
+        ? ADD_LIQUIDITY_TITLES.INCREASE_LIQUIDITY
+        : ADD_LIQUIDITY_TITLES.PROVIDE_LIQUIDITY
+      : ADD_LIQUIDITY_TITLES.CREATE_POOL;
+
+    setPageTitle(pageTitle);
+    //TODO: Additional request will be needed in order to get info regarding pool shares
   }, [tokensData, poolsData]);
 
   useEffect(() => {
@@ -369,13 +407,41 @@ const Create = () => {
     setReadyToProvide(isReady);
   }, [createPairData, provideNative]);
 
-  return (
-    <div className="d-flex justify-content-center">
-      <div className="container-action">
-        <div className="d-flex justify-content-end">
-          <span className="cursor-pointer" onClick={() => setShowModalTransactionSettings(true)}>
-            <img className="me-2" width={24} src={`/icons/settings.png`} alt="" />
-          </span>
+  useEffect(() => {
+    try {
+      if (address && poolsData && tokenDataList && !tokensDerivedFromPool) {
+        const chosenPool =
+          poolsData.find((pool: IPairData) => pool.pairAddress === address) || ({} as IPairData);
+        const { token0: token0Address, token1: token1Address } = chosenPool;
+        const tokenA =
+          tokenDataList.find((token: ITokenData) => token.address === token0Address) ||
+          ({} as ITokenData);
+        const tokenB =
+          tokenDataList.find((token: ITokenData) => token.address === token1Address) ||
+          ({} as ITokenData);
+
+        setTokensData({ tokenA, tokenB });
+        //We want to set the tokens from the pool selected just once
+        setTokensDerivedFromPool(true);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [poolsData, tokenDataList, address, tokensDerivedFromPool]);
+
+  //Render methods
+  const getTitleAndSettings = () => {
+    return (
+      <>
+        <div className="d-flex justify-content-between align-items-center mb-6">
+          <h1 className="text-subheader text-light">{pageTitle}</h1>
+          <div
+            className="d-flex justify-content-end align-items-center cursor-pointer"
+            onClick={() => setShowModalTransactionSettings(true)}
+          >
+            <span className="text-small me-2">Settings</span>
+            <Icon name="settings" />
+          </div>
         </div>
 
         {showModalTransactionSettings ? (
@@ -390,203 +456,303 @@ const Create = () => {
             />
           </Modal>
         ) : null}
+      </>
+    );
+  };
 
-        <div className="container-dark">
-          {error ? (
-            <div className="alert alert-danger my-5" role="alert">
-              <strong>Something went wrong!</strong>
-              <p>{errorMessages[errorMessage]}</p>
-            </div>
-          ) : null}
+  const getErrorMessage = () => {
+    return error ? (
+      <div className="alert alert-danger my-5" role="alert">
+        <strong>Something went wrong!</strong>
+        <p>{errorMessages[errorMessage]}</p>
+      </div>
+    ) : null;
+  };
 
-          {successCreate ? (
-            <div className="alert alert-success alert-dismissible my-5" role="alert">
-              <strong>Success provide!</strong>
-              <p>{successMessage}</p>
-              <button
-                onClick={() => setSuccessCreate(false)}
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="alert"
-                aria-label="Close"
-              ></button>
-            </div>
-          ) : null}
+  const getProvideSection = () => {
+    return (
+      <div className="container-dark">
+        {successCreate ? (
+          <div className="alert alert-success alert-dismissible my-5" role="alert">
+            <strong>Success provide!</strong>
+            <p>{successMessage}</p>
+            <button
+              onClick={() => setSuccessCreate(false)}
+              type="button"
+              className="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+            ></button>
+          </div>
+        ) : null}
 
-          <InputTokenSelector
-            inputTokenComponent={
-              <InputToken
-                value={createPairData.tokenAAmount}
-                onChange={handleInputChange}
-                name="tokenAAmount"
-              />
-            }
-            buttonSelectorComponent={
-              <ButtonSelector
-                onClick={() => setShowModalA(true)}
-                selectedToken={tokensData?.tokenA.symbol}
-                selectorText="Select a token"
-              />
-            }
-            walletBalanceComponent={
-              <WalletBalance
-                walletBalance={tokenBalances.tokenA}
-                onMaxButtonClick={(maxValue: string) => {
-                  // handleInputChange(maxValue);
-                }}
-              />
-            }
-          />
-          <Modal show={showModalA}>
-            <ModalSearchContent
-              modalTitle="Select a token"
-              tokenFieldId="tokenA"
-              setTokensData={setTokensData}
-              closeModal={() => setShowModalA(false)}
+        {getFeesInfo()}
+        <div className="mb-4 text-small text-bold">Enter amount</div>
+        <InputTokenSelector
+          inputTokenComponent={
+            <InputToken
+              value={createPairData.tokenAAmount}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const { value, name } = e.target;
+                const strippedValue = stripStringToFixedDecimals(value, tokensData.tokenA.decimals);
+                handleInputChange(strippedValue, name);
+              }}
+              name="tokenAAmount"
             />
-          </Modal>
-
-          <InputTokenSelector
-            className="mt-4"
-            inputTokenComponent={
-              <InputToken
-                value={createPairData.tokenBAmount}
-                onChange={handleInputChange}
-                name="tokenBAmount"
-              />
-            }
-            buttonSelectorComponent={
-              <ButtonSelector
-                onClick={() => setShowModalB(true)}
-                selectedToken={tokensData?.tokenB.symbol}
-                selectorText="Select token"
-              />
-            }
-            walletBalanceComponent={<WalletBalance walletBalance={tokenBalances.tokenB} />}
-          />
-          <Modal show={showModalB}>
-            <ModalSearchContent
-              modalTitle="Select token"
-              tokenFieldId="tokenB"
-              setTokensData={setTokensData}
-              closeModal={() => setShowModalB(false)}
+          }
+          buttonSelectorComponent={
+            <ButtonSelector
+              onClick={() => setShowModalA(true)}
+              selectedToken={tokensData?.tokenA.symbol}
+              selectorText="Select a token"
             />
-          </Modal>
+          }
+          walletBalanceComponent={
+            <WalletBalance
+              walletBalance={tokenBalances.tokenA}
+              onMaxButtonClick={(maxValue: string) => {
+                handleInputChange(maxValue, 'tokenAAmount');
+              }}
+            />
+          }
+        />
+        <Modal show={showModalA}>
+          <ModalSearchContent
+            modalTitle="Select a token"
+            tokenFieldId="tokenA"
+            setTokensData={setTokensData}
+            closeModal={() => setShowModalA(false)}
+            tokenDataList={tokenDataList || []}
+            loadingTDL={loadingTDL}
+          />
+        </Modal>
 
-          {readyToProvide ? (
-            <div className="my-4">
-              {tokensInSamePool ? (
-                <div>
-                  <div className="mt-3 d-flex justify-content-around">
-                    <div className="text-center">
-                      <p>
-                        <span className="text-small text-numeric">
-                          {Number(createPairData.tokenBAmount) /
-                            Number(createPairData.tokenAAmount)}
-                        </span>
-                      </p>
-                      <p className="text-micro">
-                        {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
-                      </p>
-                    </div>
+        <InputTokenSelector
+          className="mt-4"
+          inputTokenComponent={
+            <InputToken
+              value={createPairData.tokenBAmount}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const { value, name } = e.target;
+                const strippedValue = stripStringToFixedDecimals(value, tokensData.tokenB.decimals);
+                handleInputChange(strippedValue, name);
+              }}
+              name="tokenBAmount"
+            />
+          }
+          buttonSelectorComponent={
+            <ButtonSelector
+              onClick={() => setShowModalB(true)}
+              selectedToken={tokensData?.tokenB.symbol}
+              selectorText="Select token"
+            />
+          }
+          walletBalanceComponent={
+            <WalletBalance
+              walletBalance={tokenBalances.tokenB}
+              onMaxButtonClick={(maxValue: string) => {
+                handleInputChange(maxValue, 'tokenBAmount');
+              }}
+            />
+          }
+        />
+        <Modal show={showModalB}>
+          <ModalSearchContent
+            modalTitle="Select token"
+            tokenFieldId="tokenB"
+            setTokensData={setTokensData}
+            closeModal={() => setShowModalB(false)}
+            tokenDataList={tokenDataList || []}
+            loadingTDL={loadingTDL}
+          />
+        </Modal>
 
-                    <div className="text-center">
-                      <p>
-                        <span className="text-small text-numeric">
-                          {Number(createPairData.tokenAAmount) /
-                            Number(createPairData.tokenBAmount)}
-                        </span>
-                      </p>
-                      <p className="text-micro">
-                        {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <div className="mt-3 d-flex justify-content-around">
-                    <div className="text-center">
-                      <p>
-                        <span className="text-small text-numeric">
-                          {Number(createPairData.tokenBAmount) /
-                            Number(createPairData.tokenAAmount)}
-                        </span>
-                      </p>
-                      <p className="text-micro">
-                        {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
-                      </p>
-                    </div>
+        {getTokensRatioSection()}
+        {getActionButtons()}
+      </div>
+    );
+  };
 
-                    <div className="text-center">
-                      <p>
-                        <span className="text-small text-numeric">
-                          {Number(createPairData.tokenAAmount) /
-                            Number(createPairData.tokenBAmount)}
-                        </span>
-                      </p>
-                      <p className="text-micro">
-                        {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : null}
+  const getFeesInfo = () => {
+    return (
+      <div className="d-flex mb-4 justify-content-between align-items-center border-bottom border-secondary">
+        <span className="mb-4 text-small text-bold">Liquidity provider fee:</span>
+        <span className="mb-4 text-small">{POOLS_FEE}</span>
+      </div>
+    );
+  };
 
-          <div>
-            {tokensData.tokenA.hederaId &&
-            !approved.tokenA &&
-            createPairData.tokenAAmount !== '0' ? (
-              <div className="d-grid mt-4">
-                <Button
-                  loading={loadingApprove}
-                  onClick={() => handleApproveClick('tokenA')}
-                >{`Approve ${tokensData.tokenA.symbol}`}</Button>
-              </div>
-            ) : null}
+  const getTokensRatioSection = () => {
+    return readyToProvide ? (
+      <div className="my-4">
+        <div className="mt-3 d-flex justify-content-around">
+          <div className="text-center">
+            <p>
+              <span className="text-small text-numeric">
+                {Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount)}
+              </span>
+            </p>
+            <p className="text-micro">
+              {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
+            </p>
+          </div>
 
-            {tokensData.tokenB.hederaId &&
-            !approved.tokenB &&
-            createPairData.tokenBAmount !== '0' ? (
-              <div className="d-grid mt-4">
-                <div className="d-grid mt-4">
-                  {' '}
-                  <Button
-                    loading={loadingApprove}
-                    onClick={() => handleApproveClick('tokenB')}
-                  >{`Approve ${tokensData.tokenB.symbol}`}</Button>
-                </div>
-              </div>
-            ) : null}
-
-            {approved.tokenA && approved.tokenB ? (
-              tokensInSamePool ? (
-                <div className="d-grid mt-4">
-                  <Button
-                    loading={loadingCreate}
-                    disabled={!readyToProvide}
-                    onClick={handleCreateClick}
-                  >
-                    Provide
-                  </Button>
-                </div>
-              ) : (
-                <div className="d-grid mt-4">
-                  {' '}
-                  <Button
-                    loading={loadingCreate}
-                    disabled={!readyToProvide}
-                    onClick={handleCreateClick}
-                  >
-                    Create
-                  </Button>
-                </div>
-              )
-            ) : null}
+          <div className="text-center">
+            <p>
+              <span className="text-small text-numeric">
+                {Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount)}
+              </span>
+            </p>
+            <p className="text-micro">
+              {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}
+            </p>
+          </div>
+          <div className="text-center">
+            <p>
+              <span className="text-small text-numeric">{`${getPoolShare()}%`}</span>
+            </p>
+            <p className="text-micro">Share of the pool</p>
           </div>
         </div>
+      </div>
+    ) : null;
+  };
+
+  const getPoolShare = () => {
+    if (Object.keys(selectedPoolData).length === 0) return '100';
+
+    //Calculating the pool share using one of the pool's provision tokens as no info for the LP token is available
+    const { token0Amount, token1Amount, token0 } = selectedPoolData;
+    const { tokenAAmount, tokenAId, tokenADecimals } = createPairData;
+
+    const token0Id =
+      provideNative && !tokenAId ? (process.env.REACT_APP_WHBAR_ADDRESS as string) : tokenAId;
+
+    const tokenATotalAmountBN =
+      token0 === idToAddress(token0Id) ? new BigNumber(token0Amount) : new BigNumber(token1Amount);
+
+    const tokenAAmountBN = formatStringToBigNumberWei(tokenAAmount, tokenADecimals);
+
+    return tokenAAmountBN
+      .div(tokenATotalAmountBN.plus(tokenAAmountBN))
+      .times(new BigNumber(100))
+      .toFixed(4);
+  };
+
+  const getActionButtons = () => {
+    return (
+      <div className="mt-5">
+        {tokensData.tokenA.hederaId && !approved.tokenA && createPairData.tokenAAmount ? (
+          <div className="d-grid mt-4">
+            <Button
+              loading={loadingApprove}
+              onClick={() => handleApproveClick('tokenA')}
+              className="mx-2"
+            >{`Approve ${tokensData.tokenA.symbol}`}</Button>
+          </div>
+        ) : null}
+
+        {tokensData.tokenB.hederaId && !approved.tokenB && createPairData.tokenBAmount ? (
+          <div className="d-grid mt-4">
+            <div className="d-grid mt-4">
+              {' '}
+              <Button
+                loading={loadingApprove}
+                onClick={() => handleApproveClick('tokenB')}
+                className="mx-2"
+              >{`Approve ${tokensData.tokenB.symbol}`}</Button>
+            </div>
+          </div>
+        ) : null}
+
+        {approved.tokenA && approved.tokenB ? (
+          tokensInSamePool ? (
+            <div className="d-grid mt-4">
+              <Button
+                loading={loadingCreate}
+                disabled={!readyToProvide}
+                onClick={handleProvideClick}
+              >
+                Provide
+              </Button>
+            </div>
+          ) : (
+            <div className="d-grid mt-4">
+              {' '}
+              <Button
+                loading={loadingCreate}
+                disabled={!readyToProvide}
+                onClick={handleProvideClick}
+              >
+                Create
+              </Button>
+            </div>
+          )
+        ) : null}
+
+        {showModalConfirmProvide ? (
+          <Modal show={showModalConfirmProvide}>
+            <ConfirmTransactionModalContent
+              modalTitle={pageTitle}
+              closeModal={() => setShowModalConfirmProvide(false)}
+              confirmTansaction={handleProvideConfirm}
+              confirmButtonLabel="Confirm provide"
+            >
+              {getProvideConfirmationModalContent()}
+            </ConfirmTransactionModalContent>
+          </Modal>
+        ) : null}
+      </div>
+    );
+  };
+
+  const getProvideConfirmationModalContent = () => {
+    const hasSelectedPool = Object.keys(selectedPoolData).length;
+    const token0Symbol = hasSelectedPool ? selectedPoolData.token0Symbol : tokensData.tokenA.symbol;
+    const token1Symbol = hasSelectedPool ? selectedPoolData.token1Symbol : tokensData.tokenB.symbol;
+    return (
+      <>
+        <div className="d-flex m-4">
+          {formatIcons([token0Symbol, token1Symbol])}
+          <p className="text-small ms-3">
+            {token0Symbol}/{token1Symbol}
+          </p>
+        </div>
+        <div className="m-4 rounded border border-secondary justify-content-between ">
+          <div className="d-flex justify-content-between align-items-center m-4">
+            <div className="d-flex align-items-center">
+              <IconToken symbol={token0Symbol} />
+              <span className="text-main text-bold ms-3">{token0Symbol}</span>
+            </div>
+
+            <div className="d-flex justify-content-end align-items-center">
+              <span className="text-numeric text-main">{createPairData.tokenAAmount}</span>
+            </div>
+          </div>
+          <div className="d-flex justify-content-between align-items-center m-4">
+            <div className="d-flex align-items-center">
+              <IconToken symbol={token1Symbol} />
+              <span className="text-main text-bold ms-3">{token1Symbol}</span>
+            </div>
+
+            <div className="d-flex justify-content-end align-items-center">
+              <span className="text-numeric text-main">{createPairData.tokenBAmount}</span>
+            </div>
+          </div>
+        </div>
+        <div className="m-4 rounded border border-secondary justify-content-between ">
+          {getTokensRatioSection()}
+        </div>
+      </>
+    );
+  };
+
+  return (
+    <div className="d-flex justify-content-center">
+      <div className="container-action">
+        {getTitleAndSettings()}
+        {getErrorMessage()}
+        {getProvideSection()}
       </div>
     </div>
   );
