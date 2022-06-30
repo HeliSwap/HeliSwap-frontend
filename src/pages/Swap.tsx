@@ -504,7 +504,7 @@ const Swap = () => {
     return (
       <>
         <div className="d-flex justify-content-between align-items-center mb-6">
-          <h1 className="text-subheader">Swap</h1>
+          <h1 className="text-subheader text-light">Swap</h1>
           <div
             className="d-flex justify-content-end align-items-center cursor-pointer"
             onClick={() => setShowModalTransactionSettings(true)}

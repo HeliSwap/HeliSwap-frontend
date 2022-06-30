@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { IPairData } from '../interfaces/tokens';
 
 import Button from './Button';
@@ -7,15 +8,23 @@ import Icon from './Icon';
 
 import { formatStringWeiToStringEther } from '../utils/numberUtils';
 import { calculateReserves } from '../utils/tokenUtils';
+import { formatIcons } from '../utils/iconUtils';
+
 import { POOLS_FEE } from '../constants';
 
 interface IPoolInfoProps {
   pairData: IPairData;
   index: number;
   setShowRemoveContainer: React.Dispatch<React.SetStateAction<boolean>>;
+  setCurrentPoolIndex: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const PoolInfo = ({ pairData, index, setShowRemoveContainer }: IPoolInfoProps) => {
+const PoolInfo = ({
+  pairData,
+  index,
+  setShowRemoveContainer,
+  setCurrentPoolIndex,
+}: IPoolInfoProps) => {
   const [showPoolDetails, setShowPoolDetails] = useState(false);
 
   const { reserve0ShareStr, reserve1ShareStr } = calculateReserves(
@@ -95,10 +104,7 @@ const PoolInfo = ({ pairData, index, setShowRemoveContainer }: IPoolInfoProps) =
                 <Link className="btn btn-sm btn-primary" to={`/create/${pairData.pairAddress}`}>
                   Add Liquidity
                 </Link>
-                <Button
-                  className="btn-sm ms-3"
-                  onClick={() => setShowRemoveContainer((prev: boolean) => !prev)}
-                >
+                <Button className="btn-sm ms-3" onClick={handleRemoveButtonClick}>
                   Remove Liquidity
                 </Button>
               </div>

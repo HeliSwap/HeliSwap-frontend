@@ -26,6 +26,7 @@ const Pairs = () => {
   const [pairData, setPairData] = useState<IPairData[]>([]);
   const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
   const [showRemoveContainer, setShowRemoveContainer] = useState(false);
+  const [currentPoolIndex, setCurrentPoolIndex] = useState(0);
 
   useEffect(() => {
     userId &&
@@ -45,7 +46,10 @@ const Pairs = () => {
   return (
     <div className="d-flex justify-content-center">
       {showRemoveContainer ? (
-        <RemoveLiquidity pairData={pairData[0]} setShowRemoveContainer={setShowRemoveContainer} />
+        <RemoveLiquidity
+          pairData={pairData[currentPoolIndex]}
+          setShowRemoveContainer={setShowRemoveContainer}
+        />
       ) : (
         <div className="container-pools">
           <div className="d-flex justify-content-between align-items-center mb-6">
@@ -96,6 +100,7 @@ const Pairs = () => {
               {pairData.map((item, index) => (
                 <PoolInfo
                   setShowRemoveContainer={setShowRemoveContainer}
+                  setCurrentPoolIndex={setCurrentPoolIndex}
                   index={index}
                   key={index}
                   pairData={item}

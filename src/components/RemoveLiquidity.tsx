@@ -4,6 +4,12 @@ import { IPairData } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
 import Button from './Button';
+import Icon from './Icon';
+import IconToken from './IconToken';
+import InputTokenSelector from './InputTokenSelector';
+import InputToken from './InputToken';
+import ButtonSelector from './ButtonSelector';
+
 import { MAX_UINT_ERC20 } from '../constants';
 import { getConnectedWallet } from '../pages/Helpers';
 
@@ -49,44 +55,18 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
   const [removeNative, setRemoveNative] = useState(false);
   const [hasWrappedHBAR, setHasWrappedHBAR] = useState(false);
 
+  // TODO To be moved into helpers/utils folder
+  const formatIcons = (icons: string[]) =>
+    icons &&
+    icons.length > 0 &&
+    icons.map((item, index) => (
+      <IconToken key={index} className={index === 1 ? 'ms-n2' : ''} symbol={item} />
+    ));
+
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
     setLpInputValue(value);
-  };
-
-  const handleCalculateButtonClick = async () => {
-    const {
-      pairSupply,
-      token0Amount,
-      token1Amount,
-      token0: tokenInAddress,
-      token1: tokenOutAddress,
-      token0Decimals,
-      token1Decimals,
-    } = pairData;
-    const tokensLPToRemove = formatStringToStringWei(lpInputValue);
-
-    const { reserve0ShareStr: tokens0Amount, reserve1ShareStr: tokens1Amount } = calculateReserves(
-      tokensLPToRemove,
-      pairSupply,
-      token0Amount,
-      token1Amount,
-      token0Decimals,
-      token1Decimals,
-    );
-
-    const tokensLpAmount = hethers.utils.formatUnits(tokensLPToRemove, 18).toString();
-
-    setRemoveLpData({
-      tokenInAddress,
-      tokenOutAddress,
-      tokensLpAmount,
-      tokens0Amount,
-      tokens1Amount,
-      token0Decimals,
-      token1Decimals,
-    });
   };
 
   const handleRemoveLPButtonClick = async () => {
@@ -216,65 +196,138 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
     }
   }, [pairData, connectedWallet, removeLpData, sdk, userId]);
 
+  useEffect(() => {
+    const {
+      pairSupply,
+      token0Amount,
+      token1Amount,
+      token0: tokenInAddress,
+      token1: tokenOutAddress,
+      token0Decimals,
+      token1Decimals,
+    } = pairData;
+
+    const tokensLPToRemove = formatStringToStringWei(lpInputValue);
+
+    const { reserve0ShareStr: tokens0Amount, reserve1ShareStr: tokens1Amount } = calculateReserves(
+      tokensLPToRemove,
+      pairSupply,
+      token0Amount,
+      token1Amount,
+      token0Decimals,
+      token1Decimals,
+    );
+
+    const tokensLpAmount = hethers.utils.formatUnits(tokensLPToRemove, 18).toString();
+
+    setRemoveLpData({
+      tokenInAddress,
+      tokenOutAddress,
+      tokensLpAmount,
+      tokens0Amount,
+      tokens1Amount,
+      token0Decimals,
+      token1Decimals,
+    });
+  }, [lpInputValue, pairData]);
+
   const canRemove = lpApproved && removeLpData.tokenInAddress !== '';
 
   return (
-    <div className="mt-4 rounded border border-secondary p-4">
-      {errorRemove ? (
-        <div className="alert alert-danger mb-4" role="alert">
-          <strong>Something went wrong!</strong>
-        </div>
-      ) : null}
-      <input
-        value={lpInputValue}
-        onChange={hanleLpInputChange}
-        type="text"
-        name=""
-        className="form-control mt-2"
-      />
-      <div className="mt-4 d-flex">
-        <Button disabled={lpApproved} onClick={hanleApproveLPClick}>
-          Approve
-        </Button>
-        <Button
-          loading={loadingRemove}
-          disabled={!canRemove}
-          className="ms-3"
-          onClick={handleRemoveLPButtonClick}
+    <div className="container-action">
+      <div className="d-flex justify-content-between aling-items-center mb-6">
+        <span className="cursor-pointer" onClick={() => setShowRemoveContainer(false)}>
+          <Icon name="arrow-left" />
+        </span>
+
+        <h2 className="text-subheader text-light">Remove Liquidity</h2>
+
+        <div
+          className="d-flex justify-content-end align-items-center cursor-pointer"
+          // onClick={() => setShowModalTransactionSettings(true)}
         >
-          Remove
-        </Button>
-        <Button className="ms-3" onClick={handleCalculateButtonClick}>
-          Calculate
-        </Button>
+          <span className="text-small me-2">Settings</span>
+          <Icon name="settings" />
+        </div>
       </div>
-      <div className="mt-4">
-        {hasWrappedHBAR ? (
-          <div>
-            <label>
-              <input
-                type="checkbox"
-                checked={removeNative}
-                onClick={() => setRemoveNative(!removeNative)}
-              />
-              <span className="ms-2">Receive HBAR</span>
-            </label>
+
+      <div className="container-dark">
+        {errorRemove ? (
+          <div className="alert alert-danger mb-4" role="alert">
+            <strong>Something went wrong!</strong>
           </div>
         ) : null}
-        You will receive:
-        <div className="d-flex justify-content-between align-items-center mt-2">
-          <p>Pooled {pairData.token0Symbol}:</p>
-          <p className="d-flex align-items-center">
-            <span className="me-2">{removeLpData.tokens0Amount}</span>
-            <img width={20} src={`/icons/${pairData.token0Symbol}.png`} alt="" />
+
+        <div className="d-flex align-items-center mb-5">
+          {formatIcons([pairData.token0Symbol, pairData.token1Symbol])}
+          <p className="text-small ms-3">
+            {pairData.token0Symbol}/{pairData.token1Symbol}
           </p>
         </div>
-        <div className="d-flex justify-content-between align-items-center mt-2">
-          <p>Pooled {pairData.token1Symbol}:</p>
-          <p className="d-flex align-items-center">
-            <span className="me-2">{removeLpData.tokens1Amount}</span>
-            <img width={20} src={`/icons/${pairData.token1Symbol}.png`} alt="" />
-          </p>
+
+        <p className="text-small text-bold mb-4">Enter LP Token Amount</p>
+
+        <InputTokenSelector
+          inputTokenComponent={
+            <InputToken value={lpInputValue} onChange={hanleLpInputChange} name="amountIn" />
+          }
+          buttonSelectorComponent={
+            <ButtonSelector
+              // selectedToken={tokensData?.tokenA.symbol}
+              selectorText="Select a token"
+            />
+          }
+        />
+
+        <div className="mt-4">
+          {hasWrappedHBAR ? (
+            <div>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={removeNative}
+                  onChange={() => setRemoveNative(!removeNative)}
+                />
+                <span className="ms-2">Receive HBAR</span>
+              </label>
+            </div>
+          ) : null}
+
+          <div className="mt-4 p-4 rounded border border-secondary">
+            <div className="d-flex justify-content-between align-items-center">
+              <p className="text-small">Pooled {pairData.token0Symbol}:</p>
+              <p className="d-flex justify-content-end align-items-center">
+                <span className="text-small text-numeric me-3">{removeLpData.tokens0Amount}</span>
+                <IconToken symbol={pairData.token0Symbol} />
+              </p>
+            </div>
+
+            <div className="d-flex justify-content-between align-items-center mt-4">
+              <p className="text-small">Pooled {pairData.token1Symbol}:</p>
+              <p className="d-flex justify-content-end align-items-center">
+                <span className="text-small text-numeric me-3">{removeLpData.tokens1Amount}</span>
+                <IconToken symbol={pairData.token1Symbol} />
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <div className="d-grid mt-4">
+            {!lpApproved ? (
+              <Button className="mb-3" onClick={hanleApproveLPClick}>
+                Approve
+              </Button>
+            ) : null}
+
+            <Button
+              loading={loadingRemove}
+              disabled={!canRemove}
+              onClick={handleRemoveLPButtonClick}
+            >
+              Remove
+            </Button>
+          </div>
         </div>
       </div>
     </div>
