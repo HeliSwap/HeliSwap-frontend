@@ -315,6 +315,10 @@ const Create = () => {
     } else {
       userId && tokenB.hederaId && getAllowanceHTS(userId, tokenB, 'tokenB');
     }
+
+    return () => {
+      setReadyToProvide(false);
+    };
   }, [tokensData, sdk, userId, createPairData]);
 
   useEffect(() => {
