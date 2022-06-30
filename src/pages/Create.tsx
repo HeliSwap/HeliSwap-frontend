@@ -22,7 +22,7 @@ import WalletBalance from '../components/WalletBalance';
 
 import errorMessages from '../content/errors';
 import { checkAllowanceHTS, getTokenBalance, idToAddress } from '../utils/tokenUtils';
-import { formatStringToBigNumberEthersWei } from '../utils/numberUtils';
+import { formatStringToBigNumberEthersWei, stripStringToFixedDecimals } from '../utils/numberUtils';
 import {
   getTransactionSettings,
   INITIAL_PROVIDE_SLIPPAGE_TOLERANCE,
@@ -122,8 +122,7 @@ const Create = () => {
   // State for preset tokens from choosen pool
   const [tokensDerivedFromPool, setTokensDerivedFromPool] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value, name } = e.target;
+  const handleInputChange = (value: string, name: string) => {
     const inputToken = name === 'tokenAAmount' ? tokensData.tokenA : tokensData.tokenB;
 
     const invalidInputTokensData = !value || isNaN(Number(value));
@@ -488,7 +487,11 @@ const Create = () => {
           inputTokenComponent={
             <InputToken
               value={createPairData.tokenAAmount}
-              onChange={handleInputChange}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const { value, name } = e.target;
+                const strippedValue = stripStringToFixedDecimals(value, tokensData.tokenA.decimals);
+                handleInputChange(strippedValue, name);
+              }}
               name="tokenAAmount"
             />
           }
@@ -503,7 +506,7 @@ const Create = () => {
             <WalletBalance
               walletBalance={tokenBalances.tokenA}
               onMaxButtonClick={(maxValue: string) => {
-                // handleInputChange(maxValue);
+                handleInputChange(maxValue, 'tokenAAmount');
               }}
             />
           }
@@ -524,7 +527,11 @@ const Create = () => {
           inputTokenComponent={
             <InputToken
               value={createPairData.tokenBAmount}
-              onChange={handleInputChange}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const { value, name } = e.target;
+                const strippedValue = stripStringToFixedDecimals(value, tokensData.tokenB.decimals);
+                handleInputChange(strippedValue, name);
+              }}
               name="tokenBAmount"
             />
           }
@@ -535,7 +542,14 @@ const Create = () => {
               selectorText="Select token"
             />
           }
-          walletBalanceComponent={<WalletBalance walletBalance={tokenBalances.tokenB} />}
+          walletBalanceComponent={
+            <WalletBalance
+              walletBalance={tokenBalances.tokenB}
+              onMaxButtonClick={(maxValue: string) => {
+                handleInputChange(maxValue, 'tokenBAmount');
+              }}
+            />
+          }
         />
         <Modal show={showModalB}>
           <ModalSearchContent
