@@ -302,7 +302,7 @@ const Create = () => {
     if (tokenA.type === TokenType.HBAR) {
       setApproved(prev => ({ ...prev, tokenA: true }));
     } else if (tokenA.type === TokenType.ERC20) {
-      getAllowanceERC20(tokenA, 'tokenA');
+      userId && getAllowanceERC20(tokenA, 'tokenA');
     } else {
       userId && tokenA.hederaId && getAllowanceHTS(userId, tokenA, 'tokenA');
     }
@@ -310,7 +310,7 @@ const Create = () => {
     if (tokenB.type === TokenType.HBAR) {
       setApproved(prev => ({ ...prev, tokenB: true }));
     } else if (tokenB.type === TokenType.ERC20) {
-      getAllowanceERC20(tokenB, 'tokenB');
+      userId && getAllowanceERC20(tokenB, 'tokenB');
     } else {
       userId && tokenB.hederaId && getAllowanceHTS(userId, tokenB, 'tokenB');
     }
