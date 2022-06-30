@@ -272,10 +272,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
             <InputToken value={lpInputValue} onChange={hanleLpInputChange} name="amountIn" />
           }
           buttonSelectorComponent={
-            <ButtonSelector
-              // selectedToken={tokensData?.tokenA.symbol}
-              selectorText="Select a token"
-            />
+            <ButtonSelector disabled selectedToken="LP" selectorText="Select a token" />
           }
         />
 

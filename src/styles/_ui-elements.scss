@@ -9,8 +9,11 @@
   border-radius: $border-radius;
   display: inline-flex;
   align-items: center;
-  cursor: pointer;
-  transition: background-color 0.15s linear, border-color 0.15s linear;
+
+  &:not(.is-disabled) {
+    cursor: pointer;
+    transition: background-color 0.15s linear, border-color 0.15s linear;
+  }
 
   &.with-background {
     background-color: $neutral-700;
@@ -20,7 +23,7 @@
     border: 1px solid $neutral-400;
   }
 
-  &:hover {
+  &:hover:not(.is-disabled) {
     background-color: $neutral-500;
 
     &.with-border {

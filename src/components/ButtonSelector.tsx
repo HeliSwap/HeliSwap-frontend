@@ -36,7 +36,10 @@ const ButtonSelector = ({
   };
 
   return (
-    <div onClick={handleClick} className={`btn-selector ${typeMapping[type]} ${className}`}>
+    <div
+      onClick={handleClick}
+      className={`btn-selector ${disabled ? 'is-disabled' : ''} ${typeMapping[type]} ${className}`}
+    >
       {selectedToken ? <IconToken symbol={selectedToken} className="me-3" /> : null}
       {selectedToken ? (
         <span className="text-main">{selectedToken}</span>
