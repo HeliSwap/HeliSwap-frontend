@@ -104,7 +104,10 @@ const PoolInfo = ({
                 <Link className="btn btn-sm btn-primary" to={`/create/${pairData.pairAddress}`}>
                   Add Liquidity
                 </Link>
-                <Button className="btn-sm ms-3" onClick={handleRemoveButtonClick}>
+                <Button
+                  className="btn-sm ms-3"
+                  onClick={() => setShowRemoveContainer(prev => !prev)}
+                >
                   Remove Liquidity
                 </Button>
               </div>
