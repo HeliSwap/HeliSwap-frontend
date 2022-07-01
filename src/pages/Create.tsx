@@ -51,7 +51,7 @@ enum ADD_LIQUIDITY_TITLES {
 const Create = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
-  const { userId, hashconnectConnectorInstance } = connection;
+  const { userId, hashconnectConnectorInstance, connected, connectWallet } = connection;
   const { address } = useParams();
 
   // State for modals
@@ -133,6 +133,7 @@ const Create = () => {
     const invalidInputTokensData = !value || isNaN(Number(value));
 
     if (invalidInputTokensData) {
+      setReadyToProvide(false);
       setCreatePairData(prev => ({ ...prev, tokenAAmount: '', tokenBAmount: '' }));
       return;
     }
@@ -314,6 +315,10 @@ const Create = () => {
     } else {
       userId && tokenB.hederaId && getAllowanceHTS(userId, tokenB, 'tokenB');
     }
+
+    return () => {
+      setReadyToProvide(false);
+    };
   }, [tokensData, sdk, userId, createPairData]);
 
   useEffect(() => {
@@ -640,7 +645,7 @@ const Create = () => {
   };
 
   const getActionButtons = () => {
-    return (
+    return connected ? (
       <div className="mt-5">
         {tokensData.tokenA.hederaId && !approved.tokenA && createPairData.tokenAAmount ? (
           <div className="d-grid mt-4">
@@ -702,6 +707,10 @@ const Create = () => {
             </ConfirmTransactionModalContent>
           </Modal>
         ) : null}
+      </div>
+    ) : (
+      <div className="d-grid mt-4">
+        <Button onClick={() => connectWallet()}>Connect wallet</Button>
       </div>
     );
   };
