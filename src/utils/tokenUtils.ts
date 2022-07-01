@@ -1,13 +1,15 @@
 import axios from 'axios';
 import { hethers } from '@hashgraph/hethers';
+import BigNumber from 'bignumber.js';
 
-import { IAllowanceData, ITokenData, TokenType } from '../interfaces/tokens';
+import { IAllowanceData, IPairData, ITokenData, TokenType } from '../interfaces/tokens';
 import { Client, ContractId, AccountBalanceQuery } from '@hashgraph/sdk';
 import {
   formatNumberToBigNumber,
   formatStringToBigNumberWei,
   formatStringWeiToStringEther,
 } from './numberUtils';
+import { getPossibleTradesExactIn, tradeComparator } from './tradeUtils';
 
 export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
   const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/tokens/${tokenId}`;
@@ -210,6 +212,26 @@ export const getHBarPrice = async () => {
     },
   });
   return response.data['hedera-hashgraph']['usd'];
+};
+
+export const getTokenPrice = (poolsData: IPairData[], tokenAddress: string, hbarPrice: number) => {
+  if (hbarPrice === 0) return;
+  if (tokenAddress === process.env.REACT_APP_WHBAR_ADDRESS) return hbarPrice.toString();
+
+  const tradesIn = getPossibleTradesExactIn(
+    poolsData || [],
+    '1',
+    process.env.REACT_APP_WHBAR_ADDRESS || '',
+    tokenAddress,
+    false,
+  );
+  const sortedTrades = tradesIn.sort(tradeComparator);
+
+  if (sortedTrades.length === 0) return;
+
+  const bestTradeAmount = sortedTrades[0].amountOut;
+
+  return new BigNumber(hbarPrice).div(new BigNumber(bestTradeAmount)).toString();
 };
 
 export const NATIVE_TOKEN = {
