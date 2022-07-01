@@ -202,6 +202,16 @@ export const getTokenBalance = async (userId: string, tokenData: ITokenData) => 
   return tokenBalance;
 };
 
+export const getHBarPrice = async () => {
+  const response = await axios.get(process.env.REACT_APP_COINGECKO_URL + `/simple/price`, {
+    params: {
+      ids: 'hedera-hashgraph',
+      vs_currencies: 'usd',
+    },
+  });
+  return response.data['hedera-hashgraph']['usd'];
+};
+
 export const NATIVE_TOKEN = {
   hederaId: '',
   name: 'HBAR',
