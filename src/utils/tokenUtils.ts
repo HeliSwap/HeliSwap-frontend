@@ -205,13 +205,19 @@ export const getTokenBalance = async (userId: string, tokenData: ITokenData) => 
 };
 
 export const getHBarPrice = async () => {
-  const response = await axios.get(process.env.REACT_APP_COINGECKO_URL + `/simple/price`, {
-    params: {
-      ids: 'hedera-hashgraph',
-      vs_currencies: 'usd',
-    },
-  });
-  return response.data['hedera-hashgraph']['usd'];
+  const coingeckoURL = process.env.REACT_APP_COINGECKO_URL + `/simple/price`;
+  try {
+    const response = await axios.get(coingeckoURL, {
+      params: {
+        ids: 'hedera-hashgraph',
+        vs_currencies: 'usd',
+      },
+    });
+    return response.data['hedera-hashgraph']['usd'];
+  } catch (e) {
+    console.error(e);
+    return 0;
+  }
 };
 
 export const getTokenPrice = (poolsData: IPairData[], tokenAddress: string, hbarPrice: number) => {
