@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
 import { useParams } from 'react-router-dom';
@@ -103,10 +103,13 @@ const Create = () => {
   const [selectedPoolData, setSelectedPoolData] = useState<IPairData>({} as IPairData);
 
   // State for token balances
-  const initialBallanceData = {
-    tokenA: undefined,
-    tokenB: undefined,
-  };
+  const initialBallanceData = useMemo(
+    () => ({
+      tokenA: undefined,
+      tokenB: undefined,
+    }),
+    [],
+  );
 
   const [tokenBalances, setTokenBalances] = useState<IfaceInitialBalanceData>(initialBallanceData);
 
@@ -348,7 +351,7 @@ const Create = () => {
     setCreatePairData(prev => ({ ...prev, ...newPairData }));
     setApproved({ tokenA: false, tokenB: false });
     getTokenBalances();
-  }, [tokensData, userId]);
+  }, [tokensData, userId, initialBallanceData]);
 
   useEffect(() => {
     const { tokenA, tokenB } = tokensData;
