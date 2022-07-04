@@ -323,12 +323,16 @@ const Create = () => {
 
   useEffect(() => {
     const getTokenBalances = async () => {
-      const tokenABalance = await getTokenBalance(userId, tokenA);
-      const tokenBBalance = await getTokenBalance(userId, tokenB);
-      setTokenBalances({
-        tokenA: tokenABalance,
-        tokenB: tokenBBalance,
-      });
+      if (userId) {
+        const tokenABalance = await getTokenBalance(userId, tokenA);
+        const tokenBBalance = await getTokenBalance(userId, tokenB);
+        setTokenBalances({
+          tokenA: tokenABalance,
+          tokenB: tokenBBalance,
+        });
+      } else {
+        setTokenBalances(initialBallanceData);
+      }
     };
 
     const { tokenA, tokenB } = tokensData;
@@ -343,7 +347,7 @@ const Create = () => {
 
     setCreatePairData(prev => ({ ...prev, ...newPairData }));
     setApproved({ tokenA: false, tokenB: false });
-    if (userId) getTokenBalances();
+    getTokenBalances();
   }, [tokensData, userId]);
 
   useEffect(() => {

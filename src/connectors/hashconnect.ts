@@ -13,6 +13,7 @@ class Hashconnect {
     this.setExtensionFound = setExtensionFound;
     this.setConnected = setConnected;
     this.setUserId = setUserId;
+    this.transactionResponseReceived = new CustomEvent('transaction-response-received');
   }
 
   hashconnect: HashConnect;
@@ -44,6 +45,8 @@ class Hashconnect {
     description: 'HeliSwap DEX',
     icon: 'https://absolute.url/to/icon.png',
   };
+
+  transactionResponseReceived: Event;
 
   async initHashconnect() {
     //create the hashconnect instance
@@ -147,7 +150,13 @@ class Hashconnect {
       },
     };
 
-    return await this.hashconnect.sendTransaction(this.saveData.topic, transaction);
+    const transactionRespose = await this.hashconnect.sendTransaction(
+      this.saveData.topic,
+      transaction,
+    );
+
+    document.dispatchEvent(this.transactionResponseReceived);
+    return transactionRespose;
   }
 
   async requestAccountInfo() {
