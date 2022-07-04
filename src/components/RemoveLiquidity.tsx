@@ -50,19 +50,6 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
   const [lpInputValue, setLpInputValue] = useState(initialLpInputValue);
   const [sliderValue, setSliderValue] = useState('100');
 
-  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { target } = e;
-    const { value } = target;
-
-    setSliderValue(value);
-    setLpInputValue(calculateShareByPercentage(initialLpInputValue, value));
-  };
-
-  const handleButtonClick = (value: string) => {
-    setSliderValue(value);
-    setLpInputValue(calculateShareByPercentage(initialLpInputValue, value));
-  };
-
   const [removeLpData, setRemoveLpData] = useState({
     tokenInAddress: '',
     tokenOutAddress: '',
@@ -79,8 +66,13 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
+    const initialLpInputValueBNWei = formatStringToBigNumberWei(initialLpInputValue, 18);
+    const valueBNWei = formatStringToBigNumberWei(value, 18);
+    const inputGtInitialValue = valueBNWei.gt(initialLpInputValueBNWei);
+
     // TODO make this common for every token input
-    const invalidInputTokensData = !value || isNaN(Number(value));
+    // TODO make validation for more than 18 decs!!
+    const invalidInputTokensData = !value || isNaN(Number(value)) || inputGtInitialValue;
 
     if (invalidInputTokensData) {
       setLpInputValue(formatStringWeiToStringEther(pairData.lpShares as string));
@@ -89,6 +81,19 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
     }
 
     setLpInputValue(value);
+  };
+
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { target } = e;
+    const { value } = target;
+
+    setSliderValue(value);
+    setLpInputValue(calculateShareByPercentage(initialLpInputValue, value));
+  };
+
+  const handleButtonClick = (value: string) => {
+    setSliderValue(value);
+    setLpInputValue(calculateShareByPercentage(initialLpInputValue, value));
   };
 
   const handleRemoveLPButtonClick = async () => {
