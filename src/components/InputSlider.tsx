@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 import ButtonPercentage from './ButtonPercentage';
 
-const InputSlider = () => {
+import { formatStringToBigNumber, stripStringToFixedDecimals } from '../utils/numberUtils';
+
+interface IInputSliderProps {
+  setLpInputValue: React.Dispatch<React.SetStateAction<string>>;
+  totalLpAmount: string;
+}
+
+const InputSlider = ({ setLpInputValue, totalLpAmount }: IInputSliderProps) => {
   const buttonValues = ['25', '50', '75', '100'];
   const [sliderValue, setSliderValue] = useState('100');
 
@@ -10,6 +17,17 @@ const InputSlider = () => {
     const { value } = target;
 
     setSliderValue(value);
+    setLpInputValue(calculateShare(value, totalLpAmount));
+  };
+
+  const calculateShare = (total: string, percentage: string) => {
+    const sliderValuePerc = Number(percentage) / 100;
+    const currentValueBN = formatStringToBigNumber(total);
+    const sliderValueBN = formatStringToBigNumber(sliderValuePerc.toString());
+    const valueToUpdateBN = currentValueBN.times(sliderValueBN);
+    const valueToUpdateStr = stripStringToFixedDecimals(valueToUpdateBN.toString(), 18);
+
+    return valueToUpdateStr;
   };
 
   return (
@@ -22,6 +40,7 @@ const InputSlider = () => {
         <div className="d-flex mt-2">
           {buttonValues.map((value: string, index: number) => (
             <ButtonPercentage
+              key={index}
               className={index !== 0 ? 'ms-3' : ''}
               handleButtonClick={setSliderValue}
               percentageAmount={value}

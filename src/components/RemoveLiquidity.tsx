@@ -268,7 +268,10 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
           </p>
         </div>
 
-        <InputSlider />
+        <InputSlider
+          totalLpAmount={formatStringWeiToStringEther(pairData.lpShares as string)}
+          setLpInputValue={setLpInputValue}
+        />
 
         <p className="text-small text-bold mb-4">Enter LP Token Amount</p>
 
