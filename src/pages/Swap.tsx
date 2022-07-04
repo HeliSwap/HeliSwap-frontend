@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import {
   ITokenData,
@@ -109,10 +109,13 @@ const Swap = () => {
   const [associated, setAssociated] = useState(false);
 
   // State for token balances
-  const initialBallanceData = {
-    tokenA: undefined,
-    tokenB: undefined,
-  };
+  const initialBallanceData = useMemo(
+    () => ({
+      tokenA: undefined,
+      tokenB: undefined,
+    }),
+    [],
+  );
 
   const [tokenBalances, setTokenBalances] = useState<IfaceInitialBalanceData>(initialBallanceData);
 
@@ -460,7 +463,7 @@ const Swap = () => {
     }
 
     getTokenBalances();
-  }, [tokensData, userId]);
+  }, [tokensData, userId, initialBallanceData]);
 
   useEffect(() => {
     let ready = true;
