@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ButtonPercentage from './ButtonPercentage';
 
 const InputSlider = () => {
   const [sliderValue, setSliderValue] = useState('100');
@@ -10,10 +11,6 @@ const InputSlider = () => {
     setSliderValue(value);
   };
 
-  const handlePercentageButtonClick = (percentage: string) => {
-    setSliderValue(percentage);
-  };
-
   return (
     <div className="container-input-token mb-4">
       <p className="text-micro">Amount</p>
@@ -22,30 +19,22 @@ const InputSlider = () => {
         <span className="text-title text-numeric">{sliderValue}%</span>
 
         <div className="d-flex mt-2">
-          <span
-            onClick={() => handlePercentageButtonClick('25')}
-            className="badge bg-secondary mx-2"
-          >
-            25%
-          </span>
-          <span
-            onClick={() => handlePercentageButtonClick('50')}
-            className="badge bg-secondary mx-2"
-          >
-            50%
-          </span>
-          <span
-            onClick={() => handlePercentageButtonClick('75')}
-            className="badge bg-secondary mx-2"
-          >
-            75%
-          </span>
-          <span
-            onClick={() => handlePercentageButtonClick('100')}
-            className="badge bg-secondary mx-2"
-          >
-            MAX
-          </span>
+          <ButtonPercentage handleButtonClick={setSliderValue} percentageAmount="25" />
+          <ButtonPercentage
+            className="ms-3"
+            handleButtonClick={setSliderValue}
+            percentageAmount="50"
+          />
+          <ButtonPercentage
+            className="ms-3"
+            handleButtonClick={setSliderValue}
+            percentageAmount="75"
+          />
+          <ButtonPercentage
+            className="ms-3"
+            handleButtonClick={setSliderValue}
+            percentageAmount="100"
+          />
         </div>
       </div>
 
