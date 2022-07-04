@@ -6,8 +6,10 @@ import { IAllowanceData, IPairData, ITokenData, TokenType } from '../interfaces/
 import { Client, ContractId, AccountBalanceQuery } from '@hashgraph/sdk';
 import {
   formatNumberToBigNumber,
+  formatStringToBigNumber,
   formatStringToBigNumberWei,
   formatStringWeiToStringEther,
+  stripStringToFixedDecimals,
 } from './numberUtils';
 import { getPossibleTradesExactIn, tradeComparator } from './tradeUtils';
 
@@ -186,6 +188,28 @@ export const calculateReserves = (
     reserve0ShareStr,
     reserve1ShareStr,
   };
+};
+
+/**
+ * Calucate share based on total amount and percentage
+ * @public
+ * @param {string} totalAmount - total amount of tokens in ETH
+ * @param {string} percentage - percentage
+ * @return {string} - Share in ETH
+ */
+export const calculateShareByPercentage = (totalAmount: string, percentage: string) => {
+  const percentageStr = (Number(percentage) / 100).toString();
+  const percentageBN = formatStringToBigNumber(percentageStr);
+  const totalAmountBN = formatStringToBigNumberWei(totalAmount);
+
+  const shareBN = totalAmountBN.times(percentageBN);
+
+  const shareFomatted = stripStringToFixedDecimals(
+    formatStringWeiToStringEther(shareBN.toFixed(), 18),
+    18,
+  );
+
+  return shareFomatted;
 };
 
 export const getTokenBalance = async (userId: string, tokenData: ITokenData) => {

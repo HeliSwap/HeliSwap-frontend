@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
 import ButtonPercentage from './ButtonPercentage';
 
-import {
-  formatStringToBigNumber,
-  formatStringToBigNumberWei,
-  formatStringWeiToStringEther,
-  stripStringToFixedDecimals,
-} from '../utils/numberUtils';
+import { calculateShareByPercentage } from '../utils/tokenUtils';
 
 interface IInputSliderProps {
   setLpInputValue: React.Dispatch<React.SetStateAction<string>>;
@@ -22,25 +17,12 @@ const InputSlider = ({ setLpInputValue, totalLpAmount }: IInputSliderProps) => {
     const { value } = target;
 
     setSliderValue(value);
-    setLpInputValue(calculateShare(value, totalLpAmount));
+    setLpInputValue(calculateShareByPercentage(value, totalLpAmount));
   };
 
   const handleButtonClick = (value: string) => {
     setSliderValue(value);
-    setLpInputValue(calculateShare(value, totalLpAmount));
-  };
-
-  const calculateShare = (total: string, percentage: string) => {
-    const sliderValuePerc = Number(percentage) / 100;
-    const currentValueBN = formatStringToBigNumberWei(total);
-    const sliderValueBN = formatStringToBigNumber(sliderValuePerc.toString());
-    const valueToUpdateBN = currentValueBN.times(sliderValueBN);
-    const valueToUpdateStr = stripStringToFixedDecimals(
-      formatStringWeiToStringEther(valueToUpdateBN.toFixed(), 18),
-      18,
-    );
-
-    return valueToUpdateStr;
+    setLpInputValue(calculateShareByPercentage(value, totalLpAmount));
   };
 
   return (
