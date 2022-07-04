@@ -1,29 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import ButtonPercentage from './ButtonPercentage';
 
-import { calculateShareByPercentage } from '../utils/tokenUtils';
-
 interface IInputSliderProps {
-  setLpInputValue: React.Dispatch<React.SetStateAction<string>>;
-  totalLpAmount: string;
+  sliderValue: string;
+  handleButtonClick: (value: string) => void;
+  handleSliderChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const InputSlider = ({ setLpInputValue, totalLpAmount }: IInputSliderProps) => {
+const InputSlider = ({ sliderValue, handleButtonClick, handleSliderChange }: IInputSliderProps) => {
   const buttonValues = ['25', '50', '75', '100'];
-  const [sliderValue, setSliderValue] = useState('100');
-
-  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { target } = e;
-    const { value } = target;
-
-    setSliderValue(value);
-    setLpInputValue(calculateShareByPercentage(value, totalLpAmount));
-  };
-
-  const handleButtonClick = (value: string) => {
-    setSliderValue(value);
-    setLpInputValue(calculateShareByPercentage(value, totalLpAmount));
-  };
 
   return (
     <div className="container-input-token mb-4">

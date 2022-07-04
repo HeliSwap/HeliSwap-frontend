@@ -20,7 +20,12 @@ import {
   formatStringToBigNumber,
   formatStringToBigNumberWei,
 } from '../utils/numberUtils';
-import { calculateReserves, addressToContractId, idToAddress } from '../utils/tokenUtils';
+import {
+  calculateReserves,
+  addressToContractId,
+  idToAddress,
+  calculateShareByPercentage,
+} from '../utils/tokenUtils';
 import { getTransactionSettings } from '../utils/transactionUtils';
 import { formatIcons } from '../utils/iconUtils';
 
@@ -36,13 +41,27 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
   const connectedWallet = getConnectedWallet();
 
+  const initialLpInputValue: string = formatStringWeiToStringEther(pairData.lpShares as string);
+
   const [loadingRemove, setLoadingRemove] = useState(false);
   const [errorRemove, setErrorRemove] = useState(false);
 
   const [lpApproved, setLpApproved] = useState(false);
-  const [lpInputValue, setLpInputValue] = useState(
-    formatStringWeiToStringEther(pairData.lpShares as string),
-  );
+  const [lpInputValue, setLpInputValue] = useState(initialLpInputValue);
+  const [sliderValue, setSliderValue] = useState('100');
+
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { target } = e;
+    const { value } = target;
+
+    setSliderValue(value);
+    setLpInputValue(calculateShareByPercentage(initialLpInputValue, value));
+  };
+
+  const handleButtonClick = (value: string) => {
+    setSliderValue(value);
+    setLpInputValue(calculateShareByPercentage(initialLpInputValue, value));
+  };
 
   const [removeLpData, setRemoveLpData] = useState({
     tokenInAddress: '',
@@ -269,8 +288,9 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
         </div>
 
         <InputSlider
-          totalLpAmount={formatStringWeiToStringEther(pairData.lpShares as string)}
-          setLpInputValue={setLpInputValue}
+          handleSliderChange={handleSliderChange}
+          handleButtonClick={handleButtonClick}
+          sliderValue={sliderValue}
         />
 
         <p className="text-small text-bold mb-4">Enter LP Token Amount</p>
