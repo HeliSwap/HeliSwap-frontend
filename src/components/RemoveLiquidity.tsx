@@ -25,6 +25,7 @@ import {
   addressToContractId,
   idToAddress,
   calculateShareByPercentage,
+  calculatePercentageByShare,
 } from '../utils/tokenUtils';
 import { getTransactionSettings } from '../utils/transactionUtils';
 import { formatIcons } from '../utils/iconUtils';
@@ -79,6 +80,9 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
       return;
     }
+
+    const percentage = calculatePercentageByShare(initialLpInputValue, value);
+    setSliderValue(percentage);
 
     setLpInputValue(value);
   };

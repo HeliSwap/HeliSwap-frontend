@@ -12,6 +12,7 @@ import {
   stripStringToFixedDecimals,
 } from './numberUtils';
 import { getPossibleTradesExactIn, tradeComparator } from './tradeUtils';
+import { HUNDRED_BN } from '../constants';
 
 export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
   const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/tokens/${tokenId}`;
@@ -204,12 +205,30 @@ export const calculateShareByPercentage = (totalAmount: string, percentage: stri
 
   const shareBN = totalAmountBN.times(percentageBN);
 
-  const shareFomatted = stripStringToFixedDecimals(
+  const shareFormatted = stripStringToFixedDecimals(
     formatStringWeiToStringEther(shareBN.toFixed(), 18),
     18,
   );
 
-  return shareFomatted;
+  return shareFormatted;
+};
+
+/**
+ * Calucate percentage based on total amount and share
+ * @public
+ * @param {string} totalAmount - total amount of tokens in ETH
+ * @param {string} share - percentage
+ * @return {string} - Percentage
+ */
+export const calculatePercentageByShare = (totalAmount: string, share: string) => {
+  const shareBN = formatStringToBigNumberWei(share);
+  const totalAmountBN = formatStringToBigNumberWei(totalAmount);
+
+  const percentageBN = shareBN.div(totalAmountBN).times(HUNDRED_BN);
+
+  const percentageFormatted = percentageBN.toFixed(0);
+
+  return percentageFormatted;
 };
 
 export const getTokenBalance = async (userId: string, tokenData: ITokenData) => {
