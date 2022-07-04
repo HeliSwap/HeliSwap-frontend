@@ -10,6 +10,8 @@ import InputTokenSelector from './InputTokenSelector';
 import InputToken from './InputToken';
 import ButtonSelector from './ButtonSelector';
 import InputSlider from './InputSlider';
+import TransactionSettingsModalContent from './Modals/TransactionSettingsModalContent';
+import Modal from './Modal';
 
 import { MAX_UINT_ERC20 } from '../constants';
 import { getConnectedWallet } from '../pages/Helpers';
@@ -27,7 +29,11 @@ import {
   calculateShareByPercentage,
   calculatePercentageByShare,
 } from '../utils/tokenUtils';
-import { getTransactionSettings } from '../utils/transactionUtils';
+import {
+  getTransactionSettings,
+  handleSaveTransactionSettings,
+  INITIAL_SWAP_SLIPPAGE_TOLERANCE,
+} from '../utils/transactionUtils';
 import { formatIcons } from '../utils/iconUtils';
 
 interface IRemoveLiquidityProps {
@@ -63,6 +69,8 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
   const [removeNative, setRemoveNative] = useState(false);
   const [hasWrappedHBAR, setHasWrappedHBAR] = useState(false);
+
+  const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
 
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -275,12 +283,25 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
         <div
           className="d-flex justify-content-end align-items-center cursor-pointer"
-          // onClick={() => setShowModalTransactionSettings(true)}
+          onClick={() => setShowModalTransactionSettings(true)}
         >
           <span className="text-small me-2">Settings</span>
           <Icon name="settings" />
         </div>
       </div>
+
+      {showModalTransactionSettings ? (
+        <Modal show={showModalTransactionSettings}>
+          <TransactionSettingsModalContent
+            modalTitle="Transaction settings"
+            closeModal={() => setShowModalTransactionSettings(false)}
+            slippage={getTransactionSettings().swapSlippage}
+            expiration={getTransactionSettings().transactionExpiration}
+            saveChanges={handleSaveTransactionSettings}
+            defaultSlippageValue={INITIAL_SWAP_SLIPPAGE_TOLERANCE}
+          />
+        </Modal>
+      ) : null}
 
       <div className="container-dark">
         {errorRemove ? (
