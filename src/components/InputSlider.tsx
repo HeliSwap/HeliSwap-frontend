@@ -22,7 +22,7 @@ const InputSlider = () => {
         <div className="d-flex mt-2">
           {buttonValues.map((value: string, index: number) => (
             <ButtonPercentage
-              className={index != 0 ? 'ms-3' : ''}
+              className={index !== 0 ? 'ms-3' : ''}
               handleButtonClick={setSliderValue}
               percentageAmount={value}
               isSelected={value === sliderValue}

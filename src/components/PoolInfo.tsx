@@ -36,6 +36,11 @@ const PoolInfo = ({
     pairData.token1Decimals,
   );
 
+  const handleRemoveButtonClick = () => {
+    setShowRemoveContainer(prev => !prev);
+    setCurrentPoolIndex(index);
+  };
+
   return (
     <>
       <div className={`table-pools-row ${index % 2 === 0 ? 'is-gray' : ''}`}>
@@ -104,10 +109,7 @@ const PoolInfo = ({
                 <Link className="btn btn-sm btn-primary" to={`/create/${pairData.pairAddress}`}>
                   Add Liquidity
                 </Link>
-                <Button
-                  className="btn-sm ms-3"
-                  onClick={() => setShowRemoveContainer(prev => !prev)}
-                >
+                <Button className="btn-sm ms-3" onClick={handleRemoveButtonClick}>
                   Remove Liquidity
                 </Button>
               </div>
