@@ -17,16 +17,21 @@ const Header = () => {
 
   useEffect(() => {
     const getUserTokensData = async () => {
-      const provider = hethers.providers.getDefaultProvider(process.env.REACT_APP_NETWORK_TYPE);
-      const userBalanceBN = await provider.getBalance(userId);
-      const tokenBalance = hethers.utils.formatHbar(userBalanceBN);
+      if (userId) {
+        const provider = hethers.providers.getDefaultProvider(process.env.REACT_APP_NETWORK_TYPE);
+        const userBalanceBN = await provider.getBalance(userId);
+        const tokenBalance = hethers.utils.formatHbar(userBalanceBN);
 
-      setUserBalance(tokenBalance);
+        setUserBalance(tokenBalance);
+      }
     };
 
-    if (userId) {
-      getUserTokensData();
-    }
+    getUserTokensData();
+    document.addEventListener('transaction-response-received', getUserTokensData);
+
+    return () => {
+      document.removeEventListener('transaction-response-received', getUserTokensData);
+    };
   }, [userId]);
 
   return (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import {
   ITokenData,
@@ -109,10 +109,13 @@ const Swap = () => {
   const [associated, setAssociated] = useState(false);
 
   // State for token balances
-  const initialBallanceData = {
-    tokenA: undefined,
-    tokenB: undefined,
-  };
+  const initialBallanceData = useMemo(
+    () => ({
+      tokenA: undefined,
+      tokenB: undefined,
+    }),
+    [],
+  );
 
   const [tokenBalances, setTokenBalances] = useState<IfaceInitialBalanceData>(initialBallanceData);
 
@@ -429,12 +432,16 @@ const Swap = () => {
 
   useEffect(() => {
     const getTokenBalances = async () => {
-      const tokenABalance = await getTokenBalance(userId, tokenA);
-      const tokenBBalance = await getTokenBalance(userId, tokenB);
-      setTokenBalances({
-        tokenA: tokenABalance,
-        tokenB: tokenBBalance,
-      });
+      if (userId) {
+        const tokenABalance = await getTokenBalance(userId, tokenA);
+        const tokenBBalance = await getTokenBalance(userId, tokenB);
+        setTokenBalances({
+          tokenA: tokenABalance,
+          tokenB: tokenBBalance,
+        });
+      } else {
+        setTokenBalances(initialBallanceData);
+      }
     };
 
     const { tokenA, tokenB } = tokensData;
@@ -455,8 +462,8 @@ const Swap = () => {
       setSwapData(prev => ({ ...prev, ...newSwapData }));
     }
 
-    if (userId) getTokenBalances();
-  }, [tokensData, userId]);
+    getTokenBalances();
+  }, [tokensData, userId, initialBallanceData]);
 
   useEffect(() => {
     let ready = true;
