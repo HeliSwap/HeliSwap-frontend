@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface IButtonPercentageProps {
-  handleButtonClick: React.Dispatch<React.SetStateAction<string>>;
+  handleButtonClick: (percentageAmount: string) => void;
   isSelected?: boolean;
   percentageAmount: string;
   className?: string;

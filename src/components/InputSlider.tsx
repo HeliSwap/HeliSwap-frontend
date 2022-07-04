@@ -25,6 +25,11 @@ const InputSlider = ({ setLpInputValue, totalLpAmount }: IInputSliderProps) => {
     setLpInputValue(calculateShare(value, totalLpAmount));
   };
 
+  const handleButtonClick = (value: string) => {
+    setSliderValue(value);
+    setLpInputValue(calculateShare(value, totalLpAmount));
+  };
+
   const calculateShare = (total: string, percentage: string) => {
     const sliderValuePerc = Number(percentage) / 100;
     const currentValueBN = formatStringToBigNumberWei(total);
@@ -50,7 +55,7 @@ const InputSlider = ({ setLpInputValue, totalLpAmount }: IInputSliderProps) => {
             <ButtonPercentage
               key={index}
               className={index !== 0 ? 'ms-3' : ''}
-              handleButtonClick={setSliderValue}
+              handleButtonClick={handleButtonClick}
               percentageAmount={value}
               isSelected={value === sliderValue}
             />
