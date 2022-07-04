@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import ButtonPercentage from './ButtonPercentage';
 
 const InputSlider = () => {
+  const buttonValues = ['25', '50', '75', '100'];
   const [sliderValue, setSliderValue] = useState('100');
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,22 +20,14 @@ const InputSlider = () => {
         <span className="text-title text-numeric">{sliderValue}%</span>
 
         <div className="d-flex mt-2">
-          <ButtonPercentage handleButtonClick={setSliderValue} percentageAmount="25" />
-          <ButtonPercentage
-            className="ms-3"
-            handleButtonClick={setSliderValue}
-            percentageAmount="50"
-          />
-          <ButtonPercentage
-            className="ms-3"
-            handleButtonClick={setSliderValue}
-            percentageAmount="75"
-          />
-          <ButtonPercentage
-            className="ms-3"
-            handleButtonClick={setSliderValue}
-            percentageAmount="100"
-          />
+          {buttonValues.map((value: string, index: number) => (
+            <ButtonPercentage
+              className={index != 0 ? 'ms-3' : ''}
+              handleButtonClick={setSliderValue}
+              percentageAmount={value}
+              isSelected={value === sliderValue}
+            />
+          ))}
         </div>
       </div>
 
