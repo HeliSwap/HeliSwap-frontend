@@ -24,6 +24,7 @@ export const getPossibleTradesExactIn = (
   amountIn: string,
   currencyIn: string,
   currencyOut: string,
+  applyFees: boolean,
   { maxNumResults = 3, maxHops = 3 }: BestTradeOptions = {},
   currentPools: IPairData[] = [],
   nextAmountIn: string = amountIn,
@@ -37,7 +38,7 @@ export const getPossibleTradesExactIn = (
     if (!(token0 === nextCurrencyIn) && !(token1 === nextCurrencyIn)) continue;
 
     const tokenInFirstAtPool = token0 === nextCurrencyIn;
-    const amountOut = getAmountOut(nextAmountIn, tokenInFirstAtPool, currentPool);
+    const amountOut = getAmountOut(nextAmountIn, tokenInFirstAtPool, currentPool, applyFees);
     const otherTokenInPool = tokenInFirstAtPool ? token1 : token0;
 
     if (otherTokenInPool === currencyOut) {
@@ -57,6 +58,7 @@ export const getPossibleTradesExactIn = (
         amountIn,
         currencyIn,
         currencyOut,
+        applyFees,
         {
           maxNumResults,
           maxHops: maxHops - 1,
@@ -76,6 +78,7 @@ export const getPossibleTradesExactOut = (
   amountOut: string,
   currencyIn: string,
   currencyOut: string,
+  applyFees: boolean,
   { maxNumResults = 3, maxHops = 3 }: BestTradeOptions = {},
   currentPools: IPairData[] = [],
   nextAmountOut: string = amountOut,
@@ -100,7 +103,7 @@ export const getPossibleTradesExactOut = (
     )
       continue;
 
-    const amountIn = getAmountIn(nextAmountOut, tokenOutFirstAtPool, currentPool);
+    const amountIn = getAmountIn(nextAmountOut, tokenOutFirstAtPool, currentPool, applyFees);
     const otherTokenInPool = tokenOutFirstAtPool ? token1 : token0;
 
     if (otherTokenInPool === currencyIn) {
@@ -120,6 +123,7 @@ export const getPossibleTradesExactOut = (
         amountOut,
         currencyIn,
         currencyOut,
+        applyFees,
         {
           maxNumResults,
           maxHops: maxHops - 1,
@@ -191,6 +195,7 @@ const getSwapAmountOut = (
   amountOutRes: string,
   decIn: number,
   decOut: number,
+  applyFees: boolean,
 ) => {
   //get values in hethers big number
   const amountInBNStrHethers = formatStringToBigNumberEthersWei(amountIn, decIn);
@@ -198,7 +203,7 @@ const getSwapAmountOut = (
   const amountOutResBNStrHethers = BigNumber.from(amountOutRes);
 
   //replicate contract calculations
-  const amountInWithFee = amountInBNStrHethers.mul(997);
+  const amountInWithFee = amountInBNStrHethers.mul(applyFees ? 997 : 1000);
   const numerator = amountInWithFee.mul(amountOutResBNStrHethers);
   const denominator = amountInResBNStrHethers.mul(1000).add(amountInWithFee);
   const amountOut = numerator.div(denominator);
@@ -212,6 +217,7 @@ const getSwapAmountIn = (
   amountOutRes: string,
   decIn: number,
   decOut: number,
+  applyFees: boolean,
 ) => {
   //get values in hethers big number
   const amountOutBNStrHethers = formatStringToBigNumberEthersWei(amountOut, decOut);
@@ -220,13 +226,20 @@ const getSwapAmountIn = (
 
   //replicate contract calculations
   const numerator = amountInResBNStrHethers.mul(amountOutBNStrHethers).mul(1000);
-  const denominator = amountOutResBNStrHethers.sub(amountOutBNStrHethers).mul(997);
+  const denominator = amountOutResBNStrHethers
+    .sub(amountOutBNStrHethers)
+    .mul(applyFees ? 997 : 1000);
   const amountIn = numerator.div(denominator).add(1);
 
   return hethers.utils.formatUnits(amountIn, decIn).toString();
 };
 
-const getAmountOut = (amountIn: string, tokenInFirstAtPool: boolean, pool: IPairData) => {
+const getAmountOut = (
+  amountIn: string,
+  tokenInFirstAtPool: boolean,
+  pool: IPairData,
+  applyFees: boolean,
+) => {
   const { token0Amount, token1Amount, token0Decimals, token1Decimals } = pool;
 
   const resIn = tokenInFirstAtPool ? token0Amount : token1Amount;
@@ -234,11 +247,16 @@ const getAmountOut = (amountIn: string, tokenInFirstAtPool: boolean, pool: IPair
   const decIn = tokenInFirstAtPool ? token0Decimals : token1Decimals;
   const decOut = tokenInFirstAtPool ? token1Decimals : token0Decimals;
 
-  const swapAmountOut = getSwapAmountOut(amountIn, resIn, resOut, decIn, decOut);
+  const swapAmountOut = getSwapAmountOut(amountIn, resIn, resOut, decIn, decOut, applyFees);
   return swapAmountOut;
 };
 
-const getAmountIn = (amountOut: string, tokenOutFirstAtPool: boolean, pool: IPairData) => {
+const getAmountIn = (
+  amountOut: string,
+  tokenOutFirstAtPool: boolean,
+  pool: IPairData,
+  applyFees: boolean,
+) => {
   const { token0Amount, token1Amount, token0Decimals, token1Decimals } = pool;
 
   const resIn = tokenOutFirstAtPool ? token1Amount : token0Amount;
@@ -246,6 +264,6 @@ const getAmountIn = (amountOut: string, tokenOutFirstAtPool: boolean, pool: IPai
   const decIn = tokenOutFirstAtPool ? token1Decimals : token0Decimals;
   const decOut = tokenOutFirstAtPool ? token0Decimals : token1Decimals;
 
-  const swapAmountIn = getSwapAmountIn(amountOut, resIn, resOut, decIn, decOut);
+  const swapAmountIn = getSwapAmountIn(amountOut, resIn, resOut, decIn, decOut, applyFees);
   return swapAmountIn;
 };

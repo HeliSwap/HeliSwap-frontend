@@ -176,6 +176,7 @@ const Swap = () => {
           amountIn,
           tokenInAddress,
           tokenOutAddress,
+          true,
         );
 
         const sortedTrades = trades.sort(tradeComparator);
@@ -193,6 +194,7 @@ const Swap = () => {
           amountOut,
           tokenInAddress,
           tokenOutAddress,
+          true,
         );
 
         const sortedTrades = trades.sort(tradeComparator);
