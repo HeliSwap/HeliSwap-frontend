@@ -1,5 +1,6 @@
 import React from 'react';
 import { ReactComponent as ArrowDown } from '../icons/system/arrow-down.svg';
+import { ReactComponent as ArrowLeft } from '../icons/system/arrow-left.svg';
 import { ReactComponent as Check } from '../icons/system/check.svg';
 import { ReactComponent as Cancel } from '../icons/system/cancel.svg';
 import { ReactComponent as Chevron } from '../icons/system/chevron.svg';
@@ -38,6 +39,7 @@ const icons: IIconMapping = {
   cancel: Cancel,
   chevron: Chevron,
   'arrow-down': ArrowDown,
+  'arrow-left': ArrowLeft,
   hint: Hint,
   loader: Loader,
   more: More,

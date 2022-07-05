@@ -30,6 +30,7 @@ const tokenMapping: ITokenMapping = {
   WBTC: WBTC,
   WETH: ETH,
   WHBAR: HBAR,
+  LP: HBAR,
 };
 
 const defaultIconToken = unknown;

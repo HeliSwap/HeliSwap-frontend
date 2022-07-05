@@ -54,7 +54,7 @@ export const formatStringWeiToStringEther = (numberToFormat: string, decimals: n
   const numberToFormatBN = new BigNumber(numberToFormat);
   const tenPowDec = new BigNumber(10).pow(decimals);
 
-  return numberToFormatBN.div(tenPowDec).toString();
+  return numberToFormatBN.div(tenPowDec).toFixed();
 };
 
 // Used to calculate token min/max amount including slippage

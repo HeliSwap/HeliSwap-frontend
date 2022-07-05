@@ -17,6 +17,7 @@ $neutral-100: #f9f9f9;
 
 $primary: #2f18e5;
 $primary-200: #7391ff;
+$primary-300: #4d5fff;
 $secondary: $neutral-400;
 $success: #0da048;
 $danger: #ea1548;
@@ -286,10 +287,20 @@ $custom-select-line-height: 1.5;
 $custom-select-height: auto;
 $custom-select-focus-box-shadow: 0 0 0 1px $primary;
 
+// Range
+$form-range-track-bg: $neutral-500;
+$form-range-track-height: 0.25rem;
+$form-range-thumb-width: 1.5rem;
+$form-range-thumb-height: 1.5rem;
+$form-range-thumb-border: 4px solid $primary-300;
+
 // Modals
 $modal-content-bg: $neutral-900;
 $modal-header-border-color: $dark;
 $modal-backdrop-opacity: 1;
+$form-range-thumb-bg: $neutral-100;
 $modal-backdrop-bg: rgba(49, 49, 53, 0.3);
+$modal-header-padding: 24px;
+$modal-inner-padding: 1.5rem;
 
 $btn-close-color: $white;

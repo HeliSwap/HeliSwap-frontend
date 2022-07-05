@@ -9,8 +9,11 @@
   border-radius: $border-radius;
   display: inline-flex;
   align-items: center;
-  cursor: pointer;
-  transition: background-color 0.15s linear, border-color 0.15s linear;
+
+  &:not(.is-disabled) {
+    cursor: pointer;
+    transition: background-color 0.15s linear, border-color 0.15s linear;
+  }
 
   &.with-background {
     background-color: $neutral-700;
@@ -20,12 +23,27 @@
     border: 1px solid $neutral-400;
   }
 
-  &:hover {
+  &:hover:not(.is-disabled) {
     background-color: $neutral-500;
 
     &.with-border {
       border-color: $neutral-500;
     }
+  }
+}
+
+.btn-percentage {
+  cursor: pointer;
+  border: 1px solid $primary-300;
+  border-radius: $border-radius;
+  font-size: 12px;
+  line-height: 16px;
+  color: $neutral-100;
+  padding: 4px 12px;
+  transition: background-color 0.15s linear;
+
+  &.is-active {
+    background-color: $primary-300;
   }
 }
 
