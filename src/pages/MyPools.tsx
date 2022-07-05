@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { useLazyQuery } from '@apollo/client';
 import { GET_POOLS_BY_USER } from '../GraphQL/Queries';
 import { IPairData } from '../interfaces/tokens';
-import { idToAddress } from '../utils/tokenUtils';
+import { getHBarPrice, idToAddress } from '../utils/tokenUtils';
 import {
   getTransactionSettings,
   INITIAL_REMOVE_SLIPPAGE_TOLERANCE,
@@ -27,6 +27,7 @@ const Pairs = () => {
   const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
   const [showRemoveContainer, setShowRemoveContainer] = useState(false);
   const [currentPoolIndex, setCurrentPoolIndex] = useState(0);
+  const [hbarPrice, setHbarPrice] = useState(0);
 
   useEffect(() => {
     userId &&
@@ -40,6 +41,15 @@ const Pairs = () => {
   useEffect(() => {
     data && setPairData(data.getPoolsByUser);
   }, [data]);
+
+  useEffect(() => {
+    const getHBARPrice = async () => {
+      const hbarPrice = await getHBarPrice();
+      setHbarPrice(hbarPrice);
+    };
+
+    getHBARPrice();
+  }, []);
 
   const havePairs = pairData.length > 0;
 
@@ -104,6 +114,8 @@ const Pairs = () => {
                   index={index}
                   key={index}
                   pairData={item}
+                  allPoolsData={pairData}
+                  hbarPrice={hbarPrice}
                 />
               ))}
             </div>

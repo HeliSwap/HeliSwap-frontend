@@ -7,21 +7,25 @@ import IconToken from './IconToken';
 import Icon from './Icon';
 
 import { formatStringWeiToStringEther } from '../utils/numberUtils';
-import { calculateReserves } from '../utils/tokenUtils';
+import { calculateReserves, getTokenPrice } from '../utils/tokenUtils';
 import { formatIcons } from '../utils/iconUtils';
 
 import { POOLS_FEE } from '../constants';
 
 interface IPoolInfoProps {
   pairData: IPairData;
+  allPoolsData: IPairData[];
   index: number;
+  hbarPrice: number;
   setShowRemoveContainer: React.Dispatch<React.SetStateAction<boolean>>;
   setCurrentPoolIndex: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const PoolInfo = ({
   pairData,
+  allPoolsData,
   index,
+  hbarPrice,
   setShowRemoveContainer,
   setCurrentPoolIndex,
 }: IPoolInfoProps) => {
@@ -40,6 +44,14 @@ const PoolInfo = ({
     setShowRemoveContainer(prev => !prev);
     setCurrentPoolIndex(index);
   };
+
+  const token0Price = getTokenPrice(allPoolsData, pairData.token0, hbarPrice);
+  const token1Price = getTokenPrice(allPoolsData, pairData.token1, hbarPrice);
+
+  const token0Value = Number(pairData.token0Amount) * Number(token0Price);
+  const token1Value = Number(pairData.token1Amount) * Number(token1Price);
+  const totalLpValue = token0Value + token1Value;
+  const totalLpValueStr = totalLpValue.toFixed(2);
 
   return (
     <>
@@ -94,7 +106,10 @@ const PoolInfo = ({
               </div>
 
               <div className="ms-4">
-                <div className="container-neutral-500"></div>
+                <div className="container-neutral-500 d-flex justify-content-between align-items-center">
+                  <span className="text-main text-bold">Liquidity</span>
+                  <span className="text-main text-numeric ms-4">${totalLpValueStr}</span>
+                </div>
                 <div className="container-neutral-500 mt-4 d-flex justify-content-between align-items-center">
                   <span className="text-main text-bold">LP Tokens Count</span>
                   <span className="text-main text-numeric ms-4">
