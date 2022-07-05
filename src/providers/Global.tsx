@@ -14,7 +14,7 @@ const contextInitialValue = {
     disconnectWallet: () => {},
     hashconnectConnectorInstance: {} as Hashconnect,
   },
-  isRunning: true,
+  isRunning: false,
 };
 
 export const GlobalContext = React.createContext(contextInitialValue);
@@ -31,13 +31,13 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
   const [hashconnectConnectorInstance, setHashconnectConnectorInstance] = useState<Hashconnect>();
   const [userId, setUserId] = useState('');
 
-  const { timestamp } = useHealthCheck({
+  const { timestamp, error } = useHealthCheck({
     fetchPolicy: 'network-only',
-    pollInterval: 5000,
+    pollInterval: 1000,
   });
 
   const nowSeconds = Date.now() / 1000;
-  const isRunning = nowSeconds >= Number(timestamp);
+  const isRunning = !error ? (timestamp ? nowSeconds >= Number(timestamp) : false) : false;
 
   const connectWallet = () => {
     hashconnectConnectorInstance?.connect();
