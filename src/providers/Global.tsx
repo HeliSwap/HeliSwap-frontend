@@ -30,7 +30,6 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
   const [extensionFound, setExtensionFound] = useState(false);
   const [hashconnectConnectorInstance, setHashconnectConnectorInstance] = useState<Hashconnect>();
   const [userId, setUserId] = useState('');
-  const [healthcheck, setHealthcheck] = useState('');
 
   const { timestamp } = useHealthCheck({
     fetchPolicy: 'network-only',
