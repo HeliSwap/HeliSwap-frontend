@@ -99,3 +99,9 @@ export const GET_SWAP_RATE = gql`
     }
   }
 `;
+
+export const HEALTH_CHECK = gql`
+  query {
+    healthcheck
+  }
+`;

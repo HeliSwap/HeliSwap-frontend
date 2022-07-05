@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Hashconnect from '../connectors/hashconnect';
+import useHealthCheck from '../hooks/useHealthCheck';
 import SDK from '../sdk/sdk';
 
 const contextInitialValue = {
@@ -13,6 +14,7 @@ const contextInitialValue = {
     disconnectWallet: () => {},
     hashconnectConnectorInstance: {} as Hashconnect,
   },
+  isRunning: true,
 };
 
 export const GlobalContext = React.createContext(contextInitialValue);
@@ -28,6 +30,15 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
   const [extensionFound, setExtensionFound] = useState(false);
   const [hashconnectConnectorInstance, setHashconnectConnectorInstance] = useState<Hashconnect>();
   const [userId, setUserId] = useState('');
+  const [healthcheck, setHealthcheck] = useState('');
+
+  const { timestamp } = useHealthCheck({
+    fetchPolicy: 'network-only',
+    pollInterval: 5000,
+  });
+
+  const nowSeconds = Date.now() / 1000;
+  const isRunning = nowSeconds >= Number(timestamp);
 
   const connectWallet = () => {
     hashconnectConnectorInstance?.connect();
@@ -47,7 +58,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
     disconnectWallet,
     hashconnectConnectorInstance: hashconnectConnectorInstance || ({} as Hashconnect),
   };
-  const contextValue = { sdk, connection };
+  const contextValue = { sdk, connection, isRunning };
 
   useEffect(() => {
     const initHashconnectConnector = async () => {
