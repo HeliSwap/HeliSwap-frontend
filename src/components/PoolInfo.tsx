@@ -6,7 +6,7 @@ import Button from './Button';
 import IconToken from './IconToken';
 import Icon from './Icon';
 
-import { formatStringWeiToStringEther } from '../utils/numberUtils';
+import { formatStringToPrice, formatStringWeiToStringEther } from '../utils/numberUtils';
 import { calculateReserves, getTokenPrice } from '../utils/tokenUtils';
 import { formatIcons } from '../utils/iconUtils';
 
@@ -48,8 +48,8 @@ const PoolInfo = ({
   const token0Price = getTokenPrice(allPoolsData, pairData.token0, hbarPrice);
   const token1Price = getTokenPrice(allPoolsData, pairData.token1, hbarPrice);
 
-  const token0Value = Number(pairData.token0Amount) * Number(token0Price);
-  const token1Value = Number(pairData.token1Amount) * Number(token1Price);
+  const token0Value = Number(reserve0ShareStr) * Number(token0Price);
+  const token1Value = Number(reserve1ShareStr) * Number(token1Price);
   const totalLpValue = token0Value + token1Value;
   const totalLpValueStr = totalLpValue.toFixed(2);
 
@@ -108,7 +108,9 @@ const PoolInfo = ({
               <div className="ms-4">
                 <div className="container-neutral-500 d-flex justify-content-between align-items-center">
                   <span className="text-main text-bold">Liquidity</span>
-                  <span className="text-main text-numeric ms-4">${totalLpValueStr}</span>
+                  <span className="text-main text-numeric ms-4">
+                    {formatStringToPrice(totalLpValueStr)}
+                  </span>
                 </div>
                 <div className="container-neutral-500 mt-4 d-flex justify-content-between align-items-center">
                   <span className="text-main text-bold">LP Tokens Count</span>
