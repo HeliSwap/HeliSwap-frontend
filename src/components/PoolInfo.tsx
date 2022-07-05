@@ -106,12 +106,19 @@ const PoolInfo = ({
 
             <div>
               <div className="d-flex align-items-center">
-                <Link className="btn btn-sm btn-primary" to={`/create/${pairData.pairAddress}`}>
-                  Add Liquidity
-                </Link>
-                <Button className="btn-sm ms-3" onClick={handleRemoveButtonClick}>
+                <Button
+                  className="btn-sm"
+                  type="outline-secondary"
+                  onClick={handleRemoveButtonClick}
+                >
                   Remove Liquidity
                 </Button>
+                <Link
+                  className="btn btn-sm btn-secondary ms-3"
+                  to={`/create/${pairData.pairAddress}`}
+                >
+                  Add Liquidity
+                </Link>
               </div>
             </div>
           </div>
