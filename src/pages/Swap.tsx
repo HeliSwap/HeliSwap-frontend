@@ -146,7 +146,8 @@ const Swap = () => {
       !value ||
       isNaN(Number(value)) ||
       Object.keys(tokenA).length === 0 ||
-      Object.keys(tokenB).length === 0;
+      Object.keys(tokenB).length === 0 ||
+      tokenA.address === tokenB.address;
 
     if (invalidInputTokensData) {
       setSwapData(prev => ({ ...prev, amountIn: '', amountOut: '' }));
