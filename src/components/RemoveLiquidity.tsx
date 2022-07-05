@@ -11,6 +11,7 @@ import InputToken from './InputToken';
 import ButtonSelector from './ButtonSelector';
 import InputSlider from './InputSlider';
 import TransactionSettingsModalContent from './Modals/TransactionSettingsModalContent';
+import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
 import Modal from './Modal';
 
 import { MAX_UINT_ERC20 } from '../constants';
@@ -71,6 +72,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
   const [hasWrappedHBAR, setHasWrappedHBAR] = useState(false);
 
   const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
+  const [showModalConfirmRemove, setShowModalConfirmRemove] = useState(false);
 
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -378,12 +380,58 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
             <Button
               loading={loadingRemove}
               disabled={!canRemove}
-              onClick={handleRemoveLPButtonClick}
+              onClick={() => setShowModalConfirmRemove(true)}
             >
               Remove
             </Button>
           </div>
         </div>
+
+        {showModalConfirmRemove ? (
+          <Modal show={showModalConfirmRemove}>
+            <ConfirmTransactionModalContent
+              modalTitle="Remove liquidity"
+              closeModal={() => setShowModalConfirmRemove(false)}
+              confirmTansaction={handleRemoveLPButtonClick}
+              confirmButtonLabel="Remove"
+            >
+              <div className="d-flex justify-content-between align-items-center px-3">
+                <div className="d-flex align-items-center">
+                  <IconToken symbol="LP" />
+                  <span className="text-main ms-3">LP Token</span>
+                </div>
+
+                <div className="text-main text-numeric">{lpInputValue}</div>
+              </div>
+
+              <hr />
+
+              <div className="d-flex justify-content-between align-items-center px-3">
+                <div className="d-flex align-items-center">
+                  <IconToken symbol={pairData.token0Symbol} />
+                  <span className="text-main ms-3">{pairData.token0Symbol}</span>
+                </div>
+
+                <div className="text-main text-numeric">{removeLpData.tokens0Amount}</div>
+              </div>
+
+              <div className="d-flex justify-content-between align-items-center px-3 mt-4">
+                <div className="d-flex align-items-center">
+                  <IconToken symbol={pairData.token1Symbol} />
+                  <span className="text-main ms-3">{pairData.token1Symbol}</span>
+                </div>
+
+                <div className="text-main text-numeric">{removeLpData.tokens1Amount}</div>
+              </div>
+
+              <hr />
+
+              <p className="text-micro mb-5 px-3">
+                You will also collect fees earned from this position.
+              </p>
+            </ConfirmTransactionModalContent>
+          </Modal>
+        ) : null}
       </div>
     </div>
   );

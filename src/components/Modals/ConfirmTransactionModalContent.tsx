@@ -22,7 +22,7 @@ const ConfirmTransactionModalContent = ({
   return (
     <>
       <div className="modal-header">
-        <h5 className="modal-title" id="exampleModalLabel">
+        <h5 className="modal-title text-small text-bold" id="exampleModalLabel">
           {modalTitle}
         </h5>
 
