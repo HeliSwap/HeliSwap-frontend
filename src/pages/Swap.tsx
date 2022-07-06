@@ -142,14 +142,18 @@ const Swap = () => {
       [name]: value,
     };
 
-    const invalidInputTokensData =
-      !value ||
-      isNaN(Number(value)) ||
-      Object.keys(tokenA).length === 0 ||
-      Object.keys(tokenB).length === 0 ||
-      tokenA.address === tokenB.address;
+    const invalidTokenData = () => {
+      const tokenANotSelected = Object.keys(tokenA).length === 0;
+      const tokenBNotSelected = Object.keys(tokenB).length === 0;
+      const sameTokenSelected = tokenA.address === tokenB.address;
+      return tokenANotSelected || tokenBNotSelected || sameTokenSelected;
+    };
 
-    if (invalidInputTokensData) {
+    const invalidInputTokensData = () => {
+      return !value || isNaN(Number(value));
+    };
+
+    if (invalidInputTokensData() || invalidTokenData()) {
       setSwapData(prev => ({ ...prev, amountIn: '', amountOut: '' }));
 
       return;

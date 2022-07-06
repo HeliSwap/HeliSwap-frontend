@@ -140,13 +140,14 @@ const Create = () => {
 
     const invalidTokenData = () => {
       const hbarAddresss = process.env.REACT_APP_WHBAR_ADDRESS;
-      return (
-        Object.keys(tokenA).length === 0 ||
-        Object.keys(tokenB).length === 0 ||
-        tokenA.address === tokenB.address ||
+      const tokenANotSelected = Object.keys(tokenA).length === 0;
+      const tokenBNotSelected = Object.keys(tokenB).length === 0;
+      const sameTokenSelected = tokenA.address === tokenB.address;
+      const onlyHbarSelected =
         (tokenA.type === TokenType.HBAR && tokenB.address === hbarAddresss) ||
-        (tokenB.type === TokenType.HBAR && tokenA.address === hbarAddresss)
-      );
+        (tokenB.type === TokenType.HBAR && tokenA.address === hbarAddresss);
+
+      return tokenANotSelected || tokenBNotSelected || sameTokenSelected || onlyHbarSelected;
     };
 
     if (invalidInputTokensData() || invalidTokenData()) {
