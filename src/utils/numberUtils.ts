@@ -67,6 +67,7 @@ export const formatStringETHtoPriceFormatted = (
   const splitted = stringToFormat.split('.');
   const lengthAfterDecimals = splitted[1].length;
 
+  // If the number contains zeros in the decimals, leaves the zeros and shows to more symbols, despite the how many symbols are indicated in the second argument
   let zerosBeforeSymbol = 0;
 
   for (const num of splitted[1]) {
@@ -85,8 +86,6 @@ export const formatStringETHtoPriceFormatted = (
     : stringToFormat.slice(0, decPosition + symbolsAfterDecimals + 1);
 
   const formatted = lenghtMoreThanMaxDecimals ? logicForZeros : stringToFormat;
-
-  console.log('formatted', formatted);
 
   // Remove leading zeros
   let zerosToRemove = 0;
