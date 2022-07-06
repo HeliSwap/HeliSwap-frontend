@@ -54,7 +54,52 @@ export const formatStringWeiToStringEther = (numberToFormat: string, decimals: n
   const numberToFormatBN = new BigNumber(numberToFormat);
   const tenPowDec = new BigNumber(10).pow(decimals);
 
-  return numberToFormatBN.div(tenPowDec).toFixed();
+  const numberToFormatStr = numberToFormatBN.div(tenPowDec).toFixed();
+
+  return numberToFormatStr;
+};
+
+export const formatStringETHtoPriceFormatted = (
+  stringToFormat: string,
+  symbolsAfterDecimals = 4,
+) => {
+  const decPosition = stringToFormat.indexOf('.');
+  const splitted = stringToFormat.split('.');
+  const lengthAfterDecimals = splitted[1].length;
+
+  // If the number contains zeros in the decimals, leaves the zeros and shows to more symbols, despite the how many symbols are indicated in the second argument
+  let zerosBeforeSymbol = 0;
+
+  for (const num of splitted[1]) {
+    if (num === '0') {
+      zerosBeforeSymbol++;
+    } else {
+      break;
+    }
+  }
+
+  const lenghtMoreThanMaxDecimals = lengthAfterDecimals > symbolsAfterDecimals;
+  const zerosMoreThanMaxDecimals = zerosBeforeSymbol >= symbolsAfterDecimals;
+
+  const logicForZeros = zerosMoreThanMaxDecimals
+    ? stringToFormat.slice(0, decPosition + zerosBeforeSymbol + 3)
+    : stringToFormat.slice(0, decPosition + symbolsAfterDecimals + 1);
+
+  const formatted = lenghtMoreThanMaxDecimals ? logicForZeros : stringToFormat;
+
+  // Remove leading zeros
+  let zerosToRemove = 0;
+  for (let i = formatted.length - 1; i > 0; i--) {
+    if (formatted[i] === '0') {
+      zerosToRemove++;
+    } else {
+      break;
+    }
+  }
+
+  const withoutLeadingZeros = zerosToRemove > 0 ? formatted.slice(0, -zerosToRemove) : formatted;
+
+  return withoutLeadingZeros;
 };
 
 // Used to calculate token min/max amount including slippage
