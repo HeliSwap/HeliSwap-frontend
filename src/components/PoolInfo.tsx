@@ -6,7 +6,11 @@ import Button from './Button';
 import IconToken from './IconToken';
 import Icon from './Icon';
 
-import { formatStringToPrice, formatStringWeiToStringEther } from '../utils/numberUtils';
+import {
+  formatStringETHtoPriceFormatted,
+  formatStringToPrice,
+  formatStringWeiToStringEther,
+} from '../utils/numberUtils';
 import { calculateReserves, getTokenPrice } from '../utils/tokenUtils';
 import { formatIcons } from '../utils/iconUtils';
 
@@ -116,6 +120,14 @@ const PoolInfo = ({
                   <span className="text-main text-bold">LP Tokens Count</span>
                   <span className="text-main text-numeric ms-4">
                     {formatStringWeiToStringEther(pairData.lpShares as string)}
+                  </span>
+                </div>
+                <div className="container-neutral-500 mt-4 d-flex justify-content-between align-items-center">
+                  <span className="text-main text-bold">LP Tokens Count</span>
+                  <span className="text-main text-numeric ms-4">
+                    {formatStringETHtoPriceFormatted(
+                      formatStringWeiToStringEther(pairData.lpShares as string),
+                    )}
                   </span>
                 </div>
               </div>

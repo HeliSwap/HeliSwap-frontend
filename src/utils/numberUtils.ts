@@ -54,7 +54,37 @@ export const formatStringWeiToStringEther = (numberToFormat: string, decimals: n
   const numberToFormatBN = new BigNumber(numberToFormat);
   const tenPowDec = new BigNumber(10).pow(decimals);
 
-  return numberToFormatBN.div(tenPowDec).toFixed();
+  const numberToFormatStr = numberToFormatBN.div(tenPowDec).toFixed();
+
+  return numberToFormatStr;
+};
+
+export const formatStringETHtoPriceFormatted = (stringToFormat: string) => {
+  const decPosition = stringToFormat.indexOf('.');
+  const splitted = stringToFormat.split('.');
+  const lengthAfterDecs = splitted[1].length;
+  const MAX_LENGTH_AFTER_DECIMALS = 8;
+
+  let zerosBeforeSymbol = 0;
+  Array.from(splitted[1]).every(num => {
+    if (num === '0') {
+      zerosBeforeSymbol++;
+      return true;
+    } else {
+      return false;
+    }
+  });
+
+  const lenghtMoreThanMaxDecimals = lengthAfterDecs > MAX_LENGTH_AFTER_DECIMALS;
+  const zerosMoreThanMaxDecimals = zerosBeforeSymbol >= MAX_LENGTH_AFTER_DECIMALS;
+
+  const formatted = lenghtMoreThanMaxDecimals
+    ? zerosMoreThanMaxDecimals
+      ? stringToFormat.slice(0, decPosition + zerosBeforeSymbol + 2)
+      : stringToFormat.slice(0, decPosition + MAX_LENGTH_AFTER_DECIMALS + 1)
+    : stringToFormat;
+
+  return formatted;
 };
 
 // Used to calculate token min/max amount including slippage
