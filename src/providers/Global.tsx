@@ -33,7 +33,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
 
   const { timestamp, error } = useHealthCheck({
     fetchPolicy: 'network-only',
-    pollInterval: 1000,
+    pollInterval: 5000,
   });
 
   const nowSeconds = Date.now() / 1000;
