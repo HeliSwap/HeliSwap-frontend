@@ -10,6 +10,7 @@ const InputToken = (props: IInputTokenProps) => {
 
   return (
     <input
+      autoComplete="off"
       placeholder={placeholder ? placeholder : '0.0'}
       className={`input-token ${className}`}
       type="text"
