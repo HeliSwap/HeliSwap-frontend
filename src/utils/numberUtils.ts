@@ -59,32 +59,48 @@ export const formatStringWeiToStringEther = (numberToFormat: string, decimals: n
   return numberToFormatStr;
 };
 
-export const formatStringETHtoPriceFormatted = (stringToFormat: string) => {
+export const formatStringETHtoPriceFormatted = (
+  stringToFormat: string,
+  symbolsAfterDecimals = 4,
+) => {
   const decPosition = stringToFormat.indexOf('.');
   const splitted = stringToFormat.split('.');
-  const lengthAfterDecs = splitted[1].length;
-  const MAX_LENGTH_AFTER_DECIMALS = 8;
+  const lengthAfterDecimals = splitted[1].length;
 
   let zerosBeforeSymbol = 0;
-  Array.from(splitted[1]).every(num => {
+
+  for (const num of splitted[1]) {
     if (num === '0') {
       zerosBeforeSymbol++;
-      return true;
     } else {
-      return false;
+      break;
     }
-  });
+  }
 
-  const lenghtMoreThanMaxDecimals = lengthAfterDecs > MAX_LENGTH_AFTER_DECIMALS;
-  const zerosMoreThanMaxDecimals = zerosBeforeSymbol >= MAX_LENGTH_AFTER_DECIMALS;
+  const lenghtMoreThanMaxDecimals = lengthAfterDecimals > symbolsAfterDecimals;
+  const zerosMoreThanMaxDecimals = zerosBeforeSymbol >= symbolsAfterDecimals;
 
-  const formatted = lenghtMoreThanMaxDecimals
-    ? zerosMoreThanMaxDecimals
-      ? stringToFormat.slice(0, decPosition + zerosBeforeSymbol + 2)
-      : stringToFormat.slice(0, decPosition + MAX_LENGTH_AFTER_DECIMALS + 1)
-    : stringToFormat;
+  const logicForZeros = zerosMoreThanMaxDecimals
+    ? stringToFormat.slice(0, decPosition + zerosBeforeSymbol + 3)
+    : stringToFormat.slice(0, decPosition + symbolsAfterDecimals + 1);
 
-  return formatted;
+  const formatted = lenghtMoreThanMaxDecimals ? logicForZeros : stringToFormat;
+
+  console.log('formatted', formatted);
+
+  // Remove leading zeros
+  let zerosToRemove = 0;
+  for (let i = formatted.length - 1; i > 0; i--) {
+    if (formatted[i] === '0') {
+      zerosToRemove++;
+    } else {
+      break;
+    }
+  }
+
+  const withoutLeadingZeros = zerosToRemove > 0 ? formatted.slice(0, -zerosToRemove) : formatted;
+
+  return withoutLeadingZeros;
 };
 
 // Used to calculate token min/max amount including slippage

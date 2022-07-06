@@ -93,7 +93,9 @@ const PoolInfo = ({
                   </div>
 
                   <div className="d-flex justify-content-end align-items-center ms-4">
-                    <span className="text-numeric text-main">{reserve0ShareStr}</span>
+                    <span className="text-numeric text-main">
+                      {formatStringETHtoPriceFormatted(reserve0ShareStr)}
+                    </span>
                   </div>
                 </div>
 
@@ -104,7 +106,9 @@ const PoolInfo = ({
                   </div>
 
                   <div className="d-flex justify-content-end align-items-center ms-4">
-                    <span className="text-numeric text-main">{reserve1ShareStr}</span>
+                    <span className="text-numeric text-main">
+                      {formatStringETHtoPriceFormatted(reserve1ShareStr)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -114,12 +118,6 @@ const PoolInfo = ({
                   <span className="text-main text-bold">Liquidity</span>
                   <span className="text-main text-numeric ms-4">
                     {formatStringToPrice(totalLpValueStr)}
-                  </span>
-                </div>
-                <div className="container-neutral-500 mt-4 d-flex justify-content-between align-items-center">
-                  <span className="text-main text-bold">LP Tokens Count</span>
-                  <span className="text-main text-numeric ms-4">
-                    {formatStringWeiToStringEther(pairData.lpShares as string)}
                   </span>
                 </div>
                 <div className="container-neutral-500 mt-4 d-flex justify-content-between align-items-center">
