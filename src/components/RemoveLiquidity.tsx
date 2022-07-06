@@ -74,6 +74,8 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
   const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
   const [showModalConfirmRemove, setShowModalConfirmRemove] = useState(false);
 
+  const [loadingApprove, setLoadingApprove] = useState(false);
+
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
@@ -197,6 +199,8 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
   const hanleApproveLPClick = async () => {
     const amount = MAX_UINT_ERC20.toString();
 
+    setLoadingApprove(true);
+
     try {
       const contractId = addressToContractId(pairData.pairAddress);
       await sdk.approveToken(hashconnectConnectorInstance, amount, userId, contractId);
@@ -204,6 +208,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
     } catch (e) {
       console.error(e);
     } finally {
+      setLoadingApprove(false);
     }
   };
 
@@ -372,7 +377,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
         <div className="mt-4">
           <div className="d-grid mt-4">
             {!lpApproved ? (
-              <Button className="mb-3" onClick={hanleApproveLPClick}>
+              <Button loading={loadingApprove} className="mb-3" onClick={hanleApproveLPClick}>
                 Approve
               </Button>
             ) : null}
