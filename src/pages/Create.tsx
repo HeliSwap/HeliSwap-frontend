@@ -131,11 +131,26 @@ const Create = () => {
   const [tokensDerivedFromPool, setTokensDerivedFromPool] = useState(false);
 
   const handleInputChange = (value: string, name: string) => {
-    const inputToken = name === 'tokenAAmount' ? tokensData.tokenA : tokensData.tokenB;
+    const { tokenA, tokenB } = tokensData;
+    const inputToken = name === 'tokenAAmount' ? tokenA : tokenB;
 
-    const invalidInputTokensData = !value || isNaN(Number(value));
+    const invalidInputTokensData = () => {
+      return !value || isNaN(Number(value));
+    };
 
-    if (invalidInputTokensData) {
+    const invalidTokenData = () => {
+      const hbarAddresss = process.env.REACT_APP_WHBAR_ADDRESS;
+      const tokenANotSelected = Object.keys(tokenA).length === 0;
+      const tokenBNotSelected = Object.keys(tokenB).length === 0;
+      const sameTokenSelected = tokenA.address === tokenB.address;
+      const onlyHbarSelected =
+        (tokenA.type === TokenType.HBAR && tokenB.address === hbarAddresss) ||
+        (tokenB.type === TokenType.HBAR && tokenA.address === hbarAddresss);
+
+      return tokenANotSelected || tokenBNotSelected || sameTokenSelected || onlyHbarSelected;
+    };
+
+    if (invalidInputTokensData() || invalidTokenData()) {
       setReadyToProvide(false);
       setCreatePairData(prev => ({ ...prev, tokenAAmount: '', tokenBAmount: '' }));
       return;
