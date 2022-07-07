@@ -15,9 +15,9 @@ import { GlobalContext } from '../providers/Global';
 import Button from '../components/Button';
 import Modal from '../components/Modal';
 import ModalSearchContent from '../components/Modals/ModalSearchContent';
-import TransactionSettingsModalContent from '../components/Modals/TransactionSettingsModalContent';
 import InputTokenSelector from '../components/InputTokenSelector';
 import InputToken from '../components/InputToken';
+import PageHeader from '../components/PageHeader';
 import ButtonSelector from '../components/ButtonSelector';
 import WalletBalance from '../components/WalletBalance';
 
@@ -28,16 +28,11 @@ import {
   formatStringToBigNumberWei,
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
-import {
-  getTransactionSettings,
-  INITIAL_PROVIDE_SLIPPAGE_TOLERANCE,
-  handleSaveTransactionSettings,
-} from '../utils/transactionUtils';
+import { getTransactionSettings } from '../utils/transactionUtils';
 import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
 import useTokens from '../hooks/useTokens';
 import { MAX_UINT_ERC20, MAX_UINT_HTS, POOLS_FEE } from '../constants';
-import Icon from '../components/Icon';
 import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
 import { formatIcons } from '../utils/iconUtils';
 import IconToken from '../components/IconToken';
@@ -57,7 +52,6 @@ const Create = () => {
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
-  const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
   const [showModalConfirmProvide, setShowModalConfirmProvide] = useState(false);
 
   const initialTokensData = {
@@ -457,36 +451,6 @@ const Create = () => {
   }, [poolsData, tokenDataList, address, tokensDerivedFromPool]);
 
   //Render methods
-  const getTitleAndSettings = () => {
-    return (
-      <>
-        <div className="d-flex justify-content-between align-items-center mb-6">
-          <h1 className="text-subheader text-light">{pageTitle}</h1>
-          <div
-            className="d-flex justify-content-end align-items-center cursor-pointer"
-            onClick={() => setShowModalTransactionSettings(true)}
-          >
-            <span className="text-small me-2">Settings</span>
-            <Icon name="settings" />
-          </div>
-        </div>
-
-        {showModalTransactionSettings ? (
-          <Modal show={showModalTransactionSettings}>
-            <TransactionSettingsModalContent
-              modalTitle="Transaction settings"
-              closeModal={() => setShowModalTransactionSettings(false)}
-              slippage={getTransactionSettings().provideSlippage}
-              expiration={getTransactionSettings().transactionExpiration}
-              saveChanges={handleSaveTransactionSettings}
-              defaultSlippageValue={INITIAL_PROVIDE_SLIPPAGE_TOLERANCE}
-            />
-          </Modal>
-        ) : null}
-      </>
-    );
-  };
-
   const getErrorMessage = () => {
     return error ? (
       <div className="alert alert-danger my-5" role="alert">
@@ -781,7 +745,7 @@ const Create = () => {
   return (
     <div className="d-flex justify-content-center">
       <div className="container-action">
-        {getTitleAndSettings()}
+        <PageHeader title={pageTitle} />
         {getErrorMessage()}
         {getProvideSection()}
       </div>
