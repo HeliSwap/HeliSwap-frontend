@@ -13,13 +13,14 @@ const Settings = () => {
   const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
 
   return (
-    <div
-      className="d-flex justify-content-end align-items-center cursor-pointer"
-      onClick={() => setShowModalTransactionSettings(true)}
-    >
-      <span className="text-small me-2">Settings</span>
-      <Icon name="settings" />
-
+    <>
+      <div
+        className="d-flex justify-content-end align-items-center cursor-pointer"
+        onClick={() => setShowModalTransactionSettings(true)}
+      >
+        <span className="text-small me-2">Settings</span>
+        <Icon name="settings" />
+      </div>
       {showModalTransactionSettings ? (
         <Modal show={showModalTransactionSettings}>
           <TransactionSettingsModalContent
@@ -32,7 +33,7 @@ const Settings = () => {
           />
         </Modal>
       ) : null}
-    </div>
+    </>
   );
 };
 
