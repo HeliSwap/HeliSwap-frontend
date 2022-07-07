@@ -8,9 +8,27 @@ import {
   handleSaveTransactionSettings,
   INITIAL_REMOVE_SLIPPAGE_TOLERANCE,
 } from '../utils/transactionUtils';
+import { IStringToString } from '../interfaces/comon';
 
-const Settings = () => {
+interface ISettingsProps {
+  slippage: string;
+}
+
+const Settings = ({ slippage }: ISettingsProps) => {
   const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
+
+  const slippageMapping: IStringToString = {
+    provide: 'provideSlippage',
+    swap: 'swapSlippage',
+    remove: 'removeSlippage',
+  };
+
+  const currentSlippage = getTransactionSettings();
+  const currentSlippageKey = slippageMapping[slippage] as keyof {
+    provideSlippage: number;
+    swapSlippage: number;
+    removeSlippage: number;
+  };
 
   return (
     <>
@@ -26,7 +44,7 @@ const Settings = () => {
           <TransactionSettingsModalContent
             modalTitle="Transaction settings"
             closeModal={() => setShowModalTransactionSettings(false)}
-            slippage={getTransactionSettings().removeSlippage}
+            slippage={currentSlippage[currentSlippageKey]}
             expiration={getTransactionSettings().transactionExpiration}
             saveChanges={handleSaveTransactionSettings}
             defaultSlippageValue={INITIAL_REMOVE_SLIPPAGE_TOLERANCE}

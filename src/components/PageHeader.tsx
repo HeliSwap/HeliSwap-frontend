@@ -4,10 +4,11 @@ import Settings from './Settings';
 
 interface IPageHeaderProps {
   title: string;
+  slippage: string;
   handleBackClick?: () => void;
 }
 
-const PageHeader = ({ title, handleBackClick }: IPageHeaderProps) => {
+const PageHeader = ({ title, handleBackClick, slippage }: IPageHeaderProps) => {
   return (
     <div className="d-flex justify-content-between align-items-center mb-6">
       {handleBackClick ? (
@@ -17,7 +18,7 @@ const PageHeader = ({ title, handleBackClick }: IPageHeaderProps) => {
       ) : null}
 
       <h1 className="text-subheader text-light">{title}</h1>
-      <Settings />
+      <Settings slippage={slippage} />
     </div>
   );
 };

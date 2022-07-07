@@ -745,7 +745,7 @@ const Create = () => {
   return (
     <div className="d-flex justify-content-center">
       <div className="container-action">
-        <PageHeader title={pageTitle} />
+        <PageHeader slippage="create" title={pageTitle} />
         {getErrorMessage()}
         {getProvideSection()}
       </div>

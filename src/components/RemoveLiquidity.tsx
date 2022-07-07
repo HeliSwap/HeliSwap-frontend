@@ -281,7 +281,11 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
   return (
     <div className="container-action">
-      <PageHeader title="Remove Liquidity" handleBackClick={() => setShowRemoveContainer(false)} />
+      <PageHeader
+        slippage="remove"
+        title="Remove Liquidity"
+        handleBackClick={() => setShowRemoveContainer(false)}
+      />
 
       {showModalTransactionSettings ? (
         <Modal show={showModalTransactionSettings}>

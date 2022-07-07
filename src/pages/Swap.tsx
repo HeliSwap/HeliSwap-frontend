@@ -776,7 +776,7 @@ const Swap = () => {
   return (
     <div className="d-flex justify-content-center">
       <div className="container-action">
-        <PageHeader title="Swap" />
+        <PageHeader slippage="swap" title="Swap" />
         {getErrorMessage()}
         {getSwapSection()}
       </div>
