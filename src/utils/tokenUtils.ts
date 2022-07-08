@@ -92,12 +92,9 @@ export const getHTSTokenWalletBalance = async (
 };
 
 export const getUserAssociatedTokens = async (userId: string): Promise<string[]> => {
-  const networkType = process.env.REACT_APP_NETWORK_TYPE as string;
-  const client = networkType === 'testnet' ? Client.forTestnet() : Client.forMainnet();
-  const { tokens } = await new AccountBalanceQuery().setAccountId(userId).execute(client);
-
+  const tokens = (await getUserHTSData(userId)) || [];
   const keys: string[] = [];
-  tokens?._map.forEach((_, key) => keys.push(key));
+  tokens.forEach((_, key) => keys.push(key as string));
 
   return keys;
 };
@@ -239,9 +236,12 @@ export const getTokenBalance = async (userId: string, tokenData: ITokenData) => 
     const userBalanceBN = await provider.getBalance(userId);
     tokenBalance = hethers.utils.formatHbar(userBalanceBN);
   } else if (tokenData.type === TokenType.HTS) {
-    const balance = await getHTSTokenWalletBalance(userId, tokenData.hederaId);
+    const accountTokens = await getUserHTSData(userId);
+    const balance = accountTokens?.get(tokenData.hederaId);
     const tokenDecimals = tokenData?.decimals || 8;
-    tokenBalance = formatStringWeiToStringEther(balance.toString(), tokenDecimals).toString();
+    tokenBalance = balance
+      ? formatStringWeiToStringEther(balance.toString(), tokenDecimals).toString()
+      : '0';
   }
   // Currently we don't have a way getting the balance of ERC20 tokens
   return tokenBalance;
@@ -281,6 +281,13 @@ export const getTokenPrice = (poolsData: IPairData[], tokenAddress: string, hbar
   const bestTradeAmount = sortedTrades[0].amountOut;
 
   return new BigNumber(hbarPrice).div(new BigNumber(bestTradeAmount)).toString();
+};
+
+const getUserHTSData = async (userId: string) => {
+  const networkType = process.env.REACT_APP_NETWORK_TYPE as string;
+  const client = networkType === 'testnet' ? Client.forTestnet() : Client.forMainnet();
+  const { tokens } = await new AccountBalanceQuery().setAccountId(userId).execute(client);
+  return tokens?._map;
 };
 
 export const NATIVE_TOKEN = {
