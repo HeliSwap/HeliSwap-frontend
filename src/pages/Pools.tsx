@@ -5,16 +5,10 @@ import { Link } from 'react-router-dom';
 import { useLazyQuery, useQuery } from '@apollo/client';
 import { GET_POOLS_BY_USER, GET_POOLS } from '../GraphQL/Queries';
 import { IPairData } from '../interfaces/tokens';
+import { PageViews } from '../interfaces/common';
 import { getHBarPrice, idToAddress } from '../utils/tokenUtils';
-import {
-  getTransactionSettings,
-  INITIAL_REMOVE_SLIPPAGE_TOLERANCE,
-  handleSaveTransactionSettings,
-} from '../utils/transactionUtils';
 
 import PoolInfo from '../components/PoolInfo';
-import TransactionSettingsModalContent from '../components/Modals/TransactionSettingsModalContent';
-import Modal from '../components/Modal';
 import RemoveLiquidity from '../components/RemoveLiquidity';
 
 const Pools = () => {
@@ -24,12 +18,23 @@ const Pools = () => {
 
   const [getPoolsByUser, { error, loading, data }] = useLazyQuery(GET_POOLS_BY_USER);
   const { loading: loadingPools, data: dataPools } = useQuery(GET_POOLS);
+
+  const initialCurrentView: PageViews = PageViews.ALL_POOLS;
+  const [currentView, setCurrentView] = useState<PageViews>(initialCurrentView);
+  const viewTitleMapping = {
+    [PageViews.ALL_POOLS]: 'All pools',
+    [PageViews.MY_POOLS]: 'My positions',
+  };
+
   const [pairData, setPairData] = useState<IPairData[]>([]);
   const [allPairsData, setAllPairsData] = useState<IPairData[]>([]);
-  const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
   const [showRemoveContainer, setShowRemoveContainer] = useState(false);
   const [currentPoolIndex, setCurrentPoolIndex] = useState(0);
   const [hbarPrice, setHbarPrice] = useState(0);
+
+  const handleTabItemClick = (currentView: PageViews) => {
+    setCurrentView(currentView);
+  };
 
   useEffect(() => {
     userId &&
@@ -59,6 +64,13 @@ const Pools = () => {
 
   const havePairs = pairData.length > 0;
 
+  const poolsMapping = {
+    [PageViews.ALL_POOLS]: allPairsData,
+    [PageViews.MY_POOLS]: pairData,
+  };
+
+  const poolsToShow = poolsMapping[currentView];
+
   return (
     <div className="d-flex justify-content-center">
       {showRemoveContainer ? (
@@ -69,30 +81,28 @@ const Pools = () => {
       ) : (
         <div className="container-pools">
           <div className="d-flex justify-content-between align-items-center mb-6">
-            <h1 className="text-subheader">My positions</h1>
+            <div className="d-flex">
+              <h2
+                onClick={() => handleTabItemClick(PageViews.ALL_POOLS)}
+                className={`text-subheader tab-title ${
+                  PageViews.ALL_POOLS === currentView ? 'is-active' : ''
+                }`}
+              >
+                {viewTitleMapping[PageViews.ALL_POOLS]}
+              </h2>
+              <h2
+                onClick={() => handleTabItemClick(PageViews.MY_POOLS)}
+                className={`text-subheader tab-title ${
+                  PageViews.MY_POOLS === currentView ? 'is-active' : ''
+                } ms-3`}
+              >
+                {viewTitleMapping[PageViews.MY_POOLS]}
+              </h2>
+            </div>
             <Link className="btn btn-sm btn-primary" to="/create">
               Create pool
             </Link>
           </div>
-
-          <div className="d-flex justify-content-end">
-            <span className="cursor-pointer" onClick={() => setShowModalTransactionSettings(true)}>
-              <img className="me-2" width={24} src={`/icons/settings.png`} alt="" />
-            </span>
-          </div>
-
-          {showModalTransactionSettings ? (
-            <Modal show={showModalTransactionSettings}>
-              <TransactionSettingsModalContent
-                modalTitle="Transaction settings"
-                closeModal={() => setShowModalTransactionSettings(false)}
-                slippage={getTransactionSettings().removeSlippage}
-                expiration={getTransactionSettings().transactionExpiration}
-                saveChanges={handleSaveTransactionSettings}
-                defaultSlippageValue={INITIAL_REMOVE_SLIPPAGE_TOLERANCE}
-              />
-            </Modal>
-          ) : null}
 
           {error ? (
             <div className="alert alert-danger mt-5" role="alert">
@@ -113,7 +123,7 @@ const Pools = () => {
                   <span className="text-small">Pool</span>
                 </div>
               </div>
-              {pairData.map((item, index) => (
+              {poolsToShow.map((item, index) => (
                 <PoolInfo
                   setShowRemoveContainer={setShowRemoveContainer}
                   setCurrentPoolIndex={setCurrentPoolIndex}
@@ -122,6 +132,7 @@ const Pools = () => {
                   pairData={item}
                   allPoolsData={allPairsData}
                   hbarPrice={hbarPrice}
+                  view={currentView}
                 />
               ))}
             </div>

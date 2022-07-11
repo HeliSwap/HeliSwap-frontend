@@ -120,7 +120,7 @@
     border: none;
     max-width: 250px;
     flex: 0 1 250px;
-    @include transition-link;
+    @include transition-color;
 
     &:focus {
       color: $neutral-100;
@@ -268,4 +268,15 @@
 
 .btn-close {
   opacity: 1;
+}
+
+// Tabs
+.tab-title {
+  color: $secondary;
+  cursor: pointer;
+  @include transition-color;
+
+  &.is-active {
+    color: $neutral-100;
+  }
 }

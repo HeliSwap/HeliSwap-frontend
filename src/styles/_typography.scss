@@ -62,7 +62,7 @@
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  @include transition-link;
+  @include transition-color;
 
   &.is-active {
     color: $neutral-100;

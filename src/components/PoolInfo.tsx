@@ -13,6 +13,7 @@ import {
 } from '../utils/numberUtils';
 import { calculateReserves, getTokenPrice } from '../utils/tokenUtils';
 import { formatIcons } from '../utils/iconUtils';
+import { PageViews } from '../interfaces/common';
 
 import { POOLS_FEE } from '../constants';
 
@@ -23,6 +24,7 @@ interface IPoolInfoProps {
   hbarPrice: number;
   setShowRemoveContainer: React.Dispatch<React.SetStateAction<boolean>>;
   setCurrentPoolIndex: React.Dispatch<React.SetStateAction<number>>;
+  view: PageViews;
 }
 
 const PoolInfo = ({
@@ -32,17 +34,29 @@ const PoolInfo = ({
   hbarPrice,
   setShowRemoveContainer,
   setCurrentPoolIndex,
+  view,
 }: IPoolInfoProps) => {
   const [showPoolDetails, setShowPoolDetails] = useState(false);
 
-  const { reserve0ShareStr, reserve1ShareStr } = calculateReserves(
-    pairData.lpShares as string,
-    pairData.pairSupply,
-    pairData.token0Amount,
-    pairData.token1Amount,
-    pairData.token0Decimals,
-    pairData.token1Decimals,
-  );
+  let reserve0 = '0';
+  let reserve1 = '0';
+
+  if (view === PageViews.ALL_POOLS) {
+    reserve0 = formatStringWeiToStringEther(pairData.token0Amount, pairData.token0Decimals);
+    reserve1 = formatStringWeiToStringEther(pairData.token1Amount, pairData.token1Decimals);
+  } else if (view === PageViews.MY_POOLS) {
+    const { reserve0ShareStr, reserve1ShareStr } = calculateReserves(
+      pairData.lpShares as string,
+      pairData.pairSupply,
+      pairData.token0Amount,
+      pairData.token1Amount,
+      pairData.token0Decimals,
+      pairData.token1Decimals,
+    );
+
+    reserve0 = reserve0ShareStr;
+    reserve1 = reserve1ShareStr;
+  }
 
   const handleRemoveButtonClick = () => {
     setShowRemoveContainer(prev => !prev);
@@ -52,8 +66,8 @@ const PoolInfo = ({
   const token0Price = getTokenPrice(allPoolsData, pairData.token0, hbarPrice);
   const token1Price = getTokenPrice(allPoolsData, pairData.token1, hbarPrice);
 
-  const token0Value = Number(reserve0ShareStr) * Number(token0Price);
-  const token1Value = Number(reserve1ShareStr) * Number(token1Price);
+  const token0Value = Number(reserve0) * Number(token0Price);
+  const token1Value = Number(reserve1) * Number(token1Price);
   const totalLpValue = token0Value + token1Value;
   const totalLpValueStr = totalLpValue.toFixed(2);
 
@@ -94,7 +108,7 @@ const PoolInfo = ({
 
                   <div className="d-flex justify-content-end align-items-center ms-4">
                     <span className="text-numeric text-main">
-                      {formatStringETHtoPriceFormatted(reserve0ShareStr)}
+                      {formatStringETHtoPriceFormatted(reserve0)}
                     </span>
                   </div>
                 </div>
@@ -107,7 +121,7 @@ const PoolInfo = ({
 
                   <div className="d-flex justify-content-end align-items-center ms-4">
                     <span className="text-numeric text-main">
-                      {formatStringETHtoPriceFormatted(reserve1ShareStr)}
+                      {formatStringETHtoPriceFormatted(reserve1)}
                     </span>
                   </div>
                 </div>
@@ -124,7 +138,11 @@ const PoolInfo = ({
                   <span className="text-main text-bold">LP Tokens Count</span>
                   <span className="text-main text-numeric ms-4">
                     {formatStringETHtoPriceFormatted(
-                      formatStringWeiToStringEther(pairData.lpShares as string),
+                      formatStringWeiToStringEther(
+                        view === PageViews.MY_POOLS
+                          ? (pairData.lpShares as string)
+                          : (pairData.pairSupply as string),
+                      ),
                     )}
                   </span>
                 </div>
@@ -133,13 +151,16 @@ const PoolInfo = ({
 
             <div>
               <div className="d-flex align-items-center">
-                <Button
-                  className="btn-sm"
-                  type="outline-secondary"
-                  onClick={handleRemoveButtonClick}
-                >
-                  Remove Liquidity
-                </Button>
+                {view === PageViews.MY_POOLS ? (
+                  <Button
+                    className="btn-sm"
+                    type="outline-secondary"
+                    onClick={handleRemoveButtonClick}
+                  >
+                    Remove Liquidity
+                  </Button>
+                ) : null}
+
                 <Link
                   className="btn btn-sm btn-secondary ms-3"
                   to={`/create/${pairData.pairAddress}`}
