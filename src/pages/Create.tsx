@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useMemo } from 'react';
+import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
 import { useParams } from 'react-router-dom';
@@ -124,6 +124,31 @@ const Create = () => {
   // State for preset tokens from choosen pool
   const [tokensDerivedFromPool, setTokensDerivedFromPool] = useState(false);
 
+  const invalidTokenData = useCallback(() => {
+    const { tokenA, tokenB } = tokensData;
+    const hbarAddresss = process.env.REACT_APP_WHBAR_ADDRESS;
+    const tokenANotSelected = Object.keys(tokenA).length === 0;
+    const tokenBNotSelected = Object.keys(tokenB).length === 0;
+    const sameTokenSelected = tokenA.address === tokenB.address;
+    const onlyHbarSelected =
+      (tokenA.type === TokenType.HBAR && tokenB.address === hbarAddresss) ||
+      (tokenB.type === TokenType.HBAR && tokenA.address === hbarAddresss);
+
+    return tokenANotSelected || tokenBNotSelected || sameTokenSelected || onlyHbarSelected;
+  }, [tokensData]);
+
+  const getInsufficientTokenA = useCallback(() => {
+    const { tokenA } = tokenBalances;
+    const { tokenAAmount } = createPairData;
+    return tokenA && tokenAAmount && new BigNumber(tokenAAmount).gt(new BigNumber(tokenA));
+  }, [tokenBalances, createPairData]);
+
+  const getInsufficientTokenB = useCallback(() => {
+    const { tokenB } = tokenBalances;
+    const { tokenBAmount } = createPairData;
+    return tokenB && tokenBAmount && new BigNumber(tokenBAmount).gt(new BigNumber(tokenB));
+  }, [tokenBalances, createPairData]);
+
   const handleInputChange = (value: string, name: string) => {
     const { tokenA, tokenB } = tokensData;
     const inputToken = name === 'tokenAAmount' ? tokenA : tokenB;
@@ -132,21 +157,14 @@ const Create = () => {
       return !value || isNaN(Number(value));
     };
 
-    const invalidTokenData = () => {
-      const hbarAddresss = process.env.REACT_APP_WHBAR_ADDRESS;
-      const tokenANotSelected = Object.keys(tokenA).length === 0;
-      const tokenBNotSelected = Object.keys(tokenB).length === 0;
-      const sameTokenSelected = tokenA.address === tokenB.address;
-      const onlyHbarSelected =
-        (tokenA.type === TokenType.HBAR && tokenB.address === hbarAddresss) ||
-        (tokenB.type === TokenType.HBAR && tokenA.address === hbarAddresss);
-
-      return tokenANotSelected || tokenBNotSelected || sameTokenSelected || onlyHbarSelected;
-    };
-
-    if (invalidInputTokensData() || invalidTokenData()) {
+    if (invalidInputTokensData()) {
       setReadyToProvide(false);
       setCreatePairData(prev => ({ ...prev, tokenAAmount: '', tokenBAmount: '' }));
+      return;
+    }
+    if (invalidTokenData()) {
+      setReadyToProvide(false);
+      setCreatePairData(prev => ({ ...prev, [name]: value }));
       return;
     }
 
@@ -395,7 +413,6 @@ const Create = () => {
       [];
 
     setSelectedPoolData(selectedPoolData[0] || {});
-
     setProvideNative(provideNative);
     const tokensInSamePool = selectedPoolData && selectedPoolData.length !== 0;
     setTokensInSamePool(tokensInSamePool);
@@ -410,23 +427,40 @@ const Create = () => {
   }, [tokensData, poolsData]);
 
   useEffect(() => {
+    //TODO: rafactor this function
     let isReady = true;
 
-    const { tokenAAmount, tokenAId, tokenBAmount, tokenBId } = createPairData;
+    const { tokenAAmount, tokenBAmount } = createPairData;
 
     if (!tokenAAmount || !tokenBAmount) {
       isReady = false;
     }
 
-    // Not safe enough
-    if (!provideNative) {
-      if (tokenAId === '' || tokenBId === '') {
-        isReady = false;
-      }
+    if (invalidTokenData()) {
+      isReady = false;
+    }
+
+    if (
+      (tokensData.tokenA.hederaId && !approved.tokenA) ||
+      (tokensData.tokenB.hederaId && !approved.tokenB)
+    ) {
+      isReady = false;
+    }
+
+    if (getInsufficientTokenA() || getInsufficientTokenB()) {
+      isReady = false;
     }
 
     setReadyToProvide(isReady);
-  }, [createPairData, provideNative]);
+  }, [
+    createPairData,
+    provideNative,
+    approved,
+    getInsufficientTokenA,
+    getInsufficientTokenB,
+    invalidTokenData,
+    tokensData,
+  ]);
 
   useEffect(() => {
     try {
@@ -630,6 +664,18 @@ const Create = () => {
       .toFixed(4);
   };
 
+  const getProvideButtonLabel = () => {
+    const {
+      tokenA: { symbol: symbolA },
+      tokenB: { symbol: symbolB },
+    } = tokensData;
+
+    if (getInsufficientTokenA()) return `Unsufficient ${symbolA} balance`;
+    if (getInsufficientTokenB()) return `Unsufficient ${symbolB} balance`;
+    if (invalidTokenData()) return 'Invalid pool';
+    return tokensInSamePool ? 'Provide' : 'Create';
+  };
+
   const getActionButtons = () => {
     return connected ? (
       <div className="mt-5">
@@ -642,7 +688,6 @@ const Create = () => {
             >{`Approve ${tokensData.tokenA.symbol}`}</Button>
           </div>
         ) : null}
-
         {tokensData.tokenB.hederaId && !approved.tokenB && createPairData.tokenBAmount ? (
           <div className="d-grid mt-4">
             <div className="d-grid mt-4">
@@ -656,30 +701,11 @@ const Create = () => {
           </div>
         ) : null}
 
-        {approved.tokenA && approved.tokenB ? (
-          tokensInSamePool ? (
-            <div className="d-grid mt-4">
-              <Button
-                loading={loadingCreate}
-                disabled={!readyToProvide}
-                onClick={handleProvideClick}
-              >
-                Provide
-              </Button>
-            </div>
-          ) : (
-            <div className="d-grid mt-4">
-              {' '}
-              <Button
-                loading={loadingCreate}
-                disabled={!readyToProvide}
-                onClick={handleProvideClick}
-              >
-                Create
-              </Button>
-            </div>
-          )
-        ) : null}
+        <div className="d-grid mt-4">
+          <Button loading={loadingCreate} disabled={!readyToProvide} onClick={handleProvideClick}>
+            {getProvideButtonLabel()}
+          </Button>
+        </div>
 
         {showModalConfirmProvide ? (
           <Modal show={showModalConfirmProvide}>

@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useContext, useMemo } from 'react';
+import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
 import { hethers } from '@hashgraph/hethers';
+import BigNumber from 'bignumber.js';
+
 import {
   ITokenData,
   ISwapTokenData,
@@ -130,6 +132,12 @@ const Swap = () => {
   const [loadingSwap, setLoadingSwap] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
 
+  const getInsufficientTokenIn = useCallback(() => {
+    const { tokenA: tokenABalance } = tokenBalances;
+    const { amountIn } = swapData;
+    return tokenABalance && amountIn && new BigNumber(amountIn).gt(new BigNumber(tokenABalance));
+  }, [swapData, tokenBalances]);
+
   const handleInputChange = async (value: string, name: string) => {
     const { tokenA, tokenB } = tokensData;
 
@@ -148,9 +156,13 @@ const Swap = () => {
       return !value || isNaN(Number(value));
     };
 
-    if (invalidInputTokensData() || invalidTokenData()) {
+    if (invalidInputTokensData()) {
       setSwapData(prev => ({ ...prev, amountIn: '', amountOut: '' }));
+      return;
+    }
 
+    if (invalidTokenData()) {
+      setSwapData(prev => ({ ...prev, [name]: value }));
       return;
     }
 
@@ -474,21 +486,29 @@ const Swap = () => {
     }
 
     // Token amounts need to be gt 0
-    if (swapData.amountIn === '0' || swapData.amountOut === '0') {
+    if (!swapData.amountIn || !swapData.amountOut || getInsufficientTokenIn()) {
       ready = false;
     }
 
     const readyToAssociate =
       !isNaN(Number(swapData.amountOut)) &&
       Number(swapData.amountOut) > 0 &&
-      swapData.tokenIdOut !== initialSwapData.tokenIdOut;
+      swapData.tokenIdOut !== initialSwapData.tokenIdOut &&
+      Object.keys(tokensData.tokenB).length !== 0;
     setReadyToAssociate(readyToAssociate);
 
     const readyToApprove = !isNaN(Number(swapData.amountIn)) && Number(swapData.amountIn) > 0;
     setReadyToApprove(readyToApprove);
 
     setReadyToSwap(ready);
-  }, [swapData, approved, initialSwapData.tokenIdOut]);
+  }, [
+    swapData,
+    approved,
+    initialSwapData.tokenIdOut,
+    tokenBalances,
+    getInsufficientTokenIn,
+    tokensData,
+  ]);
 
   useEffect(() => {
     const checkTokenAssociation = async (userId: string) => {
@@ -595,36 +615,43 @@ const Swap = () => {
     );
   };
 
+  const getSwapButtonLabel = () => {
+    const { tokenA, tokenB } = tokensData;
+    if (Object.keys(tokenB).length === 0) return 'Select a token';
+    if (getInsufficientTokenIn()) return `Unsufficient ${tokenA.symbol} balance`;
+    return willWrapTokens ? 'wrap' : willUnwrapTokens ? 'unwrap' : 'swap';
+  };
+
+  const getSwapButtonDisabledState = () => {
+    return !readyToSwap || !associated;
+  };
+
   const getActionButtons = () => {
-    const swapButtonLabel = willWrapTokens ? 'wrap' : willUnwrapTokens ? 'unwrap' : 'swap';
     return connected ? (
       <>
+        <div className="d-grid mt-4">
+          <Button
+            loading={loadingSwap}
+            disabled={getSwapButtonDisabledState()}
+            onClick={() => handleSwapClick()}
+          >
+            {getSwapButtonLabel()}
+          </Button>
+        </div>
         {loadingPools ? (
           <div className="d-flex justify-content-center mt-4">
             <Loader />
           </div>
-        ) : readyToApprove ? (
-          approved ? (
-            <div className="d-grid mt-4">
-              <Button
-                loading={loadingSwap}
-                disabled={!readyToSwap || !associated}
-                onClick={() => handleSwapClick()}
-              >
-                {swapButtonLabel}
-              </Button>
-            </div>
-          ) : (
-            <div className="d-grid mt-4">
-              <Button
-                loading={loadingApprove}
-                disabled={Number(swapData.amountIn) <= 0}
-                onClick={() => handleApproveClick()}
-              >
-                {`Approve ${tokensData.tokenA.symbol}`}
-              </Button>
-            </div>
-          )
+        ) : readyToApprove && !approved ? (
+          <div className="d-grid mt-4">
+            <Button
+              loading={loadingApprove}
+              disabled={Number(swapData.amountIn) <= 0}
+              onClick={() => handleApproveClick()}
+            >
+              {`Approve ${tokensData.tokenA.symbol}`}
+            </Button>
+          </div>
         ) : null}
 
         {readyToAssociate && !associated ? (
