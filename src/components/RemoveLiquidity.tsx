@@ -4,12 +4,12 @@ import { IPairData } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
 import Button from './Button';
-import Icon from './Icon';
 import IconToken from './IconToken';
 import InputTokenSelector from './InputTokenSelector';
 import InputToken from './InputToken';
 import ButtonSelector from './ButtonSelector';
 import InputSlider from './InputSlider';
+import PageHeader from './PageHeader';
 import TransactionSettingsModalContent from './Modals/TransactionSettingsModalContent';
 import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
 import Modal from './Modal';
@@ -281,21 +281,11 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
   return (
     <div className="container-action">
-      <div className="d-flex justify-content-between aling-items-center mb-6">
-        <span className="cursor-pointer" onClick={() => setShowRemoveContainer(false)}>
-          <Icon name="arrow-left" />
-        </span>
-
-        <h2 className="text-subheader text-light">Remove Liquidity</h2>
-
-        <div
-          className="d-flex justify-content-end align-items-center cursor-pointer"
-          onClick={() => setShowModalTransactionSettings(true)}
-        >
-          <span className="text-small me-2">Settings</span>
-          <Icon name="settings" />
-        </div>
-      </div>
+      <PageHeader
+        slippage="remove"
+        title="Remove Liquidity"
+        handleBackClick={() => setShowRemoveContainer(false)}
+      />
 
       {showModalTransactionSettings ? (
         <Modal show={showModalTransactionSettings}>

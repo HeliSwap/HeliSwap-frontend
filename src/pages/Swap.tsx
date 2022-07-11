@@ -15,7 +15,7 @@ import Modal from '../components/Modal';
 import ModalSearchContent from '../components/Modals/ModalSearchContent';
 import WalletBalance from '../components/WalletBalance';
 import InputTokenSelector from '../components/InputTokenSelector';
-import TransactionSettingsModalContent from '../components/Modals/TransactionSettingsModalContent';
+import PageHeader from '../components/PageHeader';
 import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
 
 import errorMessages from '../content/errors';
@@ -26,11 +26,7 @@ import {
   idToAddress,
   NATIVE_TOKEN,
 } from '../utils/tokenUtils';
-import {
-  getTransactionSettings,
-  INITIAL_SWAP_SLIPPAGE_TOLERANCE,
-  handleSaveTransactionSettings,
-} from '../utils/transactionUtils';
+import { getTransactionSettings } from '../utils/transactionUtils';
 import {
   getPossibleTradesExactIn,
   getPossibleTradesExactOut,
@@ -59,7 +55,6 @@ const Swap = () => {
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
-  const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
   const [showModalConfirmSwap, setShowModalConfirmSwap] = useState(false);
 
   const initialTokensData: ITokensData = {
@@ -505,36 +500,6 @@ const Swap = () => {
   }, [userId]);
 
   //Render methods
-  const getTitleAndSettings = () => {
-    return (
-      <>
-        <div className="d-flex justify-content-between align-items-center mb-6">
-          <h1 className="text-subheader text-light">Swap</h1>
-          <div
-            className="d-flex justify-content-end align-items-center cursor-pointer"
-            onClick={() => setShowModalTransactionSettings(true)}
-          >
-            <span className="text-small me-2">Settings</span>
-            <Icon name="settings" />
-          </div>
-        </div>
-
-        {showModalTransactionSettings ? (
-          <Modal show={showModalTransactionSettings}>
-            <TransactionSettingsModalContent
-              modalTitle="Transaction settings"
-              closeModal={() => setShowModalTransactionSettings(false)}
-              slippage={getTransactionSettings().swapSlippage}
-              expiration={getTransactionSettings().transactionExpiration}
-              saveChanges={handleSaveTransactionSettings}
-              defaultSlippageValue={INITIAL_SWAP_SLIPPAGE_TOLERANCE}
-            />
-          </Modal>
-        ) : null}
-      </>
-    );
-  };
-
   const getErrorMessage = () => {
     return error ? (
       <div className="alert alert-danger my-5" role="alert">
@@ -811,7 +776,7 @@ const Swap = () => {
   return (
     <div className="d-flex justify-content-center">
       <div className="container-action">
-        {getTitleAndSettings()}
+        <PageHeader slippage="swap" title="Swap" />
         {getErrorMessage()}
         {getSwapSection()}
       </div>
