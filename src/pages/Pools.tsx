@@ -17,7 +17,7 @@ import TransactionSettingsModalContent from '../components/Modals/TransactionSet
 import Modal from '../components/Modal';
 import RemoveLiquidity from '../components/RemoveLiquidity';
 
-const Pairs = () => {
+const Pools = () => {
   const contextValue = useContext(GlobalContext);
   const { connection } = contextValue;
   const { userId } = connection;
@@ -134,4 +134,4 @@ const Pairs = () => {
   );
 };
 
-export default Pairs;
+export default Pools;
