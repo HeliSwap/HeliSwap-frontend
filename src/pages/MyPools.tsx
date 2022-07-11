@@ -2,8 +2,8 @@ import React, { useEffect, useState, useContext } from 'react';
 import { GlobalContext } from '../providers/Global';
 import { Link } from 'react-router-dom';
 
-import { useLazyQuery } from '@apollo/client';
-import { GET_POOLS_BY_USER } from '../GraphQL/Queries';
+import { useLazyQuery, useQuery } from '@apollo/client';
+import { GET_POOLS_BY_USER, GET_POOLS } from '../GraphQL/Queries';
 import { IPairData } from '../interfaces/tokens';
 import { getHBarPrice, idToAddress } from '../utils/tokenUtils';
 import {
@@ -23,7 +23,9 @@ const Pairs = () => {
   const { userId } = connection;
 
   const [getPoolsByUser, { error, loading, data }] = useLazyQuery(GET_POOLS_BY_USER);
+  const { loading: loadingPools, data: dataPools } = useQuery(GET_POOLS);
   const [pairData, setPairData] = useState<IPairData[]>([]);
+  const [allPairsData, setAllPairsData] = useState<IPairData[]>([]);
   const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
   const [showRemoveContainer, setShowRemoveContainer] = useState(false);
   const [currentPoolIndex, setCurrentPoolIndex] = useState(0);
@@ -41,6 +43,10 @@ const Pairs = () => {
   useEffect(() => {
     data && setPairData(data.getPoolsByUser);
   }, [data]);
+
+  useEffect(() => {
+    dataPools && setAllPairsData(dataPools.pools);
+  }, [dataPools]);
 
   useEffect(() => {
     const getHBARPrice = async () => {
@@ -95,7 +101,7 @@ const Pairs = () => {
             </div>
           ) : null}
 
-          {loading ? (
+          {loading || loadingPools ? (
             <p className="text-info">Loading pools...</p>
           ) : havePairs ? (
             <div className="table-pools">
@@ -114,7 +120,7 @@ const Pairs = () => {
                   index={index}
                   key={index}
                   pairData={item}
-                  allPoolsData={pairData}
+                  allPoolsData={allPairsData}
                   hbarPrice={hbarPrice}
                 />
               ))}
