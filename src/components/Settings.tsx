@@ -19,6 +19,7 @@ const Settings = ({ slippage }: ISettingsProps) => {
 
   const slippageMapping: IStringToString = {
     provide: 'provideSlippage',
+    create: 'provideSlippage',
     swap: 'swapSlippage',
     remove: 'removeSlippage',
   };
