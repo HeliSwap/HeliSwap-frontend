@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useMemo } from 'react';
+import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
 
@@ -137,11 +137,11 @@ const Swap = () => {
   const [loadingSwap, setLoadingSwap] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
 
-  const getInsufficientTokenIn = () => {
+  const getInsufficientTokenIn = useCallback(() => {
     const { tokenA: tokenABalance } = tokenBalances;
     const { amountIn } = swapData;
     return tokenABalance && amountIn && new BigNumber(amountIn).gt(new BigNumber(tokenABalance));
-  };
+  }, [swapData, tokenBalances]);
 
   const handleInputChange = async (value: string, name: string) => {
     const { tokenA, tokenB } = tokensData;

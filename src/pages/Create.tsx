@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useMemo } from 'react';
+import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
 import { useParams } from 'react-router-dom';
@@ -130,7 +130,7 @@ const Create = () => {
   // State for preset tokens from choosen pool
   const [tokensDerivedFromPool, setTokensDerivedFromPool] = useState(false);
 
-  const invalidTokenData = () => {
+  const invalidTokenData = useCallback(() => {
     const { tokenA, tokenB } = tokensData;
     const hbarAddresss = process.env.REACT_APP_WHBAR_ADDRESS;
     const tokenANotSelected = Object.keys(tokenA).length === 0;
@@ -141,19 +141,19 @@ const Create = () => {
       (tokenB.type === TokenType.HBAR && tokenA.address === hbarAddresss);
 
     return tokenANotSelected || tokenBNotSelected || sameTokenSelected || onlyHbarSelected;
-  };
+  }, [tokensData]);
 
-  const getInsufficientTokenA = () => {
+  const getInsufficientTokenA = useCallback(() => {
     const { tokenA } = tokenBalances;
     const { tokenAAmount } = createPairData;
     return tokenA && tokenAAmount && new BigNumber(tokenAAmount).gt(new BigNumber(tokenA));
-  };
+  }, [tokenBalances, createPairData]);
 
-  const getInsufficientTokenB = () => {
+  const getInsufficientTokenB = useCallback(() => {
     const { tokenB } = tokenBalances;
     const { tokenBAmount } = createPairData;
     return tokenB && tokenBAmount && new BigNumber(tokenBAmount).gt(new BigNumber(tokenB));
-  };
+  }, [tokenBalances, createPairData]);
 
   const handleInputChange = (value: string, name: string) => {
     const { tokenA, tokenB } = tokensData;
@@ -458,7 +458,15 @@ const Create = () => {
     }
 
     setReadyToProvide(isReady);
-  }, [createPairData, provideNative, approved]);
+  }, [
+    createPairData,
+    provideNative,
+    approved,
+    getInsufficientTokenA,
+    getInsufficientTokenB,
+    invalidTokenData,
+    tokensData,
+  ]);
 
   useEffect(() => {
     try {
