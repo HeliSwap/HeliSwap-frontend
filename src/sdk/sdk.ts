@@ -1,4 +1,3 @@
-import { hethers } from '@hashgraph/hethers';
 import {
   ContractExecuteTransaction,
   ContractFunctionParameters,
@@ -17,57 +16,7 @@ import {
   formatStringToBigNumber,
 } from '../utils/numberUtils';
 
-import ERC20 from '../abi/ERC20';
-import PairV2 from '../abi/PairV2';
-
 class SDK {
-  /* Hethers contract calls - To be removed! */
-  async checkAllowance(
-    tokenAddress: string,
-    userAddress: string,
-    spenderAddress: string,
-    connectedWallet: any,
-  ) {
-    const erc20 = hethers.ContractFactory.getContract(tokenAddress, ERC20.abi, connectedWallet);
-
-    const allowance = await erc20.allowance(userAddress, spenderAddress, {
-      gasLimit: 3000000,
-    });
-
-    return allowance;
-  }
-
-  async checkBalance(tokenAddress: string, userAddress: string, connectedWallet: any) {
-    const erc20 = hethers.ContractFactory.getContract(tokenAddress, ERC20.abi, connectedWallet);
-
-    const balance = await erc20.balanceOf(userAddress, {
-      gasLimit: 3000000,
-    });
-
-    return balance;
-  }
-
-  async getReserves(poolAddess: string, connectedWallet: any) {
-    const pairV2 = hethers.ContractFactory.getContract(poolAddess, PairV2.abi, connectedWallet);
-
-    const reserves = await pairV2.getReserves({
-      gasLimit: 3000000,
-    });
-
-    return reserves;
-  }
-
-  async getTotalSupply(poolAddess: string, connectedWallet: any) {
-    const pairV2 = hethers.ContractFactory.getContract(poolAddess, PairV2.abi, connectedWallet);
-
-    const totalSupply = await pairV2.totalSupply({
-      gasLimit: 3000000,
-    });
-
-    return totalSupply;
-  }
-  /* Hethers contract calls - To be removed! */
-
   async associateToken(
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
