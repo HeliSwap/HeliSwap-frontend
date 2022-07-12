@@ -7,12 +7,12 @@ env:
   REACT_APP_MIRROR_NODE_URL: https://testnet.mirrornode.hedera.com
   REACT_APP_COINGECKO_URL: https://api.coingecko.com/api/v3
   REACT_APP_NETWORK_TYPE: testnet
-  REACT_APP_GRAPHQL_URI: https://api-testnet.heliswap.io/query
+  REACT_APP_GRAPHQL_URI: https://api-dev.heliswap.io/query
 'on':
   push:
     branches:
       - develop
-      - cicd
+      - cidi
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
