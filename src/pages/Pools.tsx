@@ -19,18 +19,26 @@ const Pools = () => {
   const [getPoolsByUser, { error, loading, data }] = useLazyQuery(GET_POOLS_BY_USER);
   const { loading: loadingPools, data: dataPools } = useQuery(GET_POOLS);
 
-  const initialCurrentView: PageViews = PageViews.ALL_POOLS;
-  const [currentView, setCurrentView] = useState<PageViews>(initialCurrentView);
-  const viewTitleMapping = {
-    [PageViews.ALL_POOLS]: 'All pools',
-    [PageViews.MY_POOLS]: 'My positions',
-  };
-
   const [pairData, setPairData] = useState<IPairData[]>([]);
   const [allPairsData, setAllPairsData] = useState<IPairData[]>([]);
   const [showRemoveContainer, setShowRemoveContainer] = useState(false);
   const [currentPoolIndex, setCurrentPoolIndex] = useState(0);
   const [hbarPrice, setHbarPrice] = useState(0);
+
+  const initialCurrentView: PageViews = PageViews.ALL_POOLS;
+  const [currentView, setCurrentView] = useState<PageViews>(initialCurrentView);
+
+  const viewTitleMapping = {
+    [PageViews.ALL_POOLS]: 'All pools',
+    [PageViews.MY_POOLS]: 'My positions',
+  };
+
+  const poolsMapping = {
+    [PageViews.ALL_POOLS]: allPairsData,
+    [PageViews.MY_POOLS]: pairData,
+  };
+
+  const poolsToShow = poolsMapping[currentView];
 
   const handleTabItemClick = (currentView: PageViews) => {
     setCurrentView(currentView);
@@ -62,14 +70,7 @@ const Pools = () => {
     getHBARPrice();
   }, []);
 
-  const havePools = pairData.length > 0;
-
-  const poolsMapping = {
-    [PageViews.ALL_POOLS]: allPairsData,
-    [PageViews.MY_POOLS]: pairData,
-  };
-
-  const poolsToShow = poolsMapping[currentView];
+  const havePools = poolsToShow.length > 0;
 
   return (
     <div className="d-flex justify-content-center">
