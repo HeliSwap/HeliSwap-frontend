@@ -68,6 +68,7 @@ const Swap = () => {
   const [willWrapTokens, setWillWrapTokens] = useState(false);
   const [willUnwrapTokens, setWillUnwrapTokens] = useState(false);
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
+  const [insufficientLiquidity, setInsufficientLiquidity] = useState(false);
 
   // State for pools
   const {
@@ -135,8 +136,13 @@ const Swap = () => {
     return tokenABalance && amountIn && new BigNumber(amountIn).gt(new BigNumber(tokenABalance));
   }, [swapData, tokenBalances]);
 
-  const handleInputChange = async (value: string, name: string) => {
-    const { tokenA, tokenB } = tokensData;
+  const handleInputChange = async (
+    value: string,
+    name: string,
+    inputTokensData: any = tokensData,
+  ) => {
+    setInsufficientLiquidity(false);
+    const { tokenA, tokenB } = inputTokensData;
 
     const tokenData = {
       [name]: value,
@@ -166,6 +172,8 @@ const Swap = () => {
     const { amountIn, amountOut } = tokenData;
 
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS || '';
+    const tokenInIsNative = tokenA.type === TokenType.HBAR;
+    const tokenOutIsNative = tokenB.type === TokenType.HBAR;
     const tokenInAddress = tokenInIsNative ? WHBARAddress : tokenA.address;
     const tokenOutAddress = tokenOutIsNative ? WHBARAddress : tokenB.address;
 
@@ -193,8 +201,12 @@ const Swap = () => {
 
         const sortedTrades = trades.sort(tradeComparator);
 
-        if (sortedTrades.length === 0) return;
-
+        if (sortedTrades.length === 0) {
+          setSwapData(prev => ({ ...prev, ...tokenData, amountOut: '' }));
+          setTokenInExactAmount(true);
+          setInsufficientLiquidity(true);
+          return;
+        }
         const bestTrade = sortedTrades[0];
 
         setBestPath(bestTrade.path);
@@ -211,7 +223,12 @@ const Swap = () => {
 
         const sortedTrades = trades.sort(tradeComparator);
 
-        if (sortedTrades.length === 0) return;
+        if (sortedTrades.length === 0) {
+          setSwapData(prev => ({ ...prev, ...tokenData, amountIn: '' }));
+          setTokenInExactAmount(false);
+          setInsufficientLiquidity(true);
+          return;
+        }
 
         const bestTrade = sortedTrades[0];
 
@@ -348,6 +365,18 @@ const Swap = () => {
     }
   };
 
+  const switchTokens = () => {
+    const newTokensData = {
+      tokenA: tokensData.tokenB,
+      tokenB: tokensData.tokenA,
+    };
+    setTokensData(newTokensData);
+    const newInputValueKey = tokenInExactAmount ? 'amountOut' : 'amountIn';
+    const oldInputValueKey = tokenInExactAmount ? 'amountIn' : 'amountOut';
+
+    handleInputChange(swapData[oldInputValueKey], newInputValueKey, newTokensData);
+  };
+
   useEffect(() => {
     refetch();
 
@@ -429,22 +458,6 @@ const Swap = () => {
 
     const { tokenA, tokenB } = tokensData;
 
-    if (
-      (tokenA && typeof tokenA.hederaId !== 'undefined') ||
-      (tokenB && typeof tokenB.hederaId !== 'undefined')
-    ) {
-      const newSwapData = {
-        tokenIdIn: tokenA.hederaId,
-        tokenIdOut: tokenB.hederaId,
-        tokenInDecimals: tokenA.decimals,
-        tokenOutDecimals: tokenB.decimals,
-        amountIn: '',
-        amountOut: '',
-      };
-
-      setSwapData(prev => ({ ...prev, ...newSwapData }));
-    }
-
     getTokenBalances();
   }, [tokensData, userId, initialBallanceData]);
 
@@ -468,7 +481,10 @@ const Swap = () => {
       Object.keys(tokensData.tokenB).length !== 0;
     setReadyToAssociate(readyToAssociate);
 
-    const readyToApprove = !isNaN(Number(swapData.amountIn)) && Number(swapData.amountIn) > 0;
+    const readyToApprove =
+      Object.keys(tokensData.tokenA).length !== 0 &&
+      !isNaN(Number(swapData.amountIn)) &&
+      Number(swapData.amountIn) > 0;
     setReadyToApprove(readyToApprove);
 
     setReadyToSwap(ready);
@@ -537,7 +553,20 @@ const Swap = () => {
           <ModalSearchContent
             modalTitle="Select a token"
             tokenFieldId="tokenA"
-            setTokensData={setTokensData}
+            setTokensData={newTokensData => {
+              const { tokenA } = newTokensData();
+              if (tokenA && typeof tokenA.hederaId !== 'undefined') {
+                const newSwapData = {
+                  tokenIdOut: tokenA.hederaId,
+                  tokenOutDecimals: tokenA.decimals,
+                  amountIn: '',
+                  amountOut: '',
+                };
+
+                setSwapData(prev => ({ ...prev, ...newSwapData }));
+              }
+              setTokensData(newTokensData);
+            }}
             closeModal={() => setShowModalA(false)}
             canImport={false}
             tokenDataList={tokenDataList || []}
@@ -545,7 +574,7 @@ const Swap = () => {
           />
         </Modal>
 
-        <div className="text-center my-4">
+        <div onClick={switchTokens} className="text-center my-4">
           <Icon name="swap" color="gradient" />
         </div>
 
@@ -574,7 +603,20 @@ const Swap = () => {
           <ModalSearchContent
             modalTitle="Select token"
             tokenFieldId="tokenB"
-            setTokensData={setTokensData}
+            setTokensData={newTokensData => {
+              const { tokenB } = newTokensData();
+              if (tokenB && typeof tokenB.hederaId !== 'undefined') {
+                const newSwapData = {
+                  tokenIdOut: tokenB.hederaId,
+                  tokenOutDecimals: tokenB.decimals,
+                  amountIn: '',
+                  amountOut: '',
+                };
+
+                setSwapData(prev => ({ ...prev, ...newSwapData }));
+              }
+              setTokensData(newTokensData);
+            }}
             closeModal={() => setShowModalB(false)}
             canImport={false}
             tokenDataList={tokenDataList || []}
@@ -588,8 +630,10 @@ const Swap = () => {
 
   const getSwapButtonLabel = () => {
     const { tokenA, tokenB } = tokensData;
-    if (Object.keys(tokenB).length === 0) return 'Select a token';
+    if (Object.keys(tokenB).length === 0 || Object.keys(tokenA).length === 0)
+      return 'Select a token';
     if (getInsufficientTokenIn()) return `Unsufficient ${tokenA.symbol} balance`;
+    if (insufficientLiquidity) return 'Insufficient liquidity for this trade.';
     return willWrapTokens ? 'wrap' : willUnwrapTokens ? 'unwrap' : 'swap';
   };
 
