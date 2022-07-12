@@ -165,7 +165,12 @@ const Swap = () => {
     }
 
     if (invalidTokenData()) {
-      setSwapData(prev => ({ ...prev, [name]: value }));
+      setSwapData(prev => ({
+        ...prev,
+        [name]: value,
+        [name === 'amountIn' ? 'amountOut' : 'amountIn']: '',
+      }));
+      setTokenInExactAmount(name === 'amountIn');
       return;
     }
 
