@@ -73,7 +73,11 @@ const PoolInfo = ({
 
   return (
     <>
-      <div className={`table-pools-row ${index % 2 === 0 ? 'is-gray' : ''}`}>
+      <div
+        className={`table-pools-row ${index % 2 === 0 ? 'is-gray' : ''} ${
+          view === PageViews.ALL_POOLS ? 'with-4-columns' : ''
+        }`}
+      >
         <div className="table-pools-cell">
           <span className="text-small">#</span>
         </div>
@@ -84,6 +88,11 @@ const PoolInfo = ({
           </p>
           <span className="text-micro text-numeric badge bg-secondary ms-3">{POOLS_FEE}</span>
         </div>
+        {view === PageViews.ALL_POOLS ? (
+          <div className="table-pools-cell justify-content-end">
+            <span className="text-small text-numeric">{formatStringToPrice(totalLpValueStr)}</span>
+          </div>
+        ) : null}
         <div className="table-pools-cell d-flex justify-content-end">
           <p
             onClick={() => setShowPoolDetails(prev => !prev)}

@@ -174,6 +174,10 @@
     gap: 1em;
     grid-template-columns: 30px 3fr 1fr;
 
+    &.with-4-columns {
+      grid-template-columns: 30px 2fr 1fr 1fr;
+    }
+
     &.is-gray {
       background-color: $neutral-700;
     }

@@ -62,7 +62,7 @@ const Pools = () => {
     getHBARPrice();
   }, []);
 
-  const havePairs = pairData.length > 0;
+  const havePools = pairData.length > 0;
 
   const poolsMapping = {
     [PageViews.ALL_POOLS]: allPairsData,
@@ -113,15 +113,24 @@ const Pools = () => {
 
           {loading || loadingPools ? (
             <p className="text-info">Loading pools...</p>
-          ) : havePairs ? (
+          ) : havePools ? (
             <div className="table-pools">
-              <div className="table-pools-row">
+              <div
+                className={`table-pools-row ${
+                  currentView === PageViews.ALL_POOLS ? 'with-4-columns' : ''
+                }`}
+              >
                 <div className="table-pools-cell">
                   <span className="text-small">#</span>
                 </div>
                 <div className="table-pools-cell">
                   <span className="text-small">Pool</span>
                 </div>
+                {currentView === PageViews.ALL_POOLS ? (
+                  <div className="table-pools-cell justify-content-end">
+                    <span className="text-small">TVL</span>
+                  </div>
+                ) : null}
               </div>
               {poolsToShow.map((item, index) => (
                 <PoolInfo
