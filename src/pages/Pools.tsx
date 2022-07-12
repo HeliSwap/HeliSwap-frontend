@@ -2,14 +2,15 @@ import React, { useEffect, useState, useContext } from 'react';
 import { GlobalContext } from '../providers/Global';
 import { Link } from 'react-router-dom';
 
-import { useLazyQuery, useQuery } from '@apollo/client';
-import { GET_POOLS_BY_USER, GET_POOLS } from '../GraphQL/Queries';
+import { useLazyQuery } from '@apollo/client';
+import { GET_POOLS_BY_USER } from '../GraphQL/Queries';
 import { IPairData } from '../interfaces/tokens';
 import { PageViews } from '../interfaces/common';
 import { getHBarPrice, idToAddress } from '../utils/tokenUtils';
 
 import PoolInfo from '../components/PoolInfo';
 import RemoveLiquidity from '../components/RemoveLiquidity';
+import usePools from '../hooks/usePools';
 
 const Pools = () => {
   const contextValue = useContext(GlobalContext);
@@ -17,10 +18,12 @@ const Pools = () => {
   const { userId } = connection;
 
   const [getPoolsByUser, { error, loading, data }] = useLazyQuery(GET_POOLS_BY_USER);
-  const { loading: loadingPools, data: dataPools } = useQuery(GET_POOLS);
+  const { loading: loadingPools, pools: allPairsData } = usePools({
+    fetchPolicy: 'network-only',
+    pollInterval: 10000,
+  });
 
   const [pairData, setPairData] = useState<IPairData[]>([]);
-  const [allPairsData, setAllPairsData] = useState<IPairData[]>([]);
   const [showRemoveContainer, setShowRemoveContainer] = useState(false);
   const [currentPoolIndex, setCurrentPoolIndex] = useState(0);
   const [hbarPrice, setHbarPrice] = useState(0);
@@ -58,10 +61,6 @@ const Pools = () => {
   }, [data]);
 
   useEffect(() => {
-    dataPools && setAllPairsData(dataPools.pools);
-  }, [dataPools]);
-
-  useEffect(() => {
     const getHBARPrice = async () => {
       const hbarPrice = await getHBarPrice();
       setHbarPrice(hbarPrice);
@@ -70,7 +69,7 @@ const Pools = () => {
     getHBARPrice();
   }, []);
 
-  const havePools = poolsToShow.length > 0;
+  const havePools = poolsToShow!.length > 0;
 
   return (
     <div className="d-flex justify-content-center">
@@ -117,7 +116,7 @@ const Pools = () => {
             </div>
           ) : null}
 
-          {loading || loadingPools ? (
+          {loading && loadingPools ? (
             <p className="text-info">Loading pools...</p>
           ) : havePools ? (
             <div className="table-pools">
@@ -152,7 +151,7 @@ const Pools = () => {
               ))}
             </div>
           ) : (
-            <p className="text-warning">No pools found</p>
+            <p className="text-warning text-center">No pools found</p>
           )}
         </div>
       )}

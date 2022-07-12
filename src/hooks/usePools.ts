@@ -5,7 +5,7 @@ import { QueryHookOptions, useQuery } from '@apollo/client';
 import { GET_POOLS } from '../GraphQL/Queries';
 
 const usePools = (useQueryOptions: QueryHookOptions = {}) => {
-  const [pools, setPools] = useState<IPairData[]>();
+  const [pools, setPools] = useState<IPairData[]>([]);
 
   const { data, loading, error, refetch } = useQuery(GET_POOLS, useQueryOptions);
 
