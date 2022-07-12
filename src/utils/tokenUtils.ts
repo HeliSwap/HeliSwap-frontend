@@ -144,7 +144,7 @@ export const addressToId = (tokenAddress: string) => {
 };
 
 export const idToAddress = (tokenId: string) => {
-  return hethers.utils.getAddressFromAccount(tokenId);
+  return hethers.utils.getChecksumAddress(hethers.utils.getAddressFromAccount(tokenId));
 };
 
 export const addressToContractId = (tokenAddress: string) => {
