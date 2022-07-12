@@ -30,7 +30,7 @@ const Sidebar = () => {
           </NavLink>
           <NavLink
             className={({ isActive }) => (isActive ? 'link-menu is-active mt-4' : 'link-menu mt-4')}
-            to="/my-pools"
+            to="/pools"
           >
             <span className="icon-menu">
               <Icon color="gray" name="pools" />

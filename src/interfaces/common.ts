@@ -5,3 +5,8 @@ export interface IStringToString {
 export interface IStringToNumber {
   [key: string]: number;
 }
+
+export enum PageViews {
+  ALL_POOLS,
+  MY_POOLS,
+}

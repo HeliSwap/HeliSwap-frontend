@@ -120,7 +120,7 @@
     border: none;
     max-width: 250px;
     flex: 0 1 250px;
-    @include transition-link;
+    @include transition-color;
 
     &:focus {
       color: $neutral-100;
@@ -173,6 +173,10 @@
     display: grid;
     gap: 1em;
     grid-template-columns: 30px 3fr 1fr;
+
+    &.with-4-columns {
+      grid-template-columns: 30px 2fr 1fr 1fr;
+    }
 
     &.is-gray {
       background-color: $neutral-700;
@@ -268,4 +272,23 @@
 
 .btn-close {
   opacity: 1;
+}
+
+// Tabs
+.tab-title {
+  color: $secondary;
+  cursor: pointer;
+  @include transition-color;
+
+  &.is-active {
+    color: $neutral-100;
+
+    &:after {
+      content: '';
+      display: block;
+      height: 1px;
+      background-color: $neutral-100;
+      transform: translateY(17px);
+    }
+  }
 }

@@ -10,7 +10,7 @@ import {
   INITIAL_SWAP_SLIPPAGE_TOLERANCE,
   INITIAL_PROVIDE_SLIPPAGE_TOLERANCE,
 } from '../utils/transactionUtils';
-import { IStringToString, IStringToNumber } from '../interfaces/comon';
+import { IStringToString, IStringToNumber } from '../interfaces/common';
 
 interface ISettingsProps {
   slippage: string;
