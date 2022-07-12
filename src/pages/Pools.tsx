@@ -81,11 +81,11 @@ const Pools = () => {
         />
       ) : (
         <div className="container-pools">
-          <div className="d-flex justify-content-between align-items-center mb-6">
+          <div className="d-flex justify-content-between align-items-center mb-4">
             <div className="d-flex">
               <h2
                 onClick={() => handleTabItemClick(PageViews.ALL_POOLS)}
-                className={`text-subheader tab-title ${
+                className={`text-subheader tab-title mx-4 ${
                   PageViews.ALL_POOLS === currentView ? 'is-active' : ''
                 }`}
               >
@@ -93,13 +93,18 @@ const Pools = () => {
               </h2>
               <h2
                 onClick={() => handleTabItemClick(PageViews.MY_POOLS)}
-                className={`text-subheader tab-title ${
+                className={`text-subheader tab-title mx-4 ${
                   PageViews.MY_POOLS === currentView ? 'is-active' : ''
                 } ms-3`}
               >
                 {viewTitleMapping[PageViews.MY_POOLS]}
               </h2>
             </div>
+          </div>
+
+          <hr />
+
+          <div className="d-flex justify-content-end align-items-center my-5">
             <Link className="btn btn-sm btn-primary" to="/create">
               Create pool
             </Link>

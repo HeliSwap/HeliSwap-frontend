@@ -282,5 +282,13 @@
 
   &.is-active {
     color: $neutral-100;
+
+    &:after {
+      content: '';
+      display: block;
+      height: 1px;
+      background-color: $neutral-100;
+      transform: translateY(17px);
+    }
   }
 }
