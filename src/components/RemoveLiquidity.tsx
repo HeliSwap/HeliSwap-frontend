@@ -15,18 +15,15 @@ import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransact
 import Modal from './Modal';
 
 import { MAX_UINT_ERC20 } from '../constants';
-import { getConnectedWallet } from '../pages/Helpers';
 
 import {
   formatStringWeiToStringEther,
   formatStringToStringWei,
-  formatStringToBigNumber,
   formatStringToBigNumberWei,
 } from '../utils/numberUtils';
 import {
   calculateReserves,
   addressToContractId,
-  idToAddress,
   calculateShareByPercentage,
   calculatePercentageByShare,
 } from '../utils/tokenUtils';
@@ -46,8 +43,6 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
-
-  const connectedWallet = getConnectedWallet();
 
   const initialLpInputValue: string = formatStringWeiToStringEther(pairData.lpShares as string);
 
@@ -213,34 +208,13 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
   };
 
   useEffect(() => {
-    const getApproved = async () => {
-      if (connectedWallet) {
-        const resultBN = await sdk.checkAllowance(
-          pairData.pairAddress,
-          idToAddress(userId),
-          process.env.REACT_APP_ROUTER_ADDRESS as string,
-          connectedWallet,
-        );
-
-        const currentAllowanceBN = formatStringToBigNumber(resultBN.toString());
-        const amountToSpend = removeLpData.tokensLpAmount;
-        const amountToSpendBN = formatStringToBigNumberWei(amountToSpend);
-
-        const canSpend = amountToSpendBN.lte(currentAllowanceBN);
-
-        setLpApproved(canSpend);
-      }
-    };
-
-    pairData && pairData.pairAddress && userId && getApproved();
-
     if (pairData && pairData.pairAddress) {
       setHasWrappedHBAR(
         pairData.token0 === process.env.REACT_APP_WHBAR_ADDRESS ||
           pairData.token1 === process.env.REACT_APP_WHBAR_ADDRESS,
       );
     }
-  }, [pairData, connectedWallet, removeLpData, sdk, userId]);
+  }, [pairData, removeLpData, sdk, userId]);
 
   useEffect(() => {
     const {
