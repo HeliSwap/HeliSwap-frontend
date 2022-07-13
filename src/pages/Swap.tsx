@@ -659,42 +659,47 @@ const Swap = () => {
   const getActionButtons = () => {
     return connected ? (
       <>
-        <div className="d-grid mt-4">
-          <Button
-            loading={loadingSwap}
-            disabled={getSwapButtonDisabledState()}
-            onClick={() => handleSwapClick()}
-          >
-            {getSwapButtonLabel()}
-          </Button>
-        </div>
         {loadingPools ? (
           <div className="d-flex justify-content-center mt-4">
             <Loader />
           </div>
-        ) : readyToApprove && !approved ? (
-          <div className="d-grid mt-4">
-            <Button
-              loading={loadingApprove}
-              disabled={Number(swapData.amountIn) <= 0}
-              onClick={() => handleApproveClick()}
-            >
-              {`Approve ${tokensData.tokenA.symbol}`}
-            </Button>
-          </div>
-        ) : null}
+        ) : (
+          <>
+            {readyToApprove && !approved ? (
+              <div className="d-grid mt-4">
+                <Button
+                  loading={loadingApprove}
+                  disabled={Number(swapData.amountIn) <= 0}
+                  onClick={() => handleApproveClick()}
+                >
+                  {`Approve ${tokensData.tokenA.symbol}`}
+                </Button>
+              </div>
+            ) : null}
 
-        {readyToAssociate && !associated ? (
-          <div className="d-grid mt-4">
-            <Button
-              loading={loadingSwap}
-              disabled={!readyToAssociate}
-              onClick={() => handleAssociateClick()}
-            >
-              Associate token
-            </Button>
-          </div>
-        ) : null}
+            {readyToAssociate && !associated ? (
+              <div className="d-grid mt-4">
+                <Button
+                  loading={loadingSwap}
+                  disabled={!readyToAssociate}
+                  onClick={() => handleAssociateClick()}
+                >
+                  Associate token
+                </Button>
+              </div>
+            ) : null}
+
+            <div className="d-grid mt-4">
+              <Button
+                loading={loadingSwap}
+                disabled={getSwapButtonDisabledState()}
+                onClick={() => handleSwapClick()}
+              >
+                {getSwapButtonLabel()}
+              </Button>
+            </div>
+          </>
+        )}
 
         {showModalConfirmSwap ? (
           <Modal show={showModalConfirmSwap}>
