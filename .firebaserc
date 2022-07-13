@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "heliswap-test"
-  }
+    "default": "heliswap-test",
+    "dev": "heliswap-dev-e552e"
+  },
+  "targets": {}
 }
