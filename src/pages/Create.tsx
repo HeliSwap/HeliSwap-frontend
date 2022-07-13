@@ -29,7 +29,6 @@ import {
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
 import { getTransactionSettings } from '../utils/transactionUtils';
-import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
 import useTokens from '../hooks/useTokens';
 import { MAX_UINT_ERC20, MAX_UINT_HTS, POOLS_FEE } from '../constants';
@@ -295,31 +294,6 @@ const Create = () => {
   };
 
   useEffect(() => {
-    const getAllowanceERC20 = async (token: ITokenData, index: string) => {
-      const connectedWallet = getConnectedWallet();
-      if (connectedWallet) {
-        const tokenAddress = idToAddress(token.hederaId);
-        const userAddress = idToAddress(userId);
-        const resultBN = await sdk.checkAllowance(
-          tokenAddress,
-          userAddress,
-          process.env.REACT_APP_ROUTER_ADDRESS as string,
-          connectedWallet,
-        );
-
-        const resultStr = hethers.utils.formatUnits(resultBN, token.decimals);
-        const resultNum = Number(resultStr);
-        const key = `${index}Amount`;
-
-        setApproved(prev => ({
-          ...prev,
-          [index]: resultNum >= Number(createPairData[key as keyof ICreatePairData]),
-        }));
-      } else {
-        setApproved(prev => ({ ...prev, [index]: false }));
-      }
-    };
-
     const getAllowanceHTS = async (userId: string, token: ITokenData, index: string) => {
       const key = `${index}Amount`;
       const amountToSpend = createPairData[key as keyof ICreatePairData] as string;
@@ -332,16 +306,12 @@ const Create = () => {
 
     if (tokenA.type === TokenType.HBAR) {
       setApproved(prev => ({ ...prev, tokenA: true }));
-    } else if (tokenA.type === TokenType.ERC20) {
-      userId && getAllowanceERC20(tokenA, 'tokenA');
     } else {
       userId && tokenA.hederaId && getAllowanceHTS(userId, tokenA, 'tokenA');
     }
 
     if (tokenB.type === TokenType.HBAR) {
       setApproved(prev => ({ ...prev, tokenB: true }));
-    } else if (tokenB.type === TokenType.ERC20) {
-      userId && getAllowanceERC20(tokenB, 'tokenB');
     } else {
       userId && tokenB.hederaId && getAllowanceHTS(userId, tokenB, 'tokenB');
     }

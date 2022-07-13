@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
-import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
 
 import {
@@ -25,7 +24,6 @@ import {
   checkAllowanceHTS,
   getTokenBalance,
   getUserAssociatedTokens,
-  idToAddress,
   NATIVE_TOKEN,
 } from '../utils/tokenUtils';
 import { getTransactionSettings } from '../utils/transactionUtils';
@@ -40,7 +38,6 @@ import {
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
 
-import { getConnectedWallet } from './Helpers';
 import usePools from '../hooks/usePools';
 import useTokens from '../hooks/useTokens';
 
@@ -373,28 +370,6 @@ const Swap = () => {
   }, [poolsData, tokensData, refetch]);
 
   useEffect(() => {
-    const getAllowanceERC20 = async (swapData: ISwapTokenData) => {
-      const connectedWallet = getConnectedWallet();
-
-      if (connectedWallet) {
-        const tokenAddress = idToAddress(swapData.tokenIdIn);
-        const userAddress = idToAddress(userId);
-        const resultBN = await sdk.checkAllowance(
-          tokenAddress,
-          userAddress,
-          process.env.REACT_APP_ROUTER_ADDRESS as string,
-          connectedWallet,
-        );
-
-        const resultStr = hethers.utils.formatUnits(resultBN, swapData.tokenInDecimals);
-        const resultNum = Number(resultStr);
-
-        setApproved(resultNum >= Number(swapData.amountIn));
-      } else {
-        setApproved(false);
-      }
-    };
-
     const getAllowanceHTS = async (userId: string) => {
       const amountToSpend = swapData.amountIn;
       const tokenAData: ITokenData = {
@@ -423,10 +398,6 @@ const Swap = () => {
 
     const hasTokenAData = swapData.tokenIdIn && swapData.amountIn !== '0';
     const hasTokenBData = swapData.tokenIdOut && swapData.amountOut !== '0';
-
-    if (tokensData.tokenA.type === TokenType.ERC20 && hasTokenAData && userId) {
-      getAllowanceERC20(swapData);
-    }
 
     if (tokensData.tokenA.type === TokenType.HTS && hasTokenAData && userId) {
       getAllowanceHTS(userId);
