@@ -12,12 +12,13 @@ env:
   push:
     branches:
       - develop
-      - cidi
+      - cicd
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: FirebaseExtended/action-hosting-deploy@v0
       - name: Set prod ENV
         run: |
           echo "REACT_APP_ROUTER_ADDRESS=0x0000000000000000000000000000000002d7026a" >> $GITHUB_ENV
