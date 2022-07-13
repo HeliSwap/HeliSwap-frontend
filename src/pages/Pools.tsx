@@ -41,8 +41,6 @@ const Pools = () => {
     [PageViews.MY_POOLS]: pairData,
   };
 
-  console.log('pairData', pairData);
-
   const poolsToShow = poolsMapping[currentView];
 
   const handleTabItemClick = (currentView: PageViews) => {
