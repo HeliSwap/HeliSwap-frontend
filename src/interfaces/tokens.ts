@@ -52,8 +52,6 @@ export interface ISwapTokenData {
   tokenIdOut: string;
   amountIn: string;
   amountOut: string;
-  tokenInDecimals: number;
-  tokenOutDecimals: number;
 }
 
 export interface ICreatePairData {

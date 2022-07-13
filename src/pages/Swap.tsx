@@ -90,8 +90,6 @@ const Swap = () => {
     tokenIdOut: '',
     amountIn: '',
     amountOut: '',
-    tokenInDecimals: 0,
-    tokenOutDecimals: 0,
   };
 
   // State for Swap
@@ -310,7 +308,11 @@ const Swap = () => {
   };
 
   const handleSwapConfirm = async () => {
-    const { amountIn, amountOut, tokenInDecimals, tokenOutDecimals } = swapData;
+    const { amountIn, amountOut } = swapData;
+    const {
+      tokenA: { decimals: decimalsA },
+      tokenB: { decimals: decimalsB },
+    } = tokensData;
 
     setError(false);
     setErrorMessage('');
@@ -333,8 +335,8 @@ const Swap = () => {
           userId,
           amountIn,
           amountOut,
-          tokenInDecimals,
-          tokenOutDecimals,
+          decimalsA,
+          decimalsB,
           swapSlippage,
           transactionExpiration,
           bestPath,
@@ -405,14 +407,19 @@ const Swap = () => {
 
   useEffect(() => {
     const getAllowanceHTS = async (userId: string) => {
-      const amountToSpend = swapData.amountIn;
+      const { amountIn: amountToSpend, tokenIdIn } = swapData;
+
+      const {
+        tokenA: { type, decimals },
+      } = tokensData;
+
       const tokenAData: ITokenData = {
-        hederaId: swapData.tokenIdIn,
+        hederaId: tokenIdIn,
         name: '',
         symbol: '',
-        decimals: swapData.tokenInDecimals,
+        decimals,
         address: '',
-        type: tokensData.tokenA.type,
+        type,
       };
 
       const canSpend = await checkAllowanceHTS(userId, tokenAData, amountToSpend);
