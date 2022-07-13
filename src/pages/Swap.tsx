@@ -490,13 +490,15 @@ const Swap = () => {
       !isNaN(Number(swapData.amountOut)) &&
       Number(swapData.amountOut) > 0 &&
       swapData.tokenIdOut !== initialSwapData.tokenIdOut &&
-      Object.keys(tokensData.tokenB).length !== 0;
+      Object.keys(tokensData.tokenB).length !== 0 &&
+      !insufficientLiquidity;
     setReadyToAssociate(readyToAssociate);
 
     const readyToApprove =
       Object.keys(tokensData.tokenA).length !== 0 &&
       !isNaN(Number(swapData.amountIn)) &&
-      Number(swapData.amountIn) > 0;
+      Number(swapData.amountIn) > 0 &&
+      !insufficientLiquidity;
     setReadyToApprove(readyToApprove);
 
     setReadyToSwap(ready);
@@ -507,6 +509,7 @@ const Swap = () => {
     tokenBalances,
     getInsufficientTokenIn,
     tokensData,
+    insufficientLiquidity,
   ]);
 
   useEffect(() => {
