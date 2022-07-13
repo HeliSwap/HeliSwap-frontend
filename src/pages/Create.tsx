@@ -654,20 +654,16 @@ const Create = () => {
             <Button
               loading={loadingApprove}
               onClick={() => handleApproveClick('tokenA')}
-              className="mx-2"
             >{`Approve ${tokensData.tokenA.symbol}`}</Button>
           </div>
         ) : null}
+
         {tokensData.tokenB.hederaId && !approved.tokenB && createPairData.tokenBAmount ? (
           <div className="d-grid mt-4">
-            <div className="d-grid mt-4">
-              {' '}
-              <Button
-                loading={loadingApprove}
-                onClick={() => handleApproveClick('tokenB')}
-                className="mx-2"
-              >{`Approve ${tokensData.tokenB.symbol}`}</Button>
-            </div>
+            <Button
+              loading={loadingApprove}
+              onClick={() => handleApproveClick('tokenB')}
+            >{`Approve ${tokensData.tokenB.symbol}`}</Button>
           </div>
         ) : null}
 
