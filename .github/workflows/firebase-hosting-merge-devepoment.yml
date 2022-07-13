@@ -26,6 +26,6 @@ jobs:
         run: yarn install --frozen-lockfile && yarn run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_HELISWAP_TEST }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_HELISWAP_DEV_E552E }}'
           channelId: live
           projectId: heliswap-dev-e552e
