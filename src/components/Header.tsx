@@ -10,6 +10,7 @@ const Header = () => {
     disconnectWallet,
     extensionFound,
     isConnectionLoading,
+    isHashpackLoading,
     userId,
   } = contextValue.connection;
   const { isRunning } = contextValue;
@@ -42,7 +43,9 @@ const Header = () => {
           {isRunning ? <span className="me-3">🟢</span> : <span className="me-3">🔴</span>}
           {!isConnectionLoading ? (
             extensionFound ? (
-              connected ? (
+              isHashpackLoading ? (
+                <p className="text-warning mx-2">Please aprove from your wallet</p>
+              ) : connected ? (
                 <>
                   <div className="container-connected">
                     <div className="text-small">{userBalance} HBAR</div>
