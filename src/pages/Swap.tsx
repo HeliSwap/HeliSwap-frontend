@@ -98,7 +98,8 @@ const Swap = () => {
 
   // State for approved
   const [approved, setApproved] = useState(false);
-
+  const [needApproval, setNeedApproval] = useState(true);
+  const [readyToApprove, setReadyToApprove] = useState(false);
   // State for associated
   const [associated, setAssociated] = useState(false);
 
@@ -114,7 +115,7 @@ const Swap = () => {
   const [tokenBalances, setTokenBalances] = useState<IfaceInitialBalanceData>(initialBallanceData);
 
   // Additional states for Swaps
-  const [readyToApprove, setReadyToApprove] = useState(false);
+
   const [readyToAssociate, setReadyToAssociate] = useState(false);
   const [readyToSwap, setReadyToSwap] = useState(false);
   const [tokenInExactAmount, setTokenInExactAmount] = useState(true);
@@ -170,6 +171,7 @@ const Swap = () => {
         [name === 'amountIn' ? 'amountOut' : 'amountIn']: '',
       }));
       setTokenInExactAmount(name === 'amountIn');
+      setInsufficientLiquidity(true);
       return;
     }
 
@@ -378,9 +380,12 @@ const Swap = () => {
       tokenA: tokensData.tokenB,
       tokenB: tokensData.tokenA,
     };
+    setNeedApproval(true);
+    setApproved(false);
     setTokensData(newTokensData);
     const newInputValueKey = tokenInExactAmount ? 'amountOut' : 'amountIn';
     const oldInputValueKey = tokenInExactAmount ? 'amountIn' : 'amountOut';
+    setSwapData({ ...swapData, tokenIdIn: swapData.tokenIdOut, tokenIdOut: swapData.tokenIdIn });
 
     handleInputChange(swapData[oldInputValueKey], newInputValueKey, newTokensData);
   };
@@ -424,8 +429,7 @@ const Swap = () => {
       };
 
       const canSpend = await checkAllowanceHTS(userId, tokenAData, amountToSpend);
-
-      setApproved(canSpend);
+      setNeedApproval(!canSpend);
     };
 
     const checkTokenAssociation = () => {
@@ -433,13 +437,13 @@ const Swap = () => {
       setAssociated(foundToken);
     };
 
-    setApproved(tokensData.tokenA.type === TokenType.HBAR);
+    setNeedApproval(tokensData.tokenA.type !== TokenType.HBAR);
     setAssociated(
       tokensData.tokenB.type === TokenType.HBAR || tokensData.tokenB.type === TokenType.ERC20,
     );
 
-    const hasTokenAData = swapData.tokenIdIn && swapData.amountIn !== '0';
-    const hasTokenBData = swapData.tokenIdOut && swapData.amountOut !== '0';
+    const hasTokenAData = swapData.tokenIdIn && swapData.amountIn;
+    const hasTokenBData = swapData.tokenIdOut && swapData.amountOut;
 
     if (tokensData.tokenA.type === TokenType.HTS && hasTokenAData && userId) {
       getAllowanceHTS(userId);
@@ -478,7 +482,7 @@ const Swap = () => {
     let ready = true;
 
     // First token needs to be approved
-    if (!approved) {
+    if (needApproval && !approved) {
       ready = false;
     }
 
@@ -570,6 +574,8 @@ const Swap = () => {
             modalTitle="Select a token"
             tokenFieldId="tokenA"
             setTokensData={newTokensData => {
+              setNeedApproval(true);
+              setApproved(false);
               const { tokenA } = newTokensData();
               if (tokenA && typeof tokenA.hederaId !== 'undefined') {
                 const newSwapData = {
@@ -667,7 +673,7 @@ const Swap = () => {
             </div>
           ) : (
             <>
-              {readyToApprove && !approved ? (
+              {readyToApprove && needApproval && !approved ? (
                 <div className="d-grid mt-4">
                   <Button
                     loading={loadingApprove}
@@ -837,6 +843,7 @@ const Swap = () => {
       </div>
     );
   };
+  console.log(swapData);
 
   return (
     <div className="d-flex justify-content-center">
