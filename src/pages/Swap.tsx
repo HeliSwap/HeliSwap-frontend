@@ -263,6 +263,8 @@ const Swap = () => {
         setErrorMessage(error);
       } else {
         setAssociated(true);
+        const tokens = await getUserAssociatedTokens(userId);
+        setUserAssociatedTokens(tokens);
       }
     } catch (err) {
       console.error(err);
@@ -515,6 +517,7 @@ const Swap = () => {
     getInsufficientTokenIn,
     tokensData,
     insufficientLiquidity,
+    needApproval,
   ]);
 
   useEffect(() => {
@@ -654,7 +657,7 @@ const Swap = () => {
     const { tokenA, tokenB } = tokensData;
     if (Object.keys(tokenB).length === 0 || Object.keys(tokenA).length === 0)
       return 'Select a token';
-    if (getInsufficientTokenIn()) return `Unsufficient ${tokenA.symbol} balance`;
+    if (getInsufficientTokenIn()) return `Insufficient ${tokenA.symbol} balance`;
     if (insufficientLiquidity) return 'Insufficient liquidity for this trade.';
     return willWrapTokens ? 'wrap' : willUnwrapTokens ? 'unwrap' : 'swap';
   };
