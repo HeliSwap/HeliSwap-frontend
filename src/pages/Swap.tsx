@@ -573,8 +573,8 @@ const Swap = () => {
               const { tokenA } = newTokensData();
               if (tokenA && typeof tokenA.hederaId !== 'undefined') {
                 const newSwapData = {
-                  tokenIdOut: tokenA.hederaId,
-                  tokenOutDecimals: tokenA.decimals,
+                  tokenIdIn: tokenA.hederaId,
+                  tokenInDecimals: tokenA.decimals,
                   amountIn: '',
                   amountOut: '',
                 };
