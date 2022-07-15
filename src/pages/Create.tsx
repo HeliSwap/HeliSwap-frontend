@@ -22,7 +22,7 @@ import ButtonSelector from '../components/ButtonSelector';
 import WalletBalance from '../components/WalletBalance';
 
 import errorMessages from '../content/errors';
-import { checkAllowanceHTS, getTokenBalance, idToAddress } from '../utils/tokenUtils';
+import { checkAllowanceHTS, getTokenBalance, idToAddress, NATIVE_TOKEN } from '../utils/tokenUtils';
 import {
   formatStringETHtoPriceFormatted,
   formatStringToBigNumberEthersWei,
@@ -434,17 +434,27 @@ const Create = () => {
   ]);
 
   useEffect(() => {
+    console.log('address', address);
     try {
       if (address && poolsData && tokenDataList && !tokensDerivedFromPool) {
         const chosenPool =
           poolsData.find((pool: IPairData) => pool.pairAddress === address) || ({} as IPairData);
         const { token0: token0Address, token1: token1Address } = chosenPool;
-        const tokenA =
-          tokenDataList.find((token: ITokenData) => token.address === token0Address) ||
-          ({} as ITokenData);
-        const tokenB =
-          tokenDataList.find((token: ITokenData) => token.address === token1Address) ||
-          ({} as ITokenData);
+
+        // Check if one of tokens is WHBAR - to be switched for HBAR
+        const isTokenAWrappedHBAR =
+          token0Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+        const isTokenBWrappedHBAR =
+          token1Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+
+        const tokenA = isTokenAWrappedHBAR
+          ? NATIVE_TOKEN
+          : tokenDataList.find((token: ITokenData) => token.address === token0Address) ||
+            ({} as ITokenData);
+        const tokenB = isTokenBWrappedHBAR
+          ? NATIVE_TOKEN
+          : tokenDataList.find((token: ITokenData) => token.address === token1Address) ||
+            ({} as ITokenData);
 
         setTokensData({ tokenA, tokenB });
         //We want to set the tokens from the pool selected just once
@@ -578,7 +588,7 @@ const Create = () => {
     );
   };
 
-  const tokenBARatio = Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount)
+  const tokenBARatio = Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount);
   const tokenABRatio = Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount);
   const tokenBARatioFormatted = formatStringETHtoPriceFormatted(tokenBARatio.toString());
   const tokenABRatioFormatted = formatStringETHtoPriceFormatted(tokenABRatio.toString());
