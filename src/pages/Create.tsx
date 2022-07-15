@@ -24,6 +24,7 @@ import WalletBalance from '../components/WalletBalance';
 import errorMessages from '../content/errors';
 import { checkAllowanceHTS, getTokenBalance, idToAddress } from '../utils/tokenUtils';
 import {
+  formatStringETHtoPriceFormatted,
   formatStringToBigNumberEthersWei,
   formatStringToBigNumberWei,
   stripStringToFixedDecimals,
@@ -577,15 +578,18 @@ const Create = () => {
     );
   };
 
+  const tokenBARatio = Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount)
+  const tokenABRatio = Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount);
+  const tokenBARatioFormatted = formatStringETHtoPriceFormatted(tokenBARatio.toString());
+  const tokenABRatioFormatted = formatStringETHtoPriceFormatted(tokenABRatio.toString());
+
   const getTokensRatioSection = () => {
     return readyToProvide ? (
       <div className="my-4">
         <div className="mt-3 d-flex justify-content-around">
           <div className="text-center">
             <p>
-              <span className="text-small text-numeric">
-                {Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount)}
-              </span>
+              <span className="text-small text-numeric">{tokenBARatioFormatted}</span>
             </p>
             <p className="text-micro">
               {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
@@ -594,9 +598,7 @@ const Create = () => {
 
           <div className="text-center">
             <p>
-              <span className="text-small text-numeric">
-                {Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount)}
-              </span>
+              <span className="text-small text-numeric">{tokenABRatioFormatted}</span>
             </p>
             <p className="text-micro">
               {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}

@@ -20,6 +20,7 @@ import {
   formatStringWeiToStringEther,
   formatStringToStringWei,
   formatStringToBigNumberWei,
+  formatStringETHtoPriceFormatted,
 } from '../utils/numberUtils';
 import {
   calculateReserves,
@@ -323,7 +324,9 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
             <div className="d-flex justify-content-between align-items-center">
               <p className="text-small">Pooled {pairData.token0Symbol}:</p>
               <p className="d-flex justify-content-end align-items-center">
-                <span className="text-small text-numeric me-3">{removeLpData.tokens0Amount}</span>
+                <span className="text-small text-numeric me-3">
+                  {formatStringETHtoPriceFormatted(removeLpData.tokens0Amount)}
+                </span>
                 <IconToken symbol={pairData.token0Symbol} />
               </p>
             </div>
@@ -331,7 +334,9 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
             <div className="d-flex justify-content-between align-items-center mt-4">
               <p className="text-small">Pooled {pairData.token1Symbol}:</p>
               <p className="d-flex justify-content-end align-items-center">
-                <span className="text-small text-numeric me-3">{removeLpData.tokens1Amount}</span>
+                <span className="text-small text-numeric me-3">
+                  {formatStringETHtoPriceFormatted(removeLpData.tokens1Amount)}
+                </span>
                 <IconToken symbol={pairData.token1Symbol} />
               </p>
             </div>
@@ -381,7 +386,9 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
                   <span className="text-main ms-3">{pairData.token0Symbol}</span>
                 </div>
 
-                <div className="text-main text-numeric">{removeLpData.tokens0Amount}</div>
+                <div className="text-main text-numeric">
+                  {formatStringETHtoPriceFormatted(removeLpData.tokens0Amount)}
+                </div>
               </div>
 
               <div className="d-flex justify-content-between align-items-center px-3 mt-4">
@@ -390,7 +397,9 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
                   <span className="text-main ms-3">{pairData.token1Symbol}</span>
                 </div>
 
-                <div className="text-main text-numeric">{removeLpData.tokens1Amount}</div>
+                <div className="text-main text-numeric">
+                  {formatStringETHtoPriceFormatted(removeLpData.tokens1Amount)}
+                </div>
               </div>
 
               <hr />
