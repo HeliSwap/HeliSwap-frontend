@@ -31,7 +31,7 @@ import {
 import { getTransactionSettings } from '../utils/transactionUtils';
 import usePools from '../hooks/usePools';
 import useTokens from '../hooks/useTokens';
-import { MAX_UINT_ERC20, MAX_UINT_HTS, POOLS_FEE } from '../constants';
+import { MAX_UINT_ERC20, MAX_UINT_HTS, POOLS_FEE, REFRESH_TIME } from '../constants';
 import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
 import { formatIcons } from '../utils/iconUtils';
 import IconToken from '../components/IconToken';
@@ -64,12 +64,12 @@ const Create = () => {
   // State for pools
   const { pools: poolsData } = usePools({
     fetchPolicy: 'network-only',
-    pollInterval: 10000,
+    pollInterval: REFRESH_TIME,
   });
 
   const { loading: loadingTDL, tokens: tokenDataList } = useTokens({
     fetchPolicy: 'network-only',
-    pollInterval: 10000,
+    pollInterval: REFRESH_TIME,
   });
 
   const initialCreateData: ICreatePairData = {

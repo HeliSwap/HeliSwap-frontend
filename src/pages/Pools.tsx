@@ -11,6 +11,7 @@ import { getHBarPrice, idToAddress } from '../utils/tokenUtils';
 import PoolInfo from '../components/PoolInfo';
 import RemoveLiquidity from '../components/RemoveLiquidity';
 import usePools from '../hooks/usePools';
+import { REFRESH_TIME } from '../constants';
 
 const Pools = () => {
   const contextValue = useContext(GlobalContext);
@@ -20,7 +21,7 @@ const Pools = () => {
   const [getPoolsByUser, { error, loading, data }] = useLazyQuery(GET_POOLS_BY_USER);
   const { loading: loadingPools, pools: allPairsData } = usePools({
     fetchPolicy: 'network-only',
-    pollInterval: 10000,
+    pollInterval: REFRESH_TIME,
   });
 
   const [pairData, setPairData] = useState<IPairData[]>([]);
@@ -51,7 +52,7 @@ const Pools = () => {
     if (userId) {
       getPoolsByUser({
         variables: { address: idToAddress(userId) },
-        pollInterval: 10000,
+        pollInterval: REFRESH_TIME,
         fetchPolicy: 'network-only',
       });
     } else {
