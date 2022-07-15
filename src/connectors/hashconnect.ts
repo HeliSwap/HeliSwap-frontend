@@ -7,12 +7,14 @@ class Hashconnect {
     setExtensionFound: (loading: boolean) => void,
     setConnected: (loading: boolean) => void,
     setUserId: (userId: string) => void,
+    setIsHashpackLoading: (loading: boolean) => void,
   ) {
     this.hashconnect = new HashConnect();
     this.setLoading = setLoading;
     this.setExtensionFound = setExtensionFound;
     this.setConnected = setConnected;
     this.setUserId = setUserId;
+    this.setIsHashpackLoading = setIsHashpackLoading;
     this.transactionResponseReceived = new CustomEvent('transaction-response-received');
   }
 
@@ -22,6 +24,7 @@ class Hashconnect {
   setLoading: (loading: boolean) => void;
   setUserId: (userId: string) => void;
   setExtensionFound: (loading: boolean) => void;
+  setIsHashpackLoading: (loading: boolean) => void;
   setConnected: (loading: boolean) => void;
 
   availableExtensions: HashConnectTypes.WalletMetadata[] = [];
@@ -103,6 +106,7 @@ class Hashconnect {
       this.saveDataInLocalstorage();
       this.setLoading(false);
       this.setConnected(true);
+      this.setIsHashpackLoading(false);
     });
 
     this.hashconnect.transactionEvent.on(data => {

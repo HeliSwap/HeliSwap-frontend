@@ -9,6 +9,7 @@ const contextInitialValue = {
     userId: '',
     connected: false,
     isConnectionLoading: true,
+    isHashpackLoading: false,
     extensionFound: false,
     connectWallet: () => {},
     disconnectWallet: () => {},
@@ -27,6 +28,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
   const [sdk, setSdk] = useState({} as SDK);
   const [connected, setConnected] = useState(false);
   const [isConnectionLoading, setIsConnectionLoading] = useState(true);
+  const [isHashpackLoading, setIsHashpackLoading] = useState(false);
   const [extensionFound, setExtensionFound] = useState(false);
   const [hashconnectConnectorInstance, setHashconnectConnectorInstance] = useState<Hashconnect>();
   const [userId, setUserId] = useState('');
@@ -41,6 +43,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
 
   const connectWallet = () => {
     hashconnectConnectorInstance?.connect();
+    setIsHashpackLoading(true);
   };
 
   const disconnectWallet = () => {
@@ -52,6 +55,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
     connected,
     userId,
     isConnectionLoading,
+    isHashpackLoading,
     extensionFound,
     connectWallet,
     disconnectWallet,
@@ -66,6 +70,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
         setExtensionFound,
         setConnected,
         setUserId,
+        setIsHashpackLoading,
       );
 
       await hashconnectConnector.initHashconnect();
