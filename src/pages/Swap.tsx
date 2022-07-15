@@ -100,8 +100,6 @@ const Swap = () => {
   const [approved, setApproved] = useState(false);
   const [needApproval, setNeedApproval] = useState(true);
   const [readyToApprove, setReadyToApprove] = useState(false);
-  // State for associated
-  const [associated, setAssociated] = useState(false);
 
   // State for token balances
   const initialBallanceData = useMemo(
@@ -262,7 +260,6 @@ const Swap = () => {
         setError(true);
         setErrorMessage(error);
       } else {
-        setAssociated(true);
         const tokens = await getUserAssociatedTokens(userId);
         setUserAssociatedTokens(tokens);
       }
@@ -364,7 +361,6 @@ const Swap = () => {
         setSwapData(initialSwapData);
         setTokensData(initialTokensData);
         setApproved(false);
-        setAssociated(false);
         setSuccessSwap(true);
         setSuccessMessage(successMessage);
         refetch();
@@ -431,33 +427,16 @@ const Swap = () => {
       };
 
       const canSpend = await checkAllowanceHTS(userId, tokenAData, amountToSpend);
-      setNeedApproval(!canSpend);
+      setApproved(canSpend);
     };
-
-    const checkTokenAssociation = () => {
-      const foundToken = userAssociatedTokens?.includes(tokensData.tokenB.hederaId);
-      setAssociated(foundToken);
-    };
-
-    setNeedApproval(tokensData.tokenA.type !== TokenType.HBAR);
-    setAssociated(
-      tokensData.tokenB.type === TokenType.HBAR || tokensData.tokenB.type === TokenType.ERC20,
-    );
+    if (tokensData.tokenA.type === TokenType.HBAR) {
+      setNeedApproval(false);
+    }
 
     const hasTokenAData = swapData.tokenIdIn && swapData.amountIn;
-    const hasTokenBData = swapData.tokenIdOut && swapData.amountOut;
 
     if (tokensData.tokenA.type === TokenType.HTS && hasTokenAData && userId) {
       getAllowanceHTS(userId);
-    }
-
-    if (
-      tokensData.tokenB.type === TokenType.HTS &&
-      hasTokenBData &&
-      userId &&
-      userAssociatedTokens
-    ) {
-      checkTokenAssociation();
     }
   }, [swapData, userId, sdk, tokensData, userAssociatedTokens]);
 
@@ -662,8 +641,14 @@ const Swap = () => {
     return willWrapTokens ? 'wrap' : willUnwrapTokens ? 'unwrap' : 'swap';
   };
 
+  const getTokenIsAssociated = () => {
+    const { tokenB } = tokensData;
+    const notHTS = tokenB.type === TokenType.HBAR || tokenB.type === TokenType.ERC20;
+    return notHTS || userAssociatedTokens?.includes(tokensData.tokenB.hederaId);
+  };
+
   const getSwapButtonDisabledState = () => {
-    return !readyToSwap || !associated;
+    return !readyToSwap || !getTokenIsAssociated();
   };
 
   const getActionButtons = () => {
@@ -688,7 +673,7 @@ const Swap = () => {
                 </div>
               ) : null}
 
-              {readyToAssociate && !associated ? (
+              {readyToAssociate && !getTokenIsAssociated() ? (
                 <div className="d-grid mt-4">
                   <Button
                     loading={loadingSwap}
@@ -846,7 +831,6 @@ const Swap = () => {
       </div>
     );
   };
-  console.log(swapData);
 
   return (
     <div className="d-flex justify-content-center">
