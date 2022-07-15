@@ -48,12 +48,15 @@ const Pools = () => {
   };
 
   useEffect(() => {
-    userId &&
+    if (userId) {
       getPoolsByUser({
         variables: { address: idToAddress(userId) },
         pollInterval: 10000,
         fetchPolicy: 'network-only',
       });
+    } else {
+      setPairData([]);
+    }
   }, [userId, getPoolsByUser]);
 
   useEffect(() => {
