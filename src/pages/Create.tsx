@@ -434,7 +434,6 @@ const Create = () => {
   ]);
 
   useEffect(() => {
-    console.log('address', address);
     try {
       if (address && poolsData && tokenDataList && !tokensDerivedFromPool) {
         const chosenPool =
