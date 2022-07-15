@@ -41,7 +41,7 @@ import {
 import usePools from '../hooks/usePools';
 import useTokens from '../hooks/useTokens';
 
-import { MAX_UINT_ERC20, MAX_UINT_HTS } from '../constants';
+import { MAX_UINT_ERC20, MAX_UINT_HTS, REFRESH_TIME } from '../constants';
 import InputToken from '../components/InputToken';
 import ButtonSelector from '../components/ButtonSelector';
 import Icon from '../components/Icon';
@@ -77,12 +77,12 @@ const Swap = () => {
     refetch,
   } = usePools({
     fetchPolicy: 'network-only',
-    pollInterval: 10000,
+    pollInterval: REFRESH_TIME,
   });
 
   const { loading: loadingTDL, tokens: tokenDataList } = useTokens({
     fetchPolicy: 'network-only',
-    pollInterval: 10000,
+    pollInterval: REFRESH_TIME,
   });
 
   const initialSwapData: ISwapTokenData = {

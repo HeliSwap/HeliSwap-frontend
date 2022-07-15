@@ -7,3 +7,5 @@ export const MAX_UINT_HTS = 15908979783.594148;
 export const POOLS_FEE = '0.3%';
 
 export const HUNDRED_BN = new BigNumber('100');
+export const REFRESH_TIME = 5000;
+export const HEALTH_CHECK_INTERVAL = 5000;

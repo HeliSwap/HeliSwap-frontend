@@ -22,8 +22,9 @@ import ButtonSelector from '../components/ButtonSelector';
 import WalletBalance from '../components/WalletBalance';
 
 import errorMessages from '../content/errors';
-import { checkAllowanceHTS, getTokenBalance, idToAddress } from '../utils/tokenUtils';
+import { checkAllowanceHTS, getTokenBalance, idToAddress, NATIVE_TOKEN } from '../utils/tokenUtils';
 import {
+  formatStringETHtoPriceFormatted,
   formatStringToBigNumberEthersWei,
   formatStringToBigNumberWei,
   stripStringToFixedDecimals,
@@ -31,7 +32,7 @@ import {
 import { getTransactionSettings } from '../utils/transactionUtils';
 import usePools from '../hooks/usePools';
 import useTokens from '../hooks/useTokens';
-import { MAX_UINT_ERC20, MAX_UINT_HTS, POOLS_FEE } from '../constants';
+import { MAX_UINT_ERC20, MAX_UINT_HTS, POOLS_FEE, REFRESH_TIME } from '../constants';
 import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
 import { formatIcons } from '../utils/iconUtils';
 import IconToken from '../components/IconToken';
@@ -64,12 +65,12 @@ const Create = () => {
   // State for pools
   const { pools: poolsData } = usePools({
     fetchPolicy: 'network-only',
-    pollInterval: 10000,
+    pollInterval: REFRESH_TIME,
   });
 
   const { loading: loadingTDL, tokens: tokenDataList } = useTokens({
     fetchPolicy: 'network-only',
-    pollInterval: 10000,
+    pollInterval: REFRESH_TIME,
   });
 
   const initialCreateData: ICreatePairData = {
@@ -438,12 +439,21 @@ const Create = () => {
         const chosenPool =
           poolsData.find((pool: IPairData) => pool.pairAddress === address) || ({} as IPairData);
         const { token0: token0Address, token1: token1Address } = chosenPool;
-        const tokenA =
-          tokenDataList.find((token: ITokenData) => token.address === token0Address) ||
-          ({} as ITokenData);
-        const tokenB =
-          tokenDataList.find((token: ITokenData) => token.address === token1Address) ||
-          ({} as ITokenData);
+
+        // Check if one of tokens is WHBAR - to be switched for HBAR
+        const isTokenAWrappedHBAR =
+          token0Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+        const isTokenBWrappedHBAR =
+          token1Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+
+        const tokenA = isTokenAWrappedHBAR
+          ? NATIVE_TOKEN
+          : tokenDataList.find((token: ITokenData) => token.address === token0Address) ||
+            ({} as ITokenData);
+        const tokenB = isTokenBWrappedHBAR
+          ? NATIVE_TOKEN
+          : tokenDataList.find((token: ITokenData) => token.address === token1Address) ||
+            ({} as ITokenData);
 
         setTokensData({ tokenA, tokenB });
         //We want to set the tokens from the pool selected just once
@@ -577,15 +587,18 @@ const Create = () => {
     );
   };
 
+  const tokenBARatio = Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount);
+  const tokenABRatio = Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount);
+  const tokenBARatioFormatted = formatStringETHtoPriceFormatted(tokenBARatio.toString());
+  const tokenABRatioFormatted = formatStringETHtoPriceFormatted(tokenABRatio.toString());
+
   const getTokensRatioSection = () => {
     return readyToProvide ? (
       <div className="my-4">
         <div className="mt-3 d-flex justify-content-around">
           <div className="text-center">
             <p>
-              <span className="text-small text-numeric">
-                {Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount)}
-              </span>
+              <span className="text-small text-numeric">{tokenBARatioFormatted}</span>
             </p>
             <p className="text-micro">
               {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
@@ -594,9 +607,7 @@ const Create = () => {
 
           <div className="text-center">
             <p>
-              <span className="text-small text-numeric">
-                {Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount)}
-              </span>
+              <span className="text-small text-numeric">{tokenABRatioFormatted}</span>
             </p>
             <p className="text-micro">
               {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}
