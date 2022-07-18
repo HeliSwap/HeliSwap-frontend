@@ -41,38 +41,40 @@ const Header = () => {
       <div className="d-flex justify-content-end">
         <div className="d-flex align-items-center">
           {isRunning ? <span className="me-3">🟢</span> : <span className="me-3">🔴</span>}
-          {!isConnectionLoading ? (
-            extensionFound ? (
-              isHashpackLoading ? (
-                <p className="text-warning mx-2">Please aprove from your wallet</p>
-              ) : connected ? (
-                <>
-                  <div className="container-connected">
-                    <div className="text-small">{userBalance} HBAR</div>
-                    <div className="container-address">
-                      <div className="text-small">{userId}</div>
-                    </div>
+          {extensionFound ? (
+            isHashpackLoading ? (
+              <p className="text-warning mx-2">Please aprove from your wallet</p>
+            ) : connected ? (
+              <>
+                <div className="container-connected">
+                  <div className="text-small">{userBalance} HBAR</div>
+                  <div className="container-address">
+                    <div className="text-small">{userId}</div>
                   </div>
-                  <button
-                    onClick={() => disconnectWallet()}
-                    className="btn btn-sm btn-outline-primary mx-2"
-                  >
-                    Disconnect
-                  </button>
-                </>
-              ) : (
+                </div>
                 <button
-                  onClick={() => connectWallet()}
+                  onClick={() => disconnectWallet()}
                   className="btn btn-sm btn-outline-primary mx-2"
                 >
-                  Connect wallet
+                  Disconnect
                 </button>
-              )
+              </>
             ) : (
-              <p className="text-warning mx-2">Please install a wallet</p>
+              <button
+                onClick={() => connectWallet()}
+                className="btn btn-sm btn-outline-primary mx-2"
+              >
+                Connect wallet
+              </button>
             )
           ) : (
-            <p className="text-success mx-2">Loading...</p>
+            <p className="text-warning mx-2">
+              Please{' '}
+              <a target="_blank" className="link" rel="noreferrer" href="https://www.hashpack.app/">
+                install
+              </a>{' '}
+              a wallet
+            </p>
           )}
         </div>
       </div>

@@ -49,7 +49,8 @@ import Icon from '../components/Icon';
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
-  const { userId, hashconnectConnectorInstance, connected, connectWallet } = connection;
+  const { userId, hashconnectConnectorInstance, connected, connectWallet, extensionFound } =
+    connection;
 
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
@@ -657,90 +658,92 @@ const Swap = () => {
   };
 
   const getActionButtons = () => {
-    return connected ? (
-      <>
-        {loadingPools ? (
-          <div className="d-flex justify-content-center mt-4">
-            <Loader />
-          </div>
-        ) : (
-          <>
-            {readyToApprove && !approved ? (
-              <div className="d-grid mt-4">
-                <Button
-                  loading={loadingApprove}
-                  disabled={Number(swapData.amountIn) <= 0}
-                  onClick={() => handleApproveClick()}
-                >
-                  {`Approve ${tokensData.tokenA.symbol}`}
-                </Button>
-              </div>
-            ) : null}
+    return extensionFound ? (
+      connected ? (
+        <>
+          {loadingPools ? (
+            <div className="d-flex justify-content-center mt-4">
+              <Loader />
+            </div>
+          ) : (
+            <>
+              {readyToApprove && !approved ? (
+                <div className="d-grid mt-4">
+                  <Button
+                    loading={loadingApprove}
+                    disabled={Number(swapData.amountIn) <= 0}
+                    onClick={() => handleApproveClick()}
+                  >
+                    {`Approve ${tokensData.tokenA.symbol}`}
+                  </Button>
+                </div>
+              ) : null}
 
-            {readyToAssociate && !associated ? (
+              {readyToAssociate && !associated ? (
+                <div className="d-grid mt-4">
+                  <Button
+                    loading={loadingSwap}
+                    disabled={!readyToAssociate}
+                    onClick={() => handleAssociateClick()}
+                  >
+                    Associate token
+                  </Button>
+                </div>
+              ) : null}
+
               <div className="d-grid mt-4">
                 <Button
                   loading={loadingSwap}
-                  disabled={!readyToAssociate}
-                  onClick={() => handleAssociateClick()}
+                  disabled={getSwapButtonDisabledState()}
+                  onClick={() => handleSwapClick()}
                 >
-                  Associate token
+                  {getSwapButtonLabel()}
                 </Button>
               </div>
-            ) : null}
+            </>
+          )}
 
-            <div className="d-grid mt-4">
-              <Button
-                loading={loadingSwap}
-                disabled={getSwapButtonDisabledState()}
-                onClick={() => handleSwapClick()}
+          {showModalConfirmSwap ? (
+            <Modal show={showModalConfirmSwap}>
+              <ConfirmTransactionModalContent
+                modalTitle="Confirm swap"
+                closeModal={() => setShowModalConfirmSwap(false)}
+                confirmTansaction={handleSwapConfirm}
+                confirmButtonLabel="Confirm swap"
               >
-                {getSwapButtonLabel()}
-              </Button>
-            </div>
-          </>
-        )}
-
-        {showModalConfirmSwap ? (
-          <Modal show={showModalConfirmSwap}>
-            <ConfirmTransactionModalContent
-              modalTitle="Confirm swap"
-              closeModal={() => setShowModalConfirmSwap(false)}
-              confirmTansaction={handleSwapConfirm}
-              confirmButtonLabel="Confirm swap"
-            >
-              <InputTokenSelector
-                inputTokenComponent={<InputToken value={swapData.amountIn} disabled={true} />}
-                buttonSelectorComponent={
-                  <ButtonSelector
-                    selectedToken={tokensData?.tokenA.symbol}
-                    selectorText="Select token"
-                    disabled={true}
-                  />
-                }
-              />
-              <InputTokenSelector
-                className="mt-5"
-                inputTokenComponent={<InputToken value={swapData.amountOut} disabled={true} />}
-                buttonSelectorComponent={
-                  <ButtonSelector
-                    selectedToken={tokensData?.tokenB.symbol}
-                    selectorText="Select token"
-                    disabled={true}
-                  />
-                }
-              />
-              {getTokensRatio()}
-              {getAdvancedSwapInfo()}
-            </ConfirmTransactionModalContent>
-          </Modal>
-        ) : null}
-      </>
-    ) : (
-      <div className="d-grid mt-4">
-        <Button onClick={() => connectWallet()}>Connect wallet</Button>
-      </div>
-    );
+                <InputTokenSelector
+                  inputTokenComponent={<InputToken value={swapData.amountIn} disabled={true} />}
+                  buttonSelectorComponent={
+                    <ButtonSelector
+                      selectedToken={tokensData?.tokenA.symbol}
+                      selectorText="Select token"
+                      disabled={true}
+                    />
+                  }
+                />
+                <InputTokenSelector
+                  className="mt-5"
+                  inputTokenComponent={<InputToken value={swapData.amountOut} disabled={true} />}
+                  buttonSelectorComponent={
+                    <ButtonSelector
+                      selectedToken={tokensData?.tokenB.symbol}
+                      selectorText="Select token"
+                      disabled={true}
+                    />
+                  }
+                />
+                {getTokensRatio()}
+                {getAdvancedSwapInfo()}
+              </ConfirmTransactionModalContent>
+            </Modal>
+          ) : null}
+        </>
+      ) : (
+        <div className="d-grid mt-4">
+          <Button onClick={() => connectWallet()}>Connect wallet</Button>
+        </div>
+      )
+    ) : null;
   };
 
   const getSuccessMessage = () => {

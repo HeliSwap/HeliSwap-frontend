@@ -294,7 +294,7 @@ export const NATIVE_TOKEN: ITokenData = {
   hederaId: '',
   name: 'HBAR',
   symbol: 'HBAR',
-  address: process.env.REACT_APP_WHBAR_ADDRESS as string,
+  address: '',
   decimals: 8,
   type: TokenType.HBAR,
 };
