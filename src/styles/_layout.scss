@@ -42,7 +42,6 @@ strong {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding-left: 100px;
 
   @include media-breakpoint-up(xxxl) {
     padding-left: 0;
