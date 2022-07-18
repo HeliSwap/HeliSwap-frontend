@@ -748,9 +748,9 @@ const Create = () => {
     const token1Symbol = hasSelectedPool ? selectedPoolData.token1Symbol : tokensData.tokenB.symbol;
     return (
       <>
-        <div className="d-flex">
-          {formatIcons([token0Symbol, token1Symbol])}
-          <p className="text-small ms-3">
+        <div className="d-flex align-items-center">
+          {formatIcons([token0Symbol, token1Symbol], 'large')}
+          <p className="text-subheader ms-3">
             {token0Symbol}/{token1Symbol}
           </p>
         </div>
@@ -759,7 +759,7 @@ const Create = () => {
           <div className="d-flex justify-content-between align-items-center m-4">
             <div className="d-flex align-items-center">
               <IconToken symbol={token0Symbol} />
-              <span className="text-main text-bold ms-3">{token0Symbol}</span>
+              <span className="text-main ms-3">{token0Symbol}</span>
             </div>
 
             <div className="d-flex justify-content-end align-items-center">
@@ -769,7 +769,7 @@ const Create = () => {
           <div className="d-flex justify-content-between align-items-center m-4">
             <div className="d-flex align-items-center">
               <IconToken symbol={token1Symbol} />
-              <span className="text-main text-bold ms-3">{token1Symbol}</span>
+              <span className="text-main ms-3">{token1Symbol}</span>
             </div>
 
             <div className="d-flex justify-content-end align-items-center">
