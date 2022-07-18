@@ -547,12 +547,14 @@ const Swap = () => {
             />
           }
           walletBalanceComponent={
-            <WalletBalance
-              walletBalance={tokenBalances.tokenA}
-              onMaxButtonClick={(maxValue: string) => {
-                handleInputChange(maxValue, 'amountIn');
-              }}
-            />
+            Object.keys(tokensData.tokenA).length > 0 ? (
+              <WalletBalance
+                walletBalance={tokenBalances.tokenA}
+                onMaxButtonClick={(maxValue: string) => {
+                  handleInputChange(maxValue, 'amountIn');
+                }}
+              />
+            ) : null
           }
         />
         <Modal show={showModalA}>
@@ -605,7 +607,11 @@ const Swap = () => {
               selectorText="Select token"
             />
           }
-          walletBalanceComponent={<WalletBalance walletBalance={tokenBalances.tokenB} />}
+          walletBalanceComponent={
+            Object.keys(tokensData.tokenB).length > 0 ? (
+              <WalletBalance walletBalance={tokenBalances.tokenB} />
+            ) : null
+          }
         />
         <Modal show={showModalB}>
           <ModalSearchContent
