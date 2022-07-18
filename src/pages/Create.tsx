@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
 import { useParams } from 'react-router-dom';
@@ -48,6 +49,7 @@ const Create = () => {
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance, connected, connectWallet } = connection;
   const { address } = useParams();
+  const navigate = useNavigate();
 
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
@@ -297,6 +299,10 @@ const Create = () => {
     } finally {
       setLoadingCreate(false);
     }
+  };
+
+  const handleBackClick = () => {
+    navigate('/pools');
   };
 
   useEffect(() => {
@@ -780,7 +786,7 @@ const Create = () => {
   return (
     <div className="d-flex justify-content-center">
       <div className="container-action">
-        <PageHeader slippage="create" title={pageTitle} />
+        <PageHeader handleBackClick={handleBackClick} slippage="create" title={pageTitle} />
         {getErrorMessage()}
         {getProvideSection()}
       </div>
