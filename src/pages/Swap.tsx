@@ -127,6 +127,7 @@ const Swap = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [loadingSwap, setLoadingSwap] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
+  const [loadingAssociate, setLoadingAssociate] = useState(false);
 
   const getInsufficientTokenIn = useCallback(() => {
     const { tokenA: tokenABalance } = tokenBalances;
@@ -246,6 +247,8 @@ const Swap = () => {
   const handleAssociateClick = async () => {
     const { tokenB } = tokensData;
 
+    setLoadingAssociate(true);
+
     try {
       const receipt = await sdk.associateToken(
         hashconnectConnectorInstance,
@@ -268,6 +271,7 @@ const Swap = () => {
       setError(true);
       setErrorMessage('Error on associate');
     } finally {
+      setLoadingAssociate(false);
     }
   };
 
@@ -676,7 +680,7 @@ const Swap = () => {
               {readyToAssociate && !getTokenIsAssociated() ? (
                 <div className="d-grid mt-4">
                   <Button
-                    loading={loadingSwap}
+                    loading={loadingAssociate}
                     disabled={!readyToAssociate}
                     onClick={() => handleAssociateClick()}
                   >
