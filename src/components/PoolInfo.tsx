@@ -163,7 +163,8 @@ const PoolInfo = ({
                 {view === PageViews.MY_POOLS ? (
                   <Button
                     className="btn-sm"
-                    type="outline-secondary"
+                    type="secondary"
+                    outline={true}
                     onClick={handleRemoveButtonClick}
                   >
                     Remove Liquidity

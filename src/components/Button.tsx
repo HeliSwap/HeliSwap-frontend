@@ -1,13 +1,15 @@
 import React from 'react';
 
 interface IButtonProps {
-  type?: string;
+  type?: 'primary' | 'secondary';
   disabled?: boolean;
   loading?: boolean;
   children: string | JSX.Element | JSX.Element[];
   className?: string;
   onClick?: () => void;
   loadingText?: string | JSX.Element | JSX.Element[];
+  size?: 'small' | 'large' | 'default';
+  outline?: boolean;
 }
 
 const Button = ({
@@ -18,12 +20,26 @@ const Button = ({
   onClick,
   loading = false,
   loadingText,
+  size = 'default',
+  outline = false,
 }: IButtonProps) => {
+  const sizeMapping = {
+    small: 'btn-sm',
+    large: 'btn-lg',
+    default: '',
+  };
+
+  const outlinePrefix = outline ? '-outline' : '';
+  const typeMapping = {
+    primary: `btn${outlinePrefix}-primary`,
+    secondary: `btn${outlinePrefix}-secondary`,
+  };
+
   return (
     <button
       onClick={onClick}
       disabled={disabled || loading}
-      className={`btn btn-${type} ${className}`}
+      className={`btn ${typeMapping[type]} ${sizeMapping[size]} ${className}`}
     >
       {loading ? (
         <>
