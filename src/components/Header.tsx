@@ -4,15 +4,8 @@ import { GlobalContext } from '../providers/Global';
 
 const Header = () => {
   const contextValue = useContext(GlobalContext);
-  const {
-    connected,
-    connectWallet,
-    disconnectWallet,
-    extensionFound,
-    isConnectionLoading,
-    isHashpackLoading,
-    userId,
-  } = contextValue.connection;
+  const { connected, connectWallet, disconnectWallet, extensionFound, isHashpackLoading, userId } =
+    contextValue.connection;
   const { isRunning } = contextValue;
 
   const [userBalance, setUserBalance] = useState('0.0');

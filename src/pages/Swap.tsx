@@ -98,9 +98,8 @@ const Swap = () => {
 
   // State for approved
   const [approved, setApproved] = useState(false);
-
-  // State for associated
-  const [associated, setAssociated] = useState(false);
+  const [needApproval, setNeedApproval] = useState(true);
+  const [readyToApprove, setReadyToApprove] = useState(false);
 
   // State for token balances
   const initialBallanceData = useMemo(
@@ -114,7 +113,7 @@ const Swap = () => {
   const [tokenBalances, setTokenBalances] = useState<IfaceInitialBalanceData>(initialBallanceData);
 
   // Additional states for Swaps
-  const [readyToApprove, setReadyToApprove] = useState(false);
+
   const [readyToAssociate, setReadyToAssociate] = useState(false);
   const [readyToSwap, setReadyToSwap] = useState(false);
   const [tokenInExactAmount, setTokenInExactAmount] = useState(true);
@@ -128,6 +127,7 @@ const Swap = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [loadingSwap, setLoadingSwap] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
+  const [loadingAssociate, setLoadingAssociate] = useState(false);
 
   const getInsufficientTokenIn = useCallback(() => {
     const { tokenA: tokenABalance } = tokenBalances;
@@ -170,6 +170,7 @@ const Swap = () => {
         [name === 'amountIn' ? 'amountOut' : 'amountIn']: '',
       }));
       setTokenInExactAmount(name === 'amountIn');
+      setInsufficientLiquidity(true);
       return;
     }
 
@@ -246,6 +247,8 @@ const Swap = () => {
   const handleAssociateClick = async () => {
     const { tokenB } = tokensData;
 
+    setLoadingAssociate(true);
+
     try {
       const receipt = await sdk.associateToken(
         hashconnectConnectorInstance,
@@ -260,13 +263,15 @@ const Swap = () => {
         setError(true);
         setErrorMessage(error);
       } else {
-        setAssociated(true);
+        const tokens = await getUserAssociatedTokens(userId);
+        setUserAssociatedTokens(tokens);
       }
     } catch (err) {
       console.error(err);
       setError(true);
       setErrorMessage('Error on associate');
     } finally {
+      setLoadingAssociate(false);
     }
   };
 
@@ -360,7 +365,6 @@ const Swap = () => {
         setSwapData(initialSwapData);
         setTokensData(initialTokensData);
         setApproved(false);
-        setAssociated(false);
         setSuccessSwap(true);
         setSuccessMessage(successMessage);
         refetch();
@@ -378,9 +382,12 @@ const Swap = () => {
       tokenA: tokensData.tokenB,
       tokenB: tokensData.tokenA,
     };
+    setNeedApproval(true);
+    setApproved(false);
     setTokensData(newTokensData);
     const newInputValueKey = tokenInExactAmount ? 'amountOut' : 'amountIn';
     const oldInputValueKey = tokenInExactAmount ? 'amountIn' : 'amountOut';
+    setSwapData({ ...swapData, tokenIdIn: swapData.tokenIdOut, tokenIdOut: swapData.tokenIdIn });
 
     handleInputChange(swapData[oldInputValueKey], newInputValueKey, newTokensData);
   };
@@ -424,34 +431,16 @@ const Swap = () => {
       };
 
       const canSpend = await checkAllowanceHTS(userId, tokenAData, amountToSpend);
-
       setApproved(canSpend);
     };
+    if (tokensData.tokenA.type === TokenType.HBAR) {
+      setNeedApproval(false);
+    }
 
-    const checkTokenAssociation = () => {
-      const foundToken = userAssociatedTokens?.includes(tokensData.tokenB.hederaId);
-      setAssociated(foundToken);
-    };
-
-    setApproved(tokensData.tokenA.type === TokenType.HBAR);
-    setAssociated(
-      tokensData.tokenB.type === TokenType.HBAR || tokensData.tokenB.type === TokenType.ERC20,
-    );
-
-    const hasTokenAData = swapData.tokenIdIn && swapData.amountIn !== '0';
-    const hasTokenBData = swapData.tokenIdOut && swapData.amountOut !== '0';
+    const hasTokenAData = swapData.tokenIdIn && swapData.amountIn;
 
     if (tokensData.tokenA.type === TokenType.HTS && hasTokenAData && userId) {
       getAllowanceHTS(userId);
-    }
-
-    if (
-      tokensData.tokenB.type === TokenType.HTS &&
-      hasTokenBData &&
-      userId &&
-      userAssociatedTokens
-    ) {
-      checkTokenAssociation();
     }
   }, [swapData, userId, sdk, tokensData, userAssociatedTokens]);
 
@@ -478,7 +467,7 @@ const Swap = () => {
     let ready = true;
 
     // First token needs to be approved
-    if (!approved) {
+    if (needApproval && !approved) {
       ready = false;
     }
 
@@ -511,6 +500,7 @@ const Swap = () => {
     getInsufficientTokenIn,
     tokensData,
     insufficientLiquidity,
+    needApproval,
   ]);
 
   useEffect(() => {
@@ -570,11 +560,13 @@ const Swap = () => {
             modalTitle="Select a token"
             tokenFieldId="tokenA"
             setTokensData={newTokensData => {
+              setNeedApproval(true);
+              setApproved(false);
               const { tokenA } = newTokensData();
               if (tokenA && typeof tokenA.hederaId !== 'undefined') {
                 const newSwapData = {
-                  tokenIdOut: tokenA.hederaId,
-                  tokenOutDecimals: tokenA.decimals,
+                  tokenIdIn: tokenA.hederaId,
+                  tokenInDecimals: tokenA.decimals,
                   amountIn: '',
                   amountOut: '',
                 };
@@ -648,13 +640,19 @@ const Swap = () => {
     const { tokenA, tokenB } = tokensData;
     if (Object.keys(tokenB).length === 0 || Object.keys(tokenA).length === 0)
       return 'Select a token';
-    if (getInsufficientTokenIn()) return `Unsufficient ${tokenA.symbol} balance`;
+    if (getInsufficientTokenIn()) return `Insufficient ${tokenA.symbol} balance`;
     if (insufficientLiquidity) return 'Insufficient liquidity for this trade.';
     return willWrapTokens ? 'wrap' : willUnwrapTokens ? 'unwrap' : 'swap';
   };
 
+  const getTokenIsAssociated = () => {
+    const { tokenB } = tokensData;
+    const notHTS = tokenB.type === TokenType.HBAR || tokenB.type === TokenType.ERC20;
+    return notHTS || userAssociatedTokens?.includes(tokensData.tokenB.hederaId);
+  };
+
   const getSwapButtonDisabledState = () => {
-    return !readyToSwap || !associated;
+    return !readyToSwap || !getTokenIsAssociated();
   };
 
   const getActionButtons = () => {
@@ -667,7 +665,7 @@ const Swap = () => {
             </div>
           ) : (
             <>
-              {readyToApprove && !approved ? (
+              {readyToApprove && needApproval && !approved ? (
                 <div className="d-grid mt-4">
                   <Button
                     loading={loadingApprove}
@@ -679,10 +677,10 @@ const Swap = () => {
                 </div>
               ) : null}
 
-              {readyToAssociate && !associated ? (
+              {readyToAssociate && !getTokenIsAssociated() ? (
                 <div className="d-grid mt-4">
                   <Button
-                    loading={loadingSwap}
+                    loading={loadingAssociate}
                     disabled={!readyToAssociate}
                     onClick={() => handleAssociateClick()}
                   >

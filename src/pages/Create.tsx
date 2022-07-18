@@ -90,8 +90,14 @@ const Create = () => {
     tokenB: false,
   };
 
+  const initialNeedApprovalData = {
+    tokenA: true,
+    tokenB: true,
+  };
+
   // State for approved
   const [approved, setApproved] = useState(initialApproveData);
+  const [needApproval, setNeedApproval] = useState(initialNeedApprovalData);
 
   // State for common pool data
   const [selectedPoolData, setSelectedPoolData] = useState<IPairData>({} as IPairData);
@@ -280,7 +286,6 @@ const Create = () => {
         const successMessage = `Provided exactly ${createPairData.tokenAAmount} ${tokensData.tokenA.symbol} and ${createPairData.tokenBAmount} ${tokensData.tokenB.symbol}`;
 
         setCreatePairData({ ...createPairData, tokenAAmount: '', tokenBAmount: '' });
-        setApproved(initialApproveData);
         setSuccessCreate(true);
         setSuccessMessage(successMessage);
         setReadyToProvide(false);
@@ -304,17 +309,25 @@ const Create = () => {
     };
 
     const { tokenA, tokenB } = tokensData;
+    const hasTokenAData = createPairData.tokenAId && createPairData.tokenAAmount;
+    const hasTokenBData = createPairData.tokenBId && createPairData.tokenBAmount;
 
     if (tokenA.type === TokenType.HBAR) {
-      setApproved(prev => ({ ...prev, tokenA: true }));
+      setNeedApproval(prev => ({ ...prev, tokenA: false }));
     } else {
-      userId && tokenA.hederaId && getAllowanceHTS(userId, tokenA, 'tokenA');
+      setNeedApproval(prev => ({ ...prev, tokenA: true }));
+      if (tokensData.tokenA.type === TokenType.HTS && hasTokenAData && userId) {
+        getAllowanceHTS(userId, tokenA, 'tokenA');
+      }
     }
 
     if (tokenB.type === TokenType.HBAR) {
-      setApproved(prev => ({ ...prev, tokenB: true }));
+      setNeedApproval(prev => ({ ...prev, tokenB: false }));
     } else {
-      userId && tokenB.hederaId && getAllowanceHTS(userId, tokenB, 'tokenB');
+      setNeedApproval(prev => ({ ...prev, tokenB: true }));
+      if (tokensData.tokenB.type === TokenType.HTS && hasTokenBData && userId) {
+        getAllowanceHTS(userId, tokenB, 'tokenB');
+      }
     }
 
     return () => {
@@ -347,7 +360,6 @@ const Create = () => {
     };
 
     setCreatePairData(prev => ({ ...prev, ...newPairData }));
-    setApproved({ tokenA: false, tokenB: false });
     getTokenBalances();
   }, [tokensData, userId, initialBallanceData]);
 
@@ -525,7 +537,14 @@ const Create = () => {
           <ModalSearchContent
             modalTitle="Select a token"
             tokenFieldId="tokenA"
-            setTokensData={setTokensData}
+            setTokensData={tokensData => {
+              const { tokenA } = tokensData();
+              if (tokenA && typeof tokenA.hederaId !== 'undefined') {
+                setNeedApproval(prev => ({ ...prev, tokenA: true }));
+                setApproved(prev => ({ ...prev, tokenA: false }));
+                setTokensData(prev => ({ ...prev, tokenA }));
+              }
+            }}
             closeModal={() => setShowModalA(false)}
             tokenDataList={tokenDataList || []}
             loadingTDL={loadingTDL}
@@ -565,7 +584,14 @@ const Create = () => {
           <ModalSearchContent
             modalTitle="Select token"
             tokenFieldId="tokenB"
-            setTokensData={setTokensData}
+            setTokensData={tokensData => {
+              const { tokenB } = tokensData();
+              if (tokenB && typeof tokenB.hederaId !== 'undefined') {
+                setNeedApproval(prev => ({ ...prev, tokenB: true }));
+                setApproved(prev => ({ ...prev, tokenB: false }));
+                setTokensData(prev => ({ ...prev, tokenB }));
+              }
+            }}
             closeModal={() => setShowModalB(false)}
             tokenDataList={tokenDataList || []}
             loadingTDL={loadingTDL}
@@ -651,8 +677,8 @@ const Create = () => {
       tokenB: { symbol: symbolB },
     } = tokensData;
 
-    if (getInsufficientTokenA()) return `Unsufficient ${symbolA} balance`;
-    if (getInsufficientTokenB()) return `Unsufficient ${symbolB} balance`;
+    if (getInsufficientTokenA()) return `Insufficient ${symbolA} balance`;
+    if (getInsufficientTokenB()) return `Insufficient ${symbolB} balance`;
     if (invalidTokenData()) return 'Invalid pool';
     return tokensInSamePool ? 'Provide' : 'Create';
   };
@@ -660,7 +686,10 @@ const Create = () => {
   const getActionButtons = () => {
     return connected ? (
       <div className="mt-5">
-        {tokensData.tokenA.hederaId && !approved.tokenA && createPairData.tokenAAmount ? (
+        {tokensData.tokenA.hederaId &&
+        needApproval.tokenA &&
+        !approved.tokenA &&
+        createPairData.tokenAAmount ? (
           <div className="d-grid mt-4">
             <Button
               loading={loadingApprove}
@@ -669,7 +698,10 @@ const Create = () => {
           </div>
         ) : null}
 
-        {tokensData.tokenB.hederaId && !approved.tokenB && createPairData.tokenBAmount ? (
+        {tokensData.tokenB.hederaId &&
+        needApproval.tokenB &&
+        !approved.tokenB &&
+        createPairData.tokenBAmount ? (
           <div className="d-grid mt-4">
             <Button
               loading={loadingApprove}
