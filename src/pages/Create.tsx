@@ -748,13 +748,14 @@ const Create = () => {
     const token1Symbol = hasSelectedPool ? selectedPoolData.token1Symbol : tokensData.tokenB.symbol;
     return (
       <>
-        <div className="d-flex m-4">
+        <div className="d-flex">
           {formatIcons([token0Symbol, token1Symbol])}
           <p className="text-small ms-3">
             {token0Symbol}/{token1Symbol}
           </p>
         </div>
-        <div className="m-4 rounded border border-secondary justify-content-between ">
+
+        <div className="mt-4 rounded border border-secondary justify-content-between ">
           <div className="d-flex justify-content-between align-items-center m-4">
             <div className="d-flex align-items-center">
               <IconToken symbol={token0Symbol} />
@@ -776,7 +777,8 @@ const Create = () => {
             </div>
           </div>
         </div>
-        <div className="m-4 rounded border border-secondary justify-content-between ">
+
+        <div className="mt-4 rounded border border-secondary justify-content-between ">
           {getTokensRatioSection()}
         </div>
       </>
