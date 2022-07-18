@@ -4,11 +4,19 @@ import { ITokenData, TokenType } from '../interfaces/tokens';
 import { QueryHookOptions, useQuery } from '@apollo/client';
 import { GET_TOKENS } from '../GraphQL/Queries';
 import { NATIVE_TOKEN } from '../utils/tokenUtils';
+import { REFRESH_TIME } from '../constants';
 
 const useTokens = (useQueryOptions: QueryHookOptions = {}) => {
   const [tokens, setTokens] = useState<ITokenData[]>();
 
-  const { data, loading, error } = useQuery(GET_TOKENS, useQueryOptions);
+  const { loading, data, error, startPolling, stopPolling } = useQuery(GET_TOKENS, useQueryOptions);
+
+  useEffect(() => {
+    startPolling(useQueryOptions.pollInterval || REFRESH_TIME);
+    return () => {
+      stopPolling();
+    };
+  }, [startPolling, stopPolling, useQueryOptions]);
 
   useEffect(() => {
     if (data) {

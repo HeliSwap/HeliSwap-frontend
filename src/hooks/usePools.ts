@@ -3,11 +3,21 @@ import { IPairData } from '../interfaces/tokens';
 
 import { QueryHookOptions, useQuery } from '@apollo/client';
 import { GET_POOLS } from '../GraphQL/Queries';
+import { REFRESH_TIME } from '../constants';
 
 const usePools = (useQueryOptions: QueryHookOptions = {}) => {
   const [pools, setPools] = useState<IPairData[]>([]);
+  const { loading, data, error, startPolling, stopPolling, refetch } = useQuery(
+    GET_POOLS,
+    useQueryOptions,
+  );
 
-  const { data, loading, error, refetch } = useQuery(GET_POOLS, useQueryOptions);
+  useEffect(() => {
+    startPolling(useQueryOptions.pollInterval || REFRESH_TIME);
+    return () => {
+      stopPolling();
+    };
+  }, [startPolling, stopPolling, useQueryOptions]);
 
   useEffect(() => {
     if (data) {
