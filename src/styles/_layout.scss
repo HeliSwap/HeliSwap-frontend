@@ -33,6 +33,10 @@ strong {
   flex: 1;
 }
 
+.bg-dark {
+  background-color: $dark;
+}
+
 // Containers
 .wrapper {
   display: flex;
