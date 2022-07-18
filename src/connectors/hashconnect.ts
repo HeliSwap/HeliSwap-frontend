@@ -3,14 +3,12 @@ import { Transaction, AccountId, TransactionId } from '@hashgraph/sdk';
 
 class Hashconnect {
   constructor(
-    setLoading: (loading: boolean) => void,
     setExtensionFound: (loading: boolean) => void,
     setConnected: (loading: boolean) => void,
     setUserId: (userId: string) => void,
     setIsHashpackLoading: (loading: boolean) => void,
   ) {
     this.hashconnect = new HashConnect();
-    this.setLoading = setLoading;
     this.setExtensionFound = setExtensionFound;
     this.setConnected = setConnected;
     this.setUserId = setUserId;
@@ -21,7 +19,6 @@ class Hashconnect {
   hashconnect: HashConnect;
   status: string = 'Initializing';
 
-  setLoading: (loading: boolean) => void;
   setUserId: (userId: string) => void;
   setExtensionFound: (loading: boolean) => void;
   setIsHashpackLoading: (loading: boolean) => void;
@@ -59,7 +56,6 @@ class Hashconnect {
       await this.hashconnect.init(this.appMetadata, this.saveData.privateKey);
       await this.hashconnect.connect(this.saveData.topic, this.saveData.pairedWalletData!);
 
-      this.setLoading(false);
       this.setExtensionFound(true);
       this.setConnected(true);
     } else {
@@ -89,7 +85,6 @@ class Hashconnect {
     this.hashconnect.foundExtensionEvent.on(data => {
       this.availableExtensions.push(data);
 
-      this.setLoading(false);
       this.setExtensionFound(true);
     });
 
@@ -104,7 +99,6 @@ class Hashconnect {
       });
 
       this.saveDataInLocalstorage();
-      this.setLoading(false);
       this.setConnected(true);
       this.setIsHashpackLoading(false);
     });
