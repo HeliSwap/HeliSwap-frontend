@@ -1,5 +1,5 @@
 import React from 'react';
-import Icon from './Icon';
+// import Icon from './Icon';
 
 interface IWalletBalance {
   walletBalance?: string;
@@ -8,7 +8,7 @@ interface IWalletBalance {
 
 const WalletBalance = ({ walletBalance, onMaxButtonClick }: IWalletBalance) => {
   return walletBalance ? (
-    <p className="text-gray text-small">
+    <p className="text-gray text-micro">
       Balance: <span className="text-numeric">{walletBalance}</span>
       {parseFloat(walletBalance) > 0 && onMaxButtonClick ? (
         <span
@@ -22,7 +22,7 @@ const WalletBalance = ({ walletBalance, onMaxButtonClick }: IWalletBalance) => {
   ) : (
     <p className="d-flex align-items-center">
       <span className="text-gray text-micro me-3">Balance not viewable</span>{' '}
-      <Icon color="gray" name="hint" />
+      {/* <Icon color="gray" name="hint" /> */}
     </p>
   );
 };

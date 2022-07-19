@@ -20,7 +20,9 @@ const InputTokenSelector = ({
         {buttonSelectorComponent}
       </div>
 
-      <div className="d-flex justify-content-end mt-7">{walletBalanceComponent}</div>
+      {walletBalanceComponent ? (
+        <div className="d-flex justify-content-end mt-4">{walletBalanceComponent}</div>
+      ) : null}
     </div>
   );
 };

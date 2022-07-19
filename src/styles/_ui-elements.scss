@@ -81,6 +81,11 @@
   display: inline-flex;
   width: 28px;
   height: 28px;
+
+  &.is-large {
+    width: 44px;
+    height: 44px;
+  }
 }
 
 /* Containers */
@@ -107,9 +112,17 @@
 }
 
 .container-input-token {
+  height: 108px;
   background-color: $neutral-700;
   border-radius: $border-radius;
   padding: 12px;
+  border: 1px solid $neutral-700;
+  transition: border 0.15s linear;
+
+  &:focus-within,
+  &:hover {
+    border-color: $neutral-100;
+  }
 
   .input-token {
     color: $neutral-300;
@@ -173,6 +186,12 @@
     display: grid;
     gap: 1em;
     grid-template-columns: 30px 3fr 1fr;
+    transition: box-shadow 0.1s linear;
+    cursor: pointer;
+
+    &:hover {
+      box-shadow: inset 0px 0px 0px 1px $neutral-100;
+    }
 
     &.with-4-columns {
       grid-template-columns: 30px 2fr 1fr 1fr;

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Hashconnect from '../connectors/hashconnect';
+import { HEALTH_CHECK_INTERVAL } from '../constants';
 import useHealthCheck from '../hooks/useHealthCheck';
 import SDK from '../sdk/sdk';
 
@@ -8,7 +9,7 @@ const contextInitialValue = {
   connection: {
     userId: '',
     connected: false,
-    isConnectionLoading: true,
+    isHashpackLoading: false,
     extensionFound: false,
     connectWallet: () => {},
     disconnectWallet: () => {},
@@ -26,21 +27,26 @@ interface IGlobalProps {
 export const GlobalProvider = ({ children }: IGlobalProps) => {
   const [sdk, setSdk] = useState({} as SDK);
   const [connected, setConnected] = useState(false);
-  const [isConnectionLoading, setIsConnectionLoading] = useState(true);
+  const [isHashpackLoading, setIsHashpackLoading] = useState(false);
   const [extensionFound, setExtensionFound] = useState(false);
   const [hashconnectConnectorInstance, setHashconnectConnectorInstance] = useState<Hashconnect>();
   const [userId, setUserId] = useState('');
 
   const { timestamp, error } = useHealthCheck({
     fetchPolicy: 'network-only',
-    pollInterval: 5000,
+    pollInterval: HEALTH_CHECK_INTERVAL,
   });
 
   const nowSeconds = Date.now() / 1000;
-  const isRunning = !error ? (timestamp ? nowSeconds >= Number(timestamp) : false) : false;
+  const isRunning = !error
+    ? timestamp
+      ? nowSeconds + HEALTH_CHECK_INTERVAL / 1000 >= Number(timestamp)
+      : false
+    : false;
 
   const connectWallet = () => {
     hashconnectConnectorInstance?.connect();
+    setIsHashpackLoading(true);
   };
 
   const disconnectWallet = () => {
@@ -51,7 +57,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
   const connection = {
     connected,
     userId,
-    isConnectionLoading,
+    isHashpackLoading,
     extensionFound,
     connectWallet,
     disconnectWallet,
@@ -62,10 +68,10 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
   useEffect(() => {
     const initHashconnectConnector = async () => {
       const hashconnectConnector = new Hashconnect(
-        setIsConnectionLoading,
         setExtensionFound,
         setConnected,
         setUserId,
+        setIsHashpackLoading,
       );
 
       await hashconnectConnector.initHashconnect();

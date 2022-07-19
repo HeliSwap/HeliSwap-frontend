@@ -2,6 +2,7 @@ import React from 'react';
 import useTokens from '../hooks/useTokens';
 import Loader from '../components/Loader';
 import IconToken from '../components/IconToken';
+import { REFRESH_TIME } from '../constants';
 
 const Tokens = () => {
   const {
@@ -10,7 +11,7 @@ const Tokens = () => {
     loading: loadingTokens,
   } = useTokens({
     fetchPolicy: 'network-only',
-    pollInterval: 10000,
+    pollInterval: REFRESH_TIME,
   });
 
   const haveTokens = tokens && tokens.length > 0;

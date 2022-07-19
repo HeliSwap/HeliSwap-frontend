@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
 import { useParams } from 'react-router-dom';
@@ -22,8 +23,9 @@ import ButtonSelector from '../components/ButtonSelector';
 import WalletBalance from '../components/WalletBalance';
 
 import errorMessages from '../content/errors';
-import { checkAllowanceHTS, getTokenBalance, idToAddress } from '../utils/tokenUtils';
+import { checkAllowanceHTS, getTokenBalance, idToAddress, NATIVE_TOKEN } from '../utils/tokenUtils';
 import {
+  formatStringETHtoPriceFormatted,
   formatStringToBigNumberEthersWei,
   formatStringToBigNumberWei,
   stripStringToFixedDecimals,
@@ -31,7 +33,7 @@ import {
 import { getTransactionSettings } from '../utils/transactionUtils';
 import usePools from '../hooks/usePools';
 import useTokens from '../hooks/useTokens';
-import { MAX_UINT_ERC20, MAX_UINT_HTS, POOLS_FEE } from '../constants';
+import { MAX_UINT_ERC20, MAX_UINT_HTS, POOLS_FEE, REFRESH_TIME } from '../constants';
 import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
 import { formatIcons } from '../utils/iconUtils';
 import IconToken from '../components/IconToken';
@@ -47,6 +49,7 @@ const Create = () => {
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance, connected, connectWallet } = connection;
   const { address } = useParams();
+  const navigate = useNavigate();
 
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
@@ -64,12 +67,12 @@ const Create = () => {
   // State for pools
   const { pools: poolsData } = usePools({
     fetchPolicy: 'network-only',
-    pollInterval: 10000,
+    pollInterval: REFRESH_TIME,
   });
 
   const { loading: loadingTDL, tokens: tokenDataList } = useTokens({
     fetchPolicy: 'network-only',
-    pollInterval: 10000,
+    pollInterval: REFRESH_TIME,
   });
 
   const initialCreateData: ICreatePairData = {
@@ -89,8 +92,14 @@ const Create = () => {
     tokenB: false,
   };
 
+  const initialNeedApprovalData = {
+    tokenA: true,
+    tokenB: true,
+  };
+
   // State for approved
   const [approved, setApproved] = useState(initialApproveData);
+  const [needApproval, setNeedApproval] = useState(initialNeedApprovalData);
 
   // State for common pool data
   const [selectedPoolData, setSelectedPoolData] = useState<IPairData>({} as IPairData);
@@ -279,7 +288,6 @@ const Create = () => {
         const successMessage = `Provided exactly ${createPairData.tokenAAmount} ${tokensData.tokenA.symbol} and ${createPairData.tokenBAmount} ${tokensData.tokenB.symbol}`;
 
         setCreatePairData({ ...createPairData, tokenAAmount: '', tokenBAmount: '' });
-        setApproved(initialApproveData);
         setSuccessCreate(true);
         setSuccessMessage(successMessage);
         setReadyToProvide(false);
@@ -293,6 +301,10 @@ const Create = () => {
     }
   };
 
+  const handleBackClick = () => {
+    navigate('/pools');
+  };
+
   useEffect(() => {
     const getAllowanceHTS = async (userId: string, token: ITokenData, index: string) => {
       const key = `${index}Amount`;
@@ -303,17 +315,25 @@ const Create = () => {
     };
 
     const { tokenA, tokenB } = tokensData;
+    const hasTokenAData = createPairData.tokenAId && createPairData.tokenAAmount;
+    const hasTokenBData = createPairData.tokenBId && createPairData.tokenBAmount;
 
     if (tokenA.type === TokenType.HBAR) {
-      setApproved(prev => ({ ...prev, tokenA: true }));
+      setNeedApproval(prev => ({ ...prev, tokenA: false }));
     } else {
-      userId && tokenA.hederaId && getAllowanceHTS(userId, tokenA, 'tokenA');
+      setNeedApproval(prev => ({ ...prev, tokenA: true }));
+      if (tokensData.tokenA.type === TokenType.HTS && hasTokenAData && userId) {
+        getAllowanceHTS(userId, tokenA, 'tokenA');
+      }
     }
 
     if (tokenB.type === TokenType.HBAR) {
-      setApproved(prev => ({ ...prev, tokenB: true }));
+      setNeedApproval(prev => ({ ...prev, tokenB: false }));
     } else {
-      userId && tokenB.hederaId && getAllowanceHTS(userId, tokenB, 'tokenB');
+      setNeedApproval(prev => ({ ...prev, tokenB: true }));
+      if (tokensData.tokenB.type === TokenType.HTS && hasTokenBData && userId) {
+        getAllowanceHTS(userId, tokenB, 'tokenB');
+      }
     }
 
     return () => {
@@ -346,7 +366,6 @@ const Create = () => {
     };
 
     setCreatePairData(prev => ({ ...prev, ...newPairData }));
-    setApproved({ tokenA: false, tokenB: false });
     getTokenBalances();
   }, [tokensData, userId, initialBallanceData]);
 
@@ -438,12 +457,21 @@ const Create = () => {
         const chosenPool =
           poolsData.find((pool: IPairData) => pool.pairAddress === address) || ({} as IPairData);
         const { token0: token0Address, token1: token1Address } = chosenPool;
-        const tokenA =
-          tokenDataList.find((token: ITokenData) => token.address === token0Address) ||
-          ({} as ITokenData);
-        const tokenB =
-          tokenDataList.find((token: ITokenData) => token.address === token1Address) ||
-          ({} as ITokenData);
+
+        // Check if one of tokens is WHBAR - to be switched for HBAR
+        const isTokenAWrappedHBAR =
+          token0Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+        const isTokenBWrappedHBAR =
+          token1Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+
+        const tokenA = isTokenAWrappedHBAR
+          ? NATIVE_TOKEN
+          : tokenDataList.find((token: ITokenData) => token.address === token0Address) ||
+            ({} as ITokenData);
+        const tokenB = isTokenBWrappedHBAR
+          ? NATIVE_TOKEN
+          : tokenDataList.find((token: ITokenData) => token.address === token1Address) ||
+            ({} as ITokenData);
 
         setTokensData({ tokenA, tokenB });
         //We want to set the tokens from the pool selected just once
@@ -515,7 +543,14 @@ const Create = () => {
           <ModalSearchContent
             modalTitle="Select a token"
             tokenFieldId="tokenA"
-            setTokensData={setTokensData}
+            setTokensData={tokensData => {
+              const { tokenA } = tokensData();
+              if (tokenA && typeof tokenA.hederaId !== 'undefined') {
+                setNeedApproval(prev => ({ ...prev, tokenA: true }));
+                setApproved(prev => ({ ...prev, tokenA: false }));
+                setTokensData(prev => ({ ...prev, tokenA }));
+              }
+            }}
             closeModal={() => setShowModalA(false)}
             tokenDataList={tokenDataList || []}
             loadingTDL={loadingTDL}
@@ -555,7 +590,14 @@ const Create = () => {
           <ModalSearchContent
             modalTitle="Select token"
             tokenFieldId="tokenB"
-            setTokensData={setTokensData}
+            setTokensData={tokensData => {
+              const { tokenB } = tokensData();
+              if (tokenB && typeof tokenB.hederaId !== 'undefined') {
+                setNeedApproval(prev => ({ ...prev, tokenB: true }));
+                setApproved(prev => ({ ...prev, tokenB: false }));
+                setTokensData(prev => ({ ...prev, tokenB }));
+              }
+            }}
             closeModal={() => setShowModalB(false)}
             tokenDataList={tokenDataList || []}
             loadingTDL={loadingTDL}
@@ -577,15 +619,18 @@ const Create = () => {
     );
   };
 
+  const tokenBARatio = Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount);
+  const tokenABRatio = Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount);
+  const tokenBARatioFormatted = formatStringETHtoPriceFormatted(tokenBARatio.toString());
+  const tokenABRatioFormatted = formatStringETHtoPriceFormatted(tokenABRatio.toString());
+
   const getTokensRatioSection = () => {
     return readyToProvide ? (
       <div className="my-4">
         <div className="mt-3 d-flex justify-content-around">
           <div className="text-center">
             <p>
-              <span className="text-small text-numeric">
-                {Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount)}
-              </span>
+              <span className="text-small text-numeric">{tokenBARatioFormatted}</span>
             </p>
             <p className="text-micro">
               {tokensData.tokenB.symbol} per {tokensData.tokenA.symbol}
@@ -594,9 +639,7 @@ const Create = () => {
 
           <div className="text-center">
             <p>
-              <span className="text-small text-numeric">
-                {Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount)}
-              </span>
+              <span className="text-small text-numeric">{tokenABRatioFormatted}</span>
             </p>
             <p className="text-micro">
               {tokensData.tokenA.symbol} per {tokensData.tokenB.symbol}
@@ -640,8 +683,8 @@ const Create = () => {
       tokenB: { symbol: symbolB },
     } = tokensData;
 
-    if (getInsufficientTokenA()) return `Unsufficient ${symbolA} balance`;
-    if (getInsufficientTokenB()) return `Unsufficient ${symbolB} balance`;
+    if (getInsufficientTokenA()) return `Insufficient ${symbolA} balance`;
+    if (getInsufficientTokenB()) return `Insufficient ${symbolB} balance`;
     if (invalidTokenData()) return 'Invalid pool';
     return tokensInSamePool ? 'Provide' : 'Create';
   };
@@ -649,25 +692,27 @@ const Create = () => {
   const getActionButtons = () => {
     return connected ? (
       <div className="mt-5">
-        {tokensData.tokenA.hederaId && !approved.tokenA && createPairData.tokenAAmount ? (
+        {tokensData.tokenA.hederaId &&
+        needApproval.tokenA &&
+        !approved.tokenA &&
+        createPairData.tokenAAmount ? (
           <div className="d-grid mt-4">
             <Button
               loading={loadingApprove}
               onClick={() => handleApproveClick('tokenA')}
-              className="mx-2"
             >{`Approve ${tokensData.tokenA.symbol}`}</Button>
           </div>
         ) : null}
-        {tokensData.tokenB.hederaId && !approved.tokenB && createPairData.tokenBAmount ? (
+
+        {tokensData.tokenB.hederaId &&
+        needApproval.tokenB &&
+        !approved.tokenB &&
+        createPairData.tokenBAmount ? (
           <div className="d-grid mt-4">
-            <div className="d-grid mt-4">
-              {' '}
-              <Button
-                loading={loadingApprove}
-                onClick={() => handleApproveClick('tokenB')}
-                className="mx-2"
-              >{`Approve ${tokensData.tokenB.symbol}`}</Button>
-            </div>
+            <Button
+              loading={loadingApprove}
+              onClick={() => handleApproveClick('tokenB')}
+            >{`Approve ${tokensData.tokenB.symbol}`}</Button>
           </div>
         ) : null}
 
@@ -703,17 +748,18 @@ const Create = () => {
     const token1Symbol = hasSelectedPool ? selectedPoolData.token1Symbol : tokensData.tokenB.symbol;
     return (
       <>
-        <div className="d-flex m-4">
-          {formatIcons([token0Symbol, token1Symbol])}
-          <p className="text-small ms-3">
+        <div className="d-flex align-items-center">
+          {formatIcons([token0Symbol, token1Symbol], 'large')}
+          <p className="text-subheader ms-3">
             {token0Symbol}/{token1Symbol}
           </p>
         </div>
-        <div className="m-4 rounded border border-secondary justify-content-between ">
+
+        <div className="mt-4 rounded border border-secondary justify-content-between ">
           <div className="d-flex justify-content-between align-items-center m-4">
             <div className="d-flex align-items-center">
               <IconToken symbol={token0Symbol} />
-              <span className="text-main text-bold ms-3">{token0Symbol}</span>
+              <span className="text-main ms-3">{token0Symbol}</span>
             </div>
 
             <div className="d-flex justify-content-end align-items-center">
@@ -723,7 +769,7 @@ const Create = () => {
           <div className="d-flex justify-content-between align-items-center m-4">
             <div className="d-flex align-items-center">
               <IconToken symbol={token1Symbol} />
-              <span className="text-main text-bold ms-3">{token1Symbol}</span>
+              <span className="text-main ms-3">{token1Symbol}</span>
             </div>
 
             <div className="d-flex justify-content-end align-items-center">
@@ -731,7 +777,8 @@ const Create = () => {
             </div>
           </div>
         </div>
-        <div className="m-4 rounded border border-secondary justify-content-between ">
+
+        <div className="mt-4 rounded border border-secondary justify-content-between ">
           {getTokensRatioSection()}
         </div>
       </>
@@ -741,7 +788,7 @@ const Create = () => {
   return (
     <div className="d-flex justify-content-center">
       <div className="container-action">
-        <PageHeader slippage="create" title={pageTitle} />
+        <PageHeader handleBackClick={handleBackClick} slippage="create" title={pageTitle} />
         {getErrorMessage()}
         {getProvideSection()}
       </div>

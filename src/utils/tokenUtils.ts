@@ -290,7 +290,7 @@ const getUserHTSData = async (userId: string) => {
   return tokens?._map;
 };
 
-export const NATIVE_TOKEN = {
+export const NATIVE_TOKEN: ITokenData = {
   hederaId: '',
   name: 'HBAR',
   symbol: 'HBAR',

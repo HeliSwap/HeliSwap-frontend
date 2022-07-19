@@ -10,17 +10,19 @@ import { getHBarPrice, idToAddress } from '../utils/tokenUtils';
 
 import PoolInfo from '../components/PoolInfo';
 import RemoveLiquidity from '../components/RemoveLiquidity';
+import Button from '../components/Button';
 import usePools from '../hooks/usePools';
+import { REFRESH_TIME } from '../constants';
 
 const Pools = () => {
   const contextValue = useContext(GlobalContext);
   const { connection } = contextValue;
-  const { userId } = connection;
+  const { userId, connected, connectWallet } = connection;
 
   const [getPoolsByUser, { error, loading, data }] = useLazyQuery(GET_POOLS_BY_USER);
   const { loading: loadingPools, pools: allPairsData } = usePools({
     fetchPolicy: 'network-only',
-    pollInterval: 10000,
+    pollInterval: REFRESH_TIME,
   });
 
   const [pairData, setPairData] = useState<IPairData[]>([]);
@@ -41,8 +43,6 @@ const Pools = () => {
     [PageViews.MY_POOLS]: pairData,
   };
 
-  console.log('pairData', pairData);
-
   const poolsToShow = poolsMapping[currentView];
 
   const handleTabItemClick = (currentView: PageViews) => {
@@ -50,12 +50,15 @@ const Pools = () => {
   };
 
   useEffect(() => {
-    userId &&
+    if (userId) {
       getPoolsByUser({
         variables: { address: idToAddress(userId) },
-        pollInterval: 10000,
+        pollInterval: REFRESH_TIME,
         fetchPolicy: 'network-only',
       });
+    } else {
+      setPairData([]);
+    }
   }, [userId, getPoolsByUser]);
 
   useEffect(() => {
@@ -118,42 +121,53 @@ const Pools = () => {
             </div>
           ) : null}
 
-          {loading && loadingPools ? (
-            <p className="text-info">Loading pools...</p>
-          ) : havePools ? (
-            <div className="table-pools">
-              <div
-                className={`table-pools-row ${
-                  currentView === PageViews.ALL_POOLS ? 'with-4-columns' : ''
-                }`}
-              >
-                <div className="table-pools-cell">
-                  <span className="text-small">#</span>
-                </div>
-                <div className="table-pools-cell">
-                  <span className="text-small">Pool</span>
-                </div>
-                {currentView === PageViews.ALL_POOLS ? (
-                  <div className="table-pools-cell justify-content-end">
-                    <span className="text-small">TVL</span>
+          {connected ? (
+            loading && loadingPools ? (
+              <p className="text-info">Loading pools...</p>
+            ) : havePools ? (
+              <div className="table-pools">
+                <div
+                  className={`table-pools-row ${
+                    currentView === PageViews.ALL_POOLS ? 'with-4-columns' : ''
+                  }`}
+                >
+                  <div className="table-pools-cell">
+                    <span className="text-small">#</span>
                   </div>
-                ) : null}
+                  <div className="table-pools-cell">
+                    <span className="text-small">Pool</span>
+                  </div>
+                  {currentView === PageViews.ALL_POOLS ? (
+                    <div className="table-pools-cell justify-content-end">
+                      <span className="text-small">TVL</span>
+                    </div>
+                  ) : null}
+                </div>
+                {poolsToShow.map((item, index) => (
+                  <PoolInfo
+                    setShowRemoveContainer={setShowRemoveContainer}
+                    setCurrentPoolIndex={setCurrentPoolIndex}
+                    index={index}
+                    key={index}
+                    pairData={item}
+                    allPoolsData={allPairsData}
+                    hbarPrice={hbarPrice}
+                    view={currentView}
+                  />
+                ))}
               </div>
-              {poolsToShow.map((item, index) => (
-                <PoolInfo
-                  setShowRemoveContainer={setShowRemoveContainer}
-                  setCurrentPoolIndex={setCurrentPoolIndex}
-                  index={index}
-                  key={index}
-                  pairData={item}
-                  allPoolsData={allPairsData}
-                  hbarPrice={hbarPrice}
-                  view={currentView}
-                />
-              ))}
-            </div>
+            ) : (
+              <p className="text-warning text-center">No pools found</p>
+            )
           ) : (
-            <p className="text-warning text-center">No pools found</p>
+            <div className="rounded bg-dark p-4 text-center">
+              <p>Your active liquidity positions will appear here.</p>
+              <div className="mt-5">
+                <Button onClick={connectWallet} type="primary">
+                  Connect Wallet
+                </Button>
+              </div>
+            </div>
           )}
         </div>
       )}

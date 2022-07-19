@@ -1,17 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import { GlobalContext } from '../providers/Global';
+import Button from './Button';
 
 const Header = () => {
   const contextValue = useContext(GlobalContext);
-  const {
-    connected,
-    connectWallet,
-    disconnectWallet,
-    extensionFound,
-    isConnectionLoading,
-    userId,
-  } = contextValue.connection;
+  const { connected, connectWallet, disconnectWallet, extensionFound, isHashpackLoading, userId } =
+    contextValue.connection;
   const { isRunning } = contextValue;
 
   const [userBalance, setUserBalance] = useState('0.0');
@@ -40,36 +35,40 @@ const Header = () => {
       <div className="d-flex justify-content-end">
         <div className="d-flex align-items-center">
           {isRunning ? <span className="me-3">🟢</span> : <span className="me-3">🔴</span>}
-          {!isConnectionLoading ? (
-            extensionFound ? (
-              connected ? (
-                <>
-                  <div className="container-connected">
-                    <div className="text-small">{userBalance} HBAR</div>
-                    <div className="container-address">
-                      <div className="text-small">{userId}</div>
-                    </div>
+          {extensionFound ? (
+            isHashpackLoading ? (
+              <p className="text-warning mx-2">Please aprove from your wallet</p>
+            ) : connected ? (
+              <>
+                <div className="container-connected">
+                  <div className="text-small">{userBalance} HBAR</div>
+                  <div className="container-address">
+                    <div className="text-small">{userId}</div>
                   </div>
-                  <button
-                    onClick={() => disconnectWallet()}
-                    className="btn btn-sm btn-outline-primary mx-2"
-                  >
-                    Disconnect
-                  </button>
-                </>
-              ) : (
-                <button
-                  onClick={() => connectWallet()}
-                  className="btn btn-sm btn-outline-primary mx-2"
+                </div>
+                <Button
+                  onClick={() => disconnectWallet()}
+                  className="mx-2"
+                  type="primary"
+                  size="small"
+                  outline={true}
                 >
-                  Connect wallet
-                </button>
-              )
+                  Disconnect
+                </Button>
+              </>
             ) : (
-              <p className="text-warning mx-2">Please install a wallet</p>
+              <Button onClick={() => connectWallet()} type="primary" size="small" className="mx-2">
+                Connect wallet
+              </Button>
             )
           ) : (
-            <p className="text-success mx-2">Loading...</p>
+            <p className="text-warning mx-2">
+              Please{' '}
+              <a target="_blank" className="link" rel="noreferrer" href="https://www.hashpack.app/">
+                install
+              </a>{' '}
+              a wallet
+            </p>
           )}
         </div>
       </div>
