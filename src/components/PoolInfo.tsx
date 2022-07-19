@@ -74,6 +74,7 @@ const PoolInfo = ({
   return (
     <>
       <div
+        onClick={() => setShowPoolDetails(prev => !prev)}
         className={`table-pools-row ${index % 2 === 0 ? 'is-gray' : ''} ${
           view === PageViews.ALL_POOLS ? 'with-4-columns' : ''
         }`}
@@ -94,10 +95,7 @@ const PoolInfo = ({
           </div>
         ) : null}
         <div className="table-pools-cell d-flex justify-content-end">
-          <p
-            onClick={() => setShowPoolDetails(prev => !prev)}
-            className="d-inline-flex align-items-center link"
-          >
+          <p className="d-inline-flex align-items-center text-white">
             <span className="text-small text-bold me-2">More</span>
             <Icon name="chevron" />
           </p>
