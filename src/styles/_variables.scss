@@ -270,7 +270,7 @@ $input-border-color: $neutral-700;
 $input-focus-border-color: $neutral-100;
 $input-focus-box-shadow: none;
 $input-height: auto;
-$input-line-height: 1.57;
+$input-line-height: 1.71;
 $input-placeholder-color: $secondary;
 $form-group-margin-bottom: 0;
 $input-bg: $neutral-700;
@@ -279,6 +279,9 @@ $input-padding-x: 12px;
 $input-font-size: 14px;
 $input-disabled-bg: $neutral-800;
 $input-disabled-border-color: $neutral-500;
+
+$input-padding-y-sm:                    7px;
+$input-padding-x-sm:                    12px;
 
 $form-select-indicator: none;
 

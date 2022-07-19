@@ -13,6 +13,7 @@ import WBTC from '../icons/tokens/WBTC.png';
 interface IIconTokenProps {
   symbol: string;
   className?: string;
+  size?: 'large' | 'default';
 }
 
 interface ITokenMapping {
@@ -35,11 +36,16 @@ const tokenMapping: ITokenMapping = {
 
 const defaultIconToken = unknown;
 
-const IconToken = ({ symbol, className = '' }: IIconTokenProps) => {
+const IconToken = ({ symbol, className = '', size = 'default' }: IIconTokenProps) => {
   const iconFound = tokenMapping[symbol];
+  const sizeMapping = {
+    large: 'is-large',
+    default: '',
+  };
+
   return (
     <img
-      className={`icon-token ${className}`}
+      className={`icon-token ${className} ${sizeMapping[size]}`}
       src={iconFound ? tokenMapping[symbol] : defaultIconToken}
       alt="token-icon"
     />

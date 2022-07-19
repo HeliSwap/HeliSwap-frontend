@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
 import { useParams } from 'react-router-dom';
@@ -48,6 +49,7 @@ const Create = () => {
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance, connected, connectWallet } = connection;
   const { address } = useParams();
+  const navigate = useNavigate();
 
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
@@ -297,6 +299,10 @@ const Create = () => {
     } finally {
       setLoadingCreate(false);
     }
+  };
+
+  const handleBackClick = () => {
+    navigate('/pools');
   };
 
   useEffect(() => {
@@ -742,17 +748,18 @@ const Create = () => {
     const token1Symbol = hasSelectedPool ? selectedPoolData.token1Symbol : tokensData.tokenB.symbol;
     return (
       <>
-        <div className="d-flex m-4">
-          {formatIcons([token0Symbol, token1Symbol])}
-          <p className="text-small ms-3">
+        <div className="d-flex align-items-center">
+          {formatIcons([token0Symbol, token1Symbol], 'large')}
+          <p className="text-subheader ms-3">
             {token0Symbol}/{token1Symbol}
           </p>
         </div>
-        <div className="m-4 rounded border border-secondary justify-content-between ">
+
+        <div className="mt-4 rounded border border-secondary justify-content-between ">
           <div className="d-flex justify-content-between align-items-center m-4">
             <div className="d-flex align-items-center">
               <IconToken symbol={token0Symbol} />
-              <span className="text-main text-bold ms-3">{token0Symbol}</span>
+              <span className="text-main ms-3">{token0Symbol}</span>
             </div>
 
             <div className="d-flex justify-content-end align-items-center">
@@ -762,7 +769,7 @@ const Create = () => {
           <div className="d-flex justify-content-between align-items-center m-4">
             <div className="d-flex align-items-center">
               <IconToken symbol={token1Symbol} />
-              <span className="text-main text-bold ms-3">{token1Symbol}</span>
+              <span className="text-main ms-3">{token1Symbol}</span>
             </div>
 
             <div className="d-flex justify-content-end align-items-center">
@@ -770,7 +777,8 @@ const Create = () => {
             </div>
           </div>
         </div>
-        <div className="m-4 rounded border border-secondary justify-content-between ">
+
+        <div className="mt-4 rounded border border-secondary justify-content-between ">
           {getTokensRatioSection()}
         </div>
       </>
@@ -780,7 +788,7 @@ const Create = () => {
   return (
     <div className="d-flex justify-content-center">
       <div className="container-action">
-        <PageHeader slippage="create" title={pageTitle} />
+        <PageHeader handleBackClick={handleBackClick} slippage="create" title={pageTitle} />
         {getErrorMessage()}
         {getProvideSection()}
       </div>

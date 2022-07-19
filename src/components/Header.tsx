@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import { GlobalContext } from '../providers/Global';
+import Button from './Button';
 
 const Header = () => {
   const contextValue = useContext(GlobalContext);
@@ -45,20 +46,20 @@ const Header = () => {
                     <div className="text-small">{userId}</div>
                   </div>
                 </div>
-                <button
+                <Button
                   onClick={() => disconnectWallet()}
-                  className="btn btn-sm btn-outline-primary mx-2"
+                  className="mx-2"
+                  type="primary"
+                  size="small"
+                  outline={true}
                 >
                   Disconnect
-                </button>
+                </Button>
               </>
             ) : (
-              <button
-                onClick={() => connectWallet()}
-                className="btn btn-sm btn-outline-primary mx-2"
-              >
+              <Button onClick={() => connectWallet()} type="primary" size="small" className="mx-2">
                 Connect wallet
-              </button>
+              </Button>
             )
           ) : (
             <p className="text-warning mx-2">

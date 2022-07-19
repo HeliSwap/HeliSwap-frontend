@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Button from '../Button';
 
 interface IModalProps {
   closeModal: () => void;
@@ -60,49 +61,44 @@ const TransactionSettingsModalContent = ({
       </div>
       <div className="modal-body">
         <div>
-          <p>Slippage tolerance</p>
-
+          <p className="text-small">Slippage</p>
           <div className="d-flex align-items-center mt-3">
-            <button
-              onClick={handleSetDefaultSlippage}
-              type="button"
-              className="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Auto
-            </button>
             <input
               type={'number'}
               value={slippageTollerance}
               onChange={handleSlippageToleranceChange}
-              className="form-control ms-3"
-            ></input>
-            <span className="ms-2">%</span>
+              className="form-control form-control-sm text-numeric me-3"
+            />
+            <span className="me-2">%</span>
+            <Button
+              onClick={handleSetDefaultSlippage}
+              type="primary"
+              outline={true}
+              data-bs-dismiss="modal"
+              size="small"
+            >
+              Auto
+            </Button>
           </div>
         </div>
 
-        <div className="mt-4">
-          <p>Transaction deadline</p>
-          <input
-            className="form-control mt-3"
-            type={'number'}
-            defaultValue={deadline}
-            onChange={handleExpirationChange}
-          ></input>
+        <div className="mt-5">
+          <p className="text-small">Transaction deadline</p>
+          <div className="d-flex align-items-center mt-3">
+            <input
+              className="form-control text-numeric form-control-sm"
+              type={'number'}
+              defaultValue={deadline}
+              onChange={handleExpirationChange}
+            />
+            <span className="ms-3">minutes</span>
+          </div>
         </div>
-      </div>
-      <div className="modal-footer">
-        <button
-          onClick={closeModal}
-          type="button"
-          className="btn btn-secondary"
-          data-bs-dismiss="modal"
-        >
-          Close
-        </button>
-        <button type="button" className="btn btn-primary" onClick={handleSaveChanges}>
-          Save changes
-        </button>
+        <div className="d-grid mt-5">
+          <button type="button" className="btn btn-primary" onClick={handleSaveChanges}>
+            Confirm settings
+          </button>
+        </div>
       </div>
     </>
   );
