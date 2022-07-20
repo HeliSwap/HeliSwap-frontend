@@ -14,7 +14,7 @@ import TransactionSettingsModalContent from './Modals/TransactionSettingsModalCo
 import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
 import Modal from './Modal';
 
-import { MAX_UINT_ERC20 } from '../constants';
+import { MAX_UINT_ERC20, SLIDER_INITIAL_VALUE } from '../constants';
 
 import {
   formatStringWeiToStringEther,
@@ -52,7 +52,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
   const [lpApproved, setLpApproved] = useState(false);
   const [lpInputValue, setLpInputValue] = useState(maxLpInputValue);
-  const [sliderValue, setSliderValue] = useState('100');
+  const [sliderValue, setSliderValue] = useState(SLIDER_INITIAL_VALUE);
 
   const [removeLpData, setRemoveLpData] = useState({
     tokenInAddress: '',
@@ -85,7 +85,8 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
     if (invalidInputTokensData) {
       setLpInputValue(formatStringWeiToStringEther(pairData.lpShares as string));
-
+      setSliderValue(SLIDER_INITIAL_VALUE);
+      recalculateReserves(formatStringWeiToStringEther(pairData.lpShares as string));
       return;
     }
 
@@ -93,6 +94,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
     setSliderValue(percentage);
 
     setLpInputValue(value);
+    recalculateReserves(value);
   };
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,12 +102,48 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
     const { value } = target;
 
     setSliderValue(value);
-    setLpInputValue(calculateShareByPercentage(maxLpInputValue, value));
+    const calculatedShare = calculateShareByPercentage(maxLpInputValue, value);
+    setLpInputValue(calculatedShare);
+    recalculateReserves(calculatedShare);
   };
 
   const handleButtonClick = (value: string) => {
     setSliderValue(value);
-    setLpInputValue(calculateShareByPercentage(maxLpInputValue, value));
+    const calculatedShare = calculateShareByPercentage(maxLpInputValue, value);
+    setLpInputValue(calculatedShare);
+    recalculateReserves(calculatedShare);
+  };
+
+  const recalculateReserves = (newInputValue: string) => {
+    const {
+      pairSupply,
+      token0Amount,
+      token1Amount,
+      token0: tokenInAddress,
+      token1: tokenOutAddress,
+      token0Decimals,
+      token1Decimals,
+    } = pairData;
+
+    const newInputValueWei = formatStringToStringWei(newInputValue);
+    const { reserve0ShareStr: tokens0Amount, reserve1ShareStr: tokens1Amount } = calculateReserves(
+      newInputValueWei,
+      pairSupply,
+      token0Amount,
+      token1Amount,
+      token0Decimals,
+      token1Decimals,
+    );
+    const tokensLpAmount = hethers.utils.formatUnits(newInputValueWei, 18).toString();
+    setRemoveLpData({
+      tokenInAddress,
+      tokenOutAddress,
+      tokensLpAmount,
+      tokens0Amount,
+      tokens1Amount,
+      token0Decimals,
+      token1Decimals,
+    });
   };
 
   const handleRemoveLPButtonClick = async () => {
@@ -231,8 +269,10 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
     const newInputValue = calculateShareByPercentage(
       formatStringWeiToStringEther(lpShares as string, 18),
-      sliderValue,
+      SLIDER_INITIAL_VALUE,
     );
+    setSliderValue(SLIDER_INITIAL_VALUE);
+
     setLpInputValue(newInputValue);
 
     const newInputValueWei = formatStringToStringWei(newInputValue);
@@ -257,7 +297,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
       token0Decimals,
       token1Decimals,
     });
-  }, [lpInputValue, pairData, sliderValue]);
+  }, [pairData]);
 
   const canRemove = lpApproved && removeLpData.tokenInAddress !== '';
 
