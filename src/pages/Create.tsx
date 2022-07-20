@@ -63,7 +63,7 @@ const Create = () => {
 
   // State for token inputs
   const [tokensData, setTokensData] = useState<ITokensData>(initialTokensData);
-
+  const [inputTokenA, setInputTokenA] = useState(true);
   // State for pools
   const { pools: poolsData } = usePools({
     fetchPolicy: 'network-only',
@@ -86,7 +86,8 @@ const Create = () => {
 
   // State for Create/Provide
   const [createPairData, setCreatePairData] = useState<ICreatePairData>(initialCreateData);
-
+  const tokenAValue = createPairData.tokenAAmount;
+  const tokenBValue = createPairData.tokenBAmount;
   const initialApproveData = {
     tokenA: false,
     tokenB: false,
@@ -157,64 +158,70 @@ const Create = () => {
     return tokenB && tokenBAmount && new BigNumber(tokenBAmount).gt(new BigNumber(tokenB));
   }, [tokenBalances, createPairData]);
 
-  const handleInputChange = (value: string, name: string) => {
-    const { tokenA, tokenB } = tokensData;
-    const inputToken = name === 'tokenAAmount' ? tokenA : tokenB;
+  const handleInputChange = useCallback(
+    (value: string, name: string, inputSelectedPoolData: IPairData = selectedPoolData) => {
+      const { tokenA, tokenB } = tokensData;
+      const inputToken = name === 'tokenAAmount' ? tokenA : tokenB;
+      setInputTokenA(name === 'tokenAAmount');
 
-    const invalidInputTokensData = () => {
-      return !value || isNaN(Number(value));
-    };
+      const invalidInputTokensData = () => {
+        return !value || isNaN(Number(value));
+      };
 
-    if (invalidInputTokensData()) {
-      setReadyToProvide(false);
-      setCreatePairData(prev => ({ ...prev, tokenAAmount: '', tokenBAmount: '' }));
-      return;
-    }
-    if (invalidTokenData()) {
-      setReadyToProvide(false);
-      setCreatePairData(prev => ({ ...prev, [name]: value }));
-      return;
-    }
+      if (invalidInputTokensData()) {
+        setReadyToProvide(false);
+        setCreatePairData(prev => ({ ...prev, tokenAAmount: '', tokenBAmount: '' }));
+        return;
+      }
+      if (invalidTokenData()) {
+        setReadyToProvide(false);
+        setCreatePairData(prev => ({ ...prev, [name]: value }));
+        return;
+      }
 
-    const inputTokenAddress = inputToken.address
-      ? inputToken.address
-      : (process.env.REACT_APP_WHBAR_ADDRESS as string);
+      const inputTokenAddress = inputToken.address
+        ? inputToken.address
+        : (process.env.REACT_APP_WHBAR_ADDRESS as string);
 
-    if (tokensInSamePool) {
-      const isInputAddressFirstInPool = inputTokenAddress === selectedPoolData?.token0;
+      if (tokensInSamePool) {
+        const isInputAddressFirstInPool = inputTokenAddress === inputSelectedPoolData?.token0;
 
-      const inputTokenAmount = isInputAddressFirstInPool
-        ? (selectedPoolData?.token0Amount as string)
-        : (selectedPoolData?.token1Amount as string);
+        const inputTokenAmount = isInputAddressFirstInPool
+          ? (inputSelectedPoolData?.token0Amount as string)
+          : (inputSelectedPoolData?.token1Amount as string);
 
-      const calculatedTokenAmount = isInputAddressFirstInPool
-        ? (selectedPoolData?.token1Amount as string)
-        : (selectedPoolData?.token0Amount as string);
+        const calculatedTokenAmount = isInputAddressFirstInPool
+          ? (inputSelectedPoolData?.token1Amount as string)
+          : (inputSelectedPoolData?.token0Amount as string);
 
-      const inputTokenDecimals = isInputAddressFirstInPool
-        ? selectedPoolData?.token0Decimals
-        : selectedPoolData?.token1Decimals;
+        const inputTokenDecimals = isInputAddressFirstInPool
+          ? inputSelectedPoolData?.token0Decimals
+          : inputSelectedPoolData?.token1Decimals;
 
-      const calculatedTokenDecimals = isInputAddressFirstInPool
-        ? selectedPoolData?.token1Decimals
-        : selectedPoolData?.token0Decimals;
+        const calculatedTokenDecimals = isInputAddressFirstInPool
+          ? inputSelectedPoolData?.token1Decimals
+          : inputSelectedPoolData?.token0Decimals;
 
-      const token0AmountBN = hethers.BigNumber.from(inputTokenAmount);
-      const token1AmountBN = hethers.BigNumber.from(calculatedTokenAmount);
+        const token0AmountBN = hethers.BigNumber.from(inputTokenAmount);
+        const token1AmountBN = hethers.BigNumber.from(calculatedTokenAmount);
 
-      const valueBN = formatStringToBigNumberEthersWei(value, inputTokenDecimals);
-      const keyToUpdate = name === 'tokenAAmount' ? 'tokenBAmount' : 'tokenAAmount';
-      const valueToUpdate = valueBN.mul(token1AmountBN).div(token0AmountBN);
+        const valueBN = formatStringToBigNumberEthersWei(value, inputTokenDecimals);
+        const keyToUpdate = name === 'tokenAAmount' ? 'tokenBAmount' : 'tokenAAmount';
+        const valueToUpdate = valueBN.mul(token1AmountBN).div(token0AmountBN);
 
-      setCreatePairData(prev => ({
-        ...prev,
-        [keyToUpdate]: hethers.utils.formatUnits(valueToUpdate, calculatedTokenDecimals).toString(),
-        [name]: value,
-      }));
-    } else {
-      setCreatePairData(prev => ({ ...prev, [name]: value }));
-    }
-  };
+        setCreatePairData(prev => ({
+          ...prev,
+          [keyToUpdate]: hethers.utils
+            .formatUnits(valueToUpdate, calculatedTokenDecimals)
+            .toString(),
+          [name]: value,
+        }));
+      } else {
+        setCreatePairData(prev => ({ ...prev, [name]: value }));
+      }
+    },
+    [invalidTokenData, selectedPoolData, tokensData, tokensInSamePool],
+  );
 
   const handleApproveClick = async (key: string) => {
     const { hederaId, type } = tokensData[key];
@@ -481,6 +488,22 @@ const Create = () => {
       console.error(err);
     }
   }, [poolsData, tokenDataList, address, tokensDerivedFromPool]);
+
+  useEffect(() => {
+    //Update inputs data on poolsData and tokensDataChange
+    const inputName = inputTokenA ? 'tokenAAmount' : 'tokenBAmount';
+    const inputValue = inputTokenA ? tokenAValue : tokenBValue;
+
+    handleInputChange(inputValue, inputName, selectedPoolData || {});
+  }, [
+    poolsData,
+    tokensData,
+    selectedPoolData,
+    handleInputChange,
+    inputTokenA,
+    tokenAValue,
+    tokenBValue,
+  ]);
 
   //Render methods
   const getErrorMessage = () => {

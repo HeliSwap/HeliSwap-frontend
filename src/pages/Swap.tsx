@@ -95,6 +95,8 @@ const Swap = () => {
 
   // State for Swap
   const [swapData, setSwapData] = useState(initialSwapData);
+  const tokenInValue = swapData.amountIn;
+  const tokenOutValue = swapData.amountOut;
 
   // State for approved
   const [approved, setApproved] = useState(false);
@@ -135,114 +137,113 @@ const Swap = () => {
     return tokenABalance && amountIn && new BigNumber(amountIn).gt(new BigNumber(tokenABalance));
   }, [swapData, tokenBalances]);
 
-  const handleInputChange = async (
-    value: string,
-    name: string,
-    inputTokensData: any = tokensData,
-  ) => {
-    setInsufficientLiquidity(false);
-    const { tokenA, tokenB } = inputTokensData;
+  const handleInputChange = useCallback(
+    (value: string, name: string, inputTokensData: any = tokensData) => {
+      setInsufficientLiquidity(false);
+      const { tokenA, tokenB } = inputTokensData;
 
-    const tokenData = {
-      [name]: value,
-    };
-
-    const invalidTokenData = () => {
-      const tokenANotSelected = Object.keys(tokenA).length === 0;
-      const tokenBNotSelected = Object.keys(tokenB).length === 0;
-      const sameTokenSelected = tokenA.address === tokenB.address;
-      return tokenANotSelected || tokenBNotSelected || sameTokenSelected;
-    };
-
-    const invalidInputTokensData = () => {
-      return !value || isNaN(Number(value));
-    };
-
-    if (invalidInputTokensData()) {
-      setSwapData(prev => ({ ...prev, amountIn: '', amountOut: '' }));
-      return;
-    }
-
-    if (invalidTokenData()) {
-      setSwapData(prev => ({
-        ...prev,
+      const tokenData = {
         [name]: value,
-        [name === 'amountIn' ? 'amountOut' : 'amountIn']: '',
-      }));
-      setTokenInExactAmount(name === 'amountIn');
-      setInsufficientLiquidity(true);
-      return;
-    }
+      };
 
-    const { amountIn, amountOut } = tokenData;
+      const invalidTokenData = () => {
+        const tokenANotSelected = Object.keys(tokenA).length === 0;
+        const tokenBNotSelected = Object.keys(tokenB).length === 0;
+        const sameTokenSelected = tokenA.address === tokenB.address;
+        return tokenANotSelected || tokenBNotSelected || sameTokenSelected;
+      };
 
-    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS || '';
-    const tokenInIsNative = tokenA.type === TokenType.HBAR;
-    const tokenOutIsNative = tokenB.type === TokenType.HBAR;
-    const tokenInAddress = tokenInIsNative ? WHBARAddress : tokenA.address;
-    const tokenOutAddress = tokenOutIsNative ? WHBARAddress : tokenB.address;
+      const invalidInputTokensData = () => {
+        return !value || isNaN(Number(value));
+      };
 
-    if (willWrapTokens || willUnwrapTokens) {
-      if (name === 'amountIn') {
-        const swapAmountOut = amountIn;
-
-        setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
-      } else if (name === 'amountOut') {
-        const swapAmountIn = amountOut;
-
-        setSwapData(prev => ({ ...prev, ...tokenData, amountIn: swapAmountIn.toString() }));
-      } else {
+      if (invalidInputTokensData()) {
         setSwapData(prev => ({ ...prev, amountIn: '', amountOut: '' }));
+        return;
       }
-    } else {
-      if (name === 'amountIn') {
-        const trades = getPossibleTradesExactIn(
-          poolsData || [],
-          amountIn,
-          tokenInAddress,
-          tokenOutAddress,
-          true,
-        );
 
-        const sortedTrades = trades.sort(tradeComparator);
+      if (invalidTokenData()) {
+        setSwapData(prev => ({
+          ...prev,
+          [name]: value,
+          [name === 'amountIn' ? 'amountOut' : 'amountIn']: '',
+        }));
+        setTokenInExactAmount(name === 'amountIn');
+        setInsufficientLiquidity(true);
+        return;
+      }
 
-        if (sortedTrades.length === 0) {
-          setSwapData(prev => ({ ...prev, ...tokenData, amountOut: '' }));
+      const { amountIn, amountOut } = tokenData;
+
+      const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS || '';
+      const tokenInIsNative = tokenA.type === TokenType.HBAR;
+      const tokenOutIsNative = tokenB.type === TokenType.HBAR;
+      const tokenInAddress = tokenInIsNative ? WHBARAddress : tokenA.address;
+      const tokenOutAddress = tokenOutIsNative ? WHBARAddress : tokenB.address;
+
+      if (willWrapTokens || willUnwrapTokens) {
+        if (name === 'amountIn') {
+          const swapAmountOut = amountIn;
+
+          setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
+        } else if (name === 'amountOut') {
+          const swapAmountIn = amountOut;
+
+          setSwapData(prev => ({ ...prev, ...tokenData, amountIn: swapAmountIn.toString() }));
+        } else {
+          setSwapData(prev => ({ ...prev, amountIn: '', amountOut: '' }));
+        }
+      } else {
+        if (name === 'amountIn') {
+          const trades = getPossibleTradesExactIn(
+            poolsData || [],
+            amountIn,
+            tokenInAddress,
+            tokenOutAddress,
+            true,
+          );
+
+          const sortedTrades = trades.sort(tradeComparator);
+
+          if (sortedTrades.length === 0) {
+            setSwapData(prev => ({ ...prev, ...tokenData, amountOut: '' }));
+            setTokenInExactAmount(true);
+            setInsufficientLiquidity(true);
+            return;
+          }
+          const bestTrade = sortedTrades[0];
+
+          setBestPath(bestTrade.path);
           setTokenInExactAmount(true);
-          setInsufficientLiquidity(true);
-          return;
-        }
-        const bestTrade = sortedTrades[0];
+          setSwapData(prev => ({ ...prev, ...tokenData, amountOut: bestTrade.amountOut }));
+        } else if (name === 'amountOut') {
+          const trades = getPossibleTradesExactOut(
+            poolsData || [],
+            amountOut,
+            tokenInAddress,
+            tokenOutAddress,
+            true,
+          );
 
-        setBestPath(bestTrade.path);
-        setTokenInExactAmount(true);
-        setSwapData(prev => ({ ...prev, ...tokenData, amountOut: bestTrade.amountOut }));
-      } else if (name === 'amountOut') {
-        const trades = getPossibleTradesExactOut(
-          poolsData || [],
-          amountOut,
-          tokenInAddress,
-          tokenOutAddress,
-          true,
-        );
+          const sortedTrades = trades.sort(tradeComparator);
 
-        const sortedTrades = trades.sort(tradeComparator);
+          if (sortedTrades.length === 0) {
+            setSwapData(prev => ({ ...prev, ...tokenData, amountIn: '' }));
+            setTokenInExactAmount(false);
+            setInsufficientLiquidity(true);
+            return;
+          }
 
-        if (sortedTrades.length === 0) {
-          setSwapData(prev => ({ ...prev, ...tokenData, amountIn: '' }));
+          const bestTrade = sortedTrades[0];
+
+          setBestPath(bestTrade.path);
           setTokenInExactAmount(false);
-          setInsufficientLiquidity(true);
-          return;
+          setSwapData(prev => ({ ...prev, ...tokenData, amountIn: bestTrade.amountIn }));
         }
-
-        const bestTrade = sortedTrades[0];
-
-        setBestPath(bestTrade.path);
-        setTokenInExactAmount(false);
-        setSwapData(prev => ({ ...prev, ...tokenData, amountIn: bestTrade.amountIn }));
       }
-    }
-  };
+    },
+    [poolsData, tokensData, willUnwrapTokens, willWrapTokens],
+  );
 
   const handleAssociateClick = async () => {
     const { tokenB } = tokensData;
@@ -412,6 +413,12 @@ const Swap = () => {
     setWillWrapTokens(willWrap);
     setWillUnwrapTokens(willUnwrap);
   }, [poolsData, tokensData, refetch]);
+
+  useEffect(() => {
+    const newInputName = tokenInExactAmount ? 'amountIn' : 'amountOut';
+    const newInputValue = tokenInExactAmount ? tokenInValue : tokenOutValue;
+    handleInputChange(newInputValue, newInputName);
+  }, [poolsData, tokensData, handleInputChange, tokenInExactAmount, tokenInValue, tokenOutValue]);
 
   useEffect(() => {
     const getAllowanceHTS = async (userId: string) => {
