@@ -78,7 +78,7 @@ const Pools = () => {
 
   return (
     <div className="d-flex justify-content-center">
-      {showRemoveContainer ? (
+      {showRemoveContainer && pairData[currentPoolIndex] ? (
         <RemoveLiquidity
           pairData={pairData[currentPoolIndex]}
           setShowRemoveContainer={setShowRemoveContainer}

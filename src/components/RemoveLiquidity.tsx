@@ -45,13 +45,13 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
 
-  const initialLpInputValue: string = formatStringWeiToStringEther(pairData.lpShares as string);
+  const maxLpInputValue: string = formatStringWeiToStringEther(pairData?.lpShares as string);
 
   const [loadingRemove, setLoadingRemove] = useState(false);
   const [errorRemove, setErrorRemove] = useState(false);
 
   const [lpApproved, setLpApproved] = useState(false);
-  const [lpInputValue, setLpInputValue] = useState(initialLpInputValue);
+  const [lpInputValue, setLpInputValue] = useState(maxLpInputValue);
   const [sliderValue, setSliderValue] = useState('100');
 
   const [removeLpData, setRemoveLpData] = useState({
@@ -75,7 +75,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
-    const initialLpInputValueBNWei = formatStringToBigNumberWei(initialLpInputValue, 18);
+    const initialLpInputValueBNWei = formatStringToBigNumberWei(maxLpInputValue, 18);
     const valueBNWei = formatStringToBigNumberWei(value, 18);
     const inputGtInitialValue = valueBNWei.gt(initialLpInputValueBNWei);
 
@@ -89,7 +89,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
       return;
     }
 
-    const percentage = calculatePercentageByShare(initialLpInputValue, value);
+    const percentage = calculatePercentageByShare(maxLpInputValue, value);
     setSliderValue(percentage);
 
     setLpInputValue(value);
@@ -100,12 +100,12 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
     const { value } = target;
 
     setSliderValue(value);
-    setLpInputValue(calculateShareByPercentage(initialLpInputValue, value));
+    setLpInputValue(calculateShareByPercentage(maxLpInputValue, value));
   };
 
   const handleButtonClick = (value: string) => {
     setSliderValue(value);
-    setLpInputValue(calculateShareByPercentage(initialLpInputValue, value));
+    setLpInputValue(calculateShareByPercentage(maxLpInputValue, value));
   };
 
   const handleRemoveLPButtonClick = async () => {
@@ -226,12 +226,19 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
       token1: tokenOutAddress,
       token0Decimals,
       token1Decimals,
+      lpShares,
     } = pairData;
 
-    const tokensLPToRemove = formatStringToStringWei(lpInputValue);
+    const newInputValue = calculateShareByPercentage(
+      formatStringWeiToStringEther(lpShares as string, 18),
+      sliderValue,
+    );
+    setLpInputValue(newInputValue);
+
+    const newInputValueWei = formatStringToStringWei(newInputValue);
 
     const { reserve0ShareStr: tokens0Amount, reserve1ShareStr: tokens1Amount } = calculateReserves(
-      tokensLPToRemove,
+      newInputValueWei,
       pairSupply,
       token0Amount,
       token1Amount,
@@ -239,7 +246,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
       token1Decimals,
     );
 
-    const tokensLpAmount = hethers.utils.formatUnits(tokensLPToRemove, 18).toString();
+    const tokensLpAmount = hethers.utils.formatUnits(newInputValueWei, 18).toString();
 
     setRemoveLpData({
       tokenInAddress,
