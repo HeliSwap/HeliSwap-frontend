@@ -257,7 +257,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
       token0Decimals,
       token1Decimals,
     });
-  }, [lpInputValue, pairData]);
+  }, [lpInputValue, pairData, sliderValue]);
 
   const canRemove = lpApproved && removeLpData.tokenInAddress !== '';
 
