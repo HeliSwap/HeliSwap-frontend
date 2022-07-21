@@ -16,10 +16,10 @@ import usePoolsByUser from '../hooks/usePoolsByUser';
 const Pools = () => {
   const contextValue = useContext(GlobalContext);
   const { connection } = contextValue;
-  const { userId, connected, connectWallet } = connection;
+  const { userId, connected, connectWallet, isHashpackLoading } = connection;
 
   const {
-    error,
+    error: errorPoools,
     loading: loadingPools,
     pools,
   } = usePools(
@@ -30,7 +30,11 @@ const Pools = () => {
     true,
   );
 
-  const { loading: loadingPoolsByUser, poolsByUser } = usePoolsByUser(
+  const {
+    error: errorPooolsByUser,
+    loading: loadingPoolsByUser,
+    poolsByUser,
+  } = usePoolsByUser(
     {
       fetchPolicy: 'network-only',
       pollInterval: REFRESH_TIME,
@@ -62,6 +66,90 @@ const Pools = () => {
   };
 
   const havePools = poolsToShow!.length > 0;
+
+  const renderAllPools = () => {
+    return loadingPools ? (
+      <p className="text-info">Loading pools...</p>
+    ) : havePools ? (
+      <div className="table-pools">
+        <div className={`table-pools-row with-6-columns`}>
+          <div className="table-pools-cell">
+            <span className="text-small">#</span>
+          </div>
+          <div className="table-pools-cell">
+            <span className="text-small">Pool</span>
+          </div>
+          <div className="table-pools-cell justify-content-end">
+            <span className="text-small">TVL</span>
+          </div>
+          <div className="table-pools-cell justify-content-end">
+            <span className="text-small">Volume 7d</span>
+          </div>
+          <div className="table-pools-cell justify-content-end">
+            <span className="text-small">Volume 24h</span>
+          </div>
+          <div className="table-pools-cell justify-content-end">
+            <span className="text-small"></span>
+          </div>
+        </div>
+        {poolsToShow.map((item, index) => (
+          <PoolInfo
+            setShowRemoveContainer={setShowRemoveContainer}
+            setCurrentPoolIndex={setCurrentPoolIndex}
+            index={index}
+            key={index}
+            poolData={item}
+            view={currentView}
+          />
+        ))}
+      </div>
+    ) : (
+      <p className="text-warning text-center">No pools found</p>
+    );
+  };
+
+  const renderUserPools = () => {
+    return connected && !isHashpackLoading ? (
+      loadingPoolsByUser ? (
+        <p className="text-info">Loading pools...</p>
+      ) : havePools ? (
+        <div className="table-pools">
+          <div className={`table-pools-row`}>
+            <div className="table-pools-cell">
+              <span className="text-small">#</span>
+            </div>
+            <div className="table-pools-cell">
+              <span className="text-small">Pool</span>
+            </div>
+            <div className="table-pools-cell justify-content-end">
+              <span className="text-small"></span>
+            </div>
+          </div>
+          {poolsToShow.map((item, index) => (
+            <PoolInfo
+              setShowRemoveContainer={setShowRemoveContainer}
+              setCurrentPoolIndex={setCurrentPoolIndex}
+              index={index}
+              key={index}
+              poolData={item}
+              view={currentView}
+            />
+          ))}
+        </div>
+      ) : (
+        <p className="text-warning text-center">No pools found</p>
+      )
+    ) : (
+      <div className="rounded bg-dark p-5 text-center mt-5">
+        <p>Your active liquidity positions will appear here.</p>
+        <div className="mt-4">
+          <Button size="small" onClick={connectWallet} type="primary">
+            Connect Wallet
+          </Button>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="d-flex justify-content-center">
@@ -95,76 +183,21 @@ const Pools = () => {
 
           <hr />
 
-          <div className="d-flex justify-content-end align-items-center my-5">
-            <Link className="btn btn-sm btn-primary" to="/create">
-              Create pool
-            </Link>
-          </div>
-
-          {error ? (
-            <div className="alert alert-danger mt-5" role="alert">
-              <strong>Something went wrong!</strong> Cannot get pairs...
-              <p>{error.message}</p>
+          {connected && !isHashpackLoading ? (
+            <div className="d-flex justify-content-end align-items-center my-5">
+              <Link className="btn btn-sm btn-primary" to="/create">
+                Create pool
+              </Link>
             </div>
           ) : null}
 
-          {connected ? (
-            loadingPools && loadingPoolsByUser ? (
-              <p className="text-info">Loading pools...</p>
-            ) : havePools ? (
-              <div className="table-pools">
-                <div
-                  className={`table-pools-row ${
-                    currentView === PageViews.ALL_POOLS ? 'with-6-columns' : ''
-                  }`}
-                >
-                  <div className="table-pools-cell">
-                    <span className="text-small">#</span>
-                  </div>
-                  <div className="table-pools-cell">
-                    <span className="text-small">Pool</span>
-                  </div>
-                  {currentView === PageViews.ALL_POOLS ? (
-                    <>
-                      <div className="table-pools-cell justify-content-end">
-                        <span className="text-small">TVL</span>
-                      </div>
-                      <div className="table-pools-cell justify-content-end">
-                        <span className="text-small">Volume 7d</span>
-                      </div>
-                      <div className="table-pools-cell justify-content-end">
-                        <span className="text-small">Volume 24h</span>
-                      </div>
-                    </>
-                  ) : null}
-                  <div className="table-pools-cell justify-content-end">
-                    <span className="text-small"></span>
-                  </div>
-                </div>
-                {poolsToShow.map((item, index) => (
-                  <PoolInfo
-                    setShowRemoveContainer={setShowRemoveContainer}
-                    setCurrentPoolIndex={setCurrentPoolIndex}
-                    index={index}
-                    key={index}
-                    poolData={item}
-                    view={currentView}
-                  />
-                ))}
-              </div>
-            ) : (
-              <p className="text-warning text-center">No pools found</p>
-            )
-          ) : (
-            <div className="rounded bg-dark p-4 text-center">
-              <p>Your active liquidity positions will appear here.</p>
-              <div className="mt-5">
-                <Button onClick={connectWallet} type="primary">
-                  Connect Wallet
-                </Button>
-              </div>
+          {errorPoools || errorPooolsByUser ? (
+            <div className="alert alert-danger mt-5" role="alert">
+              <strong>Something went wrong!</strong> Cannot get pools...
             </div>
-          )}
+          ) : null}
+
+          <>{currentView === PageViews.ALL_POOLS ? renderAllPools() : renderUserPools()}</>
         </div>
       )}
     </div>
