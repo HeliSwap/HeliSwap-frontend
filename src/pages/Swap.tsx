@@ -121,7 +121,6 @@ const Swap = () => {
   const [tokenBalances, setTokenBalances] = useState<IfaceInitialBalanceData>(initialBallanceData);
 
   // Additional states for Swaps
-
   const [readyToAssociate, setReadyToAssociate] = useState(false);
   const [readyToSwap, setReadyToSwap] = useState(false);
   const [tokenInExactAmount, setTokenInExactAmount] = useState(true);
@@ -140,6 +139,7 @@ const Swap = () => {
   const getInsufficientTokenIn = useCallback(() => {
     const { tokenA: tokenABalance } = tokenBalances;
     const { amountIn } = swapData;
+
     return tokenABalance && amountIn && new BigNumber(amountIn).gt(new BigNumber(tokenABalance));
   }, [swapData, tokenBalances]);
 
@@ -548,6 +548,7 @@ const Swap = () => {
         {getSuccessMessage()}
 
         <InputTokenSelector
+          isInvalid={getInsufficientTokenIn() as boolean}
           inputTokenComponent={
             <InputToken
               value={swapData.amountIn}

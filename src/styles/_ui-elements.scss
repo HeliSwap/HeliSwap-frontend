@@ -124,6 +124,10 @@
     border-color: $neutral-100;
   }
 
+  &.is-invalid {
+    border-color: $danger;
+  }
+
   .input-token {
     color: $neutral-300;
     font-family: $font-family-numeric;
