@@ -2,7 +2,7 @@ import axios from 'axios';
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
 
-import { IAllowanceData, IPairData, ITokenData, TokenType } from '../interfaces/tokens';
+import { IAllowanceData, IPoolData, ITokenData, TokenType } from '../interfaces/tokens';
 import { Client, ContractId, AccountBalanceQuery } from '@hashgraph/sdk';
 import {
   formatNumberToBigNumber,
@@ -263,7 +263,7 @@ export const getHBarPrice = async () => {
   }
 };
 
-export const getTokenPrice = (poolsData: IPairData[], tokenAddress: string, hbarPrice: number) => {
+export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbarPrice: number) => {
   if (hbarPrice === 0) return;
   if (tokenAddress === process.env.REACT_APP_WHBAR_ADDRESS) return hbarPrice.toString();
 

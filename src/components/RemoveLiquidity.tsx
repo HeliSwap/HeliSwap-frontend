@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
-import { IPairData } from '../interfaces/tokens';
+import { IPoolData } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
 import Button from './Button';
@@ -36,7 +36,7 @@ import {
 import { formatIcons } from '../utils/iconUtils';
 
 interface IRemoveLiquidityProps {
-  pairData: IPairData;
+  pairData: IPoolData;
   setShowRemoveContainer: React.Dispatch<React.SetStateAction<boolean>>;
 }
 

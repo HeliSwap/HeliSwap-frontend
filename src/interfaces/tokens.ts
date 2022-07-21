@@ -14,7 +14,7 @@ export interface ITokensData {
   [key: string]: ITokenData;
 }
 
-export interface IPairData {
+export interface IPoolData {
   pairName: string;
   pairAddress: string;
   pairSymbol: string;
