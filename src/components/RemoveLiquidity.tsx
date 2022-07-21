@@ -64,7 +64,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
     token1Decimals: 0,
   });
 
-  const [removeNative, setRemoveNative] = useState(false);
+  const [removeNative, setRemoveNative] = useState(true);
   const [hasWrappedHBAR, setHasWrappedHBAR] = useState(false);
 
   const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
