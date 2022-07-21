@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import {
   ITokenData,
   TokenType,
-  IPairData,
+  IPoolData,
   ICreatePairData,
   ITokensData,
   IfaceInitialBalanceData,
@@ -103,7 +103,7 @@ const Create = () => {
   const [needApproval, setNeedApproval] = useState(initialNeedApprovalData);
 
   // State for common pool data
-  const [selectedPoolData, setSelectedPoolData] = useState<IPairData>({} as IPairData);
+  const [selectedPoolData, setSelectedPoolData] = useState<IPoolData>({} as IPoolData);
 
   // State for token balances
   const initialBallanceData = useMemo(
@@ -159,7 +159,7 @@ const Create = () => {
   }, [tokenBalances, createPairData]);
 
   const handleInputChange = useCallback(
-    (value: string, name: string, inputSelectedPoolData: IPairData = selectedPoolData) => {
+    (value: string, name: string, inputSelectedPoolData: IPoolData = selectedPoolData) => {
       const { tokenA, tokenB } = tokensData;
       const inputToken = name === 'tokenAAmount' ? tokenA : tokenB;
       setInputTokenA(name === 'tokenAAmount');
@@ -312,6 +312,7 @@ const Create = () => {
     navigate('/pools');
   };
 
+  // Check for allowance and approvals
   useEffect(() => {
     const getAllowanceHTS = async (userId: string, token: ITokenData, index: string) => {
       const key = `${index}Amount`;
@@ -348,6 +349,7 @@ const Create = () => {
     };
   }, [tokensData, sdk, userId, createPairData]);
 
+  // Check for balances
   useEffect(() => {
     const getTokenBalances = async () => {
       if (userId) {
@@ -376,6 +378,7 @@ const Create = () => {
     getTokenBalances();
   }, [tokensData, userId, initialBallanceData]);
 
+  // Check for native tokens
   useEffect(() => {
     const { tokenA, tokenB } = tokensData;
 
@@ -422,6 +425,56 @@ const Create = () => {
     //TODO: Additional request will be needed in order to get info regarding pool shares
   }, [tokensData, poolsData]);
 
+  // Check for address in url
+  useEffect(() => {
+    try {
+      if (address && poolsData && tokenDataList && !tokensDerivedFromPool) {
+        const chosenPool =
+          poolsData.find((pool: IPoolData) => pool.pairAddress === address) || ({} as IPoolData);
+        const { token0: token0Address, token1: token1Address } = chosenPool;
+
+        // Check if one of tokens is WHBAR - to be switched for HBAR
+        const isTokenAWrappedHBAR =
+          token0Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+        const isTokenBWrappedHBAR =
+          token1Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+
+        const tokenA = isTokenAWrappedHBAR
+          ? NATIVE_TOKEN
+          : tokenDataList.find((token: ITokenData) => token.address === token0Address) ||
+            ({} as ITokenData);
+        const tokenB = isTokenBWrappedHBAR
+          ? NATIVE_TOKEN
+          : tokenDataList.find((token: ITokenData) => token.address === token1Address) ||
+            ({} as ITokenData);
+
+        setTokensData({ tokenA, tokenB });
+        //We want to set the tokens from the pool selected just once
+        setTokensDerivedFromPool(true);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [poolsData, tokenDataList, address, tokensDerivedFromPool]);
+
+  // Cache input values
+  useEffect(() => {
+    //Update inputs data on poolsData and tokensDataChange
+    const inputName = inputTokenA ? 'tokenAAmount' : 'tokenBAmount';
+    const inputValue = inputTokenA ? tokenAValue : tokenBValue;
+
+    handleInputChange(inputValue, inputName, selectedPoolData || {});
+  }, [
+    poolsData,
+    tokensData,
+    selectedPoolData,
+    handleInputChange,
+    inputTokenA,
+    tokenAValue,
+    tokenBValue,
+  ]);
+
+  // Final check before create
   useEffect(() => {
     //TODO: rafactor this function
     let isReady = true;
@@ -456,53 +509,6 @@ const Create = () => {
     getInsufficientTokenB,
     invalidTokenData,
     tokensData,
-  ]);
-
-  useEffect(() => {
-    try {
-      if (address && poolsData && tokenDataList && !tokensDerivedFromPool) {
-        const chosenPool =
-          poolsData.find((pool: IPairData) => pool.pairAddress === address) || ({} as IPairData);
-        const { token0: token0Address, token1: token1Address } = chosenPool;
-
-        // Check if one of tokens is WHBAR - to be switched for HBAR
-        const isTokenAWrappedHBAR =
-          token0Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
-        const isTokenBWrappedHBAR =
-          token1Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
-
-        const tokenA = isTokenAWrappedHBAR
-          ? NATIVE_TOKEN
-          : tokenDataList.find((token: ITokenData) => token.address === token0Address) ||
-            ({} as ITokenData);
-        const tokenB = isTokenBWrappedHBAR
-          ? NATIVE_TOKEN
-          : tokenDataList.find((token: ITokenData) => token.address === token1Address) ||
-            ({} as ITokenData);
-
-        setTokensData({ tokenA, tokenB });
-        //We want to set the tokens from the pool selected just once
-        setTokensDerivedFromPool(true);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }, [poolsData, tokenDataList, address, tokensDerivedFromPool]);
-
-  useEffect(() => {
-    //Update inputs data on poolsData and tokensDataChange
-    const inputName = inputTokenA ? 'tokenAAmount' : 'tokenBAmount';
-    const inputValue = inputTokenA ? tokenAValue : tokenBValue;
-
-    handleInputChange(inputValue, inputName, selectedPoolData || {});
-  }, [
-    poolsData,
-    tokensData,
-    selectedPoolData,
-    handleInputChange,
-    inputTokenA,
-    tokenAValue,
-    tokenBValue,
   ]);
 
   //Render methods
@@ -554,12 +560,14 @@ const Create = () => {
             />
           }
           walletBalanceComponent={
-            <WalletBalance
-              walletBalance={tokenBalances.tokenA}
-              onMaxButtonClick={(maxValue: string) => {
-                handleInputChange(maxValue, 'tokenAAmount');
-              }}
-            />
+            Object.keys(tokensData.tokenA).length > 0 ? (
+              <WalletBalance
+                walletBalance={tokenBalances.tokenA}
+                onMaxButtonClick={(maxValue: string) => {
+                  handleInputChange(maxValue, 'tokenAAmount');
+                }}
+              />
+            ) : null
           }
         />
         <Modal show={showModalA}>
@@ -601,12 +609,14 @@ const Create = () => {
             />
           }
           walletBalanceComponent={
-            <WalletBalance
-              walletBalance={tokenBalances.tokenB}
-              onMaxButtonClick={(maxValue: string) => {
-                handleInputChange(maxValue, 'tokenBAmount');
-              }}
-            />
+            Object.keys(tokensData.tokenB).length > 0 ? (
+              <WalletBalance
+                walletBalance={tokenBalances.tokenB}
+                onMaxButtonClick={(maxValue: string) => {
+                  handleInputChange(maxValue, 'tokenBAmount');
+                }}
+              />
+            ) : null
           }
         />
         <Modal show={showModalB}>
@@ -641,11 +651,6 @@ const Create = () => {
       </div>
     );
   };
-
-  const tokenBARatio = Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount);
-  const tokenABRatio = Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount);
-  const tokenBARatioFormatted = formatStringETHtoPriceFormatted(tokenBARatio.toString());
-  const tokenABRatioFormatted = formatStringETHtoPriceFormatted(tokenABRatio.toString());
 
   const getTokensRatioSection = () => {
     return readyToProvide ? (
@@ -807,6 +812,11 @@ const Create = () => {
       </>
     );
   };
+
+  const tokenBARatio = Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount);
+  const tokenABRatio = Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount);
+  const tokenBARatioFormatted = formatStringETHtoPriceFormatted(tokenBARatio.toString());
+  const tokenABRatioFormatted = formatStringETHtoPriceFormatted(tokenABRatio.toString());
 
   return (
     <div className="d-flex justify-content-center">

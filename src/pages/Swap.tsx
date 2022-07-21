@@ -378,7 +378,7 @@ const Swap = () => {
     }
   };
 
-  const switchTokens = () => {
+  const handleSwitchTokens = () => {
     const newTokensData = {
       tokenA: tokensData.tokenB,
       tokenB: tokensData.tokenA,
@@ -393,6 +393,7 @@ const Swap = () => {
     handleInputChange(swapData[oldInputValueKey], newInputValueKey, newTokensData);
   };
 
+  // Check for WRAP/UNWRAP
   useEffect(() => {
     refetch();
 
@@ -414,12 +415,14 @@ const Swap = () => {
     setWillUnwrapTokens(willUnwrap);
   }, [poolsData, tokensData, refetch]);
 
+  // Check for cached input values - used for auto pooling
   useEffect(() => {
     const newInputName = tokenInExactAmount ? 'amountIn' : 'amountOut';
     const newInputValue = tokenInExactAmount ? tokenInValue : tokenOutValue;
     handleInputChange(newInputValue, newInputName);
   }, [poolsData, tokensData, handleInputChange, tokenInExactAmount, tokenInValue, tokenOutValue]);
 
+  // Check for approvals
   useEffect(() => {
     const getAllowanceHTS = async (userId: string) => {
       const { amountIn: amountToSpend, tokenIdIn } = swapData;
@@ -440,6 +443,7 @@ const Swap = () => {
       const canSpend = await checkAllowanceHTS(userId, tokenAData, amountToSpend);
       setApproved(canSpend);
     };
+
     if (tokensData.tokenA.type === TokenType.HBAR) {
       setNeedApproval(false);
     }
@@ -451,6 +455,17 @@ const Swap = () => {
     }
   }, [swapData, userId, sdk, tokensData, userAssociatedTokens]);
 
+  // Check for associations
+  useEffect(() => {
+    const checkTokenAssociation = async (userId: string) => {
+      const tokens = await getUserAssociatedTokens(userId);
+      setUserAssociatedTokens(tokens);
+    };
+
+    userId && checkTokenAssociation(userId);
+  }, [userId]);
+
+  // Check for balances
   useEffect(() => {
     const getTokenBalances = async () => {
       if (userId) {
@@ -470,6 +485,7 @@ const Swap = () => {
     getTokenBalances();
   }, [tokensData, userId, initialBallanceData]);
 
+  // Final checks before swap
   useEffect(() => {
     let ready = true;
 
@@ -509,15 +525,6 @@ const Swap = () => {
     insufficientLiquidity,
     needApproval,
   ]);
-
-  useEffect(() => {
-    const checkTokenAssociation = async (userId: string) => {
-      const tokens = await getUserAssociatedTokens(userId);
-      setUserAssociatedTokens(tokens);
-    };
-
-    userId && checkTokenAssociation(userId);
-  }, [userId]);
 
   //Render methods
   const getErrorMessage = () => {
@@ -591,7 +598,7 @@ const Swap = () => {
           />
         </Modal>
 
-        <div onClick={switchTokens} className="text-center my-4">
+        <div onClick={handleSwitchTokens} className="text-center my-4">
           <Icon className="cursor-pointer" name="swap" color="gradient" />
         </div>
 
