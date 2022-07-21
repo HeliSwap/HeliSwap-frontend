@@ -99,11 +99,13 @@ const Pools = () => {
 
           <hr />
 
-          <div className="d-flex justify-content-end align-items-center my-5">
-            <Link className="btn btn-sm btn-primary" to="/create">
-              Create pool
-            </Link>
-          </div>
+          {connected ? (
+            <div className="d-flex justify-content-end align-items-center my-5">
+              <Link className="btn btn-sm btn-primary" to="/create">
+                Create pool
+              </Link>
+            </div>
+          ) : null}
 
           {errorPoools || errorPooolsByUser ? (
             <div className="alert alert-danger mt-5" role="alert">
@@ -159,10 +161,10 @@ const Pools = () => {
               <p className="text-warning text-center">No pools found</p>
             )
           ) : (
-            <div className="rounded bg-dark p-4 text-center">
+            <div className="rounded bg-dark p-5 text-center mt-5">
               <p>Your active liquidity positions will appear here.</p>
-              <div className="mt-5">
-                <Button onClick={connectWallet} type="primary">
+              <div className="mt-4">
+                <Button size="small" onClick={connectWallet} type="primary">
                   Connect Wallet
                 </Button>
               </div>
