@@ -429,7 +429,7 @@ const Create = () => {
   // Check for address in url
   useEffect(() => {
     try {
-      if (address && poolsData && tokenDataList && !tokensDerivedFromPool) {
+      if (address && poolsData.length !== 0 && tokenDataList && !tokensDerivedFromPool) {
         const chosenPool =
           poolsData.find((pool: IPoolData) => pool.pairAddress === address) || ({} as IPoolData);
         const { token0: token0Address, token1: token1Address } = chosenPool;
