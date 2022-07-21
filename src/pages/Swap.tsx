@@ -49,8 +49,14 @@ import Icon from '../components/Icon';
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
-  const { userId, hashconnectConnectorInstance, connected, connectWallet, extensionFound } =
-    connection;
+  const {
+    userId,
+    hashconnectConnectorInstance,
+    connected,
+    connectWallet,
+    extensionFound,
+    isHashpackLoading,
+  } = connection;
 
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
@@ -677,7 +683,7 @@ const Swap = () => {
 
   const getActionButtons = () => {
     return extensionFound ? (
-      connected ? (
+      connected && !isHashpackLoading ? (
         <>
           {loadingPools ? (
             <div className="d-flex justify-content-center mt-4">
@@ -758,7 +764,9 @@ const Swap = () => {
         </>
       ) : (
         <div className="d-grid mt-4">
-          <Button onClick={() => connectWallet()}>Connect wallet</Button>
+          <Button disabled={isHashpackLoading} onClick={() => connectWallet()}>
+            Connect wallet
+          </Button>
         </div>
       )
     ) : null;
