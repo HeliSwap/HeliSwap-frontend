@@ -65,6 +65,7 @@ const Create = () => {
   // State for token inputs
   const [tokensData, setTokensData] = useState<ITokensData>(initialTokensData);
   const [inputTokenA, setInputTokenA] = useState(true);
+
   // State for pools
   const { pools: poolsData } = usePools({
     fetchPolicy: 'network-only',
@@ -542,6 +543,7 @@ const Create = () => {
         {getFeesInfo()}
         <div className="mb-4 text-small text-bold">Enter amount</div>
         <InputTokenSelector
+          isInvalid={getInsufficientTokenA() as boolean}
           inputTokenComponent={
             <InputToken
               value={createPairData.tokenAAmount}
@@ -590,6 +592,7 @@ const Create = () => {
         </Modal>
 
         <InputTokenSelector
+          isInvalid={getInsufficientTokenB() as boolean}
           className="mt-4"
           inputTokenComponent={
             <InputToken
