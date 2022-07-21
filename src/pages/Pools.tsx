@@ -143,7 +143,7 @@ const Pools = () => {
       <div className="rounded bg-dark p-5 text-center mt-5">
         <p>Your active liquidity positions will appear here.</p>
         <div className="mt-4">
-          <Button size="small" onClick={connectWallet} type="primary">
+          <Button disabled={isHashpackLoading} size="small" onClick={connectWallet} type="primary">
             Connect Wallet
           </Button>
         </div>
