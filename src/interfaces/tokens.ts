@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js';
+
 export interface ITokenData {
   hederaId: string;
   name: string;
@@ -30,10 +32,20 @@ export interface IPoolData {
   token1Symbol: string;
   token1Decimals: number;
   lpShares?: string;
-  tvl: string;
-  volume24h: string;
+  icons?: string[];
   volume7d: string;
-  icons: string[];
+  volume24h: string;
+}
+
+export interface IPoolExtendedData extends IPoolData {
+  token0AmountFormatted: string;
+  token1AmountFormatted: string;
+  tvlBN: BigNumber;
+  tvl: string;
+  volume24Num?: number;
+  volume24?: string;
+  volume7Num?: number;
+  volume7?: string;
 }
 
 export enum TokenType {

@@ -159,10 +159,16 @@
 
 .container-pool-details {
   padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
+  grid-auto-rows: auto;
+
   border-top: 1px solid $neutral-400;
+
+  .container-pool-details-row {
+    display: grid;
+    gap: 1em;
+    grid-template-columns: 1fr 1fr 1.3fr;
+  }
 
   &.is-gray {
     background-color: $neutral-700;
@@ -193,8 +199,8 @@
       box-shadow: inset 0px 0px 0px 1px $neutral-100;
     }
 
-    &.with-4-columns {
-      grid-template-columns: 30px 2fr 1fr 1fr;
+    &.with-6-columns {
+      grid-template-columns: 30px 2fr 1fr 1fr 1fr 1fr;
     }
 
     &.is-gray {
