@@ -18,6 +18,8 @@ export const GET_POOLS = gql`
       token1Symbol
       token1Amount
       token1Decimals
+      volume24h
+      volume7d
     }
   }
 `;
