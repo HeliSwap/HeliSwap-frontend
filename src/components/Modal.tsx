@@ -1,26 +1,20 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 
 interface IModalProps {
   show?: boolean;
+  closeModal?: () => void;
   children: JSX.Element | JSX.Element[] | string;
 }
 
-const Modal = ({ show = true, children }: IModalProps) => {
-  const [toShow, setToShow] = useState(show);
-
-  const handleKeyDown = useCallback((event: any) => {
-    if (event.key === 'Escape') {
-      setToShow(prev => prev && false);
-    }
-  }, []);
-
-  useEffect(() => {
-    setToShow(show);
-
-    return () => {
-      setToShow(false);
-    };
-  }, [show]);
+const Modal = ({ show = true, children, closeModal }: IModalProps) => {
+  const handleKeyDown = useCallback(
+    (event: any) => {
+      if (event.key === 'Escape' && closeModal) {
+        closeModal();
+      }
+    },
+    [closeModal],
+  );
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
@@ -30,8 +24,6 @@ const Modal = ({ show = true, children }: IModalProps) => {
     };
   }, [handleKeyDown]);
 
-  console.log('toShow', toShow);
-
   return (
     <>
       <div
@@ -39,16 +31,13 @@ const Modal = ({ show = true, children }: IModalProps) => {
         id="exampleModal"
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"
-        style={{ display: toShow ? 'block' : 'none' }}
+        style={{ display: show ? 'block' : 'none' }}
       >
         <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">{children}</div>
         </div>
       </div>
-      <div
-        style={{ display: toShow ? 'block' : 'none' }}
-        className="modal-backdrop fade show"
-      ></div>
+      <div style={{ display: show ? 'block' : 'none' }} className="modal-backdrop fade show"></div>
     </>
   );
 };

@@ -310,7 +310,10 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
       />
 
       {showModalTransactionSettings ? (
-        <Modal show={showModalTransactionSettings}>
+        <Modal
+          show={showModalTransactionSettings}
+          closeModal={() => setShowModalTransactionSettings(false)}
+        >
           <TransactionSettingsModalContent
             modalTitle="Transaction settings"
             closeModal={() => setShowModalTransactionSettings(false)}
@@ -409,7 +412,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
         </div>
 
         {showModalConfirmRemove ? (
-          <Modal show={showModalConfirmRemove}>
+          <Modal show={showModalConfirmRemove} closeModal={() => setShowModalConfirmRemove(false)}>
             <ConfirmTransactionModalContent
               modalTitle="Remove liquidity"
               closeModal={() => setShowModalConfirmRemove(false)}
