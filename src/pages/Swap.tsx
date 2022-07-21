@@ -577,7 +577,7 @@ const Swap = () => {
             ) : null
           }
         />
-        <Modal show={showModalA}>
+        <Modal show={showModalA} closeModal={() => setShowModalA(false)}>
           <ModalSearchContent
             modalTitle="Select a token"
             tokenFieldId="tokenA"
@@ -633,7 +633,7 @@ const Swap = () => {
             ) : null
           }
         />
-        <Modal show={showModalB}>
+        <Modal show={showModalB} closeModal={() => setShowModalB(false)}>
           <ModalSearchContent
             modalTitle="Select token"
             tokenFieldId="tokenB"
@@ -728,7 +728,7 @@ const Swap = () => {
           )}
 
           {showModalConfirmSwap ? (
-            <Modal show={showModalConfirmSwap}>
+            <Modal show={showModalConfirmSwap} closeModal={() => setShowModalConfirmSwap(false)}>
               <ConfirmTransactionModalContent
                 modalTitle="Confirm swap"
                 closeModal={() => setShowModalConfirmSwap(false)}

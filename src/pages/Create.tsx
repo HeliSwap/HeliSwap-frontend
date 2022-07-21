@@ -571,7 +571,7 @@ const Create = () => {
             ) : null
           }
         />
-        <Modal show={showModalA}>
+        <Modal show={showModalA} closeModal={() => setShowModalA(false)}>
           <ModalSearchContent
             modalTitle="Select a token"
             tokenFieldId="tokenA"
@@ -620,7 +620,7 @@ const Create = () => {
             ) : null
           }
         />
-        <Modal show={showModalB}>
+        <Modal show={showModalB} closeModal={() => setShowModalB(false)}>
           <ModalSearchContent
             modalTitle="Select token"
             tokenFieldId="tokenB"
@@ -752,7 +752,10 @@ const Create = () => {
         </div>
 
         {showModalConfirmProvide ? (
-          <Modal show={showModalConfirmProvide}>
+          <Modal
+            show={showModalConfirmProvide}
+            closeModal={() => setShowModalConfirmProvide(false)}
+          >
             <ConfirmTransactionModalContent
               modalTitle={pageTitle}
               closeModal={() => setShowModalConfirmProvide(false)}
