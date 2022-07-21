@@ -19,7 +19,7 @@ const Pools = () => {
   const { userId, connected, connectWallet } = connection;
 
   const {
-    error,
+    error: errorPoools,
     loading: loadingPools,
     pools,
   } = usePools(
@@ -30,7 +30,11 @@ const Pools = () => {
     true,
   );
 
-  const { loading: loadingPoolsByUser, poolsByUser } = usePoolsByUser(
+  const {
+    error: errorPooolsByUser,
+    loading: loadingPoolsByUser,
+    poolsByUser,
+  } = usePoolsByUser(
     {
       fetchPolicy: 'network-only',
       pollInterval: REFRESH_TIME,
@@ -101,10 +105,9 @@ const Pools = () => {
             </Link>
           </div>
 
-          {error ? (
+          {errorPoools || errorPooolsByUser ? (
             <div className="alert alert-danger mt-5" role="alert">
-              <strong>Something went wrong!</strong> Cannot get pairs...
-              <p>{error.message}</p>
+              <strong>Something went wrong!</strong> Cannot get pools...
             </div>
           ) : null}
 
