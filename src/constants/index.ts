@@ -8,5 +8,5 @@ export const HUNDRED_BN = new BigNumber('100');
 export const REFRESH_TIME = 5000;
 export const HEALTH_CHECK_INTERVAL = 5000;
 export const SLIDER_INITIAL_VALUE = '100';
-export const MAX_SLIPPAGE_VALUE = 5;
-export const MAX_EXPIRATION_VALUE = 3600;
+export const MAX_SLIPPAGE_VALUE = 50;
+export const MAX_EXPIRATION_VALUE = 4000;
