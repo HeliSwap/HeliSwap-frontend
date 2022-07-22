@@ -127,8 +127,6 @@ const Create = () => {
   // State for general error
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [successCreate, setSuccessCreate] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
 
@@ -267,8 +265,6 @@ const Create = () => {
 
     setError(false);
     setErrorMessage('');
-    setSuccessCreate(false);
-    setSuccessMessage('');
     setLoadingCreate(true);
 
     try {
@@ -297,11 +293,7 @@ const Create = () => {
         setError(true);
         setErrorMessage(error);
       } else {
-        const successMessage = `Provided exactly ${createPairData.tokenAAmount} ${tokensData.tokenA.symbol} and ${createPairData.tokenBAmount} ${tokensData.tokenB.symbol}`;
-
         setCreatePairData({ ...createPairData, tokenAAmount: '', tokenBAmount: '' });
-        setSuccessCreate(true);
-        setSuccessMessage(successMessage);
         setReadyToProvide(false);
       }
     } catch (err) {
@@ -310,6 +302,7 @@ const Create = () => {
       setErrorMessage('Error on create');
     } finally {
       setLoadingCreate(false);
+      setShowModalConfirmProvide(false);
     }
   };
 
@@ -537,20 +530,6 @@ const Create = () => {
   const getProvideSection = () => {
     return (
       <div className="container-dark">
-        {successCreate ? (
-          <div className="alert alert-success alert-dismissible my-5" role="alert">
-            <strong>Success provide!</strong>
-            <p>{successMessage}</p>
-            <button
-              onClick={() => setSuccessCreate(false)}
-              type="button"
-              className="btn-close"
-              data-bs-dismiss="alert"
-              aria-label="Close"
-            ></button>
-          </div>
-        ) : null}
-
         {getFeesInfo()}
         <div className="mb-4 text-small text-bold">Enter amount</div>
         <InputTokenSelector
@@ -773,6 +752,7 @@ const Create = () => {
             closeModal={() => setShowModalConfirmProvide(false)}
           >
             <ConfirmTransactionModalContent
+              isLoading={loadingCreate}
               modalTitle={pageTitle}
               closeModal={() => setShowModalConfirmProvide(false)}
               confirmTansaction={handleProvideConfirm}
