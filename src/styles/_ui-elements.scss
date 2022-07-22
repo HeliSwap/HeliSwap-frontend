@@ -88,6 +88,22 @@
   }
 }
 
+.icon-healthcheck {
+  display: block;
+  width: 8px;
+  height: 8px;
+  background-color: $danger;
+  border-radius: 50%;
+
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+
+  &.is-running {
+    background-color: $success;
+  }
+}
+
 /* Containers */
 .container-connected {
   background-color: $neutral-900;

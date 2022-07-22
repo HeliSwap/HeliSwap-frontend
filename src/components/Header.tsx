@@ -7,7 +7,6 @@ const Header = () => {
   const contextValue = useContext(GlobalContext);
   const { connected, connectWallet, disconnectWallet, extensionFound, isHashpackLoading, userId } =
     contextValue.connection;
-  const { isRunning } = contextValue;
 
   const [userBalance, setUserBalance] = useState('0.0');
 
@@ -34,7 +33,6 @@ const Header = () => {
     <div className="p-5">
       <div className="d-flex justify-content-end">
         <div className="d-flex align-items-center">
-          {isRunning ? <span className="me-3">🟢</span> : <span className="me-3">🔴</span>}
           {extensionFound ? (
             isHashpackLoading ? (
               <p className="text-warning mx-2">Please aprove from your wallet</p>

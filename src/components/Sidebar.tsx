@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import { GlobalContext } from '../providers/Global';
 
 import Icon from './Icon';
 
 const Sidebar = () => {
-  // const isLocalDev = process.env.REACT_APP_LOCAL_DEV === 'true';
+  const contextValue = useContext(GlobalContext);
+  const { isRunning } = contextValue;
 
   return (
     <div className="container-sidebar">
@@ -54,7 +56,9 @@ const Sidebar = () => {
         </div>
 
         <div>
-          <div className="d-flex align-items-center">
+          <span className={`icon-healthcheck ${isRunning ? 'is-running' : ''}`}></span>
+
+          {/* <div className="d-flex align-items-center">
             <span className="icon-menu">
               <Icon color="gray" name="more" />
             </span>
@@ -68,7 +72,7 @@ const Sidebar = () => {
             <span className="text-small text-secondary d-none d-xxxl-inline-block ms-4">
               Support
             </span>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
