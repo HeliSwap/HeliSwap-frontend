@@ -570,6 +570,7 @@ const Swap = () => {
           walletBalanceComponent={
             Object.keys(tokensData.tokenA).length > 0 ? (
               <WalletBalance
+                insufficientBallance={getInsufficientTokenIn() as boolean}
                 walletBalance={tokenBalances.tokenA}
                 onMaxButtonClick={(maxValue: string) => {
                   handleInputChange(maxValue, 'amountIn');
