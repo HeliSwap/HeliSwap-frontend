@@ -130,8 +130,6 @@ const Swap = () => {
   // State for general error
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [successSwap, setSuccessSwap] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
   const [loadingSwap, setLoadingSwap] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
   const [loadingAssociate, setLoadingAssociate] = useState(false);
@@ -330,8 +328,6 @@ const Swap = () => {
 
     setError(false);
     setErrorMessage('');
-    setSuccessSwap(false);
-    setSuccessMessage('');
     setLoadingSwap(true);
 
     const { swapSlippage, transactionExpiration } = getTransactionSettings();
@@ -368,13 +364,9 @@ const Swap = () => {
         setError(true);
         setErrorMessage(error);
       } else {
-        const successMessage = `Swap exactly ${swapData.amountIn} ${tokensData.tokenA.symbol} for ${swapData.amountOut} ${tokensData.tokenB.symbol}`;
-
         setSwapData(initialSwapData);
         setTokensData(initialTokensData);
         setApproved(false);
-        setSuccessSwap(true);
-        setSuccessMessage(successMessage);
         refetch();
       }
     } catch (err) {
@@ -546,8 +538,6 @@ const Swap = () => {
   const getSwapSection = () => {
     return (
       <div className="container-dark">
-        {getSuccessMessage()}
-
         <InputTokenSelector
           isInvalid={getInsufficientTokenIn() as boolean}
           inputTokenComponent={
@@ -772,22 +762,6 @@ const Swap = () => {
           </Button>
         </div>
       )
-    ) : null;
-  };
-
-  const getSuccessMessage = () => {
-    return successSwap ? (
-      <div className="alert alert-success alert-dismissible mb-5" role="alert">
-        <strong>Success swap!</strong>
-        <p>{successMessage}</p>
-        <button
-          onClick={() => setSuccessSwap(false)}
-          type="button"
-          className="btn-close"
-          data-bs-dismiss="alert"
-          aria-label="Close"
-        ></button>
-      </div>
     ) : null;
   };
 
