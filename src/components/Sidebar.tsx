@@ -39,20 +39,6 @@ const Sidebar = () => {
             </span>
             <span className="ms-4 d-none d-xxxl-inline-block">Pools</span>
           </NavLink>
-          {/* <Link className="link-menu" to="/my-pools">
-            My pools
-          </Link>
-          <Link className="link-menu" to="/pairs">
-            Pairs
-          </Link>
-          <Link className="link-menu" to="/tokens">
-            Tokens
-          </Link>
-          {isLocalDev ? (
-            <Link className="link-menu" to="/helpers">
-              Helpers
-            </Link>
-          ) : null} */}
         </div>
 
         <div>
