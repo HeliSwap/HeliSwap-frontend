@@ -565,6 +565,7 @@ const Create = () => {
           walletBalanceComponent={
             Object.keys(tokensData.tokenA).length > 0 ? (
               <WalletBalance
+                insufficientBallance={getInsufficientTokenA() as boolean}
                 walletBalance={tokenBalances.tokenA}
                 onMaxButtonClick={(maxValue: string) => {
                   handleInputChange(maxValue, 'tokenAAmount');
@@ -615,6 +616,7 @@ const Create = () => {
           walletBalanceComponent={
             Object.keys(tokensData.tokenB).length > 0 ? (
               <WalletBalance
+                insufficientBallance={getInsufficientTokenB() as boolean}
                 walletBalance={tokenBalances.tokenB}
                 onMaxButtonClick={(maxValue: string) => {
                   handleInputChange(maxValue, 'tokenBAmount');
