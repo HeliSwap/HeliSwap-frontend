@@ -227,6 +227,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
       setErrorRemove(true);
     } finally {
       setLoadingRemove(false);
+      setShowModalConfirmRemove(false);
     }
   };
 
@@ -414,6 +415,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
         {showModalConfirmRemove ? (
           <Modal show={showModalConfirmRemove} closeModal={() => setShowModalConfirmRemove(false)}>
             <ConfirmTransactionModalContent
+              isLoading={loadingRemove}
               modalTitle="Remove liquidity"
               closeModal={() => setShowModalConfirmRemove(false)}
               confirmTansaction={handleRemoveLPButtonClick}
