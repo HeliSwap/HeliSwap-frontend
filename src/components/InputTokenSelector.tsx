@@ -5,6 +5,7 @@ interface IInputTokenSelector {
   inputTokenComponent: React.ReactNode;
   buttonSelectorComponent: React.ReactNode;
   walletBalanceComponent?: React.ReactNode;
+  isInvalid?: boolean;
 }
 
 const InputTokenSelector = ({
@@ -12,9 +13,10 @@ const InputTokenSelector = ({
   inputTokenComponent,
   buttonSelectorComponent,
   walletBalanceComponent,
+  isInvalid,
 }: IInputTokenSelector) => {
   return (
-    <div className={`container-input-token ${className}`}>
+    <div className={`container-input-token ${isInvalid ? 'is-invalid' : ''} ${className}`}>
       <div className="d-flex justify-content-between align-items-center">
         {inputTokenComponent}
         {buttonSelectorComponent}
