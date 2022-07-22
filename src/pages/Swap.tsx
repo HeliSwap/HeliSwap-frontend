@@ -374,6 +374,7 @@ const Swap = () => {
       setError(true);
     } finally {
       setLoadingSwap(false);
+      setShowModalConfirmSwap(false);
     }
   };
 
@@ -727,30 +728,40 @@ const Swap = () => {
                 closeModal={() => setShowModalConfirmSwap(false)}
                 confirmTansaction={handleSwapConfirm}
                 confirmButtonLabel="Confirm swap"
+                isLoading={loadingSwap}
               >
-                <InputTokenSelector
-                  inputTokenComponent={<InputToken value={swapData.amountIn} disabled={true} />}
-                  buttonSelectorComponent={
-                    <ButtonSelector
-                      selectedToken={tokensData?.tokenA.symbol}
-                      selectorText="Select token"
-                      disabled={true}
+                {loadingSwap ? (
+                  <Loader></Loader>
+                ) : (
+                  <>
+                    {' '}
+                    <InputTokenSelector
+                      inputTokenComponent={<InputToken value={swapData.amountIn} disabled={true} />}
+                      buttonSelectorComponent={
+                        <ButtonSelector
+                          selectedToken={tokensData?.tokenA.symbol}
+                          selectorText="Select token"
+                          disabled={true}
+                        />
+                      }
                     />
-                  }
-                />
-                <InputTokenSelector
-                  className="mt-5"
-                  inputTokenComponent={<InputToken value={swapData.amountOut} disabled={true} />}
-                  buttonSelectorComponent={
-                    <ButtonSelector
-                      selectedToken={tokensData?.tokenB.symbol}
-                      selectorText="Select token"
-                      disabled={true}
+                    <InputTokenSelector
+                      className="mt-5"
+                      inputTokenComponent={
+                        <InputToken value={swapData.amountOut} disabled={true} />
+                      }
+                      buttonSelectorComponent={
+                        <ButtonSelector
+                          selectedToken={tokensData?.tokenB.symbol}
+                          selectorText="Select token"
+                          disabled={true}
+                        />
+                      }
                     />
-                  }
-                />
-                {getTokensRatio()}
-                {getAdvancedSwapInfo()}
+                    {getTokensRatio()}
+                    {getAdvancedSwapInfo()}
+                  </>
+                )}
               </ConfirmTransactionModalContent>
             </Modal>
           ) : null}

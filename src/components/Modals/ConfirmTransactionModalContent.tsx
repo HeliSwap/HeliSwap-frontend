@@ -1,11 +1,13 @@
 import React from 'react';
+import Button from '../Button';
 
-interface IModalProps {
+interface IConfirmTransactionModalContentProps {
   closeModal: () => void;
   confirmTansaction: () => void;
   modalTitle: string;
   children: any;
   confirmButtonLabel: string;
+  isLoading: boolean;
 }
 
 const ConfirmTransactionModalContent = ({
@@ -14,11 +16,12 @@ const ConfirmTransactionModalContent = ({
   modalTitle,
   children,
   confirmButtonLabel,
-}: IModalProps) => {
+  isLoading,
+}: IConfirmTransactionModalContentProps) => {
   const handleConfirmButtonClick = () => {
     confirmTansaction();
-    closeModal();
   };
+
   return (
     <>
       <div className="modal-header">
@@ -37,11 +40,11 @@ const ConfirmTransactionModalContent = ({
       <div className="modal-body">
         {children}
 
-        <div className="d-grid mt-4">
-          <button type="button" className="btn btn-primary" onClick={handleConfirmButtonClick}>
-            {confirmButtonLabel}
-          </button>
-        </div>
+        {!isLoading ? (
+          <div className="d-grid mt-4">
+            <Button onClick={handleConfirmButtonClick}>{confirmButtonLabel}</Button>
+          </div>
+        ) : null}
       </div>
     </>
   );
