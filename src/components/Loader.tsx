@@ -6,11 +6,9 @@ interface ILoaderProps {
 
 const Loader = ({ loadingText }: ILoaderProps) => {
   return (
-    <div className="d-flex align-items-center">
-      <div className="spinner-border text-primary me-3" role="status">
-        <span className="visually-hidden">Loading...</span>
-      </div>
-      <p>{loadingText ? loadingText : 'Loading...'}</p>
+    <div className="d-flex justify-content-center align-items-center">
+      <div className="container-loader"></div>
+      {loadingText ? <p className="mt-3">{loadingText}</p> : null}
     </div>
   );
 };

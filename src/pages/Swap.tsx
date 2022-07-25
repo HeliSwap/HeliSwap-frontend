@@ -731,7 +731,19 @@ const Swap = () => {
                 isLoading={loadingSwap}
               >
                 {loadingSwap ? (
-                  <Loader></Loader>
+                  <>
+                    <Loader></Loader>
+                    <div className="text-center mt-4">
+                      <p className="text-subheader">Waiting for confirmation</p>
+                      <p className="text-small mt-3">
+                        Swapping {swapData.amountIn} {tokensData.tokenA.symbol} for
+                        {swapData.amountOut} {tokensData.tokenB.symbol}
+                      </p>
+                      <p className="text-micro text-gray mt-2">
+                        Confirm this transaction in your wallet
+                      </p>
+                    </div>
+                  </>
                 ) : (
                   <>
                     {' '}
