@@ -7,6 +7,7 @@ import { PageViews } from '../interfaces/common';
 import PoolInfo from '../components/PoolInfo';
 import Button from '../components/Button';
 import RemoveLiquidity from '../components/RemoveLiquidity';
+import Icon from '../components/Icon';
 
 import { REFRESH_TIME } from '../constants';
 
@@ -80,7 +81,9 @@ const Pools = () => {
             <span className="text-small">Pool</span>
           </div>
           <div className="table-pools-cell justify-content-end">
-            <span className="text-small">TVL</span>
+            <span className="text-small">
+              TVL <Icon name="arrow-down" />
+            </span>
           </div>
           <div className="table-pools-cell justify-content-end">
             <span className="text-small">Volume 7d</span>
