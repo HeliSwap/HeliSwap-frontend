@@ -23,7 +23,13 @@ import ButtonSelector from '../components/ButtonSelector';
 import WalletBalance from '../components/WalletBalance';
 
 import errorMessages from '../content/errors';
-import { checkAllowanceHTS, getTokenBalance, idToAddress, NATIVE_TOKEN } from '../utils/tokenUtils';
+import {
+  checkAllowanceHTS,
+  getTokenBalance,
+  idToAddress,
+  NATIVE_TOKEN,
+  getUserAssociatedTokens,
+} from '../utils/tokenUtils';
 import {
   formatStringETHtoPriceFormatted,
   formatStringToBigNumberEthersWei,
@@ -65,6 +71,8 @@ const Create = () => {
   // State for token inputs
   const [tokensData, setTokensData] = useState<ITokensData>(initialTokensData);
   const [inputTokenA, setInputTokenA] = useState(true);
+  const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
+  const [loadingAssociate, setLoadingAssociate] = useState(false);
 
   // State for pools
   const { pools: poolsData } = usePools({
@@ -219,11 +227,41 @@ const Create = () => {
           [name]: value,
         }));
       } else {
-        setCreatePairData(prev => ({ ...prev, [name]: value }));
+        const calculatedToken = name === 'tokenAAmount' ? 'tokenBAmount' : 'tokenAAmount';
+        setCreatePairData(prev => ({ ...prev, [name]: value, [calculatedToken]: '' }));
       }
     },
     [invalidTokenData, selectedPoolData, tokensData, tokensInSamePool],
   );
+
+  const handleAssociateClick = async (token: ITokenData) => {
+    setLoadingAssociate(true);
+
+    try {
+      const receipt = await sdk.associateToken(
+        hashconnectConnectorInstance,
+        userId,
+        token.hederaId,
+      );
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (!success) {
+        setError(true);
+        setErrorMessage(error);
+      } else {
+        const tokens = await getUserAssociatedTokens(userId);
+        setUserAssociatedTokens(tokens);
+      }
+    } catch (err) {
+      console.error(err);
+      setError(true);
+      setErrorMessage('Error on associate');
+    } finally {
+      setLoadingAssociate(false);
+    }
+  };
 
   const handleApproveClick = async (key: string) => {
     const { hederaId, type } = tokensData[key];
@@ -353,6 +391,16 @@ const Create = () => {
       setReadyToProvide(false);
     };
   }, [tokensData, sdk, userId, createPairData]);
+
+  // Check for associations
+  useEffect(() => {
+    const checkTokenAssociation = async (userId: string) => {
+      const tokens = await getUserAssociatedTokens(userId);
+      setUserAssociatedTokens(tokens);
+    };
+
+    userId && checkTokenAssociation(userId);
+  }, [userId]);
 
   // Check for balances
   useEffect(() => {
@@ -523,6 +571,14 @@ const Create = () => {
     invalidTokenData,
     tokensData,
   ]);
+
+  const getTokenIsAssociated = (token: ITokenData) => {
+    const notHTS =
+      Object.keys(token).length === 0 ||
+      token.type === TokenType.HBAR ||
+      token.type === TokenType.ERC20;
+    return notHTS || userAssociatedTokens?.includes(token.hederaId);
+  };
 
   //Render methods
   const getErrorMessage = () => {
@@ -737,10 +793,33 @@ const Create = () => {
   const getActionButtons = () => {
     return connected && !isHashpackLoading ? (
       <div className="mt-5">
+        {!getTokenIsAssociated(tokensData.tokenA) ? (
+          <div className="d-grid mt-4">
+            <Button
+              loading={loadingAssociate}
+              onClick={() => handleAssociateClick(tokensData.tokenA)}
+            >
+              {`Associate ${tokensData.tokenA.symbol}`}
+            </Button>
+          </div>
+        ) : null}
+
+        {!getTokenIsAssociated(tokensData.tokenB) ? (
+          <div className="d-grid mt-4">
+            <Button
+              loading={loadingAssociate}
+              onClick={() => handleAssociateClick(tokensData.tokenB)}
+            >
+              {`Associate ${tokensData.tokenB.symbol}`}
+            </Button>
+          </div>
+        ) : null}
+
         {tokensData.tokenA.hederaId &&
         needApproval.tokenA &&
         !approved.tokenA &&
-        createPairData.tokenAAmount ? (
+        createPairData.tokenAAmount &&
+        getTokenIsAssociated(tokensData.tokenA) ? (
           <div className="d-grid mt-4">
             <Button
               loading={loadingApprove}
@@ -752,7 +831,8 @@ const Create = () => {
         {tokensData.tokenB.hederaId &&
         needApproval.tokenB &&
         !approved.tokenB &&
-        createPairData.tokenBAmount ? (
+        createPairData.tokenBAmount &&
+        getTokenIsAssociated(tokensData.tokenB) ? (
           <div className="d-grid mt-4">
             <Button
               loading={loadingApprove}
