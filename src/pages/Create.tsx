@@ -786,7 +786,6 @@ const Create = () => {
           <Confirmation confirmationText={confirmationText} />
         ) : (
           <>
-            {' '}
             <div className="d-flex align-items-center">
               {formatIcons([token0Symbol, token1Symbol], 'large')}
               <p className="text-subheader ms-3">

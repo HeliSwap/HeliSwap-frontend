@@ -737,7 +737,6 @@ const Swap = () => {
                   <Confirmation confirmationText={confirmationText} />
                 ) : (
                   <>
-                    {' '}
                     <InputTokenSelector
                       inputTokenComponent={<InputToken value={swapData.amountIn} disabled={true} />}
                       buttonSelectorComponent={
