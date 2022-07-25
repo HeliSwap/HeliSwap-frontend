@@ -37,6 +37,7 @@ import { MAX_UINT_ERC20, MAX_UINT_HTS, POOLS_FEE, REFRESH_TIME } from '../consta
 import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
 import { formatIcons } from '../utils/iconUtils';
 import IconToken from '../components/IconToken';
+import Confirmation from '../components/Confirmation';
 
 enum ADD_LIQUIDITY_TITLES {
   CREATE_POOL = 'Create pool',
@@ -776,41 +777,49 @@ const Create = () => {
     const hasSelectedPool = Object.keys(selectedPoolData).length;
     const token0Symbol = hasSelectedPool ? selectedPoolData.token0Symbol : tokensData.tokenA.symbol;
     const token1Symbol = hasSelectedPool ? selectedPoolData.token1Symbol : tokensData.tokenB.symbol;
+
+    const confirmationText = `Providing ${createPairData.tokenAAmount} ${token0Symbol} and ${createPairData.tokenBAmount} ${token1Symbol}`;
+
     return (
       <>
-        <div className="d-flex align-items-center">
-          {formatIcons([token0Symbol, token1Symbol], 'large')}
-          <p className="text-subheader ms-3">
-            {token0Symbol}/{token1Symbol}
-          </p>
-        </div>
-
-        <div className="mt-4 rounded border border-secondary justify-content-between ">
-          <div className="d-flex justify-content-between align-items-center m-4">
+        {loadingCreate ? (
+          <Confirmation confirmationText={confirmationText} />
+        ) : (
+          <>
+            {' '}
             <div className="d-flex align-items-center">
-              <IconToken symbol={token0Symbol} />
-              <span className="text-main ms-3">{token0Symbol}</span>
+              {formatIcons([token0Symbol, token1Symbol], 'large')}
+              <p className="text-subheader ms-3">
+                {token0Symbol}/{token1Symbol}
+              </p>
             </div>
+            <div className="mt-4 rounded border border-secondary justify-content-between ">
+              <div className="d-flex justify-content-between align-items-center m-4">
+                <div className="d-flex align-items-center">
+                  <IconToken symbol={token0Symbol} />
+                  <span className="text-main ms-3">{token0Symbol}</span>
+                </div>
 
-            <div className="d-flex justify-content-end align-items-center">
-              <span className="text-numeric text-main">{createPairData.tokenAAmount}</span>
-            </div>
-          </div>
-          <div className="d-flex justify-content-between align-items-center m-4">
-            <div className="d-flex align-items-center">
-              <IconToken symbol={token1Symbol} />
-              <span className="text-main ms-3">{token1Symbol}</span>
-            </div>
+                <div className="d-flex justify-content-end align-items-center">
+                  <span className="text-numeric text-main">{createPairData.tokenAAmount}</span>
+                </div>
+              </div>
+              <div className="d-flex justify-content-between align-items-center m-4">
+                <div className="d-flex align-items-center">
+                  <IconToken symbol={token1Symbol} />
+                  <span className="text-main ms-3">{token1Symbol}</span>
+                </div>
 
-            <div className="d-flex justify-content-end align-items-center">
-              <span className="text-numeric text-main">{createPairData.tokenBAmount}</span>
+                <div className="d-flex justify-content-end align-items-center">
+                  <span className="text-numeric text-main">{createPairData.tokenBAmount}</span>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-
-        <div className="mt-4 rounded border border-secondary justify-content-between ">
-          {getTokensRatioSection()}
-        </div>
+            <div className="mt-4 rounded border border-secondary justify-content-between ">
+              {getTokensRatioSection()}
+            </div>
+          </>
+        )}
       </>
     );
   };
