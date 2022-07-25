@@ -3,6 +3,7 @@ import Hashconnect from '../connectors/hashconnect';
 import { HEALTH_CHECK_INTERVAL } from '../constants';
 import useHealthCheck from '../hooks/useHealthCheck';
 import SDK from '../sdk/sdk';
+import { timestampToDate } from '../utils/timeUtils';
 
 const contextInitialValue = {
   sdk: {} as SDK,
@@ -16,6 +17,7 @@ const contextInitialValue = {
     hashconnectConnectorInstance: {} as Hashconnect,
   },
   isRunning: false,
+  lastUpdated: '',
 };
 
 export const GlobalContext = React.createContext(contextInitialValue);
@@ -37,6 +39,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
     pollInterval: HEALTH_CHECK_INTERVAL,
   });
 
+  const lastUpdated = timestampToDate(timestamp);
   const nowSeconds = Date.now() / 1000;
   const isRunning = !error
     ? timestamp
@@ -63,7 +66,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
     disconnectWallet,
     hashconnectConnectorInstance: hashconnectConnectorInstance || ({} as Hashconnect),
   };
-  const contextValue = { sdk, connection, isRunning };
+  const contextValue = { sdk, connection, isRunning, lastUpdated };
 
   useEffect(() => {
     const initHashconnectConnector = async () => {

@@ -6,7 +6,7 @@ import Icon from './Icon';
 
 const Sidebar = () => {
   const contextValue = useContext(GlobalContext);
-  const { isRunning } = contextValue;
+  const { isRunning, lastUpdated } = contextValue;
 
   return (
     <div className="container-sidebar">
@@ -42,7 +42,10 @@ const Sidebar = () => {
         </div>
 
         <div>
-          <span className={`icon-healthcheck ${isRunning ? 'is-running' : ''}`}></span>
+          <div className="container-healthcheck d-flex align-items-center">
+            <span className="me-3 d-none d-xxl-block">{lastUpdated}</span>
+            <span className={`icon-healthcheck ${isRunning ? 'is-running' : ''}`}></span>
+          </div>
 
           {/* <div className="d-flex align-items-center">
             <span className="icon-menu">
