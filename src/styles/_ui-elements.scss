@@ -38,7 +38,7 @@
   border-radius: $border-radius;
   font-size: 12px;
   line-height: 16px;
-  color: $neutral-100;
+  color: $primary-100;
   padding: 4px 12px;
   transition: background-color 0.15s linear;
 
@@ -106,7 +106,7 @@
 
 /* Containers */
 .container-connected {
-  background-color: $neutral-900;
+  background-color: $primary-900;
   border-radius: $border-radius;
   padding: 3px 3px 3px 12px;
   display: flex;
@@ -114,14 +114,14 @@
 }
 
 .container-address {
-  background-color: $neutral-700;
+  background-color: $primary-700;
   border-radius: 2px;
   padding: 4px 8px;
   margin-left: 12px;
 }
 
 .container-dark {
-  background-color: $neutral-900;
+  background-color: $primary-900;
   box-shadow: 0px 5px 20px rgba(9, 10, 20, 0.45);
   padding: 16px;
   border-radius: 6px;
@@ -129,15 +129,15 @@
 
 .container-input-token {
   height: 108px;
-  background-color: $neutral-700;
+  background-color: $primary-700;
   border-radius: $border-radius;
   padding: 12px;
-  border: 1px solid $neutral-700;
+  border: 1px solid $primary-700;
   transition: border 0.15s linear;
 
   &:focus-within,
   &:hover {
-    border-color: $neutral-100;
+    border-color: $primary-100;
   }
 
   &.is-invalid {
@@ -145,18 +145,18 @@
   }
 
   .input-token {
-    color: $neutral-300;
+    color: $primary-100;
     font-family: $font-family-numeric;
     font-size: 28px;
     line-height: 40px;
-    background-color: $neutral-700;
+    background-color: $primary-700;
     border: none;
     max-width: 250px;
     flex: 0 1 250px;
     @include transition-color;
 
     &:focus {
-      color: $neutral-100;
+      color: $primary-100;
     }
 
     &:focus-visible {
@@ -181,8 +181,8 @@
   padding: 20px;
   display: grid;
   grid-auto-rows: auto;
-
-  border-top: 1px solid $neutral-400;
+  background-color: #1f1f4d;
+  border-bottom: 1px solid $neutral-500;
 
   .container-pool-details-row {
     display: grid;
@@ -195,10 +195,10 @@
   }
 }
 
-.container-neutral-500 {
-  background-color: $neutral-500;
+.container-transparent-border {
   padding: 18px 12px;
   border-radius: $border-radius;
+  border: 1px solid #3d3d58;
 }
 
 /* Tables */
@@ -206,25 +206,31 @@
   display: grid;
   grid-auto-rows: auto;
   border-radius: 4px 4px 0px 0px;
-  background-color: $neutral-900;
+  background-color: $primary-800;
 
   .table-pools-row {
     display: grid;
     gap: 1em;
     grid-template-columns: 30px 3fr 1fr;
-    transition: box-shadow 0.1s linear;
+    transition: background-color 0.1s linear;
+    border-bottom: 1px solid $neutral-500;
     cursor: pointer;
 
     &:hover {
-      box-shadow: inset 0px 0px 0px 1px $neutral-100;
+      background-color: #1f1f4d;
+    }
+
+    &:last-child {
+      border-bottom: none;
     }
 
     &.with-6-columns {
       grid-template-columns: 30px 2fr 1fr 1fr 1fr 1fr;
     }
 
-    &.is-gray {
-      background-color: $neutral-700;
+    &.is-opened {
+      background-color: #1f1f4d;
+      border-bottom: none;
     }
 
     .table-pools-cell {
@@ -326,13 +332,13 @@
   @include transition-color;
 
   &.is-active {
-    color: $neutral-100;
+    color: $primary-100;
 
     &:after {
       content: '';
       display: block;
       height: 1px;
-      background-color: $neutral-100;
+      background-color: $primary-100;
       transform: translateY(17px);
     }
   }

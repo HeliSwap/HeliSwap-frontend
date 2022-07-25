@@ -65,29 +65,29 @@
   @include transition-color;
 
   &.is-active {
-    color: $neutral-100;
+    color: $primary-100;
 
     .icon-menu {
-      background-color: $neutral-500;
+      background-color: $primary-500;
 
       .icon {
-        color: $neutral-100;
+        color: $primary-100;
 
         path {
-          fill: $neutral-100;
+          fill: $primary-100;
         }
       }
     }
   }
 
   &:hover {
-    color: $neutral-100;
+    color: $primary-100;
 
     .icon {
-      color: $neutral-100;
+      color: $primary-100;
 
       path {
-        fill: $neutral-100;
+        fill: $primary-100;
       }
     }
   }

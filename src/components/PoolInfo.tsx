@@ -42,7 +42,7 @@ const PoolInfo = ({
     <>
       <div
         onClick={() => setShowPoolDetails(prev => !prev)}
-        className={`table-pools-row ${index % 2 === 0 ? 'is-gray' : ''} ${
+        className={`table-pools-row ${showPoolDetails ? 'is-opened' : ''} ${
           view === PageViews.ALL_POOLS ? 'with-6-columns' : ''
         }`}
       >
@@ -83,9 +83,9 @@ const PoolInfo = ({
 
       {showPoolDetails ? (
         <>
-          <div className={`container-pool-details ${index % 2 === 0 ? 'is-gray' : ''}`}>
+          <div className="container-pool-details">
             <div className="container-pool-details-row">
-              <div className="container-neutral-500 d-flex flex-column justify-content-between">
+              <div className="container-transparent-border d-flex flex-column justify-content-between">
                 <div className="d-flex justify-content-between align-items-center">
                   <div className="d-flex align-items-center">
                     <IconToken symbol={poolData.token0Symbol} />
@@ -114,13 +114,13 @@ const PoolInfo = ({
               </div>
 
               <div>
-                <div className="container-neutral-500 d-flex justify-content-between align-items-center">
+                <div className="container-transparent-border d-flex justify-content-between align-items-center">
                   <span className="text-main text-bold">Liquidity</span>
                   <span className="text-main text-numeric ms-4">
                     {formatStringToPrice(poolData.tvl)}
                   </span>
                 </div>
-                <div className="container-neutral-500 mt-4 d-flex justify-content-between align-items-center">
+                <div className="container-transparent-border mt-4 d-flex justify-content-between align-items-center">
                   <span className="text-main text-bold">LP Tokens Count</span>
                   <span className="text-main text-numeric ms-4">
                     {formatStringETHtoPriceFormatted(
@@ -147,7 +147,7 @@ const PoolInfo = ({
                 ) : null}
 
                 <Link
-                  className="btn btn-sm btn-secondary ms-3"
+                  className="btn btn-sm btn-primary ms-3"
                   to={`/create/${poolData.pairAddress}`}
                 >
                   Add Liquidity
