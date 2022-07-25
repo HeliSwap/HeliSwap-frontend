@@ -13,11 +13,17 @@ $neutral-600: #313135;
 $neutral-500: #4b4b51;
 $neutral-400: #6f6f77;
 $neutral-300: #9d9daa;
-$neutral-100: #f9f9f9;
+$primary-100: #f9f9f9;
 
 $primary: #2f18e5;
+$primary-100: #FAFAFF;
 $primary-200: #7391ff;
 $primary-300: #4d5fff;
+$primary-500: #3D3D58;
+$primary-700: #1F1F3A;
+$primary-800: #19193F;
+$primary-850: #0C112C;
+$primary-900: #030617;
 $secondary: $neutral-400;
 $success: #0da048;
 $danger: #ea1548;
@@ -136,8 +142,8 @@ $container-max-widths: (
 );
 
 // Body
-$body-bg: $neutral-850;
-$body-color: $neutral-100;
+$body-bg: $primary-850;
+$body-color: $primary-100;
 
 // Paragraphs
 $paragraph-margin-bottom: 0;
@@ -265,20 +271,20 @@ $btn-primary-disabled-background: #232342;
 $btn-primary-outline-color: $white;
 
 // Forms
-$input-color: $neutral-100;
-$input-border-color: $neutral-700;
-$input-focus-border-color: $neutral-100;
+$input-color: $primary-100;
+$input-border-color: $primary-700;
+$input-focus-border-color: $primary-100;
 $input-focus-box-shadow: none;
 $input-height: auto;
 $input-line-height: 1.71;
 $input-placeholder-color: $secondary;
 $form-group-margin-bottom: 0;
-$input-bg: $neutral-700;
+$input-bg: $primary-700;
 $input-padding-y: 15px;
 $input-padding-x: 12px;
 $input-font-size: 14px;
 $input-disabled-bg: $neutral-800;
-$input-disabled-border-color: $neutral-500;
+$input-disabled-border-color: $primary-500;
 
 $input-padding-y-sm:                    7px;
 $input-padding-x-sm:                    12px;
@@ -298,11 +304,11 @@ $form-range-thumb-height: 1.5rem;
 $form-range-thumb-border: 4px solid $primary-300;
 
 // Modals
-$modal-content-bg: $neutral-900;
+$modal-content-bg: $primary-900;
 $modal-header-border-color: $dark;
 $modal-backdrop-opacity: 1;
-$form-range-thumb-bg: $neutral-100;
-$modal-backdrop-bg: rgba(49, 49, 53, 0.3);
+$form-range-thumb-bg: $primary-100;
+$modal-backdrop-bg: rgba(25, 25, 63, 0.3);
 $modal-header-padding: 24px;
 $modal-inner-padding: 1.5rem;
 
