@@ -237,7 +237,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
     try {
       const contractId = addressToContractId(pairData.pairAddress);
-      await sdk.approveToken(hashconnectConnectorInstance, amount, userId, contractId);
+      await sdk.approveToken(hashconnectConnectorInstance, amount, userId, contractId, false);
       setLpApproved(true);
     } catch (e) {
       console.error(e);

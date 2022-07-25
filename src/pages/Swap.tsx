@@ -296,6 +296,7 @@ const Swap = () => {
         amount,
         userId,
         tokenA.hederaId,
+        tokenA.type === TokenType.HTS,
       );
       const {
         response: { success, error },

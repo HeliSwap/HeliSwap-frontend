@@ -237,6 +237,7 @@ const Create = () => {
         amount,
         userId,
         hederaId,
+        type === TokenType.HTS,
       );
       const {
         response: { success, error },
@@ -278,6 +279,7 @@ const Create = () => {
             createPairData,
             provideSlippage,
             transactionExpiration,
+            tokensInSamePool,
           )
         : await sdk.addLiquidity(
             hashconnectConnectorInstance,
@@ -285,6 +287,7 @@ const Create = () => {
             createPairData,
             provideSlippage,
             transactionExpiration,
+            tokensInSamePool,
           );
       const {
         response: { success, error },
