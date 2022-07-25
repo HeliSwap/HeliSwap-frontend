@@ -45,6 +45,7 @@ import { MAX_UINT_ERC20, MAX_UINT_HTS, REFRESH_TIME } from '../constants';
 import InputToken from '../components/InputToken';
 import ButtonSelector from '../components/ButtonSelector';
 import Icon from '../components/Icon';
+import Confirmation from '../components/Confirmation';
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
@@ -676,6 +677,8 @@ const Swap = () => {
   };
 
   const getActionButtons = () => {
+    const confirmationText = `Swapping ${swapData.amountIn} ${tokensData.tokenA.symbol} for ${swapData.amountOut} ${tokensData.tokenB.symbol}`;
+
     return extensionFound ? (
       connected && !isHashpackLoading ? (
         <>
@@ -731,19 +734,7 @@ const Swap = () => {
                 isLoading={loadingSwap}
               >
                 {loadingSwap ? (
-                  <>
-                    <Loader></Loader>
-                    <div className="text-center mt-4">
-                      <p className="text-subheader">Waiting for confirmation</p>
-                      <p className="text-small mt-3">
-                        Swapping {swapData.amountIn} {tokensData.tokenA.symbol} for
-                        {swapData.amountOut} {tokensData.tokenB.symbol}
-                      </p>
-                      <p className="text-micro text-gray mt-2">
-                        Confirm this transaction in your wallet
-                      </p>
-                    </div>
-                  </>
+                  <Confirmation confirmationText={confirmationText} />
                 ) : (
                   <>
                     {' '}
