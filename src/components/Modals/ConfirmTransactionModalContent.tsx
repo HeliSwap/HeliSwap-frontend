@@ -39,12 +39,13 @@ const ConfirmTransactionModalContent = ({
       </div>
       <div className="modal-body">
         {children}
-
-        <div className="d-grid mt-4">
-          <Button loading={isLoading} onClick={handleConfirmButtonClick}>
-            {confirmButtonLabel}
-          </Button>
-        </div>
+        {!isLoading ? (
+          <div className="d-grid mt-4">
+            <Button loading={isLoading} onClick={handleConfirmButtonClick}>
+              {confirmButtonLabel}
+            </Button>
+          </div>
+        ) : null}
       </div>
     </>
   );
