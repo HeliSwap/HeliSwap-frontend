@@ -386,6 +386,9 @@ const Create = () => {
   // Check for native tokens
   useEffect(() => {
     const { tokenA, tokenB } = tokensData;
+    const poolsDataLoaded = poolsData.length !== 0;
+    const tokenASelected = Object.keys(tokensData.tokenA).length !== 0;
+    const tokenBSelected = Object.keys(tokensData.tokenB).length !== 0;
 
     const tokenAIsNative = tokenA.type === TokenType.HBAR;
     const tokenBIsNative = tokenB.type === TokenType.HBAR;
@@ -393,9 +396,9 @@ const Create = () => {
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
 
     const selectedPoolData =
-      (poolsData &&
-        poolsData.length > 0 &&
-        poolsData.filter((pool: any) => {
+      (poolsDataLoaded &&
+        !invalidTokenData() &&
+        poolsData.filter((pool: IPoolData) => {
           let poolMatchedBothTokens = false;
 
           const poolContainsToken = (tokenAddres: string) => {
@@ -427,8 +430,13 @@ const Create = () => {
       : ADD_LIQUIDITY_TITLES.CREATE_POOL;
 
     setPageTitle(pageTitle);
+
+    //Set selected pool address in the URL
+    if (poolsDataLoaded && tokenASelected && tokenBSelected) {
+      navigate(`/create/${selectedPoolData[0] ? selectedPoolData[0].pairAddress : ''}`);
+    }
     //TODO: Additional request will be needed in order to get info regarding pool shares
-  }, [tokensData, poolsData]);
+  }, [tokensData, poolsData, navigate, invalidTokenData]);
 
   // Check for address in url
   useEffect(() => {
