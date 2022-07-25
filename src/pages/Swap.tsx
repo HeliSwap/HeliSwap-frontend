@@ -45,6 +45,7 @@ import { MAX_UINT_ERC20, MAX_UINT_HTS, REFRESH_TIME } from '../constants';
 import InputToken from '../components/InputToken';
 import ButtonSelector from '../components/ButtonSelector';
 import Icon from '../components/Icon';
+import Confirmation from '../components/Confirmation';
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
@@ -129,8 +130,6 @@ const Swap = () => {
   // State for general error
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [successSwap, setSuccessSwap] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
   const [loadingSwap, setLoadingSwap] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
   const [loadingAssociate, setLoadingAssociate] = useState(false);
@@ -327,8 +326,6 @@ const Swap = () => {
 
     setError(false);
     setErrorMessage('');
-    setSuccessSwap(false);
-    setSuccessMessage('');
     setLoadingSwap(true);
 
     const { swapSlippage, transactionExpiration } = getTransactionSettings();
@@ -365,13 +362,9 @@ const Swap = () => {
         setError(true);
         setErrorMessage(error);
       } else {
-        const successMessage = `Swap exactly ${swapData.amountIn} ${tokensData.tokenA.symbol} for ${swapData.amountOut} ${tokensData.tokenB.symbol}`;
-
         setSwapData(initialSwapData);
         setTokensData(initialTokensData);
         setApproved(false);
-        setSuccessSwap(true);
-        setSuccessMessage(successMessage);
         refetch();
       }
     } catch (err) {
@@ -379,6 +372,7 @@ const Swap = () => {
       setError(true);
     } finally {
       setLoadingSwap(false);
+      setShowModalConfirmSwap(false);
     }
   };
 
@@ -535,8 +529,6 @@ const Swap = () => {
   const getSwapSection = () => {
     return (
       <div className="container-dark">
-        {getSuccessMessage()}
-
         <InputTokenSelector
           isInvalid={getInsufficientTokenIn() as boolean}
           inputTokenComponent={
@@ -677,6 +669,8 @@ const Swap = () => {
   };
 
   const getActionButtons = () => {
+    const confirmationText = `Swapping ${swapData.amountIn} ${tokensData.tokenA.symbol} for ${swapData.amountOut} ${tokensData.tokenB.symbol}`;
+
     return extensionFound ? (
       connected && !isHashpackLoading ? (
         <>
@@ -742,30 +736,39 @@ const Swap = () => {
                 closeModal={() => setShowModalConfirmSwap(false)}
                 confirmTansaction={handleSwapConfirm}
                 confirmButtonLabel="Confirm swap"
+                isLoading={loadingSwap}
               >
-                <InputTokenSelector
-                  inputTokenComponent={<InputToken value={swapData.amountIn} disabled={true} />}
-                  buttonSelectorComponent={
-                    <ButtonSelector
-                      selectedToken={tokensData?.tokenA.symbol}
-                      selectorText="Select token"
-                      disabled={true}
+                {loadingSwap ? (
+                  <Confirmation confirmationText={confirmationText} />
+                ) : (
+                  <>
+                    <InputTokenSelector
+                      inputTokenComponent={<InputToken value={swapData.amountIn} disabled={true} />}
+                      buttonSelectorComponent={
+                        <ButtonSelector
+                          selectedToken={tokensData?.tokenA.symbol}
+                          selectorText="Select token"
+                          disabled={true}
+                        />
+                      }
                     />
-                  }
-                />
-                <InputTokenSelector
-                  className="mt-5"
-                  inputTokenComponent={<InputToken value={swapData.amountOut} disabled={true} />}
-                  buttonSelectorComponent={
-                    <ButtonSelector
-                      selectedToken={tokensData?.tokenB.symbol}
-                      selectorText="Select token"
-                      disabled={true}
+                    <InputTokenSelector
+                      className="mt-5"
+                      inputTokenComponent={
+                        <InputToken value={swapData.amountOut} disabled={true} />
+                      }
+                      buttonSelectorComponent={
+                        <ButtonSelector
+                          selectedToken={tokensData?.tokenB.symbol}
+                          selectorText="Select token"
+                          disabled={true}
+                        />
+                      }
                     />
-                  }
-                />
-                {getTokensRatio()}
-                {getAdvancedSwapInfo()}
+                    {getTokensRatio()}
+                    {getAdvancedSwapInfo()}
+                  </>
+                )}
               </ConfirmTransactionModalContent>
             </Modal>
           ) : null}
@@ -777,22 +780,6 @@ const Swap = () => {
           </Button>
         </div>
       )
-    ) : null;
-  };
-
-  const getSuccessMessage = () => {
-    return successSwap ? (
-      <div className="alert alert-success alert-dismissible mb-5" role="alert">
-        <strong>Success swap!</strong>
-        <p>{successMessage}</p>
-        <button
-          onClick={() => setSuccessSwap(false)}
-          type="button"
-          className="btn-close"
-          data-bs-dismiss="alert"
-          aria-label="Close"
-        ></button>
-      </div>
     ) : null;
   };
 

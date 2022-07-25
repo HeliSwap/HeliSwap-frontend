@@ -18,18 +18,19 @@ $primary-100: #f9f9f9;
 $primary: #2f18e5;
 $primary-100: #FAFAFF;
 $primary-200: #7391ff;
-$primary-300: #4d5fff;
+$primary-300: #9797C2;
 $primary-500: #3D3D58;
 $primary-700: #1F1F3A;
 $primary-800: #19193F;
 $primary-850: #0C112C;
 $primary-900: #030617;
+
 $secondary: $neutral-400;
 $success: #0da048;
 $danger: #ea1548;
 $warning: #f17400;
 $info: #2f18e5;
-$gray: $neutral-300;
+$gray: $primary-300;
 
 // Add custom colors to theme-colors map
 $theme-colors: (

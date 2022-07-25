@@ -43,6 +43,7 @@ import { MAX_UINT_ERC20, MAX_UINT_HTS, POOLS_FEE, REFRESH_TIME } from '../consta
 import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
 import { formatIcons } from '../utils/iconUtils';
 import IconToken from '../components/IconToken';
+import Confirmation from '../components/Confirmation';
 
 enum ADD_LIQUIDITY_TITLES {
   CREATE_POOL = 'Create pool',
@@ -135,8 +136,6 @@ const Create = () => {
   // State for general error
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [successCreate, setSuccessCreate] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
 
@@ -305,8 +304,6 @@ const Create = () => {
 
     setError(false);
     setErrorMessage('');
-    setSuccessCreate(false);
-    setSuccessMessage('');
     setLoadingCreate(true);
 
     try {
@@ -335,11 +332,7 @@ const Create = () => {
         setError(true);
         setErrorMessage(error);
       } else {
-        const successMessage = `Provided exactly ${createPairData.tokenAAmount} ${tokensData.tokenA.symbol} and ${createPairData.tokenBAmount} ${tokensData.tokenB.symbol}`;
-
         setCreatePairData({ ...createPairData, tokenAAmount: '', tokenBAmount: '' });
-        setSuccessCreate(true);
-        setSuccessMessage(successMessage);
         setReadyToProvide(false);
       }
     } catch (err) {
@@ -348,6 +341,7 @@ const Create = () => {
       setErrorMessage('Error on create');
     } finally {
       setLoadingCreate(false);
+      setShowModalConfirmProvide(false);
     }
   };
 
@@ -593,20 +587,6 @@ const Create = () => {
   const getProvideSection = () => {
     return (
       <div className="container-dark">
-        {successCreate ? (
-          <div className="alert alert-success alert-dismissible my-5" role="alert">
-            <strong>Success provide!</strong>
-            <p>{successMessage}</p>
-            <button
-              onClick={() => setSuccessCreate(false)}
-              type="button"
-              className="btn-close"
-              data-bs-dismiss="alert"
-              aria-label="Close"
-            ></button>
-          </div>
-        ) : null}
-
         {getFeesInfo()}
         <div className="mb-4 text-small text-bold">Enter amount</div>
         <InputTokenSelector
@@ -853,6 +833,7 @@ const Create = () => {
             closeModal={() => setShowModalConfirmProvide(false)}
           >
             <ConfirmTransactionModalContent
+              isLoading={loadingCreate}
               modalTitle={pageTitle}
               closeModal={() => setShowModalConfirmProvide(false)}
               confirmTansaction={handleProvideConfirm}
@@ -876,41 +857,48 @@ const Create = () => {
     const hasSelectedPool = Object.keys(selectedPoolData).length;
     const token0Symbol = hasSelectedPool ? selectedPoolData.token0Symbol : tokensData.tokenA.symbol;
     const token1Symbol = hasSelectedPool ? selectedPoolData.token1Symbol : tokensData.tokenB.symbol;
+
+    const confirmationText = `Providing ${createPairData.tokenAAmount} ${token0Symbol} and ${createPairData.tokenBAmount} ${token1Symbol}`;
+
     return (
       <>
-        <div className="d-flex align-items-center">
-          {formatIcons([token0Symbol, token1Symbol], 'large')}
-          <p className="text-subheader ms-3">
-            {token0Symbol}/{token1Symbol}
-          </p>
-        </div>
-
-        <div className="mt-4 rounded border border-secondary justify-content-between ">
-          <div className="d-flex justify-content-between align-items-center m-4">
+        {loadingCreate ? (
+          <Confirmation confirmationText={confirmationText} />
+        ) : (
+          <>
             <div className="d-flex align-items-center">
-              <IconToken symbol={token0Symbol} />
-              <span className="text-main ms-3">{token0Symbol}</span>
+              {formatIcons([token0Symbol, token1Symbol], 'large')}
+              <p className="text-subheader ms-3">
+                {token0Symbol}/{token1Symbol}
+              </p>
             </div>
+            <div className="mt-4 rounded border border-secondary justify-content-between ">
+              <div className="d-flex justify-content-between align-items-center m-4">
+                <div className="d-flex align-items-center">
+                  <IconToken symbol={token0Symbol} />
+                  <span className="text-main ms-3">{token0Symbol}</span>
+                </div>
 
-            <div className="d-flex justify-content-end align-items-center">
-              <span className="text-numeric text-main">{createPairData.tokenAAmount}</span>
-            </div>
-          </div>
-          <div className="d-flex justify-content-between align-items-center m-4">
-            <div className="d-flex align-items-center">
-              <IconToken symbol={token1Symbol} />
-              <span className="text-main ms-3">{token1Symbol}</span>
-            </div>
+                <div className="d-flex justify-content-end align-items-center">
+                  <span className="text-numeric text-main">{createPairData.tokenAAmount}</span>
+                </div>
+              </div>
+              <div className="d-flex justify-content-between align-items-center m-4">
+                <div className="d-flex align-items-center">
+                  <IconToken symbol={token1Symbol} />
+                  <span className="text-main ms-3">{token1Symbol}</span>
+                </div>
 
-            <div className="d-flex justify-content-end align-items-center">
-              <span className="text-numeric text-main">{createPairData.tokenBAmount}</span>
+                <div className="d-flex justify-content-end align-items-center">
+                  <span className="text-numeric text-main">{createPairData.tokenBAmount}</span>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-
-        <div className="mt-4 rounded border border-secondary justify-content-between ">
-          {getTokensRatioSection()}
-        </div>
+            <div className="mt-4 rounded border border-secondary justify-content-between ">
+              {getTokensRatioSection()}
+            </div>
+          </>
+        )}
       </>
     );
   };

@@ -34,6 +34,7 @@ import {
   INITIAL_SWAP_SLIPPAGE_TOLERANCE,
 } from '../utils/transactionUtils';
 import { formatIcons } from '../utils/iconUtils';
+import Confirmation from './Confirmation';
 
 interface IRemoveLiquidityProps {
   pairData: IPoolData;
@@ -227,6 +228,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
       setErrorRemove(true);
     } finally {
       setLoadingRemove(false);
+      setShowModalConfirmRemove(false);
     }
   };
 
@@ -300,6 +302,12 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
   }, [pairData]);
 
   const canRemove = lpApproved && removeLpData.tokenInAddress !== '';
+
+  const confirmationText = `Removing ${formatStringETHtoPriceFormatted(
+    removeLpData.tokensLpAmount,
+  )} LP tokens for ${formatStringETHtoPriceFormatted(removeLpData.tokens0Amount)} ${
+    pairData.token0Symbol
+  } and ${formatStringETHtoPriceFormatted(removeLpData.tokens1Amount)} ${pairData.token1Symbol}`;
 
   return (
     <div className="container-action">
@@ -414,49 +422,56 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
         {showModalConfirmRemove ? (
           <Modal show={showModalConfirmRemove} closeModal={() => setShowModalConfirmRemove(false)}>
             <ConfirmTransactionModalContent
+              isLoading={loadingRemove}
               modalTitle="Remove liquidity"
               closeModal={() => setShowModalConfirmRemove(false)}
               confirmTansaction={handleRemoveLPButtonClick}
               confirmButtonLabel="Remove"
             >
-              <div className="d-flex justify-content-between align-items-center px-3">
-                <div className="d-flex align-items-center">
-                  <IconToken symbol="LP" />
-                  <span className="text-main ms-3">LP Token</span>
-                </div>
+              {loadingRemove ? (
+                <Confirmation confirmationText={confirmationText} />
+              ) : (
+                <>
+                  <div className="d-flex justify-content-between align-items-center px-3">
+                    <div className="d-flex align-items-center">
+                      <IconToken symbol="LP" />
+                      <span className="text-main ms-3">LP Token</span>
+                    </div>
 
-                <div className="text-main text-numeric">{lpInputValue}</div>
-              </div>
+                    <div className="text-main text-numeric">{lpInputValue}</div>
+                  </div>
 
-              <hr />
+                  <hr />
 
-              <div className="d-flex justify-content-between align-items-center px-3">
-                <div className="d-flex align-items-center">
-                  <IconToken symbol={pairData.token0Symbol} />
-                  <span className="text-main ms-3">{pairData.token0Symbol}</span>
-                </div>
+                  <div className="d-flex justify-content-between align-items-center px-3">
+                    <div className="d-flex align-items-center">
+                      <IconToken symbol={pairData.token0Symbol} />
+                      <span className="text-main ms-3">{pairData.token0Symbol}</span>
+                    </div>
 
-                <div className="text-main text-numeric">
-                  {formatStringETHtoPriceFormatted(removeLpData.tokens0Amount)}
-                </div>
-              </div>
+                    <div className="text-main text-numeric">
+                      {formatStringETHtoPriceFormatted(removeLpData.tokens0Amount)}
+                    </div>
+                  </div>
 
-              <div className="d-flex justify-content-between align-items-center px-3 mt-4">
-                <div className="d-flex align-items-center">
-                  <IconToken symbol={pairData.token1Symbol} />
-                  <span className="text-main ms-3">{pairData.token1Symbol}</span>
-                </div>
+                  <div className="d-flex justify-content-between align-items-center px-3 mt-4">
+                    <div className="d-flex align-items-center">
+                      <IconToken symbol={pairData.token1Symbol} />
+                      <span className="text-main ms-3">{pairData.token1Symbol}</span>
+                    </div>
 
-                <div className="text-main text-numeric">
-                  {formatStringETHtoPriceFormatted(removeLpData.tokens1Amount)}
-                </div>
-              </div>
+                    <div className="text-main text-numeric">
+                      {formatStringETHtoPriceFormatted(removeLpData.tokens1Amount)}
+                    </div>
+                  </div>
 
-              <hr />
+                  <hr />
 
-              <p className="text-micro mb-5 px-3">
-                You will also collect fees earned from this position.
-              </p>
+                  <p className="text-micro mb-5 px-3">
+                    You will also collect fees earned from this position.
+                  </p>
+                </>
+              )}
             </ConfirmTransactionModalContent>
           </Modal>
         ) : null}

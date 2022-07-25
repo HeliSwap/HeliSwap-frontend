@@ -203,6 +203,14 @@
   bottom: 32px;
 }
 
+.container-loader {
+  width: 80px;
+  height: 80px;
+  background-image: url('../../public/loader.svg');
+  background-repeat: no-repeat;
+  animation: 0.75s linear infinite spinner-border;
+}
+
 /* Tables */
 .table-pools {
   display: grid;
