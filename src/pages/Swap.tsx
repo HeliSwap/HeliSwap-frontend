@@ -121,7 +121,6 @@ const Swap = () => {
   const [tokenBalances, setTokenBalances] = useState<IfaceInitialBalanceData>(initialBallanceData);
 
   // Additional states for Swaps
-  const [readyToAssociate, setReadyToAssociate] = useState(false);
   const [readyToSwap, setReadyToSwap] = useState(false);
   const [tokenInExactAmount, setTokenInExactAmount] = useState(true);
   const [bestPath, setBestPath] = useState<string[]>([]);
@@ -251,16 +250,14 @@ const Swap = () => {
     [poolsData, tokensData, willUnwrapTokens, willWrapTokens],
   );
 
-  const handleAssociateClick = async () => {
-    const { tokenB } = tokensData;
-
+  const handleAssociateClick = async (token: ITokenData) => {
     setLoadingAssociate(true);
 
     try {
       const receipt = await sdk.associateToken(
         hashconnectConnectorInstance,
         userId,
-        tokenB.hederaId,
+        token.hederaId,
       );
       const {
         response: { success, error },
@@ -506,14 +503,6 @@ const Swap = () => {
       ready = false;
     }
 
-    const readyToAssociate =
-      !isNaN(Number(swapData.amountOut)) &&
-      Number(swapData.amountOut) > 0 &&
-      swapData.tokenIdOut !== initialSwapData.tokenIdOut &&
-      Object.keys(tokensData.tokenB).length !== 0 &&
-      !insufficientLiquidity;
-    setReadyToAssociate(readyToAssociate);
-
     const readyToApprove =
       Object.keys(tokensData.tokenA).length !== 0 &&
       !isNaN(Number(swapData.amountIn)) &&
@@ -674,14 +663,17 @@ const Swap = () => {
     return willWrapTokens ? 'wrap' : willUnwrapTokens ? 'unwrap' : 'swap';
   };
 
-  const getTokenIsAssociated = () => {
-    const { tokenB } = tokensData;
-    const notHTS = tokenB.type === TokenType.HBAR || tokenB.type === TokenType.ERC20;
-    return notHTS || userAssociatedTokens?.includes(tokensData.tokenB.hederaId);
+  const getTokenIsAssociated = (token: ITokenData) => {
+    const notHTS =
+      Object.keys(token).length === 0 ||
+      token.type === TokenType.HBAR ||
+      token.type === TokenType.ERC20;
+    return notHTS || userAssociatedTokens?.includes(token.hederaId);
   };
 
   const getSwapButtonDisabledState = () => {
-    return !readyToSwap || !getTokenIsAssociated();
+    const { tokenA, tokenB } = tokensData;
+    return !readyToSwap || !getTokenIsAssociated(tokenA) || !getTokenIsAssociated(tokenB);
   };
 
   const getActionButtons = () => {
@@ -694,7 +686,32 @@ const Swap = () => {
             </div>
           ) : (
             <>
-              {readyToApprove && needApproval && !approved ? (
+              {!getTokenIsAssociated(tokensData.tokenA) ? (
+                <div className="d-grid mt-4">
+                  <Button
+                    loading={loadingAssociate}
+                    onClick={() => handleAssociateClick(tokensData.tokenA)}
+                  >
+                    {`Associate ${tokensData.tokenA.symbol}`}
+                  </Button>
+                </div>
+              ) : null}
+
+              {!getTokenIsAssociated(tokensData.tokenB) ? (
+                <div className="d-grid mt-4">
+                  <Button
+                    loading={loadingAssociate}
+                    onClick={() => handleAssociateClick(tokensData.tokenB)}
+                  >
+                    {`Associate ${tokensData.tokenB.symbol}`}
+                  </Button>
+                </div>
+              ) : null}
+
+              {readyToApprove &&
+              needApproval &&
+              !approved &&
+              getTokenIsAssociated(tokensData.tokenA) ? (
                 <div className="d-grid mt-4">
                   <Button
                     loading={loadingApprove}
@@ -702,18 +719,6 @@ const Swap = () => {
                     onClick={() => handleApproveClick()}
                   >
                     {`Approve ${tokensData.tokenA.symbol}`}
-                  </Button>
-                </div>
-              ) : null}
-
-              {readyToAssociate && !getTokenIsAssociated() ? (
-                <div className="d-grid mt-4">
-                  <Button
-                    loading={loadingAssociate}
-                    disabled={!readyToAssociate}
-                    onClick={() => handleAssociateClick()}
-                  >
-                    Associate token
                   </Button>
                 </div>
               ) : null}
