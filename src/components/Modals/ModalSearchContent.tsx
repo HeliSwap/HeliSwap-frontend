@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ITokenData, TokenType } from '../../interfaces/tokens';
 
-import { getHTSTokenInfo, idToAddress } from '../../utils/tokenUtils';
+import { getHTSTokenInfo, idToAddress, isHederaIdValid } from '../../utils/tokenUtils';
 import IconToken from '../IconToken';
 import Button from '../Button';
 
@@ -114,7 +114,7 @@ const ModalSearchContent = ({
   };
 
   useEffect(() => {
-    const inputEmpty = searchInputValue === '';
+    const inputEmpty = searchInputValue.trim() === '';
     if (inputEmpty) {
       setReadyToImport(false);
       setReadyToImportERC(false);
@@ -122,20 +122,31 @@ const ModalSearchContent = ({
 
     setWarningMessage('');
 
-    const found =
-      tokenDataList?.find((item: ITokenData) => item.hederaId === searchInputValue) || false;
+    const isId = !!isHederaIdValid(searchInputValue.trim());
 
-    setShowNotFound(!found);
+    const foundItem = tokenDataList.find((item: ITokenData) => item.hederaId === searchInputValue);
+    const foundItemArray = foundItem ? [foundItem] : [];
 
-    if (searchInputValue !== '' && found) {
-      setTokenList([found]);
+    const foundItems = isId
+      ? foundItemArray
+      : tokenDataList?.filter(
+          (item: ITokenData) =>
+            item.symbol.includes(searchInputValue) || item.name.includes(searchInputValue),
+        ) || [];
+
+    const haveResults = foundItems.length > 0;
+
+    setShowNotFound(!haveResults);
+
+    if (searchInputValue !== '') {
+      setTokenList(foundItems);
     }
 
     if (searchInputValue === '' && tokenDataList) {
       setTokenList(tokenDataList);
     }
 
-    setReadyToImport(!found);
+    setReadyToImport(!haveResults && isId);
   }, [searchInputValue, tokenDataList]);
 
   useEffect(() => {
