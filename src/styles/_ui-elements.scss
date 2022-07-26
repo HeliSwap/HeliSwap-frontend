@@ -365,3 +365,13 @@
   height: 32px;
   border-radius: 50%;
 }
+
+// Overwrites
+.tippy-box {
+  background-color: $primary-400;
+  padding: 12px;
+}
+
+.tippy-arrow {
+  color: $primary-400;
+}
