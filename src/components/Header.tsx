@@ -1,14 +1,29 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import { GlobalContext } from '../providers/Global';
+
 import Button from './Button';
+import Modal from './Modal';
+import ConnectModalContent from './Modals/ConnectModalContent';
 
 const Header = () => {
   const contextValue = useContext(GlobalContext);
-  const { connected, connectWallet, disconnectWallet, extensionFound, isHashpackLoading, userId } =
-    contextValue.connection;
+  const {
+    connected,
+    connectWallet,
+    disconnectWallet,
+    extensionFound,
+    isHashpackLoading,
+    userId,
+    showConnectModal,
+    setShowConnectModal,
+  } = contextValue.connection;
 
   const [userBalance, setUserBalance] = useState('0.0');
+
+  const handleConnectButtonClick = () => {
+    setShowConnectModal(true);
+  };
 
   useEffect(() => {
     const getUserTokensData = async () => {
@@ -33,41 +48,43 @@ const Header = () => {
     <div className="p-5">
       <div className="d-flex justify-content-end">
         <div className="d-flex align-items-center">
-          {extensionFound ? (
-            isHashpackLoading ? (
-              <p className="text-warning mx-2">Please aprove from your wallet</p>
-            ) : connected ? (
-              <>
-                <div className="container-connected">
-                  <div className="text-small">{userBalance} HBAR</div>
-                  <div className="container-address">
-                    <div className="text-small">{userId}</div>
-                  </div>
+          {connected ? (
+            <>
+              <div className="container-connected">
+                <div className="text-small">{userBalance} HBAR</div>
+                <div className="container-address">
+                  <div className="text-small">{userId}</div>
                 </div>
-                <Button
-                  onClick={() => disconnectWallet()}
-                  className="mx-2"
-                  type="primary"
-                  size="small"
-                  outline={true}
-                >
-                  Disconnect
-                </Button>
-              </>
-            ) : (
-              <Button onClick={() => connectWallet()} type="primary" size="small" className="mx-2">
-                Connect wallet
+              </div>
+              <Button
+                onClick={() => disconnectWallet()}
+                className="mx-2"
+                type="primary"
+                size="small"
+                outline={true}
+              >
+                Disconnect
               </Button>
-            )
+            </>
           ) : (
-            <p className="text-warning mx-2">
-              Please{' '}
-              <a target="_blank" className="link" rel="noreferrer" href="https://www.hashpack.app/">
-                install
-              </a>{' '}
-              a wallet
-            </p>
+            <Button
+              onClick={() => handleConnectButtonClick()}
+              type="primary"
+              size="small"
+              className="mx-2"
+            >
+              Connect wallet
+            </Button>
           )}
+          <Modal show={showConnectModal} closeModal={() => setShowConnectModal(false)}>
+            <ConnectModalContent
+              modalTitle="Connect wallet"
+              closeModal={() => setShowConnectModal(false)}
+              connectWallet={connectWallet}
+              isLoading={isHashpackLoading}
+              extensionFound={extensionFound}
+            />
+          </Modal>
         </div>
       </div>
     </div>

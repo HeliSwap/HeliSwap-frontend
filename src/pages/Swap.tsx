@@ -54,7 +54,7 @@ const Swap = () => {
     userId,
     hashconnectConnectorInstance,
     connected,
-    connectWallet,
+    setShowConnectModal,
     extensionFound,
     isHashpackLoading,
   } = connection;
@@ -775,7 +775,7 @@ const Swap = () => {
         </>
       ) : (
         <div className="d-grid mt-4">
-          <Button disabled={isHashpackLoading} onClick={() => connectWallet()}>
+          <Button disabled={isHashpackLoading} onClick={() => setShowConnectModal(true)}>
             Connect wallet
           </Button>
         </div>

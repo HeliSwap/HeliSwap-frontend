@@ -2,6 +2,10 @@
 .btn {
   text-transform: uppercase;
   letter-spacing: 0.5px;
+
+  &.btn-sm {
+    text-transform: none;
+  }
 }
 
 .btn-selector {
@@ -44,6 +48,21 @@
 
   &.is-active {
     background-color: $primary-300;
+  }
+}
+
+.btn-connect-wallet {
+  background-color: $primary-700;
+  border-radius: $border-radius;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  cursor: pointer;
+  transition: background-color 0.15s linear;
+
+  &:hover {
+    background-color: $primary-500;
   }
 }
 
@@ -98,6 +117,12 @@
   &.is-running {
     background-color: #29bc63;
   }
+}
+
+.icon-hashpack {
+  width: 26px;
+  height: 32px;
+  background-image: url('../../public/logo-hashpack.svg');
 }
 
 /* Containers */

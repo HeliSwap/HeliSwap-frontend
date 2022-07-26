@@ -17,7 +17,7 @@ import usePoolsByUser from '../hooks/usePoolsByUser';
 const Pools = () => {
   const contextValue = useContext(GlobalContext);
   const { connection } = contextValue;
-  const { userId, connected, connectWallet, isHashpackLoading } = connection;
+  const { userId, connected, isHashpackLoading, setShowConnectModal } = connection;
 
   const {
     error: errorPoools,
@@ -146,7 +146,12 @@ const Pools = () => {
       <div className="rounded bg-dark p-5 text-center mt-5">
         <p>Your active liquidity positions will appear here.</p>
         <div className="mt-4">
-          <Button disabled={isHashpackLoading} size="small" onClick={connectWallet} type="primary">
+          <Button
+            disabled={isHashpackLoading}
+            size="small"
+            onClick={() => setShowConnectModal(true)}
+            type="primary"
+          >
             Connect Wallet
           </Button>
         </div>
