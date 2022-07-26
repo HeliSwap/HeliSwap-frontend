@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { GlobalContext } from '../providers/Global';
 import { Link } from 'react-router-dom';
 
@@ -13,6 +13,21 @@ import { REFRESH_TIME } from '../constants';
 
 import usePools from '../hooks/usePools';
 import usePoolsByUser from '../hooks/usePoolsByUser';
+import { IPoolExtendedData } from '../interfaces/tokens';
+import BigNumber from 'bignumber.js';
+
+enum SORT_OPTIONS_ENUM {
+  TVL = 'tvl',
+  VOL_7 = 'volume7',
+  VOL_24 = 'volume24',
+}
+
+type SORT_OPTIONS = SORT_OPTIONS_ENUM.TVL | SORT_OPTIONS_ENUM.VOL_7 | SORT_OPTIONS_ENUM.VOL_24;
+
+enum SORT_DIRECTION {
+  ASC = 'asc',
+  DESC = 'desc',
+}
 
 const Pools = () => {
   const contextValue = useContext(GlobalContext);
@@ -49,6 +64,18 @@ const Pools = () => {
 
   const initialCurrentView: PageViews = PageViews.ALL_POOLS;
   const [currentView, setCurrentView] = useState<PageViews>(initialCurrentView);
+  const [collapseAll, setCollapseAll] = useState<boolean>(false);
+
+  const [sortDirection, setSortDirection] = useState<SORT_DIRECTION>(SORT_DIRECTION.DESC);
+  const [poolsSortBy, setPoolsSortBy] = useState<SORT_OPTIONS>(SORT_OPTIONS_ENUM.TVL);
+
+  const sortPools = (valueA: string, valueB: string, direction: SORT_DIRECTION) => {
+    const valueABN = new BigNumber(valueA);
+    const valueBBN = new BigNumber(valueB);
+    return direction === SORT_DIRECTION.ASC
+      ? Number(valueABN.minus(valueBBN))
+      : Number(valueBBN.minus(valueABN));
+  };
 
   const viewTitleMapping = {
     [PageViews.ALL_POOLS]: 'All pools',
@@ -66,8 +93,29 @@ const Pools = () => {
     setCurrentView(currentView);
   };
 
-  const havePools = poolsToShow!.length > 0;
+  const handleSortClick = (sortBy: SORT_OPTIONS) => {
+    setCollapseAll(true);
+    if (sortBy === poolsSortBy) {
+      setSortDirection(
+        sortDirection === SORT_DIRECTION.ASC ? SORT_DIRECTION.DESC : SORT_DIRECTION.ASC,
+      );
+    } else {
+      setPoolsSortBy(sortBy);
+    }
+  };
 
+  const getSortIcon = (option: SORT_OPTIONS) => {
+    const icon =
+      sortDirection === SORT_DIRECTION.ASC ? (
+        // TODO: import arrow up SVG
+        <Icon name="arrow-down" />
+      ) : (
+        <Icon name="arrow-down" />
+      );
+    return option === poolsSortBy ? icon : null;
+  };
+
+  const havePools = pools!.length > 0;
   const renderAllPools = () => {
     return loadingPools ? (
       <p className="text-info">Loading pools...</p>
@@ -80,31 +128,44 @@ const Pools = () => {
           <div className="table-pools-cell">
             <span className="text-small">Pool</span>
           </div>
-          <div className="table-pools-cell justify-content-end">
-            <span className="text-small">
-              TVL <Icon name="arrow-down" />
-            </span>
+          <div
+            className="table-pools-cell justify-content-end"
+            onClick={() => handleSortClick(SORT_OPTIONS_ENUM.TVL)}
+          >
+            <span className="text-small">TVL {getSortIcon(SORT_OPTIONS_ENUM.TVL)}</span>
           </div>
-          <div className="table-pools-cell justify-content-end">
-            <span className="text-small">Volume 7d</span>
+          <div
+            className="table-pools-cell justify-content-end"
+            onClick={() => handleSortClick(SORT_OPTIONS_ENUM.VOL_7)}
+          >
+            <span className="text-small">Volume 7d {getSortIcon(SORT_OPTIONS_ENUM.VOL_7)}</span>
           </div>
-          <div className="table-pools-cell justify-content-end">
-            <span className="text-small">Volume 24h</span>
+          <div
+            className="table-pools-cell justify-content-end"
+            onClick={() => handleSortClick(SORT_OPTIONS_ENUM.VOL_24)}
+          >
+            <span className="text-small">Volume 24h {getSortIcon(SORT_OPTIONS_ENUM.VOL_24)}</span>
           </div>
           <div className="table-pools-cell justify-content-end">
             <span className="text-small"></span>
           </div>
         </div>
-        {poolsToShow.map((item, index) => (
-          <PoolInfo
-            setShowRemoveContainer={setShowRemoveContainer}
-            setCurrentPoolIndex={setCurrentPoolIndex}
-            index={index}
-            key={index}
-            poolData={item}
-            view={currentView}
-          />
-        ))}
+        {poolsToShow
+          .sort((a: IPoolExtendedData, b: IPoolExtendedData) =>
+            sortPools(a[poolsSortBy as string], b[poolsSortBy as string], sortDirection),
+          )
+          .map((item, index) => (
+            <PoolInfo
+              setShowRemoveContainer={setShowRemoveContainer}
+              setCurrentPoolIndex={setCurrentPoolIndex}
+              index={index}
+              key={index}
+              poolData={item}
+              view={currentView}
+              collapseAll={collapseAll}
+              setCollapseAll={setCollapseAll}
+            />
+          ))}
       </div>
     ) : (
       renderEmptyPoolsState('There are no active pools at this moment.')
@@ -128,16 +189,22 @@ const Pools = () => {
               <span className="text-small"></span>
             </div>
           </div>
-          {poolsToShow.map((item, index) => (
-            <PoolInfo
-              setShowRemoveContainer={setShowRemoveContainer}
-              setCurrentPoolIndex={setCurrentPoolIndex}
-              index={index}
-              key={index}
-              poolData={item}
-              view={currentView}
-            />
-          ))}
+          {poolsToShow
+            .sort((a: IPoolExtendedData, b: IPoolExtendedData) =>
+              sortPools(a[SORT_OPTIONS_ENUM.TVL], b[SORT_OPTIONS_ENUM.TVL], SORT_DIRECTION.DESC),
+            )
+            .map((item, index) => (
+              <PoolInfo
+                setShowRemoveContainer={setShowRemoveContainer}
+                setCurrentPoolIndex={setCurrentPoolIndex}
+                index={index}
+                key={index}
+                poolData={item}
+                view={currentView}
+                collapseAll={collapseAll}
+                setCollapseAll={setCollapseAll}
+              />
+            ))}
         </div>
       ) : (
         renderEmptyPoolsState('You don’t have active pools at this moment.')
