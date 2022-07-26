@@ -15,6 +15,8 @@ const contextInitialValue = {
     connectWallet: () => {},
     disconnectWallet: () => {},
     hashconnectConnectorInstance: {} as Hashconnect,
+    showConnectModal: false,
+    setShowConnectModal: (show: boolean) => {},
   },
   isRunning: false,
   lastUpdated: '',
@@ -33,6 +35,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
   const [extensionFound, setExtensionFound] = useState(false);
   const [hashconnectConnectorInstance, setHashconnectConnectorInstance] = useState<Hashconnect>();
   const [userId, setUserId] = useState('');
+  const [showConnectModal, setShowConnectModal] = useState(false);
 
   const { timestamp, error } = useHealthCheck({
     fetchPolicy: 'network-only',
@@ -65,6 +68,8 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
     connectWallet,
     disconnectWallet,
     hashconnectConnectorInstance: hashconnectConnectorInstance || ({} as Hashconnect),
+    showConnectModal,
+    setShowConnectModal,
   };
   const contextValue = { sdk, connection, isRunning, lastUpdated };
 
@@ -75,6 +80,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
         setConnected,
         setUserId,
         setIsHashpackLoading,
+        setShowConnectModal,
       );
 
       await hashconnectConnector.initHashconnect();

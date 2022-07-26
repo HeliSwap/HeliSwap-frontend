@@ -2,6 +2,10 @@
 .btn {
   text-transform: uppercase;
   letter-spacing: 0.5px;
+
+  &.btn-sm {
+    text-transform: none;
+  }
 }
 
 .btn-selector {
@@ -16,18 +20,18 @@
   }
 
   &.with-background {
-    background-color: $neutral-700;
+    background-color: $primary-700;
   }
 
   &.with-border {
-    border: 1px solid $neutral-400;
+    border: 1px solid $primary-400;
   }
 
   &:hover:not(.is-disabled) {
-    background-color: $neutral-500;
+    background-color: $primary-500;
 
     &.with-border {
-      border-color: $neutral-500;
+      border-color: $primary-500;
     }
   }
 }
@@ -47,6 +51,21 @@
   }
 }
 
+.btn-connect-wallet {
+  background-color: $primary-700;
+  border-radius: $border-radius;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  cursor: pointer;
+  transition: background-color 0.15s linear;
+
+  &:hover {
+    background-color: $primary-500;
+  }
+}
+
 /* Icons */
 .icon {
   display: inline-flex;
@@ -56,7 +75,7 @@
 
   &.is-gray {
     path {
-      fill: $neutral-400;
+      fill: $primary-400;
     }
   }
 
@@ -98,6 +117,12 @@
   &.is-running {
     background-color: #29bc63;
   }
+}
+
+.icon-hashpack {
+  width: 26px;
+  height: 32px;
+  background-image: url('../../public/logo-hashpack.svg');
 }
 
 /* Containers */
@@ -178,7 +203,7 @@
   display: grid;
   grid-auto-rows: auto;
   background-color: #1f1f4d;
-  border-bottom: 1px solid $neutral-500;
+  border-bottom: 1px solid $primary-500;
 
   .container-pool-details-row {
     display: grid;
@@ -187,7 +212,7 @@
   }
 
   &.is-gray {
-    background-color: $neutral-700;
+    background-color: $primary-700;
   }
 }
 
@@ -223,7 +248,7 @@
     gap: 1em;
     grid-template-columns: 30px 3fr 1fr;
     transition: background-color 0.1s linear;
-    border-bottom: 1px solid $neutral-500;
+    border-bottom: 1px solid $primary-500;
     cursor: pointer;
 
     &:hover {
