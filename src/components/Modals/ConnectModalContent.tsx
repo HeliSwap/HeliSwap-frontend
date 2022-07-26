@@ -48,7 +48,7 @@ const ConnectModalContent = ({
               <p className="text-subheader">Connecting...</p>
               <p className="text-micro text-gray mt-4">
                 By connecting a wallet, you agree to HeliSwap Terms of Service and acknowledge that
-                you have read and understand the Uniswap Protocol Disclaimer.
+                you have read and understand the Heliswap Protocol Disclaimer.
               </p>
             </div>
           </>
@@ -65,7 +65,7 @@ const ConnectModalContent = ({
             </div>
             <p className="text-micro text-gray mt-4">
               By connecting a wallet, you agree to HeliSwap Terms of Service and acknowledge that
-              you have read and understand the Uniswap Protocol Disclaimer.
+              you have read and understand the Heliswap Protocol Disclaimer.
             </p>
           </>
         )}

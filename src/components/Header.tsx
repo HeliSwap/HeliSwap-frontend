@@ -5,6 +5,7 @@ import { GlobalContext } from '../providers/Global';
 import Button from './Button';
 import Modal from './Modal';
 import ConnectModalContent from './Modals/ConnectModalContent';
+import { formatStringETHtoPriceFormatted } from '../utils/numberUtils';
 
 const Header = () => {
   const contextValue = useContext(GlobalContext);
@@ -32,7 +33,7 @@ const Header = () => {
         const userBalanceBN = await provider.getBalance(userId);
         const tokenBalance = hethers.utils.formatHbar(userBalanceBN);
 
-        setUserBalance(tokenBalance);
+        setUserBalance(formatStringETHtoPriceFormatted(tokenBalance));
       }
     };
 

@@ -43,7 +43,7 @@ const Sidebar = () => {
 
         <div>
           <div className="container-healthcheck d-flex align-items-center">
-            <span className="me-3 d-none d-xxl-block">{lastUpdated}</span>
+            <span className="me-3 d-none d-xxl-block text-micro">{lastUpdated}</span>
             <span className={`icon-healthcheck ${isRunning ? 'is-running' : ''}`}></span>
           </div>
 

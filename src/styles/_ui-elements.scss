@@ -149,15 +149,18 @@
 }
 
 .container-input-token {
-  height: 108px;
   background-color: $primary-700;
   border-radius: $border-radius;
   padding: 12px;
   border: 1px solid $primary-700;
   transition: border 0.15s linear;
 
-  &:focus-within,
-  &:hover {
+  &:not(.is-readonly) {
+    height: 108px;
+  }
+
+  &:focus-within:not(.is-readonly),
+  &:hover:not(.is-readonly) {
     border-color: $primary-100;
   }
 

@@ -175,6 +175,7 @@ const ModalSearchContent = ({
             onChange={onSearchInputChange}
             type="text"
             className="form-control"
+            placeholder="Search name or paste address"
           />
         </div>
 
