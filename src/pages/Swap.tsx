@@ -33,6 +33,7 @@ import {
   tradeComparator,
 } from '../utils/tradeUtils';
 import {
+  formatStringETHtoPriceFormatted,
   formatStringWeiToStringEther,
   getAmountWithSlippage,
   stripStringToFixedDecimals,
@@ -743,6 +744,7 @@ const Swap = () => {
                 ) : (
                   <>
                     <InputTokenSelector
+                      readonly={true}
                       inputTokenComponent={<InputToken value={swapData.amountIn} disabled={true} />}
                       buttonSelectorComponent={
                         <ButtonSelector
@@ -753,6 +755,7 @@ const Swap = () => {
                       }
                     />
                     <InputTokenSelector
+                      readonly={true}
                       className="mt-5"
                       inputTokenComponent={
                         <InputToken value={swapData.amountOut} disabled={true} />
@@ -798,7 +801,9 @@ const Swap = () => {
       <div
         className="text-small mt-4 cursor-pointer"
         onClick={() => setRatioBasedOnTokenOut(!ratioBasedOnTokenOut)}
-      >{`1 ${baseTokenName} = ${ratio} ${secondTokenName}`}</div>
+      >{`1 ${baseTokenName} = ${formatStringETHtoPriceFormatted(
+        ratio.toString(),
+      )} ${secondTokenName}`}</div>
     );
   };
 
@@ -837,7 +842,9 @@ const Swap = () => {
         <div className="mt-4 rounded border border-secondary">
           <div className="d-flex justify-content-between m-4">
             <span className="text-small">Expected Output:</span>
-            <span className="text-small text-numeric text-bold">{`${swapData.amountOut} ${tokensData.tokenB.symbol}`}</span>
+            <span className="text-small text-numeric text-bold">{`${formatStringETHtoPriceFormatted(
+              swapData.amountOut,
+            )} ${tokensData.tokenB.symbol}`}</span>
           </div>
           {/* <div className="d-flex justify-content-between m-4">
             <span className="text-small">Price Impact:</span>
@@ -851,7 +858,9 @@ const Swap = () => {
               {amountAfterSlippageMessage} ({getTransactionSettings().swapSlippage}%)
             </span>
 
-            <span className="text-small text-numeric text-bold">{`${amountAfterSlippageStr} ${secondTokenName}`}</span>
+            <span className="text-small text-numeric text-bold">{`${formatStringETHtoPriceFormatted(
+              amountAfterSlippageStr,
+            )} ${secondTokenName}`}</span>
           </div>
         </div>
         <p className="text-micro text-secondary mt-5">{estimationMessage}</p>
