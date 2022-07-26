@@ -274,7 +274,7 @@ export const getHBarPrice = async () => {
 };
 
 export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbarPrice: number) => {
-  if (hbarPrice === 0) return;
+  if (hbarPrice === 0) return '0';
   if (tokenAddress === process.env.REACT_APP_WHBAR_ADDRESS) return hbarPrice.toString();
 
   const tradesIn = getPossibleTradesExactIn(
@@ -286,7 +286,7 @@ export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbar
   );
   const sortedTrades = tradesIn.sort(tradeComparator);
 
-  if (sortedTrades.length === 0) return;
+  if (sortedTrades.length === 0) return '0';
 
   const bestTradeAmount = sortedTrades[0].amountOut;
 
