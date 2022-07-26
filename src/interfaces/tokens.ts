@@ -53,6 +53,8 @@ export interface IPoolExtendedData extends IPoolData {
   volume7?: string;
   feesNum?: number;
   feesStr?: string;
+  tokensPriceEvaluated?: boolean;
+  [key: string]: any;
 }
 
 export enum TokenType {
