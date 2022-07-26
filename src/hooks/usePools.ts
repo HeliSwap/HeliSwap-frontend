@@ -78,6 +78,12 @@ const usePools = (useQueryOptions: QueryHookOptions = {}, getExtended = false) =
             const volume7dValueStr = volume7dValue.toFixed(2);
             const volume24hValueStr = volume24hValue.toFixed(2);
 
+            const tokensPriceEvaluated =
+              !isNaN(Number(token0Price)) &&
+              Number(token0Price) !== 0 &&
+              !isNaN(Number(token1Price)) &&
+              Number(token1Price) !== 0;
+
             const poolData: IPoolExtendedData = {
               ...pool,
               token0AmountFormatted,
@@ -88,6 +94,7 @@ const usePools = (useQueryOptions: QueryHookOptions = {}, getExtended = false) =
               volume24Num: volume24hValue,
               volume7: volume7dValueStr,
               volume7Num: volume7dValue,
+              tokensPriceEvaluated,
             };
 
             return poolData;
@@ -95,11 +102,7 @@ const usePools = (useQueryOptions: QueryHookOptions = {}, getExtended = false) =
 
           const poolsFormatted = pools.map(formatPoolData);
 
-          const poolsSorted = poolsFormatted.sort((a: IPoolExtendedData, b: IPoolExtendedData) =>
-            Number(b.tvlBN.minus(a.tvlBN)),
-          );
-
-          setPools(poolsSorted);
+          setPools(poolsFormatted);
         }
       } else {
         if (pools.length > 0) {
