@@ -17,7 +17,12 @@ const ConnectModalContent = ({
   extensionFound,
 }: IConnectModalContentProps) => {
   const handleConnectButtonClick = () => {
-    connectWallet();
+    if (extensionFound) {
+      connectWallet();
+    } else {
+      const newWindow = window.open('https://www.hashpack.app/', '_blank', 'noopener,noreferrer');
+      if (newWindow) newWindow.opener = null;
+    }
   };
 
   return (
@@ -36,15 +41,7 @@ const ConnectModalContent = ({
         ></button>
       </div>
       <div className="modal-body">
-        {!extensionFound ? (
-          <p className="text-warning mx-2">
-            Please{' '}
-            <a target="_blank" className="link" rel="noreferrer" href="https://www.hashpack.app/">
-              install
-            </a>{' '}
-            a wallet
-          </p>
-        ) : isLoading ? (
+        {isLoading ? (
           <>
             <Loader></Loader>
             <div className="text-center mt-4">
@@ -58,7 +55,12 @@ const ConnectModalContent = ({
         ) : (
           <>
             <div onClick={handleConnectButtonClick} className="btn-connect-wallet">
-              <span className="text-main">Hashpack</span>
+              <div>
+                <p className="text-main">Hashpack</p>
+                {!extensionFound ? (
+                  <p className="text-micro text-gray mt-2">Not installed</p>
+                ) : null}
+              </div>
               <span className="icon-hashpack"></span>
             </div>
             <p className="text-micro text-gray mt-4">
