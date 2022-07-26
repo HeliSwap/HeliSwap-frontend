@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { ITokenData, TokenType } from '../../interfaces/tokens';
 
-import { getHTSTokenInfo, idToAddress, isHederaIdValid } from '../../utils/tokenUtils';
+import {
+  addressToId,
+  getHTSTokenInfo,
+  idToAddress,
+  isAddressValid,
+  isHederaIdValid,
+} from '../../utils/tokenUtils';
 import IconToken from '../IconToken';
 import Button from '../Button';
 
@@ -97,7 +103,10 @@ const ModalSearchContent = ({
   };
 
   const handleImportButtonClick = async () => {
-    const result = await getHTSTokenInfo(searchInputValue);
+    const isAddress = !!isAddressValid(searchInputValue.trim());
+    const result = await getHTSTokenInfo(
+      isAddress ? addressToId(searchInputValue) : searchInputValue,
+    );
     const hasResults = Object.keys(result).length > 0;
 
     if (hasResults) {
@@ -123,16 +132,21 @@ const ModalSearchContent = ({
     setWarningMessage('');
 
     const isId = !!isHederaIdValid(searchInputValue.trim());
+    const isAddress = !!isAddressValid(searchInputValue.trim());
 
-    const foundItem = tokenDataList.find((item: ITokenData) => item.hederaId === searchInputValue);
+    const foundItem = tokenDataList.find(
+      (item: ITokenData) => item.hederaId === searchInputValue || item.address === searchInputValue,
+    );
     const foundItemArray = foundItem ? [foundItem] : [];
 
-    const foundItems = isId
-      ? foundItemArray
-      : tokenDataList?.filter(
-          (item: ITokenData) =>
-            item.symbol.includes(searchInputValue) || item.name.includes(searchInputValue),
-        ) || [];
+    const foundItems =
+      isId || isAddress
+        ? foundItemArray
+        : tokenDataList?.filter(
+            (item: ITokenData) =>
+              item.symbol.toLowerCase().includes(searchInputValue) ||
+              item.name.toLowerCase().includes(searchInputValue),
+          ) || [];
 
     const haveResults = foundItems.length > 0;
 
@@ -146,7 +160,7 @@ const ModalSearchContent = ({
       setTokenList(tokenDataList);
     }
 
-    setReadyToImport(!haveResults && isId);
+    setReadyToImport(!haveResults && (isId || isAddress));
   }, [searchInputValue, tokenDataList]);
 
   useEffect(() => {
@@ -186,7 +200,7 @@ const ModalSearchContent = ({
             onChange={onSearchInputChange}
             type="text"
             className="form-control"
-            placeholder="Search name or paste address"
+            placeholder="Search name or paste token Id or address"
           />
         </div>
 

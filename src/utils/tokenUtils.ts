@@ -157,6 +157,10 @@ export const isHederaIdValid = (hederaId: string) => {
     .match(/^(0|(?:[1-9]\d*))\.(0|(?:[1-9]\d*))\.(0|(?:[1-9]\d*))(?:-([a-z]{5}))?$/g);
 };
 
+export const isAddressValid = (address: string) => {
+  return address.toLowerCase().match(/^0x[a-fA-F0-9]{40}$/g);
+};
+
 /**
  * Calucate reserves based on total amount ot LP
  * @public
