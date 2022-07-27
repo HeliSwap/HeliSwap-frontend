@@ -1,6 +1,7 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { GlobalContext } from '../providers/Global';
 import { Link } from 'react-router-dom';
+import ReactPaginate from 'react-paginate';
 
 import { PageViews } from '../interfaces/common';
 
@@ -29,7 +30,11 @@ enum SORT_DIRECTION {
   DESC = 'desc',
 }
 
-const Pools = () => {
+interface IPoolsProps {
+  itemsPerPage: number;
+}
+
+const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection } = contextValue;
   const { userId, connected, isHashpackLoading, setShowConnectModal } = connection;
@@ -58,6 +63,10 @@ const Pools = () => {
     userId,
     pools,
   );
+
+  const [currentItems, setCurrentItems] = useState<IPoolExtendedData[]>([]);
+  const [pageCount, setPageCount] = useState(0);
+  const [itemOffset, setItemOffset] = useState(0);
 
   const [showRemoveContainer, setShowRemoveContainer] = useState(false);
   const [currentPoolIndex, setCurrentPoolIndex] = useState(0);
@@ -110,6 +119,28 @@ const Pools = () => {
     return option === poolsSortBy ? icon : null;
   };
 
+  useEffect(() => {
+    // Fetch items from another resources.
+    const endOffset = itemOffset + itemsPerPage;
+    console.log(`Loading items from ${itemOffset} to ${endOffset}`);
+    const sortedPoolsToShow = poolsToShow.sort((a: IPoolExtendedData, b: IPoolExtendedData) =>
+      sortPools(a[poolsSortBy as string], b[poolsSortBy as string], sortDirection),
+    );
+    setCurrentItems(sortedPoolsToShow.slice(itemOffset, endOffset));
+    setPageCount(Math.ceil(sortedPoolsToShow.length / itemsPerPage));
+  }, [itemOffset, itemsPerPage, poolsSortBy, sortDirection, poolsToShow]);
+
+  // Invoke when user click to request another page.
+  const handlePageClick = (event: any) => {
+    setCollapseAll(true);
+    const sortedPoolsToShow = poolsToShow.sort((a: IPoolExtendedData, b: IPoolExtendedData) =>
+      sortPools(a[poolsSortBy as string], b[poolsSortBy as string], sortDirection),
+    );
+    const newOffset = (event.selected * itemsPerPage) % sortedPoolsToShow.length;
+    console.log(`User requested page number ${event.selected}, which is offset ${newOffset}`);
+    setItemOffset(newOffset);
+  };
+
   const havePools = pools!.length > 0;
   const renderAllPools = () => {
     return loadingPools ? (
@@ -149,11 +180,9 @@ const Pools = () => {
             <span className="text-small"></span>
           </div>
         </div>
-        {poolsToShow
-          .sort((a: IPoolExtendedData, b: IPoolExtendedData) =>
-            sortPools(a[poolsSortBy as string], b[poolsSortBy as string], sortDirection),
-          )
-          .map((item, index) => (
+
+        <>
+          {currentItems.map((item, index) => (
             <PoolInfo
               setShowRemoveContainer={setShowRemoveContainer}
               setCurrentPoolIndex={setCurrentPoolIndex}
@@ -165,6 +194,26 @@ const Pools = () => {
               setCollapseAll={setCollapseAll}
             />
           ))}
+          <ReactPaginate
+            breakLabel="..."
+            nextLabel="next >"
+            onPageChange={handlePageClick}
+            pageRangeDisplayed={5}
+            pageCount={pageCount}
+            previousLabel="< previous"
+            renderOnZeroPageCount={undefined}
+            breakClassName={'page-item'}
+            breakLinkClassName={'page-link'}
+            containerClassName={'pagination'}
+            pageClassName={'page-item'}
+            pageLinkClassName={'page-link'}
+            previousClassName={'page-item'}
+            previousLinkClassName={'page-link'}
+            nextClassName={'page-item'}
+            nextLinkClassName={'page-link'}
+            activeClassName={'active'}
+          />
+        </>
       </div>
     ) : (
       renderEmptyPoolsState('There are no active pools at this moment.')
