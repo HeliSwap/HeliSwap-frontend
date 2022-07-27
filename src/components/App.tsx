@@ -29,6 +29,7 @@ function App() {
                 <div className="container py-5 py-lg-7">
                   <Routes>
                     <Route path="/" element={<Swap />} />
+                    <Route path="/:address" element={<Swap />} />
                     <Route path="create/" element={<Create />} />
                     <Route path="create/:address" element={<Create />} />
                     <Route path="pools" element={<Pools />} />
