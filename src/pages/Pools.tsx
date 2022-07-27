@@ -16,6 +16,9 @@ import usePools from '../hooks/usePools';
 import usePoolsByUser from '../hooks/usePoolsByUser';
 import { IPoolExtendedData } from '../interfaces/tokens';
 import BigNumber from 'bignumber.js';
+import SearchArea from '../components/SearchArea';
+import { useLazyQuery } from '@apollo/client';
+import { GET_POOL_BY_TOKEN } from '../GraphQL/Queries';
 
 enum SORT_OPTIONS_ENUM {
   TVL = 'tvl',
@@ -63,6 +66,11 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     userId,
     pools,
   );
+
+  const [
+    loadExtraPools,
+    { called: calledExtraPools, loading: loadingExtraPools, data: extraPoolsData },
+  ] = useLazyQuery(GET_POOL_BY_TOKEN);
 
   const [currentItems, setCurrentItems] = useState<IPoolExtendedData[]>([]);
   const [pageCount, setPageCount] = useState(0);
@@ -316,11 +324,23 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
           <hr />
 
           {connected && !isHashpackLoading && havePools ? (
-            <div className="d-flex justify-content-end align-items-center my-5">
-              <Link className="btn btn-sm btn-primary" to="/create">
-                Create pool
-              </Link>
-            </div>
+            <>
+              <SearchArea
+                searchFunc={(value: string) => {
+                  loadExtraPools({
+                    variables: { token: '0x0000000000000000000000000000000002be8c90' },
+                  });
+                }}
+                calledSearchResults={calledExtraPools}
+                loadingSearchResults={loadingExtraPools}
+                results={extraPoolsData ? extraPoolsData.poolsByToken : []}
+              />
+              <div className="d-flex justify-content-end align-items-center my-5">
+                <Link className="btn btn-sm btn-primary" to="/create">
+                  Create pool
+                </Link>
+              </div>
+            </>
           ) : null}
 
           {errorPoools || errorPooolsByUser ? (
