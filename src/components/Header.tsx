@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import { GlobalContext } from '../providers/Global';
+import md5 from 'md5';
 
 import Button from './Button';
 import Modal from './Modal';
@@ -57,6 +58,11 @@ const Header = () => {
                 <div className="text-small">{userBalance} HBAR</div>
                 <div className="container-address" onClick={() => setShowUserAccountModal(true)}>
                   <div className="text-small">{userId}</div>
+                  <img
+                    className="img-profile ms-3"
+                    src={`https://www.gravatar.com/avatar/${md5(userId)}/?d=identicon`}
+                    alt=""
+                  />
                 </div>
               </div>
             </>

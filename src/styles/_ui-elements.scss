@@ -141,6 +141,8 @@
   margin-left: 12px;
   cursor: pointer;
   transition: background-color 0.15s linear;
+  display: flex;
+  align-items: center;
 
   &:hover {
     background-color: $primary-600;
@@ -366,4 +368,11 @@
       transform: translateY(17px);
     }
   }
+}
+
+// Images
+.img-profile {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
 }
