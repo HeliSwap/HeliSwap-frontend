@@ -143,7 +143,7 @@ const Pools = () => {
         <p className="text-warning text-center">No pools found</p>
       )
     ) : (
-      <div className="rounded bg-dark p-5 text-center mt-5">
+      <div className="text-center mt-10">
         <p>Your active liquidity positions will appear here.</p>
         <div className="mt-4">
           <Button
