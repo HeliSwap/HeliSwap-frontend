@@ -226,8 +226,7 @@ const Create = () => {
           [name]: value,
         }));
       } else {
-        const calculatedToken = name === 'tokenAAmount' ? 'tokenBAmount' : 'tokenAAmount';
-        setCreatePairData(prev => ({ ...prev, [name]: value, [calculatedToken]: '' }));
+        setCreatePairData(prev => ({ ...prev, [name]: value }));
       }
     },
     [invalidTokenData, selectedPoolData, tokensData, tokensInSamePool],
