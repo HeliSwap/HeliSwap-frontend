@@ -75,8 +75,8 @@ const PoolInfo = ({
         ) : null}
         <div className="table-pools-cell d-flex justify-content-end">
           <p className="d-inline-flex align-items-center text-white">
-            <span className="text-small text-bold me-2">More</span>
-            <Icon name="chevron" />
+            <span className="text-small text-bold me-2">{showPoolDetails ? 'Less' : 'More'}</span>
+            <Icon name={`chevron-${showPoolDetails ? 'up' : 'down'}`} />
           </p>
         </div>
       </div>

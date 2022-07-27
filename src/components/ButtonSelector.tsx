@@ -46,7 +46,7 @@ const ButtonSelector = ({
       ) : (
         <span className="text-small">{selectorText}</span>
       )}
-      {!disabled ? <Icon name="chevron" className="ms-2" /> : null}
+      {!disabled ? <Icon name="chevron-down" className="ms-2" /> : null}
     </div>
   );
 };
