@@ -158,7 +158,7 @@ export const isHederaIdValid = (hederaId: string) => {
 };
 
 export const isAddressValid = (address: string) => {
-  return address.toLowerCase().match(/^0x[a-fA-F0-9]{40}$/g);
+  return hethers.utils.isAddress(address.toLowerCase());
 };
 
 /**
