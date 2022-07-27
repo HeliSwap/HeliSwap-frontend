@@ -106,12 +106,7 @@ const Pools = () => {
 
   const getSortIcon = (option: SORT_OPTIONS) => {
     const icon =
-      sortDirection === SORT_DIRECTION.ASC ? (
-        // TODO: import arrow up SVG
-        <Icon name="arrow-down" />
-      ) : (
-        <Icon name="arrow-down" />
-      );
+      sortDirection === SORT_DIRECTION.ASC ? <Icon name="arrow-up" /> : <Icon name="arrow-down" />;
     return option === poolsSortBy ? icon : null;
   };
 
