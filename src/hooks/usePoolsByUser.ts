@@ -94,7 +94,7 @@ const usePoolsByUser = (
         setPoolsByUser(sortedPools);
       }
     }
-  }, [data, hbarPrice, poolsExtended]);
+  }, [userId, data, hbarPrice, poolsExtended]);
 
   return { poolsByUser, loading, error, refetch };
 };
