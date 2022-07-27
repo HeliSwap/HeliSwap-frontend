@@ -11,7 +11,7 @@ const InputSlider = ({ sliderValue, handleButtonClick, handleSliderChange }: IIn
   const buttonValues = ['25', '50', '75', '100'];
 
   return (
-    <div className="container-input-token mb-4">
+    <div className="container-input-token is-readonly mb-4">
       <p className="text-micro">Amount</p>
 
       <div className="d-flex justify-content-between align-items-start">

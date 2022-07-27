@@ -14,6 +14,8 @@ import { ReactComponent as Swap } from '../icons/system/swap.svg';
 import { ReactComponent as SwapGradient } from '../icons/system/swap-gradient.svg';
 import { ReactComponent as Transfer } from '../icons/system/transfer.svg';
 import { ReactComponent as Settings } from '../icons/system/settings.svg';
+import { ReactComponent as Copy } from '../icons/system/copy.svg';
+import { ReactComponent as External } from '../icons/system/external.svg';
 
 interface IIconProps {
   name: string;
@@ -50,6 +52,8 @@ const icons: IIconMapping = {
   'swap-gradient': SwapGradient,
   transfer: Transfer,
   settings: Settings,
+  copy: Copy,
+  external: External,
 };
 
 const colorMapping: IColorMapping = {
