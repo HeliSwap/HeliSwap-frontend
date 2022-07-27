@@ -20,7 +20,7 @@ const SearchArea = ({
   const handleSearch = useCallback(
     (value: string) => {
       if (value.length > 1) {
-        console.log('now searching for', value);
+        console.log('Searching for', value);
         searchFunc(value);
       }
     },

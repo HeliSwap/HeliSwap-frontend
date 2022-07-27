@@ -328,7 +328,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
               <SearchArea
                 searchFunc={(value: string) => {
                   loadExtraPools({
-                    variables: { token: '0x0000000000000000000000000000000002be8c90' },
+                    variables: { token: value },
                   });
                 }}
                 calledSearchResults={calledExtraPools}
