@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import { GlobalContext } from '../providers/Global';
-import md5 from 'md5';
+import { Md5 } from 'ts-md5/dist/md5';
 
 import Button from './Button';
 import Modal from './Modal';
@@ -52,7 +52,7 @@ const Header = () => {
     <div className="p-5">
       <div className="d-flex justify-content-end">
         <div className="d-flex align-items-center">
-          {connected ? (
+          {connected && userId ? (
             <>
               <div className="container-connected">
                 <div className="text-small">{userBalance} HBAR</div>
@@ -60,7 +60,7 @@ const Header = () => {
                   <div className="text-small">{userId}</div>
                   <img
                     className="img-profile ms-3"
-                    src={`https://www.gravatar.com/avatar/${md5(userId)}/?d=identicon`}
+                    src={`https://www.gravatar.com/avatar/${Md5.hashStr(userId)}/?d=identicon`}
                     alt=""
                   />
                 </div>

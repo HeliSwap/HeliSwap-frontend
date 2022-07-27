@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from '../Button';
 import Icon from '../Icon';
-import md5 from 'md5';
+import { Md5 } from 'ts-md5/dist/md5';
 
 interface IUserAccoutnModalContentProps {
   closeModal: () => void;
@@ -47,14 +47,16 @@ const UserAccoutnModalContent = ({
           <div className="d-flex justify-content-between align-items-start">
             <div>
               <p className="text-small text-bold">Connected with Hashpack</p>
-              <div className="d-flex align-items-center mt-5">
-                <img
-                  className="img-profile me-3"
-                  src={`https://www.gravatar.com/avatar/${md5(userId)}/?d=identicon`}
-                  alt=""
-                />
-                <p className="text-main text-bold">{userId}</p>
-              </div>
+              {userId ? (
+                <div className="d-flex align-items-center mt-5">
+                  <img
+                    className="img-profile me-3"
+                    src={`https://www.gravatar.com/avatar/${Md5.hashStr(userId)}/?d=identicon`}
+                    alt=""
+                  />
+                  <p className="text-main text-bold">{userId}</p>
+                </div>
+              ) : null}
             </div>
 
             <Button
