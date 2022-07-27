@@ -169,7 +169,7 @@
 
   &:focus-within:not(.is-readonly),
   &:hover:not(.is-readonly) {
-    border-color: $primary-100;
+    border-color: $primary-500;
   }
 
   &.is-invalid {
