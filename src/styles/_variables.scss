@@ -277,7 +277,7 @@ $btn-primary-outline-color: $white;
 // Forms
 $input-color: $primary-100;
 $input-border-color: $primary-700;
-$input-focus-border-color: $primary-100;
+$input-focus-border-color: $primary-400;
 $input-focus-box-shadow: none;
 $input-height: auto;
 $input-line-height: 1.71;
@@ -287,8 +287,8 @@ $input-bg: $primary-700;
 $input-padding-y: 15px;
 $input-padding-x: 12px;
 $input-font-size: 14px;
-$input-disabled-bg: $neutral-800;
-$input-disabled-border-color: $primary-500;
+$input-disabled-bg: $primary-800;
+$input-disabled-border-color: $primary-800;
 
 $input-padding-y-sm:                    7px;
 $input-padding-x-sm:                    12px;
