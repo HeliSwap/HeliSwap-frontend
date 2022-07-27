@@ -240,15 +240,15 @@ const Styleguide = () => {
       <div className="mb-4 d-flex align-items-center">
         <div className="btn-selector">
           <span className="text-small">Select token</span>
-          <Icon name="chevron" className="ms-2" />
+          <Icon name="chevron-down" className="ms-2" />
         </div>
         <div className="btn-selector with-background ms-3">
           <span className="text-small">Select token</span>
-          <Icon name="chevron" className="ms-2" />
+          <Icon name="chevron-down" className="ms-2" />
         </div>
         <div className="btn-selector with-border ms-3">
           <span className="text-small">Select token</span>
-          <Icon name="chevron" className="ms-2" />
+          <Icon name="chevron-down" className="ms-2" />
         </div>
       </div>
 
@@ -256,19 +256,19 @@ const Styleguide = () => {
         <div className="btn-selector">
           <IconToken symbol="ETH" className="me-3" />
           <span className="text-small">ETH</span>
-          <Icon name="chevron" className="ms-2" />
+          <Icon name="chevron-down" className="ms-2" />
         </div>
 
         <div className="btn-selector with-background ms-3">
           <IconToken symbol="HBAR" className="me-3" />
           <span className="text-small">HBAR</span>
-          <Icon name="chevron" className="ms-2" />
+          <Icon name="chevron-down" className="ms-2" />
         </div>
 
         <div className="btn-selector with-border ms-3">
           <IconToken symbol="HBAR" className="me-3" />
           <span className="text-small">HBAR</span>
-          <Icon name="chevron" className="ms-2" />
+          <Icon name="chevron-down" className="ms-2" />
         </div>
       </div>
 

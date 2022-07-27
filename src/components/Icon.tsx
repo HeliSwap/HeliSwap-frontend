@@ -3,7 +3,8 @@ import { ReactComponent as ArrowDown } from '../icons/system/arrow-down.svg';
 import { ReactComponent as ArrowLeft } from '../icons/system/arrow-left.svg';
 import { ReactComponent as Check } from '../icons/system/check.svg';
 import { ReactComponent as Cancel } from '../icons/system/cancel.svg';
-import { ReactComponent as Chevron } from '../icons/system/chevron.svg';
+import { ReactComponent as ChevronUp } from '../icons/system/chevron-up.svg';
+import { ReactComponent as ChevronDown } from '../icons/system/chevron-down.svg';
 import { ReactComponent as Hint } from '../icons/system/hint.svg';
 import { ReactComponent as Loader } from '../icons/system/loader.svg';
 import { ReactComponent as More } from '../icons/system/more.svg';
@@ -39,7 +40,8 @@ interface IIconMapping {
 const icons: IIconMapping = {
   check: Check,
   cancel: Cancel,
-  chevron: Chevron,
+  'chevron-up': ChevronUp,
+  'chevron-down': ChevronDown,
   'arrow-down': ArrowDown,
   'arrow-left': ArrowLeft,
   hint: Hint,

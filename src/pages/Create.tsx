@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
-import { useParams } from 'react-router-dom';
 import {
   ITokenData,
   TokenType,

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import BigNumber from 'bignumber.js';
 
 import {
@@ -7,6 +8,7 @@ import {
   TokenType,
   ITokensData,
   IfaceInitialBalanceData,
+  IPoolData,
 } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
@@ -59,6 +61,9 @@ const Swap = () => {
     extensionFound,
     isHashpackLoading,
   } = connection;
+
+  const { address } = useParams();
+  const navigate = useNavigate();
 
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
@@ -134,6 +139,9 @@ const Swap = () => {
   const [loadingSwap, setLoadingSwap] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
   const [loadingAssociate, setLoadingAssociate] = useState(false);
+
+  // State for preset tokens from choosen pool
+  const [tokensDerivedFromPool, setTokensDerivedFromPool] = useState(false);
 
   const getInsufficientTokenIn = useCallback(() => {
     const { tokenA: tokenABalance } = tokenBalances;
@@ -516,6 +524,78 @@ const Swap = () => {
     insufficientLiquidity,
     needApproval,
   ]);
+
+  // Check for address in url
+  useEffect(() => {
+    try {
+      if (address && poolsData.length !== 0 && tokenDataList && !tokensDerivedFromPool) {
+        const chosenPool =
+          poolsData.find((pool: IPoolData) => pool.pairAddress === address) || ({} as IPoolData);
+        const { token0: token0Address, token1: token1Address } = chosenPool;
+
+        // Check if one of tokens is WHBAR - to be switched for HBAR
+        const isTokenAWrappedHBAR =
+          token0Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+        const isTokenBWrappedHBAR =
+          token1Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+
+        const tokenA = isTokenAWrappedHBAR
+          ? NATIVE_TOKEN
+          : tokenDataList.find((token: ITokenData) => token.address === token0Address) ||
+            ({} as ITokenData);
+        const tokenB = isTokenBWrappedHBAR
+          ? NATIVE_TOKEN
+          : tokenDataList.find((token: ITokenData) => token.address === token1Address) ||
+            ({} as ITokenData);
+
+        setTokensData({ tokenA, tokenB });
+        //We want to set the tokens from the pool selected just once
+        setTokensDerivedFromPool(true);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [poolsData, tokenDataList, address, tokensDerivedFromPool]);
+
+  useEffect(() => {
+    const { tokenA, tokenB } = tokensData;
+    const poolsDataLoaded = poolsData.length !== 0;
+    const tokenASelected = Object.keys(tokensData.tokenA).length !== 0;
+    const tokenBSelected = Object.keys(tokensData.tokenB).length !== 0;
+
+    const tokenAIsNative = tokenA.type === TokenType.HBAR;
+    const tokenBIsNative = tokenB.type === TokenType.HBAR;
+    const provideNative = tokenAIsNative || tokenBIsNative;
+    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
+
+    const selectedPoolData =
+      (poolsDataLoaded &&
+        poolsData.filter((pool: IPoolData) => {
+          let poolMatchedBothTokens = false;
+
+          const poolContainsToken = (tokenAddres: string) => {
+            return pool.token0 === tokenAddres || pool.token1 === tokenAddres;
+          };
+
+          if (provideNative) {
+            poolMatchedBothTokens =
+              poolContainsToken(WHBARAddress) &&
+              (poolContainsToken(tokenA.address) || poolContainsToken(tokenB.address));
+          } else {
+            //Both tokens are in the same pool
+            poolMatchedBothTokens =
+              poolContainsToken(tokenA.address) && poolContainsToken(tokenB.address);
+          }
+
+          return poolMatchedBothTokens;
+        })) ||
+      [];
+
+    //Set selected pool address in the URL
+    if (poolsDataLoaded && tokenASelected && tokenBSelected) {
+      navigate(`/${selectedPoolData[0] ? selectedPoolData[0].pairAddress : ''}`);
+    }
+  }, [tokensData, poolsData, navigate]);
 
   //Render methods
   const getErrorMessage = () => {

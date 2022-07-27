@@ -107,7 +107,7 @@ const Pools = () => {
         ))}
       </div>
     ) : (
-      <p className="text-warning text-center">No pools found</p>
+      renderEmptyPoolsState('There are no active pools at this moment.')
     );
   };
 
@@ -140,10 +140,10 @@ const Pools = () => {
           ))}
         </div>
       ) : (
-        <p className="text-warning text-center">No pools found</p>
+        renderEmptyPoolsState('You don’t have active pools at this moment.')
       )
     ) : (
-      <div className="rounded bg-dark p-5 text-center mt-5">
+      <div className="text-center mt-10">
         <p>Your active liquidity positions will appear here.</p>
         <div className="mt-4">
           <Button
@@ -158,6 +158,15 @@ const Pools = () => {
       </div>
     );
   };
+
+  const renderEmptyPoolsState = (infoMessage: string) => (
+    <div className="text-center mt-10">
+      <p className="text-small">{infoMessage}</p>
+      <Link to="/create" className="btn btn-primary btn-sm mt-5">
+        Create pool
+      </Link>
+    </div>
+  );
 
   return (
     <div className="d-flex justify-content-center">
@@ -191,7 +200,7 @@ const Pools = () => {
 
           <hr />
 
-          {connected && !isHashpackLoading ? (
+          {connected && !isHashpackLoading && havePools ? (
             <div className="d-flex justify-content-end align-items-center my-5">
               <Link className="btn btn-sm btn-primary" to="/create">
                 Create pool

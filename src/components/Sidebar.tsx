@@ -1,13 +1,9 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { GlobalContext } from '../providers/Global';
 
 import Icon from './Icon';
 
 const Sidebar = () => {
-  const contextValue = useContext(GlobalContext);
-  const { isRunning, lastUpdated } = contextValue;
-
   return (
     <div className="container-sidebar">
       <div className="container-logo">
@@ -42,11 +38,6 @@ const Sidebar = () => {
         </div>
 
         <div>
-          <div className="container-healthcheck d-flex align-items-center">
-            <span className="me-3 d-none d-xxl-block text-micro">{lastUpdated}</span>
-            <span className={`icon-healthcheck ${isRunning ? 'is-running' : ''}`}></span>
-          </div>
-
           {/* <div className="d-flex align-items-center">
             <span className="icon-menu">
               <Icon color="gray" name="more" />

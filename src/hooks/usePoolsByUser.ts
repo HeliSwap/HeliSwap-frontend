@@ -92,9 +92,11 @@ const usePoolsByUser = (
         });
 
         setPoolsByUser(sortedPools);
+      } else {
+        setPoolsByUser([]);
       }
     }
-  }, [data, hbarPrice, poolsExtended]);
+  }, [userId, data, hbarPrice, poolsExtended]);
 
   return { poolsByUser, loading, error, refetch };
 };
