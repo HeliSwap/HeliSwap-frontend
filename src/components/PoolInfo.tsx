@@ -144,10 +144,11 @@ const PoolInfo = ({
                   >
                     Remove Liquidity
                   </Button>
-                ) : null}
-                <Link className="btn btn-sm btn-primary ms-3" to={`/${poolData.pairAddress}`}>
-                  Swap
-                </Link>
+                ) : (
+                  <Link className="btn btn-sm btn-primary ms-3" to={`/${poolData.pairAddress}`}>
+                    Swap
+                  </Link>
+                )}
                 <Link
                   className="btn btn-sm btn-primary ms-3"
                   to={`/create/${poolData.pairAddress}`}
