@@ -44,6 +44,7 @@ const icons: IIconMapping = {
   'chevron-up': ChevronUp,
   'chevron-down': ChevronDown,
   'arrow-down': ArrowDown,
+  'arrow-up': ArrowUp,
   'arrow-left': ArrowLeft,
   hint: Hint,
   loader: Loader,
