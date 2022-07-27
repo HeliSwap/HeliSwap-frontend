@@ -151,6 +151,16 @@ export const addressToContractId = (tokenAddress: string) => {
   return ContractId.fromEvmAddress(0, 0, tokenAddress);
 };
 
+export const isHederaIdValid = (hederaId: string) => {
+  return hederaId
+    .toLowerCase()
+    .match(/^(0|(?:[1-9]\d*))\.(0|(?:[1-9]\d*))\.(0|(?:[1-9]\d*))(?:-([a-z]{5}))?$/g);
+};
+
+export const isAddressValid = (address: string) => {
+  return hethers.utils.isAddress(address.toLowerCase());
+};
+
 /**
  * Calucate reserves based on total amount ot LP
  * @public
