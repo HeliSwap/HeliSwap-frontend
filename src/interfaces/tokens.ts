@@ -35,6 +35,8 @@ export interface IPoolData {
   icons?: string[];
   volume7d: string;
   volume24h: string;
+  fee0?: string;
+  fee1?: string;
 }
 
 export interface IPoolExtendedData extends IPoolData {
@@ -46,6 +48,8 @@ export interface IPoolExtendedData extends IPoolData {
   volume24?: string;
   volume7Num?: number;
   volume7?: string;
+  feesNum?: number;
+  feesStr?: string;
 }
 
 export enum TokenType {

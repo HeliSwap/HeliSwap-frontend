@@ -62,6 +62,8 @@ export const GET_POOLS_BY_USER = gql`
       token1Amount
       token1Decimals
       lpShares
+      fee0
+      fee1
     }
   }
 `;

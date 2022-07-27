@@ -57,6 +57,8 @@ const usePoolsByUser = (
             token1,
             lpShares,
             pairSupply,
+            fee0,
+            fee1,
           } = pool;
 
           const { reserve0ShareStr, reserve1ShareStr } = calculateReserves(
@@ -71,6 +73,11 @@ const usePoolsByUser = (
           const token0Price = getTokenPrice(poolsExtended, token0, hbarPrice);
           const token1Price = getTokenPrice(poolsExtended, token1, hbarPrice);
 
+          const fee0Value = Number(fee0) * Number(token0Price);
+          const fee1Value = Number(fee1) * Number(token0Price);
+          const totalFeeValue = fee0Value + fee1Value;
+          const totalFeeValueString = totalFeeValue.toFixed(2);
+
           const token0Value = Number(reserve0ShareStr) * Number(token0Price);
           const token1Value = Number(reserve1ShareStr) * Number(token1Price);
           const totalLpValue = token0Value + token1Value;
@@ -82,6 +89,8 @@ const usePoolsByUser = (
             token1AmountFormatted: reserve1ShareStr,
             tvl: totalLpValueStr,
             tvlBN: new BigNumber(totalLpValueStr),
+            feesNum: totalFeeValue,
+            feesStr: totalFeeValueString,
           };
 
           return poolData;
