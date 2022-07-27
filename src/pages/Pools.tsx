@@ -127,19 +127,23 @@ const Pools = () => {
             className="table-pools-cell justify-content-end"
             onClick={() => handleSortClick(SORT_OPTIONS_ENUM.TVL)}
           >
-            <span className="text-small">TVL {getSortIcon(SORT_OPTIONS_ENUM.TVL)}</span>
+            <span className="text-small ws-no-wrap">TVL {getSortIcon(SORT_OPTIONS_ENUM.TVL)}</span>
           </div>
           <div
             className="table-pools-cell justify-content-end"
             onClick={() => handleSortClick(SORT_OPTIONS_ENUM.VOL_7)}
           >
-            <span className="text-small">Volume 7d {getSortIcon(SORT_OPTIONS_ENUM.VOL_7)}</span>
+            <span className="text-small ws-no-wrap">
+              Volume 7d {getSortIcon(SORT_OPTIONS_ENUM.VOL_7)}
+            </span>
           </div>
           <div
             className="table-pools-cell justify-content-end"
             onClick={() => handleSortClick(SORT_OPTIONS_ENUM.VOL_24)}
           >
-            <span className="text-small">Volume 24h {getSortIcon(SORT_OPTIONS_ENUM.VOL_24)}</span>
+            <span className="text-small ws-no-wrap">
+              Volume 24h {getSortIcon(SORT_OPTIONS_ENUM.VOL_24)}
+            </span>
           </div>
           <div className="table-pools-cell justify-content-end">
             <span className="text-small"></span>
