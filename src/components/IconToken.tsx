@@ -1,6 +1,6 @@
 import React from 'react';
-import HBAR from '../icons/tokens/HBAR.svg';
-import WHBAR from '../icons/tokens/WHBAR.svg';
+import HBAR from '../icons/tokens/HBAR.png';
+import WHBAR from '../icons/tokens/WHBAR.png';
 import ETH from '../icons/tokens/ETH.svg';
 import unknown from '../icons/tokens/unknown.svg';
 
