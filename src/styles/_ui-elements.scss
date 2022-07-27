@@ -139,6 +139,12 @@
   border-radius: 2px;
   padding: 4px 8px;
   margin-left: 12px;
+  cursor: pointer;
+  transition: background-color 0.15s linear;
+
+  &:hover {
+    background-color: $primary-600;
+  }
 }
 
 .container-dark {
@@ -289,7 +295,6 @@
 }
 
 /* Not relevant */
-
 .container-pairs {
   background-color: $darkest;
   border-radius: 15px;
@@ -325,26 +330,7 @@
   }
 }
 
-.input-container {
-  position: relative;
-
-  .text-link-input {
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-}
-
-.container-token-selector {
-  padding: 6px 6px 6px 12px;
-  color: $input-color;
-  background-color: $darkest;
-  border: 1px solid $input-border-color;
-  border-radius: $border-radius;
-  font-size: $input-font-size;
-}
-
+// Lists
 .list-token-item {
   padding: 4px 8px;
   border-radius: $border-radius;

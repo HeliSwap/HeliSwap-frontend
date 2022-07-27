@@ -6,6 +6,7 @@ import Button from './Button';
 import Modal from './Modal';
 import ConnectModalContent from './Modals/ConnectModalContent';
 import { formatStringETHtoPriceFormatted } from '../utils/numberUtils';
+import UserAccountModalContent from './Modals/UserAccountModalContent';
 
 const Header = () => {
   const contextValue = useContext(GlobalContext);
@@ -21,6 +22,7 @@ const Header = () => {
   } = contextValue.connection;
 
   const [userBalance, setUserBalance] = useState('0.0');
+  const [showUserAccountModal, setShowUserAccountModal] = useState(false);
 
   const handleConnectButtonClick = () => {
     setShowConnectModal(true);
@@ -53,19 +55,10 @@ const Header = () => {
             <>
               <div className="container-connected">
                 <div className="text-small">{userBalance} HBAR</div>
-                <div className="container-address">
+                <div className="container-address" onClick={() => setShowUserAccountModal(true)}>
                   <div className="text-small">{userId}</div>
                 </div>
               </div>
-              <Button
-                onClick={() => disconnectWallet()}
-                className="mx-2"
-                type="primary"
-                size="small"
-                outline={true}
-              >
-                Disconnect
-              </Button>
             </>
           ) : (
             <Button
@@ -84,6 +77,14 @@ const Header = () => {
               connectWallet={connectWallet}
               isLoading={isHashpackLoading}
               extensionFound={extensionFound}
+            />
+          </Modal>
+          <Modal show={showUserAccountModal} closeModal={() => setShowUserAccountModal(false)}>
+            <UserAccountModalContent
+              modalTitle="Account"
+              closeModal={() => setShowUserAccountModal(false)}
+              disconnectWallet={disconnectWallet}
+              userId={userId}
             />
           </Modal>
         </div>
