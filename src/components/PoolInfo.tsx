@@ -95,64 +95,75 @@ const PoolInfo = ({
   const renderMyPoolsDetails = () => {
     return (
       <div className="row align-items-center">
-        <div className="col-4">
-          <div className="container-rounded-dark">
-            <p className="text-small">Liquidity</p>
-            <p className="text-title text-numeric">{formatStringToPrice(poolData.tvl)}</p>
+        <div className="col-8">
+          <div className="row">
+            <div className="col-6">
+              <div className="container-rounded-dark">
+                <p className="text-small">Liquidity</p>
+                <p className="text-title text-numeric">{formatStringToPrice(poolData.tvl)}</p>
 
-            <hr className="my-4" />
+                <hr className="my-4" />
 
-            <div className="d-flex justify-content-between align-items-center">
-              <div className="d-flex align-items-center">
-                <IconToken symbol={poolData.token0Symbol} />
-                <span className="text-main text-bold ms-3">{poolData.token0Symbol}</span>
+                <div className="d-flex justify-content-between align-items-center">
+                  <div className="d-flex align-items-center">
+                    <IconToken symbol={poolData.token0Symbol} />
+                    <span className="text-main text-bold ms-3">{poolData.token0Symbol}</span>
+                  </div>
+
+                  <span className="text-numeric text-small">
+                    {formatStringETHtoPriceFormatted(poolData.token0AmountFormatted)}
+                  </span>
+                </div>
+
+                <div className="d-flex justify-content-between align-items-center mt-3">
+                  <div className="d-flex align-items-center">
+                    <IconToken symbol={poolData.token1Symbol} />
+                    <span className="text-main text-bold ms-3">{poolData.token1Symbol}</span>
+                  </div>
+
+                  <span className="text-numeric text-small">
+                    {formatStringETHtoPriceFormatted(poolData.token1AmountFormatted)}
+                  </span>
+                </div>
               </div>
-
-              <span className="text-numeric text-small">
-                {formatStringETHtoPriceFormatted(poolData.token0AmountFormatted)}
-              </span>
             </div>
 
-            <div className="d-flex justify-content-between align-items-center mt-3">
-              <div className="d-flex align-items-center">
-                <IconToken symbol={poolData.token1Symbol} />
-                <span className="text-main text-bold ms-3">{poolData.token1Symbol}</span>
-              </div>
+            <div className="col-6">
+              <div className="container-rounded-dark">
+                <p className="text-small">Unclaimed fees</p>
+                <p className="text-title text-numeric">12</p>
 
-              <span className="text-numeric text-small">
-                {formatStringETHtoPriceFormatted(poolData.token1AmountFormatted)}
-              </span>
+                <hr className="my-4" />
+
+                <div className="d-flex justify-content-between align-items-center">
+                  <div className="d-flex align-items-center">
+                    <IconToken symbol={poolData.token0Symbol} />
+                    <span className="text-main text-bold ms-3">{poolData.token0Symbol}</span>
+                  </div>
+
+                  <span className="text-numeric text-small">
+                    {formatStringETHtoPriceFormatted('1')}
+                  </span>
+                </div>
+
+                <div className="d-flex justify-content-between align-items-center mt-3">
+                  <div className="d-flex align-items-center">
+                    <IconToken symbol={poolData.token1Symbol} />
+                    <span className="text-main text-bold ms-3">{poolData.token1Symbol}</span>
+                  </div>
+
+                  <span className="text-numeric text-small">
+                    {formatStringETHtoPriceFormatted('1')}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="col-4">
-          <div className="container-rounded-dark">
-            <p className="text-small">Unclaimed fees</p>
-            <p className="text-title text-numeric">12</p>
-
-            <hr className="my-4" />
-
+          <div className="container-rounded-dark mt-4">
             <div className="d-flex justify-content-between align-items-center">
-              <div className="d-flex align-items-center">
-                <IconToken symbol={poolData.token0Symbol} />
-                <span className="text-main text-bold ms-3">{poolData.token0Symbol}</span>
-              </div>
-
-              <span className="text-numeric text-small">
-                {formatStringETHtoPriceFormatted('1')}
-              </span>
-            </div>
-
-            <div className="d-flex justify-content-between align-items-center mt-3">
-              <div className="d-flex align-items-center">
-                <IconToken symbol={poolData.token1Symbol} />
-                <span className="text-main text-bold ms-3">{poolData.token1Symbol}</span>
-              </div>
-
-              <span className="text-numeric text-small">
-                {formatStringETHtoPriceFormatted('1')}
-              </span>
+              <span className="text-small text-bold">% of the pool</span>
+              <span className="text-small text-numeric">{}%</span>
             </div>
           </div>
         </div>
