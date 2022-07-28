@@ -38,6 +38,147 @@ const PoolInfo = ({
     setCurrentPoolIndex(index);
   };
 
+  const renderAllPoolsDetails = () => {
+    return (
+      <div className="row align-items-center">
+        <div className="col-6">
+          <div className="container-rounded-dark">
+            <p className="text-small">TVL</p>
+            <p className="text-title text-numeric">{formatStringToPrice(poolData.tvl)}</p>
+
+            <hr className="my-4" />
+
+            <div className="d-flex justify-content-between align-items-center">
+              <div className="d-flex align-items-center">
+                <IconToken symbol={poolData.token0Symbol} />
+                <span className="text-main text-bold ms-3">{poolData.token0Symbol}</span>
+              </div>
+
+              <span className="text-numeric text-small">
+                {formatStringETHtoPriceFormatted(poolData.token0AmountFormatted)}
+              </span>
+            </div>
+
+            <div className="d-flex justify-content-between align-items-center mt-3">
+              <div className="d-flex align-items-center">
+                <IconToken symbol={poolData.token1Symbol} />
+                <span className="text-main text-bold ms-3">{poolData.token1Symbol}</span>
+              </div>
+
+              <span className="text-numeric text-small">
+                {formatStringETHtoPriceFormatted(poolData.token1AmountFormatted)}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-6 d-flex">
+          <div className="flex-1">
+            <Link className="d-block btn btn-sm btn-primary ms-3" to={`/${poolData.pairAddress}`}>
+              Trade
+            </Link>
+          </div>
+
+          <div className="flex-1">
+            <Link
+              className="d-block btn btn-sm btn-primary ms-3"
+              to={`/create/${poolData.pairAddress}`}
+            >
+              Add Liquidity
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderMyPoolsDetails = () => {
+    return (
+      <div className="row align-items-center">
+        <div className="col-4">
+          <div className="container-rounded-dark">
+            <p className="text-small">Liquidity</p>
+            <p className="text-title text-numeric">{formatStringToPrice(poolData.tvl)}</p>
+
+            <hr className="my-4" />
+
+            <div className="d-flex justify-content-between align-items-center">
+              <div className="d-flex align-items-center">
+                <IconToken symbol={poolData.token0Symbol} />
+                <span className="text-main text-bold ms-3">{poolData.token0Symbol}</span>
+              </div>
+
+              <span className="text-numeric text-small">
+                {formatStringETHtoPriceFormatted(poolData.token0AmountFormatted)}
+              </span>
+            </div>
+
+            <div className="d-flex justify-content-between align-items-center mt-3">
+              <div className="d-flex align-items-center">
+                <IconToken symbol={poolData.token1Symbol} />
+                <span className="text-main text-bold ms-3">{poolData.token1Symbol}</span>
+              </div>
+
+              <span className="text-numeric text-small">
+                {formatStringETHtoPriceFormatted(poolData.token1AmountFormatted)}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-4">
+          <div className="container-rounded-dark">
+            <p className="text-small">Unclaimed fees</p>
+            <p className="text-title text-numeric">12</p>
+
+            <hr className="my-4" />
+
+            <div className="d-flex justify-content-between align-items-center">
+              <div className="d-flex align-items-center">
+                <IconToken symbol={poolData.token0Symbol} />
+                <span className="text-main text-bold ms-3">{poolData.token0Symbol}</span>
+              </div>
+
+              <span className="text-numeric text-small">
+                {formatStringETHtoPriceFormatted('1')}
+              </span>
+            </div>
+
+            <div className="d-flex justify-content-between align-items-center mt-3">
+              <div className="d-flex align-items-center">
+                <IconToken symbol={poolData.token1Symbol} />
+                <span className="text-main text-bold ms-3">{poolData.token1Symbol}</span>
+              </div>
+
+              <span className="text-numeric text-small">
+                {formatStringETHtoPriceFormatted('1')}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-4">
+          <div>
+            <Link className="d-block btn btn-sm btn-primary" to={`/create/${poolData.pairAddress}`}>
+              Increase Liquidity
+            </Link>
+          </div>
+
+          <div className="d-grid mt-3">
+            <Button
+              className="btn-sm"
+              type="secondary"
+              outline={true}
+              onClick={handleRemoveButtonClick}
+            >
+              Remove Liquidity
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <div
@@ -82,83 +223,9 @@ const PoolInfo = ({
       </div>
 
       {showPoolDetails ? (
-        <>
-          <div className="container-pool-details">
-            <div className="container-pool-details-row">
-              <div className="container-transparent-border d-flex flex-column justify-content-between">
-                <div className="d-flex justify-content-between align-items-center">
-                  <div className="d-flex align-items-center">
-                    <IconToken symbol={poolData.token0Symbol} />
-                    <span className="text-main text-bold ms-3">{poolData.token0Symbol}</span>
-                  </div>
-
-                  <div className="d-flex justify-content-end align-items-center ms-4">
-                    <span className="text-numeric text-main">
-                      {formatStringETHtoPriceFormatted(poolData.token0AmountFormatted)}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="d-flex justify-content-between align-items-center mt-2">
-                  <div className="d-flex align-items-center">
-                    <IconToken symbol={poolData.token1Symbol} />
-                    <span className="text-main text-bold ms-3">{poolData.token1Symbol}</span>
-                  </div>
-
-                  <div className="d-flex justify-content-end align-items-center ms-4">
-                    <span className="text-numeric text-main">
-                      {formatStringETHtoPriceFormatted(poolData.token1AmountFormatted)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <div className="container-transparent-border d-flex justify-content-between align-items-center">
-                  <span className="text-main text-bold">Liquidity</span>
-                  <span className="text-main text-numeric ms-4">
-                    {formatStringToPrice(poolData.tvl)}
-                  </span>
-                </div>
-                <div className="container-transparent-border mt-4 d-flex justify-content-between align-items-center">
-                  <span className="text-main text-bold">LP Tokens Count</span>
-                  <span className="text-main text-numeric ms-4">
-                    {formatStringETHtoPriceFormatted(
-                      formatStringWeiToStringEther(
-                        view === PageViews.MY_POOLS
-                          ? (poolData.lpShares as string)
-                          : (poolData.pairSupply as string),
-                      ),
-                    )}
-                  </span>
-                </div>
-              </div>
-
-              <div className="d-flex justify-content-end align-items-center">
-                {view === PageViews.MY_POOLS ? (
-                  <Button
-                    className="btn-sm"
-                    type="secondary"
-                    outline={true}
-                    onClick={handleRemoveButtonClick}
-                  >
-                    Remove Liquidity
-                  </Button>
-                ) : (
-                  <Link className="btn btn-sm btn-primary ms-3" to={`/${poolData.pairAddress}`}>
-                    Swap
-                  </Link>
-                )}
-                <Link
-                  className="btn btn-sm btn-primary ms-3"
-                  to={`/create/${poolData.pairAddress}`}
-                >
-                  Add Liquidity
-                </Link>
-              </div>
-            </div>
-          </div>
-        </>
+        <div className="container-pool-details">
+          {view === PageViews.ALL_POOLS ? renderAllPoolsDetails() : renderMyPoolsDetails()}
+        </div>
       ) : null}
     </>
   );
