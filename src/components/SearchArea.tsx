@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import { IPoolExtendedData } from '../interfaces/tokens';
 // import debounce from 'lodash.debounce';
 const debounce = require('lodash.debounce');
 
@@ -6,7 +7,7 @@ interface ISearchAreaProps {
   searchFunc: (value: string) => void;
   calledSearchResults: boolean;
   loadingSearchResults: boolean;
-  results: Object[];
+  results: IPoolExtendedData[];
 }
 
 const SearchArea = ({
@@ -51,7 +52,7 @@ const SearchArea = ({
         <div>Loading...</div>
       ) : (
         <ul>
-          {(results || []).map((item: any, index: number) => {
+          {(results || []).map((item: IPoolExtendedData, index: number) => {
             return <li key={index}>{item.pairName}</li>;
           })}
         </ul>
