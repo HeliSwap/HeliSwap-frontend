@@ -80,11 +80,11 @@ const usePoolsByUser = (
           const token0Price = getTokenPrice(poolsExtended, token0, hbarPrice);
           const token1Price = getTokenPrice(poolsExtended, token1, hbarPrice);
 
-          const fee0Formatted = formatStringWeiToStringEther(fee0 as string);
-          const fee1Formatted = formatStringWeiToStringEther(fee1 as string);
+          const fee0Formatted = formatStringWeiToStringEther(fee0 as string, token0Decimals);
+          const fee1Formatted = formatStringWeiToStringEther(fee1 as string, token1Decimals);
 
           const fee0Value = Number(fee0Formatted) * Number(token0Price);
-          const fee1Value = Number(fee1Formatted) * Number(token0Price);
+          const fee1Value = Number(fee1Formatted) * Number(token1Price);
           const totalFeeValue = fee0Value + fee1Value;
           const totalFeeValueString = totalFeeValue.toFixed(2);
 
