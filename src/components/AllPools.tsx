@@ -78,10 +78,8 @@ const AllPools = ({
   // Invoke when user click to request another page.
   const handlePageClick = (event: any) => {
     setCollapseAll(true);
-    const sortedPoolsToShow = pools.sort((a: IPoolExtendedData, b: IPoolExtendedData) =>
-      sortPools(a[poolsSortBy as string], b[poolsSortBy as string], sortDirection),
-    );
-    const newOffset = (event.selected * itemsPerPage) % sortedPoolsToShow.length;
+
+    const newOffset = (event.selected * itemsPerPage) % pools.length;
     setItemOffset(newOffset);
   };
 
