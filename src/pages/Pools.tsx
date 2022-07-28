@@ -11,10 +11,9 @@ import { REFRESH_TIME } from '../constants';
 import usePools from '../hooks/usePools';
 import usePoolsByUser from '../hooks/usePoolsByUser';
 import SearchArea from '../components/SearchArea';
-import { useLazyQuery } from '@apollo/client';
-import { GET_POOL_BY_TOKEN } from '../GraphQL/Queries';
 import AllPools from '../components/AllPools';
 import MyPools from '../components/MyPools';
+import useFilteredPools from '../hooks/useFilteredPools';
 
 interface IPoolsProps {
   itemsPerPage: number;
@@ -25,6 +24,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const { connection } = contextValue;
   const { userId, connected, isHashpackLoading, setShowConnectModal } = connection;
 
+  //Data fetching hooks
   const {
     error: errorPoools,
     loading: loadingPools,
@@ -34,6 +34,16 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
       fetchPolicy: 'network-only',
       pollInterval: REFRESH_TIME,
     },
+    true,
+  );
+
+  const [searchQuery, setSearchQuery] = useState({});
+
+  const { filteredPools, filteredPoolsCalled, filteredPoolsLoading } = useFilteredPools(
+    {
+      fetchPolicy: 'network-only',
+    },
+    searchQuery,
     true,
   );
 
@@ -49,11 +59,6 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     userId,
     pools,
   );
-
-  const [
-    loadExtraPools,
-    { called: calledExtraPools, loading: loadingExtraPools, data: extraPoolsData },
-  ] = useLazyQuery(GET_POOL_BY_TOKEN);
 
   const [showRemoveContainer, setShowRemoveContainer] = useState(false);
   const [currentPoolIndex, setCurrentPoolIndex] = useState(0);
@@ -157,13 +162,11 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
             <>
               <SearchArea
                 searchFunc={(value: string) => {
-                  loadExtraPools({
-                    variables: { token: value },
-                  });
+                  setSearchQuery({ keyword: value });
                 }}
-                calledSearchResults={calledExtraPools}
-                loadingSearchResults={loadingExtraPools}
-                results={extraPoolsData ? extraPoolsData.poolsByToken : []}
+                calledSearchResults={filteredPoolsCalled}
+                loadingSearchResults={filteredPoolsLoading}
+                results={filteredPools ? filteredPools : []}
               />
               <div className="d-flex justify-content-end align-items-center my-5">
                 <Link className="btn btn-sm btn-primary" to="/create">
