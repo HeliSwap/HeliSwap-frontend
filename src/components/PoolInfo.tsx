@@ -6,7 +6,11 @@ import Button from './Button';
 import IconToken from './IconToken';
 import Icon from './Icon';
 
-import { formatStringETHtoPriceFormatted, formatStringToPrice } from '../utils/numberUtils';
+import {
+  formatStringETHtoPriceFormatted,
+  formatStringToPrice,
+  formatStringWeiToStringEther,
+} from '../utils/numberUtils';
 import { formatIcons } from '../utils/iconUtils';
 import { PageViews } from '../interfaces/common';
 
@@ -129,8 +133,8 @@ const PoolInfo = ({
             <div className="col-6">
               <div className="container-rounded-dark">
                 <p className="text-small">Unclaimed fees</p>
-                <p className="text-title text-numeric">
-                  {formatStringETHtoPriceFormatted(poolData.feesStr as string)}
+                <p className="text-title text-numeric text-success">
+                  ${formatStringETHtoPriceFormatted(poolData.feesStr as string)}
                 </p>
 
                 <hr className="my-4" />
@@ -142,7 +146,7 @@ const PoolInfo = ({
                   </div>
 
                   <span className="text-numeric text-small">
-                    {formatStringETHtoPriceFormatted('1')}
+                    {formatStringWeiToStringEther(poolData.fee0 as string)}
                   </span>
                 </div>
 
@@ -153,7 +157,7 @@ const PoolInfo = ({
                   </div>
 
                   <span className="text-numeric text-small">
-                    {formatStringETHtoPriceFormatted('1')}
+                    {formatStringWeiToStringEther(poolData.fee1 as string)}
                   </span>
                 </div>
               </div>
@@ -163,7 +167,7 @@ const PoolInfo = ({
           <div className="container-rounded-dark mt-4">
             <div className="d-flex justify-content-between align-items-center">
               <span className="text-small text-bold">% of the pool</span>
-              <span className="text-small text-numeric">{}%</span>
+              <span className="text-small text-numeric">{poolData.poolPercenatage}%</span>
             </div>
           </div>
         </div>

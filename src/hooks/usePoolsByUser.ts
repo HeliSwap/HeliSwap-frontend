@@ -8,7 +8,13 @@ import { REFRESH_TIME } from '../constants';
 
 import { IPoolData, IPoolExtendedData } from '../interfaces/tokens';
 
-import { getTokenPrice, getHBarPrice, idToAddress, calculateReserves } from '../utils/tokenUtils';
+import {
+  getTokenPrice,
+  getHBarPrice,
+  idToAddress,
+  calculateReserves,
+  calculatePercentageByShare,
+} from '../utils/tokenUtils';
 
 const usePoolsByUser = (
   useQueryOptions: QueryHookOptions = {},
@@ -83,6 +89,8 @@ const usePoolsByUser = (
           const totalLpValue = token0Value + token1Value;
           const totalLpValueStr = totalLpValue.toFixed(2);
 
+          const userPercentageShare = calculatePercentageByShare(pairSupply, lpShares as string);
+
           const poolData: IPoolExtendedData = {
             ...pool,
             token0AmountFormatted: reserve0ShareStr,
@@ -91,6 +99,7 @@ const usePoolsByUser = (
             tvlBN: new BigNumber(totalLpValueStr),
             feesNum: totalFeeValue,
             feesStr: totalFeeValueString,
+            poolPercenatage: userPercentageShare,
           };
 
           return poolData;

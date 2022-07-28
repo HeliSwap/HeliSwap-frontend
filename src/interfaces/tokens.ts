@@ -32,6 +32,7 @@ export interface IPoolData {
   token1Symbol: string;
   token1Decimals: number;
   lpShares?: string;
+  poolPercenatage?: string;
   icons?: string[];
   volume7d: string;
   volume24h: string;
