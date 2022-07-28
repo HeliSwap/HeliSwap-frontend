@@ -156,6 +156,12 @@
   border-radius: 6px;
 }
 
+.container-rounded-dark {
+  background-color: #25255f;
+  border-radius: $border-radius;
+  padding: 16px;
+}
+
 .container-input-token {
   background-color: $primary-700;
   border-radius: $border-radius;
@@ -210,21 +216,9 @@
 }
 
 .container-pool-details {
-  padding: 20px;
-  display: grid;
-  grid-auto-rows: auto;
+  padding: 0 20px 20px 20px;
   background-color: #1f1f4d;
   border-bottom: 1px solid $primary-500;
-
-  .container-pool-details-row {
-    display: grid;
-    gap: 1em;
-    grid-template-columns: 1fr 1fr 1.3fr;
-  }
-
-  &.is-gray {
-    background-color: $primary-700;
-  }
 }
 
 .container-transparent-border {
