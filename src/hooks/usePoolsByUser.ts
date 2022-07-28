@@ -86,7 +86,7 @@ const usePoolsByUser = (
           const fee0Value = Number(fee0Formatted) * Number(token0Price);
           const fee1Value = Number(fee1Formatted) * Number(token1Price);
           const totalFeeValue = fee0Value + fee1Value;
-          const totalFeeValueString = totalFeeValue.toFixed(2);
+          const totalFeeValueString = totalFeeValue.toString();
 
           const token0Value = Number(reserve0ShareStr) * Number(token0Price);
           const token1Value = Number(reserve1ShareStr) * Number(token1Price);
