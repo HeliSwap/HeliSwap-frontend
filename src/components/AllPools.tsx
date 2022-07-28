@@ -68,7 +68,6 @@ const AllPools = ({
   useEffect(() => {
     // Fetch items from another resources.
     const endOffset = itemOffset + itemsPerPage;
-    console.log(`Loading items from ${itemOffset} to ${endOffset}`);
     const sortedPoolsToShow = pools.sort((a: IPoolExtendedData, b: IPoolExtendedData) =>
       sortPools(a[poolsSortBy as string], b[poolsSortBy as string], sortDirection),
     );
@@ -83,10 +82,8 @@ const AllPools = ({
       sortPools(a[poolsSortBy as string], b[poolsSortBy as string], sortDirection),
     );
     const newOffset = (event.selected * itemsPerPage) % sortedPoolsToShow.length;
-    console.log(`User requested page number ${event.selected}, which is offset ${newOffset}`);
     setItemOffset(newOffset);
   };
-  console.log(havePools);
 
   return loadingPools ? (
     <p className="text-info">Loading pools...</p>

@@ -107,3 +107,12 @@ export const HEALTH_CHECK = gql`
     healthcheck
   }
 `;
+
+export const GET_FILTERED_POOLS = gql`
+  query getFilterPools($keyword: String!) {
+    filterPools(keyword: $keyword) {
+      id
+      pairName
+    }
+  }
+`;
