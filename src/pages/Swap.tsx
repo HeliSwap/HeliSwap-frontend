@@ -592,9 +592,9 @@ const Swap = () => {
       [];
 
     //Set selected pool address in the URL
-    if (poolsDataLoaded && tokenASelected && tokenBSelected) {
-      navigate(`/${selectedPoolData[0] ? selectedPoolData[0].pairAddress : ''}`);
-    }
+    // if (poolsDataLoaded && tokenASelected && tokenBSelected) {
+    //   navigate(`/${selectedPoolData[0] ? selectedPoolData[0].pairAddress : ''}`);
+    // }
   }, [tokensData, poolsData, navigate]);
 
   //Render methods

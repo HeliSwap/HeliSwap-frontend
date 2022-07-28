@@ -70,7 +70,7 @@ const Header = () => {
                 <span className="text-small">
                   HBAR price:{' '}
                   <span className="text-numeric">
-                    ${formatStringETHtoPriceFormatted(hbarPrice.toString(), 2)}
+                    ${formatStringETHtoPriceFormatted(hbarPrice.toString(), 3)}
                   </span>
                 </span>
               </div>
