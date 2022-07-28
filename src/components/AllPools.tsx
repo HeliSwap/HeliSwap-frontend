@@ -68,7 +68,7 @@ const AllPools = ({
   useEffect(() => {
     // Fetch items from another resources.
     const endOffset = itemOffset + itemsPerPage;
-    const sortedPoolsToShow = pools.sort((a: IPoolExtendedData, b: IPoolExtendedData) =>
+    const sortedPoolsToShow = (pools || []).sort((a: IPoolExtendedData, b: IPoolExtendedData) =>
       sortPools(a[poolsSortBy as string], b[poolsSortBy as string], sortDirection),
     );
     setCurrentItems(sortedPoolsToShow.slice(itemOffset, endOffset));
