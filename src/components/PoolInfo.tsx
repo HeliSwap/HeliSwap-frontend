@@ -6,11 +6,7 @@ import Button from './Button';
 import IconToken from './IconToken';
 import Icon from './Icon';
 
-import {
-  formatStringETHtoPriceFormatted,
-  formatStringToPrice,
-  formatStringWeiToStringEther,
-} from '../utils/numberUtils';
+import { formatStringETHtoPriceFormatted, formatStringToPrice } from '../utils/numberUtils';
 import { formatIcons } from '../utils/iconUtils';
 import { PageViews } from '../interfaces/common';
 
@@ -37,8 +33,6 @@ const PoolInfo = ({
     setShowRemoveContainer(prev => !prev);
     setCurrentPoolIndex(index);
   };
-
-  console.log('poolData', poolData);
 
   const renderAllPoolsDetails = () => {
     return (
@@ -145,9 +139,7 @@ const PoolInfo = ({
                     <span className="text-main text-bold ms-3">{poolData.token0Symbol}</span>
                   </div>
 
-                  <span className="text-numeric text-small">
-                    {formatStringWeiToStringEther(poolData.fee0 as string)}
-                  </span>
+                  <span className="text-numeric text-small">{poolData.fee0AmountFormatted}</span>
                 </div>
 
                 <div className="d-flex justify-content-between align-items-center mt-3">
@@ -156,9 +148,7 @@ const PoolInfo = ({
                     <span className="text-main text-bold ms-3">{poolData.token1Symbol}</span>
                   </div>
 
-                  <span className="text-numeric text-small">
-                    {formatStringWeiToStringEther(poolData.fee1 as string)}
-                  </span>
+                  <span className="text-numeric text-small">{poolData.fee1AmountFormatted}</span>
                 </div>
               </div>
             </div>

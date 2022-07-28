@@ -43,6 +43,8 @@ export interface IPoolData {
 export interface IPoolExtendedData extends IPoolData {
   token0AmountFormatted: string;
   token1AmountFormatted: string;
+  fee0AmountFormatted?: string;
+  fee1AmountFormatted?: string;
   tvlBN: BigNumber;
   tvl: string;
   volume24Num?: number;

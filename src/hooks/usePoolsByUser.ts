@@ -15,6 +15,7 @@ import {
   calculateReserves,
   calculatePercentageByShare,
 } from '../utils/tokenUtils';
+import { formatStringWeiToStringEther } from '../utils/numberUtils';
 
 const usePoolsByUser = (
   useQueryOptions: QueryHookOptions = {},
@@ -79,8 +80,11 @@ const usePoolsByUser = (
           const token0Price = getTokenPrice(poolsExtended, token0, hbarPrice);
           const token1Price = getTokenPrice(poolsExtended, token1, hbarPrice);
 
-          const fee0Value = Number(fee0) * Number(token0Price);
-          const fee1Value = Number(fee1) * Number(token0Price);
+          const fee0Formatted = formatStringWeiToStringEther(fee0 as string);
+          const fee1Formatted = formatStringWeiToStringEther(fee1 as string);
+
+          const fee0Value = Number(fee0Formatted) * Number(token0Price);
+          const fee1Value = Number(fee1Formatted) * Number(token0Price);
           const totalFeeValue = fee0Value + fee1Value;
           const totalFeeValueString = totalFeeValue.toFixed(2);
 
@@ -100,6 +104,8 @@ const usePoolsByUser = (
             feesNum: totalFeeValue,
             feesStr: totalFeeValueString,
             poolPercenatage: userPercentageShare,
+            fee0AmountFormatted: fee0Formatted,
+            fee1AmountFormatted: fee1Formatted,
           };
 
           return poolData;
