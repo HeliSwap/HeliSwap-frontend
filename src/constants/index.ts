@@ -24,3 +24,19 @@ export const TRANSACTION_MAX_FEES = {
   WRAP_HBAR: 60000,
   UNWRAP_WHBAR: 80000,
 };
+
+export enum SORT_OPTIONS_ENUM {
+  TVL = 'tvl',
+  VOL_7 = 'volume7',
+  VOL_24 = 'volume24',
+}
+
+export type SORT_OPTIONS =
+  | SORT_OPTIONS_ENUM.TVL
+  | SORT_OPTIONS_ENUM.VOL_7
+  | SORT_OPTIONS_ENUM.VOL_24;
+
+export enum SORT_DIRECTION {
+  ASC = 'asc',
+  DESC = 'desc',
+}
