@@ -118,3 +118,27 @@ export const GET_FILTERED_POOLS = gql`
     }
   }
 `;
+
+export const GET_WHITELISTED_POOLS = gql`
+  query getWhitelistedPools($tokens: [String]) {
+    poolsConsistingOf(tokens: $tokens) {
+      id
+      pairName
+      pairSymbol
+      pairAddress
+      pairSupply
+      token0
+      token0Name
+      token0Amount
+      token0Symbol
+      token0Decimals
+      token1
+      token1Name
+      token1Symbol
+      token1Amount
+      token1Decimals
+      volume24h
+      volume7d
+    }
+  }
+`;
