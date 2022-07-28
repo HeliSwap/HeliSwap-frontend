@@ -24,6 +24,7 @@ const Header = () => {
     setShowConnectModal,
   } = contextValue.connection;
 
+  const [showUserAccountModal, setShowUserAccountModal] = useState(false);
   const [userBalance, setUserBalance] = useState('0.0');
   const [hbarPrice, setHbarPrice] = useState(0);
 
@@ -68,7 +69,7 @@ const Header = () => {
               <div className="me-5">
                 <span className="text-small">
                   HBAR price:{' '}
-                  <span className="text-bold text-numeric">
+                  <span className="text-numeric">
                     ${formatStringETHtoPriceFormatted(hbarPrice.toString(), 2)}
                   </span>
                 </span>
