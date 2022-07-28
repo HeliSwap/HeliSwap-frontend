@@ -139,7 +139,9 @@ const PoolInfo = ({
                     <span className="text-main text-bold ms-3">{poolData.token0Symbol}</span>
                   </div>
 
-                  <span className="text-numeric text-small">{poolData.fee0AmountFormatted}</span>
+                  <span className="text-numeric text-small">
+                    {formatStringETHtoPriceFormatted(poolData.fee0AmountFormatted as string)}
+                  </span>
                 </div>
 
                 <div className="d-flex justify-content-between align-items-center mt-3">
@@ -148,7 +150,9 @@ const PoolInfo = ({
                     <span className="text-main text-bold ms-3">{poolData.token1Symbol}</span>
                   </div>
 
-                  <span className="text-numeric text-small">{poolData.fee1AmountFormatted}</span>
+                  <span className="text-numeric text-small">
+                    {formatStringETHtoPriceFormatted(poolData.fee1AmountFormatted as string)}
+                  </span>
                 </div>
               </div>
             </div>
