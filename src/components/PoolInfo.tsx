@@ -6,11 +6,7 @@ import Button from './Button';
 import IconToken from './IconToken';
 import Icon from './Icon';
 
-import {
-  formatStringETHtoPriceFormatted,
-  formatStringToPrice,
-  formatStringWeiToStringEther,
-} from '../utils/numberUtils';
+import { formatStringETHtoPriceFormatted, formatStringToPrice } from '../utils/numberUtils';
 import { formatIcons } from '../utils/iconUtils';
 import { PageViews } from '../interfaces/common';
 
