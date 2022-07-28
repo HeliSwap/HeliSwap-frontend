@@ -54,7 +54,7 @@ const MyPools = ({
   useEffect(() => {
     const endOffset = itemOffset + itemsPerPage;
     console.log(`Loading items from ${itemOffset} to ${endOffset}`);
-    const sortedPoolsToShow = pools.sort((a: IPoolExtendedData, b: IPoolExtendedData) =>
+    const sortedPoolsToShow = (pools || []).sort((a: IPoolExtendedData, b: IPoolExtendedData) =>
       sortPools(a[SORT_OPTIONS_ENUM.TVL], b[SORT_OPTIONS_ENUM.TVL], SORT_DIRECTION.DESC),
     );
     setCurrentItems(sortedPoolsToShow.slice(itemOffset, endOffset));
@@ -63,10 +63,8 @@ const MyPools = ({
 
   const handlePageClick = (event: any) => {
     setCollapseAll(true);
-    const sortedPoolsToShow = pools.sort((a: IPoolExtendedData, b: IPoolExtendedData) =>
-      sortPools(a[SORT_OPTIONS_ENUM.TVL], b[SORT_OPTIONS_ENUM.TVL], SORT_DIRECTION.DESC),
-    );
-    const newOffset = (event.selected * itemsPerPage) % sortedPoolsToShow.length;
+
+    const newOffset = (event.selected * itemsPerPage) % pools.length;
     console.log(`User requested page number ${event.selected}, which is offset ${newOffset}`);
     setItemOffset(newOffset);
   };
