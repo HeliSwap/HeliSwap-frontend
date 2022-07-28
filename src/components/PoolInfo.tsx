@@ -34,6 +34,8 @@ const PoolInfo = ({
     setCurrentPoolIndex(index);
   };
 
+  console.log('poolData', poolData);
+
   const renderAllPoolsDetails = () => {
     return (
       <div className="row align-items-center">
@@ -127,7 +129,9 @@ const PoolInfo = ({
             <div className="col-6">
               <div className="container-rounded-dark">
                 <p className="text-small">Unclaimed fees</p>
-                <p className="text-title text-numeric">12</p>
+                <p className="text-title text-numeric">
+                  {formatStringETHtoPriceFormatted(poolData.feesStr as string)}
+                </p>
 
                 <hr className="my-4" />
 
@@ -202,7 +206,7 @@ const PoolInfo = ({
           <p className="text-small ms-3">
             {poolData.token0Symbol}/{poolData.token1Symbol}
           </p>
-          <span className="text-micro text-numeric badge bg-secondary ms-3">{POOLS_FEE}</span>
+          <span className="text-micro text-numeric badge bg-secondary-800 ms-3">{POOLS_FEE}</span>
         </div>
         {view === PageViews.ALL_POOLS ? (
           <>
