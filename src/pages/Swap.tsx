@@ -151,7 +151,7 @@ const Swap = () => {
   }, [swapData, tokenBalances]);
 
   const handleInputChange = useCallback(
-    (value: string, name: string, inputTokensData: any = tokensData) => {
+    (value: string, name: string, inputTokensData: ITokensData = tokensData) => {
       setInsufficientLiquidity(false);
       const { tokenA, tokenB } = inputTokensData;
 
