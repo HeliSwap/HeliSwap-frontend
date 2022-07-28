@@ -8,12 +8,18 @@ import RemoveLiquidity from '../components/RemoveLiquidity';
 
 import { REFRESH_TIME } from '../constants';
 
-import usePools from '../hooks/usePools';
 import usePoolsByUser from '../hooks/usePoolsByUser';
 import SearchArea from '../components/SearchArea';
 import AllPools from '../components/AllPools';
 import MyPools from '../components/MyPools';
 import useFilteredPools from '../hooks/useFilteredPools';
+import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
+
+const whitelistedTokensMockedData = [
+  '0x00000000000000000000000000000000021546BB',
+  '0x0000000000000000000000000000000002bD6493',
+  '0x0000000000000000000000000000000002BD6495',
+];
 
 interface IPoolsProps {
   itemsPerPage: number;
@@ -24,18 +30,31 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const { connection } = contextValue;
   const { userId, connected, isHashpackLoading, setShowConnectModal } = connection;
 
-  //Data fetching hooks
   const {
-    error: errorPoools,
-    loading: loadingPools,
-    pools,
-  } = usePools(
+    poolsByTokenList: pools,
+    loadingPoolsByTokenList: loadingPools,
+    errorPoolsByTokenList: errorPoools,
+  } = usePoolsByTokensList(
     {
       fetchPolicy: 'network-only',
       pollInterval: REFRESH_TIME,
     },
     true,
+    whitelistedTokensMockedData,
   );
+
+  //Data fetching hooks
+  // const {
+  //   error: errorPoools,
+  //   loading: loadingPools,
+  //   pools,
+  // } = usePools(
+  //   {
+  //     fetchPolicy: 'network-only',
+  //     pollInterval: REFRESH_TIME,
+  //   },
+  //   true,
+  // );
 
   const [searchQuery, setSearchQuery] = useState({});
 
