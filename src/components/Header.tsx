@@ -6,8 +6,10 @@ import { Md5 } from 'ts-md5/dist/md5';
 import Button from './Button';
 import Modal from './Modal';
 import ConnectModalContent from './Modals/ConnectModalContent';
-import { formatStringETHtoPriceFormatted } from '../utils/numberUtils';
 import UserAccountModalContent from './Modals/UserAccountModalContent';
+
+import { formatStringETHtoPriceFormatted } from '../utils/numberUtils';
+import { getHBarPrice } from '../utils/tokenUtils';
 
 const Header = () => {
   const contextValue = useContext(GlobalContext);
@@ -22,8 +24,9 @@ const Header = () => {
     setShowConnectModal,
   } = contextValue.connection;
 
-  const [userBalance, setUserBalance] = useState('0.0');
   const [showUserAccountModal, setShowUserAccountModal] = useState(false);
+  const [userBalance, setUserBalance] = useState('0.0');
+  const [hbarPrice, setHbarPrice] = useState(0);
 
   const handleConnectButtonClick = () => {
     setShowConnectModal(true);
@@ -48,12 +51,29 @@ const Header = () => {
     };
   }, [userId]);
 
+  useEffect(() => {
+    const getHBARPrice = async () => {
+      const hbarPrice = await getHBarPrice();
+      setHbarPrice(hbarPrice);
+    };
+
+    getHBARPrice();
+  }, []);
+
   return (
     <div className="p-5">
       <div className="d-flex justify-content-end">
         <div className="d-flex align-items-center">
           {connected && userId ? (
             <>
+              <div className="me-5">
+                <span className="text-small">
+                  HBAR price:{' '}
+                  <span className="text-numeric">
+                    ${formatStringETHtoPriceFormatted(hbarPrice.toString(), 2)}
+                  </span>
+                </span>
+              </div>
               <div className="container-connected">
                 <div className="text-small">{userBalance} HBAR</div>
                 <div className="container-address" onClick={() => setShowUserAccountModal(true)}>
