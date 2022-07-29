@@ -551,53 +551,26 @@ const Swap = () => {
           setNeedApproval(true);
         }
         setTokensData({ tokenA, tokenB });
+
+        //Fix for wrong ERC20 tokenA balance when prepopulate tokens data
+        setTimeout(async () => {
+          if (userId) {
+            const tokenABalance = await getTokenBalance(userId, tokenA);
+            const tokenBBalance = await getTokenBalance(userId, tokenB);
+            setTokenBalances({
+              tokenA: tokenABalance,
+              tokenB: tokenBBalance,
+            });
+          }
+        }, 500);
+
         //We want to set the tokens from the pool selected just once
         setTokensDerivedFromPool(true);
       }
     } catch (err) {
       console.error(err);
     }
-  }, [poolsData, tokenDataList, address, tokensDerivedFromPool]);
-
-  // useEffect(() => {
-  //   const { tokenA, tokenB } = tokensData;
-  //   const poolsDataLoaded = poolsData.length !== 0;
-  //   const tokenASelected = Object.keys(tokensData.tokenA).length !== 0;
-  //   const tokenBSelected = Object.keys(tokensData.tokenB).length !== 0;
-
-  //   const tokenAIsNative = tokenA.type === TokenType.HBAR;
-  //   const tokenBIsNative = tokenB.type === TokenType.HBAR;
-  //   const provideNative = tokenAIsNative || tokenBIsNative;
-  //   const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
-
-  //   const selectedPoolData =
-  //     (poolsDataLoaded &&
-  //       poolsData.filter((pool: IPoolData) => {
-  //         let poolMatchedBothTokens = false;
-
-  //         const poolContainsToken = (tokenAddres: string) => {
-  //           return pool.token0 === tokenAddres || pool.token1 === tokenAddres;
-  //         };
-
-  //         if (provideNative) {
-  //           poolMatchedBothTokens =
-  //             poolContainsToken(WHBARAddress) &&
-  //             (poolContainsToken(tokenA.address) || poolContainsToken(tokenB.address));
-  //         } else {
-  //           //Both tokens are in the same pool
-  //           poolMatchedBothTokens =
-  //             poolContainsToken(tokenA.address) && poolContainsToken(tokenB.address);
-  //         }
-
-  //         return poolMatchedBothTokens;
-  //       })) ||
-  //     [];
-
-  //   //Set selected pool address in the URL
-  //   if (poolsDataLoaded && tokenASelected && tokenBSelected) {
-  //     navigate(`/${selectedPoolData[0] ? selectedPoolData[0].pairAddress : ''}`);
-  //   }
-  // }, [tokensData, poolsData, navigate]);
+  }, [poolsData, tokenDataList, address, tokensDerivedFromPool, userId]);
 
   //Render methods
   const getErrorMessage = () => {
