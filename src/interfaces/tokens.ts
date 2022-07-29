@@ -10,6 +10,15 @@ export interface ITokenData {
   details?: any;
 }
 
+export interface ITokenListData {
+  address: string;
+  chainId: number;
+  decimals: number;
+  logoURI: string;
+  name: string;
+  symbol: string;
+}
+
 export interface ITokensData {
   tokenA: ITokenData;
   tokenB: ITokenData;
