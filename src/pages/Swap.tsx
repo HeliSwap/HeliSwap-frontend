@@ -548,6 +548,9 @@ const Swap = () => {
           : tokenDataList.find((token: ITokenData) => token.address === token1Address) ||
             ({} as ITokenData);
 
+        if (tokenA.type !== TokenType.HBAR) {
+          setNeedApproval(true);
+        }
         setTokensData({ tokenA, tokenB });
         //We want to set the tokens from the pool selected just once
         setTokensDerivedFromPool(true);
@@ -557,45 +560,45 @@ const Swap = () => {
     }
   }, [poolsData, tokenDataList, address, tokensDerivedFromPool]);
 
-  useEffect(() => {
-    const { tokenA, tokenB } = tokensData;
-    const poolsDataLoaded = poolsData.length !== 0;
-    const tokenASelected = Object.keys(tokensData.tokenA).length !== 0;
-    const tokenBSelected = Object.keys(tokensData.tokenB).length !== 0;
+  // useEffect(() => {
+  //   const { tokenA, tokenB } = tokensData;
+  //   const poolsDataLoaded = poolsData.length !== 0;
+  //   const tokenASelected = Object.keys(tokensData.tokenA).length !== 0;
+  //   const tokenBSelected = Object.keys(tokensData.tokenB).length !== 0;
 
-    const tokenAIsNative = tokenA.type === TokenType.HBAR;
-    const tokenBIsNative = tokenB.type === TokenType.HBAR;
-    const provideNative = tokenAIsNative || tokenBIsNative;
-    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
+  //   const tokenAIsNative = tokenA.type === TokenType.HBAR;
+  //   const tokenBIsNative = tokenB.type === TokenType.HBAR;
+  //   const provideNative = tokenAIsNative || tokenBIsNative;
+  //   const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
 
-    const selectedPoolData =
-      (poolsDataLoaded &&
-        poolsData.filter((pool: IPoolData) => {
-          let poolMatchedBothTokens = false;
+  //   const selectedPoolData =
+  //     (poolsDataLoaded &&
+  //       poolsData.filter((pool: IPoolData) => {
+  //         let poolMatchedBothTokens = false;
 
-          const poolContainsToken = (tokenAddres: string) => {
-            return pool.token0 === tokenAddres || pool.token1 === tokenAddres;
-          };
+  //         const poolContainsToken = (tokenAddres: string) => {
+  //           return pool.token0 === tokenAddres || pool.token1 === tokenAddres;
+  //         };
 
-          if (provideNative) {
-            poolMatchedBothTokens =
-              poolContainsToken(WHBARAddress) &&
-              (poolContainsToken(tokenA.address) || poolContainsToken(tokenB.address));
-          } else {
-            //Both tokens are in the same pool
-            poolMatchedBothTokens =
-              poolContainsToken(tokenA.address) && poolContainsToken(tokenB.address);
-          }
+  //         if (provideNative) {
+  //           poolMatchedBothTokens =
+  //             poolContainsToken(WHBARAddress) &&
+  //             (poolContainsToken(tokenA.address) || poolContainsToken(tokenB.address));
+  //         } else {
+  //           //Both tokens are in the same pool
+  //           poolMatchedBothTokens =
+  //             poolContainsToken(tokenA.address) && poolContainsToken(tokenB.address);
+  //         }
 
-          return poolMatchedBothTokens;
-        })) ||
-      [];
+  //         return poolMatchedBothTokens;
+  //       })) ||
+  //     [];
 
-    //Set selected pool address in the URL
-    // if (poolsDataLoaded && tokenASelected && tokenBSelected) {
-    //   navigate(`/${selectedPoolData[0] ? selectedPoolData[0].pairAddress : ''}`);
-    // }
-  }, [tokensData, poolsData, navigate]);
+  //   //Set selected pool address in the URL
+  //   if (poolsDataLoaded && tokenASelected && tokenBSelected) {
+  //     navigate(`/${selectedPoolData[0] ? selectedPoolData[0].pairAddress : ''}`);
+  //   }
+  // }, [tokensData, poolsData, navigate]);
 
   //Render methods
   const getErrorMessage = () => {
