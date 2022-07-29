@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import BigNumber from 'bignumber.js';
 
 import {
@@ -63,7 +63,6 @@ const Swap = () => {
   } = connection;
 
   const { address } = useParams();
-  const navigate = useNavigate();
 
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
