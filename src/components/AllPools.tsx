@@ -52,8 +52,8 @@ const AllPools = ({
   };
 
   const getSortIcon = (option: SORT_OPTIONS) => {
-    const icon =
-      sortDirection === SORT_DIRECTION.ASC ? <Icon name="arrow-up" /> : <Icon name="arrow-down" />;
+    const icon = <Icon name={`arrow-${sortDirection === SORT_DIRECTION.ASC ? 'up' : 'down'}`} />;
+
     return option === poolsSortBy ? icon : null;
   };
 
