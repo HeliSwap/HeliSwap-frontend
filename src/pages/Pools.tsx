@@ -162,13 +162,15 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
 
           {connected && !isHashpackLoading && havePools ? (
             <>
-              <SearchArea
-                searchFunc={searchFunc}
-                inputValue={inputValue}
-                setInputValue={setInputValue}
-                minLength={searchThreshold + 1}
-              />
-              <div className="d-flex justify-content-end align-items-center my-5">
+              <div className="d-flex justify-content-between align-items-center my-5">
+                <div>
+                  <SearchArea
+                    searchFunc={searchFunc}
+                    inputValue={inputValue}
+                    setInputValue={setInputValue}
+                    minLength={searchThreshold + 1}
+                  />
+                </div>
                 <Link className="btn btn-sm btn-primary" to="/create">
                   Create pool
                 </Link>
