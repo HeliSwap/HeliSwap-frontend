@@ -25,7 +25,8 @@ const SearchArea = ({ searchFunc, setInputValue, inputValue, minLength }: ISearc
           onChange={e => {
             setInputValue(e.target.value);
           }}
-          className="search-area-input"
+          placeholder="Search pools"
+          className="form-control form-control-sm"
           minLength={minLength}
         ></input>
       </div>
