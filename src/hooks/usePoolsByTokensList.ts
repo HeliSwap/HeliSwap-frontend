@@ -46,7 +46,7 @@ const usePoolsByTokensList = (
     if (data) {
       const { poolsConsistingOf } = data;
       const processedPools = getProcessedPools(poolsConsistingOf, getExtended, hbarPrice);
-      setPools(processedPools);
+      if (processedPools) setPools(processedPools);
     }
   }, [data, hbarPrice, getExtended]);
 
