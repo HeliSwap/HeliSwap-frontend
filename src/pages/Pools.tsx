@@ -72,7 +72,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     whitelistedTokensMockedData,
   );
 
-  const { filteredPools } = useFilteredPools(
+  const { filteredPools, filteredPoolsLoading } = useFilteredPools(
     {
       fetchPolicy: 'network-only',
     },
@@ -106,13 +106,13 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   };
 
   useEffect(() => {
-    if (pools || filteredPools) {
+    if ((pools || filteredPools) && !filteredPoolsLoading && !loadingPools) {
       const whitelistedFilteredPools = filterPoolsByPattern(inputValue, pools, searchThreshold);
       const visiblePools = joinByFieldSkipDuplicates(whitelistedFilteredPools, filteredPools, 'id');
       setPoolsToShow(visiblePools);
     }
     setHavePools(pools && pools.length !== 0);
-  }, [pools, filteredPools, inputValue]);
+  }, [pools, filteredPools, inputValue, filteredPoolsLoading, loadingPools]);
 
   useEffect(() => {
     if (poolsByUser) setUserPoolsToShow(poolsByUser);
