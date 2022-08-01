@@ -361,3 +361,16 @@
   height: 32px;
   border-radius: 50%;
 }
+
+// Pagination
+.page-item {
+  &:first-child,
+  &:last-child {
+    display: none;
+  }
+}
+
+.page-link {
+  border-radius: $border-radius;
+  font-size: 14px;
+}
