@@ -14,10 +14,11 @@ import AllPools from '../components/AllPools';
 import MyPools from '../components/MyPools';
 import useFilteredPools from '../hooks/useFilteredPools';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
+import { joinByFieldSkipDuplicates } from '../utils/poolUtils';
 
 const whitelistedTokensMockedData = [
   '0x00000000000000000000000000000000021546BB',
-  '0x0000000000000000000000000000000002bD6493',
+  // '0x0000000000000000000000000000000002bD6493',
   '0x0000000000000000000000000000000002BD6495',
   '0x0000000000000000000000000000000002bd6497',
   '0x0000000000000000000000000000000002bd6499',
@@ -99,7 +100,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   };
 
   const poolsMapping = {
-    [PageViews.ALL_POOLS]: pools,
+    [PageViews.ALL_POOLS]: joinByFieldSkipDuplicates(pools, filteredPools, 'id'),
     [PageViews.MY_POOLS]: poolsByUser,
   };
 

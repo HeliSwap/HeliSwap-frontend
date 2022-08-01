@@ -34,7 +34,7 @@ function App() {
                       <Route path="/:address" element={<Swap />} />
                       <Route path="create/" element={<Create />} />
                       <Route path="create/:address" element={<Create />} />
-                      <Route path="pools" element={<Pools itemsPerPage={20} />} />
+                      <Route path="pools" element={<Pools itemsPerPage={3} />} />
                       <Route path="tokens" element={<Tokens />} />
                       <Route path="styleguide" element={<Styleguide />} />
                     </Routes>
