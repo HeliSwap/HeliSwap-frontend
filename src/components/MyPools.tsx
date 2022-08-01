@@ -73,42 +73,45 @@ const MyPools = ({
     loadingPools ? (
       <p className="text-info">Loading pools...</p>
     ) : havePools ? (
-      <div className="table-pools">
-        <div className={`table-pools-row`}>
-          <div className="table-pools-cell">
-            <span className="text-small">#</span>
+      <>
+        <div className="table-pools">
+          <div className={`table-pools-row`}>
+            <div className="table-pools-cell">
+              <span className="text-small">#</span>
+            </div>
+            <div className="table-pools-cell">
+              <span className="text-small">Pool</span>
+            </div>
+            <div className="table-pools-cell justify-content-end">
+              <span className="text-small"></span>
+            </div>
           </div>
-          <div className="table-pools-cell">
-            <span className="text-small">Pool</span>
-          </div>
-          <div className="table-pools-cell justify-content-end">
-            <span className="text-small"></span>
-          </div>
+          <>
+            {currentItems
+              .sort((a: IPoolExtendedData, b: IPoolExtendedData) =>
+                sortPools(a[SORT_OPTIONS_ENUM.TVL], b[SORT_OPTIONS_ENUM.TVL], SORT_DIRECTION.DESC),
+              )
+              .map((item, index) => (
+                <PoolInfo
+                  setShowRemoveContainer={setShowRemoveContainer}
+                  setCurrentPoolIndex={setCurrentPoolIndex}
+                  index={index}
+                  key={index}
+                  poolData={item}
+                  view={currentView}
+                  collapseAll={collapseAll}
+                  setCollapseAll={setCollapseAll}
+                />
+              ))}
+          </>
         </div>
-        <>
-          {currentItems
-            .sort((a: IPoolExtendedData, b: IPoolExtendedData) =>
-              sortPools(a[SORT_OPTIONS_ENUM.TVL], b[SORT_OPTIONS_ENUM.TVL], SORT_DIRECTION.DESC),
-            )
-            .map((item, index) => (
-              <PoolInfo
-                setShowRemoveContainer={setShowRemoveContainer}
-                setCurrentPoolIndex={setCurrentPoolIndex}
-                index={index}
-                key={index}
-                poolData={item}
-                view={currentView}
-                collapseAll={collapseAll}
-                setCollapseAll={setCollapseAll}
-              />
-            ))}
+
+        <div className="d-flex justify-content-center mt-4">
           <ReactPaginate
             breakLabel="..."
-            nextLabel="next >"
             onPageChange={handlePageClick}
             pageRangeDisplayed={5}
             pageCount={pageCount}
-            previousLabel="< previous"
             renderOnZeroPageCount={undefined}
             breakClassName={'page-item'}
             breakLinkClassName={'page-link'}
@@ -121,8 +124,8 @@ const MyPools = ({
             nextLinkClassName={'page-link'}
             activeClassName={'active'}
           />
-        </>
-      </div>
+        </div>
+      </>
     ) : (
       renderEmptyPoolsState('You don’t have active pools at this moment.')
     )
