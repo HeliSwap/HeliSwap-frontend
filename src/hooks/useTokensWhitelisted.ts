@@ -3,7 +3,7 @@ import axios from 'axios';
 import { ITokenListData } from '../interfaces/tokens';
 
 const useTokensWhitelisted = () => {
-  const [tokens, setTokens] = useState<ITokenListData[]>();
+  const [tokens, setTokens] = useState<ITokenListData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
