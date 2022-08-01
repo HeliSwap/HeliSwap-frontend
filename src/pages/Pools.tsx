@@ -14,13 +14,14 @@ import AllPools from '../components/AllPools';
 import MyPools from '../components/MyPools';
 import useFilteredPools from '../hooks/useFilteredPools';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
-import { joinByFieldSkipDuplicates } from '../utils/poolUtils';
+import { filterPoolsByPattern, joinByFieldSkipDuplicates } from '../utils/poolUtils';
 import { IPoolExtendedData } from '../interfaces/tokens';
 
+const searchThreshold = 2;
 const whitelistedTokensMockedData = [
-  '0x00000000000000000000000000000000021546BB',
+  // '0x00000000000000000000000000000000021546BB',
   // '0x0000000000000000000000000000000002bD6493',
-  '0x0000000000000000000000000000000002BD6495',
+  // '0x0000000000000000000000000000000002BD6495',
   '0x0000000000000000000000000000000002bd6497',
   '0x0000000000000000000000000000000002bd6499',
   '0x0000000000000000000000000000000002bd649B',
@@ -53,7 +54,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
 
   const searchFunc = useMemo(
     () => (value: string) => {
-      setSearchQuery({ keyword: value });
+      if (value.length > searchThreshold) setSearchQuery({ keyword: value });
     },
     [],
   );
@@ -106,11 +107,12 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
 
   useEffect(() => {
     if (pools || filteredPools) {
-      const visiblePools = joinByFieldSkipDuplicates(pools, filteredPools, 'id');
+      const whitelistedFilteredPools = filterPoolsByPattern(inputValue, pools, searchThreshold);
+      const visiblePools = joinByFieldSkipDuplicates(whitelistedFilteredPools, filteredPools, 'id');
       setPoolsToShow(visiblePools);
     }
     setHavePools(pools && pools.length !== 0);
-  }, [pools, filteredPools]);
+  }, [pools, filteredPools, inputValue]);
 
   useEffect(() => {
     if (poolsByUser) setUserPoolsToShow(poolsByUser);

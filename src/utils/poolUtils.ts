@@ -83,3 +83,28 @@ export const joinByFieldSkipDuplicates = (
   const b = new Set(arr2.map(x => x[joinByField]));
   return [...arr1.filter(x => !b.has(x[joinByField])), ...arr2.filter(x => !a.has(x[joinByField]))];
 };
+
+export const filterPoolsByPattern = (
+  inputValue: string,
+  pools: IPoolExtendedData[],
+  searchThreshold: number = 2,
+) => {
+  if (inputValue.length <= searchThreshold) return pools;
+
+  return pools.filter((pool: IPoolExtendedData) => {
+    const matchedPairAddress = pool.pairAddress.indexOf(inputValue) !== -1;
+    const matchedPairName = pool.pairName.indexOf(inputValue) !== -1;
+    const matchedPairSymbol = pool.pairName.indexOf(inputValue) !== -1;
+
+    const matchedToken0Address = pool.token0.indexOf(inputValue) !== -1;
+    const matchedToken1Address = pool.token1.indexOf(inputValue) !== -1;
+
+    return (
+      matchedPairAddress ||
+      matchedPairName ||
+      matchedPairSymbol ||
+      matchedToken0Address ||
+      matchedToken1Address
+    );
+  });
+};
