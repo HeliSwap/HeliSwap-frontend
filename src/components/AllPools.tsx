@@ -86,61 +86,64 @@ const AllPools = ({
   return loadingPools ? (
     <p className="text-info">Loading pools...</p>
   ) : havePools ? (
-    <div className="table-pools">
-      <div className={`table-pools-row with-6-columns`}>
-        <div className="table-pools-cell">
-          <span className="text-small">#</span>
+    <>
+      <div className="table-pools">
+        <div className={`table-pools-row with-6-columns`}>
+          <div className="table-pools-cell">
+            <span className="text-small">#</span>
+          </div>
+          <div className="table-pools-cell">
+            <span className="text-small">Pool</span>
+          </div>
+          <div
+            className="table-pools-cell justify-content-end"
+            onClick={() => handleSortClick(SORT_OPTIONS_ENUM.TVL)}
+          >
+            <span className="text-small ws-no-wrap">TVL {getSortIcon(SORT_OPTIONS_ENUM.TVL)}</span>
+          </div>
+          <div
+            className="table-pools-cell justify-content-end"
+            onClick={() => handleSortClick(SORT_OPTIONS_ENUM.VOL_7)}
+          >
+            <span className="text-small ws-no-wrap">
+              Volume 7d {getSortIcon(SORT_OPTIONS_ENUM.VOL_7)}
+            </span>
+          </div>
+          <div
+            className="table-pools-cell justify-content-end"
+            onClick={() => handleSortClick(SORT_OPTIONS_ENUM.VOL_24)}
+          >
+            <span className="text-small ws-no-wrap">
+              Volume 24h {getSortIcon(SORT_OPTIONS_ENUM.VOL_24)}
+            </span>
+          </div>
+          <div className="table-pools-cell justify-content-end">
+            <span className="text-small"></span>
+          </div>
         </div>
-        <div className="table-pools-cell">
-          <span className="text-small">Pool</span>
-        </div>
-        <div
-          className="table-pools-cell justify-content-end"
-          onClick={() => handleSortClick(SORT_OPTIONS_ENUM.TVL)}
-        >
-          <span className="text-small ws-no-wrap">TVL {getSortIcon(SORT_OPTIONS_ENUM.TVL)}</span>
-        </div>
-        <div
-          className="table-pools-cell justify-content-end"
-          onClick={() => handleSortClick(SORT_OPTIONS_ENUM.VOL_7)}
-        >
-          <span className="text-small ws-no-wrap">
-            Volume 7d {getSortIcon(SORT_OPTIONS_ENUM.VOL_7)}
-          </span>
-        </div>
-        <div
-          className="table-pools-cell justify-content-end"
-          onClick={() => handleSortClick(SORT_OPTIONS_ENUM.VOL_24)}
-        >
-          <span className="text-small ws-no-wrap">
-            Volume 24h {getSortIcon(SORT_OPTIONS_ENUM.VOL_24)}
-          </span>
-        </div>
-        <div className="table-pools-cell justify-content-end">
-          <span className="text-small"></span>
-        </div>
+
+        <>
+          {currentItems.map((item, index) => (
+            <PoolInfo
+              setShowRemoveContainer={setShowRemoveContainer}
+              setCurrentPoolIndex={setCurrentPoolIndex}
+              index={index}
+              key={index}
+              poolData={item}
+              view={currentView}
+              collapseAll={collapseAll}
+              setCollapseAll={setCollapseAll}
+            />
+          ))}
+        </>
       </div>
 
-      <>
-        {currentItems.map((item, index) => (
-          <PoolInfo
-            setShowRemoveContainer={setShowRemoveContainer}
-            setCurrentPoolIndex={setCurrentPoolIndex}
-            index={index}
-            key={index}
-            poolData={item}
-            view={currentView}
-            collapseAll={collapseAll}
-            setCollapseAll={setCollapseAll}
-          />
-        ))}
+      <div className="d-flex justify-content-center mt-4">
         <ReactPaginate
           breakLabel="..."
-          nextLabel="next >"
           onPageChange={handlePageClick}
           pageRangeDisplayed={5}
           pageCount={pageCount}
-          previousLabel="< previous"
           renderOnZeroPageCount={undefined}
           breakClassName={'page-item'}
           breakLinkClassName={'page-link'}
@@ -153,8 +156,8 @@ const AllPools = ({
           nextLinkClassName={'page-link'}
           activeClassName={'active'}
         />
-      </>
-    </div>
+      </div>
+    </>
   ) : (
     renderEmptyPoolsState('There are no active pools at this moment.')
   );
