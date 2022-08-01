@@ -81,7 +81,7 @@ export const joinByFieldSkipDuplicates = (
 ) => {
   const a = new Set(arr1.map(x => x[joinByField]));
   const b = new Set(arr2.map(x => x[joinByField]));
-  return [...arr1.filter(x => !b.has(x[joinByField])), ...arr2.filter(x => !a.has(x[joinByField]))];
+  return [...arr1, ...arr2.filter(x => !a.has(x[joinByField]))];
 };
 
 export const filterPoolsByPattern = (
