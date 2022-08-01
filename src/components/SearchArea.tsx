@@ -1,40 +1,20 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { IPoolExtendedData } from '../interfaces/tokens';
-// import debounce from 'lodash.debounce';
-const debounce = require('lodash.debounce');
+import React, { useEffect } from 'react';
+import useDebounce from '../hooks/useDebounce';
 
 interface ISearchAreaProps {
   searchFunc: (value: string) => void;
-  calledSearchResults: boolean;
-  loadingSearchResults: boolean;
-  results: IPoolExtendedData[];
+  setInputValue: (value: string) => void;
+  inputValue: string;
 }
 
-const SearchArea = ({
-  searchFunc,
-  calledSearchResults,
-  loadingSearchResults,
-  results,
-}: ISearchAreaProps) => {
-  const [inputValue, setInputValue] = useState('');
-
-  const handleSearch = useCallback(
-    (value: string) => {
-      if (value.length > 1) {
-        console.log('Searching for', value);
-        searchFunc(value);
-      }
-    },
-    [searchFunc],
-  );
-
-  const debouncedSearchHandler = useMemo(() => debounce(handleSearch, 1000), [handleSearch]);
+const SearchArea = ({ searchFunc, setInputValue, inputValue }: ISearchAreaProps) => {
+  const debouncedSearchTerm: string = useDebounce(inputValue, 1000);
 
   useEffect(() => {
-    return () => {
-      debouncedSearchHandler.cancel();
-    };
-  }, [debouncedSearchHandler]);
+    if (debouncedSearchTerm) {
+      searchFunc(debouncedSearchTerm);
+    }
+  }, [debouncedSearchTerm, searchFunc]);
 
   return (
     <div className="search-area-container">
@@ -43,20 +23,10 @@ const SearchArea = ({
           value={inputValue}
           onChange={e => {
             setInputValue(e.target.value);
-            debouncedSearchHandler(e.target.value);
           }}
           className="search-area-input"
         ></input>
       </div>
-      {calledSearchResults && loadingSearchResults ? (
-        <div>Loading...</div>
-      ) : (
-        <ul>
-          {(results || []).map((item: IPoolExtendedData, index: number) => {
-            return <li key={index}>{item.pairName}</li>;
-          })}
-        </ul>
-      )}
     </div>
   );
 };
