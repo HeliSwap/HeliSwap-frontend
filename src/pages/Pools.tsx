@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect, useMemo } from 'react';
 import { GlobalContext } from '../providers/Global';
 import { Link } from 'react-router-dom';
 
@@ -48,6 +48,16 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const [havePools, setHavePools] = useState(false);
   const [haveUserPools, setHaveUserPools] = useState(false);
 
+  //Search area state
+  const [inputValue, setInputValue] = useState('');
+
+  const searchFunc = useMemo(
+    () => (value: string) => {
+      setSearchQuery({ keyword: value });
+    },
+    [],
+  );
+
   const {
     poolsByTokenList: pools,
     loadingPoolsByTokenList: loadingPools,
@@ -61,7 +71,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     whitelistedTokensMockedData,
   );
 
-  const { filteredPools, filteredPoolsCalled, filteredPoolsLoading } = useFilteredPools(
+  const { filteredPools } = useFilteredPools(
     {
       fetchPolicy: 'network-only',
     },
@@ -151,12 +161,9 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
           {connected && !isHashpackLoading && havePools ? (
             <>
               <SearchArea
-                searchFunc={(value: string) => {
-                  setSearchQuery({ keyword: value });
-                }}
-                calledSearchResults={filteredPoolsCalled}
-                loadingSearchResults={filteredPoolsLoading}
-                results={filteredPools ? filteredPools : []}
+                searchFunc={searchFunc}
+                inputValue={inputValue}
+                setInputValue={setInputValue}
               />
               <div className="d-flex justify-content-end align-items-center my-5">
                 <Link className="btn btn-sm btn-primary" to="/create">
