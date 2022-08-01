@@ -194,6 +194,10 @@
     flex: 0 1 250px;
     @include transition-color;
 
+    &::placeholder {
+      color: $primary-100;
+    }
+
     &:focus {
       color: $primary-100;
     }
