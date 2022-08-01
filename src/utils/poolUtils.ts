@@ -75,8 +75,8 @@ export const getProcessedPools = (
 };
 
 export const joinByFieldSkipDuplicates = (
-  arr1: IPoolExtendedData[],
-  arr2: IPoolExtendedData[],
+  arr1: IPoolExtendedData[] = [],
+  arr2: IPoolExtendedData[] = [],
   joinByField: string,
 ) => {
   const a = new Set(arr1.map(x => x[joinByField]));
