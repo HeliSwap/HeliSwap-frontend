@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { GlobalContext } from '../providers/Global';
 import { Link } from 'react-router-dom';
 
@@ -15,6 +15,7 @@ import MyPools from '../components/MyPools';
 import useFilteredPools from '../hooks/useFilteredPools';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import { joinByFieldSkipDuplicates } from '../utils/poolUtils';
+import { IPoolExtendedData } from '../interfaces/tokens';
 
 const whitelistedTokensMockedData = [
   '0x00000000000000000000000000000000021546BB',
@@ -39,6 +40,14 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const { connection } = contextValue;
   const { userId, connected, isHashpackLoading, setShowConnectModal } = connection;
 
+  const [searchQuery, setSearchQuery] = useState({});
+  const [showRemoveContainer, setShowRemoveContainer] = useState(false);
+  const [currentPoolIndex, setCurrentPoolIndex] = useState(0);
+  const [poolsToShow, setPoolsToShow] = useState<IPoolExtendedData[]>([]);
+  const [userPoolsToShow, setUserPoolsToShow] = useState<IPoolExtendedData[]>([]);
+  const [havePools, setHavePools] = useState(false);
+  const [haveUserPools, setHaveUserPools] = useState(false);
+
   const {
     poolsByTokenList: pools,
     loadingPoolsByTokenList: loadingPools,
@@ -51,21 +60,6 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     true,
     whitelistedTokensMockedData,
   );
-
-  //Data fetching hooks
-  // const {
-  //   error: errorPoools,
-  //   loading: loadingPools,
-  //   pools,
-  // } = usePools(
-  //   {
-  //     fetchPolicy: 'network-only',
-  //     pollInterval: REFRESH_TIME,
-  //   },
-  //   true,
-  // );
-
-  const [searchQuery, setSearchQuery] = useState({});
 
   const { filteredPools, filteredPoolsCalled, filteredPoolsLoading } = useFilteredPools(
     {
@@ -88,9 +82,6 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     pools,
   );
 
-  const [showRemoveContainer, setShowRemoveContainer] = useState(false);
-  const [currentPoolIndex, setCurrentPoolIndex] = useState(0);
-
   const initialCurrentView: PageViews = PageViews.ALL_POOLS;
   const [currentView, setCurrentView] = useState<PageViews>(initialCurrentView);
 
@@ -99,51 +90,22 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     [PageViews.MY_POOLS]: 'My positions',
   };
 
-  const poolsMapping = {
-    [PageViews.ALL_POOLS]: joinByFieldSkipDuplicates(pools, filteredPools, 'id'),
-    [PageViews.MY_POOLS]: poolsByUser,
-  };
-
-  const poolsToShow = poolsMapping[currentView];
-
   const handleTabItemClick = (currentView: PageViews) => {
     setCurrentView(currentView);
   };
 
-  const havePools = pools && pools.length > 0;
+  useEffect(() => {
+    if (pools || filteredPools) {
+      const visiblePools = joinByFieldSkipDuplicates(pools, filteredPools, 'id');
+      setPoolsToShow(visiblePools);
+    }
+    setHavePools(pools && pools.length !== 0);
+  }, [pools, filteredPools]);
 
-  const renderAllPools = () => {
-    return (
-      <AllPools
-        loadingPools={loadingPools}
-        havePools={havePools}
-        itemsPerPage={itemsPerPage}
-        pools={poolsToShow}
-        setShowRemoveContainer={setShowRemoveContainer}
-        setCurrentPoolIndex={setCurrentPoolIndex}
-        currentView={currentView}
-        renderEmptyPoolsState={renderEmptyPoolsState}
-      />
-    );
-  };
-
-  const renderUserPools = () => {
-    return (
-      <MyPools
-        connected={connected}
-        isHashpackLoading={isHashpackLoading}
-        loadingPools={loadingPoolsByUser}
-        pools={poolsToShow}
-        havePools={havePools}
-        setShowRemoveContainer={setShowRemoveContainer}
-        setCurrentPoolIndex={setCurrentPoolIndex}
-        currentView={currentView}
-        renderEmptyPoolsState={renderEmptyPoolsState}
-        setShowConnectModal={setShowConnectModal}
-        itemsPerPage={itemsPerPage}
-      />
-    );
-  };
+  useEffect(() => {
+    if (poolsByUser) setUserPoolsToShow(poolsByUser);
+    setHaveUserPools(poolsByUser && poolsByUser.length !== 0);
+  }, [poolsByUser]);
 
   const renderEmptyPoolsState = (infoMessage: string) => (
     <div className="text-center mt-10">
@@ -210,7 +172,34 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
             </div>
           ) : null}
 
-          <>{currentView === PageViews.ALL_POOLS ? renderAllPools() : renderUserPools()}</>
+          <>
+            {currentView === PageViews.ALL_POOLS ? (
+              <AllPools
+                loadingPools={loadingPools}
+                havePools={havePools}
+                itemsPerPage={itemsPerPage}
+                pools={poolsToShow}
+                setShowRemoveContainer={setShowRemoveContainer}
+                setCurrentPoolIndex={setCurrentPoolIndex}
+                currentView={currentView}
+                renderEmptyPoolsState={renderEmptyPoolsState}
+              />
+            ) : (
+              <MyPools
+                connected={connected}
+                isHashpackLoading={isHashpackLoading}
+                loadingPools={loadingPoolsByUser}
+                pools={userPoolsToShow}
+                havePools={haveUserPools}
+                setShowRemoveContainer={setShowRemoveContainer}
+                setCurrentPoolIndex={setCurrentPoolIndex}
+                currentView={currentView}
+                renderEmptyPoolsState={renderEmptyPoolsState}
+                setShowConnectModal={setShowConnectModal}
+                itemsPerPage={itemsPerPage}
+              />
+            )}
+          </>
         </div>
       )}
     </div>
