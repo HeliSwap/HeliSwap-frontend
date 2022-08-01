@@ -24,6 +24,7 @@ import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransact
 
 import errorMessages from '../content/errors';
 import {
+  addressToId,
   checkAllowanceHTS,
   getTokenBalance,
   getUserAssociatedTokens,
@@ -43,17 +44,18 @@ import {
 } from '../utils/numberUtils';
 
 import usePools from '../hooks/usePools';
-import useTokens from '../hooks/useTokens';
+// import useTokens from '../hooks/useTokens';
 
 import { MAX_UINT_ERC20, MAX_UINT_HTS, REFRESH_TIME } from '../constants';
 import InputToken from '../components/InputToken';
 import ButtonSelector from '../components/ButtonSelector';
 import Icon from '../components/Icon';
 import Confirmation from '../components/Confirmation';
+import useTokensFiltered from '../hooks/useTokensFiltered';
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
-  const { connection, sdk } = contextValue;
+  const { connection, sdk, tokensWhitelisted } = contextValue;
   const {
     userId,
     hashconnectConnectorInstance,
@@ -94,7 +96,14 @@ const Swap = () => {
     pollInterval: REFRESH_TIME,
   });
 
-  const { loading: loadingTDL, tokens: tokenDataList } = useTokens({
+  // const { loading: loadingTDL, tokens: tokenDataList } = useTokens({
+  //   fetchPolicy: 'network-only',
+  //   pollInterval: REFRESH_TIME,
+  // });
+
+  const tokensWhitelistedIds = tokensWhitelisted.map(item => addressToId(item.address));
+
+  const { loading: loadingTDL, tokens: tokenDataList } = useTokensFiltered(tokensWhitelistedIds, {
     fetchPolicy: 'network-only',
     pollInterval: REFRESH_TIME,
   });
