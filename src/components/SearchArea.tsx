@@ -5,9 +5,10 @@ interface ISearchAreaProps {
   searchFunc: (value: string) => void;
   setInputValue: (value: string) => void;
   inputValue: string;
+  minLength: number;
 }
 
-const SearchArea = ({ searchFunc, setInputValue, inputValue }: ISearchAreaProps) => {
+const SearchArea = ({ searchFunc, setInputValue, inputValue, minLength }: ISearchAreaProps) => {
   const debouncedSearchTerm: string = useDebounce(inputValue, 1000);
 
   useEffect(() => {
@@ -25,6 +26,7 @@ const SearchArea = ({ searchFunc, setInputValue, inputValue }: ISearchAreaProps)
             setInputValue(e.target.value);
           }}
           className="search-area-input"
+          minLength={minLength}
         ></input>
       </div>
     </div>
