@@ -166,6 +166,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
                 searchFunc={searchFunc}
                 inputValue={inputValue}
                 setInputValue={setInputValue}
+                minLength={searchThreshold + 1}
               />
               <div className="d-flex justify-content-end align-items-center my-5">
                 <Link className="btn btn-sm btn-primary" to="/create">
