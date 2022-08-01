@@ -46,8 +46,8 @@ const useFilteredPools = (
 
   useEffect(() => {
     if (filteredPoolsData) {
-      const { filteredPools } = filteredPoolsData;
-      const processedPools = getProcessedPools(filteredPools, getExtended, hbarPrice);
+      const { filterPools } = filteredPoolsData;
+      const processedPools = getProcessedPools(filterPools, getExtended, hbarPrice);
       setFilteredPools(processedPools);
     }
   }, [filteredPoolsData, hbarPrice, getExtended]);

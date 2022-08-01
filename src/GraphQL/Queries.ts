@@ -118,7 +118,7 @@ export const GET_FILTERED_POOLS = gql`
 `;
 
 export const GET_WHITELISTED_POOLS = gql`
-  query getWhitelistedPools($tokens: [String]) {
+  query getWhitelistedPools($tokens: [String]!) {
     poolsConsistingOf(tokens: $tokens) {
       id
       pairName
