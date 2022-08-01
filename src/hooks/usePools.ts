@@ -37,7 +37,7 @@ const usePools = (useQueryOptions: QueryHookOptions = {}, getExtended = false) =
     if (data) {
       const { pools } = data;
       const processedPools = getProcessedPools(pools, getExtended, hbarPrice);
-      setPools(processedPools);
+      if (processedPools) setPools(processedPools);
     }
   }, [data, hbarPrice, getExtended]);
 

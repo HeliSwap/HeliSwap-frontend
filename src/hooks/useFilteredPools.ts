@@ -48,7 +48,7 @@ const useFilteredPools = (
     if (filteredPoolsData) {
       const { filterPools } = filteredPoolsData;
       const processedPools = getProcessedPools(filterPools, getExtended, hbarPrice);
-      setFilteredPools(processedPools);
+      if (processedPools) setFilteredPools(processedPools);
     }
   }, [filteredPoolsData, hbarPrice, getExtended]);
 
