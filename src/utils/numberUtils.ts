@@ -6,6 +6,10 @@ export const formatStringToPrice = (stringToFormat: string) => {
   return `$${numeral(stringToFormat).format('0.0a')}`;
 };
 
+export const formatHBARStringToPrice = (stringToFormat: string) => {
+  return `${numeral(stringToFormat).format('0,0.0000')}`;
+};
+
 export const formatNumberToBigNumber = (numberToFormat: number) => {
   const numberToFormatBN = new BigNumber(numberToFormat);
 
