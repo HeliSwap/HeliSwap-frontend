@@ -413,7 +413,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
               >
                 <span>Approve LP</span>
                 <Tippy
-                  content={`You must give the HeliSwap smart contracts permission to use your LP tokens. You only have to do this once per token.`}
+                  content={`You must give the HeliSwap smart contracts permission to use your LP tokens.`}
                 >
                   <span className="ms-2">
                     <Icon name="hint" />

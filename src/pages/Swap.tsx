@@ -772,7 +772,7 @@ const Swap = () => {
                   >
                     <span>{`Approve ${tokensData.tokenA.symbol}`}</span>
                     <Tippy
-                      content={`You must give the HeliSwap smart contracts permission to use your ${tokensData.tokenA.symbol}. You only have to do this once per token.`}
+                      content={`You must give the HeliSwap smart contracts permission to use your ${tokensData.tokenA.symbol}.`}
                     >
                       <span className="ms-2">
                         <Icon name="hint" />
