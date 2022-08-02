@@ -12,6 +12,7 @@ const useFilteredPools = (
   useQueryOptions: QueryHookOptions = {},
   searchQuery: Object,
   getExtended: boolean,
+  restPools: IPoolExtendedData[] = [],
 ) => {
   const [hbarPrice, setHbarPrice] = useState(0);
   const [filteredPools, setFilteredPools] = useState<IPoolExtendedData[]>([]);
@@ -47,10 +48,10 @@ const useFilteredPools = (
   useEffect(() => {
     if (filteredPoolsData) {
       const { filterPools } = filteredPoolsData;
-      const processedPools = getProcessedPools(filterPools, getExtended, hbarPrice);
+      const processedPools = getProcessedPools(filterPools, getExtended, hbarPrice, restPools);
       if (processedPools) setFilteredPools(processedPools);
     }
-  }, [filteredPoolsData, hbarPrice, getExtended]);
+  }, [filteredPoolsData, hbarPrice, getExtended, restPools]);
 
   return { filteredPools, filteredPoolsCalled, filteredPoolsLoading, filteredPoolsError };
 };

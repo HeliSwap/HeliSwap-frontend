@@ -4,11 +4,13 @@ import { formatStringWeiToStringEther } from './numberUtils';
 import { getTokenPrice } from './tokenUtils';
 
 export const getProcessedPools = (
-  pools: any,
+  pools: IPoolExtendedData[],
   getExtended: boolean,
   hbarPrice: number | undefined,
+  restPools: IPoolExtendedData[] = [],
 ) => {
   if (getExtended) {
+    const mergedPools = joinByFieldSkipDuplicates(restPools, pools, 'id');
     if (pools.length > 0 && hbarPrice) {
       const formatPoolData = (pool: IPoolData) => {
         const {
@@ -22,8 +24,8 @@ export const getProcessedPools = (
           volume24h: volume24hWei,
         } = pool;
 
-        const token0Price = getTokenPrice(pools, token0, hbarPrice);
-        const token1Price = getTokenPrice(pools, token1, hbarPrice);
+        const token0Price = getTokenPrice(mergedPools, token0, hbarPrice);
+        const token1Price = getTokenPrice(mergedPools, token1, hbarPrice);
 
         const token0AmountFormatted = formatStringWeiToStringEther(token0Amount, token0Decimals);
         const token1AmountFormatted = formatStringWeiToStringEther(token1Amount, token1Decimals);
@@ -80,7 +82,7 @@ export const joinByFieldSkipDuplicates = (
   joinByField: string,
 ) => {
   const a = new Set(arr1.map(x => x[joinByField]));
-  const b = new Set(arr2.map(x => x[joinByField]));
+  // const b = new Set(arr2.map(x => x[joinByField]));
   return [...arr1, ...arr2.filter(x => !a.has(x[joinByField]))];
 };
 
