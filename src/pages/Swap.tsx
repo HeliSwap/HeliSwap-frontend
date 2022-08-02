@@ -52,6 +52,9 @@ import ButtonSelector from '../components/ButtonSelector';
 import Icon from '../components/Icon';
 import Confirmation from '../components/Confirmation';
 import useTokensByListIds from '../hooks/useTokensByListIds';
+import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
+import usePoolsByToken from '../hooks/usePoolsByToken';
+import { joinByFieldSkipDuplicates } from '../utils/poolUtils';
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
@@ -86,22 +89,32 @@ const Swap = () => {
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
   const [insufficientLiquidity, setInsufficientLiquidity] = useState(false);
 
-  // State for pools
+  //State for tokens whitelist
+  const [tokensWhitelistedIds, setTokensWhitelistedIds] = useState<string[]>([]);
+
+  const [loadPoolsByToken, setLoadPoolsByToken] = useState('');
+  const [mergedPoolsData, setMergedPoolsData] = useState<IPoolData[]>([] as IPoolData[]);
+
   const {
-    pools: poolsData,
-    loading: loadingPools,
-    refetch,
-  } = usePools({
-    fetchPolicy: 'network-only',
-    pollInterval: REFRESH_TIME,
-  });
+    poolsByTokenList: whitelistedPoolsData,
+    loadingPoolsByTokenList: loadingPools,
+    refetchPoolsByTokenList: refetch,
+  } = usePoolsByTokensList(
+    {
+      fetchPolicy: 'network-only',
+      pollInterval: REFRESH_TIME,
+    },
+    false,
+    tokensWhitelistedIds,
+  );
 
-  // const { loading: loadingTDL, tokens: tokenDataList } = useTokens({
-  //   fetchPolicy: 'network-only',
-  //   pollInterval: REFRESH_TIME,
-  // });
-
-  const tokensWhitelistedIds = tokensWhitelisted.map(item => addressToId(item.address));
+  const { filteredPools: filteredPoolsData } = usePoolsByToken(
+    {
+      fetchPolicy: 'network-only',
+    },
+    loadPoolsByToken,
+    true,
+  );
 
   const { loading: loadingTDL, tokens: tokenDataList } = useTokensByListIds(tokensWhitelistedIds, {
     fetchPolicy: 'network-only',
@@ -218,7 +231,7 @@ const Swap = () => {
       } else {
         if (name === 'amountIn') {
           const trades = getPossibleTradesExactIn(
-            poolsData || [],
+            mergedPoolsData || [],
             amountIn,
             tokenInAddress,
             tokenOutAddress,
@@ -240,7 +253,7 @@ const Swap = () => {
           setSwapData(prev => ({ ...prev, ...tokenData, amountOut: bestTrade.amountOut }));
         } else if (name === 'amountOut') {
           const trades = getPossibleTradesExactOut(
-            poolsData || [],
+            mergedPoolsData || [],
             amountOut,
             tokenInAddress,
             tokenOutAddress,
@@ -264,7 +277,7 @@ const Swap = () => {
         }
       }
     },
-    [poolsData, tokensData, willUnwrapTokens, willWrapTokens],
+    [mergedPoolsData, tokensData, willUnwrapTokens, willWrapTokens],
   );
 
   const handleAssociateClick = async (token: ITokenData) => {
@@ -429,14 +442,21 @@ const Swap = () => {
 
     setWillWrapTokens(willWrap);
     setWillUnwrapTokens(willUnwrap);
-  }, [poolsData, tokensData, refetch]);
+  }, [mergedPoolsData, tokensData, refetch]);
 
   // Check for cached input values - used for auto pooling
   useEffect(() => {
     const newInputName = tokenInExactAmount ? 'amountIn' : 'amountOut';
     const newInputValue = tokenInExactAmount ? tokenInValue : tokenOutValue;
     handleInputChange(newInputValue, newInputName);
-  }, [poolsData, tokensData, handleInputChange, tokenInExactAmount, tokenInValue, tokenOutValue]);
+  }, [
+    mergedPoolsData,
+    tokensData,
+    handleInputChange,
+    tokenInExactAmount,
+    tokenInValue,
+    tokenOutValue,
+  ]);
 
   // Check for approvals
   useEffect(() => {
@@ -537,9 +557,10 @@ const Swap = () => {
   // Check for address in url
   useEffect(() => {
     try {
-      if (address && poolsData.length !== 0 && tokenDataList && !tokensDerivedFromPool) {
+      if (address && mergedPoolsData.length !== 0 && tokenDataList && !tokensDerivedFromPool) {
         const chosenPool =
-          poolsData.find((pool: IPoolData) => pool.pairAddress === address) || ({} as IPoolData);
+          mergedPoolsData.find((pool: IPoolData) => pool.pairAddress === address) ||
+          ({} as IPoolData);
         const { token0: token0Address, token1: token1Address } = chosenPool;
 
         // Check if one of tokens is WHBAR - to be switched for HBAR
@@ -580,7 +601,23 @@ const Swap = () => {
     } catch (err) {
       console.error(err);
     }
-  }, [poolsData, tokenDataList, address, tokensDerivedFromPool, userId]);
+  }, [mergedPoolsData, tokenDataList, address, tokensDerivedFromPool, userId]);
+
+  useEffect(() => {
+    if (tokensWhitelisted && tokensWhitelisted.length !== 0) {
+      const tokensWhitelistedIds = tokensWhitelisted.map(item => item.address);
+      setTokensWhitelistedIds(tokensWhitelistedIds);
+    }
+  }, [tokensWhitelisted]);
+
+  useEffect(() => {
+    const mergedPoolsData = joinByFieldSkipDuplicates(
+      whitelistedPoolsData,
+      filteredPoolsData,
+      'id',
+    );
+    setMergedPoolsData(mergedPoolsData);
+  }, [whitelistedPoolsData, filteredPoolsData]);
 
   //Render methods
   const getErrorMessage = () => {
@@ -644,6 +681,7 @@ const Swap = () => {
                 };
 
                 setSwapData(prev => ({ ...prev, ...newSwapData }));
+                setLoadPoolsByToken(tokenA.address);
               }
               setTokensData(newTokensData);
             }}
@@ -698,6 +736,7 @@ const Swap = () => {
                 };
 
                 setSwapData(prev => ({ ...prev, ...newSwapData }));
+                setLoadPoolsByToken(tokenB.address);
               }
               setTokensData(newTokensData);
             }}
