@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { hethers } from '@hashgraph/hethers';
-import { IPairData } from '../interfaces/tokens';
+import { IPoolData } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
 import Button from './Button';
@@ -14,7 +14,7 @@ import TransactionSettingsModalContent from './Modals/TransactionSettingsModalCo
 import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
 import Modal from './Modal';
 
-import { MAX_UINT_ERC20 } from '../constants';
+import { MAX_UINT_ERC20, SLIDER_INITIAL_VALUE } from '../constants';
 
 import {
   formatStringWeiToStringEther,
@@ -34,9 +34,10 @@ import {
   INITIAL_SWAP_SLIPPAGE_TOLERANCE,
 } from '../utils/transactionUtils';
 import { formatIcons } from '../utils/iconUtils';
+import Confirmation from './Confirmation';
 
 interface IRemoveLiquidityProps {
-  pairData: IPairData;
+  pairData: IPoolData;
   setShowRemoveContainer: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -52,7 +53,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
   const [lpApproved, setLpApproved] = useState(false);
   const [lpInputValue, setLpInputValue] = useState(maxLpInputValue);
-  const [sliderValue, setSliderValue] = useState('100');
+  const [sliderValue, setSliderValue] = useState(SLIDER_INITIAL_VALUE);
 
   const [removeLpData, setRemoveLpData] = useState({
     tokenInAddress: '',
@@ -64,7 +65,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
     token1Decimals: 0,
   });
 
-  const [removeNative, setRemoveNative] = useState(false);
+  const [removeNative, setRemoveNative] = useState(true);
   const [hasWrappedHBAR, setHasWrappedHBAR] = useState(false);
 
   const [showModalTransactionSettings, setShowModalTransactionSettings] = useState(false);
@@ -85,7 +86,8 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
     if (invalidInputTokensData) {
       setLpInputValue(formatStringWeiToStringEther(pairData.lpShares as string));
-
+      setSliderValue(SLIDER_INITIAL_VALUE);
+      recalculateReserves(formatStringWeiToStringEther(pairData.lpShares as string));
       return;
     }
 
@@ -93,6 +95,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
     setSliderValue(percentage);
 
     setLpInputValue(value);
+    recalculateReserves(value);
   };
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,12 +103,48 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
     const { value } = target;
 
     setSliderValue(value);
-    setLpInputValue(calculateShareByPercentage(maxLpInputValue, value));
+    const calculatedShare = calculateShareByPercentage(maxLpInputValue, value);
+    setLpInputValue(calculatedShare);
+    recalculateReserves(calculatedShare);
   };
 
   const handleButtonClick = (value: string) => {
     setSliderValue(value);
-    setLpInputValue(calculateShareByPercentage(maxLpInputValue, value));
+    const calculatedShare = calculateShareByPercentage(maxLpInputValue, value);
+    setLpInputValue(calculatedShare);
+    recalculateReserves(calculatedShare);
+  };
+
+  const recalculateReserves = (newInputValue: string) => {
+    const {
+      pairSupply,
+      token0Amount,
+      token1Amount,
+      token0: tokenInAddress,
+      token1: tokenOutAddress,
+      token0Decimals,
+      token1Decimals,
+    } = pairData;
+
+    const newInputValueWei = formatStringToStringWei(newInputValue);
+    const { reserve0ShareStr: tokens0Amount, reserve1ShareStr: tokens1Amount } = calculateReserves(
+      newInputValueWei,
+      pairSupply,
+      token0Amount,
+      token1Amount,
+      token0Decimals,
+      token1Decimals,
+    );
+    const tokensLpAmount = hethers.utils.formatUnits(newInputValueWei, 18).toString();
+    setRemoveLpData({
+      tokenInAddress,
+      tokenOutAddress,
+      tokensLpAmount,
+      tokens0Amount,
+      tokens1Amount,
+      token0Decimals,
+      token1Decimals,
+    });
   };
 
   const handleRemoveLPButtonClick = async () => {
@@ -189,6 +228,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
       setErrorRemove(true);
     } finally {
       setLoadingRemove(false);
+      setShowModalConfirmRemove(false);
     }
   };
 
@@ -199,7 +239,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
     try {
       const contractId = addressToContractId(pairData.pairAddress);
-      await sdk.approveToken(hashconnectConnectorInstance, amount, userId, contractId);
+      await sdk.approveToken(hashconnectConnectorInstance, amount, userId, contractId, false);
       setLpApproved(true);
     } catch (e) {
       console.error(e);
@@ -231,8 +271,10 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
     const newInputValue = calculateShareByPercentage(
       formatStringWeiToStringEther(lpShares as string, 18),
-      sliderValue,
+      SLIDER_INITIAL_VALUE,
     );
+    setSliderValue(SLIDER_INITIAL_VALUE);
+
     setLpInputValue(newInputValue);
 
     const newInputValueWei = formatStringToStringWei(newInputValue);
@@ -257,9 +299,15 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
       token0Decimals,
       token1Decimals,
     });
-  }, [lpInputValue, pairData, sliderValue]);
+  }, [pairData]);
 
   const canRemove = lpApproved && removeLpData.tokenInAddress !== '';
+
+  const confirmationText = `Removing ${formatStringETHtoPriceFormatted(
+    removeLpData.tokensLpAmount,
+  )} LP tokens for ${formatStringETHtoPriceFormatted(removeLpData.tokens0Amount)} ${
+    pairData.token0Symbol
+  } and ${formatStringETHtoPriceFormatted(removeLpData.tokens1Amount)} ${pairData.token1Symbol}`;
 
   return (
     <div className="container-action">
@@ -270,7 +318,10 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
       />
 
       {showModalTransactionSettings ? (
-        <Modal show={showModalTransactionSettings}>
+        <Modal
+          show={showModalTransactionSettings}
+          closeModal={() => setShowModalTransactionSettings(false)}
+        >
           <TransactionSettingsModalContent
             modalTitle="Transaction settings"
             closeModal={() => setShowModalTransactionSettings(false)}
@@ -369,51 +420,58 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
         </div>
 
         {showModalConfirmRemove ? (
-          <Modal show={showModalConfirmRemove}>
+          <Modal show={showModalConfirmRemove} closeModal={() => setShowModalConfirmRemove(false)}>
             <ConfirmTransactionModalContent
+              isLoading={loadingRemove}
               modalTitle="Remove liquidity"
               closeModal={() => setShowModalConfirmRemove(false)}
               confirmTansaction={handleRemoveLPButtonClick}
               confirmButtonLabel="Remove"
             >
-              <div className="d-flex justify-content-between align-items-center px-3">
-                <div className="d-flex align-items-center">
-                  <IconToken symbol="LP" />
-                  <span className="text-main ms-3">LP Token</span>
-                </div>
+              {loadingRemove ? (
+                <Confirmation confirmationText={confirmationText} />
+              ) : (
+                <>
+                  <div className="d-flex justify-content-between align-items-center px-3">
+                    <div className="d-flex align-items-center">
+                      <IconToken symbol="LP" />
+                      <span className="text-main ms-3">LP Token</span>
+                    </div>
 
-                <div className="text-main text-numeric">{lpInputValue}</div>
-              </div>
+                    <div className="text-main text-numeric">{lpInputValue}</div>
+                  </div>
 
-              <hr />
+                  <hr />
 
-              <div className="d-flex justify-content-between align-items-center px-3">
-                <div className="d-flex align-items-center">
-                  <IconToken symbol={pairData.token0Symbol} />
-                  <span className="text-main ms-3">{pairData.token0Symbol}</span>
-                </div>
+                  <div className="d-flex justify-content-between align-items-center px-3">
+                    <div className="d-flex align-items-center">
+                      <IconToken symbol={pairData.token0Symbol} />
+                      <span className="text-main ms-3">{pairData.token0Symbol}</span>
+                    </div>
 
-                <div className="text-main text-numeric">
-                  {formatStringETHtoPriceFormatted(removeLpData.tokens0Amount)}
-                </div>
-              </div>
+                    <div className="text-main text-numeric">
+                      {formatStringETHtoPriceFormatted(removeLpData.tokens0Amount)}
+                    </div>
+                  </div>
 
-              <div className="d-flex justify-content-between align-items-center px-3 mt-4">
-                <div className="d-flex align-items-center">
-                  <IconToken symbol={pairData.token1Symbol} />
-                  <span className="text-main ms-3">{pairData.token1Symbol}</span>
-                </div>
+                  <div className="d-flex justify-content-between align-items-center px-3 mt-4">
+                    <div className="d-flex align-items-center">
+                      <IconToken symbol={pairData.token1Symbol} />
+                      <span className="text-main ms-3">{pairData.token1Symbol}</span>
+                    </div>
 
-                <div className="text-main text-numeric">
-                  {formatStringETHtoPriceFormatted(removeLpData.tokens1Amount)}
-                </div>
-              </div>
+                    <div className="text-main text-numeric">
+                      {formatStringETHtoPriceFormatted(removeLpData.tokens1Amount)}
+                    </div>
+                  </div>
 
-              <hr />
+                  <hr />
 
-              <p className="text-micro mb-5 px-3">
-                You will also collect fees earned from this position.
-              </p>
+                  <p className="text-micro mb-5 px-3">
+                    You will also collect fees earned from this position.
+                  </p>
+                </>
+              )}
             </ConfirmTransactionModalContent>
           </Modal>
         ) : null}

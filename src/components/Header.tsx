@@ -1,15 +1,36 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import { GlobalContext } from '../providers/Global';
+import { Md5 } from 'ts-md5/dist/md5';
+
 import Button from './Button';
+import Modal from './Modal';
+import ConnectModalContent from './Modals/ConnectModalContent';
+import UserAccountModalContent from './Modals/UserAccountModalContent';
+
+import { formatStringETHtoPriceFormatted } from '../utils/numberUtils';
+import { getHBarPrice } from '../utils/tokenUtils';
 
 const Header = () => {
   const contextValue = useContext(GlobalContext);
-  const { connected, connectWallet, disconnectWallet, extensionFound, isHashpackLoading, userId } =
-    contextValue.connection;
-  const { isRunning } = contextValue;
+  const {
+    connected,
+    connectWallet,
+    disconnectWallet,
+    extensionFound,
+    isHashpackLoading,
+    userId,
+    showConnectModal,
+    setShowConnectModal,
+  } = contextValue.connection;
 
+  const [showUserAccountModal, setShowUserAccountModal] = useState(false);
   const [userBalance, setUserBalance] = useState('0.0');
+  const [hbarPrice, setHbarPrice] = useState(0);
+
+  const handleConnectButtonClick = () => {
+    setShowConnectModal(true);
+  };
 
   useEffect(() => {
     const getUserTokensData = async () => {
@@ -18,7 +39,7 @@ const Header = () => {
         const userBalanceBN = await provider.getBalance(userId);
         const tokenBalance = hethers.utils.formatHbar(userBalanceBN);
 
-        setUserBalance(tokenBalance);
+        setUserBalance(formatStringETHtoPriceFormatted(tokenBalance));
       }
     };
 
@@ -30,46 +51,68 @@ const Header = () => {
     };
   }, [userId]);
 
+  useEffect(() => {
+    const getHBARPrice = async () => {
+      const hbarPrice = await getHBarPrice();
+      setHbarPrice(hbarPrice);
+    };
+
+    getHBARPrice();
+  }, []);
+
   return (
     <div className="p-5">
       <div className="d-flex justify-content-end">
         <div className="d-flex align-items-center">
-          {isRunning ? <span className="me-3">🟢</span> : <span className="me-3">🔴</span>}
-          {extensionFound ? (
-            isHashpackLoading ? (
-              <p className="text-warning mx-2">Please aprove from your wallet</p>
-            ) : connected ? (
-              <>
-                <div className="container-connected">
-                  <div className="text-small">{userBalance} HBAR</div>
-                  <div className="container-address">
-                    <div className="text-small">{userId}</div>
-                  </div>
+          {connected && userId ? (
+            <>
+              <div className="me-5">
+                <span className="text-small">
+                  HBAR price:{' '}
+                  <span className="text-numeric">
+                    ${formatStringETHtoPriceFormatted(hbarPrice.toString(), 3)}
+                  </span>
+                </span>
+              </div>
+              <div className="container-connected">
+                <div className="text-small">{userBalance} HBAR</div>
+                <div className="container-address" onClick={() => setShowUserAccountModal(true)}>
+                  <div className="text-small">{userId}</div>
+                  <img
+                    className="img-profile ms-3"
+                    src={`https://www.gravatar.com/avatar/${Md5.hashStr(userId)}/?d=identicon`}
+                    alt=""
+                  />
                 </div>
-                <Button
-                  onClick={() => disconnectWallet()}
-                  className="mx-2"
-                  type="primary"
-                  size="small"
-                  outline={true}
-                >
-                  Disconnect
-                </Button>
-              </>
-            ) : (
-              <Button onClick={() => connectWallet()} type="primary" size="small" className="mx-2">
-                Connect wallet
-              </Button>
-            )
+              </div>
+            </>
           ) : (
-            <p className="text-warning mx-2">
-              Please{' '}
-              <a target="_blank" className="link" rel="noreferrer" href="https://www.hashpack.app/">
-                install
-              </a>{' '}
-              a wallet
-            </p>
+            <Button
+              onClick={() => handleConnectButtonClick()}
+              type="primary"
+              size="small"
+              className="mx-2"
+            >
+              Connect wallet
+            </Button>
           )}
+          <Modal show={showConnectModal} closeModal={() => setShowConnectModal(false)}>
+            <ConnectModalContent
+              modalTitle="Connect wallet"
+              closeModal={() => setShowConnectModal(false)}
+              connectWallet={connectWallet}
+              isLoading={isHashpackLoading}
+              extensionFound={extensionFound}
+            />
+          </Modal>
+          <Modal show={showUserAccountModal} closeModal={() => setShowUserAccountModal(false)}>
+            <UserAccountModalContent
+              modalTitle="Account"
+              closeModal={() => setShowUserAccountModal(false)}
+              disconnectWallet={disconnectWallet}
+              userId={userId}
+            />
+          </Modal>
         </div>
       </div>
     </div>

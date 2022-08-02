@@ -2,7 +2,7 @@ import axios from 'axios';
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
 
-import { IAllowanceData, IPairData, ITokenData, TokenType } from '../interfaces/tokens';
+import { IAllowanceData, IPoolData, ITokenData, TokenType } from '../interfaces/tokens';
 import { Client, ContractId, AccountBalanceQuery } from '@hashgraph/sdk';
 import {
   formatNumberToBigNumber,
@@ -151,6 +151,16 @@ export const addressToContractId = (tokenAddress: string) => {
   return ContractId.fromEvmAddress(0, 0, tokenAddress);
 };
 
+export const isHederaIdValid = (hederaId: string) => {
+  return hederaId
+    .toLowerCase()
+    .match(/^(0|(?:[1-9]\d*))\.(0|(?:[1-9]\d*))\.(0|(?:[1-9]\d*))(?:-([a-z]{5}))?$/g);
+};
+
+export const isAddressValid = (address: string) => {
+  return hethers.utils.isAddress(address.toLowerCase());
+};
+
 /**
  * Calucate reserves based on total amount ot LP
  * @public
@@ -263,7 +273,7 @@ export const getHBarPrice = async () => {
   }
 };
 
-export const getTokenPrice = (poolsData: IPairData[], tokenAddress: string, hbarPrice: number) => {
+export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbarPrice: number) => {
   if (hbarPrice === 0) return;
   if (tokenAddress === process.env.REACT_APP_WHBAR_ADDRESS) return hbarPrice.toString();
 

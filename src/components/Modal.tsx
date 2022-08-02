@@ -1,11 +1,29 @@
-import React from 'react';
+import React, { useEffect, useCallback } from 'react';
 
 interface IModalProps {
   show?: boolean;
+  closeModal?: () => void;
   children: JSX.Element | JSX.Element[] | string;
 }
 
-const Modal = ({ show = true, children }: IModalProps) => {
+const Modal = ({ show = true, children, closeModal }: IModalProps) => {
+  const handleKeyDown = useCallback(
+    (event: any) => {
+      if (event.key === 'Escape' && closeModal) {
+        closeModal();
+      }
+    },
+    [closeModal],
+  );
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleKeyDown]);
+
   return (
     <>
       <div

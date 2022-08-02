@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
+import { useParams } from 'react-router-dom';
 import BigNumber from 'bignumber.js';
 
 import {
@@ -7,6 +8,7 @@ import {
   TokenType,
   ITokensData,
   IfaceInitialBalanceData,
+  IPoolData,
 } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
@@ -33,6 +35,7 @@ import {
   tradeComparator,
 } from '../utils/tradeUtils';
 import {
+  formatStringETHtoPriceFormatted,
   formatStringWeiToStringEther,
   getAmountWithSlippage,
   stripStringToFixedDecimals,
@@ -45,12 +48,21 @@ import { MAX_UINT_ERC20, MAX_UINT_HTS, REFRESH_TIME } from '../constants';
 import InputToken from '../components/InputToken';
 import ButtonSelector from '../components/ButtonSelector';
 import Icon from '../components/Icon';
+import Confirmation from '../components/Confirmation';
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
-  const { userId, hashconnectConnectorInstance, connected, connectWallet, extensionFound } =
-    connection;
+  const {
+    userId,
+    hashconnectConnectorInstance,
+    connected,
+    setShowConnectModal,
+    extensionFound,
+    isHashpackLoading,
+  } = connection;
+
+  const { address } = useParams();
 
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
@@ -115,8 +127,6 @@ const Swap = () => {
   const [tokenBalances, setTokenBalances] = useState<IfaceInitialBalanceData>(initialBallanceData);
 
   // Additional states for Swaps
-
-  const [readyToAssociate, setReadyToAssociate] = useState(false);
   const [readyToSwap, setReadyToSwap] = useState(false);
   const [tokenInExactAmount, setTokenInExactAmount] = useState(true);
   const [bestPath, setBestPath] = useState<string[]>([]);
@@ -125,15 +135,17 @@ const Swap = () => {
   // State for general error
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [successSwap, setSuccessSwap] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
   const [loadingSwap, setLoadingSwap] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
   const [loadingAssociate, setLoadingAssociate] = useState(false);
 
+  // State for preset tokens from choosen pool
+  const [tokensDerivedFromPool, setTokensDerivedFromPool] = useState(false);
+
   const getInsufficientTokenIn = useCallback(() => {
     const { tokenA: tokenABalance } = tokenBalances;
     const { amountIn } = swapData;
+
     return tokenABalance && amountIn && new BigNumber(amountIn).gt(new BigNumber(tokenABalance));
   }, [swapData, tokenBalances]);
 
@@ -245,16 +257,14 @@ const Swap = () => {
     [poolsData, tokensData, willUnwrapTokens, willWrapTokens],
   );
 
-  const handleAssociateClick = async () => {
-    const { tokenB } = tokensData;
-
+  const handleAssociateClick = async (token: ITokenData) => {
     setLoadingAssociate(true);
 
     try {
       const receipt = await sdk.associateToken(
         hashconnectConnectorInstance,
         userId,
-        tokenB.hederaId,
+        token.hederaId,
       );
       const {
         response: { success, error },
@@ -290,6 +300,7 @@ const Swap = () => {
         amount,
         userId,
         tokenA.hederaId,
+        tokenA.type === TokenType.HTS,
       );
       const {
         response: { success, error },
@@ -323,8 +334,6 @@ const Swap = () => {
 
     setError(false);
     setErrorMessage('');
-    setSuccessSwap(false);
-    setSuccessMessage('');
     setLoadingSwap(true);
 
     const { swapSlippage, transactionExpiration } = getTransactionSettings();
@@ -361,13 +370,9 @@ const Swap = () => {
         setError(true);
         setErrorMessage(error);
       } else {
-        const successMessage = `Swap exactly ${swapData.amountIn} ${tokensData.tokenA.symbol} for ${swapData.amountOut} ${tokensData.tokenB.symbol}`;
-
         setSwapData(initialSwapData);
         setTokensData(initialTokensData);
         setApproved(false);
-        setSuccessSwap(true);
-        setSuccessMessage(successMessage);
         refetch();
       }
     } catch (err) {
@@ -375,10 +380,11 @@ const Swap = () => {
       setError(true);
     } finally {
       setLoadingSwap(false);
+      setShowModalConfirmSwap(false);
     }
   };
 
-  const switchTokens = () => {
+  const handleSwitchTokens = () => {
     const newTokensData = {
       tokenA: tokensData.tokenB,
       tokenB: tokensData.tokenA,
@@ -393,6 +399,7 @@ const Swap = () => {
     handleInputChange(swapData[oldInputValueKey], newInputValueKey, newTokensData);
   };
 
+  // Check for WRAP/UNWRAP
   useEffect(() => {
     refetch();
 
@@ -414,12 +421,14 @@ const Swap = () => {
     setWillUnwrapTokens(willUnwrap);
   }, [poolsData, tokensData, refetch]);
 
+  // Check for cached input values - used for auto pooling
   useEffect(() => {
     const newInputName = tokenInExactAmount ? 'amountIn' : 'amountOut';
     const newInputValue = tokenInExactAmount ? tokenInValue : tokenOutValue;
     handleInputChange(newInputValue, newInputName);
   }, [poolsData, tokensData, handleInputChange, tokenInExactAmount, tokenInValue, tokenOutValue]);
 
+  // Check for approvals
   useEffect(() => {
     const getAllowanceHTS = async (userId: string) => {
       const { amountIn: amountToSpend, tokenIdIn } = swapData;
@@ -440,6 +449,7 @@ const Swap = () => {
       const canSpend = await checkAllowanceHTS(userId, tokenAData, amountToSpend);
       setApproved(canSpend);
     };
+
     if (tokensData.tokenA.type === TokenType.HBAR) {
       setNeedApproval(false);
     }
@@ -451,6 +461,17 @@ const Swap = () => {
     }
   }, [swapData, userId, sdk, tokensData, userAssociatedTokens]);
 
+  // Check for associations
+  useEffect(() => {
+    const checkTokenAssociation = async (userId: string) => {
+      const tokens = await getUserAssociatedTokens(userId);
+      setUserAssociatedTokens(tokens);
+    };
+
+    userId && checkTokenAssociation(userId);
+  }, [userId]);
+
+  // Check for balances
   useEffect(() => {
     const getTokenBalances = async () => {
       if (userId) {
@@ -470,6 +491,7 @@ const Swap = () => {
     getTokenBalances();
   }, [tokensData, userId, initialBallanceData]);
 
+  // Final checks before swap
   useEffect(() => {
     let ready = true;
 
@@ -482,14 +504,6 @@ const Swap = () => {
     if (!swapData.amountIn || !swapData.amountOut || getInsufficientTokenIn()) {
       ready = false;
     }
-
-    const readyToAssociate =
-      !isNaN(Number(swapData.amountOut)) &&
-      Number(swapData.amountOut) > 0 &&
-      swapData.tokenIdOut !== initialSwapData.tokenIdOut &&
-      Object.keys(tokensData.tokenB).length !== 0 &&
-      !insufficientLiquidity;
-    setReadyToAssociate(readyToAssociate);
 
     const readyToApprove =
       Object.keys(tokensData.tokenA).length !== 0 &&
@@ -510,14 +524,53 @@ const Swap = () => {
     needApproval,
   ]);
 
+  // Check for address in url
   useEffect(() => {
-    const checkTokenAssociation = async (userId: string) => {
-      const tokens = await getUserAssociatedTokens(userId);
-      setUserAssociatedTokens(tokens);
-    };
+    try {
+      if (address && poolsData.length !== 0 && tokenDataList && !tokensDerivedFromPool) {
+        const chosenPool =
+          poolsData.find((pool: IPoolData) => pool.pairAddress === address) || ({} as IPoolData);
+        const { token0: token0Address, token1: token1Address } = chosenPool;
 
-    userId && checkTokenAssociation(userId);
-  }, [userId]);
+        // Check if one of tokens is WHBAR - to be switched for HBAR
+        const isTokenAWrappedHBAR =
+          token0Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+        const isTokenBWrappedHBAR =
+          token1Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+
+        const tokenA = isTokenAWrappedHBAR
+          ? NATIVE_TOKEN
+          : tokenDataList.find((token: ITokenData) => token.address === token0Address) ||
+            ({} as ITokenData);
+        const tokenB = isTokenBWrappedHBAR
+          ? NATIVE_TOKEN
+          : tokenDataList.find((token: ITokenData) => token.address === token1Address) ||
+            ({} as ITokenData);
+
+        if (tokenA.type !== TokenType.HBAR) {
+          setNeedApproval(true);
+        }
+        setTokensData({ tokenA, tokenB });
+
+        //Fix for wrong ERC20 tokenA balance when prepopulate tokens data
+        setTimeout(async () => {
+          if (userId) {
+            const tokenABalance = await getTokenBalance(userId, tokenA);
+            const tokenBBalance = await getTokenBalance(userId, tokenB);
+            setTokenBalances({
+              tokenA: tokenABalance,
+              tokenB: tokenBBalance,
+            });
+          }
+        }, 500);
+
+        //We want to set the tokens from the pool selected just once
+        setTokensDerivedFromPool(true);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [poolsData, tokenDataList, address, tokensDerivedFromPool, userId]);
 
   //Render methods
   const getErrorMessage = () => {
@@ -532,9 +585,8 @@ const Swap = () => {
   const getSwapSection = () => {
     return (
       <div className="container-dark">
-        {getSuccessMessage()}
-
         <InputTokenSelector
+          isInvalid={getInsufficientTokenIn() as boolean}
           inputTokenComponent={
             <InputToken
               value={swapData.amountIn}
@@ -556,6 +608,7 @@ const Swap = () => {
           walletBalanceComponent={
             Object.keys(tokensData.tokenA).length > 0 ? (
               <WalletBalance
+                insufficientBallance={getInsufficientTokenIn() as boolean}
                 walletBalance={tokenBalances.tokenA}
                 onMaxButtonClick={(maxValue: string) => {
                   handleInputChange(maxValue, 'amountIn');
@@ -564,7 +617,7 @@ const Swap = () => {
             ) : null
           }
         />
-        <Modal show={showModalA}>
+        <Modal show={showModalA} closeModal={() => setShowModalA(false)}>
           <ModalSearchContent
             modalTitle="Select a token"
             tokenFieldId="tokenA"
@@ -591,7 +644,7 @@ const Swap = () => {
           />
         </Modal>
 
-        <div onClick={switchTokens} className="text-center my-4">
+        <div onClick={handleSwitchTokens} className="text-center my-4">
           <Icon className="cursor-pointer" name="swap" color="gradient" />
         </div>
 
@@ -620,7 +673,7 @@ const Swap = () => {
             ) : null
           }
         />
-        <Modal show={showModalB}>
+        <Modal show={showModalB} closeModal={() => setShowModalB(false)}>
           <ModalSearchContent
             modalTitle="Select token"
             tokenFieldId="tokenB"
@@ -658,19 +711,24 @@ const Swap = () => {
     return willWrapTokens ? 'wrap' : willUnwrapTokens ? 'unwrap' : 'swap';
   };
 
-  const getTokenIsAssociated = () => {
-    const { tokenB } = tokensData;
-    const notHTS = tokenB.type === TokenType.HBAR || tokenB.type === TokenType.ERC20;
-    return notHTS || userAssociatedTokens?.includes(tokensData.tokenB.hederaId);
+  const getTokenIsAssociated = (token: ITokenData) => {
+    const notHTS =
+      Object.keys(token).length === 0 ||
+      token.type === TokenType.HBAR ||
+      token.type === TokenType.ERC20;
+    return notHTS || userAssociatedTokens?.includes(token.hederaId);
   };
 
   const getSwapButtonDisabledState = () => {
-    return !readyToSwap || !getTokenIsAssociated();
+    const { tokenA, tokenB } = tokensData;
+    return !readyToSwap || !getTokenIsAssociated(tokenA) || !getTokenIsAssociated(tokenB);
   };
 
   const getActionButtons = () => {
+    const confirmationText = `Swapping ${swapData.amountIn} ${tokensData.tokenA.symbol} for ${swapData.amountOut} ${tokensData.tokenB.symbol}`;
+
     return extensionFound ? (
-      connected ? (
+      connected && !isHashpackLoading ? (
         <>
           {loadingPools ? (
             <div className="d-flex justify-content-center mt-4">
@@ -678,7 +736,32 @@ const Swap = () => {
             </div>
           ) : (
             <>
-              {readyToApprove && needApproval && !approved ? (
+              {!getTokenIsAssociated(tokensData.tokenA) ? (
+                <div className="d-grid mt-4">
+                  <Button
+                    loading={loadingAssociate}
+                    onClick={() => handleAssociateClick(tokensData.tokenA)}
+                  >
+                    {`Associate ${tokensData.tokenA.symbol}`}
+                  </Button>
+                </div>
+              ) : null}
+
+              {!getTokenIsAssociated(tokensData.tokenB) ? (
+                <div className="d-grid mt-4">
+                  <Button
+                    loading={loadingAssociate}
+                    onClick={() => handleAssociateClick(tokensData.tokenB)}
+                  >
+                    {`Associate ${tokensData.tokenB.symbol}`}
+                  </Button>
+                </div>
+              ) : null}
+
+              {readyToApprove &&
+              needApproval &&
+              !approved &&
+              getTokenIsAssociated(tokensData.tokenA) ? (
                 <div className="d-grid mt-4">
                   <Button
                     loading={loadingApprove}
@@ -686,18 +769,6 @@ const Swap = () => {
                     onClick={() => handleApproveClick()}
                   >
                     {`Approve ${tokensData.tokenA.symbol}`}
-                  </Button>
-                </div>
-              ) : null}
-
-              {readyToAssociate && !getTokenIsAssociated() ? (
-                <div className="d-grid mt-4">
-                  <Button
-                    loading={loadingAssociate}
-                    disabled={!readyToAssociate}
-                    onClick={() => handleAssociateClick()}
-                  >
-                    Associate token
                   </Button>
                 </div>
               ) : null}
@@ -715,61 +786,58 @@ const Swap = () => {
           )}
 
           {showModalConfirmSwap ? (
-            <Modal show={showModalConfirmSwap}>
+            <Modal show={showModalConfirmSwap} closeModal={() => setShowModalConfirmSwap(false)}>
               <ConfirmTransactionModalContent
                 modalTitle="Confirm swap"
                 closeModal={() => setShowModalConfirmSwap(false)}
                 confirmTansaction={handleSwapConfirm}
                 confirmButtonLabel="Confirm swap"
+                isLoading={loadingSwap}
               >
-                <InputTokenSelector
-                  inputTokenComponent={<InputToken value={swapData.amountIn} disabled={true} />}
-                  buttonSelectorComponent={
-                    <ButtonSelector
-                      selectedToken={tokensData?.tokenA.symbol}
-                      selectorText="Select token"
-                      disabled={true}
+                {loadingSwap ? (
+                  <Confirmation confirmationText={confirmationText} />
+                ) : (
+                  <>
+                    <InputTokenSelector
+                      readonly={true}
+                      inputTokenComponent={<InputToken value={swapData.amountIn} disabled={true} />}
+                      buttonSelectorComponent={
+                        <ButtonSelector
+                          selectedToken={tokensData?.tokenA.symbol}
+                          selectorText="Select token"
+                          disabled={true}
+                        />
+                      }
                     />
-                  }
-                />
-                <InputTokenSelector
-                  className="mt-5"
-                  inputTokenComponent={<InputToken value={swapData.amountOut} disabled={true} />}
-                  buttonSelectorComponent={
-                    <ButtonSelector
-                      selectedToken={tokensData?.tokenB.symbol}
-                      selectorText="Select token"
-                      disabled={true}
+                    <InputTokenSelector
+                      readonly={true}
+                      className="mt-5"
+                      inputTokenComponent={
+                        <InputToken value={swapData.amountOut} disabled={true} />
+                      }
+                      buttonSelectorComponent={
+                        <ButtonSelector
+                          selectedToken={tokensData?.tokenB.symbol}
+                          selectorText="Select token"
+                          disabled={true}
+                        />
+                      }
                     />
-                  }
-                />
-                {getTokensRatio()}
-                {getAdvancedSwapInfo()}
+                    {getTokensRatio()}
+                    {getAdvancedSwapInfo()}
+                  </>
+                )}
               </ConfirmTransactionModalContent>
             </Modal>
           ) : null}
         </>
       ) : (
         <div className="d-grid mt-4">
-          <Button onClick={() => connectWallet()}>Connect wallet</Button>
+          <Button disabled={isHashpackLoading} onClick={() => setShowConnectModal(true)}>
+            Connect wallet
+          </Button>
         </div>
       )
-    ) : null;
-  };
-
-  const getSuccessMessage = () => {
-    return successSwap ? (
-      <div className="alert alert-success alert-dismissible mb-5" role="alert">
-        <strong>Success swap!</strong>
-        <p>{successMessage}</p>
-        <button
-          onClick={() => setSuccessSwap(false)}
-          type="button"
-          className="btn-close"
-          data-bs-dismiss="alert"
-          aria-label="Close"
-        ></button>
-      </div>
     ) : null;
   };
 
@@ -788,7 +856,9 @@ const Swap = () => {
       <div
         className="text-small mt-4 cursor-pointer"
         onClick={() => setRatioBasedOnTokenOut(!ratioBasedOnTokenOut)}
-      >{`1 ${baseTokenName} = ${ratio} ${secondTokenName}`}</div>
+      >{`1 ${baseTokenName} = ${formatStringETHtoPriceFormatted(
+        ratio.toString(),
+      )} ${secondTokenName}`}</div>
     );
   };
 
@@ -827,7 +897,9 @@ const Swap = () => {
         <div className="mt-4 rounded border border-secondary">
           <div className="d-flex justify-content-between m-4">
             <span className="text-small">Expected Output:</span>
-            <span className="text-small text-numeric text-bold">{`${swapData.amountOut} ${tokensData.tokenB.symbol}`}</span>
+            <span className="text-small text-numeric text-bold">{`${formatStringETHtoPriceFormatted(
+              swapData.amountOut,
+            )} ${tokensData.tokenB.symbol}`}</span>
           </div>
           {/* <div className="d-flex justify-content-between m-4">
             <span className="text-small">Price Impact:</span>
@@ -841,7 +913,9 @@ const Swap = () => {
               {amountAfterSlippageMessage} ({getTransactionSettings().swapSlippage}%)
             </span>
 
-            <span className="text-small text-numeric text-bold">{`${amountAfterSlippageStr} ${secondTokenName}`}</span>
+            <span className="text-small text-numeric text-bold">{`${formatStringETHtoPriceFormatted(
+              amountAfterSlippageStr,
+            )} ${secondTokenName}`}</span>
           </div>
         </div>
         <p className="text-micro text-secondary mt-5">{estimationMessage}</p>

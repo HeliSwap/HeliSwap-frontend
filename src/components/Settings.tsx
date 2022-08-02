@@ -50,7 +50,10 @@ const Settings = ({ slippage }: ISettingsProps) => {
         <Icon name="settings" />
       </div>
       {showModalTransactionSettings ? (
-        <Modal show={showModalTransactionSettings}>
+        <Modal
+          show={showModalTransactionSettings}
+          closeModal={() => setShowModalTransactionSettings(false)}
+        >
           <TransactionSettingsModalContent
             modalTitle="Transaction settings"
             closeModal={() => setShowModalTransactionSettings(false)}

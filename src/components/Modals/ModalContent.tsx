@@ -1,11 +1,11 @@
 import React from 'react';
 
-interface IModalProps {
+interface IModalContentProps {
   closeModal: () => void;
   modalTitle?: string;
 }
 
-const ModalContent = ({ closeModal, modalTitle }: IModalProps) => {
+const ModalContent = ({ closeModal, modalTitle }: IModalContentProps) => {
   return (
     <>
       <div className="modal-header">

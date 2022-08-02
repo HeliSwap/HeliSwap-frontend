@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { MAX_EXPIRATION_VALUE, MAX_SLIPPAGE_VALUE } from '../../constants';
 import Button from '../Button';
 
 interface IModalProps {
@@ -24,7 +25,11 @@ const TransactionSettingsModalContent = ({
 
   const handleSlippageToleranceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    setSlippageTollerance(parseFloat(value));
+    const parsedValue = parseFloat(value);
+
+    const isValid = !isNaN(parsedValue) && parsedValue <= MAX_SLIPPAGE_VALUE;
+
+    setSlippageTollerance(isValid ? parsedValue : defaultSlippageValue);
   };
 
   const handleSetDefaultSlippage = () => {
@@ -34,7 +39,11 @@ const TransactionSettingsModalContent = ({
 
   const handleExpirationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    setDeadline(parseFloat(value));
+    const parsedValue = parseFloat(value);
+
+    const isValid = !isNaN(parsedValue) && parsedValue <= MAX_EXPIRATION_VALUE;
+
+    setDeadline(isValid ? parsedValue : expiration);
   };
 
   const handleSaveChanges = () => {
@@ -88,7 +97,7 @@ const TransactionSettingsModalContent = ({
             <input
               className="form-control text-numeric form-control-sm"
               type={'number'}
-              defaultValue={deadline}
+              value={deadline}
               onChange={handleExpirationChange}
             />
             <span className="ms-3">minutes</span>

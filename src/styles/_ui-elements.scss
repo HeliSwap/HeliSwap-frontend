@@ -2,6 +2,10 @@
 .btn {
   text-transform: uppercase;
   letter-spacing: 0.5px;
+
+  &.btn-sm {
+    text-transform: none;
+  }
 }
 
 .btn-selector {
@@ -16,18 +20,18 @@
   }
 
   &.with-background {
-    background-color: $neutral-700;
+    background-color: $primary-700;
   }
 
   &.with-border {
-    border: 1px solid $neutral-400;
+    border: 1px solid $primary-400;
   }
 
   &:hover:not(.is-disabled) {
-    background-color: $neutral-500;
+    background-color: $primary-500;
 
     &.with-border {
-      border-color: $neutral-500;
+      border-color: $primary-500;
     }
   }
 }
@@ -38,12 +42,27 @@
   border-radius: $border-radius;
   font-size: 12px;
   line-height: 16px;
-  color: $neutral-100;
+  color: $primary-100;
   padding: 4px 12px;
   transition: background-color 0.15s linear;
 
   &.is-active {
     background-color: $primary-300;
+  }
+}
+
+.btn-connect-wallet {
+  background-color: $primary-700;
+  border-radius: $border-radius;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  cursor: pointer;
+  transition: background-color 0.15s linear;
+
+  &:hover {
+    background-color: $primary-500;
   }
 }
 
@@ -56,7 +75,7 @@
 
   &.is-gray {
     path {
-      fill: $neutral-400;
+      fill: $primary-400;
     }
   }
 
@@ -88,9 +107,28 @@
   }
 }
 
+.icon-healthcheck {
+  display: block;
+  width: 12px;
+  height: 12px;
+  background-color: $danger;
+  border-radius: 50%;
+
+  &.is-running {
+    background-color: #29bc63;
+  }
+}
+
+.icon-hashpack {
+  width: 26px;
+  height: 32px;
+  background-image: url('../../public/logo-hashpack.svg');
+}
+
 /* Containers */
 .container-connected {
-  background-color: $neutral-900;
+  background-color: $primary-700;
+  box-shadow: 0px 2px 16px rgba(0, 0, 0, 0.05);
   border-radius: $border-radius;
   padding: 3px 3px 3px 12px;
   display: flex;
@@ -98,45 +136,70 @@
 }
 
 .container-address {
-  background-color: $neutral-700;
+  background-color: $primary-500;
   border-radius: 2px;
   padding: 4px 8px;
   margin-left: 12px;
+  cursor: pointer;
+  transition: background-color 0.15s linear;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    background-color: $primary-600;
+  }
 }
 
 .container-dark {
-  background-color: $neutral-900;
+  background-color: $primary-950;
   box-shadow: 0px 5px 20px rgba(9, 10, 20, 0.45);
   padding: 16px;
   border-radius: 6px;
 }
 
+.container-rounded-dark {
+  background-color: #25255f;
+  border-radius: $border-radius;
+  padding: 16px;
+}
+
 .container-input-token {
-  height: 108px;
-  background-color: $neutral-700;
+  background-color: $primary-700;
   border-radius: $border-radius;
   padding: 12px;
-  border: 1px solid $neutral-700;
+  border: 1px solid $primary-700;
   transition: border 0.15s linear;
 
-  &:focus-within,
-  &:hover {
-    border-color: $neutral-100;
+  &:not(.is-readonly) {
+    height: 108px;
+  }
+
+  &:focus-within:not(.is-readonly),
+  &:hover:not(.is-readonly) {
+    border-color: $primary-500;
+  }
+
+  &.is-invalid {
+    border-color: $danger;
   }
 
   .input-token {
-    color: $neutral-300;
+    color: $primary-100;
     font-family: $font-family-numeric;
     font-size: 28px;
     line-height: 40px;
-    background-color: $neutral-700;
+    background-color: $primary-700;
     border: none;
     max-width: 250px;
     flex: 0 1 250px;
     @include transition-color;
 
+    &::placeholder {
+      color: $primary-100;
+    }
+
     &:focus {
-      color: $neutral-100;
+      color: $primary-100;
     }
 
     &:focus-visible {
@@ -158,21 +221,23 @@
 }
 
 .container-pool-details {
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid $neutral-400;
-
-  &.is-gray {
-    background-color: $neutral-700;
-  }
+  padding: 0 20px 20px 20px;
+  background-color: #1f1f4d;
+  border-bottom: 1px solid $primary-500;
 }
 
-.container-neutral-500 {
-  background-color: $neutral-500;
+.container-transparent-border {
   padding: 18px 12px;
   border-radius: $border-radius;
+  border: 1px solid #3d3d58;
+}
+
+.container-loader {
+  width: 80px;
+  height: 80px;
+  background-image: url('../../public/loader.svg');
+  background-repeat: no-repeat;
+  animation: 0.75s linear infinite spinner-border;
 }
 
 /* Tables */
@@ -180,25 +245,31 @@
   display: grid;
   grid-auto-rows: auto;
   border-radius: 4px 4px 0px 0px;
-  background-color: $neutral-900;
+  background-color: $primary-800;
 
   .table-pools-row {
     display: grid;
     gap: 1em;
     grid-template-columns: 30px 3fr 1fr;
-    transition: box-shadow 0.1s linear;
+    transition: background-color 0.1s linear;
+    border-bottom: 1px solid $primary-500;
     cursor: pointer;
 
     &:hover {
-      box-shadow: inset 0px 0px 0px 1px $neutral-100;
+      background-color: #1f1f4d;
     }
 
-    &.with-4-columns {
-      grid-template-columns: 30px 2fr 1fr 1fr;
+    &:last-child {
+      border-bottom: none;
     }
 
-    &.is-gray {
-      background-color: $neutral-700;
+    &.with-6-columns {
+      grid-template-columns: 30px 2fr 1fr 1fr 1fr 1fr;
+    }
+
+    &.is-opened {
+      background-color: #1f1f4d;
+      border-bottom: none;
     }
 
     .table-pools-cell {
@@ -219,7 +290,6 @@
 }
 
 /* Not relevant */
-
 .container-pairs {
   background-color: $darkest;
   border-radius: 15px;
@@ -255,37 +325,14 @@
   }
 }
 
-.input-container {
-  position: relative;
-
-  .text-link-input {
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-}
-
-.container-token-selector {
-  padding: 6px 6px 6px 12px;
-  color: $input-color;
-  background-color: $darkest;
-  border: 1px solid $input-border-color;
-  border-radius: $border-radius;
-  font-size: $input-font-size;
-}
-
+// Lists
 .list-token-item {
   padding: 4px 8px;
   border-radius: $border-radius;
   transition: background-color 0.15s linear;
 
   &:hover {
-    background-color: $darkest;
-  }
-
-  &.is-selected {
-    background-color: $darkest;
+    background-color: $primary-700;
   }
 }
 
@@ -300,14 +347,21 @@
   @include transition-color;
 
   &.is-active {
-    color: $neutral-100;
+    color: $primary-100;
 
     &:after {
       content: '';
       display: block;
       height: 1px;
-      background-color: $neutral-100;
+      background-color: $primary-100;
       transform: translateY(17px);
     }
   }
+}
+
+// Images
+.img-profile {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
 }

@@ -14,8 +14,11 @@ const contextInitialValue = {
     connectWallet: () => {},
     disconnectWallet: () => {},
     hashconnectConnectorInstance: {} as Hashconnect,
+    showConnectModal: false,
+    setShowConnectModal: (show: boolean) => {},
   },
   isRunning: false,
+  lastUpdated: '',
 };
 
 export const GlobalContext = React.createContext(contextInitialValue);
@@ -31,11 +34,14 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
   const [extensionFound, setExtensionFound] = useState(false);
   const [hashconnectConnectorInstance, setHashconnectConnectorInstance] = useState<Hashconnect>();
   const [userId, setUserId] = useState('');
+  const [showConnectModal, setShowConnectModal] = useState(false);
 
   const { timestamp, error } = useHealthCheck({
     fetchPolicy: 'network-only',
     pollInterval: HEALTH_CHECK_INTERVAL,
   });
+
+  const lastUpdated = new Date(Number(timestamp) * 1000).toString();
 
   const nowSeconds = Date.now() / 1000;
   const isRunning = !error
@@ -62,8 +68,10 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
     connectWallet,
     disconnectWallet,
     hashconnectConnectorInstance: hashconnectConnectorInstance || ({} as Hashconnect),
+    showConnectModal,
+    setShowConnectModal,
   };
-  const contextValue = { sdk, connection, isRunning };
+  const contextValue = { sdk, connection, isRunning, lastUpdated };
 
   useEffect(() => {
     const initHashconnectConnector = async () => {
@@ -72,6 +80,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
         setConnected,
         setUserId,
         setIsHashpackLoading,
+        setShowConnectModal,
       );
 
       await hashconnectConnector.initHashconnect();

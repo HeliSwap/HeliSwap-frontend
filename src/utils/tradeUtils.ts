@@ -1,4 +1,4 @@
-import { IPairData } from '../interfaces/tokens';
+import { IPoolData } from '../interfaces/tokens';
 import { formatStringToBigNumberEthersWei, formatStringToBigNumberWei } from './numberUtils';
 import { hethers, BigNumber } from '@hashgraph/hethers';
 import BN from 'bignumber.js';
@@ -11,7 +11,7 @@ interface BestTradeOptions {
 }
 
 interface Trade {
-  pools: IPairData[];
+  pools: IPoolData[];
   currencyIn: string;
   currencyOut: string;
   amountIn: string;
@@ -20,13 +20,13 @@ interface Trade {
 }
 
 export const getPossibleTradesExactIn = (
-  pools: IPairData[],
+  pools: IPoolData[],
   amountIn: string,
   currencyIn: string,
   currencyOut: string,
   applyFees: boolean,
   { maxNumResults = 3, maxHops = 3 }: BestTradeOptions = {},
-  currentPools: IPairData[] = [],
+  currentPools: IPoolData[] = [],
   nextAmountIn: string = amountIn,
   nextCurrencyIn: string = currencyIn,
   possibleTrades: Trade[] = [],
@@ -74,13 +74,13 @@ export const getPossibleTradesExactIn = (
 };
 
 export const getPossibleTradesExactOut = (
-  pools: IPairData[],
+  pools: IPoolData[],
   amountOut: string,
   currencyIn: string,
   currencyOut: string,
   applyFees: boolean,
   { maxNumResults = 3, maxHops = 3 }: BestTradeOptions = {},
-  currentPools: IPairData[] = [],
+  currentPools: IPoolData[] = [],
   nextAmountOut: string = amountOut,
   nextCurrencyOut: string = currencyOut,
   possibleTrades: Trade[] = [],
@@ -139,7 +139,7 @@ export const getPossibleTradesExactOut = (
   return possibleTrades;
 };
 
-const getPath = (poolsArray: IPairData[], startingCurreny: string) => {
+const getPath = (poolsArray: IPoolData[], startingCurreny: string) => {
   const path = [startingCurreny];
 
   for (let index = 0; index < poolsArray.length; index++) {
@@ -237,7 +237,7 @@ const getSwapAmountIn = (
 const getAmountOut = (
   amountIn: string,
   tokenInFirstAtPool: boolean,
-  pool: IPairData,
+  pool: IPoolData,
   applyFees: boolean,
 ) => {
   const { token0Amount, token1Amount, token0Decimals, token1Decimals } = pool;
@@ -254,7 +254,7 @@ const getAmountOut = (
 const getAmountIn = (
   amountOut: string,
   tokenOutFirstAtPool: boolean,
-  pool: IPairData,
+  pool: IPoolData,
   applyFees: boolean,
 ) => {
   const { token0Amount, token1Amount, token0Decimals, token1Decimals } = pool;

@@ -1,5 +1,6 @@
 import React from 'react';
-import HBAR from '../icons/tokens/HBAR.svg';
+import HBAR from '../icons/tokens/HBAR.png';
+import WHBAR from '../icons/tokens/WHBAR.png';
 import ETH from '../icons/tokens/ETH.svg';
 import unknown from '../icons/tokens/unknown.svg';
 
@@ -30,7 +31,7 @@ const tokenMapping: ITokenMapping = {
   USDT: USDT,
   WBTC: WBTC,
   WETH: ETH,
-  WHBAR: HBAR,
+  WHBAR: WHBAR,
   LP: HBAR,
 };
 

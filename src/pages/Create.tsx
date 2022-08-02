@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
-import { useParams } from 'react-router-dom';
 import {
   ITokenData,
   TokenType,
-  IPairData,
+  IPoolData,
   ICreatePairData,
   ITokensData,
   IfaceInitialBalanceData,
@@ -23,7 +22,13 @@ import ButtonSelector from '../components/ButtonSelector';
 import WalletBalance from '../components/WalletBalance';
 
 import errorMessages from '../content/errors';
-import { checkAllowanceHTS, getTokenBalance, idToAddress, NATIVE_TOKEN } from '../utils/tokenUtils';
+import {
+  checkAllowanceHTS,
+  getTokenBalance,
+  idToAddress,
+  NATIVE_TOKEN,
+  getUserAssociatedTokens,
+} from '../utils/tokenUtils';
 import {
   formatStringETHtoPriceFormatted,
   formatStringToBigNumberEthersWei,
@@ -37,6 +42,7 @@ import { MAX_UINT_ERC20, MAX_UINT_HTS, POOLS_FEE, REFRESH_TIME } from '../consta
 import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
 import { formatIcons } from '../utils/iconUtils';
 import IconToken from '../components/IconToken';
+import Confirmation from '../components/Confirmation';
 
 enum ADD_LIQUIDITY_TITLES {
   CREATE_POOL = 'Create pool',
@@ -47,7 +53,8 @@ enum ADD_LIQUIDITY_TITLES {
 const Create = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
-  const { userId, hashconnectConnectorInstance, connected, connectWallet } = connection;
+  const { userId, hashconnectConnectorInstance, connected, connectWallet, isHashpackLoading } =
+    connection;
   const { address } = useParams();
   const navigate = useNavigate();
 
@@ -64,6 +71,9 @@ const Create = () => {
   // State for token inputs
   const [tokensData, setTokensData] = useState<ITokensData>(initialTokensData);
   const [inputTokenA, setInputTokenA] = useState(true);
+  const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
+  const [loadingAssociate, setLoadingAssociate] = useState(false);
+
   // State for pools
   const { pools: poolsData } = usePools({
     fetchPolicy: 'network-only',
@@ -103,7 +113,7 @@ const Create = () => {
   const [needApproval, setNeedApproval] = useState(initialNeedApprovalData);
 
   // State for common pool data
-  const [selectedPoolData, setSelectedPoolData] = useState<IPairData>({} as IPairData);
+  const [selectedPoolData, setSelectedPoolData] = useState<IPoolData>({} as IPoolData);
 
   // State for token balances
   const initialBallanceData = useMemo(
@@ -125,8 +135,6 @@ const Create = () => {
   // State for general error
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [successCreate, setSuccessCreate] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
 
@@ -159,7 +167,7 @@ const Create = () => {
   }, [tokenBalances, createPairData]);
 
   const handleInputChange = useCallback(
-    (value: string, name: string, inputSelectedPoolData: IPairData = selectedPoolData) => {
+    (value: string, name: string, inputSelectedPoolData: IPoolData = selectedPoolData) => {
       const { tokenA, tokenB } = tokensData;
       const inputToken = name === 'tokenAAmount' ? tokenA : tokenB;
       setInputTokenA(name === 'tokenAAmount');
@@ -223,6 +231,35 @@ const Create = () => {
     [invalidTokenData, selectedPoolData, tokensData, tokensInSamePool],
   );
 
+  const handleAssociateClick = async (token: ITokenData) => {
+    setLoadingAssociate(true);
+
+    try {
+      const receipt = await sdk.associateToken(
+        hashconnectConnectorInstance,
+        userId,
+        token.hederaId,
+      );
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (!success) {
+        setError(true);
+        setErrorMessage(error);
+      } else {
+        const tokens = await getUserAssociatedTokens(userId);
+        setUserAssociatedTokens(tokens);
+      }
+    } catch (err) {
+      console.error(err);
+      setError(true);
+      setErrorMessage('Error on associate');
+    } finally {
+      setLoadingAssociate(false);
+    }
+  };
+
   const handleApproveClick = async (key: string) => {
     const { hederaId, type } = tokensData[key];
     const amount = type === TokenType.ERC20 ? MAX_UINT_ERC20.toString() : MAX_UINT_HTS.toString();
@@ -235,6 +272,7 @@ const Create = () => {
         amount,
         userId,
         hederaId,
+        type === TokenType.HTS,
       );
       const {
         response: { success, error },
@@ -264,8 +302,6 @@ const Create = () => {
 
     setError(false);
     setErrorMessage('');
-    setSuccessCreate(false);
-    setSuccessMessage('');
     setLoadingCreate(true);
 
     try {
@@ -276,6 +312,7 @@ const Create = () => {
             createPairData,
             provideSlippage,
             transactionExpiration,
+            tokensInSamePool,
           )
         : await sdk.addLiquidity(
             hashconnectConnectorInstance,
@@ -283,6 +320,7 @@ const Create = () => {
             createPairData,
             provideSlippage,
             transactionExpiration,
+            tokensInSamePool,
           );
       const {
         response: { success, error },
@@ -292,11 +330,7 @@ const Create = () => {
         setError(true);
         setErrorMessage(error);
       } else {
-        const successMessage = `Provided exactly ${createPairData.tokenAAmount} ${tokensData.tokenA.symbol} and ${createPairData.tokenBAmount} ${tokensData.tokenB.symbol}`;
-
         setCreatePairData({ ...createPairData, tokenAAmount: '', tokenBAmount: '' });
-        setSuccessCreate(true);
-        setSuccessMessage(successMessage);
         setReadyToProvide(false);
       }
     } catch (err) {
@@ -305,6 +339,7 @@ const Create = () => {
       setErrorMessage('Error on create');
     } finally {
       setLoadingCreate(false);
+      setShowModalConfirmProvide(false);
     }
   };
 
@@ -312,6 +347,7 @@ const Create = () => {
     navigate('/pools');
   };
 
+  // Check for allowance and approvals
   useEffect(() => {
     const getAllowanceHTS = async (userId: string, token: ITokenData, index: string) => {
       const key = `${index}Amount`;
@@ -348,6 +384,17 @@ const Create = () => {
     };
   }, [tokensData, sdk, userId, createPairData]);
 
+  // Check for associations
+  useEffect(() => {
+    const checkTokenAssociation = async (userId: string) => {
+      const tokens = await getUserAssociatedTokens(userId);
+      setUserAssociatedTokens(tokens);
+    };
+
+    userId && checkTokenAssociation(userId);
+  }, [userId]);
+
+  // Check for balances
   useEffect(() => {
     const getTokenBalances = async () => {
       if (userId) {
@@ -376,8 +423,12 @@ const Create = () => {
     getTokenBalances();
   }, [tokensData, userId, initialBallanceData]);
 
+  // Check for native tokens
   useEffect(() => {
     const { tokenA, tokenB } = tokensData;
+    const poolsDataLoaded = poolsData.length !== 0;
+    const tokenASelected = Object.keys(tokensData.tokenA).length !== 0;
+    const tokenBSelected = Object.keys(tokensData.tokenB).length !== 0;
 
     const tokenAIsNative = tokenA.type === TokenType.HBAR;
     const tokenBIsNative = tokenB.type === TokenType.HBAR;
@@ -385,9 +436,9 @@ const Create = () => {
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
 
     const selectedPoolData =
-      (poolsData &&
-        poolsData.length > 0 &&
-        poolsData.filter((pool: any) => {
+      (poolsDataLoaded &&
+        !invalidTokenData() &&
+        poolsData.filter((pool: IPoolData) => {
           let poolMatchedBothTokens = false;
 
           const poolContainsToken = (tokenAddres: string) => {
@@ -419,9 +470,64 @@ const Create = () => {
       : ADD_LIQUIDITY_TITLES.CREATE_POOL;
 
     setPageTitle(pageTitle);
-    //TODO: Additional request will be needed in order to get info regarding pool shares
-  }, [tokensData, poolsData]);
 
+    //Set selected pool address in the URL
+    if (poolsDataLoaded && tokenASelected && tokenBSelected) {
+      navigate(`/create/${selectedPoolData[0] ? selectedPoolData[0].pairAddress : ''}`);
+    }
+    //TODO: Additional request will be needed in order to get info regarding pool shares
+  }, [tokensData, poolsData, navigate, invalidTokenData]);
+
+  // Check for address in url
+  useEffect(() => {
+    try {
+      if (address && poolsData.length !== 0 && tokenDataList && !tokensDerivedFromPool) {
+        const chosenPool =
+          poolsData.find((pool: IPoolData) => pool.pairAddress === address) || ({} as IPoolData);
+        const { token0: token0Address, token1: token1Address } = chosenPool;
+
+        // Check if one of tokens is WHBAR - to be switched for HBAR
+        const isTokenAWrappedHBAR =
+          token0Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+        const isTokenBWrappedHBAR =
+          token1Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+
+        const tokenA = isTokenAWrappedHBAR
+          ? NATIVE_TOKEN
+          : tokenDataList.find((token: ITokenData) => token.address === token0Address) ||
+            ({} as ITokenData);
+        const tokenB = isTokenBWrappedHBAR
+          ? NATIVE_TOKEN
+          : tokenDataList.find((token: ITokenData) => token.address === token1Address) ||
+            ({} as ITokenData);
+
+        setTokensData({ tokenA, tokenB });
+        //We want to set the tokens from the pool selected just once
+        setTokensDerivedFromPool(true);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [poolsData, tokenDataList, address, tokensDerivedFromPool]);
+
+  // Cache input values
+  useEffect(() => {
+    //Update inputs data on poolsData and tokensDataChange
+    const inputName = inputTokenA ? 'tokenAAmount' : 'tokenBAmount';
+    const inputValue = inputTokenA ? tokenAValue : tokenBValue;
+
+    handleInputChange(inputValue, inputName, selectedPoolData || {});
+  }, [
+    poolsData,
+    tokensData,
+    selectedPoolData,
+    handleInputChange,
+    inputTokenA,
+    tokenAValue,
+    tokenBValue,
+  ]);
+
+  // Final check before create
   useEffect(() => {
     //TODO: rafactor this function
     let isReady = true;
@@ -458,52 +564,13 @@ const Create = () => {
     tokensData,
   ]);
 
-  useEffect(() => {
-    try {
-      if (address && poolsData && tokenDataList && !tokensDerivedFromPool) {
-        const chosenPool =
-          poolsData.find((pool: IPairData) => pool.pairAddress === address) || ({} as IPairData);
-        const { token0: token0Address, token1: token1Address } = chosenPool;
-
-        // Check if one of tokens is WHBAR - to be switched for HBAR
-        const isTokenAWrappedHBAR =
-          token0Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
-        const isTokenBWrappedHBAR =
-          token1Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
-
-        const tokenA = isTokenAWrappedHBAR
-          ? NATIVE_TOKEN
-          : tokenDataList.find((token: ITokenData) => token.address === token0Address) ||
-            ({} as ITokenData);
-        const tokenB = isTokenBWrappedHBAR
-          ? NATIVE_TOKEN
-          : tokenDataList.find((token: ITokenData) => token.address === token1Address) ||
-            ({} as ITokenData);
-
-        setTokensData({ tokenA, tokenB });
-        //We want to set the tokens from the pool selected just once
-        setTokensDerivedFromPool(true);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }, [poolsData, tokenDataList, address, tokensDerivedFromPool]);
-
-  useEffect(() => {
-    //Update inputs data on poolsData and tokensDataChange
-    const inputName = inputTokenA ? 'tokenAAmount' : 'tokenBAmount';
-    const inputValue = inputTokenA ? tokenAValue : tokenBValue;
-
-    handleInputChange(inputValue, inputName, selectedPoolData || {});
-  }, [
-    poolsData,
-    tokensData,
-    selectedPoolData,
-    handleInputChange,
-    inputTokenA,
-    tokenAValue,
-    tokenBValue,
-  ]);
+  const getTokenIsAssociated = (token: ITokenData) => {
+    const notHTS =
+      Object.keys(token).length === 0 ||
+      token.type === TokenType.HBAR ||
+      token.type === TokenType.ERC20;
+    return notHTS || userAssociatedTokens?.includes(token.hederaId);
+  };
 
   //Render methods
   const getErrorMessage = () => {
@@ -518,23 +585,10 @@ const Create = () => {
   const getProvideSection = () => {
     return (
       <div className="container-dark">
-        {successCreate ? (
-          <div className="alert alert-success alert-dismissible my-5" role="alert">
-            <strong>Success provide!</strong>
-            <p>{successMessage}</p>
-            <button
-              onClick={() => setSuccessCreate(false)}
-              type="button"
-              className="btn-close"
-              data-bs-dismiss="alert"
-              aria-label="Close"
-            ></button>
-          </div>
-        ) : null}
-
         {getFeesInfo()}
         <div className="mb-4 text-small text-bold">Enter amount</div>
         <InputTokenSelector
+          isInvalid={getInsufficientTokenA() as boolean}
           inputTokenComponent={
             <InputToken
               value={createPairData.tokenAAmount}
@@ -554,15 +608,18 @@ const Create = () => {
             />
           }
           walletBalanceComponent={
-            <WalletBalance
-              walletBalance={tokenBalances.tokenA}
-              onMaxButtonClick={(maxValue: string) => {
-                handleInputChange(maxValue, 'tokenAAmount');
-              }}
-            />
+            Object.keys(tokensData.tokenA).length > 0 ? (
+              <WalletBalance
+                insufficientBallance={getInsufficientTokenA() as boolean}
+                walletBalance={tokenBalances.tokenA}
+                onMaxButtonClick={(maxValue: string) => {
+                  handleInputChange(maxValue, 'tokenAAmount');
+                }}
+              />
+            ) : null
           }
         />
-        <Modal show={showModalA}>
+        <Modal show={showModalA} closeModal={() => setShowModalA(false)}>
           <ModalSearchContent
             modalTitle="Select a token"
             tokenFieldId="tokenA"
@@ -581,6 +638,7 @@ const Create = () => {
         </Modal>
 
         <InputTokenSelector
+          isInvalid={getInsufficientTokenB() as boolean}
           className="mt-4"
           inputTokenComponent={
             <InputToken
@@ -601,15 +659,18 @@ const Create = () => {
             />
           }
           walletBalanceComponent={
-            <WalletBalance
-              walletBalance={tokenBalances.tokenB}
-              onMaxButtonClick={(maxValue: string) => {
-                handleInputChange(maxValue, 'tokenBAmount');
-              }}
-            />
+            Object.keys(tokensData.tokenB).length > 0 ? (
+              <WalletBalance
+                insufficientBallance={getInsufficientTokenB() as boolean}
+                walletBalance={tokenBalances.tokenB}
+                onMaxButtonClick={(maxValue: string) => {
+                  handleInputChange(maxValue, 'tokenBAmount');
+                }}
+              />
+            ) : null
           }
         />
-        <Modal show={showModalB}>
+        <Modal show={showModalB} closeModal={() => setShowModalB(false)}>
           <ModalSearchContent
             modalTitle="Select token"
             tokenFieldId="tokenB"
@@ -641,11 +702,6 @@ const Create = () => {
       </div>
     );
   };
-
-  const tokenBARatio = Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount);
-  const tokenABRatio = Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount);
-  const tokenBARatioFormatted = formatStringETHtoPriceFormatted(tokenBARatio.toString());
-  const tokenABRatioFormatted = formatStringETHtoPriceFormatted(tokenABRatio.toString());
 
   const getTokensRatioSection = () => {
     return readyToProvide ? (
@@ -713,12 +769,35 @@ const Create = () => {
   };
 
   const getActionButtons = () => {
-    return connected ? (
+    return connected && !isHashpackLoading ? (
       <div className="mt-5">
+        {!getTokenIsAssociated(tokensData.tokenA) ? (
+          <div className="d-grid mt-4">
+            <Button
+              loading={loadingAssociate}
+              onClick={() => handleAssociateClick(tokensData.tokenA)}
+            >
+              {`Associate ${tokensData.tokenA.symbol}`}
+            </Button>
+          </div>
+        ) : null}
+
+        {!getTokenIsAssociated(tokensData.tokenB) ? (
+          <div className="d-grid mt-4">
+            <Button
+              loading={loadingAssociate}
+              onClick={() => handleAssociateClick(tokensData.tokenB)}
+            >
+              {`Associate ${tokensData.tokenB.symbol}`}
+            </Button>
+          </div>
+        ) : null}
+
         {tokensData.tokenA.hederaId &&
         needApproval.tokenA &&
         !approved.tokenA &&
-        createPairData.tokenAAmount ? (
+        createPairData.tokenAAmount &&
+        getTokenIsAssociated(tokensData.tokenA) ? (
           <div className="d-grid mt-4">
             <Button
               loading={loadingApprove}
@@ -730,7 +809,8 @@ const Create = () => {
         {tokensData.tokenB.hederaId &&
         needApproval.tokenB &&
         !approved.tokenB &&
-        createPairData.tokenBAmount ? (
+        createPairData.tokenBAmount &&
+        getTokenIsAssociated(tokensData.tokenB) ? (
           <div className="d-grid mt-4">
             <Button
               loading={loadingApprove}
@@ -746,8 +826,12 @@ const Create = () => {
         </div>
 
         {showModalConfirmProvide ? (
-          <Modal show={showModalConfirmProvide}>
+          <Modal
+            show={showModalConfirmProvide}
+            closeModal={() => setShowModalConfirmProvide(false)}
+          >
             <ConfirmTransactionModalContent
+              isLoading={loadingCreate}
               modalTitle={pageTitle}
               closeModal={() => setShowModalConfirmProvide(false)}
               confirmTansaction={handleProvideConfirm}
@@ -760,7 +844,9 @@ const Create = () => {
       </div>
     ) : (
       <div className="d-grid mt-4">
-        <Button onClick={() => connectWallet()}>Connect wallet</Button>
+        <Button disabled={isHashpackLoading} onClick={() => connectWallet()}>
+          Connect wallet
+        </Button>
       </div>
     );
   };
@@ -769,44 +855,56 @@ const Create = () => {
     const hasSelectedPool = Object.keys(selectedPoolData).length;
     const token0Symbol = hasSelectedPool ? selectedPoolData.token0Symbol : tokensData.tokenA.symbol;
     const token1Symbol = hasSelectedPool ? selectedPoolData.token1Symbol : tokensData.tokenB.symbol;
+
+    const confirmationText = `Providing ${createPairData.tokenAAmount} ${token0Symbol} and ${createPairData.tokenBAmount} ${token1Symbol}`;
+
     return (
       <>
-        <div className="d-flex align-items-center">
-          {formatIcons([token0Symbol, token1Symbol], 'large')}
-          <p className="text-subheader ms-3">
-            {token0Symbol}/{token1Symbol}
-          </p>
-        </div>
-
-        <div className="mt-4 rounded border border-secondary justify-content-between ">
-          <div className="d-flex justify-content-between align-items-center m-4">
+        {loadingCreate ? (
+          <Confirmation confirmationText={confirmationText} />
+        ) : (
+          <>
             <div className="d-flex align-items-center">
-              <IconToken symbol={token0Symbol} />
-              <span className="text-main ms-3">{token0Symbol}</span>
+              {formatIcons([token0Symbol, token1Symbol], 'large')}
+              <p className="text-subheader ms-3">
+                {token0Symbol}/{token1Symbol}
+              </p>
             </div>
+            <div className="mt-4 rounded border border-secondary justify-content-between ">
+              <div className="d-flex justify-content-between align-items-center m-4">
+                <div className="d-flex align-items-center">
+                  <IconToken symbol={token0Symbol} />
+                  <span className="text-main ms-3">{token0Symbol}</span>
+                </div>
 
-            <div className="d-flex justify-content-end align-items-center">
-              <span className="text-numeric text-main">{createPairData.tokenAAmount}</span>
-            </div>
-          </div>
-          <div className="d-flex justify-content-between align-items-center m-4">
-            <div className="d-flex align-items-center">
-              <IconToken symbol={token1Symbol} />
-              <span className="text-main ms-3">{token1Symbol}</span>
-            </div>
+                <div className="d-flex justify-content-end align-items-center">
+                  <span className="text-numeric text-main">{createPairData.tokenAAmount}</span>
+                </div>
+              </div>
+              <div className="d-flex justify-content-between align-items-center m-4">
+                <div className="d-flex align-items-center">
+                  <IconToken symbol={token1Symbol} />
+                  <span className="text-main ms-3">{token1Symbol}</span>
+                </div>
 
-            <div className="d-flex justify-content-end align-items-center">
-              <span className="text-numeric text-main">{createPairData.tokenBAmount}</span>
+                <div className="d-flex justify-content-end align-items-center">
+                  <span className="text-numeric text-main">{createPairData.tokenBAmount}</span>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-
-        <div className="mt-4 rounded border border-secondary justify-content-between ">
-          {getTokensRatioSection()}
-        </div>
+            <div className="mt-4 rounded border border-secondary justify-content-between ">
+              {getTokensRatioSection()}
+            </div>
+          </>
+        )}
       </>
     );
   };
+
+  const tokenBARatio = Number(createPairData.tokenBAmount) / Number(createPairData.tokenAAmount);
+  const tokenABRatio = Number(createPairData.tokenAAmount) / Number(createPairData.tokenBAmount);
+  const tokenBARatioFormatted = formatStringETHtoPriceFormatted(tokenBARatio.toString());
+  const tokenABRatioFormatted = formatStringETHtoPriceFormatted(tokenABRatio.toString());
 
   return (
     <div className="d-flex justify-content-center">

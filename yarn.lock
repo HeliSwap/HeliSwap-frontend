@@ -9287,6 +9287,11 @@ ts-invariant@^0.10.3:
   dependencies:
     tslib "^2.1.0"
 
+ts-md5@^1.2.11:
+  version "1.2.11"
+  resolved "https://registry.yarnpkg.com/ts-md5/-/ts-md5-1.2.11.tgz#0bbdf884eecf7da3952fe8671a109d7e55d322c6"
+  integrity sha512-vAwy9rEuRE6a8xa1MavIVkLFyyU0ydk4CLMFA5vOVccmQKLOuGb/BHm3oEN7XHf2FoqS+z0pSvhaad/ombd1Vg==
+
 ts-typed-events@3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/ts-typed-events/-/ts-typed-events-3.0.0.tgz#2f9d96ff962edfc936402c859370337373880faa"

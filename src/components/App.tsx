@@ -12,6 +12,7 @@ import Tokens from '../pages/Tokens';
 import Styleguide from '../pages/Styleguide';
 
 import Header from './Header';
+import Footer from './Footer';
 import Sidebar from './Sidebar';
 
 function App() {
@@ -25,17 +26,21 @@ function App() {
             <Sidebar />
             <div className="wrapper flex-1">
               <div className="main">
-                <Header />
-                <div className="container py-5 py-lg-7">
-                  <Routes>
-                    <Route path="/" element={<Swap />} />
-                    <Route path="create/" element={<Create />} />
-                    <Route path="create/:address" element={<Create />} />
-                    <Route path="pools" element={<Pools />} />
-                    <Route path="tokens" element={<Tokens />} />
-                    <Route path="styleguide" element={<Styleguide />} />
-                  </Routes>
+                <div className="flex-1">
+                  <Header />
+                  <div className="container py-5 py-lg-7">
+                    <Routes>
+                      <Route path="/" element={<Swap />} />
+                      <Route path="/:address" element={<Swap />} />
+                      <Route path="create/" element={<Create />} />
+                      <Route path="create/:address" element={<Create />} />
+                      <Route path="pools" element={<Pools />} />
+                      <Route path="tokens" element={<Tokens />} />
+                      <Route path="styleguide" element={<Styleguide />} />
+                    </Routes>
+                  </div>
                 </div>
+                <Footer />
               </div>
             </div>
           </div>
