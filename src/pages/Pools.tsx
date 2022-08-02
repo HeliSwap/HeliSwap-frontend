@@ -18,12 +18,6 @@ import { filterPoolsByPattern, joinByFieldSkipDuplicates } from '../utils/poolUt
 import { IPoolExtendedData } from '../interfaces/tokens';
 
 const searchThreshold = 2;
-const whitelistedTokensMockedData = [
-  '0x00000000000000000000000000000000021546BB',
-  '0x0000000000000000000000000000000002D96407',
-  '0x0000000000000000000000000000000002D96418',
-  '0x0000000000000000000000000000000002D96447',
-];
 
 interface IPoolsProps {
   itemsPerPage: number;
@@ -31,7 +25,7 @@ interface IPoolsProps {
 
 const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const contextValue = useContext(GlobalContext);
-  const { connection } = contextValue;
+  const { connection, tokensWhitelisted } = contextValue;
   const { userId, connected, isHashpackLoading, setShowConnectModal } = connection;
 
   const [searchQuery, setSearchQuery] = useState({});
@@ -52,6 +46,8 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     [],
   );
 
+  const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
+
   const {
     poolsByTokenList: pools,
     loadingPoolsByTokenList: loadingPools,
@@ -62,7 +58,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
       pollInterval: REFRESH_TIME,
     },
     true,
-    whitelistedTokensMockedData,
+    tokensWhitelistedAddresses,
   );
 
   const { filteredPools, filteredPoolsLoading } = useFilteredPools(
