@@ -89,7 +89,7 @@ const PoolInfo = ({
           <div className="flex-1">
             <Link
               className="d-block btn btn-sm btn-primary ms-3"
-              to={`/create/${poolData.pairAddress}`}
+              to={`/create/${poolData.token0}/${poolData.token1}`}
             >
               Add Liquidity
             </Link>
@@ -179,7 +179,10 @@ const PoolInfo = ({
 
         <div className="col-4">
           <div>
-            <Link className="d-block btn btn-sm btn-primary" to={`/create/${poolData.pairAddress}`}>
+            <Link
+              className="d-block btn btn-sm btn-primary"
+              to={`/create/${poolData.token0}/${poolData.token1}`}
+            >
               Increase Liquidity
             </Link>
           </div>

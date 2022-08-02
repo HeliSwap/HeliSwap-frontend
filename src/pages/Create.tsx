@@ -42,11 +42,13 @@ import {
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
 import { getTransactionSettings } from '../utils/transactionUtils';
-import { formatIcons } from '../utils/iconUtils';
-
-import usePools from '../hooks/usePools';
 import useTokens from '../hooks/useTokens';
 import { MAX_UINT_ERC20, MAX_UINT_HTS, POOLS_FEE, REFRESH_TIME } from '../constants';
+import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
+import { formatIcons } from '../utils/iconUtils';
+import IconToken from '../components/IconToken';
+import Confirmation from '../components/Confirmation';
+import usePoolsByToken from '../hooks/usePoolsByToken';
 
 enum ADD_LIQUIDITY_TITLES {
   CREATE_POOL = 'Create pool',
@@ -59,7 +61,7 @@ const Create = () => {
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance, connected, connectWallet, isHashpackLoading } =
     connection;
-  const { address } = useParams();
+  const { token0, token1 } = useParams();
   const navigate = useNavigate();
 
   // State for modals
@@ -78,11 +80,15 @@ const Create = () => {
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
   const [loadingAssociate, setLoadingAssociate] = useState(false);
 
-  // State for pools
-  const { pools: poolsData } = usePools({
-    fetchPolicy: 'network-only',
-    pollInterval: REFRESH_TIME,
-  });
+  const { filteredPools: poolsData } = usePoolsByToken(
+    {
+      fetchPolicy: 'network-only',
+      pollInterval: REFRESH_TIME,
+    },
+    tokensData.tokenA.address || (process.env.REACT_APP_WHBAR_ADDRESS as string),
+    false,
+  );
+  console.log(poolsData);
 
   const { loading: loadingTDL, tokens: tokenDataList } = useTokens({
     fetchPolicy: 'network-only',
@@ -484,7 +490,11 @@ const Create = () => {
 
     //Set selected pool address in the URL
     if (poolsDataLoaded && tokenASelected && tokenBSelected) {
-      navigate(`/create/${selectedPoolData[0] ? selectedPoolData[0].pairAddress : ''}`);
+      navigate(
+        `/create/${
+          selectedPoolData[0] ? `${selectedPoolData[0].token0}/${selectedPoolData[0].token1}` : ''
+        }`,
+      );
     }
     //TODO: Additional request will be needed in order to get info regarding pool shares
   }, [tokensData, poolsData, navigate, invalidTokenData]);
@@ -492,24 +502,17 @@ const Create = () => {
   // Check for address in url
   useEffect(() => {
     try {
-      if (address && poolsData.length !== 0 && tokenDataList && !tokensDerivedFromPool) {
-        const chosenPool =
-          poolsData.find((pool: IPoolData) => pool.pairAddress === address) || ({} as IPoolData);
-        const { token0: token0Address, token1: token1Address } = chosenPool;
-
-        // Check if one of tokens is WHBAR - to be switched for HBAR
-        const isTokenAWrappedHBAR =
-          token0Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
-        const isTokenBWrappedHBAR =
-          token1Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+      if (!tokensDerivedFromPool && token0 && token1 && poolsData.length !== 0 && tokenDataList) {
+        const isTokenAWrappedHBAR = token0 === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+        const isTokenBWrappedHBAR = token1 === (process.env.REACT_APP_WHBAR_ADDRESS as string);
 
         const tokenA = isTokenAWrappedHBAR
           ? NATIVE_TOKEN
-          : tokenDataList.find((token: ITokenData) => token.address === token0Address) ||
+          : tokenDataList.find((token: ITokenData) => token.address === token0) ||
             ({} as ITokenData);
         const tokenB = isTokenBWrappedHBAR
           ? NATIVE_TOKEN
-          : tokenDataList.find((token: ITokenData) => token.address === token1Address) ||
+          : tokenDataList.find((token: ITokenData) => token.address === token1) ||
             ({} as ITokenData);
 
         setTokensData({ tokenA, tokenB });
@@ -519,7 +522,7 @@ const Create = () => {
     } catch (err) {
       console.error(err);
     }
-  }, [poolsData, tokenDataList, address, tokensDerivedFromPool]);
+  }, [poolsData, tokenDataList, token0, token1, tokensDerivedFromPool]);
 
   // Cache input values
   useEffect(() => {
