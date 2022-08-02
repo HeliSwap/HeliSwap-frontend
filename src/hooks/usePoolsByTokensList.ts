@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { QueryHookOptions, useQuery } from '@apollo/client';
-import { GET_WHITELISTED_POOLS } from '../GraphQL/Queries';
+import { GET_POOLS_WHITELISTED } from '../GraphQL/Queries';
 import { REFRESH_TIME } from '../constants';
 
 import { IPoolExtendedData } from '../interfaces/tokens';
@@ -17,7 +17,7 @@ const usePoolsByTokensList = (
   const [hbarPrice, setHbarPrice] = useState(0);
   const [pools, setPools] = useState<IPoolExtendedData[]>([]);
   const { loading, data, error, startPolling, stopPolling, refetch } = useQuery(
-    GET_WHITELISTED_POOLS,
+    GET_POOLS_WHITELISTED,
     {
       variables: {
         tokens: tokensList,

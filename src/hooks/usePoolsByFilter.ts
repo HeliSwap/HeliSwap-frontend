@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 
 import { QueryHookOptions, useLazyQuery } from '@apollo/client';
-import { GET_FILTERED_POOLS } from '../GraphQL/Queries';
+import { GET_POOLS_FILTERED } from '../GraphQL/Queries';
 
 import { IPoolExtendedData } from '../interfaces/tokens';
 
 import { getHBarPrice } from '../utils/tokenUtils';
 import { getProcessedPools } from '../utils/poolUtils';
 
-const useFilteredPools = (
+const usePoolsByFilter = (
   useQueryOptions: QueryHookOptions = {},
   searchQuery: Object,
   getExtended: boolean,
@@ -25,7 +25,7 @@ const useFilteredPools = (
       data: filteredPoolsData,
       error: filteredPoolsError,
     },
-  ] = useLazyQuery(GET_FILTERED_POOLS, useQueryOptions);
+  ] = useLazyQuery(GET_POOLS_FILTERED, useQueryOptions);
 
   useEffect(() => {
     const getHBARPrice = async () => {
@@ -56,4 +56,4 @@ const useFilteredPools = (
   return { filteredPools, filteredPoolsCalled, filteredPoolsLoading, filteredPoolsError };
 };
 
-export default useFilteredPools;
+export default usePoolsByFilter;
