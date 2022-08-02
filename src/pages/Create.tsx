@@ -813,9 +813,19 @@ const Create = () => {
         getTokenIsAssociated(tokensData.tokenA) ? (
           <div className="d-grid mt-4">
             <Button
+              className="d-flex justify-content-center align-items-center"
               loading={loadingApprove}
               onClick={() => handleApproveClick('tokenA')}
-            >{`Approve ${tokensData.tokenA.symbol}`}</Button>
+            >
+              <span>{`Approve ${tokensData.tokenA.symbol}`}</span>
+              <Tippy
+                content={`You must give the HeliSwap smart contracts permission to use your ${tokensData.tokenA.symbol}. You only have to do this once per token.`}
+              >
+                <span className="ms-2">
+                  <Icon name="hint" />
+                </span>
+              </Tippy>
+            </Button>
           </div>
         ) : null}
 
@@ -826,9 +836,19 @@ const Create = () => {
         getTokenIsAssociated(tokensData.tokenB) ? (
           <div className="d-grid mt-4">
             <Button
+              className="d-flex justify-content-center align-items-center"
               loading={loadingApprove}
               onClick={() => handleApproveClick('tokenB')}
-            >{`Approve ${tokensData.tokenB.symbol}`}</Button>
+            >
+              <span>{`Approve ${tokensData.tokenB.symbol}`}</span>
+              <Tippy
+                content={`You must give the HeliSwap smart contracts permission to use your ${tokensData.tokenB.symbol}. You only have to do this once per token.`}
+              >
+                <span className="ms-2">
+                  <Icon name="hint" />
+                </span>
+              </Tippy>
+            </Button>
           </div>
         ) : null}
 

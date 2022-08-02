@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
+import Tippy from '@tippyjs/react';
 import BigNumber from 'bignumber.js';
 
 import {
@@ -767,8 +768,16 @@ const Swap = () => {
                     loading={loadingApprove}
                     disabled={Number(swapData.amountIn) <= 0}
                     onClick={() => handleApproveClick()}
+                    className="d-flex justify-content-center align-items-center"
                   >
-                    {`Approve ${tokensData.tokenA.symbol}`}
+                    <span>{`Approve ${tokensData.tokenA.symbol}`}</span>
+                    <Tippy
+                      content={`You must give the HeliSwap smart contracts permission to use your ${tokensData.tokenA.symbol}. You only have to do this once per token.`}
+                    >
+                      <span className="ms-2">
+                        <Icon name="hint" />
+                      </span>
+                    </Tippy>
                   </Button>
                 </div>
               ) : null}
