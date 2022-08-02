@@ -4,25 +4,17 @@ import { ITokenData, TokenType } from '../interfaces/tokens';
 import { QueryHookOptions, useQuery } from '@apollo/client';
 import { GET_TOKENS } from '../GraphQL/Queries';
 import { NATIVE_TOKEN } from '../utils/tokenUtils';
-import { REFRESH_TIME } from '../constants';
 
-const useTokensFiltered = (
+const useTokensByListIds = (
   tokensWhitelistedIds: string[],
   useQueryOptions: QueryHookOptions = {},
 ) => {
   const [tokens, setTokens] = useState<ITokenData[]>();
 
-  const { loading, data, error, startPolling, stopPolling } = useQuery(GET_TOKENS, {
+  const { loading, data, error } = useQuery(GET_TOKENS, {
     variables: { tokensWhitelistedIds },
     ...useQueryOptions,
   });
-
-  useEffect(() => {
-    startPolling(useQueryOptions.pollInterval || REFRESH_TIME);
-    return () => {
-      stopPolling();
-    };
-  }, [startPolling, stopPolling, useQueryOptions]);
 
   useEffect(() => {
     if (data) {
@@ -50,4 +42,4 @@ const useTokensFiltered = (
   return { tokens, loading, error };
 };
 
-export default useTokensFiltered;
+export default useTokensByListIds;
