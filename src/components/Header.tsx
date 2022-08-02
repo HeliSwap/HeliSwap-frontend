@@ -8,8 +8,10 @@ import Modal from './Modal';
 import ConnectModalContent from './Modals/ConnectModalContent';
 import UserAccountModalContent from './Modals/UserAccountModalContent';
 
-import { formatStringETHtoPriceFormatted } from '../utils/numberUtils';
+import { formatHBARStringToPrice, formatStringETHtoPriceFormatted } from '../utils/numberUtils';
 import { getHBarPrice } from '../utils/tokenUtils';
+
+import { BALLANCE_FETCH_INTERVAL } from '../constants';
 
 const Header = () => {
   const contextValue = useContext(GlobalContext);
@@ -62,7 +64,7 @@ const Header = () => {
     const fetchInterval = setInterval(() => {
       getHBARPrice();
       getUserTokensData();
-    }, 20000);
+    }, BALLANCE_FETCH_INTERVAL);
     return () => {
       clearInterval(fetchInterval);
     };
@@ -83,7 +85,9 @@ const Header = () => {
                 </span>
               </div>
               <div className="container-connected">
-                <div className="text-small">{userBalance} HBAR</div>
+                <div className="text-small">
+                  <span className="text-numeric">{formatHBARStringToPrice(userBalance)}</span> HBAR
+                </div>
                 <div className="container-address" onClick={() => setShowUserAccountModal(true)}>
                   <div className="text-small">{userId}</div>
                   <img
