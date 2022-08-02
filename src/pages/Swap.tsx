@@ -50,7 +50,7 @@ import InputToken from '../components/InputToken';
 import ButtonSelector from '../components/ButtonSelector';
 import Icon from '../components/Icon';
 import Confirmation from '../components/Confirmation';
-import useTokensFiltered from '../hooks/useTokensFiltered';
+import useTokensByListIds from '../hooks/useTokensByListIds';
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
@@ -102,7 +102,7 @@ const Swap = () => {
 
   const tokensWhitelistedIds = tokensWhitelisted.map(item => addressToId(item.address));
 
-  const { loading: loadingTDL, tokens: tokenDataList } = useTokensFiltered(tokensWhitelistedIds, {
+  const { loading: loadingTDL, tokens: tokenDataList } = useTokensByListIds(tokensWhitelistedIds, {
     fetchPolicy: 'network-only',
     pollInterval: REFRESH_TIME,
   });
