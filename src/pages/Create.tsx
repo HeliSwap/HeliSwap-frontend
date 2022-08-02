@@ -44,10 +44,7 @@ import {
 import { getTransactionSettings } from '../utils/transactionUtils';
 import useTokens from '../hooks/useTokens';
 import { MAX_UINT_ERC20, MAX_UINT_HTS, POOLS_FEE, REFRESH_TIME } from '../constants';
-import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
 import { formatIcons } from '../utils/iconUtils';
-import IconToken from '../components/IconToken';
-import Confirmation from '../components/Confirmation';
 import usePoolsByToken from '../hooks/usePoolsByToken';
 
 enum ADD_LIQUIDITY_TITLES {
