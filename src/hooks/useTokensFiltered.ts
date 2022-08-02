@@ -12,8 +12,6 @@ const useTokensFiltered = (
 ) => {
   const [tokens, setTokens] = useState<ITokenData[]>();
 
-  console.log('tokensWhitelistedIds', tokensWhitelistedIds);
-
   const { loading, data, error, startPolling, stopPolling } = useQuery(GET_TOKENS, {
     variables: { tokensWhitelistedIds },
     ...useQueryOptions,
