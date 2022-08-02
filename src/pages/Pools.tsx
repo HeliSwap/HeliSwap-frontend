@@ -1,6 +1,7 @@
 import { useState, useContext, useEffect, useMemo } from 'react';
 import { GlobalContext } from '../providers/Global';
 import { Link } from 'react-router-dom';
+var _ = require('lodash');
 
 import { PageViews } from '../interfaces/common';
 
@@ -14,7 +15,7 @@ import AllPools from '../components/AllPools';
 import MyPools from '../components/MyPools';
 import usePoolsByFilter from '../hooks/usePoolsByFilter';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
-import { filterPoolsByPattern, joinByFieldSkipDuplicates } from '../utils/poolUtils';
+import { filterPoolsByPattern } from '../utils/poolUtils';
 import { IPoolExtendedData } from '../interfaces/tokens';
 
 const searchThreshold = 2;
@@ -98,7 +99,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   useEffect(() => {
     if ((pools || filteredPools) && !filteredPoolsLoading && !loadingPools) {
       const whitelistedFilteredPools = filterPoolsByPattern(inputValue, pools, searchThreshold);
-      const visiblePools = joinByFieldSkipDuplicates(whitelistedFilteredPools, filteredPools, 'id');
+      const visiblePools = _.unionBy(whitelistedFilteredPools, filteredPools, 'id');
       setPoolsToShow(visiblePools);
     }
     setHavePools(pools && pools.length !== 0);

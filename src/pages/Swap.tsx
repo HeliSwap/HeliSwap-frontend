@@ -127,8 +127,6 @@ const Swap = () => {
   });
 
   const initialSwapData: ISwapTokenData = {
-    tokenIdIn: '',
-    tokenIdOut: '',
     amountIn: '',
     amountOut: '',
   };
@@ -422,54 +420,24 @@ const Swap = () => {
     setTokensData(newTokensData);
     const newInputValueKey = tokenInExactAmount ? 'amountOut' : 'amountIn';
     const oldInputValueKey = tokenInExactAmount ? 'amountIn' : 'amountOut';
-    setSwapData({ ...swapData, tokenIdIn: swapData.tokenIdOut, tokenIdOut: swapData.tokenIdIn });
 
     handleInputChange(swapData[oldInputValueKey], newInputValueKey, newTokensData);
   };
-
-  // Check for WRAP/UNWRAP
-  useEffect(() => {
-    refetch();
-
-    const { tokenA, tokenB } = tokensData;
-    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
-
-    const tokenInIsNative = tokenA.type === TokenType.HBAR;
-    const tokenOutIsNative = tokenB.type === TokenType.HBAR;
-
-    const tokenInWrappedHBAR = tokenA.address === WHBARAddress;
-    const tokenOutWrappedHBAR = tokenB.address === WHBARAddress;
-
-    setTokenInIsNative(tokenInIsNative);
-    setTokenOutIsNative(tokenOutIsNative);
-    const willWrap = tokenInIsNative && tokenOutWrappedHBAR;
-    const willUnwrap = tokenOutIsNative && tokenInWrappedHBAR;
-
-    setWillWrapTokens(willWrap);
-    setWillUnwrapTokens(willUnwrap);
-  }, [mergedPoolsData, tokensData, refetch]);
 
   // Check for cached input values - used for auto pooling
   useEffect(() => {
     const newInputName = tokenInExactAmount ? 'amountIn' : 'amountOut';
     const newInputValue = tokenInExactAmount ? tokenInValue : tokenOutValue;
     handleInputChange(newInputValue, newInputName);
-  }, [
-    mergedPoolsData,
-    tokensData,
-    handleInputChange,
-    tokenInExactAmount,
-    tokenInValue,
-    tokenOutValue,
-  ]);
+  }, [mergedPoolsData, handleInputChange, tokenInExactAmount, tokenInValue, tokenOutValue]);
 
   // Check for approvals
   useEffect(() => {
     const getAllowanceHTS = async (userId: string) => {
-      const { amountIn: amountToSpend, tokenIdIn } = swapData;
+      const { amountIn: amountToSpend } = swapData;
 
       const {
-        tokenA: { type, decimals },
+        tokenA: { type, decimals, hederaId: tokenIdIn },
       } = tokensData;
 
       const tokenAData: ITokenData = {
@@ -489,12 +457,12 @@ const Swap = () => {
       setNeedApproval(false);
     }
 
-    const hasTokenAData = swapData.tokenIdIn && swapData.amountIn;
+    const hasTokenAData = tokensData.tokenA.hederaId && swapData.amountIn;
 
     if (tokensData.tokenA.type === TokenType.HTS && hasTokenAData && userId) {
       getAllowanceHTS(userId);
     }
-  }, [swapData, userId, sdk, tokensData, userAssociatedTokens]);
+  }, [swapData, userId, tokensData]);
 
   // Check for associations
   useEffect(() => {
@@ -506,7 +474,7 @@ const Swap = () => {
     userId && checkTokenAssociation(userId);
   }, [userId]);
 
-  // Check for balances
+  // Check for balances and wrap/unwrap
   useEffect(() => {
     const getTokenBalances = async () => {
       if (userId) {
@@ -524,6 +492,22 @@ const Swap = () => {
     const { tokenA, tokenB } = tokensData;
 
     getTokenBalances();
+
+    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
+
+    const tokenInIsNative = tokenA.type === TokenType.HBAR;
+    const tokenOutIsNative = tokenB.type === TokenType.HBAR;
+
+    const tokenInWrappedHBAR = tokenA.address === WHBARAddress;
+    const tokenOutWrappedHBAR = tokenB.address === WHBARAddress;
+
+    setTokenInIsNative(tokenInIsNative);
+    setTokenOutIsNative(tokenOutIsNative);
+    const willWrap = tokenInIsNative && tokenOutWrappedHBAR;
+    const willUnwrap = tokenOutIsNative && tokenInWrappedHBAR;
+
+    setWillWrapTokens(willWrap);
+    setWillUnwrapTokens(willUnwrap);
   }, [tokensData, userId, initialBallanceData]);
 
   // Final checks before swap
@@ -548,18 +532,9 @@ const Swap = () => {
     setReadyToApprove(readyToApprove);
 
     setReadyToSwap(ready);
-  }, [
-    swapData,
-    approved,
-    initialSwapData.tokenIdOut,
-    tokenBalances,
-    getInsufficientTokenIn,
-    tokensData,
-    insufficientLiquidity,
-    needApproval,
-  ]);
+  }, [swapData, approved, getInsufficientTokenIn, tokensData, insufficientLiquidity, needApproval]);
 
-  // Check for address in url
+  // Check for prepopulated tokens in url
   useEffect(() => {
     try {
       if (

@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js';
 import { IPoolData, IPoolExtendedData } from '../interfaces/tokens';
 import { formatStringWeiToStringEther } from './numberUtils';
 import { getTokenPrice } from './tokenUtils';
+var _ = require('lodash');
 
 export const getProcessedPools = (
   pools: IPoolExtendedData[],
@@ -10,7 +11,7 @@ export const getProcessedPools = (
   restPools: IPoolExtendedData[] = [],
 ) => {
   if (getExtended) {
-    const mergedPools = joinByFieldSkipDuplicates(restPools, pools, 'id');
+    const mergedPools = _.unionBy(restPools, pools, 'id');
 
     if (pools.length > 0 && hbarPrice) {
       const formatPoolData = (pool: IPoolData) => {
@@ -87,16 +88,6 @@ export const getProcessedPools = (
       return pools;
     }
   }
-};
-
-export const joinByFieldSkipDuplicates = (
-  arr1: IPoolExtendedData[] = [],
-  arr2: IPoolExtendedData[] = [],
-  joinByField: string,
-) => {
-  const a = new Set(arr1.map(x => x[joinByField]));
-  // const b = new Set(arr2.map(x => x[joinByField]));
-  return [...arr1, ...arr2.filter(x => !a.has(x[joinByField]))];
 };
 
 export const filterPoolsByPattern = (

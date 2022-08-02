@@ -78,8 +78,6 @@ export interface IUserToken {
 }
 
 export interface ISwapTokenData {
-  tokenIdIn: string;
-  tokenIdOut: string;
   amountIn: string;
   amountOut: string;
 }
