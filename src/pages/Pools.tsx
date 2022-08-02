@@ -12,7 +12,7 @@ import usePoolsByUser from '../hooks/usePoolsByUser';
 import SearchArea from '../components/SearchArea';
 import AllPools from '../components/AllPools';
 import MyPools from '../components/MyPools';
-import useFilteredPools from '../hooks/useFilteredPools';
+import usePoolsByFilter from '../hooks/usePoolsByFilter';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import { filterPoolsByPattern, joinByFieldSkipDuplicates } from '../utils/poolUtils';
 import { IPoolExtendedData } from '../interfaces/tokens';
@@ -61,7 +61,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     tokensWhitelistedAddresses,
   );
 
-  const { filteredPools, filteredPoolsLoading } = useFilteredPools(
+  const { filteredPools, filteredPoolsLoading } = usePoolsByFilter(
     {
       fetchPolicy: 'network-only',
     },

@@ -108,7 +108,7 @@ export const HEALTH_CHECK = gql`
   }
 `;
 
-export const GET_FILTERED_POOLS = gql`
+export const GET_POOLS_FILTERED = gql`
   query getFilterPools($keyword: String!) {
     filterPools(keyword: $keyword) {
       id
@@ -132,7 +132,7 @@ export const GET_FILTERED_POOLS = gql`
   }
 `;
 
-export const GET_WHITELISTED_POOLS = gql`
+export const GET_POOLS_WHITELISTED = gql`
   query getWhitelistedPools($tokens: [String]!) {
     poolsConsistingOf(tokens: $tokens) {
       id

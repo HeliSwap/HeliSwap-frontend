@@ -66,7 +66,6 @@ const AllPools = ({
   };
 
   useEffect(() => {
-    // Fetch items from another resources.
     const endOffset = itemOffset + itemsPerPage;
     const sortedPoolsToShow = (pools || []).sort((a: IPoolExtendedData, b: IPoolExtendedData) =>
       sortPools(a[poolsSortBy as string], b[poolsSortBy as string], sortDirection),
@@ -75,7 +74,6 @@ const AllPools = ({
     setPageCount(Math.ceil(sortedPoolsToShow.length / itemsPerPage));
   }, [itemOffset, itemsPerPage, poolsSortBy, sortDirection, pools]);
 
-  // Invoke when user click to request another page.
   const handlePageClick = (event: any) => {
     setCollapseAll(true);
 
