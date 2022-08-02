@@ -2,6 +2,8 @@ import React, { useState, useEffect, useContext, useMemo, useCallback } from 're
 import { useNavigate, useParams } from 'react-router-dom';
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
+import Tippy from '@tippyjs/react';
+
 import {
   ITokenData,
   TokenType,
@@ -20,6 +22,10 @@ import InputToken from '../components/InputToken';
 import PageHeader from '../components/PageHeader';
 import ButtonSelector from '../components/ButtonSelector';
 import WalletBalance from '../components/WalletBalance';
+import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
+import IconToken from '../components/IconToken';
+import Confirmation from '../components/Confirmation';
+import Icon from '../components/Icon';
 
 import errorMessages from '../content/errors';
 import {
@@ -36,13 +42,11 @@ import {
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
 import { getTransactionSettings } from '../utils/transactionUtils';
+import { formatIcons } from '../utils/iconUtils';
+
 import usePools from '../hooks/usePools';
 import useTokens from '../hooks/useTokens';
 import { MAX_UINT_ERC20, MAX_UINT_HTS, POOLS_FEE, REFRESH_TIME } from '../constants';
-import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
-import { formatIcons } from '../utils/iconUtils';
-import IconToken from '../components/IconToken';
-import Confirmation from '../components/Confirmation';
 
 enum ADD_LIQUIDITY_TITLES {
   CREATE_POOL = 'Create pool',
@@ -585,7 +589,6 @@ const Create = () => {
   const getProvideSection = () => {
     return (
       <div className="container-dark">
-        {getFeesInfo()}
         <div className="mb-4 text-small text-bold">Enter amount</div>
         <InputTokenSelector
           isInvalid={getInsufficientTokenA() as boolean}
@@ -687,7 +690,8 @@ const Create = () => {
             loadingTDL={loadingTDL}
           />
         </Modal>
-
+        {getFeesInfo()}
+        <hr className="my-4" />
         {getTokensRatioSection()}
         {getActionButtons()}
       </div>
@@ -696,9 +700,18 @@ const Create = () => {
 
   const getFeesInfo = () => {
     return (
-      <div className="d-flex mb-4 justify-content-between align-items-center border-bottom border-secondary">
-        <span className="mb-4 text-small text-bold">Liquidity provider fee:</span>
-        <span className="mb-4 text-small">{POOLS_FEE}</span>
+      <div className="d-flex my-4 justify-content-between align-items-center ">
+        <span className="text-small text-bold">Liquidity provider fee:</span>
+        <div className="d-flex align-items-center">
+          <span className="text-small text-numeric">{POOLS_FEE}</span>
+          <Tippy
+            content={`The liquidity provider fee is predefined. You'll earn ${POOLS_FEE} of all trades on this pair proportional to your share of the pool. Fees are added to the pool, accrue in real time and can be claimed by withdrawing your liquidity.`}
+          >
+            <span className="ms-2">
+              <Icon color="gray" name="hint" />
+            </span>
+          </Tippy>
+        </div>
       </div>
     );
   };
@@ -800,9 +813,19 @@ const Create = () => {
         getTokenIsAssociated(tokensData.tokenA) ? (
           <div className="d-grid mt-4">
             <Button
+              className="d-flex justify-content-center align-items-center"
               loading={loadingApprove}
               onClick={() => handleApproveClick('tokenA')}
-            >{`Approve ${tokensData.tokenA.symbol}`}</Button>
+            >
+              <span>{`Approve ${tokensData.tokenA.symbol}`}</span>
+              <Tippy
+                content={`You must give the HeliSwap smart contracts permission to use your ${tokensData.tokenA.symbol}.`}
+              >
+                <span className="ms-2">
+                  <Icon name="hint" />
+                </span>
+              </Tippy>
+            </Button>
           </div>
         ) : null}
 
@@ -813,9 +836,19 @@ const Create = () => {
         getTokenIsAssociated(tokensData.tokenB) ? (
           <div className="d-grid mt-4">
             <Button
+              className="d-flex justify-content-center align-items-center"
               loading={loadingApprove}
               onClick={() => handleApproveClick('tokenB')}
-            >{`Approve ${tokensData.tokenB.symbol}`}</Button>
+            >
+              <span>{`Approve ${tokensData.tokenB.symbol}`}</span>
+              <Tippy
+                content={`You must give the HeliSwap smart contracts permission to use your ${tokensData.tokenB.symbol}.`}
+              >
+                <span className="ms-2">
+                  <Icon name="hint" />
+                </span>
+              </Tippy>
+            </Button>
           </div>
         ) : null}
 

@@ -75,7 +75,7 @@
 
   &.is-gray {
     path {
-      fill: $primary-400;
+      fill: $primary-300;
     }
   }
 
@@ -364,4 +364,14 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
+}
+
+// Overwrites
+.tippy-box {
+  background-color: $primary-400;
+  padding: 12px;
+}
+
+.tippy-arrow {
+  color: $primary-400;
 }

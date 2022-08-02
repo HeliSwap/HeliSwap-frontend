@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Tippy from '@tippyjs/react';
 import { ITokenData, TokenType } from '../../interfaces/tokens';
 
 import {
@@ -10,6 +11,7 @@ import {
 } from '../../utils/tokenUtils';
 import IconToken from '../IconToken';
 import Button from '../Button';
+import Icon from '../Icon';
 
 import search from '../../icons/system/search-gradient.svg';
 
@@ -199,7 +201,7 @@ const ModalSearchContent = ({
             value={searchInputValue}
             onChange={onSearchInputChange}
             type="text"
-            className="form-control"
+            className="form-control form-control-sm"
             placeholder="Search name or paste token Id or address"
           />
         </div>
@@ -213,18 +215,25 @@ const ModalSearchContent = ({
 
             {showImportButton ? (
               <>
-                <p className="text-micro text-secondary mt-3 mb-5">
-                  Would you like to import{' '}
-                  <a
-                    target="_blank"
-                    rel="noreferrer"
-                    className="link-primary"
-                    href={`${hashScanUrl}${searchInputValue}`}
-                  >
-                    {searchInputValue}
-                  </a>
-                  ?
-                </p>
+                <div className="mt-3 mb-5 d-flex justify-content-center align-items-center">
+                  <p className="text-micro text-secondary">
+                    Would you like to import{' '}
+                    <a
+                      target="_blank"
+                      rel="noreferrer"
+                      className="link-primary"
+                      href={`${hashScanUrl}${searchInputValue}`}
+                    >
+                      {searchInputValue}
+                    </a>
+                    ?
+                  </p>
+                  <Tippy content="This token is not in our database, but you can add it by providing its tokenID or token address. After clicking Import, please specify the number of decimals for this token (i.e. ERC-20 = 18 decimals). Make sure you are providing the correct number of decimals. ">
+                    <span className="ms-2">
+                      <Icon color="gray" name="hint" />
+                    </span>
+                  </Tippy>
+                </div>
                 <Button onClick={handleImportButtonClick} type="primary" className="btn-sm">
                   Import
                 </Button>
@@ -234,13 +243,23 @@ const ModalSearchContent = ({
         ) : null}
 
         {readyToImportERC ? (
-          <div className="d-flex align-items-center mt-5">
-            <input
-              className="form-control"
-              type="text"
-              value={decimals}
-              onChange={handleDecimalsInputChange}
-            />
+          <div className="d-flex align-items-end mt-5">
+            <div className="flex-1">
+              <div className="d-flex align-items-center mb-3">
+                <p className="text-small">Decimals</p>
+                <Tippy content="Number of decimals for this token. Make sure you are providing the correct number of decimals.">
+                  <span className="ms-2">
+                    <Icon color="gray" name="hint" />
+                  </span>
+                </Tippy>
+              </div>
+              <input
+                className="form-control form-control-sm"
+                type="text"
+                value={decimals}
+                onChange={handleDecimalsInputChange}
+              />
+            </div>
             <Button onClick={handleImportERC20ButtonClick} className="btn btn-sm btn-primary ms-3">
               Import
             </Button>

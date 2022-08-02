@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import Tippy from '@tippyjs/react';
 import { MAX_EXPIRATION_VALUE, MAX_SLIPPAGE_VALUE } from '../../constants';
 import Button from '../Button';
+import Icon from '../Icon';
 
 interface IModalProps {
   closeModal: () => void;
@@ -70,7 +72,14 @@ const TransactionSettingsModalContent = ({
       </div>
       <div className="modal-body">
         <div>
-          <p className="text-small">Slippage</p>
+          <p className="d-flex align-items-center">
+            <span className="text-small">Slippage</span>
+            <Tippy content="If the prices of your specified tokens change adversely, your transaction will revert. Set your price change tolerance.">
+              <span className="ms-2">
+                <Icon color="gray" name="hint" />
+              </span>
+            </Tippy>
+          </p>
           <div className="d-flex align-items-center mt-3">
             <input
               type={'number'}
@@ -92,7 +101,14 @@ const TransactionSettingsModalContent = ({
         </div>
 
         <div className="mt-5">
-          <p className="text-small">Transaction deadline</p>
+          <p className="d-flex align-items-center">
+            <span className="text-small">Transaction deadline</span>
+            <Tippy content="If the transaction takes more time than your specified deadline, it will be automatically reverted.">
+              <span className="ms-2">
+                <Icon color="gray" name="hint" />
+              </span>
+            </Tippy>
+          </p>
           <div className="d-flex align-items-center mt-3">
             <input
               className="form-control text-numeric form-control-sm"

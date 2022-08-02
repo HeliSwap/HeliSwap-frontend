@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
+import Tippy from '@tippyjs/react';
 import { hethers } from '@hashgraph/hethers';
 import { IPoolData } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
@@ -8,6 +9,7 @@ import IconToken from './IconToken';
 import InputTokenSelector from './InputTokenSelector';
 import InputToken from './InputToken';
 import ButtonSelector from './ButtonSelector';
+import Icon from './Icon';
 import InputSlider from './InputSlider';
 import PageHeader from './PageHeader';
 import TransactionSettingsModalContent from './Modals/TransactionSettingsModalContent';
@@ -404,8 +406,19 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
         <div className="mt-4">
           <div className="d-grid mt-4">
             {!lpApproved ? (
-              <Button loading={loadingApprove} className="mb-3" onClick={hanleApproveLPClick}>
-                Approve
+              <Button
+                className="d-flex justify-content-center align-items-center mb-3"
+                loading={loadingApprove}
+                onClick={hanleApproveLPClick}
+              >
+                <span>Approve LP</span>
+                <Tippy
+                  content={`You must give the HeliSwap smart contracts permission to use your LP tokens.`}
+                >
+                  <span className="ms-2">
+                    <Icon name="hint" />
+                  </span>
+                </Tippy>
               </Button>
             ) : null}
 
