@@ -11,6 +11,7 @@ export const getProcessedPools = (
 ) => {
   if (getExtended) {
     const mergedPools = joinByFieldSkipDuplicates(restPools, pools, 'id');
+
     if (pools.length > 0 && hbarPrice) {
       const formatPoolData = (pool: IPoolData) => {
         const {

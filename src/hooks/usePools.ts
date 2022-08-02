@@ -36,8 +36,10 @@ const usePools = (useQueryOptions: QueryHookOptions = {}, getExtended = false) =
   useEffect(() => {
     if (data) {
       const { pools } = data;
-      const processedPools = getProcessedPools(pools, getExtended, hbarPrice);
-      if (processedPools) setPools(processedPools);
+      if (pools) {
+        const processedPools = getProcessedPools(pools, getExtended, hbarPrice);
+        if (processedPools) setPools(processedPools);
+      }
     }
   }, [data, hbarPrice, getExtended]);
 
