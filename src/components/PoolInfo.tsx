@@ -78,7 +78,10 @@ const PoolInfo = ({
 
         <div className="col-6 d-flex">
           <div className="flex-1">
-            <Link className="d-block btn btn-sm btn-primary ms-3" to={`/${poolData.pairAddress}`}>
+            <Link
+              className="d-block btn btn-sm btn-primary ms-3"
+              to={`/${poolData.token0}/${poolData.token1}`}
+            >
               Trade
             </Link>
           </div>

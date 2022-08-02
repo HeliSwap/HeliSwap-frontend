@@ -24,7 +24,6 @@ import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransact
 
 import errorMessages from '../content/errors';
 import {
-  addressToId,
   checkAllowanceHTS,
   getTokenBalance,
   getUserAssociatedTokens,
@@ -43,9 +42,6 @@ import {
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
 
-import usePools from '../hooks/usePools';
-// import useTokens from '../hooks/useTokens';
-
 import { MAX_UINT_ERC20, MAX_UINT_HTS, REFRESH_TIME } from '../constants';
 import InputToken from '../components/InputToken';
 import ButtonSelector from '../components/ButtonSelector';
@@ -54,7 +50,7 @@ import Confirmation from '../components/Confirmation';
 import useTokensByListIds from '../hooks/useTokensByListIds';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import usePoolsByToken from '../hooks/usePoolsByToken';
-import { joinByFieldSkipDuplicates } from '../utils/poolUtils';
+var _ = require('lodash');
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
@@ -68,7 +64,7 @@ const Swap = () => {
     isHashpackLoading,
   } = connection;
 
-  const { address } = useParams();
+  const { token0, token1 } = useParams();
 
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
@@ -92,7 +88,6 @@ const Swap = () => {
   //State for tokens whitelist
   const [tokensWhitelistedIds, setTokensWhitelistedIds] = useState<string[]>([]);
 
-  const [loadPoolsByToken, setLoadPoolsByToken] = useState('');
   const [mergedPoolsData, setMergedPoolsData] = useState<IPoolData[]>([] as IPoolData[]);
 
   const {
@@ -108,11 +103,19 @@ const Swap = () => {
     tokensWhitelistedIds,
   );
 
-  const { filteredPools: filteredPoolsData } = usePoolsByToken(
+  const { filteredPools: filteredPoolsDataTokenA } = usePoolsByToken(
     {
       fetchPolicy: 'network-only',
     },
-    loadPoolsByToken,
+    tokensData.tokenA.address,
+    false,
+  );
+
+  const { filteredPools: filteredPoolsDataTokenB } = usePoolsByToken(
+    {
+      fetchPolicy: 'network-only',
+    },
+    tokensData.tokenB.address,
     true,
   );
 
@@ -557,25 +560,24 @@ const Swap = () => {
   // Check for address in url
   useEffect(() => {
     try {
-      if (address && mergedPoolsData.length !== 0 && tokenDataList && !tokensDerivedFromPool) {
-        const chosenPool =
-          mergedPoolsData.find((pool: IPoolData) => pool.pairAddress === address) ||
-          ({} as IPoolData);
-        const { token0: token0Address, token1: token1Address } = chosenPool;
-
+      if (
+        !tokensDerivedFromPool &&
+        token0 &&
+        token1 &&
+        mergedPoolsData.length !== 0 &&
+        tokenDataList
+      ) {
         // Check if one of tokens is WHBAR - to be switched for HBAR
-        const isTokenAWrappedHBAR =
-          token0Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
-        const isTokenBWrappedHBAR =
-          token1Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+        const isTokenAWrappedHBAR = token0 === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+        const isTokenBWrappedHBAR = token1 === (process.env.REACT_APP_WHBAR_ADDRESS as string);
 
         const tokenA = isTokenAWrappedHBAR
           ? NATIVE_TOKEN
-          : tokenDataList.find((token: ITokenData) => token.address === token0Address) ||
+          : tokenDataList.find((token: ITokenData) => token.address === token0) ||
             ({} as ITokenData);
         const tokenB = isTokenBWrappedHBAR
           ? NATIVE_TOKEN
-          : tokenDataList.find((token: ITokenData) => token.address === token1Address) ||
+          : tokenDataList.find((token: ITokenData) => token.address === token1) ||
             ({} as ITokenData);
 
         if (tokenA.type !== TokenType.HBAR) {
@@ -601,7 +603,7 @@ const Swap = () => {
     } catch (err) {
       console.error(err);
     }
-  }, [mergedPoolsData, tokenDataList, address, tokensDerivedFromPool, userId]);
+  }, [mergedPoolsData, tokenDataList, token0, token1, tokensDerivedFromPool, userId]);
 
   useEffect(() => {
     if (tokensWhitelisted && tokensWhitelisted.length !== 0) {
@@ -611,13 +613,14 @@ const Swap = () => {
   }, [tokensWhitelisted]);
 
   useEffect(() => {
-    const mergedPoolsData = joinByFieldSkipDuplicates(
+    const mergedPoolsData = _.unionBy(
       whitelistedPoolsData,
-      filteredPoolsData,
+      filteredPoolsDataTokenA,
+      filteredPoolsDataTokenB,
       'id',
     );
     setMergedPoolsData(mergedPoolsData);
-  }, [whitelistedPoolsData, filteredPoolsData]);
+  }, [whitelistedPoolsData, filteredPoolsDataTokenA, filteredPoolsDataTokenB]);
 
   //Render methods
   const getErrorMessage = () => {
@@ -681,7 +684,6 @@ const Swap = () => {
                 };
 
                 setSwapData(prev => ({ ...prev, ...newSwapData }));
-                setLoadPoolsByToken(tokenA.address);
               }
               setTokensData(newTokensData);
             }}
@@ -736,7 +738,6 @@ const Swap = () => {
                 };
 
                 setSwapData(prev => ({ ...prev, ...newSwapData }));
-                setLoadPoolsByToken(tokenB.address);
               }
               setTokensData(newTokensData);
             }}
