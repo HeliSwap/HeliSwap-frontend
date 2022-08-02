@@ -106,16 +106,18 @@ const Swap = () => {
   const { filteredPools: filteredPoolsDataTokenA } = usePoolsByToken(
     {
       fetchPolicy: 'network-only',
+      pollInterval: REFRESH_TIME,
     },
-    tokensData.tokenA.address,
+    tokensData.tokenA.address || (process.env.REACT_APP_WHBAR_ADDRESS as string),
     false,
   );
 
   const { filteredPools: filteredPoolsDataTokenB } = usePoolsByToken(
     {
       fetchPolicy: 'network-only',
+      pollInterval: REFRESH_TIME,
     },
-    tokensData.tokenB.address,
+    tokensData.tokenB.address || (process.env.REACT_APP_WHBAR_ADDRESS as string),
     true,
   );
 

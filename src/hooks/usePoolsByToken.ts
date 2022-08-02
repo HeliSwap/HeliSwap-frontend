@@ -7,6 +7,7 @@ import { IPoolExtendedData } from '../interfaces/tokens';
 
 import { getHBarPrice } from '../utils/tokenUtils';
 import { getProcessedPools } from '../utils/poolUtils';
+import { REFRESH_TIME } from '../constants';
 
 const usePoolsByToken = (
   useQueryOptions: QueryHookOptions = {},
@@ -23,8 +24,17 @@ const usePoolsByToken = (
       loading: filteredPoolsLoading,
       data: filteredPoolsData,
       error: filteredPoolsError,
+      startPolling,
+      stopPolling,
     },
   ] = useLazyQuery(GET_POOL_BY_TOKEN, useQueryOptions);
+
+  useEffect(() => {
+    startPolling(useQueryOptions.pollInterval || REFRESH_TIME);
+    return () => {
+      stopPolling();
+    };
+  }, [startPolling, stopPolling, useQueryOptions]);
 
   useEffect(() => {
     const getHBARPrice = async () => {
