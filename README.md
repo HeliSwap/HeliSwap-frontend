@@ -16,9 +16,17 @@ Please follow instruction [here](https://www.freecodecamp.org/news/how-to-set-up
 
 Before running the project please create `.env` or use the example one.
 
+```shell
+cp .env.example .env
+```
+
 ```
 REACT_APP_MIRROR_NODE_URL = <LINK_TO_MIRROR_NODE>
+REACT_APP_COINGECKO_URL = <LINK_TO_COINGECKO_API>
 REACT_APP_NETWORK_TYPE = <NETWORK_TYPE>
+REACT_APP_GRAPHQL_URI = <LINK_TO_GRAPHQL_ENDPOINT>
+REACT_APP_ROUTER_ADDRESS = <ROUTER_ADDRESS>
+REACT_APP_WHBAR_ADDRESS = <WRAPPED_HBAR_ADDRESS>
 ```
 
 ## 🚀 Available Scripts

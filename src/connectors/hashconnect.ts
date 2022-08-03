@@ -3,22 +3,29 @@ import { Transaction, AccountId, TransactionId } from '@hashgraph/sdk';
 
 class Hashconnect {
   constructor(
-    setLoading: (loading: boolean) => void,
     setExtensionFound: (loading: boolean) => void,
     setConnected: (loading: boolean) => void,
+    setUserId: (userId: string) => void,
+    setIsHashpackLoading: (loading: boolean) => void,
+    setShowConnectModal: (show: boolean) => void,
   ) {
     this.hashconnect = new HashConnect();
-    this.setLoading = setLoading;
     this.setExtensionFound = setExtensionFound;
     this.setConnected = setConnected;
+    this.setUserId = setUserId;
+    this.setIsHashpackLoading = setIsHashpackLoading;
+    this.setShowConnectModal = setShowConnectModal;
+    this.transactionResponseReceived = new CustomEvent('transaction-response-received');
   }
 
   hashconnect: HashConnect;
   status: string = 'Initializing';
 
-  setLoading: (loading: boolean) => void;
+  setUserId: (userId: string) => void;
   setExtensionFound: (loading: boolean) => void;
+  setIsHashpackLoading: (loading: boolean) => void;
   setConnected: (loading: boolean) => void;
+  setShowConnectModal: (show: boolean) => void;
 
   availableExtensions: HashConnectTypes.WalletMetadata[] = [];
 
@@ -42,6 +49,8 @@ class Hashconnect {
     icon: 'https://absolute.url/to/icon.png',
   };
 
+  transactionResponseReceived: Event;
+
   async initHashconnect() {
     //create the hashconnect instance
     this.hashconnect = new HashConnect(true);
@@ -50,7 +59,6 @@ class Hashconnect {
       await this.hashconnect.init(this.appMetadata, this.saveData.privateKey);
       await this.hashconnect.connect(this.saveData.topic, this.saveData.pairedWalletData!);
 
-      this.setLoading(false);
       this.setExtensionFound(true);
       this.setConnected(true);
     } else {
@@ -80,7 +88,6 @@ class Hashconnect {
     this.hashconnect.foundExtensionEvent.on(data => {
       this.availableExtensions.push(data);
 
-      this.setLoading(false);
       this.setExtensionFound(true);
     });
 
@@ -88,12 +95,16 @@ class Hashconnect {
       this.saveData.pairedWalletData = data.metadata;
 
       data.accountIds.forEach(id => {
-        if (this.saveData.pairedAccounts.indexOf(id) === -1) this.saveData.pairedAccounts.push(id);
+        if (this.saveData.pairedAccounts.indexOf(id) === -1) {
+          this.saveData.pairedAccounts.push(id);
+          this.setUserId(id);
+        }
       });
 
       this.saveDataInLocalstorage();
-      this.setLoading(false);
       this.setConnected(true);
+      this.setIsHashpackLoading(false);
+      this.setShowConnectModal(false);
     });
 
     this.hashconnect.transactionEvent.on(data => {
@@ -141,7 +152,13 @@ class Hashconnect {
       },
     };
 
-    return await this.hashconnect.sendTransaction(this.saveData.topic, transaction);
+    const transactionRespose = await this.hashconnect.sendTransaction(
+      this.saveData.topic,
+      transaction,
+    );
+
+    document.dispatchEvent(this.transactionResponseReceived);
+    return transactionRespose;
   }
 
   async requestAccountInfo() {

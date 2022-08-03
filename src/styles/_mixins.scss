@@ -45,17 +45,6 @@
 // Typography Mixins and functions
 @mixin text() {
   font-family: $font-family-primary;
-  font-weight: normal;
-}
-
-@mixin fontAwesome($boldness: 700) {
-  font-family: 'Font Awesome 5 Free';
-  font-weight: $boldness;
-}
-
-@mixin fontAwesomeBrands($boldness: 700) {
-  font-family: 'Font Awesome 5 Brands';
-  font-weight: $boldness;
 }
 
 @mixin text-overflow {
@@ -100,7 +89,7 @@
 }
 
 // Transition mixins
-@mixin transition-link {
+@mixin transition-color {
   transition: color 0.15s linear;
 }
 

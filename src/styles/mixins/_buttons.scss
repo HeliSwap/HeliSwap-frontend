@@ -34,8 +34,8 @@
       tint-color($border, $btn-active-border-tint-amount)
     ),
   $active-color: color-contrast($active-background),
-  $disabled-background: $background,
-  $disabled-border: $border,
+  $disabled-background: $btn-primary-disabled-background,
+  $disabled-border: $btn-primary-disabled-background,
   $disabled-color: $btn-primary-color
 ) {
   color: $color;
@@ -106,13 +106,14 @@
   $color-hover: color-contrast($color),
   $active-background: $color,
   $active-border: $color,
-  $active-color: color-contrast($active-background)
+  $active-color: color-contrast($active-background),
+  $text-color: $btn-primary-outline-color
 ) {
-  color: $color;
+  color: $text-color;
   border-color: $color;
 
   &:hover {
-    color: $color-hover;
+    color: $text-color;
     background-color: $active-background;
     border-color: $active-border;
   }

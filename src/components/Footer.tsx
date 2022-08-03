@@ -1,35 +1,19 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import Tippy from '@tippyjs/react';
+import { GlobalContext } from '../providers/Global';
 
 const Footer = () => {
-  return (
-    <div className="footer">
-      <div className="container">
-        <div className="d-flex justify-content-between">
-          <div>
-            <a className="link mx-4" href="#index">
-              USD
-            </a>
-            <a className="link mx-4" href="#index">
-              English
-            </a>
-          </div>
+  const contextValue = useContext(GlobalContext);
+  const { isRunning, lastUpdated } = contextValue;
 
-          <div>
-            <a className="link mx-4" href="#index">
-              Support
-            </a>
-            <a className="link mx-4" href="#index">
-              FAQ
-            </a>
-            <a className="link mx-4" href="#index">
-              Privacy policy
-            </a>
-            <a className="link mx-4" href="#index">
-              Terms of service
-            </a>
-          </div>
+  return (
+    <div className="d-flex justify-content-end pe-4 mb-4">
+      <Tippy content="The time at which the application was updated. Prices are updated up to this timestamp.">
+        <div className="d-flex align-items-center">
+          <span className="me-3 text-micro">{lastUpdated}</span>
+          <span className={`icon-healthcheck ${isRunning ? 'is-running' : ''}`}></span>
         </div>
-      </div>
+      </Tippy>
     </div>
   );
 };

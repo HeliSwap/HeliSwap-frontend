@@ -19,24 +19,36 @@
   font-size: 24px;
 }
 
+.text-numeric {
+  font-family: $font-family-numeric;
+}
+
+.text-light {
+  font-weight: $font-weight-light;
+}
+
+.text-bold {
+  font-weight: $font-weight-semi-bold;
+}
+
 // Links
 .link {
-  @include custom-underline($body-color);
-
+  cursor: pointer;
   color: $body-color;
   text-decoration: none;
+  transition: color 0.15s linear;
 
   &:hover {
-    color: $body-color;
+    color: $secondary;
     text-decoration: none;
   }
 }
 
 .link-primary {
-  @include custom-underline($primary);
   cursor: pointer;
+  transition: color 0.15s linear;
 
-  color: $primary;
+  color: $primary-200;
   text-decoration: none;
 
   &:hover {
@@ -45,15 +57,42 @@
   }
 }
 
-.link-secondary {
-  @include custom-underline($secondary);
-  cursor: pointer;
-
-  color: $secondary;
+.link-menu {
+  color: $primary-400;
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  @include transition-color;
+
+  &.is-active {
+    color: $primary-100;
+
+    .icon-menu {
+      background-color: $primary-500;
+
+      .icon {
+        color: $primary-100;
+
+        path {
+          fill: $primary-100;
+        }
+      }
+    }
+  }
 
   &:hover {
-    color: $secondary;
-    text-decoration: none;
+    color: $primary-100;
+
+    .icon {
+      color: $primary-100;
+
+      path {
+        fill: $primary-100;
+      }
+    }
   }
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
