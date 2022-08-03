@@ -235,14 +235,14 @@ const PoolInfo = ({
             <div className="table-pools-cell justify-content-end">
               <span className="text-small text-numeric">
                 {poolData.tokensPriceEvaluated
-                  ? formatStringToPrice(poolData.volume7 || '')
+                  ? formatStringToPrice(poolData.volume24 || '')
                   : 'N/A'}
               </span>
             </div>
             <div className="table-pools-cell justify-content-end">
               <span className="text-small text-numeric">
                 {poolData.tokensPriceEvaluated
-                  ? formatStringToPrice(poolData.volume24 || '')
+                  ? formatStringToPrice(poolData.volume7 || '')
                   : 'N/A'}
               </span>
             </div>
