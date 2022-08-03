@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext, useMemo, useCallback } from 're
 import { useParams } from 'react-router-dom';
 import Tippy from '@tippyjs/react';
 import BigNumber from 'bignumber.js';
+import _ from 'lodash';
 
 import {
   ITokenData,
@@ -50,7 +51,6 @@ import Confirmation from '../components/Confirmation';
 import useTokensByListIds from '../hooks/useTokensByListIds';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import usePoolsByToken from '../hooks/usePoolsByToken';
-var _ = require('lodash');
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);

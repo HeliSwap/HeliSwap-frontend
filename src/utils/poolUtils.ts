@@ -1,8 +1,8 @@
 import BigNumber from 'bignumber.js';
+import _ from 'lodash';
 import { IPoolData, IPoolExtendedData } from '../interfaces/tokens';
 import { formatStringWeiToStringEther } from './numberUtils';
 import { getTokenPrice } from './tokenUtils';
-var _ = require('lodash');
 
 export const getProcessedPools = (
   pools: IPoolExtendedData[],

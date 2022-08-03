@@ -1,6 +1,7 @@
 import { useState, useContext, useEffect, useMemo } from 'react';
 import { GlobalContext } from '../providers/Global';
 import { Link } from 'react-router-dom';
+import _ from 'lodash';
 
 import { PageViews } from '../interfaces/common';
 
@@ -16,7 +17,6 @@ import usePoolsByFilter from '../hooks/usePoolsByFilter';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import { filterPoolsByPattern } from '../utils/poolUtils';
 import { IPoolExtendedData } from '../interfaces/tokens';
-var _ = require('lodash');
 
 const searchThreshold = 2;
 
