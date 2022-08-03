@@ -101,7 +101,7 @@ class SDK {
       //Amount of HBAR we want to provide
       .setPayableAmount(HBARAmount)
       .setFunction(
-        'addLiquidityETH',
+        'addLiquidityHBAR',
         new ContractFunctionParameters()
           .addAddress(tokenAddress)
           .addUint256(tokenAmount)
@@ -207,7 +207,7 @@ class SDK {
       .setGas(maxFee)
       //Set the contract function to call
       .setFunction(
-        'removeLiquidityETH',
+        'removeLiquidityHBAR',
         new ContractFunctionParameters()
           .addAddress(tokenAddress)
           .addUint256(tokensLpAmountBN)
@@ -279,15 +279,15 @@ class SDK {
     const getTransactionName = () => {
       if (exactAmountIn) {
         return tokenInIsNative
-          ? 'swapExactETHForTokens'
+          ? 'swapExactHBARForTokens'
           : tokenOutIsNative
-          ? 'swapExactTokensForETH'
+          ? 'swapExactTokensForHBAR'
           : 'swapExactTokensForTokens';
       } else {
         return tokenInIsNative
-          ? 'swapETHForExactTokens'
+          ? 'swapHBARForExactTokens'
           : tokenOutIsNative
-          ? 'swapTokensForExactETH'
+          ? 'swapTokensForExactHBAR'
           : 'swapTokensForExactTokens';
       }
     };
