@@ -101,13 +101,16 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     if ((pools || filteredPools) && !filteredPoolsLoading && !loadingPools) {
       const whitelistedFilteredPools = filterPoolsByPattern(inputValue, pools, searchThreshold);
       const visiblePools = _.unionBy(whitelistedFilteredPools, filteredPools, 'id');
+
       setPoolsToShow(visiblePools);
     }
+
     setHavePools(pools && pools.length !== 0);
   }, [pools, filteredPools, inputValue, filteredPoolsLoading, loadingPools]);
 
   useEffect(() => {
     if (poolsByUser) setUserPoolsToShow(poolsByUser);
+
     setHaveUserPools(poolsByUser && poolsByUser.length !== 0);
   }, [poolsByUser]);
 

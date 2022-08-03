@@ -41,6 +41,7 @@ const AllPools = ({
 
   const handleSortClick = (sortBy: SORT_OPTIONS) => {
     setCollapseAll(true);
+
     if (sortBy === poolsSortBy) {
       setSortDirection(
         sortDirection === SORT_DIRECTION.ASC ? SORT_DIRECTION.DESC : SORT_DIRECTION.ASC,
@@ -59,6 +60,7 @@ const AllPools = ({
   const sortPools = (valueA: string, valueB: string, direction: SORT_DIRECTION) => {
     const valueABN = new BigNumber(valueA);
     const valueBBN = new BigNumber(valueB);
+
     return direction === SORT_DIRECTION.ASC
       ? Number(valueABN.minus(valueBBN))
       : Number(valueBBN.minus(valueABN));
@@ -69,6 +71,7 @@ const AllPools = ({
     const sortedPoolsToShow = (pools || []).sort((a: IPoolExtendedData, b: IPoolExtendedData) =>
       sortPools(a[poolsSortBy as string], b[poolsSortBy as string], sortDirection),
     );
+
     setCurrentItems(sortedPoolsToShow.slice(itemOffset, endOffset));
     setPageCount(Math.ceil(sortedPoolsToShow.length / itemsPerPage));
   }, [itemOffset, itemsPerPage, poolsSortBy, sortDirection, pools]);

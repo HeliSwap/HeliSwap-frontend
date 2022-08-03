@@ -46,6 +46,7 @@ const MyPools = ({
   const sortPools = (valueA: string, valueB: string, direction: SORT_DIRECTION) => {
     const valueABN = new BigNumber(valueA);
     const valueBBN = new BigNumber(valueB);
+
     return direction === SORT_DIRECTION.ASC
       ? Number(valueABN.minus(valueBBN))
       : Number(valueBBN.minus(valueABN));
@@ -56,6 +57,7 @@ const MyPools = ({
     const sortedPoolsToShow = (pools || []).sort((a: IPoolExtendedData, b: IPoolExtendedData) =>
       sortPools(a[SORT_OPTIONS_ENUM.TVL], b[SORT_OPTIONS_ENUM.TVL], SORT_DIRECTION.DESC),
     );
+
     setCurrentItems(sortedPoolsToShow.slice(itemOffset, endOffset));
     setPageCount(Math.ceil(sortedPoolsToShow.length / itemsPerPage));
   }, [itemOffset, itemsPerPage, pools]);
