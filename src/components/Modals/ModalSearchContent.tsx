@@ -5,7 +5,6 @@ import { ITokenData, TokenType } from '../../interfaces/tokens';
 import {
   addressToId,
   getHTSTokenInfo,
-  idToAddress,
   isAddressValid,
   isHederaIdValid,
   requestAddressFromId,
@@ -16,7 +15,6 @@ import Button from '../Button';
 import Icon from '../Icon';
 
 import search from '../../icons/system/search-gradient.svg';
-import { hethers } from '@hashgraph/hethers';
 
 interface IModalProps {
   modalTitle?: string;
