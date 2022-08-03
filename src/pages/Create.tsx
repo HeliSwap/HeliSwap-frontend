@@ -303,6 +303,10 @@ const Create = () => {
 
   const handleProvideConfirm = async () => {
     const { provideSlippage, transactionExpiration } = getTransactionSettings();
+    const {
+      tokenA: { type: typeA },
+      tokenB: { type: typeB },
+    } = tokensData;
 
     setError(false);
     setErrorMessage('');
@@ -317,6 +321,7 @@ const Create = () => {
             provideSlippage,
             transactionExpiration,
             tokensInSamePool,
+            typeA === TokenType.HBAR ? typeB : typeA,
           )
         : await sdk.addLiquidity(
             hashconnectConnectorInstance,
@@ -325,6 +330,8 @@ const Create = () => {
             provideSlippage,
             transactionExpiration,
             tokensInSamePool,
+            typeA,
+            typeB,
           );
       const {
         response: { success, error },

@@ -8,12 +8,15 @@ import {
   idToAddress,
   isAddressValid,
   isHederaIdValid,
+  requestAddressFromId,
+  requestIdFromAddress,
 } from '../../utils/tokenUtils';
 import IconToken from '../IconToken';
 import Button from '../Button';
 import Icon from '../Icon';
 
 import search from '../../icons/system/search-gradient.svg';
+import { hethers } from '@hashgraph/hethers';
 
 interface IModalProps {
   modalTitle?: string;
@@ -72,14 +75,22 @@ const ModalSearchContent = ({
     closeModal();
   };
 
-  const handleImportERC20ButtonClick = () => {
+  const handleImportERC20ButtonClick = async () => {
+    const searchValueIsAddress = isAddressValid(searchInputValue.trim());
+    const hederaId = searchValueIsAddress
+      ? await requestIdFromAddress(searchInputValue.trim())
+      : searchInputValue;
+    const address = searchValueIsAddress
+      ? searchInputValue.trim()
+      : await requestAddressFromId(searchInputValue);
+
     const sampleERC20 = {
-      hederaId: searchInputValue,
+      hederaId,
       type: TokenType.ERC20,
       symbol: 'ERC20',
       name: 'Possible ERC20 Token',
       decimals,
-      address: idToAddress(searchInputValue),
+      address,
     };
 
     setTokensData((prev: any) => ({

@@ -7,8 +7,8 @@ import {
   Transaction,
 } from '@hashgraph/sdk';
 import Hashconnect from '../connectors/hashconnect';
-import { ICreatePairData } from '../interfaces/tokens';
-import { addressToId, idToAddress } from '../utils/tokenUtils';
+import { ICreatePairData, TokenType } from '../interfaces/tokens';
+import { addressToId, requestAddressFromId, idToAddress } from '../utils/tokenUtils';
 import {
   getAmountWithSlippage,
   getExpirationTime,
@@ -66,6 +66,7 @@ class SDK {
     slippage: number,
     expiresAfter: number,
     poolExists: boolean,
+    typeType: TokenType,
   ) {
     const {
       tokenAAmount: tokenAAmountString,
@@ -79,7 +80,8 @@ class SDK {
     const tokenDecimals = tokenAId ? tokenADecimals : tokenBDecimals;
     const tokenAmountString = tokenAId ? tokenAAmountString : tokenBAmountString;
     const HBARAmountString = tokenAId ? tokenBAmountString : tokenAAmountString;
-    const tokenAddress = idToAddress(tokenId);
+    const tokenAddress =
+      typeType === TokenType.HTS ? idToAddress(tokenId) : await requestAddressFromId(tokenId);
 
     const HBARAmount = formatStringToBigNumberWei(HBARAmountString, 0);
     const tokenAmount = formatStringToBigNumberWei(tokenAmountString, tokenDecimals);
@@ -119,6 +121,8 @@ class SDK {
     slippage: number,
     expiresAfter: number,
     poolExists: boolean,
+    typeA: TokenType,
+    typeB: TokenType,
   ) {
     const {
       tokenAAmount: tokenAAmountString,
@@ -128,9 +132,10 @@ class SDK {
       tokenADecimals,
       tokenBDecimals,
     } = createPairData;
-
-    const tokenAAddress = idToAddress(tokenAId);
-    const tokenBAddress = idToAddress(tokenBId);
+    const tokenAAddress =
+      typeA === TokenType.HTS ? idToAddress(tokenAId) : await requestAddressFromId(tokenAId);
+    const tokenBAddress =
+      typeB === TokenType.HTS ? idToAddress(tokenBId) : await requestAddressFromId(tokenBId);
 
     const tokenAAmount = formatStringToBigNumberWei(tokenAAmountString, tokenADecimals);
     const tokenBAmount = formatStringToBigNumberWei(tokenBAmountString, tokenBDecimals);
