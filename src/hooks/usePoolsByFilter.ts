@@ -49,7 +49,7 @@ const usePoolsByFilter = (
     if (filteredPoolsData) {
       const { filterPools } = filteredPoolsData;
       const processedPools = getProcessedPools(filterPools, getExtended, hbarPrice, restPools);
-      if (processedPools) setFilteredPools(processedPools);
+      setFilteredPools(processedPools || []);
     }
   }, [filteredPoolsData, hbarPrice, getExtended, restPools]);
 
