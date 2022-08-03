@@ -3,20 +3,21 @@ import { GlobalContext } from '../providers/Global';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
 
-import { PageViews } from '../interfaces/common';
-
-import RemoveLiquidity from '../components/RemoveLiquidity';
-
 import { REFRESH_TIME } from '../constants';
 
-import usePoolsByUser from '../hooks/usePoolsByUser';
+import { PageViews } from '../interfaces/common';
+import { IPoolExtendedData } from '../interfaces/tokens';
+
 import SearchArea from '../components/SearchArea';
 import AllPools from '../components/AllPools';
 import MyPools from '../components/MyPools';
+import RemoveLiquidity from '../components/RemoveLiquidity';
+
+import { filterPoolsByPattern } from '../utils/poolUtils';
+
+import usePoolsByUser from '../hooks/usePoolsByUser';
 import usePoolsByFilter from '../hooks/usePoolsByFilter';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
-import { filterPoolsByPattern } from '../utils/poolUtils';
-import { IPoolExtendedData } from '../interfaces/tokens';
 
 const searchThreshold = 2;
 
