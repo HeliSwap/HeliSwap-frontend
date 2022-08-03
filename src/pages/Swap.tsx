@@ -22,6 +22,10 @@ import WalletBalance from '../components/WalletBalance';
 import InputTokenSelector from '../components/InputTokenSelector';
 import PageHeader from '../components/PageHeader';
 import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
+import InputToken from '../components/InputToken';
+import ButtonSelector from '../components/ButtonSelector';
+import Icon from '../components/Icon';
+import Confirmation from '../components/Confirmation';
 
 import errorMessages from '../content/errors';
 import {
@@ -44,10 +48,7 @@ import {
 } from '../utils/numberUtils';
 
 import { MAX_UINT_ERC20, MAX_UINT_HTS, REFRESH_TIME } from '../constants';
-import InputToken from '../components/InputToken';
-import ButtonSelector from '../components/ButtonSelector';
-import Icon from '../components/Icon';
-import Confirmation from '../components/Confirmation';
+
 import useTokensByListIds from '../hooks/useTokensByListIds';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import usePoolsByToken from '../hooks/usePoolsByToken';

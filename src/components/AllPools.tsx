@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
-
 import ReactPaginate from 'react-paginate';
 import BigNumber from 'bignumber.js';
 
 import Icon from './Icon';
+import PoolInfo from './PoolInfo';
 
 import { IPoolExtendedData } from '../interfaces/tokens';
 import { PageViews } from '../interfaces/common';
-import { SORT_DIRECTION, SORT_OPTIONS, SORT_OPTIONS_ENUM } from '../constants/index';
 
-import PoolInfo from './PoolInfo';
+import { SORT_DIRECTION, SORT_OPTIONS, SORT_OPTIONS_ENUM } from '../constants/index';
 
 interface IAllPoolsProps {
   loadingPools: boolean;
