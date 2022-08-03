@@ -27,29 +27,41 @@ export const getProcessedPools = (
 
         const token0Price = getTokenPrice(mergedPools, token0, hbarPrice);
         const token1Price = getTokenPrice(mergedPools, token1, hbarPrice);
-
         const token0AmountFormatted = formatStringWeiToStringEther(token0Amount, token0Decimals);
         const token1AmountFormatted = formatStringWeiToStringEther(token1Amount, token1Decimals);
-        const volume7d = formatStringWeiToStringEther(volume7dWei, token0Decimals);
-        const volume24h = formatStringWeiToStringEther(volume24hWei, token0Decimals);
-
         const token0Value = Number(token0AmountFormatted) * Number(token0Price);
         const token1Value = Number(token1AmountFormatted) * Number(token1Price);
 
-        const totalLpValue = token0Value + token1Value;
-        const totalLpValueStr = totalLpValue.toFixed(2);
+        let volume7d, volume24h, volume7dValue, volume24hValue;
+        if (token0Value !== 0) {
+          volume7d = formatStringWeiToStringEther(volume7dWei, token0Decimals);
+          volume24h = formatStringWeiToStringEther(volume24hWei, token0Decimals);
+          volume7dValue = Number(volume7d) * Number(token0Price);
+          volume24hValue = Number(volume24h) * Number(token0Price);
+        } else {
+          volume7d = formatStringWeiToStringEther(volume7dWei, token1Decimals);
+          volume24h = formatStringWeiToStringEther(volume24hWei, token1Decimals);
+          volume7dValue = Number(volume7d) * Number(token1Price);
+          volume24hValue = Number(volume24h) * Number(token1Price);
+        }
 
-        const volume7dValue = Number(volume7d) * Number(token0Price);
-        const volume24hValue = Number(volume24h) * Number(token0Price);
+        let totalLpValue = 0;
+        if (token0Value !== 0 && token1Value !== 0) {
+          totalLpValue = token0Value + token1Value;
+        } else if (token0Value !== 0) {
+          totalLpValue = 2 * token0Value;
+        } else if (token1Value !== 0) {
+          totalLpValue = 2 * token1Value;
+        }
+
+        const totalLpValueStr = totalLpValue.toFixed(2);
 
         const volume7dValueStr = volume7dValue.toFixed(2);
         const volume24hValueStr = volume24hValue.toFixed(2);
 
         const tokensPriceEvaluated =
-          !isNaN(Number(token0Price)) &&
-          Number(token0Price) !== 0 &&
-          !isNaN(Number(token1Price)) &&
-          Number(token1Price) !== 0;
+          (!isNaN(Number(token0Price)) && Number(token0Price) !== 0) ||
+          (!isNaN(Number(token1Price)) && Number(token1Price) !== 0);
 
         const poolData: IPoolExtendedData = {
           ...pool,
