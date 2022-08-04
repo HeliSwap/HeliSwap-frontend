@@ -8,7 +8,12 @@ import {
 } from '@hashgraph/sdk';
 import Hashconnect from '../connectors/hashconnect';
 import { ICreatePairData, TokenType } from '../interfaces/tokens';
-import { addressToId, requestAddressFromId, idToAddress } from '../utils/tokenUtils';
+import {
+  addressToId,
+  requestAddressFromId,
+  idToAddress,
+  requestIdFromAddress,
+} from '../utils/tokenUtils';
 import {
   getAmountWithSlippage,
   getExpirationTime,
@@ -375,6 +380,31 @@ class SDK {
       .setGas(maxFee)
       //Set the contract function to call
       .setFunction('withdraw', new ContractFunctionParameters().addUint256(tokenAmountInNum));
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
+  async transferERC20(
+    hashconnectConnectorInstance: Hashconnect,
+    userId: string,
+    tokenAddress: string,
+    amount: string,
+    to: string,
+    decimals: number = 18,
+  ) {
+    const tokenAAmount = formatStringToBigNumberWei(amount, decimals);
+    const tokenId = await requestIdFromAddress(tokenAddress);
+    const maxFee = TRANSACTION_MAX_FEES.TRANSFER_ERC20;
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(tokenId)
+      //Set the gas for the contract call
+      .setGas(maxFee)
+      //Set the contract function to call
+      .setFunction(
+        'transfer',
+        new ContractFunctionParameters().addAddress(to).addUint256(tokenAAmount),
+      );
 
     return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
