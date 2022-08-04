@@ -300,6 +300,31 @@ const getUserHTSData = async (userId: string) => {
   return tokens?._map;
 };
 
+export const requestIdFromAddress = async (id: string) => {
+  const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/contracts/${id}`;
+  try {
+    const {
+      data: { contract_id },
+    } = await axios(url);
+    return contract_id;
+  } catch (e) {
+    console.error(e);
+    return '0';
+  }
+};
+export const requestAddressFromId = async (address: string) => {
+  const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/contracts/${address}`;
+  try {
+    const {
+      data: { evm_address },
+    } = await axios(url);
+    return evm_address;
+  } catch (e) {
+    console.error(e);
+    return '0';
+  }
+};
+
 export const NATIVE_TOKEN: ITokenData = {
   hederaId: '',
   name: 'HBAR',
