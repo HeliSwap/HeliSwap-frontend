@@ -46,8 +46,8 @@ import { formatIcons } from '../utils/iconUtils';
 
 import { MAX_UINT_ERC20, MAX_UINT_HTS, POOLS_FEE, REFRESH_TIME } from '../constants';
 
-import useTokens from '../hooks/useTokens';
 import usePoolsByToken from '../hooks/usePoolsByToken';
+import useTokensByListIds from '../hooks/useTokensByListIds';
 
 enum ADD_LIQUIDITY_TITLES {
   CREATE_POOL = 'Create pool',
@@ -57,11 +57,14 @@ enum ADD_LIQUIDITY_TITLES {
 
 const Create = () => {
   const contextValue = useContext(GlobalContext);
-  const { connection, sdk } = contextValue;
+  const { connection, sdk, tokensWhitelisted } = contextValue;
   const { userId, hashconnectConnectorInstance, connected, connectWallet, isHashpackLoading } =
     connection;
   const { token0, token1 } = useParams();
   const navigate = useNavigate();
+
+  //State for tokens whitelist
+  const [tokensWhitelistedIds, setTokensWhitelistedIds] = useState<string[]>([]);
 
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
@@ -79,6 +82,7 @@ const Create = () => {
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
   const [loadingAssociate, setLoadingAssociate] = useState(false);
 
+  //Get pools by token A
   const { filteredPools: poolsData } = usePoolsByToken(
     {
       fetchPolicy: 'network-only',
@@ -88,9 +92,9 @@ const Create = () => {
     false,
   );
 
-  const { loading: loadingTDL, tokens: tokenDataList } = useTokens({
+  //Get whitelisted tokens
+  const { loading: loadingTDL, tokens: tokenDataList } = useTokensByListIds(tokensWhitelistedIds, {
     fetchPolicy: 'network-only',
-    pollInterval: REFRESH_TIME,
   });
 
   const initialCreateData: ICreatePairData = {
@@ -575,6 +579,13 @@ const Create = () => {
     invalidTokenData,
     tokensData,
   ]);
+
+  useEffect(() => {
+    if (tokensWhitelisted && tokensWhitelisted.length !== 0) {
+      const tokensWhitelistedIds = tokensWhitelisted.map(item => item.address);
+      setTokensWhitelistedIds(tokensWhitelistedIds);
+    }
+  }, [tokensWhitelisted]);
 
   const getTokenIsAssociated = (token: ITokenData) => {
     const notHTS =
