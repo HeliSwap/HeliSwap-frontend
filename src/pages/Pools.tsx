@@ -32,7 +32,6 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const { connection, tokensWhitelisted } = contextValue;
   const { userId, connected, isHashpackLoading, setShowConnectModal } = connection;
 
-  const [searchQuery, setSearchQuery] = useState({});
   const [showRemoveContainer, setShowRemoveContainer] = useState(false);
   const [currentPoolIndex, setCurrentPoolIndex] = useState(0);
   const [poolsToShow, setPoolsToShow] = useState<IPoolExtendedData[]>([]);
@@ -70,11 +69,10 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     tokensWhitelistedAddresses,
   );
 
-  const { filteredPools, filteredPoolsLoading } = usePoolsByFilter(
+  const { filteredPools, filteredPoolsLoading, loadExtraPools } = usePoolsByFilter(
     {
       fetchPolicy: 'network-only',
     },
-    searchQuery,
     true,
     pools,
   );
@@ -94,6 +92,13 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
 
   const initialCurrentView: PageViews = PageViews.ALL_POOLS;
   const [currentView, setCurrentView] = useState<PageViews>(initialCurrentView);
+
+  const searchFunc = useMemo(
+    () => (value: string) => {
+      if (value.length > searchThreshold) loadExtraPools({ variables: { keyword: value } });
+    },
+    [loadExtraPools],
+  );
 
   const viewTitleMapping = {
     [PageViews.ALL_POOLS]: 'All pools',

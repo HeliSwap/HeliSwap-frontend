@@ -10,7 +10,6 @@ import { getProcessedPools } from '../utils/poolUtils';
 
 const usePoolsByFilter = (
   useQueryOptions: QueryHookOptions = {},
-  searchQuery: Object,
   getExtended: boolean,
   restPools: IPoolExtendedData[] = [],
 ) => {
@@ -37,15 +36,6 @@ const usePoolsByFilter = (
   }, [getExtended]);
 
   useEffect(() => {
-    if (Object.keys(searchQuery).length !== 0)
-      loadExtraPools({
-        variables: {
-          ...searchQuery,
-        },
-      });
-  }, [loadExtraPools, searchQuery]);
-
-  useEffect(() => {
     if (filteredPoolsData) {
       const { filterPools } = filteredPoolsData;
       const processedPools = getProcessedPools(filterPools, getExtended, hbarPrice, restPools);
@@ -53,7 +43,13 @@ const usePoolsByFilter = (
     }
   }, [filteredPoolsData, hbarPrice, getExtended, restPools]);
 
-  return { filteredPools, filteredPoolsCalled, filteredPoolsLoading, filteredPoolsError };
+  return {
+    filteredPools,
+    filteredPoolsCalled,
+    filteredPoolsLoading,
+    filteredPoolsError,
+    loadExtraPools,
+  };
 };
 
 export default usePoolsByFilter;
