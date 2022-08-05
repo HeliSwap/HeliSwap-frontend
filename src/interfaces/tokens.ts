@@ -32,20 +32,27 @@ export interface IPoolData {
   token1Symbol: string;
   token1Decimals: number;
   lpShares?: string;
+  poolPercenatage?: string;
   icons?: string[];
   volume7d: string;
   volume24h: string;
+  fee0?: string;
+  fee1?: string;
 }
 
 export interface IPoolExtendedData extends IPoolData {
   token0AmountFormatted: string;
   token1AmountFormatted: string;
+  fee0AmountFormatted?: string;
+  fee1AmountFormatted?: string;
   tvlBN: BigNumber;
   tvl: string;
   volume24Num?: number;
   volume24?: string;
   volume7Num?: number;
   volume7?: string;
+  feesNum?: number;
+  feesStr?: string;
 }
 
 export enum TokenType {

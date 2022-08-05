@@ -3,6 +3,7 @@ import HBAR from '../icons/tokens/HBAR.png';
 import WHBAR from '../icons/tokens/WHBAR.png';
 import ETH from '../icons/tokens/ETH.svg';
 import unknown from '../icons/tokens/unknown.svg';
+import LP from '../icons/tokens/LP.svg';
 
 import HELI from '../icons/tokens/HELI.png';
 import DOB from '../icons/tokens/DOB.png';
@@ -32,7 +33,7 @@ const tokenMapping: ITokenMapping = {
   WBTC: WBTC,
   WETH: ETH,
   WHBAR: WHBAR,
-  LP: HBAR,
+  LP: LP,
 };
 
 const defaultIconToken = unknown;

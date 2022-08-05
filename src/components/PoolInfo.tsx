@@ -127,7 +127,9 @@ const PoolInfo = ({
             <div className="col-6">
               <div className="container-rounded-dark">
                 <p className="text-small">Unclaimed fees</p>
-                <p className="text-title text-numeric">12</p>
+                <p className="text-title text-numeric text-success">
+                  ${formatStringETHtoPriceFormatted(poolData.feesStr as string)}
+                </p>
 
                 <hr className="my-4" />
 
@@ -138,7 +140,7 @@ const PoolInfo = ({
                   </div>
 
                   <span className="text-numeric text-small">
-                    {formatStringETHtoPriceFormatted('1')}
+                    {formatStringETHtoPriceFormatted(poolData.fee0AmountFormatted as string)}
                   </span>
                 </div>
 
@@ -149,7 +151,7 @@ const PoolInfo = ({
                   </div>
 
                   <span className="text-numeric text-small">
-                    {formatStringETHtoPriceFormatted('1')}
+                    {formatStringETHtoPriceFormatted(poolData.fee1AmountFormatted as string)}
                   </span>
                 </div>
               </div>
@@ -159,7 +161,7 @@ const PoolInfo = ({
           <div className="container-rounded-dark mt-4">
             <div className="d-flex justify-content-between align-items-center">
               <span className="text-small text-bold">% of the pool</span>
-              <span className="text-small text-numeric">{}%</span>
+              <span className="text-small text-numeric">{poolData.poolPercenatage}%</span>
             </div>
           </div>
         </div>
@@ -202,7 +204,7 @@ const PoolInfo = ({
           <p className="text-small ms-3">
             {poolData.token0Symbol}/{poolData.token1Symbol}
           </p>
-          <span className="text-micro text-numeric badge bg-secondary ms-3">{POOLS_FEE}</span>
+          <span className="text-micro text-numeric badge bg-secondary-800 ms-3">{POOLS_FEE}</span>
         </div>
         {view === PageViews.ALL_POOLS ? (
           <>

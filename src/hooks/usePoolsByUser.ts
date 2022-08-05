@@ -8,7 +8,14 @@ import { REFRESH_TIME } from '../constants';
 
 import { IPoolData, IPoolExtendedData } from '../interfaces/tokens';
 
-import { getTokenPrice, getHBarPrice, idToAddress, calculateReserves } from '../utils/tokenUtils';
+import {
+  getTokenPrice,
+  getHBarPrice,
+  idToAddress,
+  calculateReserves,
+  calculatePercentageByShare,
+} from '../utils/tokenUtils';
+import { formatStringWeiToStringEther } from '../utils/numberUtils';
 
 const usePoolsByUser = (
   useQueryOptions: QueryHookOptions = {},
@@ -57,6 +64,8 @@ const usePoolsByUser = (
             token1,
             lpShares,
             pairSupply,
+            fee0,
+            fee1,
           } = pool;
 
           const { reserve0ShareStr, reserve1ShareStr } = calculateReserves(
@@ -71,10 +80,20 @@ const usePoolsByUser = (
           const token0Price = getTokenPrice(poolsExtended, token0, hbarPrice);
           const token1Price = getTokenPrice(poolsExtended, token1, hbarPrice);
 
+          const fee0Formatted = formatStringWeiToStringEther(fee0 as string, token0Decimals);
+          const fee1Formatted = formatStringWeiToStringEther(fee1 as string, token1Decimals);
+
+          const fee0Value = Number(fee0Formatted) * Number(token0Price);
+          const fee1Value = Number(fee1Formatted) * Number(token1Price);
+          const totalFeeValue = fee0Value + fee1Value;
+          const totalFeeValueString = totalFeeValue.toString();
+
           const token0Value = Number(reserve0ShareStr) * Number(token0Price);
           const token1Value = Number(reserve1ShareStr) * Number(token1Price);
           const totalLpValue = token0Value + token1Value;
           const totalLpValueStr = totalLpValue.toFixed(2);
+
+          const userPercentageShare = calculatePercentageByShare(pairSupply, lpShares as string);
 
           const poolData: IPoolExtendedData = {
             ...pool,
@@ -82,6 +101,11 @@ const usePoolsByUser = (
             token1AmountFormatted: reserve1ShareStr,
             tvl: totalLpValueStr,
             tvlBN: new BigNumber(totalLpValueStr),
+            feesNum: totalFeeValue,
+            feesStr: totalFeeValueString,
+            poolPercenatage: userPercentageShare,
+            fee0AmountFormatted: fee0Formatted,
+            fee1AmountFormatted: fee1Formatted,
           };
 
           return poolData;
