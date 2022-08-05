@@ -284,6 +284,7 @@ export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbar
     tokenAddress,
     false,
   );
+
   const sortedTrades = tradesIn.sort(tradeComparator);
 
   if (sortedTrades.length === 0) return;
@@ -295,8 +296,10 @@ export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbar
     let determinedPrice = false;
     let multiplier = 2;
     const step = 2;
+
     //Set a threshold in order to avoid infinit loop
     const threshold = 1000;
+
     while (!determinedPrice && multiplier < threshold) {
       const tradesInMultiplied = getPossibleTradesExactIn(
         poolsData || [],
@@ -305,7 +308,9 @@ export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbar
         tokenAddress,
         false,
       );
+
       const sortedTradesMultiplied = tradesInMultiplied.sort(tradeComparator);
+
       if (Number(sortedTradesMultiplied[0].amountOut) === 0) {
         multiplier = step * multiplier;
       } else {
