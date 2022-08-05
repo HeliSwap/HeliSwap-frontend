@@ -91,6 +91,7 @@ const Swap = () => {
 
   const [mergedPoolsData, setMergedPoolsData] = useState<IPoolData[]>([] as IPoolData[]);
 
+  //Get whitelisted pools
   const {
     poolsByTokenList: whitelistedPoolsData,
     loadingPoolsByTokenList: loadingPools,
@@ -103,7 +104,7 @@ const Swap = () => {
     false,
     tokensWhitelistedIds,
   );
-
+  //Get pools by token A
   const { filteredPools: filteredPoolsDataTokenA } = usePoolsByToken(
     {
       fetchPolicy: 'network-only',
@@ -113,6 +114,7 @@ const Swap = () => {
     false,
   );
 
+  //Get pools by token B
   const { filteredPools: filteredPoolsDataTokenB } = usePoolsByToken(
     {
       fetchPolicy: 'network-only',
@@ -122,9 +124,9 @@ const Swap = () => {
     true,
   );
 
+  //Get whitelisted tokens
   const { loading: loadingTDL, tokens: tokenDataList } = useTokensByListIds(tokensWhitelistedIds, {
     fetchPolicy: 'network-only',
-    pollInterval: REFRESH_TIME,
   });
 
   const initialSwapData: ISwapTokenData = {

@@ -157,3 +157,17 @@ export const GET_POOLS_WHITELISTED = gql`
     }
   }
 `;
+
+export const GET_TOKENS_WHITELISTED = gql`
+  query getWhitelistedTokens($addresses: [String]!) {
+    getWhitelistedTokens(addresses: $addresses) {
+      id
+      address
+      hederaId
+      symbol
+      name
+      decimals
+      isHTS
+    }
+  }
+`;
