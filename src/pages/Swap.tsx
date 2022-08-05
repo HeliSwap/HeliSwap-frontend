@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext, useMemo, useCallback } from 're
 import { useParams } from 'react-router-dom';
 import Tippy from '@tippyjs/react';
 import BigNumber from 'bignumber.js';
+import _ from 'lodash';
 
 import {
   ITokenData,
@@ -21,6 +22,10 @@ import WalletBalance from '../components/WalletBalance';
 import InputTokenSelector from '../components/InputTokenSelector';
 import PageHeader from '../components/PageHeader';
 import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
+import InputToken from '../components/InputToken';
+import ButtonSelector from '../components/ButtonSelector';
+import Icon from '../components/Icon';
+import Confirmation from '../components/Confirmation';
 
 import errorMessages from '../content/errors';
 import {
@@ -42,18 +47,15 @@ import {
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
 
-import usePools from '../hooks/usePools';
-import useTokens from '../hooks/useTokens';
-
 import { MAX_UINT_ERC20, MAX_UINT_HTS, REFRESH_TIME } from '../constants';
-import InputToken from '../components/InputToken';
-import ButtonSelector from '../components/ButtonSelector';
-import Icon from '../components/Icon';
-import Confirmation from '../components/Confirmation';
+
+import useTokensByListIds from '../hooks/useTokensByListIds';
+import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
+import usePoolsByToken from '../hooks/usePoolsByToken';
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
-  const { connection, sdk } = contextValue;
+  const { connection, sdk, tokensWhitelisted } = contextValue;
   const {
     userId,
     hashconnectConnectorInstance,
@@ -63,7 +65,7 @@ const Swap = () => {
     isHashpackLoading,
   } = connection;
 
-  const { address } = useParams();
+  const { token0, token1 } = useParams();
 
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
@@ -84,24 +86,48 @@ const Swap = () => {
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
   const [insufficientLiquidity, setInsufficientLiquidity] = useState(false);
 
-  // State for pools
-  const {
-    pools: poolsData,
-    loading: loadingPools,
-    refetch,
-  } = usePools({
-    fetchPolicy: 'network-only',
-    pollInterval: REFRESH_TIME,
-  });
+  //State for tokens whitelist
+  const [tokensWhitelistedIds, setTokensWhitelistedIds] = useState<string[]>([]);
 
-  const { loading: loadingTDL, tokens: tokenDataList } = useTokens({
+  const [mergedPoolsData, setMergedPoolsData] = useState<IPoolData[]>([] as IPoolData[]);
+
+  const {
+    poolsByTokenList: whitelistedPoolsData,
+    loadingPoolsByTokenList: loadingPools,
+    refetchPoolsByTokenList: refetch,
+  } = usePoolsByTokensList(
+    {
+      fetchPolicy: 'network-only',
+      pollInterval: REFRESH_TIME,
+    },
+    false,
+    tokensWhitelistedIds,
+  );
+
+  const { filteredPools: filteredPoolsDataTokenA } = usePoolsByToken(
+    {
+      fetchPolicy: 'network-only',
+      pollInterval: REFRESH_TIME,
+    },
+    tokensData.tokenA.address || (process.env.REACT_APP_WHBAR_ADDRESS as string),
+    false,
+  );
+
+  const { filteredPools: filteredPoolsDataTokenB } = usePoolsByToken(
+    {
+      fetchPolicy: 'network-only',
+      pollInterval: REFRESH_TIME,
+    },
+    tokensData.tokenB.address || (process.env.REACT_APP_WHBAR_ADDRESS as string),
+    true,
+  );
+
+  const { loading: loadingTDL, tokens: tokenDataList } = useTokensByListIds(tokensWhitelistedIds, {
     fetchPolicy: 'network-only',
     pollInterval: REFRESH_TIME,
   });
 
   const initialSwapData: ISwapTokenData = {
-    tokenIdIn: '',
-    tokenIdOut: '',
     amountIn: '',
     amountOut: '',
   };
@@ -151,7 +177,7 @@ const Swap = () => {
   }, [swapData, tokenBalances]);
 
   const handleInputChange = useCallback(
-    (value: string, name: string, inputTokensData: any = tokensData) => {
+    (value: string, name: string, inputTokensData: ITokensData = tokensData) => {
       setInsufficientLiquidity(false);
       const { tokenA, tokenB } = inputTokensData;
 
@@ -209,7 +235,7 @@ const Swap = () => {
       } else {
         if (name === 'amountIn') {
           const trades = getPossibleTradesExactIn(
-            poolsData || [],
+            mergedPoolsData || [],
             amountIn,
             tokenInAddress,
             tokenOutAddress,
@@ -231,7 +257,7 @@ const Swap = () => {
           setSwapData(prev => ({ ...prev, ...tokenData, amountOut: bestTrade.amountOut }));
         } else if (name === 'amountOut') {
           const trades = getPossibleTradesExactOut(
-            poolsData || [],
+            mergedPoolsData || [],
             amountOut,
             tokenInAddress,
             tokenOutAddress,
@@ -255,7 +281,7 @@ const Swap = () => {
         }
       }
     },
-    [poolsData, tokensData, willUnwrapTokens, willWrapTokens],
+    [mergedPoolsData, tokensData, willUnwrapTokens, willWrapTokens],
   );
 
   const handleAssociateClick = async (token: ITokenData) => {
@@ -395,47 +421,24 @@ const Swap = () => {
     setTokensData(newTokensData);
     const newInputValueKey = tokenInExactAmount ? 'amountOut' : 'amountIn';
     const oldInputValueKey = tokenInExactAmount ? 'amountIn' : 'amountOut';
-    setSwapData({ ...swapData, tokenIdIn: swapData.tokenIdOut, tokenIdOut: swapData.tokenIdIn });
 
     handleInputChange(swapData[oldInputValueKey], newInputValueKey, newTokensData);
   };
-
-  // Check for WRAP/UNWRAP
-  useEffect(() => {
-    refetch();
-
-    const { tokenA, tokenB } = tokensData;
-    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
-
-    const tokenInIsNative = tokenA.type === TokenType.HBAR;
-    const tokenOutIsNative = tokenB.type === TokenType.HBAR;
-
-    const tokenInWrappedHBAR = tokenA.address === WHBARAddress;
-    const tokenOutWrappedHBAR = tokenB.address === WHBARAddress;
-
-    setTokenInIsNative(tokenInIsNative);
-    setTokenOutIsNative(tokenOutIsNative);
-    const willWrap = tokenInIsNative && tokenOutWrappedHBAR;
-    const willUnwrap = tokenOutIsNative && tokenInWrappedHBAR;
-
-    setWillWrapTokens(willWrap);
-    setWillUnwrapTokens(willUnwrap);
-  }, [poolsData, tokensData, refetch]);
 
   // Check for cached input values - used for auto pooling
   useEffect(() => {
     const newInputName = tokenInExactAmount ? 'amountIn' : 'amountOut';
     const newInputValue = tokenInExactAmount ? tokenInValue : tokenOutValue;
     handleInputChange(newInputValue, newInputName);
-  }, [poolsData, tokensData, handleInputChange, tokenInExactAmount, tokenInValue, tokenOutValue]);
+  }, [mergedPoolsData, handleInputChange, tokenInExactAmount, tokenInValue, tokenOutValue]);
 
   // Check for approvals
   useEffect(() => {
     const getAllowanceHTS = async (userId: string) => {
-      const { amountIn: amountToSpend, tokenIdIn } = swapData;
+      const { amountIn: amountToSpend } = swapData;
 
       const {
-        tokenA: { type, decimals },
+        tokenA: { type, decimals, hederaId: tokenIdIn },
       } = tokensData;
 
       const tokenAData: ITokenData = {
@@ -455,12 +458,12 @@ const Swap = () => {
       setNeedApproval(false);
     }
 
-    const hasTokenAData = swapData.tokenIdIn && swapData.amountIn;
+    const hasTokenAData = tokensData.tokenA.hederaId && swapData.amountIn;
 
     if (tokensData.tokenA.type === TokenType.HTS && hasTokenAData && userId) {
       getAllowanceHTS(userId);
     }
-  }, [swapData, userId, sdk, tokensData, userAssociatedTokens]);
+  }, [swapData, userId, tokensData]);
 
   // Check for associations
   useEffect(() => {
@@ -472,7 +475,7 @@ const Swap = () => {
     userId && checkTokenAssociation(userId);
   }, [userId]);
 
-  // Check for balances
+  // Check for balances and wrap/unwrap
   useEffect(() => {
     const getTokenBalances = async () => {
       if (userId) {
@@ -490,6 +493,22 @@ const Swap = () => {
     const { tokenA, tokenB } = tokensData;
 
     getTokenBalances();
+
+    const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
+
+    const tokenInIsNative = tokenA.type === TokenType.HBAR;
+    const tokenOutIsNative = tokenB.type === TokenType.HBAR;
+
+    const tokenInWrappedHBAR = tokenA.address === WHBARAddress;
+    const tokenOutWrappedHBAR = tokenB.address === WHBARAddress;
+
+    setTokenInIsNative(tokenInIsNative);
+    setTokenOutIsNative(tokenOutIsNative);
+    const willWrap = tokenInIsNative && tokenOutWrappedHBAR;
+    const willUnwrap = tokenOutIsNative && tokenInWrappedHBAR;
+
+    setWillWrapTokens(willWrap);
+    setWillUnwrapTokens(willUnwrap);
   }, [tokensData, userId, initialBallanceData]);
 
   // Final checks before swap
@@ -514,38 +533,29 @@ const Swap = () => {
     setReadyToApprove(readyToApprove);
 
     setReadyToSwap(ready);
-  }, [
-    swapData,
-    approved,
-    initialSwapData.tokenIdOut,
-    tokenBalances,
-    getInsufficientTokenIn,
-    tokensData,
-    insufficientLiquidity,
-    needApproval,
-  ]);
+  }, [swapData, approved, getInsufficientTokenIn, tokensData, insufficientLiquidity, needApproval]);
 
-  // Check for address in url
+  // Check for prepopulated tokens in url
   useEffect(() => {
     try {
-      if (address && poolsData.length !== 0 && tokenDataList && !tokensDerivedFromPool) {
-        const chosenPool =
-          poolsData.find((pool: IPoolData) => pool.pairAddress === address) || ({} as IPoolData);
-        const { token0: token0Address, token1: token1Address } = chosenPool;
-
+      if (
+        !tokensDerivedFromPool &&
+        token0 &&
+        token1 &&
+        mergedPoolsData.length !== 0 &&
+        tokenDataList
+      ) {
         // Check if one of tokens is WHBAR - to be switched for HBAR
-        const isTokenAWrappedHBAR =
-          token0Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
-        const isTokenBWrappedHBAR =
-          token1Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+        const isTokenAWrappedHBAR = token0 === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+        const isTokenBWrappedHBAR = token1 === (process.env.REACT_APP_WHBAR_ADDRESS as string);
 
         const tokenA = isTokenAWrappedHBAR
           ? NATIVE_TOKEN
-          : tokenDataList.find((token: ITokenData) => token.address === token0Address) ||
+          : tokenDataList.find((token: ITokenData) => token.address === token0) ||
             ({} as ITokenData);
         const tokenB = isTokenBWrappedHBAR
           ? NATIVE_TOKEN
-          : tokenDataList.find((token: ITokenData) => token.address === token1Address) ||
+          : tokenDataList.find((token: ITokenData) => token.address === token1) ||
             ({} as ITokenData);
 
         if (tokenA.type !== TokenType.HBAR) {
@@ -571,7 +581,24 @@ const Swap = () => {
     } catch (err) {
       console.error(err);
     }
-  }, [poolsData, tokenDataList, address, tokensDerivedFromPool, userId]);
+  }, [mergedPoolsData, tokenDataList, token0, token1, tokensDerivedFromPool, userId]);
+
+  useEffect(() => {
+    if (tokensWhitelisted && tokensWhitelisted.length !== 0) {
+      const tokensWhitelistedIds = tokensWhitelisted.map(item => item.address);
+      setTokensWhitelistedIds(tokensWhitelistedIds);
+    }
+  }, [tokensWhitelisted]);
+
+  useEffect(() => {
+    const mergedPoolsData = _.unionBy(
+      whitelistedPoolsData,
+      filteredPoolsDataTokenA,
+      filteredPoolsDataTokenB,
+      'id',
+    );
+    setMergedPoolsData(mergedPoolsData);
+  }, [whitelistedPoolsData, filteredPoolsDataTokenA, filteredPoolsDataTokenB]);
 
   //Render methods
   const getErrorMessage = () => {

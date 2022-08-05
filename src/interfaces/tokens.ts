@@ -10,6 +10,15 @@ export interface ITokenData {
   details?: any;
 }
 
+export interface ITokenListData {
+  address: string;
+  chainId: number;
+  decimals: number;
+  logoURI: string;
+  name: string;
+  symbol: string;
+}
+
 export interface ITokensData {
   tokenA: ITokenData;
   tokenB: ITokenData;
@@ -53,6 +62,8 @@ export interface IPoolExtendedData extends IPoolData {
   volume7?: string;
   feesNum?: number;
   feesStr?: string;
+  tokensPriceEvaluated?: boolean;
+  [key: string]: any;
 }
 
 export enum TokenType {
@@ -67,8 +78,6 @@ export interface IUserToken {
 }
 
 export interface ISwapTokenData {
-  tokenIdIn: string;
-  tokenIdOut: string;
   amountIn: string;
   amountOut: string;
 }

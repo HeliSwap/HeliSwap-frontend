@@ -1,0 +1,46 @@
+{
+  "name": "HeliSwap Whitelisted",
+  "timestamp": "2022-07-29T15:57:01.868Z",
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  },
+  "tags": {},
+  "logoURI": "ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/HELI.png",
+  "keywords": ["heliswap", "default"],
+  "tokens": [
+    {
+      "chainId": 290,
+      "address": "0x0000000000000000000000000000000002be8c90",
+      "name": "Wrapped HBAR",
+      "symbol": "WHBAR",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/WHBAR.png"
+    },
+    {
+      "chainId": 290,
+      "address": "0x0000000000000000000000000000000002121D51",
+      "name": "USD Tether",
+      "symbol": "USDT",
+      "decimals": 6,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/USDT.png"
+    },
+    {
+      "chainId": 290,
+      "address": "0x0000000000000000000000000000000002121d92",
+      "name": "Wrapped Ethereum",
+      "symbol": "WETH",
+      "decimals": 18,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/WETH.png"
+    },
+    {
+      "chainId": 290,
+      "address": "0x0000000000000000000000000000000002121d92",
+      "name": "Wrapped Bitcoin",
+      "symbol": "WBTC",
+      "decimals": 18,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/WBTC.png"
+    }
+  ]
+}

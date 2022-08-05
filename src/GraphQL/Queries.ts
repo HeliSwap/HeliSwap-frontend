@@ -109,3 +109,51 @@ export const HEALTH_CHECK = gql`
     healthcheck
   }
 `;
+
+export const GET_POOLS_FILTERED = gql`
+  query getFilterPools($keyword: String!) {
+    filterPools(keyword: $keyword) {
+      id
+      pairName
+      pairSymbol
+      pairAddress
+      pairSupply
+      token0
+      token0Name
+      token0Amount
+      token0Symbol
+      token0Decimals
+      token1
+      token1Name
+      token1Symbol
+      token1Amount
+      token1Decimals
+      volume24h
+      volume7d
+    }
+  }
+`;
+
+export const GET_POOLS_WHITELISTED = gql`
+  query getWhitelistedPools($tokens: [String]!) {
+    poolsConsistingOf(tokens: $tokens) {
+      id
+      pairName
+      pairSymbol
+      pairAddress
+      pairSupply
+      token0
+      token0Name
+      token0Amount
+      token0Symbol
+      token0Decimals
+      token1
+      token1Name
+      token1Symbol
+      token1Amount
+      token1Decimals
+      volume24h
+      volume7d
+    }
+  }
+`;

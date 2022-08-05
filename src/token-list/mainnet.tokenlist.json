@@ -1,0 +1,22 @@
+{
+  "name": "HeliSwap Whitelisted",
+  "timestamp": "2022-07-29T15:57:01.868Z",
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  },
+  "tags": {},
+  "logoURI": "ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/HELI.png",
+  "keywords": ["heliswap", "default"],
+  "tokens": [
+    {
+      "chainId": 295,
+      "address": "0x00000000000000000000000000000000000f7e89",
+      "name": "Wrapped HBAR",
+      "symbol": "WHBAR",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/WHBAR.png"
+    }
+  ]
+}

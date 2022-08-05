@@ -1,34 +1,75 @@
-import React, { useState, useContext } from 'react';
+import { useState, useContext, useEffect, useMemo } from 'react';
 import { GlobalContext } from '../providers/Global';
 import { Link } from 'react-router-dom';
-
-import { PageViews } from '../interfaces/common';
-
-import PoolInfo from '../components/PoolInfo';
-import Button from '../components/Button';
-import RemoveLiquidity from '../components/RemoveLiquidity';
-import Icon from '../components/Icon';
+import _ from 'lodash';
 
 import { REFRESH_TIME } from '../constants';
 
-import usePools from '../hooks/usePools';
-import usePoolsByUser from '../hooks/usePoolsByUser';
+import { PageViews } from '../interfaces/common';
+import { IPoolExtendedData } from '../interfaces/tokens';
 
-const Pools = () => {
+import SearchArea from '../components/SearchArea';
+import AllPools from '../components/AllPools';
+import MyPools from '../components/MyPools';
+import RemoveLiquidity from '../components/RemoveLiquidity';
+
+import { filterPoolsByPattern } from '../utils/poolUtils';
+
+import usePoolsByUser from '../hooks/usePoolsByUser';
+import usePoolsByFilter from '../hooks/usePoolsByFilter';
+import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
+
+const searchThreshold = 2;
+
+interface IPoolsProps {
+  itemsPerPage: number;
+}
+
+const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const contextValue = useContext(GlobalContext);
-  const { connection } = contextValue;
+  const { connection, tokensWhitelisted } = contextValue;
   const { userId, connected, isHashpackLoading, setShowConnectModal } = connection;
 
+  const [searchQuery, setSearchQuery] = useState({});
+  const [showRemoveContainer, setShowRemoveContainer] = useState(false);
+  const [currentPoolIndex, setCurrentPoolIndex] = useState(0);
+  const [poolsToShow, setPoolsToShow] = useState<IPoolExtendedData[]>([]);
+  const [userPoolsToShow, setUserPoolsToShow] = useState<IPoolExtendedData[]>([]);
+  const [havePools, setHavePools] = useState(false);
+  const [haveUserPools, setHaveUserPools] = useState(false);
+
+  //Search area state
+  const [inputValue, setInputValue] = useState('');
+
+  const searchFunc = useMemo(
+    () => (value: string) => {
+      if (value.length > searchThreshold) setSearchQuery({ keyword: value });
+    },
+    [],
+  );
+
+  const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
+
   const {
-    error: errorPoools,
-    loading: loadingPools,
-    pools,
-  } = usePools(
+    poolsByTokenList: pools,
+    loadingPoolsByTokenList: loadingPools,
+    errorPoolsByTokenList: errorPoools,
+  } = usePoolsByTokensList(
     {
       fetchPolicy: 'network-only',
       pollInterval: REFRESH_TIME,
     },
     true,
+    tokensWhitelistedAddresses,
+  );
+
+  const { filteredPools, filteredPoolsLoading } = usePoolsByFilter(
+    {
+      fetchPolicy: 'network-only',
+    },
+    searchQuery,
+    true,
+    pools,
   );
 
   const {
@@ -44,9 +85,6 @@ const Pools = () => {
     pools,
   );
 
-  const [showRemoveContainer, setShowRemoveContainer] = useState(false);
-  const [currentPoolIndex, setCurrentPoolIndex] = useState(0);
-
   const initialCurrentView: PageViews = PageViews.ALL_POOLS;
   const [currentView, setCurrentView] = useState<PageViews>(initialCurrentView);
 
@@ -55,109 +93,26 @@ const Pools = () => {
     [PageViews.MY_POOLS]: 'My positions',
   };
 
-  const poolsMapping = {
-    [PageViews.ALL_POOLS]: pools,
-    [PageViews.MY_POOLS]: poolsByUser,
-  };
-
-  const poolsToShow = poolsMapping[currentView];
-
   const handleTabItemClick = (currentView: PageViews) => {
     setCurrentView(currentView);
   };
 
-  const havePools = poolsToShow!.length > 0;
+  useEffect(() => {
+    if ((pools || filteredPools) && !filteredPoolsLoading && !loadingPools) {
+      const whitelistedFilteredPools = filterPoolsByPattern(inputValue, pools, searchThreshold);
+      const visiblePools = _.unionBy(whitelistedFilteredPools, filteredPools, 'id');
 
-  const renderAllPools = () => {
-    return loadingPools ? (
-      <p className="text-info">Loading pools...</p>
-    ) : havePools ? (
-      <div className="table-pools">
-        <div className={`table-pools-row with-6-columns`}>
-          <div className="table-pools-cell">
-            <span className="text-small">#</span>
-          </div>
-          <div className="table-pools-cell">
-            <span className="text-small">Pool</span>
-          </div>
-          <div className="table-pools-cell justify-content-end">
-            <span className="text-small">
-              TVL <Icon name="arrow-down" />
-            </span>
-          </div>
-          <div className="table-pools-cell justify-content-end">
-            <span className="text-small">Volume 7d</span>
-          </div>
-          <div className="table-pools-cell justify-content-end">
-            <span className="text-small">Volume 24h</span>
-          </div>
-          <div className="table-pools-cell justify-content-end">
-            <span className="text-small"></span>
-          </div>
-        </div>
-        {poolsToShow.map((item, index) => (
-          <PoolInfo
-            setShowRemoveContainer={setShowRemoveContainer}
-            setCurrentPoolIndex={setCurrentPoolIndex}
-            index={index}
-            key={index}
-            poolData={item}
-            view={currentView}
-          />
-        ))}
-      </div>
-    ) : (
-      renderEmptyPoolsState('There are no active pools at this moment.')
-    );
-  };
+      setPoolsToShow(visiblePools);
+    }
 
-  const renderUserPools = () => {
-    return connected && !isHashpackLoading ? (
-      loadingPoolsByUser ? (
-        <p className="text-info">Loading pools...</p>
-      ) : havePools ? (
-        <div className="table-pools">
-          <div className={`table-pools-row`}>
-            <div className="table-pools-cell">
-              <span className="text-small">#</span>
-            </div>
-            <div className="table-pools-cell">
-              <span className="text-small">Pool</span>
-            </div>
-            <div className="table-pools-cell justify-content-end">
-              <span className="text-small"></span>
-            </div>
-          </div>
-          {poolsToShow.map((item, index) => (
-            <PoolInfo
-              setShowRemoveContainer={setShowRemoveContainer}
-              setCurrentPoolIndex={setCurrentPoolIndex}
-              index={index}
-              key={index}
-              poolData={item}
-              view={currentView}
-            />
-          ))}
-        </div>
-      ) : (
-        renderEmptyPoolsState('You don’t have active pools at this moment.')
-      )
-    ) : (
-      <div className="text-center mt-10">
-        <p>Your active liquidity positions will appear here.</p>
-        <div className="mt-4">
-          <Button
-            disabled={isHashpackLoading}
-            size="small"
-            onClick={() => setShowConnectModal(true)}
-            type="primary"
-          >
-            Connect Wallet
-          </Button>
-        </div>
-      </div>
-    );
-  };
+    setHavePools(pools && pools.length !== 0);
+  }, [pools, filteredPools, inputValue, filteredPoolsLoading, loadingPools]);
+
+  useEffect(() => {
+    if (poolsByUser) setUserPoolsToShow(poolsByUser);
+
+    setHaveUserPools(poolsByUser && poolsByUser.length !== 0);
+  }, [poolsByUser]);
 
   const renderEmptyPoolsState = (infoMessage: string) => (
     <div className="text-center mt-10">
@@ -201,11 +156,23 @@ const Pools = () => {
           <hr />
 
           {connected && !isHashpackLoading && havePools ? (
-            <div className="d-flex justify-content-end align-items-center my-5">
-              <Link className="btn btn-sm btn-primary" to="/create">
-                Create pool
-              </Link>
-            </div>
+            <>
+              <div className="d-flex justify-content-between align-items-center my-5">
+                {currentView === PageViews.ALL_POOLS ? (
+                  <div>
+                    <SearchArea
+                      searchFunc={searchFunc}
+                      inputValue={inputValue}
+                      setInputValue={setInputValue}
+                      minLength={searchThreshold + 1}
+                    />
+                  </div>
+                ) : null}
+                <Link className="btn btn-sm btn-primary" to="/create">
+                  Create pool
+                </Link>
+              </div>
+            </>
           ) : null}
 
           {errorPoools || errorPooolsByUser ? (
@@ -214,7 +181,34 @@ const Pools = () => {
             </div>
           ) : null}
 
-          <>{currentView === PageViews.ALL_POOLS ? renderAllPools() : renderUserPools()}</>
+          <>
+            {currentView === PageViews.ALL_POOLS ? (
+              <AllPools
+                loadingPools={loadingPools}
+                havePools={havePools}
+                itemsPerPage={itemsPerPage}
+                pools={poolsToShow}
+                setShowRemoveContainer={setShowRemoveContainer}
+                setCurrentPoolIndex={setCurrentPoolIndex}
+                currentView={currentView}
+                renderEmptyPoolsState={renderEmptyPoolsState}
+              />
+            ) : (
+              <MyPools
+                connected={connected}
+                isHashpackLoading={isHashpackLoading}
+                loadingPools={loadingPoolsByUser}
+                pools={userPoolsToShow}
+                havePools={haveUserPools}
+                setShowRemoveContainer={setShowRemoveContainer}
+                setCurrentPoolIndex={setCurrentPoolIndex}
+                currentView={currentView}
+                renderEmptyPoolsState={renderEmptyPoolsState}
+                setShowConnectModal={setShowConnectModal}
+                itemsPerPage={itemsPerPage}
+              />
+            )}
+          </>
         </div>
       )}
     </div>
