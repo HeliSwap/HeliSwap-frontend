@@ -284,11 +284,41 @@ export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbar
     tokenAddress,
     false,
   );
+
   const sortedTrades = tradesIn.sort(tradeComparator);
 
   if (sortedTrades.length === 0) return;
 
-  const bestTradeAmount = sortedTrades[0].amountOut;
+  let bestTradeAmount = sortedTrades[0].amountOut;
+
+  //Handle special case where for 1 token in you get 0 tokens out because of big difference of the amounts and decimals
+  if (Number(sortedTrades[0].amountOut) === 0) {
+    let determinedPrice = false;
+    let multiplier = 2;
+    const step = 2;
+
+    //Set a threshold in order to avoid infinit loop
+    const threshold = 1000;
+
+    while (!determinedPrice && multiplier < threshold) {
+      const tradesInMultiplied = getPossibleTradesExactIn(
+        poolsData || [],
+        multiplier.toString(),
+        process.env.REACT_APP_WHBAR_ADDRESS || '',
+        tokenAddress,
+        false,
+      );
+
+      const sortedTradesMultiplied = tradesInMultiplied.sort(tradeComparator);
+
+      if (Number(sortedTradesMultiplied[0].amountOut) === 0) {
+        multiplier = step * multiplier;
+      } else {
+        determinedPrice = true;
+        bestTradeAmount = sortedTradesMultiplied[0].amountOut;
+      }
+    }
+  }
 
   return new BigNumber(hbarPrice).div(new BigNumber(bestTradeAmount)).toString();
 };
