@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
 import Tippy from '@tippyjs/react';
+import _ from 'lodash';
 
 import {
   ITokenData,
@@ -94,6 +95,13 @@ const Create = () => {
 
   //Get whitelisted tokens
   const { loading: loadingTDL, tokens: tokenDataList } = useTokensByListIds(tokensWhitelistedIds, {
+    fetchPolicy: 'network-only',
+  });
+
+  const [selectedTokensIds, setSelectedTokensIds] = useState<string[]>([]);
+  const [mergedTokensData, setMergedTokensData] = useState<ITokenData[]>([] as ITokenData[]);
+
+  const { tokens: selectedTokens } = useTokensByListIds(selectedTokensIds, {
     fetchPolicy: 'network-only',
   });
 
@@ -504,17 +512,31 @@ const Create = () => {
   // Check for address in url
   useEffect(() => {
     try {
-      if (!tokensDerivedFromPool && token0 && token1 && poolsData.length !== 0 && tokenDataList) {
+      if (
+        !tokensDerivedFromPool &&
+        token0 &&
+        token1 &&
+        poolsData.length !== 0 &&
+        mergedTokensData
+      ) {
+        const token0Found = mergedTokensData.some((token: ITokenData) => token.address === token0);
+        const token1Found = mergedTokensData.some((token: ITokenData) => token.address === token1);
+
+        if (!token0Found || !token1Found) {
+          //Load data for the tokens chosen
+          setSelectedTokensIds([token0, token1]);
+          return;
+        }
         const isTokenAWrappedHBAR = token0 === (process.env.REACT_APP_WHBAR_ADDRESS as string);
         const isTokenBWrappedHBAR = token1 === (process.env.REACT_APP_WHBAR_ADDRESS as string);
 
         const tokenA = isTokenAWrappedHBAR
           ? NATIVE_TOKEN
-          : tokenDataList.find((token: ITokenData) => token.address === token0) ||
+          : mergedTokensData.find((token: ITokenData) => token.address === token0) ||
             ({} as ITokenData);
         const tokenB = isTokenBWrappedHBAR
           ? NATIVE_TOKEN
-          : tokenDataList.find((token: ITokenData) => token.address === token1) ||
+          : mergedTokensData.find((token: ITokenData) => token.address === token1) ||
             ({} as ITokenData);
 
         setTokensData({ tokenA, tokenB });
@@ -524,7 +546,7 @@ const Create = () => {
     } catch (err) {
       console.error(err);
     }
-  }, [poolsData, tokenDataList, token0, token1, tokensDerivedFromPool]);
+  }, [poolsData, mergedTokensData, token0, token1, tokensDerivedFromPool]);
 
   // Cache input values
   useEffect(() => {
@@ -586,6 +608,11 @@ const Create = () => {
       setTokensWhitelistedIds(tokensWhitelistedIds);
     }
   }, [tokensWhitelisted]);
+
+  useEffect(() => {
+    const mergedTokensData = _.unionBy(tokenDataList, selectedTokens, 'address');
+    setMergedTokensData(mergedTokensData);
+  }, [tokenDataList, selectedTokens]);
 
   const getTokenIsAssociated = (token: ITokenData) => {
     const notHTS =
@@ -654,7 +681,7 @@ const Create = () => {
               }
             }}
             closeModal={() => setShowModalA(false)}
-            tokenDataList={tokenDataList || []}
+            tokenDataList={mergedTokensData || []}
             loadingTDL={loadingTDL}
           />
         </Modal>
@@ -705,7 +732,7 @@ const Create = () => {
               }
             }}
             closeModal={() => setShowModalB(false)}
-            tokenDataList={tokenDataList || []}
+            tokenDataList={mergedTokensData || []}
             loadingTDL={loadingTDL}
           />
         </Modal>

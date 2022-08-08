@@ -62,8 +62,6 @@ export const GET_POOLS_BY_USER = gql`
       token1Amount
       token1Decimals
       lpShares
-      fee0
-      fee1
     }
   }
 `;
@@ -85,6 +83,20 @@ export const GET_TOKENS = gql`
 export const GET_TOKEN_INFO = gql`
   query getTokenByAddressOrId($id: String!) {
     getTokenInfo(tokenIdOrAddress: $id) {
+      id
+      address
+      hederaId
+      symbol
+      name
+      decimals
+      isHTS
+    }
+  }
+`;
+
+export const GET_TOKENS_FILTERED = gql`
+  query getFilterTokens($keyword: String!) {
+    getTokensFilter(keyword: $keyword) {
       id
       address
       hederaId
