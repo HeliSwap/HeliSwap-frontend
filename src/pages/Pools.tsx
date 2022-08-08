@@ -161,23 +161,31 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
             <>
               <div className="d-flex justify-content-between align-items-center my-5">
                 {currentView === PageViews.ALL_POOLS ? (
-                  <div className="d-flex align-items-center">
-                    <SearchArea
-                      searchFunc={searchFunc}
-                      inputValue={inputValue}
-                      setInputValue={setInputValue}
-                      minLength={searchThreshold + 1}
-                    />
-                    <Tippy content="Searching by pool name or symbol will show all pools">
-                      <span className="ms-2">
-                        <Icon color="gray" name="hint" />
-                      </span>
-                    </Tippy>
-                  </div>
+                  <>
+                    <div className="d-flex align-items-center">
+                      <SearchArea
+                        searchFunc={searchFunc}
+                        inputValue={inputValue}
+                        setInputValue={setInputValue}
+                        minLength={searchThreshold + 1}
+                      />
+                      <Tippy content="Searching by pool name or symbol will show all pools">
+                        <span className="ms-2">
+                          <Icon color="gray" name="hint" />
+                        </span>
+                      </Tippy>
+                    </div>
+                    <Link className="btn btn-sm btn-primary" to="/create">
+                      Create pool
+                    </Link>
+                  </>
                 ) : null}
-                <Link className="btn btn-sm btn-primary" to="/create">
-                  Create pool
-                </Link>
+
+                {currentView === PageViews.MY_POOLS && poolsByUser.length > 0 ? (
+                  <Link className="btn btn-sm btn-primary" to="/create">
+                    Create pool
+                  </Link>
+                ) : null}
               </div>
             </>
           ) : null}
