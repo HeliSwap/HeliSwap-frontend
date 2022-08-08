@@ -1,5 +1,6 @@
 import { useState, useContext, useEffect, useMemo } from 'react';
 import { GlobalContext } from '../providers/Global';
+import Tippy from '@tippyjs/react';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
 
@@ -12,6 +13,7 @@ import SearchArea from '../components/SearchArea';
 import AllPools from '../components/AllPools';
 import MyPools from '../components/MyPools';
 import RemoveLiquidity from '../components/RemoveLiquidity';
+import Icon from '../components/Icon';
 
 import { filterPoolsByPattern } from '../utils/poolUtils';
 
@@ -159,13 +161,18 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
             <>
               <div className="d-flex justify-content-between align-items-center my-5">
                 {currentView === PageViews.ALL_POOLS ? (
-                  <div>
+                  <div className="d-flex align-items-center">
                     <SearchArea
                       searchFunc={searchFunc}
                       inputValue={inputValue}
                       setInputValue={setInputValue}
                       minLength={searchThreshold + 1}
                     />
+                    <Tippy content="Searching by pool name or symbol will show all pools">
+                      <span className="ms-2">
+                        <Icon color="gray" name="hint" />
+                      </span>
+                    </Tippy>
                   </div>
                 ) : null}
                 <Link className="btn btn-sm btn-primary" to="/create">
@@ -184,8 +191,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
           <>
             {currentView === PageViews.ALL_POOLS ? (
               <AllPools
-                loadingPools={loadingPools}
-                havePools={havePools}
+                loadingPools={loadingPools || filteredPoolsLoading}
                 itemsPerPage={itemsPerPage}
                 pools={poolsToShow}
                 setShowRemoveContainer={setShowRemoveContainer}
