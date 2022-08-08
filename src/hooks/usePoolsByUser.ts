@@ -84,6 +84,7 @@ const usePoolsByUser = (
 
           const fee0Formatted = formatStringWeiToStringEther(fee0 as string, token0Decimals);
           const fee1Formatted = formatStringWeiToStringEther(fee1 as string, token1Decimals);
+          const lpSharesFormatted = formatStringWeiToStringEther(lpShares as string, 18);
 
           let totalFeeValue = 0;
           let totalLpValue = 0;
@@ -121,6 +122,7 @@ const usePoolsByUser = (
             ...pool,
             token0AmountFormatted: reserve0ShareStr,
             token1AmountFormatted: reserve1ShareStr,
+            lpSharesFormatted,
             tvl: totalLpValueStr,
             tvlBN: new BigNumber(totalLpValueStr),
             feesNum: totalFeeValue,

@@ -55,6 +55,7 @@ export interface IPoolExtendedData extends IPoolData {
   token1AmountFormatted: string;
   fee0AmountFormatted?: string;
   fee1AmountFormatted?: string;
+  lpSharesFormatted?: string;
   tvlBN: BigNumber;
   tvl: string;
   volume24Num?: number;
