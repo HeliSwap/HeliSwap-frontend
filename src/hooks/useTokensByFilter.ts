@@ -24,7 +24,7 @@ const useTokensByFilter = (
   useEffect(() => {
     if (filteredTokensData) {
       const { getTokensFilter } = filteredTokensData;
-      console.log(getTokensFilter);
+      setFilteredTokens(getTokensFilter);
     }
   }, [filteredTokensData, restPools]);
 

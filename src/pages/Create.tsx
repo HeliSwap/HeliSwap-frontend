@@ -49,6 +49,7 @@ import { MAX_UINT_ERC20, MAX_UINT_HTS, POOLS_FEE, REFRESH_TIME } from '../consta
 
 import usePoolsByToken from '../hooks/usePoolsByToken';
 import useTokensByListIds from '../hooks/useTokensByListIds';
+import useTokensByFilter from '../hooks/useTokensByFilter';
 
 enum ADD_LIQUIDITY_TITLES {
   CREATE_POOL = 'Create pool',
@@ -83,6 +84,10 @@ const Create = () => {
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
   const [loadingAssociate, setLoadingAssociate] = useState(false);
 
+  //State for tokens data
+  const [selectedTokensIds, setSelectedTokensIds] = useState<string[]>([]);
+  const [mergedTokensData, setMergedTokensData] = useState<ITokenData[]>([] as ITokenData[]);
+
   //Get pools by token A
   const { filteredPools: poolsData } = usePoolsByToken(
     {
@@ -98,12 +103,22 @@ const Create = () => {
     fetchPolicy: 'network-only',
   });
 
-  const [selectedTokensIds, setSelectedTokensIds] = useState<string[]>([]);
-  const [mergedTokensData, setMergedTokensData] = useState<ITokenData[]>([] as ITokenData[]);
-
+  // Get selected tokens
   const { tokens: selectedTokens } = useTokensByListIds(selectedTokensIds, {
     fetchPolicy: 'network-only',
   });
+
+  //Get tokens by filter
+  const { filteredTokens, loadFilteredTokens } = useTokensByFilter({
+    fetchPolicy: 'network-only',
+  });
+
+  const searchFunc = useMemo(
+    () => (value: string) => {
+      if (value.length > 2) loadFilteredTokens({ variables: { keyword: value } });
+    },
+    [loadFilteredTokens],
+  );
 
   const initialCreateData: ICreatePairData = {
     tokenAAmount: '',
@@ -610,9 +625,9 @@ const Create = () => {
   }, [tokensWhitelisted]);
 
   useEffect(() => {
-    const mergedTokensData = _.unionBy(tokenDataList, selectedTokens, 'address');
+    const mergedTokensData = _.unionBy(tokenDataList, selectedTokens, filteredTokens, 'address');
     setMergedTokensData(mergedTokensData);
-  }, [tokenDataList, selectedTokens]);
+  }, [tokenDataList, selectedTokens, filteredTokens]);
 
   const getTokenIsAssociated = (token: ITokenData) => {
     const notHTS =
@@ -683,6 +698,7 @@ const Create = () => {
             closeModal={() => setShowModalA(false)}
             tokenDataList={mergedTokensData || []}
             loadingTDL={loadingTDL}
+            searchFunc={searchFunc}
           />
         </Modal>
 
@@ -734,6 +750,7 @@ const Create = () => {
             closeModal={() => setShowModalB(false)}
             tokenDataList={mergedTokensData || []}
             loadingTDL={loadingTDL}
+            searchFunc={searchFunc}
           />
         </Modal>
         {getFeesInfo()}

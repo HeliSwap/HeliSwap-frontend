@@ -133,9 +133,20 @@ const Swap = () => {
 
   const [selectedTokensIds, setSelectedTokensIds] = useState<string[]>([]);
 
-  const { tokens: filteredTokens } = useTokensByListIds(selectedTokensIds, {
+  const { tokens: selectedTokens } = useTokensByListIds(selectedTokensIds, {
     fetchPolicy: 'network-only',
   });
+
+  const { filteredTokens, loadFilteredTokens } = useTokensByFilter({
+    fetchPolicy: 'network-only',
+  });
+
+  const searchFunc = useMemo(
+    () => (value: string) => {
+      if (value.length > 2) loadFilteredTokens({ variables: { keyword: value } });
+    },
+    [loadFilteredTokens],
+  );
 
   const initialSwapData: ISwapTokenData = {
     amountIn: '',
@@ -619,9 +630,9 @@ const Swap = () => {
   }, [whitelistedPoolsData, filteredPoolsDataTokenA, filteredPoolsDataTokenB]);
 
   useEffect(() => {
-    const mergedTokensData = _.unionBy(tokenDataList, filteredTokens, 'address');
+    const mergedTokensData = _.unionBy(tokenDataList, selectedTokens, filteredTokens, 'address');
     setMergedTokensData(mergedTokensData);
-  }, [tokenDataList, filteredTokens]);
+  }, [tokenDataList, selectedTokens, filteredTokens]);
 
   //Render methods
   const getErrorMessage = () => {
@@ -692,6 +703,7 @@ const Swap = () => {
             canImport={false}
             tokenDataList={mergedTokensData || []}
             loadingTDL={loadingTDL}
+            searchFunc={searchFunc}
           />
         </Modal>
 
@@ -746,6 +758,7 @@ const Swap = () => {
             canImport={false}
             tokenDataList={mergedTokensData || []}
             loadingTDL={loadingTDL}
+            searchFunc={searchFunc}
           />
         </Modal>
         {getActionButtons()}

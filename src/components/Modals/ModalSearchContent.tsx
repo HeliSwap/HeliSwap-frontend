@@ -15,6 +15,7 @@ import Button from '../Button';
 import Icon from '../Icon';
 
 import search from '../../icons/system/search-gradient.svg';
+import useDebounce from '../../hooks/useDebounce';
 
 interface IModalProps {
   modalTitle?: string;
@@ -24,6 +25,7 @@ interface IModalProps {
   canImport?: boolean;
   tokenDataList: ITokenData[];
   loadingTDL: boolean;
+  searchFunc?: (value: string) => void;
 }
 
 const ModalSearchContent = ({
@@ -34,6 +36,7 @@ const ModalSearchContent = ({
   canImport = true,
   tokenDataList,
   loadingTDL,
+  searchFunc,
 }: IModalProps) => {
   const networkType = process.env.REACT_APP_NETWORK_TYPE as string;
   const hashScanUrl = `https://hashscan.io/#/${networkType}/token/`;
@@ -53,6 +56,13 @@ const ModalSearchContent = ({
 
     setSearchInputValue(value);
   };
+  const debouncedSearchTerm: string = useDebounce(searchInputValue, 1000);
+
+  useEffect(() => {
+    if (debouncedSearchTerm && searchFunc) {
+      searchFunc(debouncedSearchTerm);
+    }
+  }, [debouncedSearchTerm, searchFunc]);
 
   const handleDecimalsInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -155,8 +165,8 @@ const ModalSearchContent = ({
         ? foundItemArray
         : tokenDataList?.filter(
             (item: ITokenData) =>
-              item.symbol.toLowerCase().includes(searchInputValue) ||
-              item.name.toLowerCase().includes(searchInputValue),
+              item.symbol.toLowerCase().includes(searchInputValue.toLowerCase()) ||
+              item.name.toLowerCase().includes(searchInputValue.toLowerCase()),
           ) || [];
 
     const haveResults = foundItems.length > 0;
