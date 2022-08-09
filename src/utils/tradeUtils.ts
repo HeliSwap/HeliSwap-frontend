@@ -101,6 +101,7 @@ export const getPossibleTradesExactOut = (
   nextAmountOut: string = amountOut,
   nextCurrencyOut: string = currencyOut,
   possibleTrades: Trade[] = [],
+  midPrices: string[] = [],
 ) => {
   for (let i = 0; i < pools.length; i++) {
     const currentPool = pools[i];
@@ -122,6 +123,19 @@ export const getPossibleTradesExactOut = (
 
     const amountIn = getAmountIn(nextAmountOut, tokenOutFirstAtPool, currentPool, applyFees);
     const otherTokenInPool = tokenOutFirstAtPool ? token1 : token0;
+
+    // const numerator0BN = new BN(currentPool.token0Amount);
+    // const numerator1BN = new BN(currentPool.token1Amount);
+    // const denominator0BN = new BN(10).pow(new BN(currentPool.token0Decimals));
+    // const denominator1BN = new BN(10).pow(new BN(currentPool.token1Decimals));
+
+    // let quot0BN = numerator0BN.div(denominator0BN);
+    // let quot1BN = numerator1BN.div(denominator1BN);
+
+    // const tokenInQuot = tokenOutFirstAtPool ? quot0BN : quot1BN;
+    // const tokenOutQuot = tokenOutFirstAtPool ? quot1BN : quot0BN;
+
+    // const currentMidPrice = tokenInQuot.div(tokenOutQuot).toString();
 
     if (otherTokenInPool === currencyIn) {
       possibleTrades.push({
@@ -284,4 +298,18 @@ const getAmountIn = (
 
   const swapAmountIn = getSwapAmountIn(amountOut, resIn, resOut, decIn, decOut, applyFees);
   return swapAmountIn;
+};
+
+export const getTradeMidPrice = (trade: Trade) => {
+  const { midPricesArr, amountIn, amountOut } = trade;
+  const tradeMidPrice = midPricesArr.slice(1).reduce((accumulator, currentValue) => {
+    return Number(accumulator) * Number(currentValue);
+  }, Number(midPricesArr[0]));
+
+  const tradePrice = Number(amountOut) / Number(amountIn);
+  const diff = tradeMidPrice - tradePrice;
+  const priceImpact = (diff / tradeMidPrice) * 100;
+
+  console.log(priceImpact);
+  return priceImpact;
 };
