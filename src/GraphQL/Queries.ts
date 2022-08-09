@@ -31,12 +31,15 @@ export const GET_POOL_BY_TOKEN = gql`
       pairName
       pairSymbol
       pairAddress
+      pairSupply
       token0
       token0Name
       token0Amount
+      token0Symbol
       token0Decimals
       token1
       token1Name
+      token1Symbol
       token1Amount
       token1Decimals
     }
