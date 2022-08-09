@@ -64,6 +64,30 @@ class SDK {
     return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
+  async approveTokenStake(
+    hashconnectConnectorInstance: Hashconnect,
+    contractAddress: string,
+    amount: string,
+    userId: string,
+    tokenAddress: string,
+  ) {
+    const amountToApproveBN = formatStringToBigNumber(amount);
+    const maxGas = TRANSACTION_MAX_FEES.APPROVE_ERC20;
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(await requestIdFromAddress(tokenAddress))
+      //Set the gas for the contract call
+      .setGas(maxGas)
+
+      //Set the contract function to call
+      .setFunction(
+        'approve',
+        new ContractFunctionParameters().addAddress(contractAddress).addUint256(amountToApproveBN),
+      );
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
   async addNativeLiquidity(
     hashconnectConnectorInstance: Hashconnect,
     userId: string,
@@ -405,6 +429,40 @@ class SDK {
         'transfer',
         new ContractFunctionParameters().addAddress(to).addUint256(tokenAAmount),
       );
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
+  async stakeLP(
+    hashconnectConnectorInstance: Hashconnect,
+    campaignAddress: string,
+    userId: string,
+  ) {
+    const tokensLpAmountBN = formatStringToBigNumberWei('0.0000001', 18);
+
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(campaignAddress))
+      //Set the gas for the contract call
+      .setGas(300000)
+      //Set the contract function to call
+      .setFunction('stake', new ContractFunctionParameters().addUint256(tokensLpAmountBN));
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
+  async collectRewards(
+    hashconnectConnectorInstance: Hashconnect,
+    campaignAddress: string,
+    userId: string,
+  ) {
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(campaignAddress))
+      //Set the gas for the contract call
+      .setGas(300000)
+      //Set the contract function to call
+      .setFunction('getReward', new ContractFunctionParameters());
 
     return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
