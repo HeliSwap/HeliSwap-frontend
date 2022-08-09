@@ -4,7 +4,7 @@ import Tippy from '@tippyjs/react';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
 
-import { REFRESH_TIME } from '../constants';
+import { REFRESH_TIME, ASYNC_SEARCH_THRESHOLD } from '../constants';
 
 import { PageViews } from '../interfaces/common';
 import { IPoolExtendedData } from '../interfaces/tokens';
@@ -20,8 +20,6 @@ import { filterPoolsByPattern } from '../utils/poolUtils';
 import usePoolsByUser from '../hooks/usePoolsByUser';
 import usePoolsByFilter from '../hooks/usePoolsByFilter';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
-
-const searchThreshold = 2;
 
 interface IPoolsProps {
   itemsPerPage: number;
@@ -45,7 +43,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
 
   const searchFunc = useMemo(
     () => (value: string) => {
-      if (value.length > searchThreshold) {
+      if (value.length > ASYNC_SEARCH_THRESHOLD) {
         setSearchQuery({ keyword: value });
       } else {
         setSearchingResults(false);
@@ -95,7 +93,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
 
   const searchFunc = useMemo(
     () => (value: string) => {
-      if (value.length > searchThreshold) loadExtraPools({ variables: { keyword: value } });
+      if (value.length > ASYNC_SEARCH_THRESHOLD) loadExtraPools({ variables: { keyword: value } });
     },
     [loadExtraPools],
   );
@@ -116,7 +114,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
       !loadingPools &&
       !searchingResults
     ) {
-      const whitelistedFilteredPools = filterPoolsByPattern(inputValue, pools, searchThreshold);
+      const whitelistedFilteredPools = filterPoolsByPattern(inputValue, pools, ASYNC_SEARCH_THRESHOLD);
       const visiblePools = _.unionBy(whitelistedFilteredPools, filteredPools, 'id');
 
       setPoolsToShow(visiblePools);
@@ -189,7 +187,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
                           setSearchingResults(true);
                           setInputValue(value);
                         }}
-                        minLength={searchThreshold + 1}
+                        minLength={ASYNC_SEARCH_THRESHOLD + 1}
                       />
                       <Tippy content="By default only whitelisted pools are visible. Searching by pool name or token symbol will show all pools. Resetting your search will display the last search results combined with the default pools.">
                         <span className="ms-2">

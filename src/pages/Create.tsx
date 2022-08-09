@@ -45,7 +45,13 @@ import {
 import { getTransactionSettings } from '../utils/transactionUtils';
 import { formatIcons } from '../utils/iconUtils';
 
-import { MAX_UINT_ERC20, MAX_UINT_HTS, POOLS_FEE, REFRESH_TIME } from '../constants';
+import {
+  MAX_UINT_ERC20,
+  MAX_UINT_HTS,
+  POOLS_FEE,
+  REFRESH_TIME,
+  ASYNC_SEARCH_THRESHOLD,
+} from '../constants';
 
 import usePoolsByToken from '../hooks/usePoolsByToken';
 import useTokensByListIds from '../hooks/useTokensByListIds';
@@ -113,9 +119,10 @@ const Create = () => {
     fetchPolicy: 'network-only',
   });
 
-  const searchFunc = useMemo(
+  const searchTokensFunc = useMemo(
     () => (value: string) => {
-      if (value.length > 2) loadFilteredTokens({ variables: { keyword: value } });
+      if (value.length > ASYNC_SEARCH_THRESHOLD)
+        loadFilteredTokens({ variables: { keyword: value } });
     },
     [loadFilteredTokens],
   );
@@ -698,7 +705,7 @@ const Create = () => {
             closeModal={() => setShowModalA(false)}
             tokenDataList={mergedTokensData || []}
             loadingTDL={loadingTDL}
-            searchFunc={searchFunc}
+            searchFunc={searchTokensFunc}
           />
         </Modal>
 
@@ -750,7 +757,7 @@ const Create = () => {
             closeModal={() => setShowModalB(false)}
             tokenDataList={mergedTokensData || []}
             loadingTDL={loadingTDL}
-            searchFunc={searchFunc}
+            searchFunc={searchTokensFunc}
           />
         </Modal>
         {getFeesInfo()}

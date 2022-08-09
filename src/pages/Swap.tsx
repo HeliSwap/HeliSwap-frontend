@@ -47,7 +47,7 @@ import {
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
 
-import { MAX_UINT_ERC20, MAX_UINT_HTS, REFRESH_TIME } from '../constants';
+import { MAX_UINT_ERC20, MAX_UINT_HTS, REFRESH_TIME, ASYNC_SEARCH_THRESHOLD } from '../constants';
 
 import useTokensByListIds from '../hooks/useTokensByListIds';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
@@ -141,13 +141,13 @@ const Swap = () => {
     fetchPolicy: 'network-only',
   });
 
-  const searchFunc = useMemo(
+  const searchTokensFunc = useMemo(
     () => (value: string) => {
-      if (value.length > 2) loadFilteredTokens({ variables: { keyword: value } });
+      if (value.length > ASYNC_SEARCH_THRESHOLD)
+        loadFilteredTokens({ variables: { keyword: value } });
     },
     [loadFilteredTokens],
   );
-
   const initialSwapData: ISwapTokenData = {
     amountIn: '',
     amountOut: '',
@@ -703,7 +703,7 @@ const Swap = () => {
             canImport={false}
             tokenDataList={mergedTokensData || []}
             loadingTDL={loadingTDL}
-            searchFunc={searchFunc}
+            searchFunc={searchTokensFunc}
           />
         </Modal>
 
@@ -758,7 +758,7 @@ const Swap = () => {
             canImport={false}
             tokenDataList={mergedTokensData || []}
             loadingTDL={loadingTDL}
-            searchFunc={searchFunc}
+            searchFunc={searchTokensFunc}
           />
         </Modal>
         {getActionButtons()}

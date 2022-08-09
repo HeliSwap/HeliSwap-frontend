@@ -41,3 +41,5 @@ export enum SORT_DIRECTION {
   ASC = 'asc',
   DESC = 'desc',
 }
+
+export const ASYNC_SEARCH_THRESHOLD = 2;
