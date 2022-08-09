@@ -280,6 +280,7 @@ const Swap = () => {
           );
 
           const sortedTrades = trades.sort(tradeComparator);
+          console.log(sortedTrades);
 
           if (sortedTrades.length === 0) {
             setBestPath([]);
