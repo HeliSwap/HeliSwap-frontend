@@ -1,5 +1,6 @@
 import { useState, useContext, useEffect, useMemo } from 'react';
 import { GlobalContext } from '../providers/Global';
+import Tippy from '@tippyjs/react';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
 
@@ -12,6 +13,7 @@ import SearchArea from '../components/SearchArea';
 import AllPools from '../components/AllPools';
 import MyPools from '../components/MyPools';
 import RemoveLiquidity from '../components/RemoveLiquidity';
+import Icon from '../components/Icon';
 
 import { filterPoolsByPattern } from '../utils/poolUtils';
 
@@ -40,10 +42,15 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
 
   //Search area state
   const [inputValue, setInputValue] = useState('');
+  const [searchingResults, setSearchingResults] = useState(false);
 
   const searchFunc = useMemo(
     () => (value: string) => {
-      if (value.length > searchThreshold) setSearchQuery({ keyword: value });
+      if (value.length > searchThreshold) {
+        setSearchQuery({ keyword: value });
+      } else {
+        setSearchingResults(false);
+      }
     },
     [],
   );
@@ -98,7 +105,12 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   };
 
   useEffect(() => {
-    if ((pools || filteredPools) && !filteredPoolsLoading && !loadingPools) {
+    if (
+      (pools.length !== 0 || filteredPools.length !== 0) &&
+      !filteredPoolsLoading &&
+      !loadingPools &&
+      !searchingResults
+    ) {
       const whitelistedFilteredPools = filterPoolsByPattern(inputValue, pools, searchThreshold);
       const visiblePools = _.unionBy(whitelistedFilteredPools, filteredPools, 'id');
 
@@ -106,13 +118,17 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     }
 
     setHavePools(pools && pools.length !== 0);
-  }, [pools, filteredPools, inputValue, filteredPoolsLoading, loadingPools]);
+  }, [pools, filteredPools, inputValue, filteredPoolsLoading, loadingPools, searchingResults]);
 
   useEffect(() => {
     if (poolsByUser) setUserPoolsToShow(poolsByUser);
 
     setHaveUserPools(poolsByUser && poolsByUser.length !== 0);
   }, [poolsByUser]);
+
+  useEffect(() => {
+    setSearchingResults(false);
+  }, [filteredPools]);
 
   const renderEmptyPoolsState = (infoMessage: string) => (
     <div className="text-center mt-10">
@@ -159,18 +175,34 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
             <>
               <div className="d-flex justify-content-between align-items-center my-5">
                 {currentView === PageViews.ALL_POOLS ? (
-                  <div>
-                    <SearchArea
-                      searchFunc={searchFunc}
-                      inputValue={inputValue}
-                      setInputValue={setInputValue}
-                      minLength={searchThreshold + 1}
-                    />
-                  </div>
+                  <>
+                    <div className="d-flex align-items-center">
+                      <SearchArea
+                        searchFunc={searchFunc}
+                        inputValue={inputValue}
+                        setInputValue={(value: string) => {
+                          setSearchingResults(true);
+                          setInputValue(value);
+                        }}
+                        minLength={searchThreshold + 1}
+                      />
+                      <Tippy content="By default only whitelisted pools are visible. Searching by pool name or token symbol will show all pools. Resetting your search will display the last search results combined with the default pools.">
+                        <span className="ms-2">
+                          <Icon color="gray" name="hint" />
+                        </span>
+                      </Tippy>
+                    </div>
+                    <Link className="btn btn-sm btn-primary" to="/create">
+                      Create pool
+                    </Link>
+                  </>
                 ) : null}
-                <Link className="btn btn-sm btn-primary" to="/create">
-                  Create pool
-                </Link>
+
+                {currentView === PageViews.MY_POOLS && poolsByUser.length > 0 ? (
+                  <Link className="btn btn-sm btn-primary" to="/create">
+                    Create pool
+                  </Link>
+                ) : null}
               </div>
             </>
           ) : null}
@@ -184,8 +216,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
           <>
             {currentView === PageViews.ALL_POOLS ? (
               <AllPools
-                loadingPools={loadingPools}
-                havePools={havePools}
+                loadingPools={loadingPools || filteredPoolsLoading}
                 itemsPerPage={itemsPerPage}
                 pools={poolsToShow}
                 setShowRemoveContainer={setShowRemoveContainer}

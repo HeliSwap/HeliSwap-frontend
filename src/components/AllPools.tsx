@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js';
 
 import Icon from './Icon';
 import PoolInfo from './PoolInfo';
+import Loader from './Loader';
 
 import { IPoolExtendedData } from '../interfaces/tokens';
 import { PageViews } from '../interfaces/common';
@@ -12,7 +13,6 @@ import { SORT_DIRECTION, SORT_OPTIONS, SORT_OPTIONS_ENUM } from '../constants/in
 
 interface IAllPoolsProps {
   loadingPools: boolean;
-  havePools: boolean;
   pools: IPoolExtendedData[];
   itemsPerPage: number;
   currentView: PageViews;
@@ -23,7 +23,6 @@ interface IAllPoolsProps {
 
 const AllPools = ({
   loadingPools,
-  havePools,
   itemsPerPage,
   pools,
   currentView,
@@ -83,8 +82,12 @@ const AllPools = ({
     setItemOffset(newOffset);
   };
 
+  const havePools = currentItems.length > 0;
+
   return loadingPools ? (
-    <p className="text-info">Loading pools...</p>
+    <div className="d-flex justify-content-center my-6">
+      <Loader />
+    </div>
   ) : havePools ? (
     <>
       <div className="table-pools">
