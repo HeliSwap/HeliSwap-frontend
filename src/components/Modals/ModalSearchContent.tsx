@@ -30,6 +30,7 @@ interface IModalProps {
   tokenDataList: ITokenData[];
   loadingTDL: boolean;
   searchFunc?: (value: string) => void;
+  itemToExlude?: ITokenData;
 }
 
 const ModalSearchContent = ({
@@ -41,6 +42,7 @@ const ModalSearchContent = ({
   tokenDataList,
   loadingTDL,
   searchFunc,
+  itemToExlude,
 }: IModalProps) => {
   const networkType = process.env.REACT_APP_NETWORK_TYPE as string;
   const hashScanUrl = `https://hashscan.io/#/${networkType}/token/`;
@@ -189,7 +191,12 @@ const ModalSearchContent = ({
       setTokenList(tokenDataList);
     }
 
-    setReadyToImport(!haveResults && (isId || isAddress));
+    const searchAddressExluded = isAddress && searchInputValue.trim() === itemToExlude?.address;
+    const searchIdExluded = isId && searchInputValue.trim() === itemToExlude?.hederaId;
+
+    setReadyToImport(
+      !haveResults && (isId || isAddress) && !searchAddressExluded && !searchIdExluded,
+    );
   }, [searchInputValue, tokenDataList]);
 
   useEffect(() => {

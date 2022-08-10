@@ -701,9 +701,14 @@ const Swap = () => {
             }}
             closeModal={() => setShowModalA(false)}
             canImport={false}
-            tokenDataList={mergedTokensData || []}
+            tokenDataList={
+              mergedTokensData.filter(
+                (token: ITokenData) => token.address !== tokensData.tokenB?.address,
+              ) || []
+            }
             loadingTDL={loadingTDL}
             searchFunc={searchTokensFunc}
+            itemToExlude={tokensData.tokenB}
           />
         </Modal>
 
@@ -758,9 +763,14 @@ const Swap = () => {
             }}
             closeModal={() => setShowModalB(false)}
             canImport={false}
-            tokenDataList={mergedTokensData || []}
+            tokenDataList={
+              mergedTokensData.filter(
+                (token: ITokenData) => token.address !== tokensData.tokenA?.address,
+              ) || []
+            }
             loadingTDL={loadingTDL}
             searchFunc={searchTokensFunc}
+            itemToExlude={tokensData.tokenA}
           />
         </Modal>
         {getActionButtons()}

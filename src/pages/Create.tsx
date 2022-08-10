@@ -703,9 +703,23 @@ const Create = () => {
               }
             }}
             closeModal={() => setShowModalA(false)}
-            tokenDataList={mergedTokensData || []}
+            tokenDataList={
+              mergedTokensData.filter((token: ITokenData) => {
+                if (
+                  tokensData.tokenB.type === TokenType.HBAR ||
+                  tokensData.tokenB.address === process.env.REACT_APP_WHBAR_ADDRESS
+                ) {
+                  return (
+                    token.type !== TokenType.HBAR &&
+                    token.address !== process.env.REACT_APP_WHBAR_ADDRESS
+                  );
+                }
+                return token.address !== tokensData.tokenB?.address;
+              }) || []
+            }
             loadingTDL={loadingTDL}
             searchFunc={searchTokensFunc}
+            itemToExlude={tokensData.tokenB}
           />
         </Modal>
 
@@ -755,9 +769,23 @@ const Create = () => {
               }
             }}
             closeModal={() => setShowModalB(false)}
-            tokenDataList={mergedTokensData || []}
+            tokenDataList={
+              mergedTokensData.filter((token: ITokenData) => {
+                if (
+                  tokensData.tokenA.type === TokenType.HBAR ||
+                  tokensData.tokenA.address === process.env.REACT_APP_WHBAR_ADDRESS
+                ) {
+                  return (
+                    token.type !== TokenType.HBAR &&
+                    token.address !== process.env.REACT_APP_WHBAR_ADDRESS
+                  );
+                }
+                return token.address !== tokensData.tokenA?.address;
+              }) || []
+            }
             loadingTDL={loadingTDL}
             searchFunc={searchTokensFunc}
+            itemToExlude={tokensData.tokenA}
           />
         </Modal>
         {getFeesInfo()}
