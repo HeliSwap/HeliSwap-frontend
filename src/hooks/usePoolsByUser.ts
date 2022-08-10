@@ -104,7 +104,7 @@ const usePoolsByUser = (
 
             token0Value = Number(reserve0ShareStr) * token0PriceNum;
             totalLpValue = 2 * token0Value;
-          } else if (token0PriceNum !== 0) {
+          } else if (token1PriceNum !== 0) {
             fee1Value = Number(fee1Formatted) * token1PriceNum;
             totalFeeValue = 2 * fee1Value;
 
