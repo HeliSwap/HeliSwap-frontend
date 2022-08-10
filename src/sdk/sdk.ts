@@ -467,6 +467,18 @@ class SDK {
     return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
+  async exit(hashconnectConnectorInstance: Hashconnect, campaignAddress: string, userId: string) {
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(campaignAddress))
+      //Set the gas for the contract call
+      .setGas(300000)
+      //Set the contract function to call
+      .setFunction('exit', new ContractFunctionParameters());
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
   sendTransactionAndGetResponse = async (
     hashconnectConnectorInstance: Hashconnect,
     transaction: Transaction,
