@@ -81,6 +81,33 @@ export interface IPoolExtendedData extends IPoolData {
   [key: string]: any;
 }
 
+export interface IFarmData {
+  address: string;
+  stakingTokenAddress: string;
+  totalStaked: string;
+  rewardsData: IReward[];
+  userStakingData?: {
+    [key: string]: IUserStakingData;
+  };
+}
+
+export interface IReward {
+  address: string;
+  symbol: string;
+  totalAmount: string;
+  duration: number;
+}
+export interface IUserReward {
+  address: string;
+  symbol: string;
+  pendingAmount: string;
+}
+
+export interface IUserStakingData {
+  stakedAmount: string;
+  rewardsData: IUserReward[];
+}
+
 export enum TokenType {
   HTS = 'HTS',
   ERC20 = 'ERC20',
