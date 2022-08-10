@@ -4,7 +4,7 @@ import Tippy from '@tippyjs/react';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
 
-import { REFRESH_TIME } from '../constants';
+import { REFRESH_TIME, ASYNC_SEARCH_THRESHOLD } from '../constants';
 
 import { PageViews } from '../interfaces/common';
 import { IPoolExtendedData } from '../interfaces/tokens';
@@ -21,8 +21,6 @@ import usePoolsByUser from '../hooks/usePoolsByUser';
 import usePoolsByFilter from '../hooks/usePoolsByFilter';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 
-const searchThreshold = 2;
-
 interface IPoolsProps {
   itemsPerPage: number;
 }
@@ -32,7 +30,6 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const { connection, tokensWhitelisted } = contextValue;
   const { userId, connected, isHashpackLoading, setShowConnectModal } = connection;
 
-  const [searchQuery, setSearchQuery] = useState({});
   const [showRemoveContainer, setShowRemoveContainer] = useState(false);
   const [currentPoolIndex, setCurrentPoolIndex] = useState(0);
   const [poolsToShow, setPoolsToShow] = useState<IPoolExtendedData[]>([]);
@@ -43,17 +40,6 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   //Search area state
   const [inputValue, setInputValue] = useState('');
   const [searchingResults, setSearchingResults] = useState(false);
-
-  const searchFunc = useMemo(
-    () => (value: string) => {
-      if (value.length > searchThreshold) {
-        setSearchQuery({ keyword: value });
-      } else {
-        setSearchingResults(false);
-      }
-    },
-    [],
-  );
 
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
 
@@ -70,11 +56,10 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     tokensWhitelistedAddresses,
   );
 
-  const { filteredPools, filteredPoolsLoading } = usePoolsByFilter(
+  const { filteredPools, filteredPoolsLoading, loadExtraPools } = usePoolsByFilter(
     {
       fetchPolicy: 'network-only',
     },
-    searchQuery,
     true,
     pools,
   );
@@ -95,6 +80,18 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const initialCurrentView: PageViews = PageViews.ALL_POOLS;
   const [currentView, setCurrentView] = useState<PageViews>(initialCurrentView);
 
+  const searchFunc = useMemo(
+    () => (value: string) => {
+      if (value.length > ASYNC_SEARCH_THRESHOLD) loadExtraPools({ variables: { keyword: value } });
+      if (value.length > ASYNC_SEARCH_THRESHOLD) {
+        loadExtraPools({ variables: { keyword: value } });
+      } else {
+        setSearchingResults(false);
+      }
+    },
+    [loadExtraPools],
+  );
+
   const viewTitleMapping = {
     [PageViews.ALL_POOLS]: 'All pools',
     [PageViews.MY_POOLS]: 'My positions',
@@ -111,7 +108,11 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
       !loadingPools &&
       !searchingResults
     ) {
-      const whitelistedFilteredPools = filterPoolsByPattern(inputValue, pools, searchThreshold);
+      const whitelistedFilteredPools = filterPoolsByPattern(
+        inputValue,
+        pools,
+        ASYNC_SEARCH_THRESHOLD,
+      );
       const visiblePools = _.unionBy(whitelistedFilteredPools, filteredPools, 'id');
 
       setPoolsToShow(visiblePools);
@@ -184,7 +185,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
                           setSearchingResults(true);
                           setInputValue(value);
                         }}
-                        minLength={searchThreshold + 1}
+                        minLength={ASYNC_SEARCH_THRESHOLD + 1}
                       />
                       <Tippy content="By default only whitelisted pools are visible. Searching by pool name or token symbol will show all pools. Resetting your search will display the last search results combined with the default pools.">
                         <span className="ms-2">

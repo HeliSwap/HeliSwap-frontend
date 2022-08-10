@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { ITokenData, TokenType } from '../interfaces/tokens';
 
 import { QueryHookOptions, useQuery } from '@apollo/client';
-import { GET_TOKENS } from '../GraphQL/Queries';
+import { GET_TOKENS_WHITELISTED } from '../GraphQL/Queries';
 import { NATIVE_TOKEN } from '../utils/tokenUtils';
 
 const useTokensByListIds = (
@@ -11,17 +11,17 @@ const useTokensByListIds = (
 ) => {
   const [tokens, setTokens] = useState<ITokenData[]>();
 
-  const { loading, data, error } = useQuery(GET_TOKENS, {
-    variables: { tokensWhitelistedIds },
+  const { loading, data, error } = useQuery(GET_TOKENS_WHITELISTED, {
+    variables: { addresses: tokensWhitelistedIds },
     ...useQueryOptions,
   });
 
   useEffect(() => {
     if (data) {
-      const { getTokensData } = data;
+      const { getWhitelistedTokens: tokensData } = data;
 
-      if (getTokensData.length > 0) {
-        const foundTokenDataList = getTokensData.map(
+      if (tokensData.length > 0) {
+        const foundTokenDataList = tokensData.map(
           ({ hederaId, name, symbol, address, decimals, isHTS }: any) => ({
             hederaId,
             name,

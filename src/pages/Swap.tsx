@@ -47,11 +47,12 @@ import {
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
 
-import { MAX_UINT_ERC20, MAX_UINT_HTS, REFRESH_TIME } from '../constants';
+import { MAX_UINT_ERC20, MAX_UINT_HTS, REFRESH_TIME, ASYNC_SEARCH_THRESHOLD } from '../constants';
 
 import useTokensByListIds from '../hooks/useTokensByListIds';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import usePoolsByToken from '../hooks/usePoolsByToken';
+import useTokensByFilter from '../hooks/useTokensByFilter';
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
@@ -90,7 +91,9 @@ const Swap = () => {
   const [tokensWhitelistedIds, setTokensWhitelistedIds] = useState<string[]>([]);
 
   const [mergedPoolsData, setMergedPoolsData] = useState<IPoolData[]>([] as IPoolData[]);
+  const [mergedTokensData, setMergedTokensData] = useState<ITokenData[]>([] as ITokenData[]);
 
+  //Get whitelisted pools
   const {
     poolsByTokenList: whitelistedPoolsData,
     loadingPoolsByTokenList: loadingPools,
@@ -103,7 +106,7 @@ const Swap = () => {
     false,
     tokensWhitelistedIds,
   );
-
+  //Get pools by token A
   const { filteredPools: filteredPoolsDataTokenA } = usePoolsByToken(
     {
       fetchPolicy: 'network-only',
@@ -113,6 +116,7 @@ const Swap = () => {
     false,
   );
 
+  //Get pools by token B
   const { filteredPools: filteredPoolsDataTokenB } = usePoolsByToken(
     {
       fetchPolicy: 'network-only',
@@ -122,11 +126,28 @@ const Swap = () => {
     true,
   );
 
+  //Get whitelisted tokens
   const { loading: loadingTDL, tokens: tokenDataList } = useTokensByListIds(tokensWhitelistedIds, {
     fetchPolicy: 'network-only',
-    pollInterval: REFRESH_TIME,
   });
 
+  const [selectedTokensIds, setSelectedTokensIds] = useState<string[]>([]);
+
+  const { tokens: selectedTokens } = useTokensByListIds(selectedTokensIds, {
+    fetchPolicy: 'network-only',
+  });
+
+  const { filteredTokens, loadFilteredTokens } = useTokensByFilter({
+    fetchPolicy: 'network-only',
+  });
+
+  const searchTokensFunc = useMemo(
+    () => (value: string) => {
+      if (value.length > ASYNC_SEARCH_THRESHOLD)
+        loadFilteredTokens({ variables: { keyword: value } });
+    },
+    [loadFilteredTokens],
+  );
   const initialSwapData: ISwapTokenData = {
     amountIn: '',
     amountOut: '',
@@ -543,19 +564,27 @@ const Swap = () => {
         token0 &&
         token1 &&
         mergedPoolsData.length !== 0 &&
-        tokenDataList
+        mergedTokensData
       ) {
+        const token0Found = mergedTokensData.some((token: ITokenData) => token.address === token0);
+        const token1Found = mergedTokensData.some((token: ITokenData) => token.address === token1);
+
+        if (!token0Found || !token1Found) {
+          //Load data for the tokens chosen
+          setSelectedTokensIds([token0, token1]);
+          return;
+        }
         // Check if one of tokens is WHBAR - to be switched for HBAR
         const isTokenAWrappedHBAR = token0 === (process.env.REACT_APP_WHBAR_ADDRESS as string);
         const isTokenBWrappedHBAR = token1 === (process.env.REACT_APP_WHBAR_ADDRESS as string);
 
         const tokenA = isTokenAWrappedHBAR
           ? NATIVE_TOKEN
-          : tokenDataList.find((token: ITokenData) => token.address === token0) ||
+          : mergedTokensData.find((token: ITokenData) => token.address === token0) ||
             ({} as ITokenData);
         const tokenB = isTokenBWrappedHBAR
           ? NATIVE_TOKEN
-          : tokenDataList.find((token: ITokenData) => token.address === token1) ||
+          : mergedTokensData.find((token: ITokenData) => token.address === token1) ||
             ({} as ITokenData);
 
         if (tokenA.type !== TokenType.HBAR) {
@@ -581,7 +610,7 @@ const Swap = () => {
     } catch (err) {
       console.error(err);
     }
-  }, [mergedPoolsData, tokenDataList, token0, token1, tokensDerivedFromPool, userId]);
+  }, [mergedPoolsData, mergedTokensData, token0, token1, tokensDerivedFromPool, userId]);
 
   useEffect(() => {
     if (tokensWhitelisted && tokensWhitelisted.length !== 0) {
@@ -599,6 +628,11 @@ const Swap = () => {
     );
     setMergedPoolsData(mergedPoolsData);
   }, [whitelistedPoolsData, filteredPoolsDataTokenA, filteredPoolsDataTokenB]);
+
+  useEffect(() => {
+    const mergedTokensData = _.unionBy(tokenDataList, selectedTokens, filteredTokens, 'address');
+    setMergedTokensData(mergedTokensData);
+  }, [tokenDataList, selectedTokens, filteredTokens]);
 
   //Render methods
   const getErrorMessage = () => {
@@ -667,8 +701,9 @@ const Swap = () => {
             }}
             closeModal={() => setShowModalA(false)}
             canImport={false}
-            tokenDataList={tokenDataList || []}
+            tokenDataList={mergedTokensData || []}
             loadingTDL={loadingTDL}
+            searchFunc={searchTokensFunc}
           />
         </Modal>
 
@@ -721,8 +756,9 @@ const Swap = () => {
             }}
             closeModal={() => setShowModalB(false)}
             canImport={false}
-            tokenDataList={tokenDataList || []}
+            tokenDataList={mergedTokensData || []}
             loadingTDL={loadingTDL}
+            searchFunc={searchTokensFunc}
           />
         </Modal>
         {getActionButtons()}

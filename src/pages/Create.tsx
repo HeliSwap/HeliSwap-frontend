@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
 import Tippy from '@tippyjs/react';
+import _ from 'lodash';
 
 import {
   ITokenData,
@@ -44,10 +45,17 @@ import {
 import { getTransactionSettings } from '../utils/transactionUtils';
 import { formatIcons } from '../utils/iconUtils';
 
-import { MAX_UINT_ERC20, MAX_UINT_HTS, POOLS_FEE, REFRESH_TIME } from '../constants';
+import {
+  MAX_UINT_ERC20,
+  MAX_UINT_HTS,
+  POOLS_FEE,
+  REFRESH_TIME,
+  ASYNC_SEARCH_THRESHOLD,
+} from '../constants';
 
-import useTokens from '../hooks/useTokens';
 import usePoolsByToken from '../hooks/usePoolsByToken';
+import useTokensByListIds from '../hooks/useTokensByListIds';
+import useTokensByFilter from '../hooks/useTokensByFilter';
 
 enum ADD_LIQUIDITY_TITLES {
   CREATE_POOL = 'Create pool',
@@ -57,11 +65,14 @@ enum ADD_LIQUIDITY_TITLES {
 
 const Create = () => {
   const contextValue = useContext(GlobalContext);
-  const { connection, sdk } = contextValue;
+  const { connection, sdk, tokensWhitelisted } = contextValue;
   const { userId, hashconnectConnectorInstance, connected, connectWallet, isHashpackLoading } =
     connection;
   const { token0, token1 } = useParams();
   const navigate = useNavigate();
+
+  //State for tokens whitelist
+  const [tokensWhitelistedIds, setTokensWhitelistedIds] = useState<string[]>([]);
 
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
@@ -79,6 +90,11 @@ const Create = () => {
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
   const [loadingAssociate, setLoadingAssociate] = useState(false);
 
+  //State for tokens data
+  const [selectedTokensIds, setSelectedTokensIds] = useState<string[]>([]);
+  const [mergedTokensData, setMergedTokensData] = useState<ITokenData[]>([] as ITokenData[]);
+
+  //Get pools by token A
   const { filteredPools: poolsData } = usePoolsByToken(
     {
       fetchPolicy: 'network-only',
@@ -88,10 +104,28 @@ const Create = () => {
     false,
   );
 
-  const { loading: loadingTDL, tokens: tokenDataList } = useTokens({
+  //Get whitelisted tokens
+  const { loading: loadingTDL, tokens: tokenDataList } = useTokensByListIds(tokensWhitelistedIds, {
     fetchPolicy: 'network-only',
-    pollInterval: REFRESH_TIME,
   });
+
+  // Get selected tokens
+  const { tokens: selectedTokens } = useTokensByListIds(selectedTokensIds, {
+    fetchPolicy: 'network-only',
+  });
+
+  //Get tokens by filter
+  const { filteredTokens, loadFilteredTokens } = useTokensByFilter({
+    fetchPolicy: 'network-only',
+  });
+
+  const searchTokensFunc = useMemo(
+    () => (value: string) => {
+      if (value.length > ASYNC_SEARCH_THRESHOLD)
+        loadFilteredTokens({ variables: { keyword: value } });
+    },
+    [loadFilteredTokens],
+  );
 
   const initialCreateData: ICreatePairData = {
     tokenAAmount: '',
@@ -500,17 +534,31 @@ const Create = () => {
   // Check for address in url
   useEffect(() => {
     try {
-      if (!tokensDerivedFromPool && token0 && token1 && poolsData.length !== 0 && tokenDataList) {
+      if (
+        !tokensDerivedFromPool &&
+        token0 &&
+        token1 &&
+        poolsData.length !== 0 &&
+        mergedTokensData
+      ) {
+        const token0Found = mergedTokensData.some((token: ITokenData) => token.address === token0);
+        const token1Found = mergedTokensData.some((token: ITokenData) => token.address === token1);
+
+        if (!token0Found || !token1Found) {
+          //Load data for the tokens chosen
+          setSelectedTokensIds([token0, token1]);
+          return;
+        }
         const isTokenAWrappedHBAR = token0 === (process.env.REACT_APP_WHBAR_ADDRESS as string);
         const isTokenBWrappedHBAR = token1 === (process.env.REACT_APP_WHBAR_ADDRESS as string);
 
         const tokenA = isTokenAWrappedHBAR
           ? NATIVE_TOKEN
-          : tokenDataList.find((token: ITokenData) => token.address === token0) ||
+          : mergedTokensData.find((token: ITokenData) => token.address === token0) ||
             ({} as ITokenData);
         const tokenB = isTokenBWrappedHBAR
           ? NATIVE_TOKEN
-          : tokenDataList.find((token: ITokenData) => token.address === token1) ||
+          : mergedTokensData.find((token: ITokenData) => token.address === token1) ||
             ({} as ITokenData);
 
         setTokensData({ tokenA, tokenB });
@@ -520,7 +568,7 @@ const Create = () => {
     } catch (err) {
       console.error(err);
     }
-  }, [poolsData, tokenDataList, token0, token1, tokensDerivedFromPool]);
+  }, [poolsData, mergedTokensData, token0, token1, tokensDerivedFromPool]);
 
   // Cache input values
   useEffect(() => {
@@ -575,6 +623,18 @@ const Create = () => {
     invalidTokenData,
     tokensData,
   ]);
+
+  useEffect(() => {
+    if (tokensWhitelisted && tokensWhitelisted.length !== 0) {
+      const tokensWhitelistedIds = tokensWhitelisted.map(item => item.address);
+      setTokensWhitelistedIds(tokensWhitelistedIds);
+    }
+  }, [tokensWhitelisted]);
+
+  useEffect(() => {
+    const mergedTokensData = _.unionBy(tokenDataList, selectedTokens, filteredTokens, 'address');
+    setMergedTokensData(mergedTokensData);
+  }, [tokenDataList, selectedTokens, filteredTokens]);
 
   const getTokenIsAssociated = (token: ITokenData) => {
     const notHTS =
@@ -643,8 +703,9 @@ const Create = () => {
               }
             }}
             closeModal={() => setShowModalA(false)}
-            tokenDataList={tokenDataList || []}
+            tokenDataList={mergedTokensData || []}
             loadingTDL={loadingTDL}
+            searchFunc={searchTokensFunc}
           />
         </Modal>
 
@@ -694,8 +755,9 @@ const Create = () => {
               }
             }}
             closeModal={() => setShowModalB(false)}
-            tokenDataList={tokenDataList || []}
+            tokenDataList={mergedTokensData || []}
             loadingTDL={loadingTDL}
+            searchFunc={searchTokensFunc}
           />
         </Modal>
         {getFeesInfo()}

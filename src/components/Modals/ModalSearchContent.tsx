@@ -10,11 +10,16 @@ import {
   requestAddressFromId,
   requestIdFromAddress,
 } from '../../utils/tokenUtils';
+
+import { ASYNC_SEARCH_THRESHOLD } from '../../constants';
+
 import IconToken from '../IconToken';
 import Button from '../Button';
 import Icon from '../Icon';
+import Loader from '../Loader';
 
 import search from '../../icons/system/search-gradient.svg';
+import useDebounce from '../../hooks/useDebounce';
 
 interface IModalProps {
   modalTitle?: string;
@@ -24,6 +29,7 @@ interface IModalProps {
   canImport?: boolean;
   tokenDataList: ITokenData[];
   loadingTDL: boolean;
+  searchFunc?: (value: string) => void;
 }
 
 const ModalSearchContent = ({
@@ -34,6 +40,7 @@ const ModalSearchContent = ({
   canImport = true,
   tokenDataList,
   loadingTDL,
+  searchFunc,
 }: IModalProps) => {
   const networkType = process.env.REACT_APP_NETWORK_TYPE as string;
   const hashScanUrl = `https://hashscan.io/#/${networkType}/token/`;
@@ -47,12 +54,20 @@ const ModalSearchContent = ({
   const [warningMessage, setWarningMessage] = useState('');
 
   const [tokenList, setTokenList] = useState<ITokenData[]>([]);
+  const [searchingResults, setSearchingResults] = useState(false);
 
   const onSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-
+    setSearchingResults(value.length > ASYNC_SEARCH_THRESHOLD);
     setSearchInputValue(value);
   };
+  const debouncedSearchTerm: string = useDebounce(searchInputValue, 1000);
+
+  useEffect(() => {
+    if (debouncedSearchTerm && searchFunc) {
+      searchFunc(debouncedSearchTerm);
+    }
+  }, [debouncedSearchTerm, searchFunc]);
 
   const handleDecimalsInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -155,8 +170,8 @@ const ModalSearchContent = ({
         ? foundItemArray
         : tokenDataList?.filter(
             (item: ITokenData) =>
-              item.symbol.toLowerCase().includes(searchInputValue) ||
-              item.name.toLowerCase().includes(searchInputValue),
+              item.symbol.toLowerCase().includes(searchInputValue.toLowerCase()) ||
+              item.name.toLowerCase().includes(searchInputValue.toLowerCase()),
           ) || [];
 
     const haveResults = foundItems.length > 0;
@@ -175,9 +190,7 @@ const ModalSearchContent = ({
   }, [searchInputValue, tokenDataList]);
 
   useEffect(() => {
-    if (tokenDataList) {
-      setTokenList(tokenDataList);
-    }
+    setSearchingResults(false);
   }, [tokenDataList]);
 
   const hasTokenList = tokenList && tokenList.length > 0;
@@ -217,7 +230,13 @@ const ModalSearchContent = ({
 
         {warningMessage ? <div className="alert alert-warning mt-5">{warningMessage}</div> : null}
 
-        {showNotFound ? (
+        {searchingResults ? (
+          <div className="d-flex justify-content-center my-6">
+            <Loader />
+          </div>
+        ) : null}
+
+        {showNotFound && !searchingResults ? (
           <div className="text-center mt-5">
             <img src={search} alt="" />
             <h2 className="text-subheader mt-4">Not Found</h2>
@@ -275,7 +294,7 @@ const ModalSearchContent = ({
           </div>
         ) : null}
 
-        {showTokenList ? (
+        {showTokenList && !searchingResults ? (
           <div className="mt-7">
             <h3 className="text-small">Token name</h3>
             <div className="mt-3">
