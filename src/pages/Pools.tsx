@@ -46,7 +46,11 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
 
   const searchFunc = useMemo(
     () => (value: string) => {
-      if (value.length > searchThreshold) setSearchQuery({ keyword: value });
+      if (value.length > searchThreshold) {
+        setSearchQuery({ keyword: value });
+      } else {
+        setSearchingResults(false);
+      }
     },
     [],
   );
