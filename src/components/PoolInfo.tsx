@@ -46,6 +46,7 @@ const PoolInfo = ({
     setCurrentPoolIndex(index);
   };
 
+  // const campaignAddress = '0x0000000000000000000000000000000002da4531';
   const campaignAddress = '0x0000000000000000000000000000000002da46d1';
 
   const handleStakeButtonClick = async () => {
@@ -67,6 +68,18 @@ const PoolInfo = ({
         campaignAddress,
         userId,
       );
+      const {
+        response: { success, error },
+      } = receipt;
+    } catch (err) {
+      console.error(err);
+    } finally {
+    }
+  };
+
+  const handleExitButtonClick = async () => {
+    try {
+      const receipt = await sdk.exit(hashconnectConnectorInstance, campaignAddress, userId);
       const {
         response: { success, error },
       } = receipt;
@@ -264,6 +277,14 @@ const PoolInfo = ({
                     size="small"
                   >
                     Collect
+                  </Button>
+                  <Button
+                    className="ms-3"
+                    onClick={handleExitButtonClick}
+                    type="secondary"
+                    size="small"
+                  >
+                    Exit
                   </Button>
                 </div>
               </div>
