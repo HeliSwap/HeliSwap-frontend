@@ -12,9 +12,7 @@ const SearchArea = ({ searchFunc, setInputValue, inputValue, minLength }: ISearc
   const debouncedSearchTerm: string = useDebounce(inputValue, 1000);
 
   useEffect(() => {
-    if (debouncedSearchTerm) {
-      searchFunc(debouncedSearchTerm);
-    }
+    searchFunc(debouncedSearchTerm);
   }, [debouncedSearchTerm, searchFunc]);
 
   return (

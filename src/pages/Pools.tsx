@@ -42,10 +42,15 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
 
   //Search area state
   const [inputValue, setInputValue] = useState('');
+  const [searchingResults, setSearchingResults] = useState(false);
 
   const searchFunc = useMemo(
     () => (value: string) => {
-      if (value.length > searchThreshold) setSearchQuery({ keyword: value });
+      if (value.length > searchThreshold) {
+        setSearchQuery({ keyword: value });
+      } else {
+        setSearchingResults(false);
+      }
     },
     [],
   );
@@ -100,7 +105,12 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   };
 
   useEffect(() => {
-    if ((pools || filteredPools) && !filteredPoolsLoading && !loadingPools) {
+    if (
+      (pools.length !== 0 || filteredPools.length !== 0) &&
+      !filteredPoolsLoading &&
+      !loadingPools &&
+      !searchingResults
+    ) {
       const whitelistedFilteredPools = filterPoolsByPattern(inputValue, pools, searchThreshold);
       const visiblePools = _.unionBy(whitelistedFilteredPools, filteredPools, 'id');
 
@@ -108,13 +118,17 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     }
 
     setHavePools(pools && pools.length !== 0);
-  }, [pools, filteredPools, inputValue, filteredPoolsLoading, loadingPools]);
+  }, [pools, filteredPools, inputValue, filteredPoolsLoading, loadingPools, searchingResults]);
 
   useEffect(() => {
     if (poolsByUser) setUserPoolsToShow(poolsByUser);
 
     setHaveUserPools(poolsByUser && poolsByUser.length !== 0);
   }, [poolsByUser]);
+
+  useEffect(() => {
+    setSearchingResults(false);
+  }, [filteredPools]);
 
   const renderEmptyPoolsState = (infoMessage: string) => (
     <div className="text-center mt-10">
@@ -166,7 +180,10 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
                       <SearchArea
                         searchFunc={searchFunc}
                         inputValue={inputValue}
-                        setInputValue={setInputValue}
+                        setInputValue={(value: string) => {
+                          setSearchingResults(true);
+                          setInputValue(value);
+                        }}
                         minLength={searchThreshold + 1}
                       />
                       <Tippy content="Searching by pool name or symbol will show all pools">
