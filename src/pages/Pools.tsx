@@ -186,7 +186,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
                         }}
                         minLength={searchThreshold + 1}
                       />
-                      <Tippy content="Searching by pool name or symbol will show all pools">
+                      <Tippy content="By default only whitelisted pools are visible. Searching by pool name or token symbol will show all pools. Resetting your search will display the last search results combined with the default pools.">
                         <span className="ms-2">
                           <Icon color="gray" name="hint" />
                         </span>
