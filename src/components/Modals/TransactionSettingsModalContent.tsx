@@ -74,7 +74,7 @@ const TransactionSettingsModalContent = ({
         <div>
           <p className="d-flex align-items-center">
             <span className="text-small">Slippage</span>
-            <Tippy content="If the prices of your specified tokens change adversely, your transaction will revert. Set your price change tolerance.">
+            <Tippy content="If the prices of your specified tokens change adversely, your transaction will revert. Slippage allows you to specify you price change tolerance.">
               <span className="ms-2">
                 <Icon color="gray" name="hint" />
               </span>

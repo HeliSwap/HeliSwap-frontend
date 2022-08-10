@@ -29,7 +29,7 @@ const WalletBalance = ({
   ) : (
     <p className="d-flex align-items-center">
       <span className="text-gray text-micro">Balance not viewable</span>{' '}
-      <Tippy content="Your ERC-20 balance cannot be shown, as ERC-20 tokens are supported on HeliSwap, but not on HashPack. We are working on a solution to be live soon.">
+      <Tippy content="Your ERC-20 balance cannot be shown as ERC-20 tokens are supported on HeliSwap, but not on HashPack.">
         <span className="ms-2">
           <Icon color="gray" name="hint" />
         </span>
