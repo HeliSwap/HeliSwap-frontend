@@ -79,9 +79,12 @@ const ModalSearchContent = ({
   };
 
   const handleTokenListClick = (token: ITokenData) => {
+    const processedToken = token.type
+      ? token
+      : { ...token, type: token.isHTS ? TokenType.HTS : TokenType.ERC20 };
     setTokensData((prev: any) => ({
       ...prev,
-      [tokenFieldId]: token,
+      [tokenFieldId]: processedToken,
     }));
 
     resetModalState();
