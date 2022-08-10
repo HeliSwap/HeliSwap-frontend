@@ -8,6 +8,7 @@ export interface ITokenData {
   decimals: number;
   type: TokenType;
   details?: any;
+  isHTS?: boolean;
 }
 
 export interface ITokenListData {
