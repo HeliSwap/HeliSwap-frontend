@@ -41,17 +41,6 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const [inputValue, setInputValue] = useState('');
   const [searchingResults, setSearchingResults] = useState(false);
 
-  const searchFunc = useMemo(
-    () => (value: string) => {
-      if (value.length > ASYNC_SEARCH_THRESHOLD) {
-        setSearchQuery({ keyword: value });
-      } else {
-        setSearchingResults(false);
-      }
-    },
-    [],
-  );
-
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
 
   const {
@@ -94,6 +83,11 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const searchFunc = useMemo(
     () => (value: string) => {
       if (value.length > ASYNC_SEARCH_THRESHOLD) loadExtraPools({ variables: { keyword: value } });
+      if (value.length > ASYNC_SEARCH_THRESHOLD) {
+        loadExtraPools({ variables: { keyword: value } });
+      } else {
+        setSearchingResults(false);
+      }
     },
     [loadExtraPools],
   );
@@ -114,7 +108,11 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
       !loadingPools &&
       !searchingResults
     ) {
-      const whitelistedFilteredPools = filterPoolsByPattern(inputValue, pools, ASYNC_SEARCH_THRESHOLD);
+      const whitelistedFilteredPools = filterPoolsByPattern(
+        inputValue,
+        pools,
+        ASYNC_SEARCH_THRESHOLD,
+      );
       const visiblePools = _.unionBy(whitelistedFilteredPools, filteredPools, 'id');
 
       setPoolsToShow(visiblePools);
