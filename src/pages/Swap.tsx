@@ -707,8 +707,10 @@ const Swap = () => {
           />
         </Modal>
 
-        <div onClick={handleSwitchTokens} className="text-center my-4">
-          <Icon className="cursor-pointer" name="swap" color="gradient" />
+        <div className="d-flex justify-content-center my-4">
+          <span className="d-block p-1" onClick={handleSwitchTokens}>
+            <Icon className="cursor-pointer" name="swap" color="gradient" />
+          </span>
         </div>
 
         <InputTokenSelector
