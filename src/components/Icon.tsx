@@ -10,6 +10,7 @@ import { ReactComponent as Hint } from '../icons/system/hint.svg';
 import { ReactComponent as Loader } from '../icons/system/loader.svg';
 import { ReactComponent as More } from '../icons/system/more.svg';
 import { ReactComponent as Pools } from '../icons/system/pools.svg';
+import { ReactComponent as Farms } from '../icons/system/farms.svg';
 import { ReactComponent as SpeachBubble } from '../icons/system/speech-bubble.svg';
 import { ReactComponent as Star } from '../icons/system/star.svg';
 import { ReactComponent as Swap } from '../icons/system/swap.svg';
@@ -58,6 +59,7 @@ const icons: IIconMapping = {
   loader: Loader,
   more: More,
   pools: Pools,
+  farms: Farms,
   'speach-bubble': SpeachBubble,
   star: Star,
   swap: Swap,
