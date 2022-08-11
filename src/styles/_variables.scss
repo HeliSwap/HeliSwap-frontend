@@ -5,6 +5,16 @@ $darkest: #272727;
 $black: #000000;
 $white: #ffffff;
 
+$primary-900: #0B0349;
+$primary-800: #120672;
+$primary-700: #1B0B9A;
+$primary-600: #2411C0;
+$primary-500: #2F18E5;
+$primary-400: #2B2EF8;
+$primary-300: #4D5FFF;
+$primary-200: #7391FF;
+$primary-100: #99BCFF;
+
 $neutral-900: #101011;
 $neutral-850: #1a1a1c95;
 $neutral-800: #1e1e21;
@@ -15,28 +25,27 @@ $neutral-400: #6f6f77;
 $neutral-300: #9d9daa;
 $neutral-100: #f9f9f9;
 
-$primary: #2f18e5;
-
-$primary-100: #FAFAFF;
-$primary-200: #7391ff;
-$primary-300: #9797C2;
-$primary-400: #7979A3;
-$primary-500: #3D3D58;
-$primary-600: #2A2A43;
-$primary-700: #1F1F3A;
-$primary-800: #19193F;
-$primary-850: #080C24;
-$primary-900: #030617;
-$primary-950: #01030F;
+$blue-neutral-100: #FAFAFF;
+$blue-neutral-200: #7391ff;
+$blue-neutral-300: #9797C2;
+$blue-neutral-400: #7979A3;
+$blue-neutral-500: #3D3D58;
+$blue-neutral-600: #2A2A43;
+$blue-neutral-700: #1F1F3A;
+$blue-neutral-800: #19193F;
+$blue-neutral-850: #080C24;
+$blue-neutral-900: #030617;
+$blue-neutral-950: #01030F;
 
 $secondary-800: #68106D;
 
-$secondary: $primary-400;
+$primary: #2f18e5;
+$secondary: $blue-neutral-400;
 $success: #0da048;
 $danger: #ea1548;
 $warning: #f17400;
 $info: #2B2EF8;
-$gray: $primary-300;
+$gray: $blue-neutral-300;
 
 // Add custom colors to theme-colors map
 $theme-colors: (
@@ -149,8 +158,8 @@ $container-max-widths: (
 );
 
 // Body
-$body-bg: $primary-850;
-$body-color: $primary-100;
+$body-bg: $blue-neutral-850;
+$body-color: $blue-neutral-100;
 
 // Paragraphs
 $paragraph-margin-bottom: 0;
@@ -276,23 +285,23 @@ $btn-disabled-opacity: 0.5;
 $btn-primary-color: $white;
 $btn-primary-disabled-background: #232342;
 $btn-primary-outline-color: $white;
-$btn-primary-outline-border-hover: $primary-200;
+$btn-primary-outline-border-hover: $blue-neutral-200;
 
 // Forms
-$input-color: $primary-100;
-$input-border-color: $primary-700;
-$input-focus-border-color: $primary-400;
+$input-color: $blue-neutral-100;
+$input-border-color: $blue-neutral-700;
+$input-focus-border-color: $blue-neutral-400;
 $input-focus-box-shadow: none;
 $input-height: auto;
 $input-line-height: 1.71;
 $input-placeholder-color: $secondary;
 $form-group-margin-bottom: 0;
-$input-bg: $primary-700;
+$input-bg: $blue-neutral-700;
 $input-padding-y: 15px;
 $input-padding-x: 12px;
 $input-font-size: 14px;
-$input-disabled-bg: $primary-800;
-$input-disabled-border-color: $primary-800;
+$input-disabled-bg: $blue-neutral-800;
+$input-disabled-border-color: $blue-neutral-800;
 
 $input-padding-y-sm:                    7px;
 $input-padding-x-sm:                    12px;
@@ -309,13 +318,13 @@ $form-range-track-bg: $neutral-500;
 $form-range-track-height: 0.25rem;
 $form-range-thumb-width: 1.5rem;
 $form-range-thumb-height: 1.5rem;
-$form-range-thumb-border: 4px solid $primary-300;
+$form-range-thumb-border: 4px solid $blue-neutral-300;
 
 // Modals
-$modal-content-bg: $primary-900;
+$modal-content-bg: $blue-neutral-900;
 $modal-header-border-color: $dark;
 $modal-backdrop-opacity: 1;
-$form-range-thumb-bg: $primary-100;
+$form-range-thumb-bg: $blue-neutral-100;
 $modal-backdrop-bg: rgba(25, 25, 63, 0.3);
 $modal-header-padding: 24px;
 $modal-inner-padding: 1.5rem;
@@ -324,9 +333,9 @@ $btn-close-color: $white;
 
 // Pagination
 $pagination-bg: transparent;
-$pagination-color: $primary-300;
+$pagination-color: $blue-neutral-300;
 $pagination-active-color: $white;
-$pagination-active-bg: $primary-500;
+$pagination-active-bg: $blue-neutral-500;
 $pagination-padding-y: 0.175rem;
 $pagination-border-width: 0;
 
