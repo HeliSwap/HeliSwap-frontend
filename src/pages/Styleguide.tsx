@@ -21,7 +21,7 @@ const Styleguide = () => {
   };
 
   return (
-    <>
+    <div className="ps-10">
       <h1 className="text-mega">Styleguide</h1>
 
       <h2 className="text-display mt-10">Colors</h2>
@@ -449,7 +449,7 @@ const Styleguide = () => {
       <Link className="link-primary" to="/">
         Back to home
       </Link>
-    </>
+    </div>
   );
 };
 

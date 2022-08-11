@@ -132,7 +132,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   }, [filteredPools]);
 
   const renderEmptyPoolsState = (infoMessage: string) => (
-    <div className="text-center mt-10">
+    <div className="text-center mt-8">
       <p className="text-small">{infoMessage}</p>
       <Link to="/create" className="btn btn-primary btn-sm mt-5">
         Create pool
@@ -209,38 +209,44 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
           ) : null}
 
           {errorPoools || errorPooolsByUser ? (
-            <div className="alert alert-danger mt-5" role="alert">
-              <strong>Something went wrong!</strong> Cannot get pools...
+            <div className="d-flex justify-content-center">
+              <div
+                className="alert alert-danger d-inline-flex align-items-center mt-5"
+                role="alert"
+              >
+                <Icon className="me-3" name="warning" color="danger" />
+                <p>Something went wrong! Cannot get pools...</p>
+              </div>
             </div>
-          ) : null}
-
-          <>
-            {currentView === PageViews.ALL_POOLS ? (
-              <AllPools
-                loadingPools={loadingPools || filteredPoolsLoading}
-                itemsPerPage={itemsPerPage}
-                pools={poolsToShow}
-                setShowRemoveContainer={setShowRemoveContainer}
-                setCurrentPoolIndex={setCurrentPoolIndex}
-                currentView={currentView}
-                renderEmptyPoolsState={renderEmptyPoolsState}
-              />
-            ) : (
-              <MyPools
-                connected={connected}
-                isHashpackLoading={isHashpackLoading}
-                loadingPools={loadingPoolsByUser}
-                pools={userPoolsToShow}
-                havePools={haveUserPools}
-                setShowRemoveContainer={setShowRemoveContainer}
-                setCurrentPoolIndex={setCurrentPoolIndex}
-                currentView={currentView}
-                renderEmptyPoolsState={renderEmptyPoolsState}
-                setShowConnectModal={setShowConnectModal}
-                itemsPerPage={itemsPerPage}
-              />
-            )}
-          </>
+          ) : (
+            <>
+              {currentView === PageViews.ALL_POOLS ? (
+                <AllPools
+                  loadingPools={loadingPools || filteredPoolsLoading}
+                  itemsPerPage={itemsPerPage}
+                  pools={poolsToShow}
+                  setShowRemoveContainer={setShowRemoveContainer}
+                  setCurrentPoolIndex={setCurrentPoolIndex}
+                  currentView={currentView}
+                  renderEmptyPoolsState={renderEmptyPoolsState}
+                />
+              ) : (
+                <MyPools
+                  connected={connected}
+                  isHashpackLoading={isHashpackLoading}
+                  loadingPools={loadingPoolsByUser}
+                  pools={userPoolsToShow}
+                  havePools={haveUserPools}
+                  setShowRemoveContainer={setShowRemoveContainer}
+                  setCurrentPoolIndex={setCurrentPoolIndex}
+                  currentView={currentView}
+                  renderEmptyPoolsState={renderEmptyPoolsState}
+                  setShowConnectModal={setShowConnectModal}
+                  itemsPerPage={itemsPerPage}
+                />
+              )}
+            </>
+          )}
         </div>
       )}
     </div>

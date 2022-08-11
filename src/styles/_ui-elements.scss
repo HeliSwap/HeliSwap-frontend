@@ -25,39 +25,39 @@
   }
 
   &.with-background {
-    background-color: $primary-700;
+    background-color: $blue-neutral-700;
   }
 
   &.with-border {
-    border: 1px solid $primary-400;
+    border: 1px solid $blue-neutral-400;
   }
 
   &:hover:not(.is-disabled) {
-    background-color: $primary-500;
+    background-color: $blue-neutral-500;
 
     &.with-border {
-      border-color: $primary-500;
+      border-color: $blue-neutral-500;
     }
   }
 }
 
 .btn-percentage {
   cursor: pointer;
-  border: 1px solid $primary-300;
+  border: 1px solid $blue-neutral-300;
   border-radius: $border-radius;
   font-size: 12px;
   line-height: 16px;
-  color: $primary-100;
+  color: $blue-neutral-100;
   padding: 4px 12px;
   transition: background-color 0.15s linear;
 
   &.is-active {
-    background-color: $primary-300;
+    background-color: $blue-neutral-300;
   }
 }
 
 .btn-connect-wallet {
-  background-color: $primary-700;
+  background-color: $blue-neutral-700;
   border-radius: $border-radius;
   display: flex;
   justify-content: space-between;
@@ -67,7 +67,7 @@
   transition: background-color 0.15s linear;
 
   &:hover {
-    background-color: $primary-500;
+    background-color: $blue-neutral-500;
   }
 }
 
@@ -80,7 +80,13 @@
 
   &.is-gray {
     path {
-      fill: $primary-300;
+      fill: $blue-neutral-300;
+    }
+  }
+
+  &.is-danger {
+    path {
+      fill: #4b0213;
     }
   }
 
@@ -88,6 +94,11 @@
     path {
       fill: linear-gradient(139.83deg, #f32fd7 0%, #3845fb 100%);
     }
+  }
+
+  &.is-small {
+    width: 20px;
+    height: 20px;
   }
 }
 
@@ -132,7 +143,7 @@
 
 /* Containers */
 .container-connected {
-  background-color: $primary-700;
+  background-color: $blue-neutral-700;
   box-shadow: 0px 2px 16px rgba(0, 0, 0, 0.05);
   border-radius: $border-radius;
   padding: 3px 3px 3px 12px;
@@ -141,7 +152,7 @@
 }
 
 .container-address {
-  background-color: $primary-500;
+  background-color: $blue-neutral-500;
   border-radius: 2px;
   padding: 4px 8px;
   margin-left: 12px;
@@ -151,12 +162,12 @@
   align-items: center;
 
   &:hover {
-    background-color: $primary-600;
+    background-color: $blue-neutral-600;
   }
 }
 
 .container-dark {
-  background-color: $primary-950;
+  background-color: $blue-neutral-950;
   box-shadow: 0px 5px 20px rgba(9, 10, 20, 0.45);
   padding: 16px;
   border-radius: 6px;
@@ -169,10 +180,10 @@
 }
 
 .container-input-token {
-  background-color: $primary-700;
+  background-color: $blue-neutral-700;
   border-radius: $border-radius;
   padding: 12px;
-  border: 1px solid $primary-700;
+  border: 1px solid $blue-neutral-700;
   transition: border 0.15s linear;
 
   &:not(.is-readonly) {
@@ -181,7 +192,7 @@
 
   &:focus-within:not(.is-readonly),
   &:hover:not(.is-readonly) {
-    border-color: $primary-500;
+    border-color: $blue-neutral-500;
   }
 
   &.is-invalid {
@@ -189,22 +200,22 @@
   }
 
   .input-token {
-    color: $primary-100;
+    color: $blue-neutral-100;
     font-family: $font-family-numeric;
     font-size: 28px;
     line-height: 40px;
-    background-color: $primary-700;
+    background-color: $blue-neutral-700;
     border: none;
     max-width: 250px;
     flex: 0 1 250px;
     @include transition-color;
 
     &::placeholder {
-      color: $primary-100;
+      color: $blue-neutral-100;
     }
 
     &:focus {
-      color: $primary-100;
+      color: $blue-neutral-100;
     }
 
     &:focus-visible {
@@ -228,7 +239,7 @@
 .container-pool-details {
   padding: 0 20px 20px 20px;
   background-color: #1f1f4d;
-  border-bottom: 1px solid $primary-500;
+  border-bottom: 1px solid $blue-neutral-500;
 }
 
 .container-transparent-border {
@@ -246,7 +257,7 @@
 }
 
 .container-sidebar-menu {
-  background-color: $primary-600;
+  background-color: $blue-neutral-600;
   box-shadow: 0px 5px 20px rgba(9, 10, 20, 0.45);
   border-radius: $border-radius;
   padding: 18px;
@@ -265,14 +276,14 @@
   display: grid;
   grid-auto-rows: auto;
   border-radius: 4px 4px 0px 0px;
-  background-color: $primary-800;
+  background-color: $blue-neutral-800;
 
   .table-pools-row {
     display: grid;
     gap: 1em;
     grid-template-columns: 30px 3fr 1fr;
     transition: background-color 0.1s linear;
-    border-bottom: 1px solid $primary-500;
+    border-bottom: 1px solid $blue-neutral-500;
     cursor: pointer;
 
     &:hover {
@@ -352,7 +363,7 @@
   transition: background-color 0.15s linear;
 
   &:hover {
-    background-color: $primary-700;
+    background-color: $blue-neutral-700;
   }
 }
 
@@ -367,13 +378,13 @@
   @include transition-color;
 
   &.is-active {
-    color: $primary-100;
+    color: $blue-neutral-100;
 
     &:after {
       content: '';
       display: block;
       height: 1px;
-      background-color: $primary-100;
+      background-color: $blue-neutral-100;
       transform: translateY(17px);
     }
   }
@@ -388,12 +399,12 @@
 
 // Overwrites
 .tippy-box {
-  background-color: $primary-400;
+  background-color: $blue-neutral-400;
   padding: 12px;
 }
 
 .tippy-arrow {
-  color: $primary-400;
+  color: $blue-neutral-400;
 }
 
 // Pagination
@@ -402,6 +413,8 @@
   &:last-child {
     display: none;
   }
+
+  margin: 0 2px;
 }
 
 .page-link {

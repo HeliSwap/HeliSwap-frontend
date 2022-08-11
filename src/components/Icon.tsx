@@ -21,15 +21,20 @@ import { ReactComponent as External } from '../icons/system/external.svg';
 import { ReactComponent as Twitter } from '../icons/system/twitter.svg';
 import { ReactComponent as Telegram } from '../icons/system/telegram.svg';
 import { ReactComponent as Github } from '../icons/system/github.svg';
+import { ReactComponent as Warning } from '../icons/system/warning.svg';
 
 interface IIconProps {
   name: string;
   className?: string;
-  size?: number;
+  size?: string;
   color?: string;
 }
 
 interface IColorMapping {
+  [key: string]: string;
+}
+
+interface ISizeMapping {
   [key: string]: string;
 }
 
@@ -64,20 +69,26 @@ const icons: IIconMapping = {
   twitter: Twitter,
   telegram: Telegram,
   github: Github,
+  warning: Warning,
 };
 
 const colorMapping: IColorMapping = {
   white: 'is-white',
   gray: 'is-gray',
   gradient: 'is-gradient',
+  danger: 'is-danger',
 };
 
-const Icon = ({ name, className = '', color = 'white' }: IIconProps) => {
+const sizeMapping: ISizeMapping = {
+  small: 'is-small',
+};
+
+const Icon = ({ name, className = '', color = 'white', size = '' }: IIconProps) => {
   const iconName = color === 'gradient' ? `${name}-gradient` : name;
   const TheIcon = icons[iconName];
   return (
     <>
-      <TheIcon className={`icon ${className} ${colorMapping[color]}`} />
+      <TheIcon className={`icon ${className} ${colorMapping[color]} ${sizeMapping[size]}`} />
     </>
   );
 };

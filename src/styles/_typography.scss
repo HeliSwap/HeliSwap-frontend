@@ -58,36 +58,36 @@
 }
 
 .link-menu {
-  color: $primary-400;
+  color: $blue-neutral-400;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   @include transition-color;
 
   &.is-active {
-    color: $primary-100;
+    color: $blue-neutral-100;
 
     .icon-menu {
-      background-color: $primary-500;
+      background-color: $blue-neutral-500;
 
       .icon {
-        color: $primary-100;
+        color: $blue-neutral-100;
 
         path {
-          fill: $primary-100;
+          fill: $blue-neutral-100;
         }
       }
     }
   }
 
   &:hover {
-    color: $primary-100;
+    color: $blue-neutral-100;
 
     .icon {
-      color: $primary-100;
+      color: $blue-neutral-100;
 
       path {
-        fill: $primary-100;
+        fill: $blue-neutral-100;
       }
     }
   }

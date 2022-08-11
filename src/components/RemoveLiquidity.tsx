@@ -338,7 +338,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
       <div className="container-dark">
         {errorRemove ? (
           <div className="alert alert-danger mb-4" role="alert">
-            <strong>Something went wrong!</strong>
+            <p>Something went wrong!</p>
           </div>
         ) : null}
 

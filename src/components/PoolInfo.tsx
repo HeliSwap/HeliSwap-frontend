@@ -216,7 +216,7 @@ const PoolInfo = ({
         }`}
       >
         <div className="table-pools-cell">
-          <span className="text-small">#</span>
+          <span className="text-small">{index + 1}</span>
         </div>
         <div className="table-pools-cell">
           {formatIcons([poolData.token0Symbol, poolData.token1Symbol])}
