@@ -1,9 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 
 import Icon from './Icon';
 
 const Sidebar = () => {
+  const [menuOpened, setMenuOpened] = useState(false);
+
+  const handleMoreButtonClick = () => {
+    setMenuOpened(prev => !prev);
+  };
+
   return (
     <div className="container-sidebar">
       <div className="container-logo">
@@ -37,15 +43,94 @@ const Sidebar = () => {
           </NavLink>
         </div>
 
-        <div>
-          {/* <div className="d-flex align-items-center">
+        <div className="position-relative">
+          <div
+            className={`d-flex align-items-center link-menu cursor-pointer ${
+              menuOpened ? 'is-active' : ''
+            }`}
+            onClick={handleMoreButtonClick}
+          >
             <span className="icon-menu">
               <Icon color="gray" name="more" />
             </span>
-            <span className="text-small text-secondary d-none d-xxxl-inline-block ms-4">More</span>
+            <span className="text-small d-none d-xxxl-inline-block ms-4">More</span>
           </div>
 
-          <div className="d-flex align-items-center mt-4">
+          {menuOpened ? (
+            <div className="container-sidebar-menu">
+              <p className="text-small text-gray mb-4">Resources</p>
+              <ul>
+                <li className="py-2">
+                  <a
+                    className="text-main link"
+                    target="_blank"
+                    rel="noreferrer"
+                    href="https://docs.heliswap.io"
+                  >
+                    Docs
+                  </a>
+                </li>
+                <li className="py-2">
+                  <a
+                    className="text-main link"
+                    target="_blank"
+                    rel="noreferrer"
+                    href="https://heliswap.io/about"
+                  >
+                    About
+                  </a>
+                </li>
+                <li className="py-2">
+                  <a
+                    className="text-main link"
+                    target="_blank"
+                    rel="noreferrer"
+                    href="https://heliswap.io/terms"
+                  >
+                    Terms of Use
+                  </a>
+                </li>
+              </ul>
+              <hr />
+              <ul>
+                <li className="py-3">
+                  <a
+                    className="text-main link d-flex align-items-center"
+                    target="_blank"
+                    rel="noreferrer"
+                    href="https://twitter.com/HeliSwap_DEX"
+                  >
+                    <Icon name="twitter" />
+                    <span className="ms-3">Twitter</span>
+                  </a>
+                </li>
+                <li className="py-3">
+                  <a
+                    className="text-main link d-flex align-items-center"
+                    target="_blank"
+                    rel="noreferrer"
+                    href="https://t.me/heliswap"
+                  >
+                    <Icon name="telegram" />
+                    <span className="ms-3">Telegram</span>
+                  </a>
+                </li>
+                <li className="py-3">
+                  <a
+                    className="text-main link d-flex align-items-center"
+                    target="_blank"
+                    rel="noreferrer"
+                    href="https://github.com/LimeChain/HeliSwap-frontend"
+                  >
+                    <Icon name="github" />
+                    <span className="ms-3">GitHub</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          ) : null}
+
+          {/* <div className="d-flex align-items-center mt-4">
             <span className="icon-menu">
               <Icon color="gray" name="speach-bubble" />
             </span>
