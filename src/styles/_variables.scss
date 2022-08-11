@@ -13,7 +13,7 @@ $neutral-600: #313135;
 $neutral-500: #4b4b51;
 $neutral-400: #6f6f77;
 $neutral-300: #9d9daa;
-$primary-100: #f9f9f9;
+$neutral-100: #f9f9f9;
 
 $primary: #2f18e5;
 
@@ -35,7 +35,7 @@ $secondary: $primary-400;
 $success: #0da048;
 $danger: #ea1548;
 $warning: #f17400;
-$info: #2f18e5;
+$info: #2B2EF8;
 $gray: $primary-300;
 
 // Add custom colors to theme-colors map
@@ -329,3 +329,8 @@ $pagination-active-color: $white;
 $pagination-active-bg: $primary-500;
 $pagination-padding-y: 0.175rem;
 $pagination-border-width: 0;
+
+// Alerts
+$alert-bg-scale:                -70% !default;
+$alert-border-scale:            40% !default;
+$alert-color-scale:             60% !default;
