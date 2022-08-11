@@ -127,6 +127,32 @@ const Create = () => {
     [loadFilteredTokens],
   );
 
+  const getFilteredTokens = (mergedTokensData: ITokenData[], filterBy: ITokenData) => {
+    return (
+      mergedTokensData.filter((token: ITokenData) => {
+        if (
+          filterBy.type === TokenType.HBAR ||
+          filterBy.address === process.env.REACT_APP_WHBAR_ADDRESS
+        ) {
+          return (
+            token.type !== TokenType.HBAR && token.address !== process.env.REACT_APP_WHBAR_ADDRESS
+          );
+        }
+        return token.address !== filterBy.address;
+      }) || []
+    );
+  };
+
+  const tokenAFilteredData = useMemo(
+    () => getFilteredTokens(mergedTokensData, tokensData.tokenB),
+    [mergedTokensData, tokensData.tokenB],
+  );
+
+  const tokenBFilteredData = useMemo(
+    () => getFilteredTokens(mergedTokensData, tokensData.tokenA),
+    [mergedTokensData, tokensData.tokenA],
+  );
+
   const initialCreateData: ICreatePairData = {
     tokenAAmount: '',
     tokenBAmount: '',
@@ -703,20 +729,7 @@ const Create = () => {
               }
             }}
             closeModal={() => setShowModalA(false)}
-            tokenDataList={
-              mergedTokensData.filter((token: ITokenData) => {
-                if (
-                  tokensData.tokenB.type === TokenType.HBAR ||
-                  tokensData.tokenB.address === process.env.REACT_APP_WHBAR_ADDRESS
-                ) {
-                  return (
-                    token.type !== TokenType.HBAR &&
-                    token.address !== process.env.REACT_APP_WHBAR_ADDRESS
-                  );
-                }
-                return token.address !== tokensData.tokenB?.address;
-              }) || []
-            }
+            tokenDataList={tokenAFilteredData}
             loadingTDL={loadingTDL}
             searchFunc={searchTokensFunc}
             itemToExlude={tokensData.tokenB}
@@ -769,20 +782,7 @@ const Create = () => {
               }
             }}
             closeModal={() => setShowModalB(false)}
-            tokenDataList={
-              mergedTokensData.filter((token: ITokenData) => {
-                if (
-                  tokensData.tokenA.type === TokenType.HBAR ||
-                  tokensData.tokenA.address === process.env.REACT_APP_WHBAR_ADDRESS
-                ) {
-                  return (
-                    token.type !== TokenType.HBAR &&
-                    token.address !== process.env.REACT_APP_WHBAR_ADDRESS
-                  );
-                }
-                return token.address !== tokensData.tokenA?.address;
-              }) || []
-            }
+            tokenDataList={tokenBFilteredData}
             loadingTDL={loadingTDL}
             searchFunc={searchTokensFunc}
             itemToExlude={tokensData.tokenA}

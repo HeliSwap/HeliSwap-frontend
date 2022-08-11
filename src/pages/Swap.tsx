@@ -153,6 +153,18 @@ const Swap = () => {
     amountOut: '',
   };
 
+  const tokenAFilteredData = useMemo(() => {
+    return mergedTokensData.filter(
+      (token: ITokenData) => token.address !== tokensData.tokenB?.address,
+    );
+  }, [mergedTokensData, tokensData.tokenB?.address]);
+
+  const tokenBFilteredData = useMemo(() => {
+    return mergedTokensData.filter(
+      (token: ITokenData) => token.address !== tokensData.tokenА?.address,
+    );
+  }, [mergedTokensData, tokensData.tokenА?.address]);
+
   // State for Swap
   const [swapData, setSwapData] = useState(initialSwapData);
   const tokenInValue = swapData.amountIn;
@@ -690,11 +702,7 @@ const Swap = () => {
             }}
             closeModal={() => setShowModalA(false)}
             canImport={false}
-            tokenDataList={
-              mergedTokensData.filter(
-                (token: ITokenData) => token.address !== tokensData.tokenB?.address,
-              ) || []
-            }
+            tokenDataList={tokenAFilteredData}
             loadingTDL={loadingTDL}
             searchFunc={searchTokensFunc}
             itemToExlude={tokensData.tokenB}
@@ -741,11 +749,7 @@ const Swap = () => {
             }}
             closeModal={() => setShowModalB(false)}
             canImport={false}
-            tokenDataList={
-              mergedTokensData.filter(
-                (token: ITokenData) => token.address !== tokensData.tokenA?.address,
-              ) || []
-            }
+            tokenDataList={tokenBFilteredData}
             loadingTDL={loadingTDL}
             searchFunc={searchTokensFunc}
             itemToExlude={tokensData.tokenA}
