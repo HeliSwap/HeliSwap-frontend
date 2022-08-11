@@ -268,7 +268,7 @@ const ModalSearchContent = ({
                   </p>
                   <Tippy content="This token is not in our database, but you can add it by providing its tokenID or token address. After clicking Import, please specify the number of decimals for this token (i.e. ERC-20 = 18 decimals). Make sure you are providing the correct number of decimals. ">
                     <span className="ms-2">
-                      <Icon color="gray" name="hint" />
+                      <Icon size="small" color="gray" name="hint" />
                     </span>
                   </Tippy>
                 </div>

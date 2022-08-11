@@ -95,6 +95,11 @@
       fill: linear-gradient(139.83deg, #f32fd7 0%, #3845fb 100%);
     }
   }
+
+  &.is-small {
+    width: 20px;
+    height: 20px;
+  }
 }
 
 .icon-menu {

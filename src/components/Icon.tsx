@@ -26,11 +26,15 @@ import { ReactComponent as Warning } from '../icons/system/warning.svg';
 interface IIconProps {
   name: string;
   className?: string;
-  size?: number;
+  size?: string;
   color?: string;
 }
 
 interface IColorMapping {
+  [key: string]: string;
+}
+
+interface ISizeMapping {
   [key: string]: string;
 }
 
@@ -75,12 +79,16 @@ const colorMapping: IColorMapping = {
   danger: 'is-danger',
 };
 
-const Icon = ({ name, className = '', color = 'white' }: IIconProps) => {
+const sizeMapping: ISizeMapping = {
+  small: 'is-small',
+};
+
+const Icon = ({ name, className = '', color = 'white', size = '' }: IIconProps) => {
   const iconName = color === 'gradient' ? `${name}-gradient` : name;
   const TheIcon = icons[iconName];
   return (
     <>
-      <TheIcon className={`icon ${className} ${colorMapping[color]}`} />
+      <TheIcon className={`icon ${className} ${colorMapping[color]} ${sizeMapping[size]}`} />
     </>
   );
 };
