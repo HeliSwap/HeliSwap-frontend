@@ -686,17 +686,6 @@ const Swap = () => {
             setTokensData={newTokensData => {
               setNeedApproval(true);
               setApproved(false);
-              const { tokenA } = newTokensData();
-              if (tokenA && typeof tokenA.hederaId !== 'undefined') {
-                const newSwapData = {
-                  tokenIdIn: tokenA.hederaId,
-                  tokenInDecimals: tokenA.decimals,
-                  amountIn: '',
-                  amountOut: '',
-                };
-
-                setSwapData(prev => ({ ...prev, ...newSwapData }));
-              }
               setTokensData(newTokensData);
             }}
             closeModal={() => setShowModalA(false)}
@@ -748,17 +737,6 @@ const Swap = () => {
             modalTitle="Select token"
             tokenFieldId="tokenB"
             setTokensData={newTokensData => {
-              const { tokenB } = newTokensData();
-              if (tokenB && typeof tokenB.hederaId !== 'undefined') {
-                const newSwapData = {
-                  tokenIdOut: tokenB.hederaId,
-                  tokenOutDecimals: tokenB.decimals,
-                  amountIn: '',
-                  amountOut: '',
-                };
-
-                setSwapData(prev => ({ ...prev, ...newSwapData }));
-              }
               setTokensData(newTokensData);
             }}
             closeModal={() => setShowModalB(false)}
