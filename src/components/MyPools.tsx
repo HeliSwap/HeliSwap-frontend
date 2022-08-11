@@ -130,7 +130,7 @@ const MyPools = ({
       renderEmptyPoolsState('You don’t have active pools at this moment.')
     )
   ) : (
-    <div className="text-center mt-10">
+    <div className="text-center mt-8">
       <p>Your active liquidity positions will appear here.</p>
       <div className="mt-4">
         <Button

@@ -84,6 +84,12 @@
     }
   }
 
+  &.is-danger {
+    path {
+      fill: #4b0213;
+    }
+  }
+
   &.is-gradient {
     path {
       fill: linear-gradient(139.83deg, #f32fd7 0%, #3845fb 100%);

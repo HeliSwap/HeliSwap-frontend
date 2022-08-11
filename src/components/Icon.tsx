@@ -21,6 +21,7 @@ import { ReactComponent as External } from '../icons/system/external.svg';
 import { ReactComponent as Twitter } from '../icons/system/twitter.svg';
 import { ReactComponent as Telegram } from '../icons/system/telegram.svg';
 import { ReactComponent as Github } from '../icons/system/github.svg';
+import { ReactComponent as Warning } from '../icons/system/warning.svg';
 
 interface IIconProps {
   name: string;
@@ -64,12 +65,14 @@ const icons: IIconMapping = {
   twitter: Twitter,
   telegram: Telegram,
   github: Github,
+  warning: Warning,
 };
 
 const colorMapping: IColorMapping = {
   white: 'is-white',
   gray: 'is-gray',
   gradient: 'is-gradient',
+  danger: 'is-danger',
 };
 
 const Icon = ({ name, className = '', color = 'white' }: IIconProps) => {
