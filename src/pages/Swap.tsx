@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 import { useParams } from 'react-router-dom';
 import Tippy from '@tippyjs/react';
 import BigNumber from 'bignumber.js';
@@ -195,9 +196,7 @@ const Swap = () => {
   const [ratioBasedOnTokenOut, setRatioBasedOnTokenOut] = useState(true);
   const [swapPriceImpact, setSwapPriceImpact] = useState<number>(0);
 
-  // State for general error
-  const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  // State for loading
   const [loadingSwap, setLoadingSwap] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
   const [loadingAssociate, setLoadingAssociate] = useState(false);
@@ -390,16 +389,14 @@ const Swap = () => {
       } = receipt;
 
       if (!success) {
-        setError(true);
-        setErrorMessage(error);
+        toast(errorMessages[error]);
       } else {
         const tokens = await getUserAssociatedTokens(userId);
         setUserAssociatedTokens(tokens);
       }
     } catch (err) {
       console.error(err);
-      setError(true);
-      setErrorMessage('Error on associate');
+      toast('Error on associate');
     } finally {
       setLoadingAssociate(false);
     }
@@ -426,15 +423,13 @@ const Swap = () => {
       } = receipt;
 
       if (!success) {
-        setError(true);
-        setErrorMessage(error);
+        toast(errorMessages[error]);
       } else {
         setApproved(true);
       }
     } catch (err) {
       console.error(err);
-      setError(true);
-      setErrorMessage('Error on create');
+      toast('Error on approve');
     } finally {
       setLoadingApprove(false);
     }
@@ -451,8 +446,6 @@ const Swap = () => {
       tokenB: { decimals: decimalsB },
     } = tokensData;
 
-    setError(false);
-    setErrorMessage('');
     setLoadingSwap(true);
 
     const { swapSlippage, transactionExpiration } = getTransactionSettings();
@@ -486,17 +479,17 @@ const Swap = () => {
       } = receipt;
 
       if (!success) {
-        setError(true);
-        setErrorMessage(error);
+        toast.error(errorMessages[error.status]);
       } else {
         setSwapData(initialSwapData);
         setTokensData(initialTokensData);
         setApproved(false);
         refetch();
+        toast.success('Swap successfull');
       }
     } catch (err) {
       console.error(`[Error on swap]: ${err}`);
-      setError(true);
+      toast.error(err as string);
     } finally {
       setLoadingSwap(false);
       setShowModalConfirmSwap(false);
@@ -706,15 +699,6 @@ const Swap = () => {
   }, [tokenDataList, selectedTokens, filteredTokens]);
 
   //Render methods
-  const getErrorMessage = () => {
-    return error ? (
-      <div className="alert alert-danger my-5" role="alert">
-        <strong>Something went wrong!</strong>
-        <p>{errorMessages[errorMessage]}</p>
-      </div>
-    ) : null;
-  };
-
   const getSwapSection = () => {
     return (
       <div className="container-dark">
@@ -1057,8 +1041,25 @@ const Swap = () => {
     <div className="d-flex justify-content-center">
       <div className="container-action">
         <PageHeader slippage="swap" title="Swap" />
-        {getErrorMessage()}
         {getSwapSection()}
+        <Toaster
+          position="top-right"
+          containerStyle={{
+            top: 100,
+          }}
+          toastOptions={{
+            success: {
+              style: {
+                background: '#0da048',
+              },
+            },
+            error: {
+              style: {
+                background: '#ea1548',
+              },
+            },
+          }}
+        />
       </div>
     </div>
   );
