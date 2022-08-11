@@ -130,7 +130,7 @@ const AllPools = ({
             <PoolInfo
               setShowRemoveContainer={setShowRemoveContainer}
               setCurrentPoolIndex={setCurrentPoolIndex}
-              index={index}
+              index={index + itemOffset}
               key={index}
               poolData={item}
               view={currentView}
