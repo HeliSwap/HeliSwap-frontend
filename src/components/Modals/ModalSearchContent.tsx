@@ -197,7 +197,7 @@ const ModalSearchContent = ({
     setReadyToImport(
       !haveResults && (isId || isAddress) && !searchAddressExluded && !searchIdExluded,
     );
-  }, [searchInputValue, tokenDataList]);
+  }, [searchInputValue, tokenDataList, itemToExlude]);
 
   useEffect(() => {
     setSearchingResults(false);
