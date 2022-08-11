@@ -161,9 +161,9 @@ const Swap = () => {
 
   const tokenBFilteredData = useMemo(() => {
     return mergedTokensData.filter(
-      (token: ITokenData) => token.address !== tokensData.tokenА?.address,
+      (token: ITokenData) => token.address !== tokensData.tokenA?.address,
     );
-  }, [mergedTokensData, tokensData.tokenА?.address]);
+  }, [mergedTokensData, tokensData.tokenA?.address]);
 
   // State for Swap
   const [swapData, setSwapData] = useState(initialSwapData);
