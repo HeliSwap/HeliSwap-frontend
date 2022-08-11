@@ -18,6 +18,9 @@ import { ReactComponent as Transfer } from '../icons/system/transfer.svg';
 import { ReactComponent as Settings } from '../icons/system/settings.svg';
 import { ReactComponent as Copy } from '../icons/system/copy.svg';
 import { ReactComponent as External } from '../icons/system/external.svg';
+import { ReactComponent as Twitter } from '../icons/system/twitter.svg';
+import { ReactComponent as Telegram } from '../icons/system/telegram.svg';
+import { ReactComponent as Github } from '../icons/system/github.svg';
 
 interface IIconProps {
   name: string;
@@ -58,6 +61,9 @@ const icons: IIconMapping = {
   settings: Settings,
   copy: Copy,
   external: External,
+  twitter: Twitter,
+  telegram: Telegram,
+  github: Github,
 };
 
 const colorMapping: IColorMapping = {
