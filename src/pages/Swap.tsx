@@ -29,7 +29,7 @@ import Icon from '../components/Icon';
 import Confirmation from '../components/Confirmation';
 import IconToken from '../components/IconToken';
 
-import errorMessages from '../content/errors';
+import getErrorMessage from '../content/errors';
 import {
   checkAllowanceHTS,
   getTokenBalance,
@@ -389,7 +389,7 @@ const Swap = () => {
       } = receipt;
 
       if (!success) {
-        toast(errorMessages[error]);
+        toast(getErrorMessage(error.status ? error.status : error));
       } else {
         const tokens = await getUserAssociatedTokens(userId);
         setUserAssociatedTokens(tokens);
@@ -423,7 +423,7 @@ const Swap = () => {
       } = receipt;
 
       if (!success) {
-        toast(errorMessages[error]);
+        toast(getErrorMessage(error.status ? error.status : error));
       } else {
         setApproved(true);
       }
@@ -479,7 +479,7 @@ const Swap = () => {
       } = receipt;
 
       if (!success) {
-        toast.error(errorMessages[error.status]);
+        toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         setSwapData(initialSwapData);
         setTokensData(initialTokensData);
