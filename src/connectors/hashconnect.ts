@@ -1,8 +1,39 @@
+import { AccountId, Transaction, TransactionId, TransactionReceipt } from '@hashgraph/sdk';
 import { HashConnect, HashConnectTypes, MessageTypes } from 'hashconnect';
 import { Transaction, AccountId, TransactionId } from '@hashgraph/sdk';
 import { randomIntFromInterval } from '../utils/numberUtils';
+import { HashConnectConnectionState } from 'hashconnect/dist/types';
 
 class Hashconnect {
+  // @ts-ignore
+  hashconnect: HashConnect;
+
+  appMetadata: HashConnectTypes.AppMetadata = {
+    name: 'dApp Example',
+    description: 'An example hedera dApp',
+    icon: 'https://www.hashpack.app/img/logo.svg',
+  };
+  // @ts-ignore
+  availableExtension: HashConnectTypes.WalletMetadata;
+
+  state: HashConnectConnectionState = HashConnectConnectionState.Disconnected;
+  // @ts-ignore
+  topic: string;
+  // @ts-ignore
+  pairingString: string;
+  pairingData: HashConnectTypes.SavedPairingData | null = null;
+
+  setUserId: (userId: string) => void;
+  setExtensionFound: (loading: boolean) => void;
+  setIsHashpackLoading: (loading: boolean) => void;
+  setConnected: (loading: boolean) => void;
+  setShowConnectModal: (show: boolean) => void;
+  transactionResponseReceived: Event;
+
+  availableExtensions: HashConnectTypes.WalletMetadata[] = [];
+  pairedWalletData?: HashConnectTypes.WalletMetadata;
+  pairedAccounts: string[] = [];
+
   constructor(
     setExtensionFound: (loading: boolean) => void,
     setConnected: (loading: boolean) => void,
@@ -19,73 +50,29 @@ class Hashconnect {
     this.transactionResponseReceived = new CustomEvent('transaction-response-received');
   }
 
-  hashconnect: HashConnect;
-  status: string = 'Initializing';
-
-  setUserId: (userId: string) => void;
-  setExtensionFound: (loading: boolean) => void;
-  setIsHashpackLoading: (loading: boolean) => void;
-  setConnected: (loading: boolean) => void;
-  setShowConnectModal: (show: boolean) => void;
-
-  availableExtensions: HashConnectTypes.WalletMetadata[] = [];
-
-  saveData: {
-    topic: string;
-    pairingString: string;
-    privateKey?: string;
-    pairedWalletData?: HashConnectTypes.WalletMetadata;
-    pairedAccounts: string[];
-  } = {
-    topic: '',
-    pairingString: '',
-    privateKey: undefined,
-    pairedWalletData: undefined,
-    pairedAccounts: [],
-  };
-
-  appMetadata: HashConnectTypes.AppMetadata = {
-    name: 'HeliSwap DEX',
-    description: 'HeliSwap DEX',
-    icon: 'https://absolute.url/to/icon.png',
-  };
-
-  transactionResponseReceived: Event;
-
   async initHashconnect() {
     //create the hashconnect instance
     this.hashconnect = new HashConnect(true);
 
-    if (this.loadLocalData()) {
-      await this.hashconnect.init(this.appMetadata, this.saveData.privateKey);
-      await this.hashconnect.connect(this.saveData.topic, this.saveData.pairedWalletData!);
+    //register events
+    this.setUpHashConnectEvents();
 
-      this.setExtensionFound(true);
+    //initialize and use returned data
+    let initData = await this.hashconnect.init(this.appMetadata, 'testnet', false);
+
+    this.topic = initData.topic;
+    this.pairingString = initData.pairingString;
+
+    //Saved pairings will return here, generally you will only have one unless you are doing something advanced
+    this.pairingData = initData.savedPairings[0];
+
+    if (this.pairingData) {
+      this.setUserId(this.pairingData.accountIds[0]);
       this.setConnected(true);
-    } else {
-      //first init, store the private key in localstorage
-      const initData = await this.hashconnect.init(this.appMetadata);
-      this.saveData.privateKey = initData.privKey;
-
-      //then connect, storing the new topic in localstorage
-      const state = await this.hashconnect.connect();
-      this.saveData.topic = state.topic;
-
-      //generate a pairing string, which you can display and generate a QR code from
-      this.saveData.pairingString = this.hashconnect.generatePairingString(
-        state,
-        process.env.REACT_APP_NETWORK_TYPE || '',
-        true,
-      );
-
-      //find any supported local wallets
-      this.hashconnect.findLocalWallets();
     }
-
-    this.setUpEvents();
   }
 
-  setUpEvents() {
+  setUpHashConnectEvents() {
     this.hashconnect.foundExtensionEvent.on(data => {
       this.availableExtensions.push(data);
 
@@ -93,16 +80,15 @@ class Hashconnect {
     });
 
     this.hashconnect.pairingEvent.on(data => {
-      this.saveData.pairedWalletData = data.metadata;
+      this.pairedWalletData = data.metadata;
 
       data.accountIds.forEach(id => {
-        if (this.saveData.pairedAccounts.indexOf(id) === -1) {
-          this.saveData.pairedAccounts.push(id);
+        if (this.pairedAccounts.indexOf(id) === -1) {
+          this.pairedAccounts.push(id);
           this.setUserId(id);
         }
       });
 
-      this.saveDataInLocalstorage();
       this.setConnected(true);
       this.setIsHashpackLoading(false);
       this.setShowConnectModal(false);
@@ -114,62 +100,44 @@ class Hashconnect {
     });
   }
 
-  connect() {
-    this.hashconnect.connectToLocalWallet(this.saveData.pairingString);
-    this.setConnected(true);
+  async connectToExtension() {
+    //this will automatically pop up a pairing request in the HashPack extension
+    this.hashconnect.connectToLocalWallet();
   }
 
-  disconnect() {
-    this.saveData.pairedAccounts = [];
-    this.saveData.pairedWalletData = undefined;
-    localStorage.removeItem('hashconnectData');
-
-    this.setConnected(false);
-  }
-
-  saveDataInLocalstorage() {
-    let data = JSON.stringify(this.saveData);
-
-    localStorage.setItem('hashconnectData', data);
-  }
-
-  loadLocalData(): boolean {
-    let foundData = localStorage.getItem('hashconnectData');
-
-    if (foundData) {
-      this.saveData = JSON.parse(foundData);
-      return true;
-    } else return false;
-  }
-
-  async sendTransaction(trans: Uint8Array, acctToSign: string, return_trans: boolean = false) {
+  async sendTransaction(
+    trans: Uint8Array,
+    acctToSign: string,
+    return_trans: boolean = false,
+    hideNfts: boolean = false,
+  ) {
     const transaction: MessageTypes.Transaction = {
-      topic: this.saveData.topic,
+      topic: this.topic,
       byteArray: trans,
 
       metadata: {
         accountToSign: acctToSign,
         returnTransaction: return_trans,
+        hideNft: hideNfts,
       },
     };
 
-    const transactionRespose = await this.hashconnect.sendTransaction(
-      this.saveData.topic,
-      transaction,
-    );
-
-    document.dispatchEvent(this.transactionResponseReceived);
-    return transactionRespose;
+    return await this.hashconnect.sendTransaction(this.topic, transaction);
   }
 
   async requestAccountInfo() {
     let request: MessageTypes.AdditionalAccountRequest = {
-      topic: this.saveData.topic,
-      network: process.env.REACT_APP_NETWORK_TYPE || '',
+      topic: this.topic,
+      network: 'mainnet',
       multiAccount: true,
     };
 
-    await this.hashconnect.requestAdditionalAccounts(this.saveData.topic, request);
+    await this.hashconnect.requestAdditionalAccounts(this.topic, request);
+  }
+
+  clearPairings() {
+    this.hashconnect.clearConnectionsAndData();
+    this.pairingData = null;
   }
 
   async makeBytes(trans: Transaction, signingAcctId: string) {

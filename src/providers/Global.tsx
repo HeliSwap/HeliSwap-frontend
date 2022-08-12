@@ -60,12 +60,12 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
     : false;
 
   const connectWallet = () => {
-    hashconnectConnectorInstance?.connect();
+    hashconnectConnectorInstance?.connectToExtension();
     setIsHashpackLoading(true);
   };
 
   const disconnectWallet = () => {
-    hashconnectConnectorInstance?.disconnect();
+    hashconnectConnectorInstance?.clearPairings();
     setUserId('');
   };
 
@@ -93,7 +93,6 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
       );
 
       await hashconnectConnector.initHashconnect();
-      setUserId(hashconnectConnector.saveData.pairedAccounts[0]);
       setHashconnectConnectorInstance(hashconnectConnector);
     };
 

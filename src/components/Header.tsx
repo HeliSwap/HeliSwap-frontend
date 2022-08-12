@@ -63,6 +63,9 @@ const Header = () => {
     };
   }, [getUserTokensData]);
 
+  console.log('connected', connected);
+  console.log('userId', userId);
+
   return (
     <div className="p-5">
       <div className="d-flex justify-content-end">
