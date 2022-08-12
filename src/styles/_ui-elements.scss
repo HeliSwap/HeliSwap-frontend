@@ -373,6 +373,15 @@
   }
 }
 
+.list-default {
+  padding-left: 24px;
+  list-style-type: circle;
+
+  li {
+    margin: 4px 0;
+  }
+}
+
 .btn-close {
   opacity: 1;
 }

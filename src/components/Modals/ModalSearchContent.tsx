@@ -20,6 +20,7 @@ import Loader from '../Loader';
 
 import search from '../../icons/system/search-gradient.svg';
 import useDebounce from '../../hooks/useDebounce';
+import { tokenPropsMessages } from '../../content/messages';
 
 interface IModalProps {
   modalTitle?: string;
@@ -53,7 +54,7 @@ const ModalSearchContent = ({
   const [showNotFound, setShowNotFound] = useState(false);
   const [readyToImport, setReadyToImport] = useState(false);
   const [readyToImportERC, setReadyToImportERC] = useState(false);
-  const [warningMessage, setWarningMessage] = useState('');
+  const [warningMessage, setWarningMessage] = useState<JSX.Element[]>([]);
 
   const [tokenList, setTokenList] = useState<ITokenData[]>([]);
   const [searchingResults, setSearchingResults] = useState(false);
@@ -121,7 +122,7 @@ const ModalSearchContent = ({
     setSearchInputValue('');
     setReadyToImportERC(false);
     setReadyToImport(false);
-    setWarningMessage('');
+    setWarningMessage([]);
     tokenDataList && setTokenList(tokenDataList);
   };
 
@@ -139,9 +140,19 @@ const ModalSearchContent = ({
 
     if (hasResults) {
       const { details } = result;
-      const { hasFees } = details;
+      const messageList: JSX.Element[] = [];
 
-      setWarningMessage(hasFees ? 'Token has fees!' : '');
+      const detailsKeys = Object.keys(details);
+      detailsKeys.forEach(key => {
+        if (details[key] !== null && key !== 'customFees') {
+          messageList.push(tokenPropsMessages[key]);
+        }
+      });
+
+      if (messageList.length > 0) {
+        setWarningMessage(messageList);
+      }
+
       setTokenList([result]);
     }
 
@@ -157,7 +168,7 @@ const ModalSearchContent = ({
       setReadyToImportERC(false);
     }
 
-    setWarningMessage('');
+    setWarningMessage([]);
 
     const isId = !!isHederaIdValid(searchInputValue.trim());
     const isAddress = !!isAddressValid(searchInputValue.trim());
@@ -237,7 +248,17 @@ const ModalSearchContent = ({
           />
         </div>
 
-        {warningMessage ? <div className="alert alert-warning mt-5">{warningMessage}</div> : null}
+        {warningMessage.length > 0 ? (
+          <div className="alert alert-warning mt-5">
+            <p className="text-bold">Warning!</p> This token contains additional properites that
+            could cause potential issues:
+            <ul className="list-default">
+              {warningMessage.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
 
         {searchingResults ? (
           <div className="d-flex justify-content-center my-6">
