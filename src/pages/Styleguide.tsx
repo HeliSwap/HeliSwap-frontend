@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import ButtonSelector from '../components/ButtonSelector';
 
 import Icon from '../components/Icon';
@@ -8,6 +8,7 @@ import IconToken from '../components/IconToken';
 import Modal from '../components/Modal';
 import ModalContent from '../components/Modals/ModalContent';
 import Button from '../components/Button';
+import ToasterWrapper from '../components/ToasterWrapper';
 
 const Styleguide = () => {
   const [showModal, setShowModal] = useState(false);
@@ -347,7 +348,7 @@ const Styleguide = () => {
       <h3 className="text-headline mb-4">Toasts</h3>
       <div className="row mb-6">
         <div className="col-lg-8">
-          <Button size="small" onClick={() => toast('Test')} type="primary">
+          <Button size="small" onClick={() => toast('Default')} type="primary">
             Open toast
           </Button>
           <Button
@@ -368,24 +369,8 @@ const Styleguide = () => {
           </Button>
         </div>
       </div>
-      <Toaster
-        position="top-right"
-        containerStyle={{
-          top: 100,
-        }}
-        toastOptions={{
-          success: {
-            style: {
-              background: '#0da048',
-            },
-          },
-          error: {
-            style: {
-              background: '#ea1548',
-            },
-          },
-        }}
-      />
+
+      <ToasterWrapper />
 
       <h3 className="text-headline mb-4">Alerts</h3>
 

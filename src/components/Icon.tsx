@@ -77,6 +77,7 @@ const colorMapping: IColorMapping = {
   gray: 'is-gray',
   gradient: 'is-gradient',
   danger: 'is-danger',
+  success: 'is-success',
 };
 
 const sizeMapping: ISizeMapping = {
