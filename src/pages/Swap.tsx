@@ -680,7 +680,7 @@ const Swap = () => {
             />
           }
           walletBalanceComponent={
-            Object.keys(tokensData.tokenA).length > 0 ? (
+            connected && !isHashpackLoading && Object.keys(tokensData.tokenA).length > 0 ? (
               <WalletBalance
                 insufficientBallance={getInsufficientTokenIn() as boolean}
                 walletBalance={tokenBalances.tokenA}
@@ -735,7 +735,7 @@ const Swap = () => {
             />
           }
           walletBalanceComponent={
-            Object.keys(tokensData.tokenB).length > 0 ? (
+            connected && !isHashpackLoading && Object.keys(tokensData.tokenB).length > 0 ? (
               <WalletBalance walletBalance={tokenBalances.tokenB} />
             ) : null
           }
