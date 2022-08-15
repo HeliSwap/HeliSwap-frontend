@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import Tippy from '@tippyjs/react';
 import { hethers } from '@hashgraph/hethers';
 import { IPoolData } from '../interfaces/tokens';
@@ -39,6 +39,7 @@ import {
 } from '../utils/transactionUtils';
 import { formatIcons } from '../utils/iconUtils';
 import Confirmation from './Confirmation';
+import ToasterWrapper from './ToasterWrapper';
 
 interface IRemoveLiquidityProps {
   pairData: IPoolData;
@@ -221,6 +222,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
           token0Decimals: 0,
           token1Decimals: 0,
         });
+        toast.success('Remove sucessfull!');
         setShowRemoveContainer(false);
       } else {
         toast.error(getErrorMessage(error.status ? error.status : error));
@@ -498,24 +500,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
           </Modal>
         ) : null}
       </div>
-      <Toaster
-        position="top-right"
-        containerStyle={{
-          top: 100,
-        }}
-        toastOptions={{
-          success: {
-            style: {
-              background: '#0da048',
-            },
-          },
-          error: {
-            style: {
-              background: '#ea1548',
-            },
-          },
-        }}
-      />
+      <ToasterWrapper />
     </div>
   );
 };

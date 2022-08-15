@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
@@ -57,6 +57,7 @@ import {
 import usePoolsByToken from '../hooks/usePoolsByToken';
 import useTokensByListIds from '../hooks/useTokensByListIds';
 import useTokensByFilter from '../hooks/useTokensByFilter';
+import ToasterWrapper from '../components/ToasterWrapper';
 
 enum ADD_LIQUIDITY_TITLES {
   CREATE_POOL = 'Create pool',
@@ -397,6 +398,7 @@ const Create = () => {
       } else {
         setCreatePairData({ ...createPairData, tokenAAmount: '', tokenBAmount: '' });
         setReadyToProvide(false);
+        toast.success('Succesfully provided!');
       }
     } catch (err) {
       console.error(err);
@@ -1020,26 +1022,8 @@ const Create = () => {
     <div className="d-flex justify-content-center">
       <div className="container-action">
         <PageHeader handleBackClick={handleBackClick} slippage="create" title={pageTitle} />
-        {/* {getErrorMessage()} */}
         {getProvideSection()}
-        <Toaster
-          position="top-right"
-          containerStyle={{
-            top: 100,
-          }}
-          toastOptions={{
-            success: {
-              style: {
-                background: '#0da048',
-              },
-            },
-            error: {
-              style: {
-                background: '#ea1548',
-              },
-            },
-          }}
-        />
+        <ToasterWrapper />
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useParams } from 'react-router-dom';
 import Tippy from '@tippyjs/react';
 import BigNumber from 'bignumber.js';
@@ -28,6 +28,7 @@ import ButtonSelector from '../components/ButtonSelector';
 import Icon from '../components/Icon';
 import Confirmation from '../components/Confirmation';
 import IconToken from '../components/IconToken';
+import ToasterWrapper from '../components/ToasterWrapper';
 
 import getErrorMessage from '../content/errors';
 import {
@@ -1042,24 +1043,7 @@ const Swap = () => {
       <div className="container-action">
         <PageHeader slippage="swap" title="Swap" />
         {getSwapSection()}
-        <Toaster
-          position="top-right"
-          containerStyle={{
-            top: 100,
-          }}
-          toastOptions={{
-            success: {
-              style: {
-                background: '#0da048',
-              },
-            },
-            error: {
-              style: {
-                background: '#ea1548',
-              },
-            },
-          }}
-        />
+        <ToasterWrapper />
       </div>
     </div>
   );

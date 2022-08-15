@@ -15,14 +15,14 @@ const ToasterWrapper = () => {
           fontSize: '14px',
         },
         success: {
-          duration: 50000,
           className: 'toast-success',
           icon: <Icon name="check" color="success" size="small" />,
+          duration: 5000,
         },
         error: {
           className: 'toast-error',
-          duration: 50000,
           icon: <Icon name="warning" color="danger" size="small" />,
+          duration: 5000,
         },
       }}
     />
