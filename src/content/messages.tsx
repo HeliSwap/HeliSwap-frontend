@@ -10,7 +10,9 @@ export const tokenPropsMessages: IStringToHTMLElement = {
   ),
   hasFees: (
     <span>
-      <span className="text-bold">Custom fees</span> -
+      <span className="text-bold">Custom fees</span> - The selected token has a Fee schedule Key set
+      by the token creator. Providing liquidity places your funds at risk! The token creator has the
+      ability to acquire all tokens provided as liquidity in the pool!
     </span>
   ),
   freezeKey: (

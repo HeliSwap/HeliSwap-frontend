@@ -250,9 +250,14 @@ const ModalSearchContent = ({
 
         {warningMessage.length > 0 ? (
           <div className="alert alert-warning mt-5">
-            <p className="text-bold">Warning!</p> This token contains additional properites that
-            could cause potential issues:
-            <ul className="list-default">
+            <div className="d-flex align-items-center">
+              <Icon name="warning" color="danger" />
+              <p className="text-bold ms-3">Warning!</p>
+            </div>
+            <p className="mt-3">
+              This token contains additional properites that could cause potential issues:
+            </p>
+            <ul className="list-default mt-2">
               {warningMessage.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
@@ -334,11 +339,36 @@ const ModalSearchContent = ({
                   className="cursor-pointer list-token-item d-flex align-items-center"
                   key={index}
                 >
-                  <IconToken symbol={token.symbol} />
-                  <div className="d-flex flex-column ms-3">
-                    <span className="text-main">{token.symbol}</span>
-                    <span className="text-small text-secondary">{token.name}</span>
+                  <div className="d-flex align-items-center">
+                    <IconToken symbol={token.symbol} />
+                    <div className="d-flex flex-column ms-3">
+                      <span className="text-main">{token.symbol}</span>
+                      <span className="text-small text-secondary">{token.name}</span>
+                    </div>
                   </div>
+                  <Tippy
+                    content={
+                      <div>
+                        <div className="d-flex align-items-center">
+                          <Icon name="warning" color="danger" />
+                          <p className="text-bold ms-3">Warning!</p>
+                        </div>
+                        <p className="mt-3">
+                          This token contains additional properites that could cause potential
+                          issues:
+                        </p>
+                        <ul className="list-default mt-2">
+                          {warningMessage.map((item, index) => (
+                            <li key={index}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    }
+                  >
+                    <span className="ms-3">
+                      <Icon color="danger" name="warning" />
+                    </span>
+                  </Tippy>
                 </div>
               ))}
             </div>
