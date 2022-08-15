@@ -66,6 +66,8 @@ const ModalSearchContent = ({
   };
   const debouncedSearchTerm: string = useDebounce(searchInputValue, 1000);
 
+  console.log('tokenDataList', tokenDataList);
+
   useEffect(() => {
     if (debouncedSearchTerm && searchFunc) {
       searchFunc(debouncedSearchTerm);
@@ -347,32 +349,38 @@ const ModalSearchContent = ({
                     <IconToken symbol={token.symbol} />
                     <div className="d-flex flex-column ms-3">
                       <span className="text-main">{token.symbol}</span>
-                      <span className="text-small text-secondary">{token.name}</span>
+                      <span className="text-small text-secondary">
+                        {token.name}{' '}
+                        {token.type !== TokenType.HBAR ? <span>({token.hederaId})</span> : null}
+                      </span>
+                      <span>{(token.keyBitmask || 0 >>> 0).toString(2)}</span>
                     </div>
                   </div>
-                  <Tippy
-                    content={
-                      <div>
-                        <div className="d-flex align-items-center">
-                          <Icon name="warning" color="danger" />
-                          <p className="text-bold ms-3">Warning!</p>
+                  {token.type !== TokenType.HBAR && token.keyBitmask !== 0 ? (
+                    <Tippy
+                      content={
+                        <div>
+                          <div className="d-flex align-items-center">
+                            <Icon name="warning" color="danger" />
+                            <p className="text-bold ms-3">Warning!</p>
+                          </div>
+                          <p className="mt-3">
+                            This token contains additional properites that could cause potential
+                            issues:
+                          </p>
+                          <ul className="list-default mt-2">
+                            {warningMessage.map((item, index) => (
+                              <li key={index}>{item}</li>
+                            ))}
+                          </ul>
                         </div>
-                        <p className="mt-3">
-                          This token contains additional properites that could cause potential
-                          issues:
-                        </p>
-                        <ul className="list-default mt-2">
-                          {warningMessage.map((item, index) => (
-                            <li key={index}>{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    }
-                  >
-                    <span className="ms-3">
-                      <Icon color="danger" name="warning" />
-                    </span>
-                  </Tippy>
+                      }
+                    >
+                      <span className="ms-3">
+                        <Icon color="danger" name="warning" />
+                      </span>
+                    </Tippy>
+                  ) : null}
                 </div>
               ))}
             </div>

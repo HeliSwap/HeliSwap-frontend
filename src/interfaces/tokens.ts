@@ -9,6 +9,7 @@ export interface ITokenData {
   type: TokenType;
   details?: any;
   isHTS?: boolean;
+  keyBitmask?: number;
 }
 
 export interface ITokenListData {

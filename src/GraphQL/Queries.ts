@@ -71,62 +71,6 @@ export const GET_POOLS_BY_USER = gql`
   }
 `;
 
-export const GET_TOKENS = gql`
-  query {
-    getTokensData {
-      id
-      address
-      hederaId
-      symbol
-      name
-      decimals
-      isHTS
-    }
-  }
-`;
-
-export const GET_TOKEN_INFO = gql`
-  query getTokenByAddressOrId($id: String!) {
-    getTokenInfo(tokenIdOrAddress: $id) {
-      id
-      address
-      hederaId
-      symbol
-      name
-      decimals
-      isHTS
-    }
-  }
-`;
-
-export const GET_TOKENS_FILTERED = gql`
-  query getFilterTokens($keyword: String!) {
-    getTokensFilter(keyword: $keyword) {
-      id
-      address
-      hederaId
-      symbol
-      name
-      decimals
-      isHTS
-    }
-  }
-`;
-
-export const GET_SWAP_RATE = gql`
-  query {
-    getSwapRate {
-      amountOut
-    }
-  }
-`;
-
-export const HEALTH_CHECK = gql`
-  query {
-    healthcheck
-  }
-`;
-
 export const GET_POOLS_FILTERED = gql`
   query getFilterPools($keyword: String!) {
     filterPools(keyword: $keyword) {
@@ -175,6 +119,36 @@ export const GET_POOLS_WHITELISTED = gql`
   }
 `;
 
+export const GET_TOKENS = gql`
+  query {
+    getTokensData {
+      id
+      address
+      hederaId
+      symbol
+      name
+      decimals
+      isHTS
+      keyBitmask
+    }
+  }
+`;
+
+export const GET_TOKENS_FILTERED = gql`
+  query getFilterTokens($keyword: String!) {
+    getTokensFilter(keyword: $keyword) {
+      id
+      address
+      hederaId
+      symbol
+      name
+      decimals
+      isHTS
+      keyBitmask
+    }
+  }
+`;
+
 export const GET_TOKENS_WHITELISTED = gql`
   query getWhitelistedTokens($addresses: [String]!) {
     getWhitelistedTokens(addresses: $addresses) {
@@ -185,6 +159,21 @@ export const GET_TOKENS_WHITELISTED = gql`
       name
       decimals
       isHTS
+      keyBitmask
     }
+  }
+`;
+
+export const GET_SWAP_RATE = gql`
+  query {
+    getSwapRate {
+      amountOut
+    }
+  }
+`;
+
+export const HEALTH_CHECK = gql`
+  query {
+    healthcheck
   }
 `;
