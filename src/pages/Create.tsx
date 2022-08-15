@@ -317,6 +317,7 @@ const Create = () => {
       } else {
         const tokens = await getUserAssociatedTokens(userId);
         setUserAssociatedTokens(tokens);
+        toast.success('Token associated!');
       }
     } catch (err) {
       toast.error(getErrorMessage('Error on associate'));
@@ -347,6 +348,7 @@ const Create = () => {
         toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         setApproved(prev => ({ ...prev, [key]: true }));
+        toast.success('Token approved!');
       }
     } catch (err) {
       toast.error(getErrorMessage('Error on create'));

@@ -427,6 +427,7 @@ const Swap = () => {
         toast(getErrorMessage(error.status ? error.status : error));
       } else {
         setApproved(true);
+        toast.success('Token approved!');
       }
     } catch (err) {
       console.error(err);

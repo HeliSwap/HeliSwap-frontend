@@ -257,6 +257,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
       if (success) {
         setLpApproved(true);
+        toast.success('Token approved!');
       } else {
         toast.error(getErrorMessage(error.status ? error.status : error));
       }
