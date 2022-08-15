@@ -8,7 +8,7 @@ export const tokenPropsMessages: IStringToHTMLElement = {
       updated/deleted)
     </span>
   ),
-  hasFees: (
+  feeScheduleKey: (
     <span>
       <span className="text-bold">Custom fees</span> - The selected token has a Fee schedule Key set
       by the token creator. Providing liquidity places your funds at risk! The token creator has the
@@ -49,6 +49,12 @@ export const tokenPropsMessages: IStringToHTMLElement = {
       account. If empty, wipe is not possible Problem Wipe key can perform TokenWipe transactions.
       If a user has balance of HTS token and TokenWipe is executed, his token balance will be burned
       by the amount specified in the wipe operation without requesting permissions from the user.
+    </span>
+  ),
+
+  hasFees: (
+    <span>
+      <span className="text-bold">Custom fees</span>
     </span>
   ),
 };

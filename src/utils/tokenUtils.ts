@@ -33,6 +33,7 @@ export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
         pause_key: pauseKey,
         supply_key: supplyKey,
         wipe_key: wipeKey,
+        fee_schedule_key: feeScheduleKey,
       },
     } = await axios(url);
 
@@ -57,6 +58,7 @@ export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
         pauseKey,
         wipeKey,
         supplyKey,
+        feeScheduleKey,
       },
     };
 
