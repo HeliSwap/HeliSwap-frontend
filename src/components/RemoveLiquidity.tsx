@@ -439,7 +439,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
               modalTitle="Remove liquidity"
               closeModal={() => setShowModalConfirmRemove(false)}
               confirmTansaction={handleRemoveLPButtonClick}
-              confirmButtonLabel="Remove"
+              confirmButtonLabel="Confirm"
             >
               {loadingRemove ? (
                 <Confirmation confirmationText={confirmationText} />

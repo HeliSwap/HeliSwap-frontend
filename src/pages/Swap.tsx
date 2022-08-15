@@ -857,7 +857,7 @@ const Swap = () => {
                 modalTitle="Confirm swap"
                 closeModal={() => setShowModalConfirmSwap(false)}
                 confirmTansaction={handleSwapConfirm}
-                confirmButtonLabel="Confirm swap"
+                confirmButtonLabel="Confirm"
                 isLoading={loadingSwap}
               >
                 {loadingSwap ? (

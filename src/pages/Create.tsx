@@ -966,7 +966,7 @@ const Create = () => {
               modalTitle={pageTitle}
               closeModal={() => setShowModalConfirmProvide(false)}
               confirmTansaction={handleProvideConfirm}
-              confirmButtonLabel="Confirm provide"
+              confirmButtonLabel="Confirm"
             >
               {getProvideConfirmationModalContent()}
             </ConfirmTransactionModalContent>
