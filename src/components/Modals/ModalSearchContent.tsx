@@ -144,7 +144,11 @@ const ModalSearchContent = ({
 
       const detailsKeys = Object.keys(details);
       detailsKeys.forEach(key => {
-        if (details[key] !== null && key !== 'customFees') {
+        if (details[key] !== null && key !== 'customFees' && key !== 'hasFees') {
+          messageList.push(tokenPropsMessages[key]);
+        }
+
+        if (key === 'hasFees' && details[key]) {
           messageList.push(tokenPropsMessages[key]);
         }
       });
