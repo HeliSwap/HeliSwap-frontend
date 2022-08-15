@@ -132,6 +132,13 @@ const PoolInfo = ({
                     {formatStringETHtoPriceFormatted(poolData.token1AmountFormatted)}
                   </span>
                 </div>
+
+                <hr className="my-4" />
+
+                <div className="d-flex justify-content-between align-items-center">
+                  <span className="text-small text-bold">% of the pool</span>
+                  <span className="text-small text-numeric">{poolData.poolPercenatage}%</span>
+                </div>
               </div>
             </div>
 
@@ -165,14 +172,16 @@ const PoolInfo = ({
                     {formatStringETHtoPriceFormatted(poolData.fee1AmountFormatted as string)}
                   </span>
                 </div>
-              </div>
-            </div>
-          </div>
 
-          <div className="container-rounded-dark mt-4">
-            <div className="d-flex justify-content-between align-items-center">
-              <span className="text-small text-bold">% of the pool</span>
-              <span className="text-small text-numeric">{poolData.poolPercenatage}%</span>
+                <hr className="my-4" />
+
+                <div className="d-flex justify-content-between align-items-center">
+                  <span className="text-small text-bold">LP token count</span>
+                  <span className="text-small text-numeric">
+                    {formatStringETHtoPriceFormatted(poolData.lpSharesFormatted as string)}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
