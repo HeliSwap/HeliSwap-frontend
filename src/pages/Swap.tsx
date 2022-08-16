@@ -26,6 +26,7 @@ import InputToken from '../components/InputToken';
 import ButtonSelector from '../components/ButtonSelector';
 import Icon from '../components/Icon';
 import Confirmation from '../components/Confirmation';
+import IconToken from '../components/IconToken';
 
 import errorMessages from '../content/errors';
 import {
@@ -230,11 +231,14 @@ const Swap = () => {
       };
 
       if (invalidInputTokensData()) {
+        setBestPath([]);
         setSwapData(prev => ({ ...prev, amountIn: '', amountOut: '' }));
         return;
       }
 
       if (invalidTokenData()) {
+        setBestPath([]);
+
         setSwapData(prev => ({
           ...prev,
           [name]: value,
@@ -256,7 +260,7 @@ const Swap = () => {
       if (willWrapTokens || willUnwrapTokens) {
         if (name === 'amountIn') {
           const swapAmountOut = amountIn;
-
+          setBestPath([]);
           setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
         } else if (name === 'amountOut') {
           const swapAmountIn = amountOut;
@@ -278,6 +282,7 @@ const Swap = () => {
           const sortedTrades = trades.sort(tradeComparator);
 
           if (sortedTrades.length === 0) {
+            setBestPath([]);
             setSwapData(prev => ({ ...prev, ...tokenData, amountOut: '' }));
             setTokenInExactAmount(true);
             setInsufficientLiquidity(true);
@@ -300,6 +305,7 @@ const Swap = () => {
           const sortedTrades = trades.sort(tradeComparator);
 
           if (sortedTrades.length === 0) {
+            setBestPath([]);
             setSwapData(prev => ({ ...prev, ...tokenData, amountIn: '' }));
             setTokenInExactAmount(false);
             setInsufficientLiquidity(true);
@@ -316,6 +322,51 @@ const Swap = () => {
     },
     [mergedPoolsData, tokensData, willUnwrapTokens, willWrapTokens],
   );
+
+  const swapPath = useMemo(() => {
+    return bestPath.length !== 0 ? (
+      <div className="d-flex justify-content-center my-5">
+        {bestPath.map((currentAddress: string, index: number) => {
+          let currentTokenSymbol =
+            mergedTokensData.find((token: ITokenData) => token.address === currentAddress)
+              ?.symbol || '';
+
+          if (!currentTokenSymbol) {
+            for (let index = 0; index < mergedPoolsData.length; index++) {
+              const currentPool = mergedPoolsData[index];
+
+              if (currentPool.token0 === currentAddress || currentPool.token1 === currentAddress) {
+                currentTokenSymbol =
+                  currentPool.token0 === currentAddress
+                    ? currentPool.token0Symbol
+                    : currentPool.token1Symbol;
+              }
+
+              if (currentTokenSymbol) break;
+            }
+          }
+
+          if (
+            currentAddress === process.env.REACT_APP_WHBAR_ADDRESS &&
+            ((tokenInIsNative && index === 0) ||
+              (tokenOutIsNative && index === bestPath.length - 1))
+          ) {
+            currentTokenSymbol = NATIVE_TOKEN.symbol;
+          }
+
+          return (
+            <div className="d-flex align-items-center" key={index}>
+              {index !== 0 ? <span className="mx-3">{'>'}</span> : null}
+              <IconToken symbol={currentTokenSymbol} />
+              <div className="d-flex flex-column ms-3">
+                <span className="text-main text-bold">{currentTokenSymbol}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    ) : null;
+  }, [bestPath, mergedTokensData, tokenInIsNative, tokenOutIsNative, mergedPoolsData]);
 
   const handleAssociateClick = async (token: ITokenData) => {
     setLoadingAssociate(true);
@@ -755,6 +806,7 @@ const Swap = () => {
             itemToExlude={tokensData.tokenA}
           />
         </Modal>
+        {swapPath}
         {getActionButtons()}
       </div>
     );
