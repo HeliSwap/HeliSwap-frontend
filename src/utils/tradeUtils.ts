@@ -124,18 +124,18 @@ export const getPossibleTradesExactOut = (
     const amountIn = getAmountIn(nextAmountOut, tokenOutFirstAtPool, currentPool, applyFees);
     const otherTokenInPool = tokenOutFirstAtPool ? token1 : token0;
 
-    // const numerator0BN = new BN(currentPool.token0Amount);
-    // const numerator1BN = new BN(currentPool.token1Amount);
-    // const denominator0BN = new BN(10).pow(new BN(currentPool.token0Decimals));
-    // const denominator1BN = new BN(10).pow(new BN(currentPool.token1Decimals));
+    const numerator0BN = new BN(currentPool.token0Amount);
+    const numerator1BN = new BN(currentPool.token1Amount);
+    const denominator0BN = new BN(10).pow(new BN(currentPool.token0Decimals));
+    const denominator1BN = new BN(10).pow(new BN(currentPool.token1Decimals));
 
-    // let quot0BN = numerator0BN.div(denominator0BN);
-    // let quot1BN = numerator1BN.div(denominator1BN);
+    let quot0BN = numerator0BN.div(denominator0BN);
+    let quot1BN = numerator1BN.div(denominator1BN);
 
-    // const tokenInQuot = tokenOutFirstAtPool ? quot0BN : quot1BN;
-    // const tokenOutQuot = tokenOutFirstAtPool ? quot1BN : quot0BN;
+    const tokenInQuot = tokenOutFirstAtPool ? quot0BN : quot1BN;
+    const tokenOutQuot = tokenOutFirstAtPool ? quot1BN : quot0BN;
 
-    // const currentMidPrice = tokenInQuot.div(tokenOutQuot).toString();
+    const currentMidPrice = tokenInQuot.div(tokenOutQuot).toString();
 
     if (otherTokenInPool === currencyIn) {
       possibleTrades.push({
@@ -145,7 +145,7 @@ export const getPossibleTradesExactOut = (
         amountIn,
         amountOut,
         path: getPath([currentPool, ...currentPools], currencyIn),
-        midPricesArr: [],
+        midPricesArr: [...midPrices, currentMidPrice],
       });
     } else if (maxHops > 1 && pools.length > 1) {
       const poolsExcludingThisPool = pools.slice(0, i).concat(pools.slice(i + 1, pools.length));
@@ -164,6 +164,7 @@ export const getPossibleTradesExactOut = (
         amountIn,
         otherTokenInPool,
         possibleTrades,
+        [...midPrices, currentMidPrice],
       );
     }
   }
@@ -300,16 +301,14 @@ const getAmountIn = (
   return swapAmountIn;
 };
 
-export const getTradeMidPrice = (trade: Trade) => {
+export const getTradePriceImpact = (trade: Trade) => {
   const { midPricesArr, amountIn, amountOut } = trade;
   const tradeMidPrice = midPricesArr.slice(1).reduce((accumulator, currentValue) => {
     return Number(accumulator) * Number(currentValue);
   }, Number(midPricesArr[0]));
 
-  const tradePrice = Number(amountOut) / Number(amountIn);
-  const diff = tradeMidPrice - tradePrice;
-  const priceImpact = (diff / tradeMidPrice) * 100;
+  const exactQuote = Number(amountIn) * Number(tradeMidPrice);
+  const slippage = (exactQuote - Number(amountOut)) / exactQuote;
 
-  console.log(priceImpact);
-  return priceImpact;
+  return slippage * 100;
 };

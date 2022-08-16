@@ -39,6 +39,7 @@ import { getTransactionSettings } from '../utils/transactionUtils';
 import {
   getPossibleTradesExactIn,
   getPossibleTradesExactOut,
+  getTradePriceImpact,
   tradeComparator,
 } from '../utils/tradeUtils';
 import {
@@ -192,6 +193,7 @@ const Swap = () => {
   const [tokenInExactAmount, setTokenInExactAmount] = useState(true);
   const [bestPath, setBestPath] = useState<string[]>([]);
   const [ratioBasedOnTokenOut, setRatioBasedOnTokenOut] = useState(true);
+  const [swapPriceImpact, setSwapPriceImpact] = useState<number>(0);
 
   // State for general error
   const [error, setError] = useState(false);
@@ -232,12 +234,14 @@ const Swap = () => {
 
       if (invalidInputTokensData()) {
         setBestPath([]);
+        setSwapPriceImpact(0);
         setSwapData(prev => ({ ...prev, amountIn: '', amountOut: '' }));
         return;
       }
 
       if (invalidTokenData()) {
         setBestPath([]);
+        setSwapPriceImpact(0);
 
         setSwapData(prev => ({
           ...prev,
@@ -261,6 +265,7 @@ const Swap = () => {
         if (name === 'amountIn') {
           const swapAmountOut = amountIn;
           setBestPath([]);
+          setSwapPriceImpact(0);
           setSwapData(prev => ({ ...prev, ...tokenData, amountOut: swapAmountOut.toString() }));
         } else if (name === 'amountOut') {
           const swapAmountIn = amountOut;
@@ -280,18 +285,18 @@ const Swap = () => {
           );
 
           const sortedTrades = trades.sort(tradeComparator);
-          console.log(sortedTrades);
 
           if (sortedTrades.length === 0) {
             setBestPath([]);
+            setSwapPriceImpact(0);
             setSwapData(prev => ({ ...prev, ...tokenData, amountOut: '' }));
             setTokenInExactAmount(true);
             setInsufficientLiquidity(true);
             return;
           }
           const bestTrade = sortedTrades[0];
-
           setBestPath(bestTrade.path);
+          setSwapPriceImpact(getTradePriceImpact(bestTrade));
           setTokenInExactAmount(true);
           setSwapData(prev => ({ ...prev, ...tokenData, amountOut: bestTrade.amountOut }));
         } else if (name === 'amountOut') {
@@ -314,8 +319,10 @@ const Swap = () => {
           }
 
           const bestTrade = sortedTrades[0];
+          getTradePriceImpact(bestTrade);
 
           setBestPath(bestTrade.path);
+          setSwapPriceImpact(getTradePriceImpact(bestTrade));
           setTokenInExactAmount(false);
           setSwapData(prev => ({ ...prev, ...tokenData, amountIn: bestTrade.amountIn }));
         }
@@ -1020,10 +1027,14 @@ const Swap = () => {
               swapData.amountOut,
             )} ${tokensData.tokenB.symbol}`}</span>
           </div>
-          {/* <div className="d-flex justify-content-between m-4">
-            <span className="text-small">Price Impact:</span>
-            <span className="text-small">TODO</span>
-          </div> */}
+          {swapPriceImpact !== 0 && !willWrapTokens && !willUnwrapTokens ? (
+            <div className="d-flex justify-content-between m-4">
+              <span className="text-small">Price Impact:</span>
+              <span className="text-small text-numeric text-bold">
+                {swapPriceImpact.toFixed(2)}%
+              </span>
+            </div>
+          ) : null}
 
           <hr className="my-3 mx-4" />
 
