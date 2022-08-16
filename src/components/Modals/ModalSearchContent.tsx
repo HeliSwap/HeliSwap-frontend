@@ -66,8 +66,6 @@ const ModalSearchContent = ({
   };
   const debouncedSearchTerm: string = useDebounce(searchInputValue, 1000);
 
-  console.log('tokenDataList', tokenDataList);
-
   useEffect(() => {
     if (debouncedSearchTerm && searchFunc) {
       searchFunc(debouncedSearchTerm);
@@ -141,17 +139,17 @@ const ModalSearchContent = ({
     const hasResults = Object.keys(result).length > 0;
 
     if (hasResults) {
-      const { details } = result;
+      const { keys: tokenKeys, hasFees } = result;
       const messageList: JSX.Element[] = [];
 
-      const detailsKeys = Object.keys(details);
-      detailsKeys.forEach(key => {
-        if (details[key] !== null && key !== 'customFees' && key !== 'hasFees') {
+      const keyIndexes = Object.keys(tokenKeys || {});
+      keyIndexes.forEach(key => {
+        if (key) {
           messageList.push(tokenPropsMessages[key]);
         }
 
-        if (key === 'hasFees' && details[key]) {
-          messageList.push(tokenPropsMessages[key]);
+        if (hasFees) {
+          messageList.push(tokenPropsMessages['hasFees']);
         }
       });
 
@@ -353,10 +351,10 @@ const ModalSearchContent = ({
                         {token.name}{' '}
                         {token.type !== TokenType.HBAR ? <span>({token.hederaId})</span> : null}
                       </span>
-                      <span>{(token.keyBitmask || 0 >>> 0).toString(2)}</span>
+                      {/* <span>{(token.keyBitmask || 0 >>> 0).toString(2)}</span> */}
                     </div>
                   </div>
-                  {token.type !== TokenType.HBAR && token.keyBitmask !== 0 ? (
+                  {token.type !== TokenType.HBAR ? (
                     <Tippy
                       content={
                         <div>

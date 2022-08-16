@@ -7,9 +7,19 @@ export interface ITokenData {
   address: string;
   decimals: number;
   type: TokenType;
-  details?: any;
+  keys?: IKeys;
+  hasFees?: boolean;
   isHTS?: boolean;
-  keyBitmask?: number;
+}
+
+export interface IKeys {
+  adminKey: boolean;
+  supplyKey: boolean;
+  wipeKey: boolean;
+  pauseKey: boolean;
+  freezeKey: boolean;
+  feeScheduleKey: boolean;
+  kycKey: boolean;
 }
 
 export interface ITokenListData {

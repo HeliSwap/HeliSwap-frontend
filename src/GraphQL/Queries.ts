@@ -129,7 +129,16 @@ export const GET_TOKENS = gql`
       name
       decimals
       isHTS
-      keyBitmask
+      keys {
+        adminKey
+        supplyKey
+        wipeKey
+        pauseKey
+        freezeKey
+        feeScheduleKey
+        kycKey
+      }
+      hasFees
     }
   }
 `;
@@ -144,7 +153,16 @@ export const GET_TOKENS_FILTERED = gql`
       name
       decimals
       isHTS
-      keyBitmask
+      keys {
+        adminKey
+        supplyKey
+        wipeKey
+        pauseKey
+        freezeKey
+        feeScheduleKey
+        kycKey
+      }
+      hasFees
     }
   }
 `;
@@ -159,7 +177,16 @@ export const GET_TOKENS_WHITELISTED = gql`
       name
       decimals
       isHTS
-      keyBitmask
+      keys {
+        adminKey
+        supplyKey
+        wipeKey
+        pauseKey
+        freezeKey
+        feeScheduleKey
+        kycKey
+      }
+      hasFees
     }
   }
 `;
