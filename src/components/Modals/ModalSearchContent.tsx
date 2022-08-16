@@ -215,6 +215,54 @@ const ModalSearchContent = ({
     setSearchingResults(false);
   }, [tokenDataList]);
 
+  const renderWarningTooltip = (token: ITokenData) => {
+    if (token.type === TokenType.HBAR) return null;
+
+    const { keys: tokenKeys, hasFees } = token;
+    const messageList: JSX.Element[] = [];
+
+    const keyIndexes = Object.keys(tokenKeys || {});
+
+    keyIndexes.forEach(key => {
+      if (tokenKeys && tokenKeys[key] && key !== '__typename') {
+        messageList.push(tokenPropsMessages[key]);
+      }
+    });
+
+    if (hasFees) {
+      messageList.push(tokenPropsMessages['hasFees']);
+    }
+
+    if (messageList.length > 0) {
+      return (
+        <Tippy
+          content={
+            <div>
+              <div className="d-flex align-items-center">
+                <Icon name="warning" color="danger" />
+                <p className="text-bold ms-3">Warning!</p>
+              </div>
+              <p className="mt-3">
+                This token contains additional properites that could cause potential issues:
+              </p>
+              <ul className="list-default mt-2">
+                {messageList.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          }
+        >
+          <span className="ms-3">
+            <Icon color="danger" name="warning" />
+          </span>
+        </Tippy>
+      );
+    } else {
+      return null;
+    }
+  };
+
   const hasTokenList = tokenList && tokenList.length > 0;
   const showImportButton = canImport && readyToImport;
   const showTokenList = canImport
@@ -341,42 +389,19 @@ const ModalSearchContent = ({
                   className="cursor-pointer list-token-item d-flex align-items-center"
                   key={index}
                 >
-                  <div className="d-flex align-items-center">
-                    <IconToken symbol={token.symbol} />
-                    <div className="d-flex flex-column ms-3">
-                      <span className="text-main">{token.symbol}</span>
-                      <span className="text-small text-secondary">
-                        {token.name}{' '}
-                        {token.type !== TokenType.HBAR ? <span>({token.hederaId})</span> : null}
-                      </span>
-                      {/* <span>{(token.keyBitmask || 0 >>> 0).toString(2)}</span> */}
+                  <>
+                    <div className="d-flex align-items-center">
+                      <IconToken symbol={token.symbol} />
+                      <div className="d-flex flex-column ms-3">
+                        <span className="text-main">{token.symbol}</span>
+                        <span className="text-small text-secondary">
+                          {token.name}{' '}
+                          {token.type !== TokenType.HBAR ? <span>({token.hederaId})</span> : null}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                  {/* {token.type !== TokenType.HBAR ? (
-                    <Tippy
-                      content={
-                        <div>
-                          <div className="d-flex align-items-center">
-                            <Icon name="warning" color="danger" />
-                            <p className="text-bold ms-3">Warning!</p>
-                          </div>
-                          <p className="mt-3">
-                            This token contains additional properites that could cause potential
-                            issues:
-                          </p>
-                          <ul className="list-default mt-2">
-                            {warningMessage.map((item, index) => (
-                              <li key={index}>{item}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      }
-                    >
-                      <span className="ms-3">
-                        <Icon color="danger" name="warning" />
-                      </span>
-                    </Tippy>
-                  ) : null} */}
+                    {renderWarningTooltip(token)}
+                  </>
                 </div>
               ))}
             </div>
