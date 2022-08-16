@@ -81,9 +81,9 @@ export interface IPoolExtendedData extends IPoolData {
   [key: string]: any;
 }
 
-export interface IFarmData {
+export interface IFarmDataRaw {
   address: string;
-  stakingTokenAddress: string;
+  poolData: IPoolData;
   totalStaked: string;
   rewardsData: IReward[];
   userStakingData?: {
@@ -91,9 +91,14 @@ export interface IFarmData {
   };
 }
 
+export interface IFarmData extends IFarmDataRaw {
+  totalStakedUSDT: string;
+}
+
 export interface IReward {
   address: string;
   symbol: string;
+  decimals: number;
   totalAmount: string;
   duration: number;
 }
