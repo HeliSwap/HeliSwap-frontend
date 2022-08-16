@@ -143,15 +143,13 @@ const ModalSearchContent = ({
       const messageList: JSX.Element[] = [];
 
       const keyIndexes = Object.keys(tokenKeys || {});
-      keyIndexes.forEach(key => {
-        if (key) {
-          messageList.push(tokenPropsMessages[key]);
-        }
+      keyIndexes.forEach(
+        key => tokenKeys && tokenKeys[key] && messageList.push(tokenPropsMessages[key]),
+      );
 
-        if (hasFees) {
-          messageList.push(tokenPropsMessages['hasFees']);
-        }
-      });
+      if (hasFees) {
+        messageList.push(tokenPropsMessages['hasFees']);
+      }
 
       if (messageList.length > 0) {
         setWarningMessage(messageList);
@@ -354,7 +352,7 @@ const ModalSearchContent = ({
                       {/* <span>{(token.keyBitmask || 0 >>> 0).toString(2)}</span> */}
                     </div>
                   </div>
-                  {token.type !== TokenType.HBAR ? (
+                  {/* {token.type !== TokenType.HBAR ? (
                     <Tippy
                       content={
                         <div>
@@ -378,7 +376,7 @@ const ModalSearchContent = ({
                         <Icon color="danger" name="warning" />
                       </span>
                     </Tippy>
-                  ) : null}
+                  ) : null} */}
                 </div>
               ))}
             </div>

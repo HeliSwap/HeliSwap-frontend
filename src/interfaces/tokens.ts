@@ -20,6 +20,7 @@ export interface IKeys {
   freezeKey: boolean;
   feeScheduleKey: boolean;
   kycKey: boolean;
+  [key: string]: boolean;
 }
 
 export interface ITokenListData {
