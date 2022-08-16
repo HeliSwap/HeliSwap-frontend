@@ -325,7 +325,7 @@ const Swap = () => {
 
   const swapPath = useMemo(() => {
     return bestPath.length !== 0 ? (
-      <div className="d-flex align-items-center">
+      <div className="d-flex justify-content-center my-5">
         {bestPath.map((currentAddress: string, index: number) => {
           let currentTokenSymbol =
             mergedTokensData.find((token: ITokenData) => token.address === currentAddress)
@@ -334,12 +334,14 @@ const Swap = () => {
           if (!currentTokenSymbol) {
             for (let index = 0; index < mergedPoolsData.length; index++) {
               const currentPool = mergedPoolsData[index];
+
               if (currentPool.token0 === currentAddress || currentPool.token1 === currentAddress) {
                 currentTokenSymbol =
                   currentPool.token0 === currentAddress
                     ? currentPool.token0Symbol
                     : currentPool.token1Symbol;
               }
+
               if (currentTokenSymbol) break;
             }
           }
@@ -353,13 +355,13 @@ const Swap = () => {
           }
 
           return (
-            <span className="d-flex align-items-center m-2" key={index}>
-              {index !== 0 ? <span className="m-2">--{'>'}</span> : null}
+            <div className="d-flex align-items-center" key={index}>
+              {index !== 0 ? <span className="mx-3">{'>'}</span> : null}
               <IconToken symbol={currentTokenSymbol} />
               <div className="d-flex flex-column ms-3">
-                <span className="text-main">{currentTokenSymbol}</span>
+                <span className="text-main text-bold">{currentTokenSymbol}</span>
               </div>
-            </span>
+            </div>
           );
         })}
       </div>
