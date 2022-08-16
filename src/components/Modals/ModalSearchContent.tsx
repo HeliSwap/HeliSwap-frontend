@@ -166,7 +166,9 @@ const ModalSearchContent = ({
     const isAddress = !!isAddressValid(searchInputValue.trim());
 
     const foundItem = tokenDataList.find(
-      (item: ITokenData) => item.hederaId === searchInputValue || item.address === searchInputValue,
+      (item: ITokenData) =>
+        item.hederaId === searchInputValue ||
+        item.address.toLowerCase() === searchInputValue.toLowerCase(),
     );
     const foundItemArray = foundItem ? [foundItem] : [];
 
