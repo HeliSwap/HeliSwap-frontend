@@ -22,7 +22,7 @@ const useTokensByListIds = (
 
       if (tokensData.length > 0) {
         const foundTokenDataList = tokensData.map(
-          ({ hederaId, name, symbol, address, decimals, isHTS }: any) => ({
+          ({ hederaId, name, symbol, address, decimals, isHTS }: ITokenData) => ({
             hederaId,
             name,
             symbol,
