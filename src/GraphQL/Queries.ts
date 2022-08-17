@@ -20,6 +20,7 @@ export const GET_POOLS = gql`
       token1Decimals
       volume24h
       volume7d
+      hasProblematicToken
     }
   }
 `;
@@ -42,6 +43,7 @@ export const GET_POOL_BY_TOKEN = gql`
       token1Symbol
       token1Amount
       token1Decimals
+      hasProblematicToken
     }
   }
 `;
@@ -91,6 +93,7 @@ export const GET_POOLS_FILTERED = gql`
       token1Decimals
       volume24h
       volume7d
+      hasProblematicToken
     }
   }
 `;

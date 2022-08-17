@@ -60,6 +60,7 @@ export interface IPoolData {
   volume24h: string;
   fee0?: string;
   fee1?: string;
+  hasProblematicToken: boolean;
 }
 
 export interface IPoolExtendedData extends IPoolData {
