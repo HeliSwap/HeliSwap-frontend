@@ -466,4 +466,12 @@
     border-color: $error-400;
     color: $error-400;
   }
+
+  .alert-icon {
+    flex-basis: 32px;
+  }
+
+  .alert-message {
+    flex: 1;
+  }
 }

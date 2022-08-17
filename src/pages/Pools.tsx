@@ -214,8 +214,8 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
                 className="alert alert-danger d-inline-flex align-items-center mt-5"
                 role="alert"
               >
-                <Icon className="me-3" name="warning" color="danger" />
-                <p>Something went wrong! Cannot get pools...</p>
+                <Icon className="me-3 alert-icon" name="warning" color="danger" />
+                <p className="alert-message">Something went wrong! Cannot get pools...</p>
               </div>
             </div>
           ) : (
