@@ -139,17 +139,7 @@ const ModalSearchContent = ({
     const hasResults = Object.keys(result).length > 0;
 
     if (hasResults) {
-      const { keys: tokenKeys, hasFees } = result;
-      const messageList: JSX.Element[] = [];
-
-      const keyIndexes = Object.keys(tokenKeys || {});
-      keyIndexes.forEach(
-        key => tokenKeys && tokenKeys[key] && messageList.push(tokenPropsMessages[key]),
-      );
-
-      if (hasFees) {
-        messageList.push(tokenPropsMessages['hasFees']);
-      }
+      const messageList = concatWarningMessage(result);
 
       if (messageList.length > 0) {
         setWarningMessage(messageList);
@@ -215,9 +205,7 @@ const ModalSearchContent = ({
     setSearchingResults(false);
   }, [tokenDataList]);
 
-  const renderWarningTooltip = (token: ITokenData) => {
-    if (token.type === TokenType.HBAR) return null;
-
+  const concatWarningMessage = (token: ITokenData) => {
     const { keys: tokenKeys, hasFees } = token;
     const messageList: JSX.Element[] = [];
 
@@ -232,6 +220,14 @@ const ModalSearchContent = ({
     if (hasFees) {
       messageList.push(tokenPropsMessages['hasFees']);
     }
+
+    return messageList;
+  };
+
+  const renderWarningTooltip = (token: ITokenData) => {
+    if (token.type === TokenType.HBAR) return null;
+
+    const messageList = concatWarningMessage(token);
 
     if (messageList.length > 0) {
       return (
