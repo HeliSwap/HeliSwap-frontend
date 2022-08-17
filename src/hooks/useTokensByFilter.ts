@@ -3,12 +3,9 @@ import { useEffect, useState } from 'react';
 import { QueryHookOptions, useLazyQuery } from '@apollo/client';
 import { GET_TOKENS_FILTERED } from '../GraphQL/Queries';
 
-import { IPoolExtendedData, ITokenData } from '../interfaces/tokens';
+import { ITokenData, TokenType } from '../interfaces/tokens';
 
-const useTokensByFilter = (
-  useQueryOptions: QueryHookOptions = {},
-  restPools: IPoolExtendedData[] = [],
-) => {
+const useTokensByFilter = (useQueryOptions: QueryHookOptions = {}) => {
   const [filteredTokens, setFilteredTokens] = useState<ITokenData[]>([]);
 
   const [
@@ -24,9 +21,19 @@ const useTokensByFilter = (
   useEffect(() => {
     if (filteredTokensData) {
       const { getTokensFilter } = filteredTokensData;
-      setFilteredTokens(getTokensFilter);
+      const foundTokenDataList = getTokensFilter.map(
+        ({ hederaId, name, symbol, address, decimals, isHTS }: ITokenData) => ({
+          hederaId,
+          name,
+          symbol,
+          address,
+          decimals,
+          type: isHTS ? TokenType.HTS : TokenType.ERC20,
+        }),
+      );
+      setFilteredTokens(foundTokenDataList);
     }
-  }, [filteredTokensData, restPools]);
+  }, [filteredTokensData]);
 
   return {
     filteredTokens,
