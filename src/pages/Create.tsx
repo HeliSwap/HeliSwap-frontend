@@ -36,6 +36,7 @@ import {
   idToAddress,
   NATIVE_TOKEN,
   getUserAssociatedTokens,
+  hasFeesOrKeys,
 } from '../utils/tokenUtils';
 import {
   formatStringETHtoPriceFormatted,
@@ -663,6 +664,27 @@ const Create = () => {
     return notHTS || userAssociatedTokens?.includes(token.hederaId);
   };
 
+  //Render methods
+  const getErrorMessage = () => {
+    return error ? (
+      <div className="alert alert-danger my-5" role="alert">
+        <strong>Something went wrong!</strong>
+        <p>{errorMessages[errorMessage]}</p>
+      </div>
+    ) : null;
+  };
+
+  const getWarningMessage = () => {
+    if (hasFeesOrKeys(tokensData.tokenA) || hasFeesOrKeys(tokensData.tokenB)) {
+      return (
+        <div className="alert alert-warning my-4 d-flex align-items-center" role="alert">
+          <Icon name="warning" color="warning" />{' '}
+          <p className="ms-3">One of the tokens has fees or keys.</p>
+        </div>
+      );
+    }
+  };
+
   const getProvideSection = () => {
     return (
       <div className="container-dark">
@@ -1006,9 +1028,10 @@ const Create = () => {
                 </div>
               </div>
             </div>
-            <div className="mt-4 rounded border border-secondary justify-content-between ">
+            <div className="mt-4 rounded border border-secondary justify-content-between">
               {getTokensRatioSection()}
             </div>
+            {getWarningMessage()}
           </>
         )}
       </>
