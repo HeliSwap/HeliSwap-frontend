@@ -17,6 +17,7 @@ interface Trade {
   amountIn: string;
   amountOut: string;
   path: string[];
+  midPricesArr: string[];
 }
 
 export const getPossibleTradesExactIn = (
@@ -30,6 +31,7 @@ export const getPossibleTradesExactIn = (
   nextAmountIn: string = amountIn,
   nextCurrencyIn: string = currencyIn,
   possibleTrades: Trade[] = [],
+  midPrices: string[] = [],
 ) => {
   for (let i = 0; i < pools.length; i++) {
     const currentPool = pools[i];
@@ -41,6 +43,19 @@ export const getPossibleTradesExactIn = (
     const amountOut = getAmountOut(nextAmountIn, tokenInFirstAtPool, currentPool, applyFees);
     const otherTokenInPool = tokenInFirstAtPool ? token1 : token0;
 
+    const numerator0BN = new BN(currentPool.token0Amount);
+    const numerator1BN = new BN(currentPool.token1Amount);
+    const denominator0BN = new BN(10).pow(new BN(currentPool.token0Decimals));
+    const denominator1BN = new BN(10).pow(new BN(currentPool.token1Decimals));
+
+    let quot0BN = numerator0BN.div(denominator0BN);
+    let quot1BN = numerator1BN.div(denominator1BN);
+
+    const tokenInQuot = tokenInFirstAtPool ? quot0BN : quot1BN;
+    const tokenOutQuot = tokenInFirstAtPool ? quot1BN : quot0BN;
+
+    const currentMidPrice = tokenOutQuot.div(tokenInQuot).toString();
+
     if (otherTokenInPool === currencyOut) {
       possibleTrades.push({
         pools: [...currentPools, currentPool],
@@ -49,6 +64,7 @@ export const getPossibleTradesExactIn = (
         amountIn,
         amountOut: amountOut,
         path: getPath([...currentPools, currentPool], currencyIn),
+        midPricesArr: [...midPrices, currentMidPrice],
       });
     } else if (maxHops > 1 && pools.length > 1) {
       const poolsExcludingThisPool = pools.slice(0, i).concat(pools.slice(i + 1, pools.length));
@@ -67,6 +83,7 @@ export const getPossibleTradesExactIn = (
         amountOut,
         otherTokenInPool,
         possibleTrades,
+        [...midPrices, currentMidPrice],
       );
     }
   }
@@ -84,6 +101,7 @@ export const getPossibleTradesExactOut = (
   nextAmountOut: string = amountOut,
   nextCurrencyOut: string = currencyOut,
   possibleTrades: Trade[] = [],
+  midPrices: string[] = [],
 ) => {
   for (let i = 0; i < pools.length; i++) {
     const currentPool = pools[i];
@@ -106,6 +124,19 @@ export const getPossibleTradesExactOut = (
     const amountIn = getAmountIn(nextAmountOut, tokenOutFirstAtPool, currentPool, applyFees);
     const otherTokenInPool = tokenOutFirstAtPool ? token1 : token0;
 
+    const numerator0BN = new BN(currentPool.token0Amount);
+    const numerator1BN = new BN(currentPool.token1Amount);
+    const denominator0BN = new BN(10).pow(new BN(currentPool.token0Decimals));
+    const denominator1BN = new BN(10).pow(new BN(currentPool.token1Decimals));
+
+    let quot0BN = numerator0BN.div(denominator0BN);
+    let quot1BN = numerator1BN.div(denominator1BN);
+
+    const tokenInQuot = tokenOutFirstAtPool ? quot0BN : quot1BN;
+    const tokenOutQuot = tokenOutFirstAtPool ? quot1BN : quot0BN;
+
+    const currentMidPrice = tokenInQuot.div(tokenOutQuot).toString();
+
     if (otherTokenInPool === currencyIn) {
       possibleTrades.push({
         pools: [currentPool, ...currentPools],
@@ -114,6 +145,7 @@ export const getPossibleTradesExactOut = (
         amountIn,
         amountOut,
         path: getPath([currentPool, ...currentPools], currencyIn),
+        midPricesArr: [...midPrices, currentMidPrice],
       });
     } else if (maxHops > 1 && pools.length > 1) {
       const poolsExcludingThisPool = pools.slice(0, i).concat(pools.slice(i + 1, pools.length));
@@ -132,6 +164,7 @@ export const getPossibleTradesExactOut = (
         amountIn,
         otherTokenInPool,
         possibleTrades,
+        [...midPrices, currentMidPrice],
       );
     }
   }
@@ -266,4 +299,16 @@ const getAmountIn = (
 
   const swapAmountIn = getSwapAmountIn(amountOut, resIn, resOut, decIn, decOut, applyFees);
   return swapAmountIn;
+};
+
+export const getTradePriceImpact = (trade: Trade) => {
+  const { midPricesArr, amountIn, amountOut } = trade;
+  const tradeMidPrice = midPricesArr.slice(1).reduce((accumulator, currentValue) => {
+    return Number(accumulator) * Number(currentValue);
+  }, Number(midPricesArr[0]));
+
+  const exactQuote = Number(amountIn) * Number(tradeMidPrice);
+  const slippage = (exactQuote - Number(amountOut)) / exactQuote;
+
+  return slippage * 100;
 };
