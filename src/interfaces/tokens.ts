@@ -86,6 +86,7 @@ export interface IFarmDataRaw {
   poolData: IPoolData;
   totalStaked: string;
   rewardsData: IReward[];
+  stakingTokenAddress: string;
   userStakingData?: {
     [key: string]: IUserStakingData;
   };

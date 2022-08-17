@@ -36,7 +36,7 @@ function App() {
                       <Route path="create/" element={<Create />} />
                       <Route path="create/:token0/:token1" element={<Create />} />
                       <Route path="pools" element={<Pools itemsPerPage={10} />} />
-                      <Route path="farms" element={<Farms />} />
+                      <Route path="farms" element={<Farms itemsPerPage={10} />} />
                       <Route path="tokens" element={<Tokens />} />
                       <Route path="styleguide" element={<Styleguide />} />
                     </Routes>
