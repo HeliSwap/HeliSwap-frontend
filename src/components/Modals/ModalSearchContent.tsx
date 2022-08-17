@@ -239,7 +239,7 @@ const ModalSearchContent = ({
           content={
             <div>
               <div className="d-flex align-items-center">
-                <Icon name="warning" color="danger" />
+                <Icon name="warning" color="warning" />
                 <p className="text-bold ms-3">Warning!</p>
               </div>
               <p className="mt-3">
@@ -254,7 +254,7 @@ const ModalSearchContent = ({
           }
         >
           <span className="ms-2">
-            <Icon color="danger" name="warning" />
+            <Icon color="warning" name="warning" />
           </span>
         </Tippy>
       );
@@ -301,7 +301,7 @@ const ModalSearchContent = ({
         {warningMessage.length > 0 ? (
           <div className="alert alert-warning mt-5">
             <div className="d-flex align-items-center">
-              <Icon name="warning" color="danger" />
+              <Icon name="warning" color="warning" />
               <p className="text-bold ms-3">Warning!</p>
             </div>
             <p className="mt-3">
