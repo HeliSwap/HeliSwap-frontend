@@ -86,13 +86,19 @@
 
   &.is-danger {
     path {
-      fill: $error-500;
+      fill: $error-400;
     }
   }
 
   &.is-success {
     path {
       fill: $positive-400;
+    }
+  }
+
+  &.is-warning {
+    path {
+      fill: $warning-300;
     }
   }
 
@@ -444,4 +450,20 @@
 
 .toast-error {
   color: $error-500;
+}
+
+// Alerts
+.alert {
+  background-color: transparent !important;
+  font-size: 14px;
+
+  &.alert-warning {
+    border-color: $warning-300;
+    color: $warning-300;
+  }
+
+  &.alert-danger {
+    border-color: $error-400;
+    color: $error-400;
+  }
 }

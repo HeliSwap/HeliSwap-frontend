@@ -35,6 +35,7 @@ import {
   checkAllowanceHTS,
   getTokenBalance,
   getUserAssociatedTokens,
+  hasFeesOrKeys,
   NATIVE_TOKEN,
 } from '../utils/tokenUtils';
 import { getTransactionSettings } from '../utils/transactionUtils';
@@ -937,6 +938,7 @@ const Swap = () => {
                     />
                     {getTokensRatio()}
                     {getAdvancedSwapInfo()}
+                    {getWarningMessage()}
                   </>
                 )}
               </ConfirmTransactionModalContent>
@@ -972,6 +974,17 @@ const Swap = () => {
         ratio.toString(),
       )} ${secondTokenName}`}</div>
     );
+  };
+
+  const getWarningMessage = () => {
+    if (hasFeesOrKeys(tokensData.tokenA) || hasFeesOrKeys(tokensData.tokenB)) {
+      return (
+        <div className="alert alert-warning my-5 d-flex align-items-center" role="alert">
+          <Icon name="warning" color="warning" />{' '}
+          <p className="ms-3">One of the tokens has fees or keys.</p>
+        </div>
+      );
+    }
   };
 
   const getAdvancedSwapInfo = () => {

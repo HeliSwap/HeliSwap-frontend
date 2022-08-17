@@ -343,6 +343,7 @@ export const requestIdFromAddress = async (id: string) => {
     return '0';
   }
 };
+
 export const requestAddressFromId = async (address: string) => {
   const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/contracts/${address}`;
   try {
@@ -354,6 +355,24 @@ export const requestAddressFromId = async (address: string) => {
     console.error(e);
     return '0';
   }
+};
+
+export const hasFeesOrKeys = (token: ITokenData) => {
+  const { hasFees, keys: tokenKeys } = token;
+  const keys = tokenKeys ? Object.keys(tokenKeys) : [];
+
+  let hasKeys = false;
+
+  if (keys.length > 0 && tokenKeys) {
+    for (let i = 0; i < keys.length; i++) {
+      if (tokenKeys[keys[i]] && keys[i] !== '__typename') {
+        hasKeys = true;
+        break;
+      }
+    }
+  }
+
+  return hasFees || hasKeys;
 };
 
 export const NATIVE_TOKEN: ITokenData = {

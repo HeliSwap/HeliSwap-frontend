@@ -253,7 +253,7 @@ const ModalSearchContent = ({
             </div>
           }
         >
-          <span className="ms-3">
+          <span className="ms-2">
             <Icon color="danger" name="warning" />
           </span>
         </Tippy>
@@ -392,15 +392,17 @@ const ModalSearchContent = ({
                   <>
                     <div className="d-flex align-items-center">
                       <IconToken symbol={token.symbol} />
-                      <div className="d-flex flex-column ms-3">
-                        <span className="text-main">{token.symbol}</span>
-                        <span className="text-small text-secondary">
+                      <div className="ms-3">
+                        <div className="d-flex align-items-center">
+                          <p className="text-main">{token.symbol}</p>
+                          {renderWarningTooltip(token)}
+                        </div>
+                        <p className="text-small text-secondary">
                           {token.name}{' '}
                           {token.type !== TokenType.HBAR ? <span>({token.hederaId})</span> : null}
-                        </span>
+                        </p>
                       </div>
                     </div>
-                    {renderWarningTooltip(token)}
                   </>
                 </div>
               ))}
