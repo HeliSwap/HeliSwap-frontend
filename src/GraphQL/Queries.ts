@@ -69,6 +69,7 @@ export const GET_POOLS_BY_USER = gql`
       lpShares
       fee0
       fee1
+      hasProblematicToken
     }
   }
 `;
