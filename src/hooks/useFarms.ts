@@ -28,7 +28,7 @@ const useFarms = (useQueryOptions: QueryHookOptions = {}) => {
               duration: 86400,
               decimals: 6,
               userRewardPerTokenPaid: 12312, //this is specific for every user per token
-              rewards: 123, //this is specific for every user per token
+              rewards: 123, //this is specific for every user per token(from rewards mapping)
               //directly from Reward struct
               rewardsDistributor: 'address',
               rewardsDuration: 123123,
@@ -44,7 +44,7 @@ const useFarms = (useQueryOptions: QueryHookOptions = {}) => {
               duration: 86400,
               decimals: 10,
               userRewardPerTokenPaid: 12312, //this is specific for every user
-              rewards: 123, //this is specific for every user per token
+              rewards: 123, //this is specific for every user per token(from rewards mapping)
               //directly from Reward struct
               rewardsDistributor: 'address',
               rewardsDuration: 123123,
@@ -69,6 +69,7 @@ const useFarms = (useQueryOptions: QueryHookOptions = {}) => {
             token1Decimals: 8,
             token1Name: 'Wrapped Hbar',
             token1Symbol: 'WHBAR',
+            token0Symbol: 't5',
           },
         },
       ]);
