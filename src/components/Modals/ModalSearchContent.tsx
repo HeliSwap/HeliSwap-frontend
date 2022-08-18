@@ -20,7 +20,7 @@ import Loader from '../Loader';
 
 import search from '../../icons/system/search-gradient.svg';
 import useDebounce from '../../hooks/useDebounce';
-import { tokenPropsMessages } from '../../content/messages';
+import { concatWarningMessage } from '../../content/messages';
 
 interface IModalProps {
   modalTitle?: string;
@@ -204,25 +204,6 @@ const ModalSearchContent = ({
   useEffect(() => {
     setSearchingResults(false);
   }, [tokenDataList]);
-
-  const concatWarningMessage = (token: ITokenData) => {
-    const { keys: tokenKeys, hasFees } = token;
-    const messageList: JSX.Element[] = [];
-
-    const keyIndexes = Object.keys(tokenKeys || {});
-
-    keyIndexes.forEach(key => {
-      if (tokenKeys && tokenKeys[key] && key !== '__typename') {
-        messageList.push(tokenPropsMessages[key]);
-      }
-    });
-
-    if (hasFees) {
-      messageList.push(tokenPropsMessages['hasFees']);
-    }
-
-    return messageList;
-  };
 
   const renderWarningTooltip = (token: ITokenData) => {
     if (token.type === TokenType.HBAR) return null;

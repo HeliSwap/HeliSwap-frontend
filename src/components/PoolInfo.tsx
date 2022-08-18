@@ -45,8 +45,6 @@ const PoolInfo = ({
     if (collapseAll) setShowPoolDetails(false);
   }, [collapseAll]);
 
-  console.log('poolData', poolData);
-
   const renderAllPoolsDetails = () => {
     return (
       <div className="row align-items-center">
