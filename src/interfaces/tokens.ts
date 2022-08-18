@@ -87,13 +87,14 @@ export interface IFarmDataRaw {
   totalStaked: string;
   rewardsData: IReward[];
   stakingTokenAddress: string;
-  userStakingData?: {
-    [key: string]: string;
+  userStakingData: {
+    stakedAmount: string;
   };
 }
 
 export interface IFarmData extends IFarmDataRaw {
   totalStakedUSDT: string;
+  userStakedUSDT: string;
 }
 
 export interface IReward {

@@ -9,7 +9,7 @@ export const getProcessedFarms = (
   pools: IPoolData[],
   hbarPrice: number,
 ): IFarmData[] => {
-  const getTotalStakedUSD = (currentFarm: IFarmDataRaw) => {
+  const getLPValue = (currentFarm: IFarmDataRaw) => {
     const {
       totalStaked,
       poolData: {
@@ -28,7 +28,6 @@ export const getProcessedFarms = (
     const token0AmountFormatted = formatStringWeiToStringEther(token0Amount, token0Decimals);
     const token1AmountFormatted = formatStringWeiToStringEther(token1Amount, token1Decimals);
     const pairSypplyFormatted = formatStringWeiToStringEther(pairSupply);
-    const totalStakedFormatted = formatStringWeiToStringEther(totalStaked);
 
     const token0Value = Number(token0AmountFormatted) * Number(token0Price);
     const token1Value = Number(token1AmountFormatted) * Number(token1Price);
@@ -42,14 +41,20 @@ export const getProcessedFarms = (
       totalLpValue = 2 * token1Value;
     }
     const lPValue = totalLpValue / Number(pairSypplyFormatted);
-    const totalStakedUSD = lPValue * Number(totalStakedFormatted);
-    return totalStakedUSD.toString();
+    return lPValue;
   };
 
   const farms: IFarmData[] = rawFarms.map((currentFarm: IFarmDataRaw) => {
+    const { totalStaked, userStakingData } = currentFarm;
+    const totalStakedFormatted = formatStringWeiToStringEther(totalStaked || '0');
+    const userStakedFormatted = formatStringWeiToStringEther(userStakingData?.stakedAmount || '0');
+
+    const lPValue = getLPValue(currentFarm);
+
     const formatted = {
       ...currentFarm,
-      totalStakedUSDT: getTotalStakedUSD(currentFarm),
+      totalStakedUSDT: (lPValue * Number(totalStakedFormatted)).toString(),
+      userStakedUSDT: (lPValue * Number(userStakedFormatted)).toString(),
     };
 
     return formatted;

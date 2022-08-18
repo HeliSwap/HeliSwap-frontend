@@ -48,13 +48,13 @@ const FarmRow = ({
         </div>
         <>
           <div className="table-pools-cell justify-content-end">
-            <span className="text-small text-numeric">'N/A'</span>
+            <span className="text-small text-numeric">{campaignData.totalStakedUSDT}</span>
           </div>
           <div className="table-pools-cell justify-content-end">
             <span className="text-small text-numeric">'N/A'</span>
           </div>
           <div className="table-pools-cell justify-content-end">
-            <span className="text-small text-numeric">'N/A'</span>
+            <span className="text-small text-numeric">{campaignData.userStakedUSDT}</span>
           </div>
         </>
         <div className="table-pools-cell d-flex justify-content-end"></div>

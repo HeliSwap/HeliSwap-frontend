@@ -21,7 +21,7 @@ const useFarms = (useQueryOptions: QueryHookOptions = {}, pools: IPoolData[]) =>
           stakingTokenAddress: '0x32Abf27699EcE08F61dd05b5b8cfc35Db0b472D8',
           totalStaked: '11256869348',
           userStakingData: {
-            stakedAmount: '123123',
+            stakedAmount: '1125686934',
           },
           rewardsData: [
             {
