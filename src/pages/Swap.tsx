@@ -427,7 +427,7 @@ const Swap = () => {
         toast(getErrorMessage(error.status ? error.status : error));
       } else {
         setApproved(true);
-        toast.success('Token approved!');
+        toast.success('Success! Token was approved.');
       }
     } catch (err) {
       console.error(err);
@@ -487,11 +487,11 @@ const Swap = () => {
         setTokensData(initialTokensData);
         setApproved(false);
         refetch();
-        toast.success('Swap successfull');
+        toast.success('Success! Tokens were swapped.');
       }
     } catch (err) {
       console.error(`[Error on swap]: ${err}`);
-      toast.error(err as string);
+      toast.error('Swap transaction resulted in an error.');
     } finally {
       setLoadingSwap(false);
       setShowModalConfirmSwap(false);

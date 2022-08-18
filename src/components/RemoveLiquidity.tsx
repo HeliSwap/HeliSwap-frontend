@@ -222,13 +222,13 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
           token0Decimals: 0,
           token1Decimals: 0,
         });
-        toast.success('Remove sucessfull!');
+        toast.success('Success! Liquidity was removed.');
         setShowRemoveContainer(false);
       } else {
         toast.error(getErrorMessage(error.status ? error.status : error));
       }
     } catch (e) {
-      toast.error(getErrorMessage('Error on remove liquidity'));
+      toast.error('Remove Liquidity transaction resulted in an error. ');
     } finally {
       setLoadingRemove(false);
       setShowModalConfirmRemove(false);
@@ -257,12 +257,12 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
       if (success) {
         setLpApproved(true);
-        toast.success('Token approved!');
+        toast.success('Success! Token was approved.');
       } else {
         toast.error(getErrorMessage(error.status ? error.status : error));
       }
     } catch (e) {
-      toast.error('Error on approve');
+      toast.error('Approve Token transaction resulted in an error.');
     } finally {
       setLoadingApprove(false);
     }

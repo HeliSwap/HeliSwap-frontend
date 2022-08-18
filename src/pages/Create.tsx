@@ -317,10 +317,10 @@ const Create = () => {
       } else {
         const tokens = await getUserAssociatedTokens(userId);
         setUserAssociatedTokens(tokens);
-        toast.success('Token associated!');
+        toast.success('Success! Token was associated.');
       }
     } catch (err) {
-      toast.error(getErrorMessage('Error on associate'));
+      toast.error('Associate Token transaction resulted in an error. ');
     } finally {
       setLoadingAssociate(false);
     }
@@ -348,10 +348,10 @@ const Create = () => {
         toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         setApproved(prev => ({ ...prev, [key]: true }));
-        toast.success('Token approved!');
+        toast.success('Success! Token was approved.');
       }
     } catch (err) {
-      toast.error(getErrorMessage('Error on create'));
+      toast.error('Approve Token transaction resulted in an error.');
     } finally {
       setLoadingApprove(false);
     }
@@ -400,11 +400,11 @@ const Create = () => {
       } else {
         setCreatePairData({ ...createPairData, tokenAAmount: '', tokenBAmount: '' });
         setReadyToProvide(false);
-        toast.success('Succesfully provided!');
+        toast.success('Success! Liquidity was added.');
       }
     } catch (err) {
       console.error(err);
-      toast.error(getErrorMessage('Error on create'));
+      toast.error('Add Liquidity transaction resulted in an error.');
     } finally {
       setLoadingCreate(false);
       setShowModalConfirmProvide(false);
