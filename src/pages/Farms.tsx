@@ -1,7 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import { GlobalContext } from '../providers/Global';
+
 import ReactPaginate from 'react-paginate';
 import FarmRow from '../components/FarmRow';
+import { REFRESH_TIME } from '../constants';
 import useFarms from '../hooks/useFarms';
+import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import { IFarmData } from '../interfaces/tokens';
 
 interface IFarmsProps {
@@ -9,7 +13,31 @@ interface IFarmsProps {
 }
 
 const Farms = ({ itemsPerPage }: IFarmsProps) => {
-  const { farms } = useFarms();
+  const contextValue = useContext(GlobalContext);
+
+  const { tokensWhitelisted } = contextValue;
+
+  const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
+
+  const {
+    poolsByTokenList: pools,
+    loadingPoolsByTokenList: loadingPools,
+    errorPoolsByTokenList: errorPoools,
+  } = usePoolsByTokensList(
+    {
+      fetchPolicy: 'network-only',
+      pollInterval: REFRESH_TIME,
+    },
+    true,
+    tokensWhitelistedAddresses,
+  );
+
+  const { farms } = useFarms(
+    {
+      fetchPolicy: 'network-only',
+    },
+    pools,
+  );
 
   const [collapseAll, setCollapseAll] = useState<boolean>(false);
 

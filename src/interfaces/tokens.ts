@@ -60,7 +60,7 @@ export interface IPoolData {
   volume24h: string;
   fee0?: string;
   fee1?: string;
-  hasProblematicToken: boolean;
+  hasProblematicToken?: boolean;
 }
 
 export interface IPoolExtendedData extends IPoolData {
@@ -88,7 +88,7 @@ export interface IFarmDataRaw {
   rewardsData: IReward[];
   stakingTokenAddress: string;
   userStakingData?: {
-    [key: string]: IUserStakingData;
+    [key: string]: string;
   };
 }
 
@@ -102,6 +102,14 @@ export interface IReward {
   decimals: number;
   totalAmount: string;
   duration: number;
+  userRewardPerTokenPaid: string;
+  rewards: string;
+  rewardsDistributor: string;
+  rewardsDuration: number;
+  periodFinish: number;
+  rewardRate: number;
+  lastUpdateTime: number;
+  rewardPerTokenStored: string;
 }
 export interface IUserReward {
   address: string;
@@ -111,7 +119,6 @@ export interface IUserReward {
 
 export interface IUserStakingData {
   stakedAmount: string;
-  rewardsData: IUserReward[];
 }
 
 export enum TokenType {
