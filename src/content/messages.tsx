@@ -54,7 +54,11 @@ export const tokenPropsMessages: IStringToHTMLElement = {
 
   hasFees: (
     <span>
-      <span className="text-bold">Custom fees</span>
+      <span className="text-bold">Custom fees</span> - The token is created with custom fees. It can
+      charge extra fees to an account, additional to protocol fees or transaction costs. A token
+      which has such fees can, upon transfer from one address to another, charge users additionally
+      without asking their permission, causing the transaction to fail or resulting in losses. If a
+      `feeScheduleKey` is also present, these fees could be updated.
     </span>
   ),
 };

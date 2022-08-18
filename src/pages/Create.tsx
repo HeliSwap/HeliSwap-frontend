@@ -667,16 +667,7 @@ const Create = () => {
   };
 
   //Render methods
-  const getErrorMessage = () => {
-    return error ? (
-      <div className="alert alert-danger my-5" role="alert">
-        <strong>Something went wrong!</strong>
-        <p>{errorMessages[errorMessage]}</p>
-      </div>
-    ) : null;
-  };
-
-  const getWarningMessage = () => {
+  const renderWarningMessage = () => {
     if (hasFeesOrKeys(tokensData.tokenA) || hasFeesOrKeys(tokensData.tokenB)) {
       return (
         <div className="alert alert-warning my-4 d-flex align-items-center" role="alert">
@@ -1033,7 +1024,7 @@ const Create = () => {
             <div className="mt-4 rounded border border-secondary justify-content-between">
               {getTokensRatioSection()}
             </div>
-            {getWarningMessage()}
+            {renderWarningMessage()}
           </>
         )}
       </>
