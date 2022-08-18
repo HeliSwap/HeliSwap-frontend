@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { GlobalContext } from '../providers/Global';
 
 import ReactPaginate from 'react-paginate';
+import FarmDetails from '../components/FarmDetails';
 import FarmRow from '../components/FarmRow';
 import { REFRESH_TIME } from '../constants';
 import useFarms from '../hooks/useFarms';
@@ -39,12 +40,11 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
     pools,
   );
 
-  const [collapseAll, setCollapseAll] = useState<boolean>(false);
-
   const [currentItems, setCurrentItems] = useState<IFarmData[]>([]);
   const [pageCount, setPageCount] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
-  const [currentPoolIndex, setCurrentPoolIndex] = useState(0);
+  const [currentFarmIndex, setCurrentFarmIndex] = useState(0);
+  const [showFarmDetails, setShowFarmDetails] = useState(false);
 
   useEffect(() => {
     const endOffset = itemOffset + itemsPerPage;
@@ -54,17 +54,21 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
   }, [itemOffset, itemsPerPage, farms]);
 
   const handlePageClick = (event: any) => {
-    setCollapseAll(true);
-
     const newOffset = (event.selected * itemsPerPage) % farms.length;
     setItemOffset(newOffset);
   };
 
+  const handleRowClick = () => {
+    setShowFarmDetails(prev => !prev);
+  };
+
   const haveFarms = farms.length > 0;
 
-  return (
+  return showFarmDetails ? (
+    <FarmDetails setShowFarmDetails={setShowFarmDetails} farmData={farms[currentFarmIndex]} />
+  ) : (
     <div className="d-flex justify-content-center">
-      <div className="container-pools">
+      <div className="container-max-with-1042">
         <div className="d-flex justify-content-between align-items-center mb-4">
           <div className="d-flex">
             <h2 className={`text-subheader tab-title is-active mx-4 `}>Farms</h2>
@@ -100,12 +104,11 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
               <>
                 {currentItems.map((item, index) => (
                   <FarmRow
-                    setCurrentPoolIndex={setCurrentPoolIndex}
-                    index={index + itemOffset}
                     key={index}
+                    index={index}
                     campaignData={item}
-                    collapseAll={false}
-                    setCollapseAll={setCollapseAll}
+                    handleRowClick={handleRowClick}
+                    setCurrentFarmIndex={setCurrentFarmIndex}
                   />
                 ))}
               </>
