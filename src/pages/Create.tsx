@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
@@ -28,7 +29,7 @@ import IconToken from '../components/IconToken';
 import Confirmation from '../components/Confirmation';
 import Icon from '../components/Icon';
 
-import errorMessages from '../content/errors';
+import getErrorMessage from '../content/errors';
 import {
   checkAllowanceHTS,
   getTokenBalance,
@@ -56,6 +57,7 @@ import {
 import usePoolsByToken from '../hooks/usePoolsByToken';
 import useTokensByListIds from '../hooks/useTokensByListIds';
 import useTokensByFilter from '../hooks/useTokensByFilter';
+import ToasterWrapper from '../components/ToasterWrapper';
 
 enum ADD_LIQUIDITY_TITLES {
   CREATE_POOL = 'Create pool',
@@ -200,9 +202,7 @@ const Create = () => {
   const [provideNative, setProvideNative] = useState(false);
   const [pageTitle, setPageTitle] = useState(ADD_LIQUIDITY_TITLES.CREATE_POOL);
 
-  // State for general error
-  const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  //State for loading data
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
 
@@ -313,16 +313,14 @@ const Create = () => {
       } = receipt;
 
       if (!success) {
-        setError(true);
-        setErrorMessage(error);
+        toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         const tokens = await getUserAssociatedTokens(userId);
         setUserAssociatedTokens(tokens);
+        toast.success('Success! Token was associated.');
       }
     } catch (err) {
-      console.error(err);
-      setError(true);
-      setErrorMessage('Error on associate');
+      toast.error('Associate Token transaction resulted in an error. ');
     } finally {
       setLoadingAssociate(false);
     }
@@ -347,15 +345,13 @@ const Create = () => {
       } = receipt;
 
       if (!success) {
-        setError(true);
-        setErrorMessage(error);
+        toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         setApproved(prev => ({ ...prev, [key]: true }));
+        toast.success('Success! Token was approved.');
       }
     } catch (err) {
-      console.error(err);
-      setError(true);
-      setErrorMessage('Error on create');
+      toast.error('Approve Token transaction resulted in an error.');
     } finally {
       setLoadingApprove(false);
     }
@@ -372,8 +368,6 @@ const Create = () => {
       tokenB: { type: typeB },
     } = tokensData;
 
-    setError(false);
-    setErrorMessage('');
     setLoadingCreate(true);
 
     try {
@@ -402,16 +396,15 @@ const Create = () => {
       } = receipt;
 
       if (!success) {
-        setError(true);
-        setErrorMessage(error);
+        toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         setCreatePairData({ ...createPairData, tokenAAmount: '', tokenBAmount: '' });
         setReadyToProvide(false);
+        toast.success('Success! Liquidity was added.');
       }
     } catch (err) {
       console.error(err);
-      setError(true);
-      setErrorMessage('Error on create');
+      toast.error('Add Liquidity transaction resulted in an error.');
     } finally {
       setLoadingCreate(false);
       setShowModalConfirmProvide(false);
@@ -668,16 +661,6 @@ const Create = () => {
       token.type === TokenType.HBAR ||
       token.type === TokenType.ERC20;
     return notHTS || userAssociatedTokens?.includes(token.hederaId);
-  };
-
-  //Render methods
-  const getErrorMessage = () => {
-    return error ? (
-      <div className="alert alert-danger my-5" role="alert">
-        <strong>Something went wrong!</strong>
-        <p>{errorMessages[errorMessage]}</p>
-      </div>
-    ) : null;
   };
 
   const getProvideSection = () => {
@@ -1041,8 +1024,8 @@ const Create = () => {
     <div className="d-flex justify-content-center">
       <div className="container-action">
         <PageHeader handleBackClick={handleBackClick} slippage="create" title={pageTitle} />
-        {getErrorMessage()}
         {getProvideSection()}
+        <ToasterWrapper />
       </div>
     </div>
   );

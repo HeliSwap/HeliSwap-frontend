@@ -86,7 +86,13 @@
 
   &.is-danger {
     path {
-      fill: #4b0213;
+      fill: $error-500;
+    }
+  }
+
+  &.is-success {
+    path {
+      fill: $positive-400;
     }
   }
 
@@ -420,4 +426,13 @@
 .page-link {
   border-radius: $border-radius;
   font-size: 14px;
+}
+
+// Toasts
+.toast-success {
+  color: $positive-400;
+}
+
+.toast-error {
+  color: $error-500;
 }

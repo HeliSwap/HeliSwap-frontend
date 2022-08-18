@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
+import toast from 'react-hot-toast';
 import Tippy from '@tippyjs/react';
 import { hethers } from '@hashgraph/hethers';
 import { IPoolData } from '../interfaces/tokens';
@@ -17,6 +18,7 @@ import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransact
 import Modal from './Modal';
 
 import { MAX_UINT_ERC20, SLIDER_INITIAL_VALUE } from '../constants';
+import getErrorMessage from '../content/errors';
 
 import {
   formatStringWeiToStringEther,
@@ -37,6 +39,7 @@ import {
 } from '../utils/transactionUtils';
 import { formatIcons } from '../utils/iconUtils';
 import Confirmation from './Confirmation';
+import ToasterWrapper from './ToasterWrapper';
 
 interface IRemoveLiquidityProps {
   pairData: IPoolData;
@@ -51,7 +54,6 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
   const maxLpInputValue: string = formatStringWeiToStringEther(pairData?.lpShares as string);
 
   const [loadingRemove, setLoadingRemove] = useState(false);
-  const [errorRemove, setErrorRemove] = useState(false);
 
   const [lpApproved, setLpApproved] = useState(false);
   const [lpInputValue, setLpInputValue] = useState(maxLpInputValue);
@@ -151,7 +153,6 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
   const handleRemoveLPButtonClick = async () => {
     setLoadingRemove(true);
-    setErrorRemove(false);
 
     try {
       let responseData;
@@ -209,7 +210,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
       }
 
       const { response } = responseData;
-      const { success } = response;
+      const { success, error } = response;
 
       if (success) {
         setRemoveLpData({
@@ -221,13 +222,13 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
           token0Decimals: 0,
           token1Decimals: 0,
         });
+        toast.success('Success! Liquidity was removed.');
         setShowRemoveContainer(false);
       } else {
-        setErrorRemove(true);
+        toast.error(getErrorMessage(error.status ? error.status : error));
       }
     } catch (e) {
-      console.error(e);
-      setErrorRemove(true);
+      toast.error('Remove Liquidity transaction resulted in an error. ');
     } finally {
       setLoadingRemove(false);
       setShowModalConfirmRemove(false);
@@ -241,10 +242,27 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
     try {
       const contractId = addressToContractId(pairData.pairAddress);
-      await sdk.approveToken(hashconnectConnectorInstance, amount, userId, contractId, false);
-      setLpApproved(true);
+
+      const receipt = await sdk.approveToken(
+        hashconnectConnectorInstance,
+        amount,
+        userId,
+        contractId,
+        false,
+      );
+
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (success) {
+        setLpApproved(true);
+        toast.success('Success! Token was approved.');
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      }
     } catch (e) {
-      console.error(e);
+      toast.error('Approve Token transaction resulted in an error.');
     } finally {
       setLoadingApprove(false);
     }
@@ -336,12 +354,6 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
       ) : null}
 
       <div className="container-dark">
-        {errorRemove ? (
-          <div className="alert alert-danger mb-4" role="alert">
-            <p>Something went wrong!</p>
-          </div>
-        ) : null}
-
         <div className="d-flex align-items-center mb-5">
           {formatIcons([pairData.token0Symbol, pairData.token1Symbol])}
           <p className="text-small ms-3">
@@ -489,6 +501,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
           </Modal>
         ) : null}
       </div>
+      <ToasterWrapper />
     </div>
   );
 };

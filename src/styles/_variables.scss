@@ -6,7 +6,7 @@ $black: #000000;
 $white: #ffffff;
 
 $primary-900: #0B0349;
-$primary-800: #120672;
+$primary-800: #3520da;
 $primary-700: #1B0B9A;
 $primary-600: #2411C0;
 $primary-500: #2F18E5;
@@ -14,6 +14,10 @@ $primary-400: #2B2EF8;
 $primary-300: #4D5FFF;
 $primary-200: #7391FF;
 $primary-100: #99BCFF;
+
+$positive-400: #29BC63;
+
+$error-500: #EA1548;
 
 $neutral-900: #101011;
 $neutral-850: #1a1a1c95;
@@ -42,7 +46,7 @@ $secondary-800: #68106D;
 $primary: #2f18e5;
 $secondary: $blue-neutral-400;
 $success: #0da048;
-$danger: #ea1548;
+$danger: $error-500;
 $warning: #f17400;
 $info: #2B2EF8;
 $gray: $blue-neutral-300;

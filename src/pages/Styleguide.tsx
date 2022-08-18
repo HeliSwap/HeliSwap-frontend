@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import ButtonSelector from '../components/ButtonSelector';
 
 import Icon from '../components/Icon';
 import IconToken from '../components/IconToken';
 import Modal from '../components/Modal';
 import ModalContent from '../components/Modals/ModalContent';
+import Button from '../components/Button';
+import ToasterWrapper from '../components/ToasterWrapper';
 
 const Styleguide = () => {
   const [showModal, setShowModal] = useState(false);
@@ -341,6 +344,33 @@ const Styleguide = () => {
           </Modal>
         </div>
       </div>
+
+      <h3 className="text-headline mb-4">Toasts</h3>
+      <div className="row mb-6">
+        <div className="col-lg-8">
+          <Button size="small" onClick={() => toast('Default')} type="primary">
+            Open toast
+          </Button>
+          <Button
+            size="small"
+            className="ms-3"
+            onClick={() => toast.success('Success')}
+            type="primary"
+          >
+            Open toast success
+          </Button>
+          <Button
+            size="small"
+            className="ms-3"
+            onClick={() => toast.error('Danger')}
+            type="primary"
+          >
+            Open toast danger
+          </Button>
+        </div>
+      </div>
+
+      <ToasterWrapper />
 
       <h3 className="text-headline mb-4">Alerts</h3>
 
