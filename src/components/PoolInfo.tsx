@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import Tippy from '@tippyjs/react';
+
 import { IPoolExtendedData } from '../interfaces/tokens';
+import { PageViews } from '../interfaces/common';
 
 import Button from './Button';
 import IconToken from './IconToken';
@@ -8,9 +11,9 @@ import Icon from './Icon';
 
 import { formatStringETHtoPriceFormatted, formatStringToPrice } from '../utils/numberUtils';
 import { formatIcons } from '../utils/iconUtils';
-import { PageViews } from '../interfaces/common';
 
 import { POOLS_FEE } from '../constants';
+import { generalFeesAndKeysWarning } from '../content/messages';
 
 interface IPoolInfoProps {
   poolData: IPoolExtendedData;
@@ -233,6 +236,13 @@ const PoolInfo = ({
             {poolData.token0Symbol}/{poolData.token1Symbol}
           </p>
           <span className="text-micro text-numeric badge bg-secondary-800 ms-3">{POOLS_FEE}</span>
+          {poolData.hasProblematicToken ? (
+            <Tippy content={generalFeesAndKeysWarning}>
+              <span className="ms-3">
+                <Icon className="ms-3" name="warning" color="warning" />
+              </span>
+            </Tippy>
+          ) : null}
         </div>
         {view === PageViews.ALL_POOLS ? (
           <>

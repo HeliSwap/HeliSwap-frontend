@@ -7,8 +7,20 @@ export interface ITokenData {
   address: string;
   decimals: number;
   type: TokenType;
-  details?: any;
+  keys?: IKeys;
+  hasFees?: boolean;
   isHTS?: boolean;
+}
+
+export interface IKeys {
+  adminKey: boolean;
+  supplyKey: boolean;
+  wipeKey: boolean;
+  pauseKey: boolean;
+  freezeKey: boolean;
+  feeScheduleKey: boolean;
+  kycKey: boolean;
+  [key: string]: boolean;
 }
 
 export interface ITokenListData {
@@ -48,6 +60,7 @@ export interface IPoolData {
   volume24h: string;
   fee0?: string;
   fee1?: string;
+  hasProblematicToken: boolean;
 }
 
 export interface IPoolExtendedData extends IPoolData {

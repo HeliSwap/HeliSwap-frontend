@@ -22,12 +22,14 @@ const useTokensByListIds = (
 
       if (tokensData.length > 0) {
         const foundTokenDataList = tokensData.map(
-          ({ hederaId, name, symbol, address, decimals, isHTS }: ITokenData) => ({
+          ({ hederaId, name, symbol, address, decimals, isHTS, keys, hasFees }: ITokenData) => ({
             hederaId,
             name,
             symbol,
             address,
             decimals,
+            keys,
+            hasFees,
             type: isHTS ? TokenType.HTS : TokenType.ERC20,
           }),
         );

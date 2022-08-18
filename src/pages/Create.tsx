@@ -36,6 +36,7 @@ import {
   idToAddress,
   NATIVE_TOKEN,
   getUserAssociatedTokens,
+  hasFeesOrKeys,
 } from '../utils/tokenUtils';
 import {
   formatStringETHtoPriceFormatted,
@@ -53,6 +54,8 @@ import {
   REFRESH_TIME,
   ASYNC_SEARCH_THRESHOLD,
 } from '../constants';
+
+import { generalFeesAndKeysWarning } from '../content/messages';
 
 import usePoolsByToken from '../hooks/usePoolsByToken';
 import useTokensByListIds from '../hooks/useTokensByListIds';
@@ -663,6 +666,18 @@ const Create = () => {
     return notHTS || userAssociatedTokens?.includes(token.hederaId);
   };
 
+  //Render methods
+  const renderWarningMessage = () => {
+    if (hasFeesOrKeys(tokensData.tokenA) || hasFeesOrKeys(tokensData.tokenB)) {
+      return (
+        <div className="alert alert-warning my-4 d-flex align-items-center" role="alert">
+          <Icon className="alert-icon" name="warning" color="warning" />{' '}
+          <p className="ms-3 alert-message">{generalFeesAndKeysWarning}</p>
+        </div>
+      );
+    }
+  };
+
   const getProvideSection = () => {
     return (
       <div className="container-dark">
@@ -1006,9 +1021,10 @@ const Create = () => {
                 </div>
               </div>
             </div>
-            <div className="mt-4 rounded border border-secondary justify-content-between ">
+            <div className="mt-4 rounded border border-secondary justify-content-between">
               {getTokensRatioSection()}
             </div>
+            {renderWarningMessage()}
           </>
         )}
       </>

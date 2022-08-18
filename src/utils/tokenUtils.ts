@@ -26,13 +26,14 @@ export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
         decimals,
         total_supply: totalSupply,
         expiry_timestamp: expiryTimestamp,
-        admin_key: adminKey,
+        admin_key,
         custom_fees: customFees,
-        freeze_key: freezeKey,
-        kyc_key: kycKey,
-        pause_key: pauseKey,
-        supply_key: supplyKey,
-        wipe_key: wipeKey,
+        freeze_key,
+        kyc_key,
+        pause_key,
+        supply_key,
+        wipe_key,
+        fee_schedule_key,
       },
     } = await axios(url);
 
@@ -48,15 +49,15 @@ export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
       expiryTimestamp,
       address: idToAddress(hederaId),
       type: TokenType.HTS,
-      details: {
-        hasFees,
-        customFees,
-        adminKey,
-        freezeKey,
-        kycKey,
-        pauseKey,
-        wipeKey,
-        supplyKey,
+      hasFees,
+      keys: {
+        adminKey: admin_key !== null,
+        freezeKey: freeze_key !== null,
+        kycKey: kyc_key !== null,
+        pauseKey: pause_key !== null,
+        wipeKey: wipe_key !== null,
+        supplyKey: supply_key !== null,
+        feeScheduleKey: fee_schedule_key !== null,
       },
     };
 
@@ -342,6 +343,7 @@ export const requestIdFromAddress = async (id: string) => {
     return '0';
   }
 };
+
 export const requestAddressFromId = async (address: string) => {
   const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/contracts/${address}`;
   try {
@@ -353,6 +355,24 @@ export const requestAddressFromId = async (address: string) => {
     console.error(e);
     return '0';
   }
+};
+
+export const hasFeesOrKeys = (token: ITokenData) => {
+  const { hasFees, keys: tokenKeys } = token;
+  const keys = tokenKeys ? Object.keys(tokenKeys) : [];
+
+  let hasKeys = false;
+
+  if (keys.length > 0 && tokenKeys) {
+    for (let i = 0; i < keys.length; i++) {
+      if (tokenKeys[keys[i]] && keys[i] !== '__typename') {
+        hasKeys = true;
+        break;
+      }
+    }
+  }
+
+  return hasFees || hasKeys;
 };
 
 export const NATIVE_TOKEN: ITokenData = {

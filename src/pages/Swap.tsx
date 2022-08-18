@@ -35,6 +35,7 @@ import {
   checkAllowanceHTS,
   getTokenBalance,
   getUserAssociatedTokens,
+  hasFeesOrKeys,
   NATIVE_TOKEN,
 } from '../utils/tokenUtils';
 import { getTransactionSettings } from '../utils/transactionUtils';
@@ -57,6 +58,7 @@ import useTokensByListIds from '../hooks/useTokensByListIds';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import usePoolsByToken from '../hooks/usePoolsByToken';
 import useTokensByFilter from '../hooks/useTokensByFilter';
+import { generalFeesAndKeysWarning } from '../content/messages';
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
@@ -937,6 +939,7 @@ const Swap = () => {
                     />
                     {getTokensRatio()}
                     {getAdvancedSwapInfo()}
+                    {getWarningMessage()}
                   </>
                 )}
               </ConfirmTransactionModalContent>
@@ -972,6 +975,17 @@ const Swap = () => {
         ratio.toString(),
       )} ${secondTokenName}`}</div>
     );
+  };
+
+  const getWarningMessage = () => {
+    if (hasFeesOrKeys(tokensData.tokenA) || hasFeesOrKeys(tokensData.tokenB)) {
+      return (
+        <div className="alert alert-warning my-5 d-flex align-items-center" role="alert">
+          <Icon className="alert-icon" name="warning" color="warning" />{' '}
+          <p className="ms-3 alert-message">{generalFeesAndKeysWarning}</p>
+        </div>
+      );
+    }
   };
 
   const getAdvancedSwapInfo = () => {

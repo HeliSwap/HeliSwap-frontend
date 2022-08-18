@@ -22,12 +22,14 @@ const useTokensByFilter = (useQueryOptions: QueryHookOptions = {}) => {
     if (filteredTokensData) {
       const { getTokensFilter } = filteredTokensData;
       const foundTokenDataList = getTokensFilter.map(
-        ({ hederaId, name, symbol, address, decimals, isHTS }: ITokenData) => ({
+        ({ hederaId, name, symbol, address, decimals, isHTS, keys, hasFees }: ITokenData) => ({
           hederaId,
           name,
           symbol,
           address,
           decimals,
+          keys,
+          hasFees,
           type: isHTS ? TokenType.HTS : TokenType.ERC20,
         }),
       );

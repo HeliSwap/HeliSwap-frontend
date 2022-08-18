@@ -20,6 +20,7 @@ import Loader from '../Loader';
 
 import search from '../../icons/system/search-gradient.svg';
 import useDebounce from '../../hooks/useDebounce';
+import { concatWarningMessage } from '../../content/messages';
 
 interface IModalProps {
   modalTitle?: string;
@@ -53,7 +54,7 @@ const ModalSearchContent = ({
   const [showNotFound, setShowNotFound] = useState(false);
   const [readyToImport, setReadyToImport] = useState(false);
   const [readyToImportERC, setReadyToImportERC] = useState(false);
-  const [warningMessage, setWarningMessage] = useState('');
+  const [warningMessage, setWarningMessage] = useState<JSX.Element[]>([]);
 
   const [tokenList, setTokenList] = useState<ITokenData[]>([]);
   const [searchingResults, setSearchingResults] = useState(false);
@@ -121,7 +122,7 @@ const ModalSearchContent = ({
     setSearchInputValue('');
     setReadyToImportERC(false);
     setReadyToImport(false);
-    setWarningMessage('');
+    setWarningMessage([]);
     tokenDataList && setTokenList(tokenDataList);
   };
 
@@ -138,10 +139,12 @@ const ModalSearchContent = ({
     const hasResults = Object.keys(result).length > 0;
 
     if (hasResults) {
-      const { details } = result;
-      const { hasFees } = details;
+      const messageList = concatWarningMessage(result);
 
-      setWarningMessage(hasFees ? 'Token has fees!' : '');
+      if (messageList.length > 0) {
+        setWarningMessage(messageList);
+      }
+
       setTokenList([result]);
     }
 
@@ -157,7 +160,7 @@ const ModalSearchContent = ({
       setReadyToImportERC(false);
     }
 
-    setWarningMessage('');
+    setWarningMessage([]);
 
     const isId = !!isHederaIdValid(searchInputValue.trim());
     const isAddress = !!isAddressValid(searchInputValue.trim());
@@ -202,6 +205,41 @@ const ModalSearchContent = ({
     setSearchingResults(false);
   }, [tokenDataList]);
 
+  const renderWarningTooltip = (token: ITokenData) => {
+    if (token.type === TokenType.HBAR) return null;
+
+    const messageList = concatWarningMessage(token);
+
+    if (messageList.length > 0) {
+      return (
+        <Tippy
+          content={
+            <div>
+              <div className="d-flex align-items-center">
+                <Icon name="warning" color="warning" />
+                <p className="text-bold ms-3">Warning!</p>
+              </div>
+              <p className="mt-3">
+                This token contains additional properites that could cause potential issues:
+              </p>
+              <ul className="list-default mt-2">
+                {messageList.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          }
+        >
+          <span className="ms-2">
+            <Icon color="warning" name="warning" />
+          </span>
+        </Tippy>
+      );
+    } else {
+      return null;
+    }
+  };
+
   const hasTokenList = tokenList && tokenList.length > 0;
   const showImportButton = canImport && readyToImport;
   const showTokenList = canImport
@@ -237,7 +275,22 @@ const ModalSearchContent = ({
           />
         </div>
 
-        {warningMessage ? <div className="alert alert-warning mt-5">{warningMessage}</div> : null}
+        {warningMessage.length > 0 ? (
+          <div className="alert alert-warning mt-5">
+            <div className="d-flex align-items-center">
+              <Icon name="warning" color="warning" />
+              <p className="text-bold ms-3">Warning!</p>
+            </div>
+            <p className="mt-3">
+              This token contains additional properites that could cause potential issues:
+            </p>
+            <ul className="list-default mt-2">
+              {warningMessage.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
 
         {searchingResults ? (
           <div className="d-flex justify-content-center my-6">
@@ -313,11 +366,21 @@ const ModalSearchContent = ({
                   className="cursor-pointer list-token-item d-flex align-items-center"
                   key={index}
                 >
-                  <IconToken symbol={token.symbol} />
-                  <div className="d-flex flex-column ms-3">
-                    <span className="text-main">{token.symbol}</span>
-                    <span className="text-small text-secondary">{token.name}</span>
-                  </div>
+                  <>
+                    <div className="d-flex align-items-center">
+                      <IconToken symbol={token.symbol} />
+                      <div className="ms-3">
+                        <div className="d-flex align-items-center">
+                          <p className="text-main">{token.symbol}</p>
+                          {renderWarningTooltip(token)}
+                        </div>
+                        <p className="text-small text-secondary">
+                          {token.name}{' '}
+                          {token.type !== TokenType.HBAR ? <span>({token.hederaId})</span> : null}
+                        </p>
+                      </div>
+                    </div>
+                  </>
                 </div>
               ))}
             </div>

@@ -43,11 +43,16 @@ $blue-neutral-950: #01030F;
 
 $secondary-800: #68106D;
 
+$warning-300: #FFA053;
+
+$error-500: #EA1548;
+$error-400: #FD2B5E;
+
 $primary: #2f18e5;
 $secondary: $blue-neutral-400;
 $success: #0da048;
 $danger: $error-500;
-$warning: #f17400;
+$warning: $warning-300;
 $info: #2B2EF8;
 $gray: $blue-neutral-300;
 
