@@ -34,13 +34,13 @@ const FarmRow = ({ campaignData, index, handleRowClick, setCurrentFarmIndex }: I
         <span className="text-micro text-numeric badge bg-secondary-800 ms-3">{POOLS_FEE}</span>
       </div>
       <div className="table-pools-cell justify-content-end">
-        <span className="text-small text-numeric">{campaignData.totalStakedUSDT}</span>
+        <span className="text-small text-numeric">{campaignData.totalStakedUSD}</span>
       </div>
       <div className="table-pools-cell justify-content-end">
         <span className="text-small text-numeric">'N/A'</span>
       </div>
       <div className="table-pools-cell justify-content-end">
-        <span className="text-small text-numeric">{campaignData.userStakedUSDT}</span>
+        <span className="text-small text-numeric">{campaignData.userStakedUSD}</span>
       </div>
       <div className="table-pools-cell d-flex justify-content-end"></div>
     </div>

@@ -1,6 +1,16 @@
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
-import { IFarmData, IFarmDataRaw, IPoolData, IPoolExtendedData } from '../interfaces/tokens';
+import { IfStatement } from 'typescript';
+import {
+  IFarmData,
+  IFarmDataRaw,
+  IPoolData,
+  IPoolExtendedData,
+  IReward,
+  IRewardRaw,
+  IUserStakingData,
+  IUserStakingDataRaw,
+} from '../interfaces/tokens';
 import { formatStringWeiToStringEther } from './numberUtils';
 import { getTokenPrice } from './tokenUtils';
 
@@ -11,7 +21,6 @@ export const getProcessedFarms = (
 ): IFarmData[] => {
   const getLPValue = (currentFarm: IFarmDataRaw) => {
     const {
-      totalStaked,
       poolData: {
         token0Amount,
         token1Amount,
@@ -44,17 +53,52 @@ export const getProcessedFarms = (
     return lPValue;
   };
 
-  const farms: IFarmData[] = rawFarms.map((currentFarm: IFarmDataRaw) => {
+  const getRewardsProcessed = (currentFarm: IFarmDataRaw) => {
+    const { rewardsData } = currentFarm;
+
+    return rewardsData.map((currentReward: IRewardRaw): IReward => {
+      const { address, totalAccumulated, totalAmount } = currentReward;
+      const rewardValueUSD = getTokenPrice(pools, address, hbarPrice);
+      return {
+        ...currentReward,
+        totalAmountUSD: (Number(totalAmount) * Number(rewardValueUSD)).toString(),
+        totalAccumulatedUSD: (Number(totalAccumulated) * Number(rewardValueUSD)).toString(),
+      };
+    });
+  };
+
+  const getUserStakingDataProcessed = (currentFarm: IFarmDataRaw): IUserStakingData => {
+    const { userStakingData } = currentFarm;
+    let rewardsProcessed = {} as IUserStakingData;
+    Object.keys(userStakingData?.rewardsAccumulated || {}).forEach((tokenAddress: string) => {
+      const rewardValueUSD = getTokenPrice(pools, tokenAddress, hbarPrice);
+      rewardsProcessed = {
+        ...rewardsProcessed,
+        [tokenAddress]: rewardValueUSD,
+      };
+    });
+
+    return {
+      ...(userStakingData as IUserStakingDataRaw),
+      rewardsAccumulatedUSD: rewardsProcessed,
+    };
+  };
+
+  const farms: IFarmData[] = rawFarms.map((currentFarm: IFarmDataRaw): IFarmData => {
     const { totalStaked, userStakingData } = currentFarm;
     const totalStakedFormatted = formatStringWeiToStringEther(totalStaked || '0');
     const userStakedFormatted = formatStringWeiToStringEther(userStakingData?.stakedAmount || '0');
 
     const lPValue = getLPValue(currentFarm);
 
+    const userStakingDataProcessed = getUserStakingDataProcessed(currentFarm);
+
     const formatted = {
       ...currentFarm,
-      totalStakedUSDT: (lPValue * Number(totalStakedFormatted)).toString(),
-      userStakedUSDT: (lPValue * Number(userStakedFormatted)).toString(),
+      totalStakedUSD: (lPValue * Number(totalStakedFormatted)).toString(),
+      userStakedUSD: (lPValue * Number(userStakedFormatted)).toString(),
+      rewardsData: getRewardsProcessed(currentFarm),
+      userStakingData: userStakingDataProcessed,
     };
 
     return formatted;

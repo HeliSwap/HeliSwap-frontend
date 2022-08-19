@@ -85,22 +85,19 @@ export interface IFarmDataRaw {
   address: string;
   poolData: IPoolData;
   totalStaked: string;
-  rewardsData: IReward[];
+  rewardsData: IRewardRaw[];
   stakingTokenAddress: string;
-  userStakingData?: {
-    stakedAmount: string;
-    rewardsAccumulated: {
-      [key: string]: string;
-    };
-  };
+  userStakingData?: IUserStakingDataRaw;
 }
 
 export interface IFarmData extends IFarmDataRaw {
-  totalStakedUSDT: string;
-  userStakedUSDT: string;
+  totalStakedUSD: string;
+  userStakedUSD: string;
+  rewardsData: IReward[];
+  userStakingData?: IUserStakingData;
 }
 
-export interface IReward {
+export interface IRewardRaw {
   address: string;
   symbol: string;
   decimals: number;
@@ -108,14 +105,29 @@ export interface IReward {
   duration: number;
   totalAccumulated: string;
 }
+
+export interface IReward extends IRewardRaw {
+  totalAmountUSD: string;
+  totalAccumulatedUSD: string;
+}
+
+export interface IUserStakingDataRaw {
+  stakedAmount: string;
+  rewardsAccumulated: {
+    [key: string]: string;
+  };
+  [key: string]: any;
+}
+
+export interface IUserStakingData extends IUserStakingDataRaw {
+  rewardsAccumulatedUSD: {
+    [key: string]: string;
+  };
+}
 export interface IUserReward {
   address: string;
   symbol: string;
   pendingAmount: string;
-}
-
-export interface IUserStakingData {
-  stakedAmount: string;
 }
 
 export enum TokenType {
