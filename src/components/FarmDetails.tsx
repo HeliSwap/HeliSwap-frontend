@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Tippy from '@tippyjs/react';
 
-import { IFarmData } from '../interfaces/tokens';
+import { IFarmData, IReward } from '../interfaces/tokens';
 
 import Icon from './Icon';
 import IconToken from './IconToken';
@@ -10,6 +10,7 @@ import Button from './Button';
 import InputTokenSelector from './InputTokenSelector';
 import ButtonSelector from './ButtonSelector';
 import InputToken from './InputToken';
+import { formatStringWeiToStringEther } from '../utils/numberUtils';
 
 interface IFarmDataBlockProps {
   blockLabel: string;
@@ -48,6 +49,34 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
     setLpInputValue(value);
   };
 
+  const totalRewardsUSD = useMemo(() => {
+    const { rewardsData } = farmData;
+
+    return rewardsData.reduce((acc: string, currentValue: IReward) => {
+      const { totalAccumulatedUSD } = currentValue;
+      return (Number(acc) + Number(totalAccumulatedUSD)).toString();
+    }, '0');
+  }, [farmData]);
+
+  const userRewardsUSD = useMemo(() => {
+    const { userStakingData } = farmData;
+
+    return Object.keys(userStakingData?.rewardsAccumulatedUSD || {}).reduce(
+      (acc: string, currentValue: string) => {
+        return (
+          Number(acc) + Number(userStakingData?.rewardsAccumulatedUSD[currentValue])
+        ).toString();
+      },
+      '0',
+    );
+  }, [farmData]);
+
+  const userShare = useMemo(() => {
+    const { totalStaked, userStakingData } = farmData;
+
+    return (Number(userStakingData?.stakedAmount) / Number(totalStaked)) * 100;
+  }, [farmData]);
+
   return (
     <div className="d-flex justify-content-center">
       <div className="container-max-with-1042">
@@ -70,19 +99,34 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
 
                 <div>
                   <p className="text-micro">
-                    Active till <span className="text-bold">15 Sep 2022</span>
+                    Active till <span className="text-bold">15 Sep 2022 - to be determined</span>
                   </p>
                 </div>
               </div>
               <div className="row mt-9">
                 <div className="col-4">
                   <FarmDataBlock blockLabel="Total APR">
-                    <p className="text-main text-numeric">23.45%</p>
+                    <p className="text-main text-numeric">23.45% - to be calculated</p>
                   </FarmDataBlock>
                 </div>
                 <div className="col-4">
                   <FarmDataBlock blockLabel="Liquidity">
-                    <p className="text-main text-numeric">123.45%</p>
+                    <p className="text-main text-numeric">123.45% - liquidity in the pool ? </p>
+                  </FarmDataBlock>
+                </div>
+              </div>
+
+              <hr className="my-5" />
+
+              <div className="row mt-9">
+                <div className="col-4">
+                  <FarmDataBlock blockLabel="Weekly Rewards">
+                    <p className="text-main text-numeric">23.45% - last week rewards ?</p>
+                  </FarmDataBlock>
+                </div>
+                <div className="col-4">
+                  <FarmDataBlock blockLabel="Total Rewards">
+                    <p className="text-main text-numeric">{totalRewardsUSD}</p>
                   </FarmDataBlock>
                 </div>
               </div>
@@ -93,14 +137,18 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                 <div className="col-4">
                   <FarmDataBlock blockLabel="Staked LP Tokens">
                     <>
-                      <p className="text-title text-numeric">23</p>
-                      <p className="text-main text-numeric">$123.45</p>
+                      <p className="text-title text-numeric">
+                        {formatStringWeiToStringEther(farmData.totalStaked)}
+                      </p>
+                      <p className="text-main text-numeric">
+                        ${farmData.userStakingData?.userStakedUSD}
+                      </p>
                     </>
                   </FarmDataBlock>
                 </div>
                 <div className="col-4">
                   <FarmDataBlock blockLabel="Your share">
-                    <p className="text-title text-numeric">0%</p>
+                    <p className="text-title text-numeric">{userShare}%</p>
                   </FarmDataBlock>
                 </div>
               </div>
@@ -114,8 +162,13 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                 </div>
 
                 <div className="mt-5">
-                  <p className="text-subheader text-success text-numeric">12</p>
-                  <p className="text-main text-numeric mt-3">$12,345</p>
+                  <p className="text-subheader text-success text-numeric">
+                    ${farmData.userStakingData?.userStakedUSD}
+                  </p>
+                  <p className="text-subheader text-success text-numeric">
+                    ${farmData.userStakingData?.userStakedUSD}
+                  </p>
+                  <p className="text-main text-numeric mt-3">${userRewardsUSD}</p>
                 </div>
               </div>
             </div>

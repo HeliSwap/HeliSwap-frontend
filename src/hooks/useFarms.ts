@@ -80,14 +80,6 @@ const useFarms = (useQueryOptions: QueryHookOptions = {}, pools: IPoolData[]) =>
   }, []);
 
   useEffect(() => {
-    const getPoolsByAddresses = async () => {
-      const addresses = farmsRaw.map(item => item.stakingTokenAddress);
-    };
-
-    getPoolsByAddresses();
-  }, [farmsRaw]);
-
-  useEffect(() => {
     if (farmsRaw.length && pools.length && hbarPrice !== 0) {
       const processedFarms = getProcessedFarms(farmsRaw, pools, hbarPrice);
       setFarms(processedFarms);

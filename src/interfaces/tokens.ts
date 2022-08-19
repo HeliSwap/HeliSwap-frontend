@@ -92,7 +92,7 @@ export interface IFarmDataRaw {
 
 export interface IFarmData extends IFarmDataRaw {
   totalStakedUSD: string;
-  userStakedUSD: string;
+  // userStakedUSD: string;
   rewardsData: IReward[];
   userStakingData?: IUserStakingData;
 }
@@ -120,6 +120,7 @@ export interface IUserStakingDataRaw {
 }
 
 export interface IUserStakingData extends IUserStakingDataRaw {
+  userStakedUSD: string;
   rewardsAccumulatedUSD: {
     [key: string]: string;
   };

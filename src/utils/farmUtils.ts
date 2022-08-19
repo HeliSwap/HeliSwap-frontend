@@ -1,11 +1,7 @@
-import BigNumber from 'bignumber.js';
-import _ from 'lodash';
-import { IfStatement } from 'typescript';
 import {
   IFarmData,
   IFarmDataRaw,
   IPoolData,
-  IPoolExtendedData,
   IReward,
   IRewardRaw,
   IUserStakingData,
@@ -67,36 +63,42 @@ export const getProcessedFarms = (
     });
   };
 
-  const getUserStakingDataProcessed = (currentFarm: IFarmDataRaw): IUserStakingData => {
+  const getUserStakingDataProcessed = (
+    currentFarm: IFarmDataRaw,
+    lPValue: number,
+  ): IUserStakingData => {
     const { userStakingData } = currentFarm;
+
+    const userStakedFormatted = formatStringWeiToStringEther(userStakingData?.stakedAmount || '0');
+
     let rewardsProcessed = {} as IUserStakingData;
     Object.keys(userStakingData?.rewardsAccumulated || {}).forEach((tokenAddress: string) => {
       const rewardValueUSD = getTokenPrice(pools, tokenAddress, hbarPrice);
+      const rewardAmount = userStakingData?.rewardsAccumulated[tokenAddress];
       rewardsProcessed = {
         ...rewardsProcessed,
-        [tokenAddress]: rewardValueUSD,
+        [tokenAddress]: (Number(rewardValueUSD) * Number(rewardAmount)).toString(),
       };
     });
 
     return {
       ...(userStakingData as IUserStakingDataRaw),
       rewardsAccumulatedUSD: rewardsProcessed,
+      userStakedUSD: (lPValue * Number(userStakedFormatted)).toString(),
     };
   };
 
   const farms: IFarmData[] = rawFarms.map((currentFarm: IFarmDataRaw): IFarmData => {
-    const { totalStaked, userStakingData } = currentFarm;
+    const { totalStaked } = currentFarm;
     const totalStakedFormatted = formatStringWeiToStringEther(totalStaked || '0');
-    const userStakedFormatted = formatStringWeiToStringEther(userStakingData?.stakedAmount || '0');
 
     const lPValue = getLPValue(currentFarm);
 
-    const userStakingDataProcessed = getUserStakingDataProcessed(currentFarm);
+    const userStakingDataProcessed = getUserStakingDataProcessed(currentFarm, lPValue);
 
     const formatted = {
       ...currentFarm,
       totalStakedUSD: (lPValue * Number(totalStakedFormatted)).toString(),
-      userStakedUSD: (lPValue * Number(userStakedFormatted)).toString(),
       rewardsData: getRewardsProcessed(currentFarm),
       userStakingData: userStakingDataProcessed,
     };

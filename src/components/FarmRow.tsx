@@ -40,7 +40,9 @@ const FarmRow = ({ campaignData, index, handleRowClick, setCurrentFarmIndex }: I
         <span className="text-small text-numeric">'N/A'</span>
       </div>
       <div className="table-pools-cell justify-content-end">
-        <span className="text-small text-numeric">{campaignData.userStakedUSD}</span>
+        <span className="text-small text-numeric">
+          {campaignData.userStakingData?.userStakedUSD}
+        </span>
       </div>
       <div className="table-pools-cell d-flex justify-content-end"></div>
     </div>

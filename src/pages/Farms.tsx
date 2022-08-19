@@ -20,11 +20,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
 
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
 
-  const {
-    poolsByTokenList: pools,
-    loadingPoolsByTokenList: loadingPools,
-    errorPoolsByTokenList: errorPoools,
-  } = usePoolsByTokensList(
+  const { poolsByTokenList: pools } = usePoolsByTokensList(
     {
       fetchPolicy: 'network-only',
       pollInterval: REFRESH_TIME,
@@ -65,7 +61,10 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
   const haveFarms = farms.length > 0;
 
   return showFarmDetails ? (
-    <FarmDetails setShowFarmDetails={setShowFarmDetails} farmData={farms[currentFarmIndex]} />
+    <FarmDetails
+      setShowFarmDetails={setShowFarmDetails}
+      farmData={currentItems[currentFarmIndex]}
+    />
   ) : (
     <div className="d-flex justify-content-center">
       <div className="container-max-with-1042">
