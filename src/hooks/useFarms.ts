@@ -22,23 +22,19 @@ const useFarms = (useQueryOptions: QueryHookOptions = {}, pools: IPoolData[]) =>
           totalStaked: '11256869348',
           userStakingData: {
             stakedAmount: '1125686934',
+            rewardsAccumulated: {
+              '0x000000000000000000000000000000000215311b': '12312',
+              '0x0000000000000000000000000000000002121d92': '12312',
+            },
           },
           rewardsData: [
             {
-              address: '0x0000000000000000000000000000000002121D51',
-              symbol: 'USDT',
+              address: '0x000000000000000000000000000000000215311b',
+              symbol: 'tHTS2',
               totalAmount: '1000',
               duration: 86400,
               decimals: 6,
-              userRewardPerTokenPaid: '12312', //this is specific for every user per token
-              rewards: '123', //this is specific for every user per token(from rewards mapping)
-              //directly from Reward struct
-              rewardsDistributor: 'address',
-              rewardsDuration: 123123,
-              periodFinish: 123123,
-              rewardRate: 123123,
-              lastUpdateTime: 123123,
-              rewardPerTokenStored: '123123',
+              totalAccumulated: '123',
             },
             {
               address: '0x0000000000000000000000000000000002121d92',
@@ -46,15 +42,7 @@ const useFarms = (useQueryOptions: QueryHookOptions = {}, pools: IPoolData[]) =>
               totalAmount: '1000',
               duration: 86400,
               decimals: 10,
-              userRewardPerTokenPaid: '12312', //this is specific for every user
-              rewards: '123', //this is specific for every user per token(from rewards mapping)
-              //directly from Reward struct
-              rewardsDistributor: 'address',
-              rewardsDuration: 123123,
-              periodFinish: 123123,
-              rewardRate: 123123,
-              lastUpdateTime: 123123,
-              rewardPerTokenStored: '123123',
+              totalAccumulated: '123',
             },
           ],
           poolData: {

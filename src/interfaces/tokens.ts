@@ -87,8 +87,11 @@ export interface IFarmDataRaw {
   totalStaked: string;
   rewardsData: IReward[];
   stakingTokenAddress: string;
-  userStakingData: {
+  userStakingData?: {
     stakedAmount: string;
+    rewardsAccumulated: {
+      [key: string]: string;
+    };
   };
 }
 
@@ -103,14 +106,7 @@ export interface IReward {
   decimals: number;
   totalAmount: string;
   duration: number;
-  userRewardPerTokenPaid: string;
-  rewards: string;
-  rewardsDistributor: string;
-  rewardsDuration: number;
-  periodFinish: number;
-  rewardRate: number;
-  lastUpdateTime: number;
-  rewardPerTokenStored: string;
+  totalAccumulated: string;
 }
 export interface IUserReward {
   address: string;
