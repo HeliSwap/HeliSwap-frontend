@@ -191,6 +191,18 @@
   padding: 16px;
 }
 
+.container-blue-neutral {
+  background-color: #25255f;
+}
+
+.container-blue-neutral-800 {
+  background-color: $blue-neutral-800;
+}
+
+.container-blue-neutral-900 {
+  background-color: $blue-neutral-900;
+}
+
 .container-input-token {
   background-color: $blue-neutral-700;
   border-radius: $border-radius;
@@ -242,7 +254,7 @@
   width: 100%;
 }
 
-.container-pools {
+.container-max-with-1042 {
   width: 100%;
   max-width: 1042px;
   margin: 0 24px;

@@ -148,7 +148,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
           setShowRemoveContainer={setShowRemoveContainer}
         />
       ) : (
-        <div className="container-pools">
+        <div className="container-max-with-1042">
           <div className="d-flex justify-content-between align-items-center mb-4">
             <div className="d-flex">
               <h2
