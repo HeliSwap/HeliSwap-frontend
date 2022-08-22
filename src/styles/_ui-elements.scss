@@ -234,6 +234,11 @@
     flex: 0 1 250px;
     @include transition-color;
 
+    &.is-compact {
+      max-width: 190px;
+      flex: 0 1 190px;
+    }
+
     &::placeholder {
       color: $blue-neutral-100;
     }

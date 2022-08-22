@@ -56,6 +56,8 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
   const [loadingApprove, setLoadingApprove] = useState(false);
   const [loadingExit, setLoadingExit] = useState(false);
 
+  const [lpApproved, setLpApproved] = useState(false);
+
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setLpInputValue(value);
@@ -150,6 +152,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
 
       if (success) {
         toast.success('Success! Token was approved.');
+        setLpApproved(true);
       } else {
         toast.error(getErrorMessage(error.status ? error.status : error));
       }
@@ -271,14 +274,24 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
               <div className="container-blue-neutral rounded p-5 mt-5">
                 <div className="d-flex justify-content-between align-items-start">
                   <p className="text-small text-bold">Pending rewards</p>
-                  <Button
-                    loading={loadingHarvest}
-                    onClick={handleHarvestClick}
-                    size="small"
-                    type="primary"
-                  >
-                    Harvest
-                  </Button>
+                  <div className="d-flex justify-content-end">
+                    <Button
+                      loading={loadingHarvest}
+                      onClick={handleHarvestClick}
+                      size="small"
+                      type="primary"
+                    >
+                      Harvest
+                    </Button>
+                    <Button
+                      className="ms-3"
+                      size="small"
+                      loading={loadingExit}
+                      onClick={() => handleExitButtonClick(farmData.address)}
+                    >
+                      Exit
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="mt-5">
@@ -303,6 +316,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                     <InputToken
                       value={lpInputValue}
                       onChange={hanleLpInputChange}
+                      isCompact={true}
                       name="amountIn"
                     />
                   }
@@ -311,28 +325,22 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                   }
                 />
               </div>
+
               <div className="d-grid">
-                <Button loading={loadingStake} onClick={handleStakeClick}>
-                  Stake
-                </Button>
-              </div>
-              <div className="d-grid">
-                <Button
-                  loading={loadingExit}
-                  onClick={() => handleExitButtonClick(farmData.address)}
-                >
-                  Exit
-                </Button>
-              </div>
-              <div className="d-grid">
-                <Button
-                  loading={loadingApprove}
-                  onClick={() =>
-                    handleApproveButtonClick(farmData.address, farmData.poolData.pairAddress)
-                  }
-                >
-                  Approve
-                </Button>
+                {lpApproved ? (
+                  <Button loading={loadingStake} onClick={handleStakeClick}>
+                    Stake
+                  </Button>
+                ) : (
+                  <Button
+                    loading={loadingApprove}
+                    onClick={() =>
+                      handleApproveButtonClick(farmData.address, farmData.poolData.pairAddress)
+                    }
+                  >
+                    Approve
+                  </Button>
+                )}
               </div>
             </div>
           </div>
