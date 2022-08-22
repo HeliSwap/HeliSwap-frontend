@@ -15,6 +15,7 @@ import { formatStringWeiToStringEther } from '../utils/numberUtils';
 import getErrorMessage from '../content/errors';
 import { MAX_UINT_ERC20 } from '../constants';
 import { formatIcons } from '../utils/iconUtils';
+import ToasterWrapper from './ToasterWrapper';
 
 interface IFarmDataBlockProps {
   blockLabel: string;
@@ -83,9 +84,9 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
       }
     } catch (err) {
       console.error(err);
-      toast('Error on stake');
+      toast.error('Error on stake');
     } finally {
-      setLoadingStake(true);
+      setLoadingStake(false);
     }
   };
 
@@ -110,7 +111,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
       console.error(err);
       toast('Error on harvest');
     } finally {
-      setLoadingHarvest(true);
+      setLoadingHarvest(false);
     }
   };
 
@@ -159,7 +160,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
     } catch (err) {
       console.error(err);
     } finally {
-      setLoadingApprove(true);
+      setLoadingApprove(false);
     }
   };
 
@@ -349,6 +350,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
           </div>
         </div>
       </div>
+      <ToasterWrapper />
     </div>
   );
 };
