@@ -1,5 +1,6 @@
 import React, { useContext, useMemo, useState } from 'react';
 import Tippy from '@tippyjs/react';
+import toast from 'react-hot-toast';
 
 import { IFarmData, IReward } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
@@ -12,6 +13,7 @@ import InputTokenSelector from './InputTokenSelector';
 import ButtonSelector from './ButtonSelector';
 import InputToken from './InputToken';
 import { formatStringWeiToStringEther } from '../utils/numberUtils';
+import getErrorMessage from '../content/errors';
 
 interface IFarmDataBlockProps {
   blockLabel: string;
@@ -252,10 +254,3 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
 };
 
 export default FarmDetails;
-function toast(arg0: any) {
-  throw new Error('Function not implemented.');
-}
-
-function getErrorMessage(arg0: any): any {
-  throw new Error('Function not implemented.');
-}
