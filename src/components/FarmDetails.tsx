@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import Tippy from '@tippyjs/react';
 
 import { IFarmData, IReward } from '../interfaces/tokens';
+import { GlobalContext } from '../providers/Global';
 
 import Icon from './Icon';
 import IconToken from './IconToken';
@@ -42,11 +43,42 @@ interface IFarmDetailsProps {
 }
 
 const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
+  const contextValue = useContext(GlobalContext);
+  const { connection, sdk, tokensWhitelisted } = contextValue;
+  const {
+    userId,
+    hashconnectConnectorInstance,
+    connected,
+    setShowConnectModal,
+    extensionFound,
+    isHashpackLoading,
+  } = connection;
+
   const [lpInputValue, setLpInputValue] = useState('0.0');
+  const [loadingStake, setLoadingStake] = useState(false);
 
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setLpInputValue(value);
+  };
+
+  const handleStakeClick = async () => {
+    setLoadingStake(true);
+    try {
+      const receipt = await sdk.stakeLP(hashconnectConnectorInstance, farmData.address, userId);
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (!success) {
+        toast(getErrorMessage(error.status ? error.status : error));
+      }
+    } catch (err) {
+      console.error(err);
+      toast('Error on associate');
+    } finally {
+      setLoadingStake(true);
+    }
   };
 
   const totalRewardsUSD = useMemo(() => {
@@ -192,7 +224,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                 />
               </div>
               <div className="d-grid">
-                <Button>Stake</Button>
+                <Button onClick={handleStakeClick}>Stake</Button>
               </div>
             </div>
           </div>
@@ -203,3 +235,10 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
 };
 
 export default FarmDetails;
+function toast(arg0: any) {
+  throw new Error('Function not implemented.');
+}
+
+function getErrorMessage(arg0: any): any {
+  throw new Error('Function not implemented.');
+}
