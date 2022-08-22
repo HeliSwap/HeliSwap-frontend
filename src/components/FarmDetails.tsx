@@ -44,17 +44,11 @@ interface IFarmDetailsProps {
 
 const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
   const contextValue = useContext(GlobalContext);
-  const { connection, sdk, tokensWhitelisted } = contextValue;
-  const {
-    userId,
-    hashconnectConnectorInstance,
-    connected,
-    setShowConnectModal,
-    extensionFound,
-    isHashpackLoading,
-  } = connection;
+  const { connection, sdk } = contextValue;
+  const { userId, hashconnectConnectorInstance } = connection;
 
   const [lpInputValue, setLpInputValue] = useState('0.0');
+  const [loadingHarvest, setLoadingHarvest] = useState(false);
   const [loadingStake, setLoadingStake] = useState(false);
 
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,9 +69,32 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
       }
     } catch (err) {
       console.error(err);
-      toast('Error on associate');
+      toast('Error on stake');
     } finally {
       setLoadingStake(true);
+    }
+  };
+
+  const handleHarvestClick = async () => {
+    setLoadingHarvest(true);
+    try {
+      const receipt = await sdk.collectRewards(
+        hashconnectConnectorInstance,
+        farmData.address,
+        userId,
+      );
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (!success) {
+        toast(getErrorMessage(error.status ? error.status : error));
+      }
+    } catch (err) {
+      console.error(err);
+      toast('Error on harvest');
+    } finally {
+      setLoadingHarvest(true);
     }
   };
 
@@ -188,7 +205,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
               <div className="container-blue-neutral rounded p-5 mt-5">
                 <div className="d-flex justify-content-between align-items-start">
                   <p className="text-small text-bold">Pending rewards</p>
-                  <Button size="small" type="primary">
+                  <Button onClick={handleHarvestClick} size="small" type="primary">
                     Harvest
                   </Button>
                 </div>
