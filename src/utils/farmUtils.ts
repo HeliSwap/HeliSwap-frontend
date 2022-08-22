@@ -88,19 +88,51 @@ export const getProcessedFarms = (
     };
   };
 
+  const getTotalRewardsUSD = (rewardsData: IReward[]) => {
+    return rewardsData.reduce((acc: string, currentValue: IReward) => {
+      const { totalAccumulatedUSD } = currentValue;
+      return (Number(acc) + Number(totalAccumulatedUSD)).toString();
+    }, '0');
+  };
+
+  const getAPR = (rewardsData: IReward[], totalStakedUSD: string, totalRewardsUSD: string) => {
+    let maxDuration = 0;
+
+    rewardsData.forEach((reward: IReward) => {
+      const { duration } = reward;
+      if (duration > maxDuration) {
+        maxDuration = duration;
+      }
+    });
+    const durationDays = maxDuration / (60 * 60 * 24 * 1000);
+
+    const rewardsPerDayUSD = Number(totalRewardsUSD) / durationDays;
+    const interest = rewardsPerDayUSD / Number(totalStakedUSD);
+    const APR = interest * 365;
+    return (APR * 100).toString();
+  };
+
   const farms: IFarmData[] = rawFarms.map((currentFarm: IFarmDataRaw): IFarmData => {
     const { totalStaked } = currentFarm;
     const totalStakedFormatted = formatStringWeiToStringEther(totalStaked || '0');
-
     const lPValue = getLPValue(currentFarm);
+
+    const totalStakedUSD = (lPValue * Number(totalStakedFormatted)).toString();
+
+    const rewardsData = getRewardsProcessed(currentFarm);
+    const totalRewardsUSD = getTotalRewardsUSD(rewardsData);
 
     const userStakingDataProcessed = getUserStakingDataProcessed(currentFarm, lPValue);
 
+    const APR = getAPR(rewardsData, totalStakedUSD, totalRewardsUSD);
+
     const formatted = {
       ...currentFarm,
-      totalStakedUSD: (lPValue * Number(totalStakedFormatted)).toString(),
-      rewardsData: getRewardsProcessed(currentFarm),
+      totalStakedUSD,
+      rewardsData,
       userStakingData: userStakingDataProcessed,
+      APR,
+      totalRewardsUSD,
     };
 
     return formatted;

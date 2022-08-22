@@ -157,7 +157,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
               <div className="row mt-9">
                 <div className="col-4">
                   <FarmDataBlock blockLabel="Total APR">
-                    <p className="text-main text-numeric">23.45% - to be calculated</p>
+                    <p className="text-main text-numeric">{farmData.APR}</p>
                   </FarmDataBlock>
                 </div>
                 <div className="col-4">
@@ -179,7 +179,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                 </div>
                 <div className="col-4">
                   <FarmDataBlock blockLabel="Total Rewards">
-                    <p className="text-main text-numeric">{totalRewardsUSD}</p>
+                    <p className="text-main text-numeric">{farmData.totalRewardsUSD}</p>
                   </FarmDataBlock>
                 </div>
               </div>
