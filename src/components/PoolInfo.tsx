@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { GlobalContext } from '../providers/Global';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Tippy from '@tippyjs/react';
 
@@ -13,7 +12,7 @@ import Icon from './Icon';
 import { formatStringETHtoPriceFormatted, formatStringToPrice } from '../utils/numberUtils';
 import { formatIcons } from '../utils/iconUtils';
 
-import { MAX_UINT_ERC20, POOLS_FEE } from '../constants';
+import { POOLS_FEE } from '../constants';
 import { generalFeesAndKeysWarning } from '../content/messages';
 
 interface IPoolInfoProps {
@@ -35,78 +34,11 @@ const PoolInfo = ({
   collapseAll,
   setCollapseAll,
 }: IPoolInfoProps) => {
-  const contextValue = useContext(GlobalContext);
-  const { sdk, connection } = contextValue;
-  const { hashconnectConnectorInstance, userId } = connection;
-
   const [showPoolDetails, setShowPoolDetails] = useState(false);
 
   const handleRemoveButtonClick = () => {
     setShowRemoveContainer(prev => !prev);
     setCurrentPoolIndex(index);
-  };
-
-  // const campaignAddress = '0x0000000000000000000000000000000002da4531';
-  const campaignAddress = '0x0000000000000000000000000000000002da46d1';
-
-  const handleStakeButtonClick = async () => {
-    try {
-      const receipt = await sdk.stakeLP(hashconnectConnectorInstance, campaignAddress, userId);
-      const {
-        response: { success, error },
-      } = receipt;
-    } catch (err) {
-      console.error(err);
-    } finally {
-    }
-  };
-
-  const handleCollectButtonClick = async () => {
-    try {
-      const receipt = await sdk.collectRewards(
-        hashconnectConnectorInstance,
-        campaignAddress,
-        userId,
-      );
-      const {
-        response: { success, error },
-      } = receipt;
-    } catch (err) {
-      console.error(err);
-    } finally {
-    }
-  };
-
-  const handleExitButtonClick = async () => {
-    try {
-      const receipt = await sdk.exit(hashconnectConnectorInstance, campaignAddress, userId);
-      const {
-        response: { success, error },
-      } = receipt;
-    } catch (err) {
-      console.error(err);
-    } finally {
-    }
-  };
-
-  const handleApproveButtonClick = async (poolAddress: string) => {
-    console.log('poolAddress', poolAddress);
-    const amount = MAX_UINT_ERC20.toString();
-    try {
-      const receipt = await sdk.approveTokenStake(
-        hashconnectConnectorInstance,
-        campaignAddress,
-        amount,
-        userId,
-        poolAddress,
-      );
-      const {
-        response: { success, error },
-      } = receipt;
-    } catch (err) {
-      console.error(err);
-    } finally {
-    }
   };
 
   useEffect(() => {
@@ -251,41 +183,6 @@ const PoolInfo = ({
                   <span className="text-small text-numeric">
                     {formatStringETHtoPriceFormatted(poolData.lpSharesFormatted as string)}
                   </span>
-                </div>
-
-                <div className="mt-4 d-flex">
-                  <Button
-                    onClick={() => handleApproveButtonClick(poolData.pairAddress)}
-                    type="primary"
-                    outline
-                    size="small"
-                  >
-                    Approve
-                  </Button>
-                  <Button
-                    className="ms-3"
-                    onClick={handleStakeButtonClick}
-                    type="primary"
-                    size="small"
-                  >
-                    Stake
-                  </Button>
-                  <Button
-                    className="ms-3"
-                    onClick={handleCollectButtonClick}
-                    type="secondary"
-                    size="small"
-                  >
-                    Collect
-                  </Button>
-                  <Button
-                    className="ms-3"
-                    onClick={handleExitButtonClick}
-                    type="secondary"
-                    size="small"
-                  >
-                    Exit
-                  </Button>
                 </div>
               </div>
             </div>
