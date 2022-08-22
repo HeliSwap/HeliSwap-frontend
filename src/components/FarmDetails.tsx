@@ -162,7 +162,9 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                 </div>
                 <div className="col-4">
                   <FarmDataBlock blockLabel="Liquidity">
-                    <p className="text-main text-numeric">123.45% - liquidity in the pool ? </p>
+                    <p className="text-main text-numeric">
+                      {formatStringWeiToStringEther(farmData.totalStaked)}
+                    </p>
                   </FarmDataBlock>
                 </div>
               </div>
@@ -189,7 +191,9 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                   <FarmDataBlock blockLabel="Staked LP Tokens">
                     <>
                       <p className="text-title text-numeric">
-                        {formatStringWeiToStringEther(farmData.totalStaked)}
+                        {formatStringWeiToStringEther(
+                          farmData.userStakingData?.stakedAmount || '0',
+                        )}
                       </p>
                       <p className="text-main text-numeric">
                         ${farmData.userStakingData?.userStakedUSD}
