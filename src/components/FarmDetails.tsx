@@ -14,6 +14,7 @@ import ButtonSelector from './ButtonSelector';
 import InputToken from './InputToken';
 import { formatStringWeiToStringEther } from '../utils/numberUtils';
 import getErrorMessage from '../content/errors';
+import { MAX_UINT_ERC20 } from '../constants';
 
 interface IFarmDataBlockProps {
   blockLabel: string;
@@ -52,6 +53,8 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
   const [lpInputValue, setLpInputValue] = useState('0.0');
   const [loadingHarvest, setLoadingHarvest] = useState(false);
   const [loadingStake, setLoadingStake] = useState(false);
+  const [loadingApprove, setLoadingApprove] = useState(false);
+  const [loadingExit, setLoadingExit] = useState(false);
 
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -61,13 +64,20 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
   const handleStakeClick = async () => {
     setLoadingStake(true);
     try {
-      const receipt = await sdk.stakeLP(hashconnectConnectorInstance, farmData.address, userId);
+      const receipt = await sdk.stakeLP(
+        hashconnectConnectorInstance,
+        lpInputValue,
+        farmData.address,
+        userId,
+      );
       const {
         response: { success, error },
       } = receipt;
 
-      if (!success) {
-        toast(getErrorMessage(error.status ? error.status : error));
+      if (success) {
+        toast.success('Success! Tokens are staked');
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
       }
     } catch (err) {
       console.error(err);
@@ -89,14 +99,64 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
         response: { success, error },
       } = receipt;
 
-      if (!success) {
-        toast(getErrorMessage(error.status ? error.status : error));
+      if (success) {
+        toast.success('Success! Rewards were harvested.');
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
       }
     } catch (err) {
       console.error(err);
       toast('Error on harvest');
     } finally {
       setLoadingHarvest(true);
+    }
+  };
+
+  const handleExitButtonClick = async (campaignAddress: string) => {
+    setLoadingExit(true);
+
+    try {
+      const receipt = await sdk.exit(hashconnectConnectorInstance, campaignAddress, userId);
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (success) {
+        toast.success('Success! Exit was successful.');
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingExit(false);
+    }
+  };
+
+  const handleApproveButtonClick = async (campaignAddress: string, poolAddress: string) => {
+    setLoadingApprove(true);
+    const amount = MAX_UINT_ERC20.toString();
+    try {
+      const receipt = await sdk.approveTokenStake(
+        hashconnectConnectorInstance,
+        campaignAddress,
+        amount,
+        userId,
+        poolAddress,
+      );
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (success) {
+        toast.success('Success! Token was approved.');
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingApprove(true);
     }
   };
 
@@ -211,7 +271,12 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
               <div className="container-blue-neutral rounded p-5 mt-5">
                 <div className="d-flex justify-content-between align-items-start">
                   <p className="text-small text-bold">Pending rewards</p>
-                  <Button onClick={handleHarvestClick} size="small" type="primary">
+                  <Button
+                    loading={loadingHarvest}
+                    onClick={handleHarvestClick}
+                    size="small"
+                    type="primary"
+                  >
                     Harvest
                   </Button>
                 </div>
@@ -247,7 +312,27 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                 />
               </div>
               <div className="d-grid">
-                <Button onClick={handleStakeClick}>Stake</Button>
+                <Button loading={loadingStake} onClick={handleStakeClick}>
+                  Stake
+                </Button>
+              </div>
+              <div className="d-grid">
+                <Button
+                  loading={loadingExit}
+                  onClick={() => handleExitButtonClick(farmData.address)}
+                >
+                  Exit
+                </Button>
+              </div>
+              <div className="d-grid">
+                <Button
+                  loading={loadingApprove}
+                  onClick={() =>
+                    handleApproveButtonClick(farmData.address, farmData.poolData.pairAddress)
+                  }
+                >
+                  Approve
+                </Button>
               </div>
             </div>
           </div>

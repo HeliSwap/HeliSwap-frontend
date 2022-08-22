@@ -435,10 +435,11 @@ class SDK {
 
   async stakeLP(
     hashconnectConnectorInstance: Hashconnect,
+    stakeAmount: string,
     campaignAddress: string,
     userId: string,
   ) {
-    const tokensLpAmountBN = formatStringToBigNumberWei('0.0000001', 18);
+    const tokensLpAmountBN = formatStringToBigNumberWei(stakeAmount, 18);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
