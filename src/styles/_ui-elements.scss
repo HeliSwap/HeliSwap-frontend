@@ -143,7 +143,19 @@
   border-radius: 50%;
 
   &.is-running {
-    background-color: #29bc63;
+    background-color: $positive-400;
+  }
+}
+
+.icon-campaign-status {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: $danger;
+
+  &.is-active {
+    background-color: $positive-400;
   }
 }
 
@@ -298,6 +310,12 @@
   @include media-breakpoint-up(xxxl) {
     left: 110px;
   }
+}
+
+.container-campaign-status {
+  border: 1px solid $blue-neutral-500;
+  border-radius: $border-radius;
+  padding: 4px 8px;
 }
 
 /* Tables */

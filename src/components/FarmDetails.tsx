@@ -6,7 +6,6 @@ import { IFarmData, IReward } from '../interfaces/tokens';
 import { GlobalContext } from '../providers/Global';
 
 import Icon from './Icon';
-import IconToken from './IconToken';
 import PageHeader from './PageHeader';
 import Button from './Button';
 import InputTokenSelector from './InputTokenSelector';
@@ -15,6 +14,7 @@ import InputToken from './InputToken';
 import { formatStringWeiToStringEther } from '../utils/numberUtils';
 import getErrorMessage from '../content/errors';
 import { MAX_UINT_ERC20 } from '../constants';
+import { formatIcons } from '../utils/iconUtils';
 
 interface IFarmDataBlockProps {
   blockLabel: string;
@@ -204,14 +204,17 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
             <div className="container-blue-neutral-800 rounded p-5">
               <div className="d-flex justify-content-between align-items-start">
                 <div className="d-flex align-items-center">
-                  <IconToken size="large" symbol={farmData.poolData.token0Symbol} />
-                  <IconToken size="large" symbol={farmData.poolData.token1Symbol} />
+                  {formatIcons(
+                    [farmData.poolData.token0Symbol, farmData.poolData.token1Symbol],
+                    'large',
+                  )}
                   <p className="text-subheader text-light ms-4">
                     {farmData.poolData.token0Symbol} / {farmData.poolData.token1Symbol}
                   </p>
                 </div>
 
-                <div>
+                <div className="container-campaign-status d-flex align-items-center">
+                  <span className="icon-campaign-status is-active me-2"></span>
                   <p className="text-micro">
                     Active till <span className="text-bold">15 Sep 2022 - to be determined</span>
                   </p>
