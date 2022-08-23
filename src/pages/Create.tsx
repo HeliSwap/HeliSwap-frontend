@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
-import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
+
+import toast from 'react-hot-toast';
+import Tippy from '@tippyjs/react';
+
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
-import Tippy from '@tippyjs/react';
 import _ from 'lodash';
+
+import { GlobalContext } from '../providers/Global';
 
 import {
   ITokenData,
@@ -14,7 +18,6 @@ import {
   ITokensData,
   IfaceInitialBalanceData,
 } from '../interfaces/tokens';
-import { GlobalContext } from '../providers/Global';
 
 import Button from '../components/Button';
 import Modal from '../components/Modal';
@@ -29,7 +32,6 @@ import IconToken from '../components/IconToken';
 import Confirmation from '../components/Confirmation';
 import Icon from '../components/Icon';
 
-import getErrorMessage from '../content/errors';
 import {
   checkAllowanceHTS,
   getTokenBalance,
@@ -47,6 +49,14 @@ import {
 import { getTransactionSettings } from '../utils/transactionUtils';
 import { formatIcons } from '../utils/iconUtils';
 
+import usePoolsByToken from '../hooks/usePoolsByToken';
+import useTokensByListIds from '../hooks/useTokensByListIds';
+import useTokensByFilter from '../hooks/useTokensByFilter';
+import ToasterWrapper from '../components/ToasterWrapper';
+
+import getErrorMessage from '../content/errors';
+import { generalFeesAndKeysWarning } from '../content/messages';
+
 import {
   MAX_UINT_ERC20,
   MAX_UINT_HTS,
@@ -54,13 +64,6 @@ import {
   REFRESH_TIME,
   ASYNC_SEARCH_THRESHOLD,
 } from '../constants';
-
-import { generalFeesAndKeysWarning } from '../content/messages';
-
-import usePoolsByToken from '../hooks/usePoolsByToken';
-import useTokensByListIds from '../hooks/useTokensByListIds';
-import useTokensByFilter from '../hooks/useTokensByFilter';
-import ToasterWrapper from '../components/ToasterWrapper';
 
 enum ADD_LIQUIDITY_TITLES {
   CREATE_POOL = 'Create pool',
@@ -73,6 +76,7 @@ const Create = () => {
   const { connection, sdk, tokensWhitelisted } = contextValue;
   const { userId, hashconnectConnectorInstance, connected, connectWallet, isHashpackLoading } =
     connection;
+
   const { token0, token1 } = useParams();
   const navigate = useNavigate();
 
@@ -237,6 +241,7 @@ const Create = () => {
     return tokenB && tokenBAmount && new BigNumber(tokenBAmount).gt(new BigNumber(tokenB));
   }, [tokenBalances, createPairData]);
 
+  // Handlers
   const handleInputChange = useCallback(
     (value: string, name: string, inputSelectedPoolData: IPoolData = selectedPoolData) => {
       const { tokenA, tokenB } = tokensData;

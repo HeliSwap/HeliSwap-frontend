@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
-import toast from 'react-hot-toast';
 import { useParams } from 'react-router-dom';
+
+import toast from 'react-hot-toast';
 import Tippy from '@tippyjs/react';
+
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
+
+import { GlobalContext } from '../providers/Global';
 
 import {
   ITokenData,
@@ -13,7 +17,6 @@ import {
   IfaceInitialBalanceData,
   IPoolData,
 } from '../interfaces/tokens';
-import { GlobalContext } from '../providers/Global';
 
 import Button from '../components/Button';
 import Loader from '../components/Loader';
@@ -30,7 +33,6 @@ import Confirmation from '../components/Confirmation';
 import IconToken from '../components/IconToken';
 import ToasterWrapper from '../components/ToasterWrapper';
 
-import getErrorMessage from '../content/errors';
 import {
   checkAllowanceHTS,
   getTokenBalance,
@@ -52,13 +54,15 @@ import {
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
 
-import { MAX_UINT_ERC20, MAX_UINT_HTS, REFRESH_TIME, ASYNC_SEARCH_THRESHOLD } from '../constants';
-
 import useTokensByListIds from '../hooks/useTokensByListIds';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import usePoolsByToken from '../hooks/usePoolsByToken';
 import useTokensByFilter from '../hooks/useTokensByFilter';
+
+import getErrorMessage from '../content/errors';
 import { generalFeesAndKeysWarning } from '../content/messages';
+
+import { MAX_UINT_ERC20, MAX_UINT_HTS, REFRESH_TIME, ASYNC_SEARCH_THRESHOLD } from '../constants';
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
@@ -112,6 +116,7 @@ const Swap = () => {
     false,
     tokensWhitelistedIds,
   );
+
   //Get pools by token A
   const { filteredPools: filteredPoolsDataTokenA } = usePoolsByToken(
     {
@@ -154,6 +159,7 @@ const Swap = () => {
     },
     [loadFilteredTokens],
   );
+
   const initialSwapData: ISwapTokenData = {
     amountIn: '',
     amountOut: '',
@@ -378,6 +384,7 @@ const Swap = () => {
     ) : null;
   }, [bestPath, mergedTokensData, tokenInIsNative, tokenOutIsNative, mergedPoolsData]);
 
+  // Handlers
   const handleAssociateClick = async (token: ITokenData) => {
     setLoadingAssociate(true);
 

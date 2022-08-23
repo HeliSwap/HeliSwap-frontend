@@ -1,10 +1,10 @@
 import { useState, useContext, useEffect, useMemo } from 'react';
-import { GlobalContext } from '../providers/Global';
-import Tippy from '@tippyjs/react';
 import { Link } from 'react-router-dom';
+
+import Tippy from '@tippyjs/react';
 import _ from 'lodash';
 
-import { REFRESH_TIME, ASYNC_SEARCH_THRESHOLD } from '../constants';
+import { GlobalContext } from '../providers/Global';
 
 import { PageViews } from '../interfaces/common';
 import { IPoolExtendedData } from '../interfaces/tokens';
@@ -20,6 +20,8 @@ import { filterPoolsByPattern } from '../utils/poolUtils';
 import usePoolsByUser from '../hooks/usePoolsByUser';
 import usePoolsByFilter from '../hooks/usePoolsByFilter';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
+
+import { REFRESH_TIME, ASYNC_SEARCH_THRESHOLD } from '../constants';
 
 interface IPoolsProps {
   itemsPerPage: number;
@@ -97,6 +99,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     [PageViews.MY_POOLS]: 'My positions',
   };
 
+  // Handlers
   const handleTabItemClick = (currentView: PageViews) => {
     setCurrentView(currentView);
   };
@@ -131,6 +134,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     setSearchingResults(false);
   }, [filteredPools]);
 
+  // Render functions
   const renderEmptyPoolsState = (infoMessage: string) => (
     <div className="text-center mt-8">
       <p className="text-small">{infoMessage}</p>

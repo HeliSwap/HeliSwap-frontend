@@ -12,8 +12,9 @@ import Icon from './Icon';
 import { formatStringETHtoPriceFormatted, formatStringToPrice } from '../utils/numberUtils';
 import { formatIcons } from '../utils/iconUtils';
 
-import { POOLS_FEE } from '../constants';
 import { generalFeesAndKeysWarning } from '../content/messages';
+
+import { POOLS_FEE } from '../constants';
 
 interface IPoolInfoProps {
   poolData: IPoolExtendedData;

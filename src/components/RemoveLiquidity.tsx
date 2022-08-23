@@ -1,9 +1,13 @@
 import React, { useEffect, useState, useContext } from 'react';
+
 import toast from 'react-hot-toast';
 import Tippy from '@tippyjs/react';
+
 import { hethers } from '@hashgraph/hethers';
-import { IPoolData } from '../interfaces/tokens';
+
 import { GlobalContext } from '../providers/Global';
+
+import { IPoolData } from '../interfaces/tokens';
 
 import Button from './Button';
 import IconToken from './IconToken';
@@ -16,9 +20,8 @@ import PageHeader from './PageHeader';
 import TransactionSettingsModalContent from './Modals/TransactionSettingsModalContent';
 import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
 import Modal from './Modal';
-
-import { MAX_UINT_ERC20, SLIDER_INITIAL_VALUE } from '../constants';
-import getErrorMessage from '../content/errors';
+import Confirmation from './Confirmation';
+import ToasterWrapper from './ToasterWrapper';
 
 import {
   formatStringWeiToStringEther,
@@ -38,8 +41,10 @@ import {
   INITIAL_SWAP_SLIPPAGE_TOLERANCE,
 } from '../utils/transactionUtils';
 import { formatIcons } from '../utils/iconUtils';
-import Confirmation from './Confirmation';
-import ToasterWrapper from './ToasterWrapper';
+
+import getErrorMessage from '../content/errors';
+
+import { MAX_UINT_ERC20, SLIDER_INITIAL_VALUE } from '../constants';
 
 interface IRemoveLiquidityProps {
   pairData: IPoolData;
@@ -77,6 +82,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
   const [loadingApprove, setLoadingApprove] = useState(false);
 
+  // Handlers
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
