@@ -41,6 +41,15 @@ const Sidebar = () => {
             </span>
             <span className="ms-4 d-none d-xxxl-inline-block">Pools</span>
           </NavLink>
+          <NavLink
+            className={({ isActive }) => (isActive ? 'link-menu is-active mt-4' : 'link-menu mt-4')}
+            to="/farms"
+          >
+            <span className="icon-menu">
+              <Icon color="gray" name="farms" />
+            </span>
+            <span className="ms-4 d-none d-xxxl-inline-block">Farms</span>
+          </NavLink>
         </div>
 
         <div className="position-relative">
