@@ -401,7 +401,7 @@ const Swap = () => {
       } = receipt;
 
       if (!success) {
-        toast(getErrorMessage(error.status ? error.status : error));
+        toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         const tokens = await getUserAssociatedTokens(userId);
         setUserAssociatedTokens(tokens);
@@ -435,7 +435,7 @@ const Swap = () => {
       } = receipt;
 
       if (!success) {
-        toast(getErrorMessage(error.status ? error.status : error));
+        toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         setApproved(true);
         toast.success('Success! Token was approved.');
