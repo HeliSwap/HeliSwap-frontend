@@ -60,7 +60,7 @@ export interface IPoolData {
   volume24h: string;
   fee0?: string;
   fee1?: string;
-  hasProblematicToken: boolean;
+  hasProblematicToken?: boolean;
 }
 
 export interface IPoolExtendedData extends IPoolData {
@@ -79,6 +79,59 @@ export interface IPoolExtendedData extends IPoolData {
   feesStr?: string;
   tokensPriceEvaluated?: boolean;
   [key: string]: any;
+}
+
+export interface IFarmDataRaw {
+  address: string;
+  poolData: IPoolData;
+  totalStaked: string;
+  rewardsData: IRewardRaw[];
+  stakingTokenAddress: string;
+  userStakingData?: IUserStakingDataRaw;
+}
+
+export interface IFarmData extends IFarmDataRaw {
+  totalStakedUSD: string;
+  rewardsData: IReward[];
+  userStakingData?: IUserStakingData;
+  APR: string;
+  totalRewardsUSD: string;
+  campaignEndDate: number;
+}
+
+export interface IRewardRaw {
+  address: string;
+  symbol: string;
+  decimals: number;
+  totalAmount: string;
+  duration: number;
+  totalAccumulated: string;
+  rewardEnd: number;
+}
+
+export interface IReward extends IRewardRaw {
+  totalAmountUSD: string;
+  totalAccumulatedUSD: string;
+}
+
+export interface IUserStakingDataRaw {
+  stakedAmount: string;
+  rewardsAccumulated: {
+    [key: string]: string;
+  };
+  [key: string]: any;
+}
+
+export interface IUserStakingData extends IUserStakingDataRaw {
+  userStakedUSD: string;
+  rewardsAccumulatedUSD: {
+    [key: string]: string;
+  };
+}
+export interface IUserReward {
+  address: string;
+  symbol: string;
+  pendingAmount: string;
 }
 
 export enum TokenType {
