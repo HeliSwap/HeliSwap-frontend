@@ -12,7 +12,7 @@ import FarmRow from '../components/FarmRow';
 import useFarms from '../hooks/useFarms';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 
-import { REFRESH_TIME } from '../constants';
+import { useQueryOptions, useQueryOptionsPolling } from '../constants';
 
 interface IFarmsProps {
   itemsPerPage: number;
@@ -31,20 +31,12 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
   const [showFarmDetails, setShowFarmDetails] = useState(false);
 
   const { poolsByTokenList: pools } = usePoolsByTokensList(
-    {
-      fetchPolicy: 'network-only',
-      pollInterval: REFRESH_TIME,
-    },
+    useQueryOptionsPolling,
     true,
     tokensWhitelistedAddresses,
   );
 
-  const { farms } = useFarms(
-    {
-      fetchPolicy: 'network-only',
-    },
-    pools,
-  );
+  const { farms } = useFarms(useQueryOptions, pools);
 
   // Handlers
   const handlePageClick = (event: any) => {
