@@ -61,8 +61,13 @@ import {
   MAX_UINT_ERC20,
   MAX_UINT_HTS,
   POOLS_FEE,
-  REFRESH_TIME,
   ASYNC_SEARCH_THRESHOLD,
+  initialTokensData,
+  initialCreateData,
+  initialApproveData,
+  initialNeedApprovalData,
+  useQueryOptionsPolling,
+  useQueryOptions,
 } from '../constants';
 
 enum ADD_LIQUIDITY_TITLES {
@@ -88,12 +93,6 @@ const Create = () => {
   const [showModalB, setShowModalB] = useState(false);
   const [showModalConfirmProvide, setShowModalConfirmProvide] = useState(false);
 
-  // TODO - Move initial states into external folder
-  const initialTokensData = {
-    tokenA: {} as ITokenData,
-    tokenB: {} as ITokenData,
-  };
-
   // State for token inputs
   const [tokensData, setTokensData] = useState<ITokensData>(initialTokensData);
   const [inputTokenA, setInputTokenA] = useState(true);
@@ -104,28 +103,10 @@ const Create = () => {
   const [selectedTokensIds, setSelectedTokensIds] = useState<string[]>([]);
   const [mergedTokensData, setMergedTokensData] = useState<ITokenData[]>([] as ITokenData[]);
 
-  const initialCreateData: ICreatePairData = {
-    tokenAAmount: '',
-    tokenBAmount: '',
-    tokenAId: '',
-    tokenBId: '',
-    tokenADecimals: 18,
-    tokenBDecimals: 18,
-  };
-
   // State for Create/Provide
   const [createPairData, setCreatePairData] = useState<ICreatePairData>(initialCreateData);
   const tokenAValue = createPairData.tokenAAmount;
   const tokenBValue = createPairData.tokenBAmount;
-  const initialApproveData = {
-    tokenA: false,
-    tokenB: false,
-  };
-
-  const initialNeedApprovalData = {
-    tokenA: true,
-    tokenB: true,
-  };
 
   // State for approved
   const [approved, setApproved] = useState(initialApproveData);
@@ -158,31 +139,24 @@ const Create = () => {
   // State for preset tokens from choosen pool
   const [tokensDerivedFromPool, setTokensDerivedFromPool] = useState(false);
 
-  // TODO - Move useQueryOptions to separate var
   //Get pools by token A
   const { filteredPools: poolsData } = usePoolsByToken(
-    {
-      fetchPolicy: 'network-only',
-      pollInterval: REFRESH_TIME,
-    },
+    useQueryOptionsPolling,
     tokensData.tokenA.address || (process.env.REACT_APP_WHBAR_ADDRESS as string),
     false,
   );
 
   //Get whitelisted tokens
-  const { loading: loadingTDL, tokens: tokenDataList } = useTokensByListIds(tokensWhitelistedIds, {
-    fetchPolicy: 'network-only',
-  });
+  const { loading: loadingTDL, tokens: tokenDataList } = useTokensByListIds(
+    tokensWhitelistedIds,
+    useQueryOptions,
+  );
 
   // Get selected tokens
-  const { tokens: selectedTokens } = useTokensByListIds(selectedTokensIds, {
-    fetchPolicy: 'network-only',
-  });
+  const { tokens: selectedTokens } = useTokensByListIds(selectedTokensIds, useQueryOptions);
 
   //Get tokens by filter
-  const { filteredTokens, loadFilteredTokens } = useTokensByFilter({
-    fetchPolicy: 'network-only',
-  });
+  const { filteredTokens, loadFilteredTokens } = useTokensByFilter(useQueryOptions);
 
   // Memoizing functions
   const searchTokensFunc = useMemo(
@@ -558,7 +532,6 @@ const Create = () => {
         }`,
       );
     }
-    //TODO: Additional request will be needed in order to get info regarding pool shares
   }, [tokensData, poolsData, navigate, invalidTokenData]);
 
   // Check for address in url
@@ -654,7 +627,7 @@ const Create = () => {
     tokensData,
   ]);
 
-  // TODO - Describe
+  // Update whitelisted tokens ids when whitelisted tokens list changes
   useEffect(() => {
     if (tokensWhitelisted && tokensWhitelisted.length !== 0) {
       const tokensWhitelistedIds = tokensWhitelisted.map(item => item.address);
@@ -662,6 +635,7 @@ const Create = () => {
     }
   }, [tokensWhitelisted]);
 
+  //Merge token lists comming from BE
   useEffect(() => {
     const mergedTokensData = _.unionBy(tokenDataList, selectedTokens, filteredTokens, 'address');
     setMergedTokensData(mergedTokensData);
