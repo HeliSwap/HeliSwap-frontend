@@ -21,7 +21,12 @@ import usePoolsByUser from '../hooks/usePoolsByUser';
 import usePoolsByFilter from '../hooks/usePoolsByFilter';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 
-import { REFRESH_TIME, ASYNC_SEARCH_THRESHOLD } from '../constants';
+import {
+  ASYNC_SEARCH_THRESHOLD,
+  poolsPageInitialCurrentView,
+  useQueryOptionsPolling,
+  useQueryOptions,
+} from '../constants';
 
 interface IPoolsProps {
   itemsPerPage: number;
@@ -43,30 +48,18 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const [inputValue, setInputValue] = useState('');
   const [searchingResults, setSearchingResults] = useState(false);
 
-  // TODO - Move initial states into external folder
-  const initialCurrentView: PageViews = PageViews.ALL_POOLS;
-  const [currentView, setCurrentView] = useState<PageViews>(initialCurrentView);
+  const [currentView, setCurrentView] = useState<PageViews>(poolsPageInitialCurrentView);
 
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
 
-  // TODO - Move useQueryOptions to separate var
   const {
     poolsByTokenList: pools,
     loadingPoolsByTokenList: loadingPools,
     errorPoolsByTokenList: errorPoools,
-  } = usePoolsByTokensList(
-    {
-      fetchPolicy: 'network-only',
-      pollInterval: REFRESH_TIME,
-    },
-    true,
-    tokensWhitelistedAddresses,
-  );
+  } = usePoolsByTokensList(useQueryOptionsPolling, true, tokensWhitelistedAddresses);
 
   const { filteredPools, filteredPoolsLoading, loadExtraPools } = usePoolsByFilter(
-    {
-      fetchPolicy: 'network-only',
-    },
+    useQueryOptions,
     true,
     pools,
   );
@@ -75,14 +68,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     error: errorPooolsByUser,
     loading: loadingPoolsByUser,
     poolsByUser,
-  } = usePoolsByUser(
-    {
-      fetchPolicy: 'network-only',
-      pollInterval: REFRESH_TIME,
-    },
-    userId,
-    pools,
-  );
+  } = usePoolsByUser(useQueryOptionsPolling, userId, pools);
 
   const searchFunc = useMemo(
     () => (value: string) => {
@@ -106,7 +92,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     setCurrentView(currentView);
   };
 
-  // TODO - Describe
+  // Merge whitelisted and pools by filter arrays
   useEffect(() => {
     if (
       (pools.length !== 0 || filteredPools.length !== 0) &&
@@ -127,12 +113,14 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     setHavePools(pools && pools.length !== 0);
   }, [pools, filteredPools, inputValue, filteredPoolsLoading, loadingPools, searchingResults]);
 
+  //Update user pools to show
   useEffect(() => {
     if (poolsByUser) setUserPoolsToShow(poolsByUser);
 
     setHaveUserPools(poolsByUser && poolsByUser.length !== 0);
   }, [poolsByUser]);
 
+  //Update searching(loading) state for searching pools by filter
   useEffect(() => {
     setSearchingResults(false);
   }, [filteredPools]);

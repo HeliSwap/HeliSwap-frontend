@@ -1,6 +1,7 @@
 import { WatchQueryFetchPolicy } from '@apollo/client';
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
+import { PageViews } from '../interfaces/common';
 import { ICreatePairData, ITokenData } from '../interfaces/tokens';
 
 export const MAX_UINT_ERC20 = hethers.constants.MaxUint256;
@@ -70,6 +71,8 @@ export const initialNeedApprovalData = {
   tokenA: true,
   tokenB: true,
 };
+
+export const poolsPageInitialCurrentView: PageViews = PageViews.ALL_POOLS;
 
 export const useQueryOptions = {
   fetchPolicy: 'network-only' as WatchQueryFetchPolicy,
