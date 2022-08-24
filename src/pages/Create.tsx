@@ -62,7 +62,7 @@ import {
   MAX_UINT_HTS,
   POOLS_FEE,
   ASYNC_SEARCH_THRESHOLD,
-  initialTokensData,
+  initialTokensDataCreate,
   initialCreateData,
   initialApproveData,
   initialNeedApprovalData,
@@ -94,7 +94,7 @@ const Create = () => {
   const [showModalConfirmProvide, setShowModalConfirmProvide] = useState(false);
 
   // State for token inputs
-  const [tokensData, setTokensData] = useState<ITokensData>(initialTokensData);
+  const [tokensData, setTokensData] = useState<ITokensData>(initialTokensDataCreate);
   const [inputTokenA, setInputTokenA] = useState(true);
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
   const [loadingAssociate, setLoadingAssociate] = useState(false);

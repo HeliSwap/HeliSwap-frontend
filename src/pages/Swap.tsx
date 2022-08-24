@@ -11,7 +11,6 @@ import { GlobalContext } from '../providers/Global';
 
 import {
   ITokenData,
-  ISwapTokenData,
   TokenType,
   ITokensData,
   IfaceInitialBalanceData,
@@ -62,7 +61,15 @@ import useTokensByFilter from '../hooks/useTokensByFilter';
 import getErrorMessage from '../content/errors';
 import { generalFeesAndKeysWarning } from '../content/messages';
 
-import { MAX_UINT_ERC20, MAX_UINT_HTS, REFRESH_TIME, ASYNC_SEARCH_THRESHOLD } from '../constants';
+import {
+  MAX_UINT_ERC20,
+  MAX_UINT_HTS,
+  ASYNC_SEARCH_THRESHOLD,
+  initialTokensDataSwap,
+  initialSwapData,
+  useQueryOptionsPolling,
+  useQueryOptions,
+} from '../constants';
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
@@ -83,14 +90,8 @@ const Swap = () => {
   const [showModalB, setShowModalB] = useState(false);
   const [showModalConfirmSwap, setShowModalConfirmSwap] = useState(false);
 
-  // TODO - Move initial states into external folder
-  const initialTokensData: ITokensData = {
-    tokenA: NATIVE_TOKEN,
-    tokenB: {} as ITokenData,
-  };
-
   // State for token inputs
-  const [tokensData, setTokensData] = useState<ITokensData>(initialTokensData);
+  const [tokensData, setTokensData] = useState<ITokensData>(initialTokensDataSwap);
   const [tokenInIsNative, setTokenInIsNative] = useState(false);
   const [tokenOutIsNative, setTokenOutIsNative] = useState(false);
   const [willWrapTokens, setWillWrapTokens] = useState(false);
@@ -104,11 +105,6 @@ const Swap = () => {
   const [mergedTokensData, setMergedTokensData] = useState<ITokenData[]>([] as ITokenData[]);
 
   const [selectedTokensIds, setSelectedTokensIds] = useState<string[]>([]);
-
-  const initialSwapData: ISwapTokenData = {
-    amountIn: '',
-    amountOut: '',
-  };
 
   // State for Swap
   const [swapData, setSwapData] = useState(initialSwapData);
@@ -146,53 +142,36 @@ const Swap = () => {
   // State for preset tokens from choosen pool
   const [tokensDerivedFromPool, setTokensDerivedFromPool] = useState(false);
 
-  // TODO - Move useQueryOptions to separate var
   //Get whitelisted pools
   const {
     poolsByTokenList: whitelistedPoolsData,
     loadingPoolsByTokenList: loadingPools,
     refetchPoolsByTokenList: refetch,
-  } = usePoolsByTokensList(
-    {
-      fetchPolicy: 'network-only',
-      pollInterval: REFRESH_TIME,
-    },
-    false,
-    tokensWhitelistedIds,
-  );
+  } = usePoolsByTokensList(useQueryOptionsPolling, false, tokensWhitelistedIds);
 
   //Get pools by token A
   const { filteredPools: filteredPoolsDataTokenA } = usePoolsByToken(
-    {
-      fetchPolicy: 'network-only',
-      pollInterval: REFRESH_TIME,
-    },
+    useQueryOptionsPolling,
     tokensData.tokenA.address || (process.env.REACT_APP_WHBAR_ADDRESS as string),
     false,
   );
 
   //Get pools by token B
   const { filteredPools: filteredPoolsDataTokenB } = usePoolsByToken(
-    {
-      fetchPolicy: 'network-only',
-      pollInterval: REFRESH_TIME,
-    },
+    useQueryOptionsPolling,
     tokensData.tokenB.address || (process.env.REACT_APP_WHBAR_ADDRESS as string),
     true,
   );
 
   //Get whitelisted tokens
-  const { loading: loadingTDL, tokens: tokenDataList } = useTokensByListIds(tokensWhitelistedIds, {
-    fetchPolicy: 'network-only',
-  });
+  const { loading: loadingTDL, tokens: tokenDataList } = useTokensByListIds(
+    tokensWhitelistedIds,
+    useQueryOptions,
+  );
 
-  const { tokens: selectedTokens } = useTokensByListIds(selectedTokensIds, {
-    fetchPolicy: 'network-only',
-  });
+  const { tokens: selectedTokens } = useTokensByListIds(selectedTokensIds, useQueryOptions);
 
-  const { filteredTokens, loadFilteredTokens } = useTokensByFilter({
-    fetchPolicy: 'network-only',
-  });
+  const { filteredTokens, loadFilteredTokens } = useTokensByFilter(useQueryOptions);
 
   // Memoizing functions
   const tokenAFilteredData = useMemo(() => {
@@ -495,7 +474,7 @@ const Swap = () => {
         toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         setSwapData(initialSwapData);
-        setTokensData(initialTokensData);
+        setTokensData(initialTokensDataSwap);
         setApproved(false);
         refetch();
         toast.success('Success! Tokens were swapped.');
@@ -689,7 +668,7 @@ const Swap = () => {
     }
   }, [mergedPoolsData, mergedTokensData, token0, token1, tokensDerivedFromPool, userId]);
 
-  // TODO - describe funtionality
+  // Update whitelisted tokens ids when whitelisted tokens list changes
   useEffect(() => {
     if (tokensWhitelisted && tokensWhitelisted.length !== 0) {
       const tokensWhitelistedIds = tokensWhitelisted.map(item => item.address);
@@ -697,6 +676,7 @@ const Swap = () => {
     }
   }, [tokensWhitelisted]);
 
+  //Merge pools comming from BE
   useEffect(() => {
     const mergedPoolsData = _.unionBy(
       whitelistedPoolsData,
@@ -707,6 +687,7 @@ const Swap = () => {
     setMergedPoolsData(mergedPoolsData);
   }, [whitelistedPoolsData, filteredPoolsDataTokenA, filteredPoolsDataTokenB]);
 
+  //Merge tokens comming from BE
   useEffect(() => {
     const mergedTokensData = _.unionBy(tokenDataList, selectedTokens, filteredTokens, 'address');
     setMergedTokensData(mergedTokensData);

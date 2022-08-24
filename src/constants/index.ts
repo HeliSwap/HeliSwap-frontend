@@ -2,7 +2,8 @@ import { WatchQueryFetchPolicy } from '@apollo/client';
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
 import { PageViews } from '../interfaces/common';
-import { ICreatePairData, ITokenData } from '../interfaces/tokens';
+import { ICreatePairData, ISwapTokenData, ITokenData, ITokensData } from '../interfaces/tokens';
+import { NATIVE_TOKEN } from '../utils/tokenUtils';
 
 export const MAX_UINT_ERC20 = hethers.constants.MaxUint256;
 export const MAX_UINT_HTS = 15908979783.594148;
@@ -48,8 +49,13 @@ export enum SORT_DIRECTION {
 
 export const ASYNC_SEARCH_THRESHOLD = 2;
 
-export const initialTokensData = {
+export const initialTokensDataCreate = {
   tokenA: {} as ITokenData,
+  tokenB: {} as ITokenData,
+};
+
+export const initialTokensDataSwap: ITokensData = {
+  tokenA: NATIVE_TOKEN,
   tokenB: {} as ITokenData,
 };
 
@@ -60,6 +66,11 @@ export const initialCreateData: ICreatePairData = {
   tokenBId: '',
   tokenADecimals: 18,
   tokenBDecimals: 18,
+};
+
+export const initialSwapData: ISwapTokenData = {
+  amountIn: '',
+  amountOut: '',
 };
 
 export const initialApproveData = {
