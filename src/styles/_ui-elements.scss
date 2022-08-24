@@ -143,7 +143,19 @@
   border-radius: 50%;
 
   &.is-running {
-    background-color: #29bc63;
+    background-color: $positive-400;
+  }
+}
+
+.icon-campaign-status {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: $danger;
+
+  &.is-active {
+    background-color: $positive-400;
   }
 }
 
@@ -191,6 +203,18 @@
   padding: 16px;
 }
 
+.container-blue-neutral {
+  background-color: #25255f;
+}
+
+.container-blue-neutral-800 {
+  background-color: $blue-neutral-800;
+}
+
+.container-blue-neutral-900 {
+  background-color: $blue-neutral-900;
+}
+
 .container-input-token {
   background-color: $blue-neutral-700;
   border-radius: $border-radius;
@@ -222,6 +246,11 @@
     flex: 0 1 250px;
     @include transition-color;
 
+    &.is-compact {
+      max-width: 190px;
+      flex: 0 1 190px;
+    }
+
     &::placeholder {
       color: $blue-neutral-100;
     }
@@ -242,7 +271,7 @@
   width: 100%;
 }
 
-.container-pools {
+.container-max-with-1042 {
   width: 100%;
   max-width: 1042px;
   margin: 0 24px;
@@ -281,6 +310,12 @@
   @include media-breakpoint-up(xxxl) {
     left: 110px;
   }
+}
+
+.container-campaign-status {
+  border: 1px solid $blue-neutral-500;
+  border-radius: $border-radius;
+  padding: 4px 8px;
 }
 
 /* Tables */
