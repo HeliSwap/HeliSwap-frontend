@@ -43,8 +43,13 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const [inputValue, setInputValue] = useState('');
   const [searchingResults, setSearchingResults] = useState(false);
 
+  // TODO - Move initial states into external folder
+  const initialCurrentView: PageViews = PageViews.ALL_POOLS;
+  const [currentView, setCurrentView] = useState<PageViews>(initialCurrentView);
+
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
 
+  // TODO - Move useQueryOptions to separate var
   const {
     poolsByTokenList: pools,
     loadingPoolsByTokenList: loadingPools,
@@ -79,9 +84,6 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     pools,
   );
 
-  const initialCurrentView: PageViews = PageViews.ALL_POOLS;
-  const [currentView, setCurrentView] = useState<PageViews>(initialCurrentView);
-
   const searchFunc = useMemo(
     () => (value: string) => {
       if (value.length > ASYNC_SEARCH_THRESHOLD) loadExtraPools({ variables: { keyword: value } });
@@ -104,6 +106,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     setCurrentView(currentView);
   };
 
+  // TODO - Describe
   useEffect(() => {
     if (
       (pools.length !== 0 || filteredPools.length !== 0) &&
