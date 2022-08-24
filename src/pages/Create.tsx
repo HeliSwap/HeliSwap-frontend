@@ -88,6 +88,7 @@ const Create = () => {
   const [showModalB, setShowModalB] = useState(false);
   const [showModalConfirmProvide, setShowModalConfirmProvide] = useState(false);
 
+  // TODO - Move initial states into external folder
   const initialTokensData = {
     tokenA: {} as ITokenData,
     tokenB: {} as ITokenData,
@@ -102,65 +103,6 @@ const Create = () => {
   //State for tokens data
   const [selectedTokensIds, setSelectedTokensIds] = useState<string[]>([]);
   const [mergedTokensData, setMergedTokensData] = useState<ITokenData[]>([] as ITokenData[]);
-
-  //Get pools by token A
-  const { filteredPools: poolsData } = usePoolsByToken(
-    {
-      fetchPolicy: 'network-only',
-      pollInterval: REFRESH_TIME,
-    },
-    tokensData.tokenA.address || (process.env.REACT_APP_WHBAR_ADDRESS as string),
-    false,
-  );
-
-  //Get whitelisted tokens
-  const { loading: loadingTDL, tokens: tokenDataList } = useTokensByListIds(tokensWhitelistedIds, {
-    fetchPolicy: 'network-only',
-  });
-
-  // Get selected tokens
-  const { tokens: selectedTokens } = useTokensByListIds(selectedTokensIds, {
-    fetchPolicy: 'network-only',
-  });
-
-  //Get tokens by filter
-  const { filteredTokens, loadFilteredTokens } = useTokensByFilter({
-    fetchPolicy: 'network-only',
-  });
-
-  const searchTokensFunc = useMemo(
-    () => (value: string) => {
-      if (value.length > ASYNC_SEARCH_THRESHOLD)
-        loadFilteredTokens({ variables: { keyword: value } });
-    },
-    [loadFilteredTokens],
-  );
-
-  const getFilteredTokens = (mergedTokensData: ITokenData[], filterBy: ITokenData) => {
-    return (
-      mergedTokensData.filter((token: ITokenData) => {
-        if (
-          filterBy.type === TokenType.HBAR ||
-          filterBy.address === process.env.REACT_APP_WHBAR_ADDRESS
-        ) {
-          return (
-            token.type !== TokenType.HBAR && token.address !== process.env.REACT_APP_WHBAR_ADDRESS
-          );
-        }
-        return token.address !== filterBy.address;
-      }) || []
-    );
-  };
-
-  const tokenAFilteredData = useMemo(
-    () => getFilteredTokens(mergedTokensData, tokensData.tokenB),
-    [mergedTokensData, tokensData.tokenB],
-  );
-
-  const tokenBFilteredData = useMemo(
-    () => getFilteredTokens(mergedTokensData, tokensData.tokenA),
-    [mergedTokensData, tokensData.tokenA],
-  );
 
   const initialCreateData: ICreatePairData = {
     tokenAAmount: '',
@@ -215,6 +157,67 @@ const Create = () => {
 
   // State for preset tokens from choosen pool
   const [tokensDerivedFromPool, setTokensDerivedFromPool] = useState(false);
+
+  // TODO - Move useQueryOptions to separate var
+  //Get pools by token A
+  const { filteredPools: poolsData } = usePoolsByToken(
+    {
+      fetchPolicy: 'network-only',
+      pollInterval: REFRESH_TIME,
+    },
+    tokensData.tokenA.address || (process.env.REACT_APP_WHBAR_ADDRESS as string),
+    false,
+  );
+
+  //Get whitelisted tokens
+  const { loading: loadingTDL, tokens: tokenDataList } = useTokensByListIds(tokensWhitelistedIds, {
+    fetchPolicy: 'network-only',
+  });
+
+  // Get selected tokens
+  const { tokens: selectedTokens } = useTokensByListIds(selectedTokensIds, {
+    fetchPolicy: 'network-only',
+  });
+
+  //Get tokens by filter
+  const { filteredTokens, loadFilteredTokens } = useTokensByFilter({
+    fetchPolicy: 'network-only',
+  });
+
+  // Memoizing functions
+  const searchTokensFunc = useMemo(
+    () => (value: string) => {
+      if (value.length > ASYNC_SEARCH_THRESHOLD)
+        loadFilteredTokens({ variables: { keyword: value } });
+    },
+    [loadFilteredTokens],
+  );
+
+  const getFilteredTokens = (mergedTokensData: ITokenData[], filterBy: ITokenData) => {
+    return (
+      mergedTokensData.filter((token: ITokenData) => {
+        if (
+          filterBy.type === TokenType.HBAR ||
+          filterBy.address === process.env.REACT_APP_WHBAR_ADDRESS
+        ) {
+          return (
+            token.type !== TokenType.HBAR && token.address !== process.env.REACT_APP_WHBAR_ADDRESS
+          );
+        }
+        return token.address !== filterBy.address;
+      }) || []
+    );
+  };
+
+  const tokenAFilteredData = useMemo(
+    () => getFilteredTokens(mergedTokensData, tokensData.tokenB),
+    [mergedTokensData, tokensData.tokenB],
+  );
+
+  const tokenBFilteredData = useMemo(
+    () => getFilteredTokens(mergedTokensData, tokensData.tokenA),
+    [mergedTokensData, tokensData.tokenA],
+  );
 
   const invalidTokenData = useCallback(() => {
     const { tokenA, tokenB } = tokensData;
@@ -651,6 +654,7 @@ const Create = () => {
     tokensData,
   ]);
 
+  // TODO - Describe
   useEffect(() => {
     if (tokensWhitelisted && tokensWhitelisted.length !== 0) {
       const tokensWhitelistedIds = tokensWhitelisted.map(item => item.address);
@@ -663,12 +667,46 @@ const Create = () => {
     setMergedTokensData(mergedTokensData);
   }, [tokenDataList, selectedTokens, filteredTokens]);
 
+  // Helper functions
   const getTokenIsAssociated = (token: ITokenData) => {
     const notHTS =
       Object.keys(token).length === 0 ||
       token.type === TokenType.HBAR ||
       token.type === TokenType.ERC20;
     return notHTS || userAssociatedTokens?.includes(token.hederaId);
+  };
+
+  const getPoolShare = () => {
+    if (Object.keys(selectedPoolData).length === 0) return '100';
+
+    //Calculating the pool share using one of the pool's provision tokens as no info for the LP token is available
+    const { token0Amount, token1Amount, token0 } = selectedPoolData;
+    const { tokenAAmount, tokenAId, tokenADecimals } = createPairData;
+
+    const token0Id =
+      provideNative && !tokenAId ? (process.env.REACT_APP_WHBAR_ADDRESS as string) : tokenAId;
+
+    const tokenATotalAmountBN =
+      token0 === idToAddress(token0Id) ? new BigNumber(token0Amount) : new BigNumber(token1Amount);
+
+    const tokenAAmountBN = formatStringToBigNumberWei(tokenAAmount, tokenADecimals);
+
+    return tokenAAmountBN
+      .div(tokenATotalAmountBN.plus(tokenAAmountBN))
+      .times(new BigNumber(100))
+      .toFixed(4);
+  };
+
+  const getProvideButtonLabel = () => {
+    const {
+      tokenA: { symbol: symbolA },
+      tokenB: { symbol: symbolB },
+    } = tokensData;
+
+    if (getInsufficientTokenA()) return `Insufficient ${symbolA} balance`;
+    if (getInsufficientTokenB()) return `Insufficient ${symbolB} balance`;
+    if (invalidTokenData()) return 'Invalid pool';
+    return tokensInSamePool ? 'Provide' : 'Create';
   };
 
   //Render methods
@@ -683,7 +721,7 @@ const Create = () => {
     }
   };
 
-  const getProvideSection = () => {
+  const renderProvideSection = () => {
     return (
       <div className="container-dark">
         <div className="mb-4 text-small text-bold">Enter amount</div>
@@ -791,15 +829,15 @@ const Create = () => {
             itemToExlude={tokensData.tokenA}
           />
         </Modal>
-        {getFeesInfo()}
+        {renderFeesInfo()}
         <hr className="my-4" />
-        {getTokensRatioSection()}
-        {getActionButtons()}
+        {renderTokensRatioSection()}
+        {renderActionButtons()}
       </div>
     );
   };
 
-  const getFeesInfo = () => {
+  const renderFeesInfo = () => {
     return (
       <div className="d-flex my-4 justify-content-between align-items-center ">
         <span className="text-small text-bold">Liquidity provider fee:</span>
@@ -817,7 +855,7 @@ const Create = () => {
     );
   };
 
-  const getTokensRatioSection = () => {
+  const renderTokensRatioSection = () => {
     return readyToProvide ? (
       <div className="my-4">
         <div className="mt-3 d-flex justify-content-around">
@@ -849,40 +887,7 @@ const Create = () => {
     ) : null;
   };
 
-  const getPoolShare = () => {
-    if (Object.keys(selectedPoolData).length === 0) return '100';
-
-    //Calculating the pool share using one of the pool's provision tokens as no info for the LP token is available
-    const { token0Amount, token1Amount, token0 } = selectedPoolData;
-    const { tokenAAmount, tokenAId, tokenADecimals } = createPairData;
-
-    const token0Id =
-      provideNative && !tokenAId ? (process.env.REACT_APP_WHBAR_ADDRESS as string) : tokenAId;
-
-    const tokenATotalAmountBN =
-      token0 === idToAddress(token0Id) ? new BigNumber(token0Amount) : new BigNumber(token1Amount);
-
-    const tokenAAmountBN = formatStringToBigNumberWei(tokenAAmount, tokenADecimals);
-
-    return tokenAAmountBN
-      .div(tokenATotalAmountBN.plus(tokenAAmountBN))
-      .times(new BigNumber(100))
-      .toFixed(4);
-  };
-
-  const getProvideButtonLabel = () => {
-    const {
-      tokenA: { symbol: symbolA },
-      tokenB: { symbol: symbolB },
-    } = tokensData;
-
-    if (getInsufficientTokenA()) return `Insufficient ${symbolA} balance`;
-    if (getInsufficientTokenB()) return `Insufficient ${symbolB} balance`;
-    if (invalidTokenData()) return 'Invalid pool';
-    return tokensInSamePool ? 'Provide' : 'Create';
-  };
-
-  const getActionButtons = () => {
+  const renderActionButtons = () => {
     return connected && !isHashpackLoading ? (
       <div className="mt-5">
         {!getTokenIsAssociated(tokensData.tokenA) ? (
@@ -971,7 +976,7 @@ const Create = () => {
               confirmTansaction={handleProvideConfirm}
               confirmButtonLabel="Confirm"
             >
-              {getProvideConfirmationModalContent()}
+              {renderProvideConfirmationModalContent()}
             </ConfirmTransactionModalContent>
           </Modal>
         ) : null}
@@ -985,7 +990,7 @@ const Create = () => {
     );
   };
 
-  const getProvideConfirmationModalContent = () => {
+  const renderProvideConfirmationModalContent = () => {
     const hasSelectedPool = Object.keys(selectedPoolData).length;
     const token0Symbol = hasSelectedPool ? selectedPoolData.token0Symbol : tokensData.tokenA.symbol;
     const token1Symbol = hasSelectedPool ? selectedPoolData.token1Symbol : tokensData.tokenB.symbol;
@@ -1027,7 +1032,7 @@ const Create = () => {
               </div>
             </div>
             <div className="mt-4 rounded border border-secondary justify-content-between">
-              {getTokensRatioSection()}
+              {renderTokensRatioSection()}
             </div>
             {renderWarningMessage()}
           </>
@@ -1045,7 +1050,7 @@ const Create = () => {
     <div className="d-flex justify-content-center">
       <div className="container-action">
         <PageHeader handleBackClick={handleBackClick} slippage="create" title={pageTitle} />
-        {getProvideSection()}
+        {renderProvideSection()}
         <ToasterWrapper />
       </div>
     </div>
