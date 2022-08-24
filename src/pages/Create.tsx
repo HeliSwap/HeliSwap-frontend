@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
-import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
+
+import toast from 'react-hot-toast';
+import Tippy from '@tippyjs/react';
+
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
-import Tippy from '@tippyjs/react';
 import _ from 'lodash';
+
+import { GlobalContext } from '../providers/Global';
 
 import {
   ITokenData,
@@ -14,7 +18,6 @@ import {
   ITokensData,
   IfaceInitialBalanceData,
 } from '../interfaces/tokens';
-import { GlobalContext } from '../providers/Global';
 
 import Button from '../components/Button';
 import Modal from '../components/Modal';
@@ -29,7 +32,6 @@ import IconToken from '../components/IconToken';
 import Confirmation from '../components/Confirmation';
 import Icon from '../components/Icon';
 
-import getErrorMessage from '../content/errors';
 import {
   checkAllowanceHTS,
   getTokenBalance,
@@ -47,20 +49,26 @@ import {
 import { getTransactionSettings } from '../utils/transactionUtils';
 import { formatIcons } from '../utils/iconUtils';
 
-import {
-  MAX_UINT_ERC20,
-  MAX_UINT_HTS,
-  POOLS_FEE,
-  REFRESH_TIME,
-  ASYNC_SEARCH_THRESHOLD,
-} from '../constants';
-
-import { generalFeesAndKeysWarning } from '../content/messages';
-
 import usePoolsByToken from '../hooks/usePoolsByToken';
 import useTokensByListIds from '../hooks/useTokensByListIds';
 import useTokensByFilter from '../hooks/useTokensByFilter';
 import ToasterWrapper from '../components/ToasterWrapper';
+
+import getErrorMessage from '../content/errors';
+import { generalFeesAndKeysWarning } from '../content/messages';
+
+import {
+  MAX_UINT_ERC20,
+  MAX_UINT_HTS,
+  POOLS_FEE,
+  ASYNC_SEARCH_THRESHOLD,
+  initialTokensDataCreate,
+  initialCreateData,
+  initialApproveData,
+  initialNeedApprovalData,
+  useQueryOptionsPolling,
+  useQueryOptions,
+} from '../constants';
 
 enum ADD_LIQUIDITY_TITLES {
   CREATE_POOL = 'Create pool',
@@ -73,6 +81,7 @@ const Create = () => {
   const { connection, sdk, tokensWhitelisted } = contextValue;
   const { userId, hashconnectConnectorInstance, connected, connectWallet, isHashpackLoading } =
     connection;
+
   const { token0, token1 } = useParams();
   const navigate = useNavigate();
 
@@ -84,13 +93,8 @@ const Create = () => {
   const [showModalB, setShowModalB] = useState(false);
   const [showModalConfirmProvide, setShowModalConfirmProvide] = useState(false);
 
-  const initialTokensData = {
-    tokenA: {} as ITokenData,
-    tokenB: {} as ITokenData,
-  };
-
   // State for token inputs
-  const [tokensData, setTokensData] = useState<ITokensData>(initialTokensData);
+  const [tokensData, setTokensData] = useState<ITokensData>(initialTokensDataCreate);
   const [inputTokenA, setInputTokenA] = useState(true);
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
   const [loadingAssociate, setLoadingAssociate] = useState(false);
@@ -99,31 +103,62 @@ const Create = () => {
   const [selectedTokensIds, setSelectedTokensIds] = useState<string[]>([]);
   const [mergedTokensData, setMergedTokensData] = useState<ITokenData[]>([] as ITokenData[]);
 
+  // State for Create/Provide
+  const [createPairData, setCreatePairData] = useState<ICreatePairData>(initialCreateData);
+  const tokenAValue = createPairData.tokenAAmount;
+  const tokenBValue = createPairData.tokenBAmount;
+
+  // State for approved
+  const [approved, setApproved] = useState(initialApproveData);
+  const [needApproval, setNeedApproval] = useState(initialNeedApprovalData);
+
+  // State for common pool data
+  const [selectedPoolData, setSelectedPoolData] = useState<IPoolData>({} as IPoolData);
+
+  // State for token balances
+  const initialBallanceData = useMemo(
+    () => ({
+      tokenA: undefined,
+      tokenB: undefined,
+    }),
+    [],
+  );
+
+  const [tokenBalances, setTokenBalances] = useState<IfaceInitialBalanceData>(initialBallanceData);
+
+  // Additional states for Providing/Creating pairs
+  const [readyToProvide, setReadyToProvide] = useState(false);
+  const [tokensInSamePool, setTokensInSamePool] = useState(false);
+  const [provideNative, setProvideNative] = useState(false);
+  const [pageTitle, setPageTitle] = useState(ADD_LIQUIDITY_TITLES.CREATE_POOL);
+
+  //State for loading data
+  const [loadingCreate, setLoadingCreate] = useState(false);
+  const [loadingApprove, setLoadingApprove] = useState(false);
+
+  // State for preset tokens from choosen pool
+  const [tokensDerivedFromPool, setTokensDerivedFromPool] = useState(false);
+
   //Get pools by token A
   const { filteredPools: poolsData } = usePoolsByToken(
-    {
-      fetchPolicy: 'network-only',
-      pollInterval: REFRESH_TIME,
-    },
+    useQueryOptionsPolling,
     tokensData.tokenA.address || (process.env.REACT_APP_WHBAR_ADDRESS as string),
     false,
   );
 
   //Get whitelisted tokens
-  const { loading: loadingTDL, tokens: tokenDataList } = useTokensByListIds(tokensWhitelistedIds, {
-    fetchPolicy: 'network-only',
-  });
+  const { loading: loadingTDL, tokens: tokenDataList } = useTokensByListIds(
+    tokensWhitelistedIds,
+    useQueryOptions,
+  );
 
   // Get selected tokens
-  const { tokens: selectedTokens } = useTokensByListIds(selectedTokensIds, {
-    fetchPolicy: 'network-only',
-  });
+  const { tokens: selectedTokens } = useTokensByListIds(selectedTokensIds, useQueryOptions);
 
   //Get tokens by filter
-  const { filteredTokens, loadFilteredTokens } = useTokensByFilter({
-    fetchPolicy: 'network-only',
-  });
+  const { filteredTokens, loadFilteredTokens } = useTokensByFilter(useQueryOptions);
 
+  // Memoizing functions
   const searchTokensFunc = useMemo(
     () => (value: string) => {
       if (value.length > ASYNC_SEARCH_THRESHOLD)
@@ -158,60 +193,6 @@ const Create = () => {
     [mergedTokensData, tokensData.tokenA],
   );
 
-  const initialCreateData: ICreatePairData = {
-    tokenAAmount: '',
-    tokenBAmount: '',
-    tokenAId: '',
-    tokenBId: '',
-    tokenADecimals: 18,
-    tokenBDecimals: 18,
-  };
-
-  // State for Create/Provide
-  const [createPairData, setCreatePairData] = useState<ICreatePairData>(initialCreateData);
-  const tokenAValue = createPairData.tokenAAmount;
-  const tokenBValue = createPairData.tokenBAmount;
-  const initialApproveData = {
-    tokenA: false,
-    tokenB: false,
-  };
-
-  const initialNeedApprovalData = {
-    tokenA: true,
-    tokenB: true,
-  };
-
-  // State for approved
-  const [approved, setApproved] = useState(initialApproveData);
-  const [needApproval, setNeedApproval] = useState(initialNeedApprovalData);
-
-  // State for common pool data
-  const [selectedPoolData, setSelectedPoolData] = useState<IPoolData>({} as IPoolData);
-
-  // State for token balances
-  const initialBallanceData = useMemo(
-    () => ({
-      tokenA: undefined,
-      tokenB: undefined,
-    }),
-    [],
-  );
-
-  const [tokenBalances, setTokenBalances] = useState<IfaceInitialBalanceData>(initialBallanceData);
-
-  // Additional states for Providing/Creating pairs
-  const [readyToProvide, setReadyToProvide] = useState(false);
-  const [tokensInSamePool, setTokensInSamePool] = useState(false);
-  const [provideNative, setProvideNative] = useState(false);
-  const [pageTitle, setPageTitle] = useState(ADD_LIQUIDITY_TITLES.CREATE_POOL);
-
-  //State for loading data
-  const [loadingCreate, setLoadingCreate] = useState(false);
-  const [loadingApprove, setLoadingApprove] = useState(false);
-
-  // State for preset tokens from choosen pool
-  const [tokensDerivedFromPool, setTokensDerivedFromPool] = useState(false);
-
   const invalidTokenData = useCallback(() => {
     const { tokenA, tokenB } = tokensData;
     const hbarAddresss = process.env.REACT_APP_WHBAR_ADDRESS;
@@ -237,6 +218,7 @@ const Create = () => {
     return tokenB && tokenBAmount && new BigNumber(tokenBAmount).gt(new BigNumber(tokenB));
   }, [tokenBalances, createPairData]);
 
+  // Handlers
   const handleInputChange = useCallback(
     (value: string, name: string, inputSelectedPoolData: IPoolData = selectedPoolData) => {
       const { tokenA, tokenB } = tokensData;
@@ -550,7 +532,6 @@ const Create = () => {
         }`,
       );
     }
-    //TODO: Additional request will be needed in order to get info regarding pool shares
   }, [tokensData, poolsData, navigate, invalidTokenData]);
 
   // Check for address in url
@@ -646,6 +627,7 @@ const Create = () => {
     tokensData,
   ]);
 
+  // Update whitelisted tokens ids when whitelisted tokens list changes
   useEffect(() => {
     if (tokensWhitelisted && tokensWhitelisted.length !== 0) {
       const tokensWhitelistedIds = tokensWhitelisted.map(item => item.address);
@@ -653,17 +635,52 @@ const Create = () => {
     }
   }, [tokensWhitelisted]);
 
+  //Merge token lists comming from BE
   useEffect(() => {
     const mergedTokensData = _.unionBy(tokenDataList, selectedTokens, filteredTokens, 'address');
     setMergedTokensData(mergedTokensData);
   }, [tokenDataList, selectedTokens, filteredTokens]);
 
+  // Helper functions
   const getTokenIsAssociated = (token: ITokenData) => {
     const notHTS =
       Object.keys(token).length === 0 ||
       token.type === TokenType.HBAR ||
       token.type === TokenType.ERC20;
     return notHTS || userAssociatedTokens?.includes(token.hederaId);
+  };
+
+  const getPoolShare = () => {
+    if (Object.keys(selectedPoolData).length === 0) return '100';
+
+    //Calculating the pool share using one of the pool's provision tokens as no info for the LP token is available
+    const { token0Amount, token1Amount, token0 } = selectedPoolData;
+    const { tokenAAmount, tokenAId, tokenADecimals } = createPairData;
+
+    const token0Id =
+      provideNative && !tokenAId ? (process.env.REACT_APP_WHBAR_ADDRESS as string) : tokenAId;
+
+    const tokenATotalAmountBN =
+      token0 === idToAddress(token0Id) ? new BigNumber(token0Amount) : new BigNumber(token1Amount);
+
+    const tokenAAmountBN = formatStringToBigNumberWei(tokenAAmount, tokenADecimals);
+
+    return tokenAAmountBN
+      .div(tokenATotalAmountBN.plus(tokenAAmountBN))
+      .times(new BigNumber(100))
+      .toFixed(4);
+  };
+
+  const getProvideButtonLabel = () => {
+    const {
+      tokenA: { symbol: symbolA },
+      tokenB: { symbol: symbolB },
+    } = tokensData;
+
+    if (getInsufficientTokenA()) return `Insufficient ${symbolA} balance`;
+    if (getInsufficientTokenB()) return `Insufficient ${symbolB} balance`;
+    if (invalidTokenData()) return 'Invalid pool';
+    return tokensInSamePool ? 'Provide' : 'Create';
   };
 
   //Render methods
@@ -678,7 +695,7 @@ const Create = () => {
     }
   };
 
-  const getProvideSection = () => {
+  const renderProvideSection = () => {
     return (
       <div className="container-dark">
         <div className="mb-4 text-small text-bold">Enter amount</div>
@@ -786,15 +803,15 @@ const Create = () => {
             itemToExlude={tokensData.tokenA}
           />
         </Modal>
-        {getFeesInfo()}
+        {renderFeesInfo()}
         <hr className="my-4" />
-        {getTokensRatioSection()}
-        {getActionButtons()}
+        {renderTokensRatioSection()}
+        {renderActionButtons()}
       </div>
     );
   };
 
-  const getFeesInfo = () => {
+  const renderFeesInfo = () => {
     return (
       <div className="d-flex my-4 justify-content-between align-items-center ">
         <span className="text-small text-bold">Liquidity provider fee:</span>
@@ -812,7 +829,7 @@ const Create = () => {
     );
   };
 
-  const getTokensRatioSection = () => {
+  const renderTokensRatioSection = () => {
     return readyToProvide ? (
       <div className="my-4">
         <div className="mt-3 d-flex justify-content-around">
@@ -844,40 +861,7 @@ const Create = () => {
     ) : null;
   };
 
-  const getPoolShare = () => {
-    if (Object.keys(selectedPoolData).length === 0) return '100';
-
-    //Calculating the pool share using one of the pool's provision tokens as no info for the LP token is available
-    const { token0Amount, token1Amount, token0 } = selectedPoolData;
-    const { tokenAAmount, tokenAId, tokenADecimals } = createPairData;
-
-    const token0Id =
-      provideNative && !tokenAId ? (process.env.REACT_APP_WHBAR_ADDRESS as string) : tokenAId;
-
-    const tokenATotalAmountBN =
-      token0 === idToAddress(token0Id) ? new BigNumber(token0Amount) : new BigNumber(token1Amount);
-
-    const tokenAAmountBN = formatStringToBigNumberWei(tokenAAmount, tokenADecimals);
-
-    return tokenAAmountBN
-      .div(tokenATotalAmountBN.plus(tokenAAmountBN))
-      .times(new BigNumber(100))
-      .toFixed(4);
-  };
-
-  const getProvideButtonLabel = () => {
-    const {
-      tokenA: { symbol: symbolA },
-      tokenB: { symbol: symbolB },
-    } = tokensData;
-
-    if (getInsufficientTokenA()) return `Insufficient ${symbolA} balance`;
-    if (getInsufficientTokenB()) return `Insufficient ${symbolB} balance`;
-    if (invalidTokenData()) return 'Invalid pool';
-    return tokensInSamePool ? 'Provide' : 'Create';
-  };
-
-  const getActionButtons = () => {
+  const renderActionButtons = () => {
     return connected && !isHashpackLoading ? (
       <div className="mt-5">
         {!getTokenIsAssociated(tokensData.tokenA) ? (
@@ -966,7 +950,7 @@ const Create = () => {
               confirmTansaction={handleProvideConfirm}
               confirmButtonLabel="Confirm"
             >
-              {getProvideConfirmationModalContent()}
+              {renderProvideConfirmationModalContent()}
             </ConfirmTransactionModalContent>
           </Modal>
         ) : null}
@@ -980,7 +964,7 @@ const Create = () => {
     );
   };
 
-  const getProvideConfirmationModalContent = () => {
+  const renderProvideConfirmationModalContent = () => {
     const hasSelectedPool = Object.keys(selectedPoolData).length;
     const token0Symbol = hasSelectedPool ? selectedPoolData.token0Symbol : tokensData.tokenA.symbol;
     const token1Symbol = hasSelectedPool ? selectedPoolData.token1Symbol : tokensData.tokenB.symbol;
@@ -1022,7 +1006,7 @@ const Create = () => {
               </div>
             </div>
             <div className="mt-4 rounded border border-secondary justify-content-between">
-              {getTokensRatioSection()}
+              {renderTokensRatioSection()}
             </div>
             {renderWarningMessage()}
           </>
@@ -1040,7 +1024,7 @@ const Create = () => {
     <div className="d-flex justify-content-center">
       <div className="container-action">
         <PageHeader handleBackClick={handleBackClick} slippage="create" title={pageTitle} />
-        {getProvideSection()}
+        {renderProvideSection()}
         <ToasterWrapper />
       </div>
     </div>

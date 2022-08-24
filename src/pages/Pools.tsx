@@ -1,10 +1,10 @@
 import { useState, useContext, useEffect, useMemo } from 'react';
-import { GlobalContext } from '../providers/Global';
-import Tippy from '@tippyjs/react';
 import { Link } from 'react-router-dom';
+
+import Tippy from '@tippyjs/react';
 import _ from 'lodash';
 
-import { REFRESH_TIME, ASYNC_SEARCH_THRESHOLD } from '../constants';
+import { GlobalContext } from '../providers/Global';
 
 import { PageViews } from '../interfaces/common';
 import { IPoolExtendedData } from '../interfaces/tokens';
@@ -20,6 +20,13 @@ import { filterPoolsByPattern } from '../utils/poolUtils';
 import usePoolsByUser from '../hooks/usePoolsByUser';
 import usePoolsByFilter from '../hooks/usePoolsByFilter';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
+
+import {
+  ASYNC_SEARCH_THRESHOLD,
+  poolsPageInitialCurrentView,
+  useQueryOptionsPolling,
+  useQueryOptions,
+} from '../constants';
 
 interface IPoolsProps {
   itemsPerPage: number;
@@ -41,25 +48,18 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const [inputValue, setInputValue] = useState('');
   const [searchingResults, setSearchingResults] = useState(false);
 
+  const [currentView, setCurrentView] = useState<PageViews>(poolsPageInitialCurrentView);
+
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
 
   const {
     poolsByTokenList: pools,
     loadingPoolsByTokenList: loadingPools,
     errorPoolsByTokenList: errorPoools,
-  } = usePoolsByTokensList(
-    {
-      fetchPolicy: 'network-only',
-      pollInterval: REFRESH_TIME,
-    },
-    true,
-    tokensWhitelistedAddresses,
-  );
+  } = usePoolsByTokensList(useQueryOptionsPolling, true, tokensWhitelistedAddresses);
 
   const { filteredPools, filteredPoolsLoading, loadExtraPools } = usePoolsByFilter(
-    {
-      fetchPolicy: 'network-only',
-    },
+    useQueryOptions,
     true,
     pools,
   );
@@ -68,17 +68,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     error: errorPooolsByUser,
     loading: loadingPoolsByUser,
     poolsByUser,
-  } = usePoolsByUser(
-    {
-      fetchPolicy: 'network-only',
-      pollInterval: REFRESH_TIME,
-    },
-    userId,
-    pools,
-  );
-
-  const initialCurrentView: PageViews = PageViews.ALL_POOLS;
-  const [currentView, setCurrentView] = useState<PageViews>(initialCurrentView);
+  } = usePoolsByUser(useQueryOptionsPolling, userId, pools);
 
   const searchFunc = useMemo(
     () => (value: string) => {
@@ -97,10 +87,12 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     [PageViews.MY_POOLS]: 'My positions',
   };
 
+  // Handlers
   const handleTabItemClick = (currentView: PageViews) => {
     setCurrentView(currentView);
   };
 
+  // Merge whitelisted and pools by filter arrays
   useEffect(() => {
     if (
       (pools.length !== 0 || filteredPools.length !== 0) &&
@@ -121,16 +113,19 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     setHavePools(pools && pools.length !== 0);
   }, [pools, filteredPools, inputValue, filteredPoolsLoading, loadingPools, searchingResults]);
 
+  //Update user pools to show
   useEffect(() => {
     if (poolsByUser) setUserPoolsToShow(poolsByUser);
 
     setHaveUserPools(poolsByUser && poolsByUser.length !== 0);
   }, [poolsByUser]);
 
+  //Update searching(loading) state for searching pools by filter
   useEffect(() => {
     setSearchingResults(false);
   }, [filteredPools]);
 
+  // Render functions
   const renderEmptyPoolsState = (infoMessage: string) => (
     <div className="text-center mt-8">
       <p className="text-small">{infoMessage}</p>

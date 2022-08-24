@@ -1,19 +1,21 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
-import toast from 'react-hot-toast';
 import { useParams } from 'react-router-dom';
+
+import toast from 'react-hot-toast';
 import Tippy from '@tippyjs/react';
+
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 
+import { GlobalContext } from '../providers/Global';
+
 import {
   ITokenData,
-  ISwapTokenData,
   TokenType,
   ITokensData,
   IfaceInitialBalanceData,
   IPoolData,
 } from '../interfaces/tokens';
-import { GlobalContext } from '../providers/Global';
 
 import Button from '../components/Button';
 import Loader from '../components/Loader';
@@ -30,7 +32,6 @@ import Confirmation from '../components/Confirmation';
 import IconToken from '../components/IconToken';
 import ToasterWrapper from '../components/ToasterWrapper';
 
-import getErrorMessage from '../content/errors';
 import {
   checkAllowanceHTS,
   getTokenBalance,
@@ -52,13 +53,23 @@ import {
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
 
-import { MAX_UINT_ERC20, MAX_UINT_HTS, REFRESH_TIME, ASYNC_SEARCH_THRESHOLD } from '../constants';
-
 import useTokensByListIds from '../hooks/useTokensByListIds';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import usePoolsByToken from '../hooks/usePoolsByToken';
 import useTokensByFilter from '../hooks/useTokensByFilter';
+
+import getErrorMessage from '../content/errors';
 import { generalFeesAndKeysWarning } from '../content/messages';
+
+import {
+  MAX_UINT_ERC20,
+  MAX_UINT_HTS,
+  ASYNC_SEARCH_THRESHOLD,
+  initialTokensDataSwap,
+  initialSwapData,
+  useQueryOptionsPolling,
+  useQueryOptions,
+} from '../constants';
 
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
@@ -79,13 +90,8 @@ const Swap = () => {
   const [showModalB, setShowModalB] = useState(false);
   const [showModalConfirmSwap, setShowModalConfirmSwap] = useState(false);
 
-  const initialTokensData: ITokensData = {
-    tokenA: NATIVE_TOKEN,
-    tokenB: {} as ITokenData,
-  };
-
   // State for token inputs
-  const [tokensData, setTokensData] = useState<ITokensData>(initialTokensData);
+  const [tokensData, setTokensData] = useState<ITokensData>(initialTokensDataSwap);
   const [tokenInIsNative, setTokenInIsNative] = useState(false);
   const [tokenOutIsNative, setTokenOutIsNative] = useState(false);
   const [willWrapTokens, setWillWrapTokens] = useState(false);
@@ -95,81 +101,10 @@ const Swap = () => {
 
   //State for tokens whitelist
   const [tokensWhitelistedIds, setTokensWhitelistedIds] = useState<string[]>([]);
-
   const [mergedPoolsData, setMergedPoolsData] = useState<IPoolData[]>([] as IPoolData[]);
   const [mergedTokensData, setMergedTokensData] = useState<ITokenData[]>([] as ITokenData[]);
 
-  //Get whitelisted pools
-  const {
-    poolsByTokenList: whitelistedPoolsData,
-    loadingPoolsByTokenList: loadingPools,
-    refetchPoolsByTokenList: refetch,
-  } = usePoolsByTokensList(
-    {
-      fetchPolicy: 'network-only',
-      pollInterval: REFRESH_TIME,
-    },
-    false,
-    tokensWhitelistedIds,
-  );
-  //Get pools by token A
-  const { filteredPools: filteredPoolsDataTokenA } = usePoolsByToken(
-    {
-      fetchPolicy: 'network-only',
-      pollInterval: REFRESH_TIME,
-    },
-    tokensData.tokenA.address || (process.env.REACT_APP_WHBAR_ADDRESS as string),
-    false,
-  );
-
-  //Get pools by token B
-  const { filteredPools: filteredPoolsDataTokenB } = usePoolsByToken(
-    {
-      fetchPolicy: 'network-only',
-      pollInterval: REFRESH_TIME,
-    },
-    tokensData.tokenB.address || (process.env.REACT_APP_WHBAR_ADDRESS as string),
-    true,
-  );
-
-  //Get whitelisted tokens
-  const { loading: loadingTDL, tokens: tokenDataList } = useTokensByListIds(tokensWhitelistedIds, {
-    fetchPolicy: 'network-only',
-  });
-
   const [selectedTokensIds, setSelectedTokensIds] = useState<string[]>([]);
-
-  const { tokens: selectedTokens } = useTokensByListIds(selectedTokensIds, {
-    fetchPolicy: 'network-only',
-  });
-
-  const { filteredTokens, loadFilteredTokens } = useTokensByFilter({
-    fetchPolicy: 'network-only',
-  });
-
-  const searchTokensFunc = useMemo(
-    () => (value: string) => {
-      if (value.length > ASYNC_SEARCH_THRESHOLD)
-        loadFilteredTokens({ variables: { keyword: value } });
-    },
-    [loadFilteredTokens],
-  );
-  const initialSwapData: ISwapTokenData = {
-    amountIn: '',
-    amountOut: '',
-  };
-
-  const tokenAFilteredData = useMemo(() => {
-    return mergedTokensData.filter(
-      (token: ITokenData) => token.address !== tokensData.tokenB?.address,
-    );
-  }, [mergedTokensData, tokensData.tokenB?.address]);
-
-  const tokenBFilteredData = useMemo(() => {
-    return mergedTokensData.filter(
-      (token: ITokenData) => token.address !== tokensData.tokenA?.address,
-    );
-  }, [mergedTokensData, tokensData.tokenA?.address]);
 
   // State for Swap
   const [swapData, setSwapData] = useState(initialSwapData);
@@ -207,6 +142,58 @@ const Swap = () => {
   // State for preset tokens from choosen pool
   const [tokensDerivedFromPool, setTokensDerivedFromPool] = useState(false);
 
+  //Get whitelisted pools
+  const {
+    poolsByTokenList: whitelistedPoolsData,
+    loadingPoolsByTokenList: loadingPools,
+    refetchPoolsByTokenList: refetch,
+  } = usePoolsByTokensList(useQueryOptionsPolling, false, tokensWhitelistedIds);
+
+  //Get pools by token A
+  const { filteredPools: filteredPoolsDataTokenA } = usePoolsByToken(
+    useQueryOptionsPolling,
+    tokensData.tokenA.address || (process.env.REACT_APP_WHBAR_ADDRESS as string),
+    false,
+  );
+
+  //Get pools by token B
+  const { filteredPools: filteredPoolsDataTokenB } = usePoolsByToken(
+    useQueryOptionsPolling,
+    tokensData.tokenB.address || (process.env.REACT_APP_WHBAR_ADDRESS as string),
+    true,
+  );
+
+  //Get whitelisted tokens
+  const { loading: loadingTDL, tokens: tokenDataList } = useTokensByListIds(
+    tokensWhitelistedIds,
+    useQueryOptions,
+  );
+
+  const { tokens: selectedTokens } = useTokensByListIds(selectedTokensIds, useQueryOptions);
+
+  const { filteredTokens, loadFilteredTokens } = useTokensByFilter(useQueryOptions);
+
+  // Memoizing functions
+  const tokenAFilteredData = useMemo(() => {
+    return mergedTokensData.filter(
+      (token: ITokenData) => token.address !== tokensData.tokenB?.address,
+    );
+  }, [mergedTokensData, tokensData.tokenB?.address]);
+
+  const tokenBFilteredData = useMemo(() => {
+    return mergedTokensData.filter(
+      (token: ITokenData) => token.address !== tokensData.tokenA?.address,
+    );
+  }, [mergedTokensData, tokensData.tokenA?.address]);
+
+  const searchTokensFunc = useMemo(
+    () => (value: string) => {
+      if (value.length > ASYNC_SEARCH_THRESHOLD)
+        loadFilteredTokens({ variables: { keyword: value } });
+    },
+    [loadFilteredTokens],
+  );
+
   const getInsufficientTokenIn = useCallback(() => {
     const { tokenA: tokenABalance } = tokenBalances;
     const { amountIn } = swapData;
@@ -214,6 +201,52 @@ const Swap = () => {
     return tokenABalance && amountIn && new BigNumber(amountIn).gt(new BigNumber(tokenABalance));
   }, [swapData, tokenBalances]);
 
+  const swapPath = useMemo(() => {
+    return bestPath.length !== 0 ? (
+      <div className="d-flex justify-content-center my-5">
+        {bestPath.map((currentAddress: string, index: number) => {
+          let currentTokenSymbol =
+            mergedTokensData.find((token: ITokenData) => token.address === currentAddress)
+              ?.symbol || '';
+
+          if (!currentTokenSymbol) {
+            for (let index = 0; index < mergedPoolsData.length; index++) {
+              const currentPool = mergedPoolsData[index];
+
+              if (currentPool.token0 === currentAddress || currentPool.token1 === currentAddress) {
+                currentTokenSymbol =
+                  currentPool.token0 === currentAddress
+                    ? currentPool.token0Symbol
+                    : currentPool.token1Symbol;
+              }
+
+              if (currentTokenSymbol) break;
+            }
+          }
+
+          if (
+            currentAddress === process.env.REACT_APP_WHBAR_ADDRESS &&
+            ((tokenInIsNative && index === 0) ||
+              (tokenOutIsNative && index === bestPath.length - 1))
+          ) {
+            currentTokenSymbol = NATIVE_TOKEN.symbol;
+          }
+
+          return (
+            <div className="d-flex align-items-center" key={index}>
+              {index !== 0 ? <span className="mx-3">{'>'}</span> : null}
+              <IconToken symbol={currentTokenSymbol} />
+              <div className="d-flex flex-column ms-3">
+                <span className="text-main text-bold">{currentTokenSymbol}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    ) : null;
+  }, [bestPath, mergedTokensData, tokenInIsNative, tokenOutIsNative, mergedPoolsData]);
+
+  // Handlers
   const handleInputChange = useCallback(
     (value: string, name: string, inputTokensData: ITokensData = tokensData) => {
       setInsufficientLiquidity(false);
@@ -333,51 +366,6 @@ const Swap = () => {
     [mergedPoolsData, tokensData, willUnwrapTokens, willWrapTokens],
   );
 
-  const swapPath = useMemo(() => {
-    return bestPath.length !== 0 ? (
-      <div className="d-flex justify-content-center my-5">
-        {bestPath.map((currentAddress: string, index: number) => {
-          let currentTokenSymbol =
-            mergedTokensData.find((token: ITokenData) => token.address === currentAddress)
-              ?.symbol || '';
-
-          if (!currentTokenSymbol) {
-            for (let index = 0; index < mergedPoolsData.length; index++) {
-              const currentPool = mergedPoolsData[index];
-
-              if (currentPool.token0 === currentAddress || currentPool.token1 === currentAddress) {
-                currentTokenSymbol =
-                  currentPool.token0 === currentAddress
-                    ? currentPool.token0Symbol
-                    : currentPool.token1Symbol;
-              }
-
-              if (currentTokenSymbol) break;
-            }
-          }
-
-          if (
-            currentAddress === process.env.REACT_APP_WHBAR_ADDRESS &&
-            ((tokenInIsNative && index === 0) ||
-              (tokenOutIsNative && index === bestPath.length - 1))
-          ) {
-            currentTokenSymbol = NATIVE_TOKEN.symbol;
-          }
-
-          return (
-            <div className="d-flex align-items-center" key={index}>
-              {index !== 0 ? <span className="mx-3">{'>'}</span> : null}
-              <IconToken symbol={currentTokenSymbol} />
-              <div className="d-flex flex-column ms-3">
-                <span className="text-main text-bold">{currentTokenSymbol}</span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    ) : null;
-  }, [bestPath, mergedTokensData, tokenInIsNative, tokenOutIsNative, mergedPoolsData]);
-
   const handleAssociateClick = async (token: ITokenData) => {
     setLoadingAssociate(true);
 
@@ -392,7 +380,7 @@ const Swap = () => {
       } = receipt;
 
       if (!success) {
-        toast(getErrorMessage(error.status ? error.status : error));
+        toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         const tokens = await getUserAssociatedTokens(userId);
         setUserAssociatedTokens(tokens);
@@ -426,7 +414,7 @@ const Swap = () => {
       } = receipt;
 
       if (!success) {
-        toast(getErrorMessage(error.status ? error.status : error));
+        toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         setApproved(true);
         toast.success('Success! Token was approved.');
@@ -486,7 +474,7 @@ const Swap = () => {
         toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         setSwapData(initialSwapData);
-        setTokensData(initialTokensData);
+        setTokensData(initialTokensDataSwap);
         setApproved(false);
         refetch();
         toast.success('Success! Tokens were swapped.');
@@ -680,6 +668,7 @@ const Swap = () => {
     }
   }, [mergedPoolsData, mergedTokensData, token0, token1, tokensDerivedFromPool, userId]);
 
+  // Update whitelisted tokens ids when whitelisted tokens list changes
   useEffect(() => {
     if (tokensWhitelisted && tokensWhitelisted.length !== 0) {
       const tokensWhitelistedIds = tokensWhitelisted.map(item => item.address);
@@ -687,6 +676,7 @@ const Swap = () => {
     }
   }, [tokensWhitelisted]);
 
+  //Merge pools comming from BE
   useEffect(() => {
     const mergedPoolsData = _.unionBy(
       whitelistedPoolsData,
@@ -697,13 +687,32 @@ const Swap = () => {
     setMergedPoolsData(mergedPoolsData);
   }, [whitelistedPoolsData, filteredPoolsDataTokenA, filteredPoolsDataTokenB]);
 
+  //Merge tokens comming from BE
   useEffect(() => {
     const mergedTokensData = _.unionBy(tokenDataList, selectedTokens, filteredTokens, 'address');
     setMergedTokensData(mergedTokensData);
   }, [tokenDataList, selectedTokens, filteredTokens]);
 
+  // Helper methods
+  const getSwapButtonLabel = () => {
+    const { tokenA, tokenB } = tokensData;
+    if (Object.keys(tokenB).length === 0 || Object.keys(tokenA).length === 0)
+      return 'Select a token';
+    if (getInsufficientTokenIn()) return `Insufficient ${tokenA.symbol} balance`;
+    if (insufficientLiquidity) return 'Insufficient liquidity for this trade.';
+    return willWrapTokens ? 'wrap' : willUnwrapTokens ? 'unwrap' : 'swap';
+  };
+
+  const getTokenIsAssociated = (token: ITokenData) => {
+    const notHTS =
+      Object.keys(token).length === 0 ||
+      token.type === TokenType.HBAR ||
+      token.type === TokenType.ERC20;
+    return notHTS || userAssociatedTokens?.includes(token.hederaId);
+  };
+
   //Render methods
-  const getSwapSection = () => {
+  const renderSwapSection = () => {
     return (
       <div className="container-dark">
         <InputTokenSelector
@@ -803,34 +812,17 @@ const Swap = () => {
           />
         </Modal>
         {swapPath}
-        {getActionButtons()}
+        {renderActionButtons()}
       </div>
     );
   };
 
-  const getSwapButtonLabel = () => {
-    const { tokenA, tokenB } = tokensData;
-    if (Object.keys(tokenB).length === 0 || Object.keys(tokenA).length === 0)
-      return 'Select a token';
-    if (getInsufficientTokenIn()) return `Insufficient ${tokenA.symbol} balance`;
-    if (insufficientLiquidity) return 'Insufficient liquidity for this trade.';
-    return willWrapTokens ? 'wrap' : willUnwrapTokens ? 'unwrap' : 'swap';
-  };
-
-  const getTokenIsAssociated = (token: ITokenData) => {
-    const notHTS =
-      Object.keys(token).length === 0 ||
-      token.type === TokenType.HBAR ||
-      token.type === TokenType.ERC20;
-    return notHTS || userAssociatedTokens?.includes(token.hederaId);
-  };
-
-  const getSwapButtonDisabledState = () => {
+  const renderSwapButtonDisabledState = () => {
     const { tokenA, tokenB } = tokensData;
     return !readyToSwap || !getTokenIsAssociated(tokenA) || !getTokenIsAssociated(tokenB);
   };
 
-  const getActionButtons = () => {
+  const renderActionButtons = () => {
     const confirmationText = `Swapping ${swapData.amountIn} ${tokensData.tokenA.symbol} for ${swapData.amountOut} ${tokensData.tokenB.symbol}`;
 
     return extensionFound ? (
@@ -890,7 +882,7 @@ const Swap = () => {
               <div className="d-grid mt-4">
                 <Button
                   loading={loadingSwap}
-                  disabled={getSwapButtonDisabledState()}
+                  disabled={renderSwapButtonDisabledState()}
                   onClick={() => handleSwapClick()}
                 >
                   {getSwapButtonLabel()}
@@ -937,9 +929,9 @@ const Swap = () => {
                         />
                       }
                     />
-                    {getTokensRatio()}
-                    {getAdvancedSwapInfo()}
-                    {getWarningMessage()}
+                    {renderTokensRatio()}
+                    {renderAdvancedSwapInfo()}
+                    {renderWarningMessage()}
                   </>
                 )}
               </ConfirmTransactionModalContent>
@@ -956,7 +948,7 @@ const Swap = () => {
     ) : null;
   };
 
-  const getTokensRatio = () => {
+  const renderTokensRatio = () => {
     const ratio = ratioBasedOnTokenOut
       ? Number(swapData.amountIn) / Number(swapData.amountOut)
       : Number(swapData.amountOut) / Number(swapData.amountIn);
@@ -977,7 +969,7 @@ const Swap = () => {
     );
   };
 
-  const getWarningMessage = () => {
+  const renderWarningMessage = () => {
     if (hasFeesOrKeys(tokensData.tokenA) || hasFeesOrKeys(tokensData.tokenB)) {
       return (
         <div className="alert alert-warning my-5 d-flex align-items-center" role="alert">
@@ -988,7 +980,7 @@ const Swap = () => {
     }
   };
 
-  const getAdvancedSwapInfo = () => {
+  const renderAdvancedSwapInfo = () => {
     const { amountIn, amountOut } = swapData;
     const { tokenA, tokenB } = tokensData;
     const slippage = getTransactionSettings().swapSlippage;
@@ -1057,7 +1049,7 @@ const Swap = () => {
     <div className="d-flex justify-content-center">
       <div className="container-action">
         <PageHeader slippage="swap" title="Swap" />
-        {getSwapSection()}
+        {renderSwapSection()}
         <ToasterWrapper />
       </div>
     </div>
