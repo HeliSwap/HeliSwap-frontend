@@ -3,6 +3,12 @@ import React from 'react';
 import { IFarmData } from '../interfaces/tokens';
 
 import { formatIcons } from '../utils/iconUtils';
+import {
+  formatStringToPercentage,
+  formatStringToPrice,
+  stripStringToFixedDecimals,
+} from '../utils/numberUtils';
+import { timestampToDate } from '../utils/timeUtils';
 
 interface IFarmRowProps {
   farmData: IFarmData;
@@ -19,8 +25,29 @@ const FarmRow = ({ farmData, index, handleRowClick, setCurrentFarmIndex }: IFarm
     setCurrentFarmIndex(index);
   };
 
+  const renderCampaignEndDate = (campaignEndDate: number) => {
+    const campaignEnded = campaignEndDate < Date.now();
+
+    const dateContent = (
+      <>
+        <span className={`icon-campaign-status ${!campaignEnded ? 'is-active' : ''}`}></span>
+        <span className="text-micro ms-3">
+          {campaignEnded ? (
+            'Campaign Ended'
+          ) : (
+            <>
+              Until <span className="text-bold">{timestampToDate(campaignEndDate)}</span>
+            </>
+          )}
+        </span>
+      </>
+    );
+
+    return <div className="d-flex align-items-center">{dateContent}</div>;
+  };
+
   return (
-    <div onClick={handleViewDetailsRowClick} className={`table-pools-row  with-6-columns `}>
+    <div onClick={handleViewDetailsRowClick} className={`table-pools-row with-6-columns-farms`}>
       <div className="table-pools-cell">
         <span className="text-small">{index + 1}</span>
       </div>
@@ -31,15 +58,25 @@ const FarmRow = ({ farmData, index, handleRowClick, setCurrentFarmIndex }: IFarm
         </p>
       </div>
       <div className="table-pools-cell justify-content-end">
-        <span className="text-small text-numeric">{farmData.totalStakedUSD}</span>
+        <span className="text-small text-numeric">
+          {formatStringToPrice(stripStringToFixedDecimals(farmData.totalStakedUSD, 2))}
+        </span>
       </div>
       <div className="table-pools-cell justify-content-end">
-        <span className="text-small text-numeric">{farmData.APR}%</span>
+        <span className="text-small text-numeric">
+          {formatStringToPercentage(stripStringToFixedDecimals(farmData.APR, 2))}
+        </span>
       </div>
       <div className="table-pools-cell justify-content-end">
-        <span className="text-small text-numeric">{farmData.userStakingData?.userStakedUSD}</span>
+        <span className="text-small text-numeric">
+          {formatStringToPrice(
+            stripStringToFixedDecimals(farmData.userStakingData?.userStakedUSD || '0', 2),
+          )}
+        </span>
       </div>
-      <div className="table-pools-cell d-flex justify-content-end"></div>
+      <div className="table-pools-cell d-flex justify-content-end">
+        {renderCampaignEndDate(farmData.campaignEndDate)}
+      </div>
     </div>
   );
 };

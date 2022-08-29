@@ -4,7 +4,7 @@ import Settings from './Settings';
 
 interface IPageHeaderProps {
   title: string;
-  slippage: string;
+  slippage?: string;
   handleBackClick?: () => void;
 }
 
@@ -18,7 +18,7 @@ const PageHeader = ({ title, handleBackClick, slippage }: IPageHeaderProps) => {
       ) : null}
 
       <h1 className="text-subheader text-light">{title}</h1>
-      <Settings slippage={slippage} />
+      {slippage ? <Settings slippage={slippage} /> : <div></div>}
     </div>
   );
 };

@@ -9,6 +9,7 @@ import { GlobalContext } from '../providers/Global';
 import { IFarmData, IReward } from '../interfaces/tokens';
 
 import Icon from './Icon';
+import IconToken from './IconToken';
 import PageHeader from './PageHeader';
 import Button from './Button';
 import InputTokenSelector from './InputTokenSelector';
@@ -18,35 +19,18 @@ import ToasterWrapper from './ToasterWrapper';
 import WalletBalance from './WalletBalance';
 
 import { formatIcons } from '../utils/iconUtils';
-import { formatStringWeiToStringEther, stripStringToFixedDecimals } from '../utils/numberUtils';
+import {
+  formatStringETHtoPriceFormatted,
+  formatStringToPercentage,
+  formatStringToPrice,
+  formatStringWeiToStringEther,
+  stripStringToFixedDecimals,
+} from '../utils/numberUtils';
 
 import getErrorMessage from '../content/errors';
 
 import { MAX_UINT_ERC20 } from '../constants';
-
-interface IFarmDataBlockProps {
-  blockLabel: string;
-  children: JSX.Element | JSX.Element[] | string;
-  toolTipContent?: string;
-}
-
-const FarmDataBlock = ({ blockLabel, children, toolTipContent }: IFarmDataBlockProps) => {
-  return (
-    <div>
-      <p className="d-flex align-items-center">
-        <span className="text-secondary text-small">{blockLabel}</span>
-        {toolTipContent && toolTipContent !== '' ? (
-          <Tippy content={toolTipContent}>
-            <span className="ms-3">
-              <Icon name="hint" color="gray" />
-            </span>
-          </Tippy>
-        ) : null}
-      </p>
-      {children}
-    </div>
-  );
-};
+import { timestampToDate } from '../utils/timeUtils';
 
 interface IFarmDetailsProps {
   farmData: IFarmData;
@@ -82,20 +66,9 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
   const userShare = useMemo(() => {
     const { totalStaked, userStakingData } = farmData;
 
+    if (Number(totalStaked) === 0) return '0';
+
     return ((Number(userStakingData?.stakedAmount) / Number(totalStaked)) * 100).toString();
-  }, [farmData]);
-
-  const campaignEndDate = useMemo(() => {
-    const { campaignEndDate } = farmData;
-
-    let date = new Date(campaignEndDate);
-    return (
-      date.getDate() +
-      ' ' +
-      date.toLocaleString('default', { month: 'short' }) +
-      ' ' +
-      date.getFullYear()
-    );
   }, [farmData]);
 
   const getInsufficientTokenBalance = useCallback(() => {
@@ -213,14 +186,31 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
     }
   };
 
+  const renderCampaignEndDate = (campaignEndDate: number) => {
+    const campaignEnded = campaignEndDate < Date.now();
+
+    const dateContent = (
+      <>
+        <span className={`icon-campaign-status ${!campaignEnded ? 'is-active' : ''}`}></span>
+        <span className="text-micro ms-3">
+          {campaignEnded ? (
+            'Campaign Ended'
+          ) : (
+            <>
+              Active until <span className="text-bold">{timestampToDate(campaignEndDate)}</span>
+            </>
+          )}
+        </span>
+      </>
+    );
+
+    return <div className="d-flex align-items-center">{dateContent}</div>;
+  };
+
   return (
     <div className="d-flex justify-content-center">
       <div className="container-max-with-1042">
-        <PageHeader
-          slippage="remove"
-          title="Manage Farm"
-          handleBackClick={() => setShowFarmDetails(false)}
-        />
+        <PageHeader title="Manage Farm" handleBackClick={() => setShowFarmDetails(false)} />
         <div className="row">
           <div className="col-8">
             <div className="container-blue-neutral-800 rounded p-5">
@@ -236,111 +226,197 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                 </div>
 
                 <div className="container-campaign-status d-flex align-items-center">
-                  <span className="icon-campaign-status is-active me-2"></span>
-                  <p className="text-micro">
-                    Active till <span className="text-bold">{campaignEndDate}</span>
-                  </p>
-                </div>
-              </div>
-              <div className="row mt-9">
-                <div className="col-4">
-                  <FarmDataBlock blockLabel="Total APR">
-                    <p className="text-main text-numeric">
-                      {stripStringToFixedDecimals(farmData.APR, 2)}%
-                    </p>
-                  </FarmDataBlock>
-                </div>
-                <div className="col-4">
-                  <FarmDataBlock blockLabel="Liquidity">
-                    <p className="text-main text-numeric">
-                      {formatStringWeiToStringEther(farmData.totalStaked)}
-                    </p>
-                  </FarmDataBlock>
+                  {renderCampaignEndDate(farmData.campaignEndDate)}
                 </div>
               </div>
 
-              <hr className="my-5" />
+              <div className="container-border-rounded-bn-500 mt-6">
+                <div className="row">
+                  <div className="col-4 d-flex align-items-center">
+                    <p className="d-flex align-items-center">
+                      <span className="text-secondary text-small">Total APR</span>
+                      <Tippy content="Your annual rate of return, expressed as a percentage. Interest paid in previous periods is not accounted for.">
+                        <span className="ms-2">
+                          <Icon name="hint" color="gray" size="small" />
+                        </span>
+                      </Tippy>
+                    </p>
+                  </div>
+                  <div className="col-4">
+                    <p className="text-subheader text-numeric">
+                      {formatStringToPercentage(stripStringToFixedDecimals(farmData.APR, 2))}
+                    </p>
+                  </div>
+                </div>
 
-              <div className="row">
-                <div className="col-4">
-                  <FarmDataBlock blockLabel="Staked LP Tokens">
-                    <>
-                      <p className="text-title text-numeric">
-                        {formatStringWeiToStringEther(
-                          farmData.userStakingData?.stakedAmount || '0',
-                        )}
-                      </p>
-                      <p className="text-main text-numeric">
-                        $
-                        {stripStringToFixedDecimals(
+                <div className="row mt-4">
+                  <div className="col-4 d-flex align-items-center">
+                    <p className="d-flex align-items-center">
+                      <span className="text-secondary text-small">Total Staked</span>
+                      <Tippy content="The total amount of staked tokens in this farm pool, denominated in $USD.">
+                        <span className="ms-2">
+                          <Icon name="hint" color="gray" size="small" />
+                        </span>
+                      </Tippy>
+                    </p>
+                  </div>
+                  <div className="col-4">
+                    <p className="text-main text-numeric">
+                      {formatStringToPrice(stripStringToFixedDecimals(farmData.totalStakedUSD, 2))}
+                    </p>
+                  </div>
+                </div>
+
+                <hr className="my-5" />
+
+                <div className="row mt-4">
+                  <div className="col-4 d-flex align-items-center">
+                    <p className="d-flex align-items-center">
+                      <span className="text-secondary text-small">Rewards</span>
+                      <Tippy content="The tokens you will be rewarded with upon harvest.">
+                        <span className="ms-2">
+                          <Icon name="hint" color="gray" size="small" />
+                        </span>
+                      </Tippy>
+                    </p>
+                  </div>
+                  <div className="col-4 d-flex align-items-center">
+                    {farmData.rewardsData.length > 0 &&
+                      farmData.rewardsData.map((reward, index) => (
+                        <div key={index} className="d-flex align-items-center me-4">
+                          <IconToken symbol={reward.symbol} />{' '}
+                          <span className="text-main ms-3">{reward.symbol}</span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                <hr className="my-5" />
+
+                <div className="row mt-4">
+                  <div className="col-4 d-flex align-items-center">
+                    <p className="d-flex align-items-center">
+                      <span className="text-secondary text-small">Your share</span>
+                      <Tippy content="Your staked amount in this farm pool, expressed as a percentage.">
+                        <span className="ms-2">
+                          <Icon name="hint" color="gray" size="small" />
+                        </span>
+                      </Tippy>
+                    </p>
+                  </div>
+                  <div className="col-4 d-flex align-items-center">
+                    <p className="text-main">{stripStringToFixedDecimals(userShare, 2)}%</p>
+                  </div>
+                </div>
+
+                <div className="row mt-4">
+                  <div className="col-4 d-flex align-items-center">
+                    <p className="d-flex align-items-center">
+                      <span className="text-secondary text-small">Staked LP Tokens</span>
+                      <Tippy content="The amount of your staked tokens in $USD, as well as staked tokens count.">
+                        <span className="ms-2">
+                          <Icon name="hint" color="gray" size="small" />
+                        </span>
+                      </Tippy>
+                    </p>
+                  </div>
+                  <div className="col-8 d-flex align-items-center">
+                    <p className="text-subheader text-numeric">
+                      {formatStringToPrice(
+                        stripStringToFixedDecimals(
                           farmData.userStakingData?.userStakedUSD || '0',
                           2,
-                        )}
-                      </p>
-                    </>
-                  </FarmDataBlock>
-                </div>
-                <div className="col-4">
-                  <FarmDataBlock blockLabel="Your share">
-                    <p className="text-title text-numeric">
-                      {stripStringToFixedDecimals(userShare, 2)}%
+                        ),
+                      )}
                     </p>
-                  </FarmDataBlock>
+                    <p className="d-flex align-items-center ms-3 mt-2">
+                      <span className="text-secondary text-main">
+                        {formatStringETHtoPriceFormatted(
+                          formatStringWeiToStringEther(
+                            farmData.userStakingData?.stakedAmount || '0',
+                          ),
+                        )}
+                      </span>
+
+                      <IconToken className="ms-3" symbol="LP" />
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              {farmData.userStakingData ? (
-                <div className="container-blue-neutral rounded p-5 mt-5">
-                  <div className="d-flex justify-content-between align-items-start">
-                    <p className="text-small text-bold">Pending rewards</p>
-                    <div className="d-flex justify-content-end">
-                      <Button
-                        loading={loadingHarvest}
-                        onClick={handleHarvestClick}
-                        size="small"
-                        type="primary"
-                      >
-                        Harvest
-                      </Button>
-                      <Button
-                        className="ms-3"
-                        size="small"
-                        loading={loadingExit}
-                        onClick={() => handleExitButtonClick(farmData.address)}
-                      >
-                        Exit
-                      </Button>
+              <div className="container-blue-neutral rounded p-5 mt-5">
+                {farmData.userStakingData?.stakedAmount !== '0' ? (
+                  <>
+                    <div className="d-flex justify-content-between align-items-start">
+                      <p className="text-small text-bold">Pending rewards</p>
+                      <div className="d-flex justify-content-end">
+                        <Button
+                          loading={loadingHarvest}
+                          onClick={handleHarvestClick}
+                          size="small"
+                          type="primary"
+                        >
+                          Harvest
+                        </Button>
+                        <Button
+                          className="ms-3"
+                          size="small"
+                          loading={loadingExit}
+                          onClick={() => handleExitButtonClick(farmData.address)}
+                        >
+                          Exit
+                        </Button>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="mt-5">
-                    {Object.keys(farmData.userStakingData.rewardsAccumulatedUSD).map(
-                      (rewardKey: string) => {
-                        const rewardData =
-                          farmData.rewardsData.find((reward: IReward) => {
-                            return reward.address === rewardKey;
-                          }) || ({} as IReward);
-                        const rewardSymbol = rewardData.symbol;
-                        return (
-                          <p key={rewardKey} className="text-subheader text-success text-numeric">
-                            {rewardSymbol} - $
-                            {stripStringToFixedDecimals(
-                              farmData.userStakingData?.rewardsAccumulatedUSD[rewardKey] || '0',
-                              2,
-                            )}
-                          </p>
-                        );
-                      },
-                    )}
+                    <div className="mt-5">
+                      <p className="text-title text-numeric ">
+                        {formatStringToPrice(stripStringToFixedDecimals(userRewardsUSD, 2))}
+                      </p>
 
-                    <p className="text-main text-numeric mt-3">
-                      ${stripStringToFixedDecimals(userRewardsUSD, 2)}
+                      <div className="d-flex align-items-center mt-4">
+                        {Object.keys(farmData.userStakingData!.rewardsAccumulatedUSD).map(
+                          (rewardKey: string) => {
+                            const rewardData =
+                              farmData.rewardsData.find((reward: IReward) => {
+                                return reward.address === rewardKey;
+                              }) || ({} as IReward);
+
+                            const rewardSymbol = rewardData.symbol;
+
+                            return (
+                              <p
+                                key={rewardKey}
+                                className="text-main text-secondary d-flex align-items-center me-3"
+                              >
+                                <span className="text-numeric me-3">
+                                  {formatStringWeiToStringEther(
+                                    farmData.userStakingData?.rewardsAccumulated[rewardKey] || '0',
+                                    farmData.rewardsData.find(
+                                      reward => reward.address === rewardKey,
+                                    )?.decimals,
+                                  )}
+                                </span>
+                                <IconToken symbol={rewardSymbol} />
+                                <span className="ms-3">{rewardSymbol}</span>
+                              </p>
+                            );
+                          },
+                        )}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div>
+                    <p className="text-small text-bold text-center my-5">
+                      Stake Your LP Tokens and Earn Rewards
                     </p>
                   </div>
-                </div>
-              ) : null}
+                )}
+              </div>
             </div>
           </div>
+
           <div className="col-4">
             <div className="container-blue-neutral-900 rounded p-5 heigth-100 d-flex flex-column justify-content-between">
               <div>

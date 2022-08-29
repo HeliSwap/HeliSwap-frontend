@@ -215,6 +215,12 @@
   background-color: $blue-neutral-900;
 }
 
+.container-border-rounded-bn-500 {
+  border: 1px solid $blue-neutral-500;
+  border-radius: $border-radius;
+  padding: 16px;
+}
+
 .container-input-token {
   background-color: $blue-neutral-700;
   border-radius: $border-radius;
@@ -343,6 +349,10 @@
 
     &.with-6-columns {
       grid-template-columns: 30px 2fr 1fr 1fr 1fr 1fr;
+    }
+
+    &.with-6-columns-farms {
+      grid-template-columns: 30px 2fr 1fr 1fr 1fr 2fr;
     }
 
     &.is-opened {

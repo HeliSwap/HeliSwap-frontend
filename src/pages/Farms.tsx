@@ -76,7 +76,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
         {haveFarms ? (
           <>
             <div className="table-pools">
-              <div className={`table-pools-row with-6-columns`}>
+              <div className={`table-pools-row with-6-columns-farms`}>
                 <div className="table-pools-cell">
                   <span className="text-small">#</span>
                 </div>
@@ -84,7 +84,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
                   <span className="text-small">Pair Name</span>
                 </div>
                 <div className="table-pools-cell justify-content-end">
-                  <span className="text-small ws-no-wrap">Liquidity</span>
+                  <span className="text-small ws-no-wrap">Total Staked</span>
                 </div>
                 <div className="table-pools-cell justify-content-end">
                   <span className="text-small ws-no-wrap">Total APR</span>
