@@ -1,8 +1,6 @@
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import Tippy from '@tippyjs/react';
 import toast from 'react-hot-toast';
-
-import BigNumber from 'bignumber.js';
 
 import { GlobalContext } from '../providers/Global';
 
@@ -12,11 +10,8 @@ import Icon from './Icon';
 import IconToken from './IconToken';
 import PageHeader from './PageHeader';
 import Button from './Button';
-import InputTokenSelector from './InputTokenSelector';
-import ButtonSelector from './ButtonSelector';
-import InputToken from './InputToken';
 import ToasterWrapper from './ToasterWrapper';
-import WalletBalance from './WalletBalance';
+import FarmActions from './FarmActions';
 
 import { formatIcons } from '../utils/iconUtils';
 import {
@@ -28,8 +23,6 @@ import {
 } from '../utils/numberUtils';
 
 import getErrorMessage from '../content/errors';
-
-import { MAX_UINT_ERC20 } from '../constants';
 import { timestampToDate } from '../utils/timeUtils';
 
 interface IFarmDetailsProps {
@@ -42,13 +35,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
 
-  const [lpInputValue, setLpInputValue] = useState('0.0');
   const [loadingHarvest, setLoadingHarvest] = useState(false);
-  const [loadingStake, setLoadingStake] = useState(false);
-  const [loadingApprove, setLoadingApprove] = useState(false);
-  const [loadingExit, setLoadingExit] = useState(false);
-
-  const [lpApproved, setLpApproved] = useState(false);
 
   const userRewardsUSD = useMemo(() => {
     const { userStakingData } = farmData;
@@ -71,47 +58,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
     return ((Number(userStakingData?.stakedAmount) / Number(totalStaked)) * 100).toString();
   }, [farmData]);
 
-  const getInsufficientTokenBalance = useCallback(() => {
-    const {
-      poolData: { lpShares },
-    } = farmData;
-
-    return new BigNumber(lpInputValue).gt(
-      new BigNumber(formatStringWeiToStringEther(lpShares || '0')),
-    );
-  }, [farmData, lpInputValue]);
-
   // Handlers
-  const hanleLpInputChange = (value: string) => {
-    setLpInputValue(value);
-  };
-
-  const handleStakeClick = async () => {
-    setLoadingStake(true);
-    try {
-      const receipt = await sdk.stakeLP(
-        hashconnectConnectorInstance,
-        lpInputValue,
-        farmData.address,
-        userId,
-      );
-      const {
-        response: { success, error },
-      } = receipt;
-
-      if (success) {
-        toast.success('Success! Tokens are staked');
-      } else {
-        toast.error(getErrorMessage(error.status ? error.status : error));
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error('Error on stake');
-    } finally {
-      setLoadingStake(false);
-    }
-  };
-
   const handleHarvestClick = async () => {
     setLoadingHarvest(true);
     try {
@@ -137,55 +84,6 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
     }
   };
 
-  const handleExitButtonClick = async (campaignAddress: string) => {
-    setLoadingExit(true);
-
-    try {
-      const receipt = await sdk.exit(hashconnectConnectorInstance, campaignAddress, userId);
-      const {
-        response: { success, error },
-      } = receipt;
-
-      if (success) {
-        toast.success('Success! Exit was successful.');
-      } else {
-        toast.error(getErrorMessage(error.status ? error.status : error));
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoadingExit(false);
-    }
-  };
-
-  const handleApproveButtonClick = async (campaignAddress: string, poolAddress: string) => {
-    setLoadingApprove(true);
-    const amount = MAX_UINT_ERC20.toString();
-    try {
-      const receipt = await sdk.approveTokenStake(
-        hashconnectConnectorInstance,
-        campaignAddress,
-        amount,
-        userId,
-        poolAddress,
-      );
-      const {
-        response: { success, error },
-      } = receipt;
-
-      if (success) {
-        toast.success('Success! Token was approved.');
-        setLpApproved(true);
-      } else {
-        toast.error(getErrorMessage(error.status ? error.status : error));
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoadingApprove(false);
-    }
-  };
-
   const renderCampaignEndDate = (campaignEndDate: number) => {
     const campaignEnded = campaignEndDate < Date.now();
 
@@ -206,6 +104,10 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
 
     return <div className="d-flex align-items-center">{dateContent}</div>;
   };
+
+  const hasUserStaked = farmData.userStakingData?.stakedAmount !== '0';
+  const hasUserProvided = farmData.poolData.lpShares !== '0';
+  const campaignEnded = farmData.campaignEndDate < Date.now();
 
   return (
     <div className="d-flex justify-content-center">
@@ -345,7 +247,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
               </div>
 
               <div className="container-blue-neutral rounded p-5 mt-5">
-                {farmData.userStakingData?.stakedAmount !== '0' ? (
+                {hasUserStaked ? (
                   <>
                     <div className="d-flex justify-content-between align-items-start">
                       <p className="text-small text-bold">Pending rewards</p>
@@ -357,14 +259,6 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                           type="primary"
                         >
                           Harvest
-                        </Button>
-                        <Button
-                          className="ms-3"
-                          size="small"
-                          loading={loadingExit}
-                          onClick={() => handleExitButtonClick(farmData.address)}
-                        >
-                          Exit
                         </Button>
                       </div>
                     </div>
@@ -406,6 +300,10 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                       </div>
                     </div>
                   </>
+                ) : campaignEnded ? (
+                  <div>
+                    <p className="text-small text-bold text-center my-5">Campaign is not active</p>
+                  </div>
                 ) : (
                   <div>
                     <p className="text-small text-bold text-center my-5">
@@ -417,58 +315,12 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
             </div>
           </div>
 
-          <div className="col-4">
-            <div className="container-blue-neutral-900 rounded p-5 heigth-100 d-flex flex-column justify-content-between">
-              <div>
-                <p className="text-small text-bold">Enter LP Token Amount</p>
-                <InputTokenSelector
-                  className="mt-4"
-                  inputTokenComponent={
-                    <InputToken
-                      value={lpInputValue}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        const { value } = e.target;
-                        hanleLpInputChange(value);
-                      }}
-                      isCompact={true}
-                      name="amountIn"
-                    />
-                  }
-                  buttonSelectorComponent={
-                    <ButtonSelector disabled selectedToken="LP" selectorText="Select a token" />
-                  }
-                  walletBalanceComponent={
-                    <WalletBalance
-                      insufficientBallance={getInsufficientTokenBalance()}
-                      walletBalance={formatStringWeiToStringEther(
-                        farmData.poolData.lpShares || '0',
-                      )}
-                      onMaxButtonClick={(maxValue: string) => {
-                        hanleLpInputChange(maxValue);
-                      }}
-                    />
-                  }
-                />
-              </div>
-
-              <div className="d-grid">
-                {lpApproved ? (
-                  <Button loading={loadingStake} onClick={handleStakeClick}>
-                    Stake
-                  </Button>
-                ) : (
-                  <Button
-                    loading={loadingApprove}
-                    onClick={() =>
-                      handleApproveButtonClick(farmData.address, farmData.poolData.pairAddress)
-                    }
-                  >
-                    Approve
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
+          <FarmActions
+            campaignEnded={campaignEnded}
+            hasUserStaked={hasUserStaked}
+            hasUserProvided={hasUserProvided}
+            farmData={farmData}
+          />
         </div>
       </div>
       <ToasterWrapper />
