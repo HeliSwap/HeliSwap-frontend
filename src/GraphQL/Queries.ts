@@ -195,6 +195,41 @@ export const GET_TOKENS_WHITELISTED = gql`
   }
 `;
 
+export const GET_FARMS = gql`
+  query getCampaignData($address: String!) {
+    getCampaignData(eoaAddress: $address) {
+      address
+      totalStaked
+      stakingTokenAddress
+      rewardsData {
+        address
+      }
+      userStakingData {
+        stakedAmount
+        rewardsAccumulated {
+          address
+          totalAccumulated
+        }
+      }
+      poolData {
+        pairSymbol
+        pairAddress
+        pairName
+        pairSupply
+        lpShares
+        token0
+        token0Amount
+        token0Decimals
+        token0Symbol
+        token1
+        token1Amount
+        token1Decimals
+        token1Symbol
+      }
+    }
+  }
+`;
+
 export const GET_SWAP_RATE = gql`
   query {
     getSwapRate {

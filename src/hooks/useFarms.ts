@@ -1,27 +1,37 @@
 import { useEffect, useState } from 'react';
+
+import { QueryHookOptions, useQuery } from '@apollo/client';
+import { GET_FARMS } from '../GraphQL/Queries';
+
 import { IFarmData, IFarmDataRaw, IPoolData } from '../interfaces/tokens';
 
-import { QueryHookOptions } from '@apollo/client';
 import { getProcessedFarms } from '../utils/farmUtils';
-import { getHBarPrice } from '../utils/tokenUtils';
-// import { GET_FARMS } from '../GraphQL/Queries';
+import { getHBarPrice, idToAddress } from '../utils/tokenUtils';
 
-const useFarms = (useQueryOptions: QueryHookOptions = {}, pools: IPoolData[]) => {
+const useFarms = (useQueryOptions: QueryHookOptions = {}, userId: string, pools: IPoolData[]) => {
   const [farmsRaw, setFarmsRaw] = useState<IFarmDataRaw[]>([]);
   const [farms, setFarms] = useState<IFarmData[]>([]);
   const [hbarPrice, setHbarPrice] = useState(0);
 
-  // const { loading, data, error, startPolling, stopPolling } = useQuery(GET_FARMS, useQueryOptions);
+  const address = userId ? idToAddress(userId) : '';
+
+  const { loading, data, error, startPolling, stopPolling } = useQuery(GET_FARMS, {
+    variables: { address },
+    ...useQueryOptions,
+    skip: !userId,
+  });
+
+  console.log('data', data);
 
   useEffect(() => {
     const getFarmsData = () => {
       setFarmsRaw([
         {
-          address: '0x0000000000000000000000000000000002DdF9F9', //campaign address
-          stakingTokenAddress: '0xe97aB1284c3f9Cc1829A2A80F221ea7b09039CF0',
-          totalStaked: '5099018512',
+          address: '0x0000000000000000000000000000000002de3560', //campaign address
+          stakingTokenAddress: '0x978264868aA0730718FBe0A3CCCF8C09f6eb74C3',
+          totalStaked: '0',
           userStakingData: {
-            stakedAmount: '2549509756',
+            stakedAmount: '0',
             rewardsAccumulated: {
               '0x0000000000000000000000000000000002be8c90': '0',
             },
@@ -40,9 +50,9 @@ const useFarms = (useQueryOptions: QueryHookOptions = {}, pools: IPoolData[]) =>
           poolData: {
             pairSymbol: 'USDT WHBAR',
             pairSupply: '5099019512',
-            pairAddress: '0xe97aB1284c3f9Cc1829A2A80F221ea7b09039CF0',
+            pairAddress: '0x978264868aA0730718FBe0A3CCCF8C09f6eb74C3',
             pairName: 'USD Hedera Token Wrapped Hbar LP',
-            lpShares: '2549509756',
+            lpShares: '15928479087',
             token0: '0x0000000000000000000000000000000002121D51',
             token0Symbol: 'USDT',
             token0Decimals: 6,
@@ -57,47 +67,47 @@ const useFarms = (useQueryOptions: QueryHookOptions = {}, pools: IPoolData[]) =>
             token1Amount: '100000000000',
           },
         },
-        {
-          address: '0x0000000000000000000000000000000002DDfB0e', //campaign address
-          stakingTokenAddress: '0xe97aB1284c3f9Cc1829A2A80F221ea7b09039CF0',
-          totalStaked: '5099018512',
-          userStakingData: {
-            stakedAmount: '2549509756',
-            rewardsAccumulated: {
-              '0x0000000000000000000000000000000002be8c90': '0',
-            },
-          },
-          rewardsData: [
-            {
-              address: '0x0000000000000000000000000000000002121D51',
-              symbol: 'USDT',
-              totalAmount: '500',
-              duration: 604800,
-              decimals: 6,
-              totalAccumulated: '0',
-              rewardEnd: 1664440074000,
-            },
-          ],
-          poolData: {
-            pairSymbol: 'USDT WHBAR',
-            pairSupply: '5099019512',
-            pairAddress: '0xe97aB1284c3f9Cc1829A2A80F221ea7b09039CF0',
-            pairName: 'USD Hedera Token Wrapped Hbar LP',
-            lpShares: '2549509756',
-            token0: '0x0000000000000000000000000000000002121D51',
-            token0Symbol: 'USDT',
-            token0Decimals: 6,
-            token0Name: 'USD Hedera Token',
-            token1: '0x0000000000000000000000000000000002be8c90',
-            token1Symbol: 'WHBAR',
-            token1Decimals: 8,
-            token1Name: 'Wrapped Hbar',
-            volume24h: '',
-            volume7d: '',
-            token0Amount: '65000000',
-            token1Amount: '100000000000',
-          },
-        },
+        // {
+        //   address: '0x0000000000000000000000000000000002DDfB0e', //campaign address
+        //   stakingTokenAddress: '0x978264868aA0730718FBe0A3CCCF8C09f6eb74C3',
+        //   totalStaked: '5099018512',
+        //   userStakingData: {
+        //     stakedAmount: '2549509756',
+        //     rewardsAccumulated: {
+        //       '0x0000000000000000000000000000000002be8c90': '0',
+        //     },
+        //   },
+        //   rewardsData: [
+        //     {
+        //       address: '0x0000000000000000000000000000000002121D51',
+        //       symbol: 'USDT',
+        //       totalAmount: '500',
+        //       duration: 604800,
+        //       decimals: 6,
+        //       totalAccumulated: '0',
+        //       rewardEnd: 1664440074000,
+        //     },
+        //   ],
+        //   poolData: {
+        //     pairSymbol: 'USDT WHBAR',
+        //     pairSupply: '5099019512',
+        //     pairAddress: '0x978264868aA0730718FBe0A3CCCF8C09f6eb74C3',
+        //     pairName: 'USD Hedera Token Wrapped Hbar LP',
+        //     lpShares: '2549509756',
+        //     token0: '0x0000000000000000000000000000000002121D51',
+        //     token0Symbol: 'USDT',
+        //     token0Decimals: 6,
+        //     token0Name: 'USD Hedera Token',
+        //     token1: '0x0000000000000000000000000000000002be8c90',
+        //     token1Symbol: 'WHBAR',
+        //     token1Decimals: 8,
+        //     token1Name: 'Wrapped Hbar',
+        //     volume24h: '',
+        //     volume7d: '',
+        //     token0Amount: '65000000',
+        //     token1Amount: '100000000000',
+        //   },
+        // },
       ]);
     };
 

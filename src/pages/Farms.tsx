@@ -20,7 +20,8 @@ interface IFarmsProps {
 
 const Farms = ({ itemsPerPage }: IFarmsProps) => {
   const contextValue = useContext(GlobalContext);
-  const { tokensWhitelisted } = contextValue;
+  const { tokensWhitelisted, connection } = contextValue;
+  const { userId } = connection;
 
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
 
@@ -36,7 +37,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
     tokensWhitelistedAddresses,
   );
 
-  const { farms } = useFarms(useQueryOptions, pools);
+  const { farms } = useFarms(useQueryOptions, userId, pools);
 
   // Handlers
   const handlePageClick = (event: any) => {
