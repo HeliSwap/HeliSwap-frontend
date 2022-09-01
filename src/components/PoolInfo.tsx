@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import Tippy from '@tippyjs/react';
 
@@ -8,13 +8,30 @@ import { PageViews } from '../interfaces/common';
 import Button from './Button';
 import IconToken from './IconToken';
 import Icon from './Icon';
+import Modal from './Modal';
+import TransferLPModalContent from './Modals/TransferLPModalContent';
+import InputTokenSelector from './InputTokenSelector';
 
-import { formatStringETHtoPriceFormatted, formatStringToPrice } from '../utils/numberUtils';
+import {
+  formatStringETHtoPriceFormatted,
+  formatStringToPrice,
+  formatStringWeiToStringEther,
+  stripStringToFixedDecimals,
+} from '../utils/numberUtils';
 import { formatIcons } from '../utils/iconUtils';
 
 import { generalFeesAndKeysWarning } from '../content/messages';
 
 import { POOLS_FEE } from '../constants';
+import InputToken from './InputToken';
+import ButtonSelector from './ButtonSelector';
+import WalletBalance from './WalletBalance';
+import ToasterWrapper from './ToasterWrapper';
+
+import { GlobalContext } from '../providers/Global';
+import getErrorMessage from '../content/errors';
+import toast from 'react-hot-toast';
+import { idToAddress } from '../utils/tokenUtils';
 
 interface IPoolInfoProps {
   poolData: IPoolExtendedData;
@@ -35,11 +52,72 @@ const PoolInfo = ({
   collapseAll,
   setCollapseAll,
 }: IPoolInfoProps) => {
+  const contextValue = useContext(GlobalContext);
+  const { connection, sdk } = contextValue;
+  const { userId, hashconnectConnectorInstance } = connection;
+
   const [showPoolDetails, setShowPoolDetails] = useState(false);
+  const [showTransferModal, setShowTransferModal] = useState(false);
+  const [inputId, setInputId] = useState('');
+  const [inputLPAmount, setInputLPAmount] = useState(
+    formatStringWeiToStringEther(poolData.lpShares as string),
+  );
+
+  const [transferLoading, setTransferLoading] = useState(false);
 
   const handleRemoveButtonClick = () => {
     setShowRemoveContainer(prev => !prev);
     setCurrentPoolIndex(index);
+  };
+
+  const handleTransferModalButtonClick = () => {
+    setShowTransferModal(true);
+  };
+
+  const handleInputIdChange = (value: string) => {
+    setInputId(value);
+  };
+
+  const handleInputLPAmountChange = (value: string) => {
+    setInputLPAmount(value);
+  };
+
+  const handleMaxButtonClick = (value: string) => {
+    setInputLPAmount(formatStringWeiToStringEther(poolData.lpShares as string));
+  };
+
+  const handleTransferButtonClick = async (
+    tokenAddress: string,
+    amount: string,
+    address: string,
+  ) => {
+    setTransferLoading(true);
+
+    try {
+      const receipt = await sdk.transferERC20(
+        hashconnectConnectorInstance,
+        userId,
+        tokenAddress,
+        amount,
+        address,
+      );
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (!success) {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      } else {
+        toast.success('Success! Tokens were trasfered.');
+        setShowTransferModal(false);
+        setInputId('');
+      }
+    } catch (err) {
+      console.error(err);
+      toast('Error on transfer');
+    } finally {
+      setTransferLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -184,7 +262,12 @@ const PoolInfo = ({
             <div className="d-flex justify-content-between align-items-center">
               <div className="d-flex align-items-center">
                 <span className="text-small text-bold me-4">LP token count</span>
-                <Button size="small" type="primary" outline>
+                <Button
+                  onClick={handleTransferModalButtonClick}
+                  size="small"
+                  type="primary"
+                  outline
+                >
                   Transfer
                 </Button>
               </div>
@@ -194,6 +277,70 @@ const PoolInfo = ({
             </div>
           </div>
         </div>
+
+        <Modal show={showTransferModal} closeModal={() => setShowTransferModal(false)}>
+          <TransferLPModalContent
+            closeModal={() => setShowTransferModal(false)}
+            modalTitle="Transfer LP Tokens"
+          >
+            <div>
+              <label className="text-small mb-2">Transfer to Wallet ID</label>
+              <input
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const { value } = e.target;
+                  const strippedValue = stripStringToFixedDecimals(value, 18);
+                  handleInputIdChange(strippedValue);
+                }}
+                value={inputId}
+                type="text"
+                className="form-control"
+              />
+
+              <label className="text-small mt-5 mb-2">Enter amount</label>
+
+              <InputTokenSelector
+                inputTokenComponent={
+                  <InputToken
+                    value={inputLPAmount}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      const { value } = e.target;
+                      const strippedValue = stripStringToFixedDecimals(value, 18);
+                      handleInputLPAmountChange(strippedValue);
+                    }}
+                    name="amountOut"
+                  />
+                }
+                buttonSelectorComponent={
+                  <ButtonSelector selectorText="" disabled selectedToken="LP" />
+                }
+                walletBalanceComponent={
+                  poolData.lpShares !== '0' ? (
+                    <WalletBalance
+                      onMaxButtonClick={handleMaxButtonClick}
+                      walletBalance={formatStringWeiToStringEther(poolData.lpShares as string)}
+                    />
+                  ) : null
+                }
+              />
+
+              <div className="d-grid mt-5">
+                <Button
+                  onClick={() =>
+                    handleTransferButtonClick(
+                      poolData.pairAddress,
+                      inputLPAmount,
+                      idToAddress(inputId),
+                    )
+                  }
+                  loading={transferLoading}
+                  type="primary"
+                >
+                  Transfer
+                </Button>
+              </div>
+            </div>
+          </TransferLPModalContent>
+        </Modal>
 
         <div className="col-4">
           <div>
@@ -292,6 +439,8 @@ const PoolInfo = ({
           {view === PageViews.ALL_POOLS ? renderAllPoolsDetails() : renderMyPoolsDetails()}
         </div>
       ) : null}
+
+      <ToasterWrapper />
     </>
   );
 };
