@@ -203,6 +203,10 @@ export const GET_FARMS = gql`
       stakingTokenAddress
       rewardsData {
         address
+        symbol
+        decimals
+        rewardEnd
+        totalAmount
       }
       userStakingData {
         stakedAmount
