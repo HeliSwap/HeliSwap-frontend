@@ -14,9 +14,9 @@ import InputTokenSelector from './InputTokenSelector';
 
 import {
   formatStringETHtoPriceFormatted,
+  formatStringToBigNumberWei,
   formatStringToPrice,
   formatStringWeiToStringEther,
-  stripStringToFixedDecimals,
 } from '../utils/numberUtils';
 import { formatIcons } from '../utils/iconUtils';
 
@@ -31,7 +31,7 @@ import ToasterWrapper from './ToasterWrapper';
 import { GlobalContext } from '../providers/Global';
 import getErrorMessage from '../content/errors';
 import toast from 'react-hot-toast';
-import { idToAddress } from '../utils/tokenUtils';
+import { idToAddress, isHederaIdValid } from '../utils/tokenUtils';
 
 interface IPoolInfoProps {
   poolData: IPoolExtendedData;
@@ -56,12 +56,16 @@ const PoolInfo = ({
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
 
+  const maxLpInputValue: string = formatStringWeiToStringEther(poolData?.lpShares as string);
+
   const [showPoolDetails, setShowPoolDetails] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [inputId, setInputId] = useState('');
+  const [inputIdValid, setInputIdValid] = useState(true);
   const [inputLPAmount, setInputLPAmount] = useState(
     formatStringWeiToStringEther(poolData.lpShares as string),
   );
+  const [inputLPAmountValid, setInputLPAMountValid] = useState(true);
 
   const [transferLoading, setTransferLoading] = useState(false);
 
@@ -74,11 +78,33 @@ const PoolInfo = ({
     setShowTransferModal(true);
   };
 
-  const handleInputIdChange = (value: string) => {
+  const handleInputIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { target } = e;
+    const { value } = target;
+
+    setInputIdValid(!!isHederaIdValid(value));
     setInputId(value);
   };
 
-  const handleInputLPAmountChange = (value: string) => {
+  const handleInputLPAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+
+    const initialLpInputValueBNWei = formatStringToBigNumberWei(maxLpInputValue, 18);
+    const valueBNWei = formatStringToBigNumberWei(value, 18);
+    const inputGtInitialValue = valueBNWei.gt(initialLpInputValueBNWei);
+
+    // TODO make this common for every token input
+    // TODO make validation for more than 18 decs!!
+    const invalidInputTokensData =
+      !value || isNaN(Number(value)) || inputGtInitialValue || Number(value) === 0;
+
+    if (invalidInputTokensData) {
+      setInputLPAmount(formatStringWeiToStringEther(poolData.lpShares as string));
+      setInputLPAMountValid(false);
+      return;
+    }
+
+    setInputLPAMountValid(true);
     setInputLPAmount(value);
   };
 
@@ -286,14 +312,10 @@ const PoolInfo = ({
             <div>
               <label className="text-small mb-2">Transfer to Wallet ID</label>
               <input
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const { value } = e.target;
-                  const strippedValue = stripStringToFixedDecimals(value, 18);
-                  handleInputIdChange(strippedValue);
-                }}
+                onChange={handleInputIdChange}
                 value={inputId}
                 type="text"
-                className="form-control"
+                className={`form-control ${!inputIdValid ? 'is-invalid' : ''}`}
               />
 
               <label className="text-small mt-5 mb-2">Enter amount</label>
@@ -302,11 +324,7 @@ const PoolInfo = ({
                 inputTokenComponent={
                   <InputToken
                     value={inputLPAmount}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      const { value } = e.target;
-                      const strippedValue = stripStringToFixedDecimals(value, 18);
-                      handleInputLPAmountChange(strippedValue);
-                    }}
+                    onChange={handleInputLPAmountChange}
                     name="amountOut"
                   />
                 }
@@ -334,6 +352,7 @@ const PoolInfo = ({
                   }
                   loading={transferLoading}
                   type="primary"
+                  disabled={!canTransfer}
                 >
                   Transfer
                 </Button>
@@ -366,6 +385,8 @@ const PoolInfo = ({
       </div>
     );
   };
+
+  const canTransfer = inputIdValid && inputId !== '' && inputLPAmountValid;
 
   return (
     <>
