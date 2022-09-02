@@ -15,6 +15,16 @@ export const getProcessedFarms = (
   pools: IPoolData[],
   hbarPrice: number,
 ): IFarmData[] => {
+  const formatEndDate = (dateInSeconds: number) => {
+    const dateSplitted = dateInSeconds.toString().split('.');
+    const dateInMilliseconds =
+      dateSplitted.length > 1
+        ? Number(dateInSeconds.toString().split('.')[0]) * 1000
+        : dateInSeconds * 1000;
+
+    return dateInMilliseconds;
+  };
+
   const getLPValue = (currentFarm: IFarmDataRaw) => {
     const {
       poolData: {
@@ -56,12 +66,20 @@ export const getProcessedFarms = (
     const { rewardsData } = currentFarm;
 
     return rewardsData.map((currentReward: IRewardRaw): IReward => {
-      const { address, totalAccumulated, totalAmount, decimals } = currentReward;
+      const {
+        address,
+        totalAccumulated,
+        totalAmount,
+        decimals,
+        rewardEnd: rewardEndSeconds,
+      } = currentReward;
       const rewardValueUSD = getTokenPrice(pools, address, hbarPrice);
       const rewardAmount = formatStringWeiToStringEther(totalAmount, decimals);
+      const rewardEnd = formatEndDate(rewardEndSeconds);
 
       return {
         ...currentReward,
+        rewardEnd,
         totalAmountUSD: (Number(rewardAmount) * Number(rewardValueUSD)).toString(),
         totalAccumulatedUSD: (Number(totalAccumulated) * Number(rewardValueUSD)).toString(),
       };
@@ -131,7 +149,8 @@ export const getProcessedFarms = (
     let endTimestamp = 0;
 
     rewardsData.forEach((currentReward: IRewardRaw) => {
-      const { rewardEnd } = currentReward;
+      const { rewardEnd: rewardEndSeconds } = currentReward;
+      const rewardEnd = formatEndDate(rewardEndSeconds);
       if (rewardEnd > endTimestamp) {
         endTimestamp = rewardEnd;
       }
