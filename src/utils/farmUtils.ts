@@ -5,7 +5,6 @@ import {
   IReward,
   IRewardRaw,
   IUserStakingData,
-  IUserStakingDataRaw,
 } from '../interfaces/tokens';
 import { formatStringWeiToStringEther } from './numberUtils';
 import { getTokenPrice } from './tokenUtils';
@@ -92,27 +91,42 @@ export const getProcessedFarms = (
   ): IUserStakingData => {
     const { userStakingData, rewardsData } = currentFarm;
 
-    const userStakedFormatted = formatStringWeiToStringEther(userStakingData?.stakedAmount || '0');
-
-    let rewardsProcessed = {} as IUserStakingData;
-
-    Object.keys(userStakingData?.rewardsAccumulated || {}).forEach((tokenAddress: string) => {
-      const rewardValueUSD = getTokenPrice(pools, tokenAddress, hbarPrice);
-      const rewardAmountWei = userStakingData?.rewardsAccumulated[tokenAddress] as string;
-      const rewardDecimals = rewardsData.find(reward => reward.address === tokenAddress)?.decimals;
-      const rewardAmount = formatStringWeiToStringEther(rewardAmountWei, rewardDecimals);
-
-      rewardsProcessed = {
-        ...rewardsProcessed,
-        [tokenAddress]: (Number(rewardValueUSD) * Number(rewardAmount)).toString(),
+    if (userStakingData?.stakedAmount === '0') {
+      return {
+        stakedAmount: '0',
+        stakedAmountUSD: '0',
+        rewardsAccumulated: [],
       };
-    });
+    } else {
+      const userStakedFormatted = formatStringWeiToStringEther(
+        userStakingData?.stakedAmount || '0',
+      );
 
-    return {
-      ...(userStakingData as IUserStakingDataRaw),
-      rewardsAccumulatedUSD: rewardsProcessed,
-      userStakedUSD: (lPValue * Number(userStakedFormatted)).toString(),
-    };
+      const rewardsProcessed =
+        userStakingData.rewardsAccumulated!.length > 0
+          ? userStakingData?.rewardsAccumulated!.map(reward => {
+              const rewardValueUSD = getTokenPrice(pools, reward.address, hbarPrice);
+              const rewardAmountWei = reward.totalAccumulated;
+              const rewardDecimals = rewardsData.find(
+                rewardDataItem => rewardDataItem.address === reward.address,
+              )?.decimals;
+              const rewardAmount = formatStringWeiToStringEther(rewardAmountWei, rewardDecimals);
+              const rewardAmountUSD = (Number(rewardValueUSD) * Number(rewardAmount)).toString();
+
+              return {
+                address: reward.address,
+                totalAccumulated: reward.totalAccumulated,
+                totalAccumulatedUSD: rewardAmountUSD,
+              };
+            })
+          : [];
+
+      return {
+        stakedAmount: userStakingData!.stakedAmount || '0',
+        stakedAmountUSD: (lPValue * Number(userStakedFormatted)).toString(),
+        rewardsAccumulated: rewardsProcessed,
+      };
+    }
   };
 
   const getTotalRewardsUSD = (rewardsData: IReward[]) => {

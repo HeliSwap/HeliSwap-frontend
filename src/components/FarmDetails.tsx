@@ -40,14 +40,9 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
   const userRewardsUSD = useMemo(() => {
     const { userStakingData } = farmData;
 
-    return Object.keys(userStakingData?.rewardsAccumulatedUSD || {}).reduce(
-      (acc: string, currentValue: string) => {
-        return (
-          Number(acc) + Number(userStakingData?.rewardsAccumulatedUSD[currentValue])
-        ).toString();
-      },
-      '0',
-    );
+    return userStakingData.rewardsAccumulated?.reduce((acc: string, currentValue) => {
+      return (Number(acc) + Number(currentValue.totalAccumulatedUSD)).toString();
+    }, '0');
   }, [farmData]);
 
   const userShare = useMemo(() => {
@@ -226,7 +221,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                     <p className="text-subheader text-numeric">
                       {formatStringToPrice(
                         stripStringToFixedDecimals(
-                          farmData.userStakingData?.userStakedUSD || '0',
+                          farmData.userStakingData.stakedAmountUSD as string,
                           2,
                         ),
                       )}
@@ -264,39 +259,36 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                     </div>
 
                     <div className="mt-5">
-                      <p className="text-title text-numeric ">
-                        {formatStringToPrice(stripStringToFixedDecimals(userRewardsUSD, 2))}
+                      <p className="text-title text-numeric">
+                        {formatStringToPrice(userRewardsUSD as string)}
                       </p>
 
                       <div className="d-flex align-items-center mt-4">
-                        {Object.keys(farmData.userStakingData!.rewardsAccumulatedUSD).map(
-                          (rewardKey: string) => {
-                            const rewardData =
-                              farmData.rewardsData.find((reward: IReward) => {
-                                return reward.address === rewardKey;
-                              }) || ({} as IReward);
+                        {farmData.userStakingData.rewardsAccumulated?.map(reward => {
+                          const rewardData =
+                            farmData.rewardsData.find((rewardSingle: IReward) => {
+                              return rewardSingle.address === reward.address;
+                            }) || ({} as IReward);
 
-                            const rewardSymbol = rewardData.symbol;
+                          const rewardSymbol = rewardData.symbol;
+                          const rewardDecimals = rewardData.decimals;
 
-                            return (
-                              <p
-                                key={rewardKey}
-                                className="text-main text-secondary d-flex align-items-center me-3"
-                              >
-                                <span className="text-numeric me-3">
-                                  {formatStringWeiToStringEther(
-                                    farmData.userStakingData?.rewardsAccumulated[rewardKey] || '0',
-                                    farmData.rewardsData.find(
-                                      reward => reward.address === rewardKey,
-                                    )?.decimals,
-                                  )}
-                                </span>
-                                <IconToken symbol={rewardSymbol} />
-                                <span className="ms-3">{rewardSymbol}</span>
-                              </p>
-                            );
-                          },
-                        )}
+                          return (
+                            <p
+                              key={rewardSymbol}
+                              className="text-main text-secondary d-flex align-items-center me-3"
+                            >
+                              <span className="text-numeric me-3">
+                                {formatStringWeiToStringEther(
+                                  reward.totalAccumulated || '0',
+                                  rewardDecimals,
+                                )}
+                              </span>
+                              <IconToken symbol={rewardSymbol} />
+                              <span className="ms-3">{rewardSymbol}</span>
+                            </p>
+                          );
+                        })}
                       </div>
                     </div>
                   </>

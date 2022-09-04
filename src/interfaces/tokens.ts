@@ -87,13 +87,13 @@ export interface IFarmDataRaw {
   totalStaked: string;
   rewardsData: IRewardRaw[];
   stakingTokenAddress: string;
-  userStakingData?: IUserStakingDataRaw;
+  userStakingData: IUserStakingDataRaw;
 }
 
 export interface IFarmData extends IFarmDataRaw {
   totalStakedUSD: string;
   rewardsData: IReward[];
-  userStakingData?: IUserStakingData;
+  userStakingData: IUserStakingData;
   APR: string;
   totalRewardsUSD: string;
   campaignEndDate: number;
@@ -115,19 +115,25 @@ export interface IReward extends IRewardRaw {
 }
 
 export interface IUserStakingDataRaw {
-  stakedAmount: string;
-  rewardsAccumulated: {
-    [key: string]: string;
-  };
+  stakedAmount?: string;
+  rewardsAccumulated?: IRewardsAccumulatedRaw[];
   [key: string]: any;
 }
 
 export interface IUserStakingData extends IUserStakingDataRaw {
-  userStakedUSD: string;
-  rewardsAccumulatedUSD: {
-    [key: string]: string;
-  };
+  stakedAmountUSD?: string;
+  rewardsAccumulated?: IRewardsAccumulated[];
 }
+
+export interface IRewardsAccumulatedRaw {
+  address: string;
+  totalAccumulated: string;
+}
+
+export interface IRewardsAccumulated extends IRewardsAccumulatedRaw {
+  totalAccumulatedUSD: string;
+}
+
 export interface IUserReward {
   address: string;
   symbol: string;
