@@ -237,6 +237,12 @@ const PoolInfo = ({
             {poolData.token0Symbol}/{poolData.token1Symbol}
           </p>
           <span className="text-micro text-numeric badge bg-secondary-800 ms-3">{POOLS_FEE}</span>
+          {poolData.hasCampaign ? (
+            <span className="text-micro text-uppercase badge bg-success-600 ms-3">
+              Yield farming
+            </span>
+          ) : null}
+
           {poolData.hasProblematicToken ? (
             <Tippy content={generalFeesAndKeysWarning}>
               <span className="ms-3">

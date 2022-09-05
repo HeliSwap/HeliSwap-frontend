@@ -21,6 +21,7 @@ export const GET_POOLS = gql`
       volume24h
       volume7d
       hasProblematicToken
+      hasCampaign
     }
   }
 `;
@@ -44,6 +45,7 @@ export const GET_POOL_BY_TOKEN = gql`
       token1Amount
       token1Decimals
       hasProblematicToken
+      hasCampaign
     }
   }
 `;
@@ -70,6 +72,7 @@ export const GET_POOLS_BY_USER = gql`
       fee0
       fee1
       hasProblematicToken
+      hasCampaign
     }
   }
 `;
@@ -95,6 +98,7 @@ export const GET_POOLS_FILTERED = gql`
       volume24h
       volume7d
       hasProblematicToken
+      hasCampaign
     }
   }
 `;
@@ -119,6 +123,7 @@ export const GET_POOLS_WHITELISTED = gql`
       token1Decimals
       volume24h
       volume7d
+      hasCampaign
     }
   }
 `;
