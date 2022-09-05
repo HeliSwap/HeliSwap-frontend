@@ -352,11 +352,11 @@
     }
 
     &.with-6-columns {
-      grid-template-columns: 30px 2fr 1fr 1fr 1fr 1fr;
+      grid-template-columns: 20px 3fr 1fr 1fr 1fr 1fr;
     }
 
     &.with-6-columns-farms {
-      grid-template-columns: 30px 2fr 1fr 1fr 1fr 2fr;
+      grid-template-columns: 20px 2fr 1fr 1fr 1fr 2fr;
     }
 
     &.is-opened {
