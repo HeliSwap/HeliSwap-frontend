@@ -8,6 +8,7 @@ import { IFarmData } from '../interfaces/tokens';
 
 import FarmDetails from '../components/FarmDetails';
 import FarmRow from '../components/FarmRow';
+import Button from '../components/Button';
 
 import useFarms from '../hooks/useFarms';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
@@ -21,7 +22,7 @@ interface IFarmsProps {
 const Farms = ({ itemsPerPage }: IFarmsProps) => {
   const contextValue = useContext(GlobalContext);
   const { tokensWhitelisted, connection } = contextValue;
-  const { userId } = connection;
+  const { userId, connected, isHashpackLoading, setShowConnectModal } = connection;
 
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
 
@@ -37,7 +38,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
     tokensWhitelistedAddresses,
   );
 
-  const { farms } = useFarms(useQueryOptions, userId, pools);
+  const { farms, loading: loadingFarms } = useFarms(useQueryOptions, userId, pools);
 
   // Handlers
   const handlePageClick = (event: any) => {
@@ -74,64 +75,86 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
 
         <hr />
 
-        {haveFarms ? (
-          <>
-            <div className="table-pools">
-              <div className={`table-pools-row with-6-columns-farms`}>
-                <div className="table-pools-cell">
-                  <span className="text-small">#</span>
+        {connected && !isHashpackLoading ? (
+          loadingFarms ? (
+            <p className="text-info">Loading farms...</p>
+          ) : haveFarms ? (
+            <>
+              <div className="table-pools">
+                <div className={`table-pools-row with-6-columns-farms`}>
+                  <div className="table-pools-cell">
+                    <span className="text-small">#</span>
+                  </div>
+                  <div className="table-pools-cell">
+                    <span className="text-small">Pair Name</span>
+                  </div>
+                  <div className="table-pools-cell justify-content-end">
+                    <span className="text-small ws-no-wrap">Total Staked</span>
+                  </div>
+                  <div className="table-pools-cell justify-content-end">
+                    <span className="text-small ws-no-wrap">Total APR</span>
+                  </div>
+                  <div className="table-pools-cell justify-content-end">
+                    <span className="text-small ws-no-wrap">Your Stake</span>
+                  </div>
+                  <div className="table-pools-cell justify-content-end">
+                    <span className="text-small">Closed Campaigns</span>
+                  </div>
                 </div>
-                <div className="table-pools-cell">
-                  <span className="text-small">Pair Name</span>
-                </div>
-                <div className="table-pools-cell justify-content-end">
-                  <span className="text-small ws-no-wrap">Total Staked</span>
-                </div>
-                <div className="table-pools-cell justify-content-end">
-                  <span className="text-small ws-no-wrap">Total APR</span>
-                </div>
-                <div className="table-pools-cell justify-content-end">
-                  <span className="text-small ws-no-wrap">Your Stake</span>
-                </div>
-                <div className="table-pools-cell justify-content-end">
-                  <span className="text-small">Closed Campaigns</span>
-                </div>
+
+                <>
+                  {currentItems.map((item, index) => (
+                    <FarmRow
+                      key={index}
+                      index={index}
+                      farmData={item}
+                      handleRowClick={handleRowClick}
+                      setCurrentFarmIndex={setCurrentFarmIndex}
+                    />
+                  ))}
+                </>
               </div>
 
-              <>
-                {currentItems.map((item, index) => (
-                  <FarmRow
-                    key={index}
-                    index={index}
-                    farmData={item}
-                    handleRowClick={handleRowClick}
-                    setCurrentFarmIndex={setCurrentFarmIndex}
-                  />
-                ))}
-              </>
+              <div className="d-flex justify-content-center mt-4">
+                <ReactPaginate
+                  breakLabel="..."
+                  onPageChange={handlePageClick}
+                  pageRangeDisplayed={5}
+                  pageCount={pageCount}
+                  renderOnZeroPageCount={undefined}
+                  breakClassName={'page-item'}
+                  breakLinkClassName={'page-link'}
+                  containerClassName={'pagination'}
+                  pageClassName={'page-item'}
+                  pageLinkClassName={'page-link'}
+                  previousClassName={'page-item'}
+                  previousLinkClassName={'page-link'}
+                  nextClassName={'page-item'}
+                  nextLinkClassName={'page-link'}
+                  activeClassName={'active'}
+                />
+              </div>
+            </>
+          ) : (
+            <div className="text-center mt-8">
+              <p className="text-small">There are no active farms at this moment</p>
             </div>
-
-            <div className="d-flex justify-content-center mt-4">
-              <ReactPaginate
-                breakLabel="..."
-                onPageChange={handlePageClick}
-                pageRangeDisplayed={5}
-                pageCount={pageCount}
-                renderOnZeroPageCount={undefined}
-                breakClassName={'page-item'}
-                breakLinkClassName={'page-link'}
-                containerClassName={'pagination'}
-                pageClassName={'page-item'}
-                pageLinkClassName={'page-link'}
-                previousClassName={'page-item'}
-                previousLinkClassName={'page-link'}
-                nextClassName={'page-item'}
-                nextLinkClassName={'page-link'}
-                activeClassName={'active'}
-              />
+          )
+        ) : (
+          <div className="text-center mt-8">
+            <p>Your active liquidity positions will appear here.</p>
+            <div className="mt-4">
+              <Button
+                disabled={isHashpackLoading}
+                size="small"
+                onClick={() => setShowConnectModal(true)}
+                type="primary"
+              >
+                Connect Wallet
+              </Button>
             </div>
-          </>
-        ) : null}
+          </div>
+        )}
       </div>
     </div>
   );
