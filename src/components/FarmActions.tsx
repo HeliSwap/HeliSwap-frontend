@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useContext } from 'react';
+import React, { useState, useCallback, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
@@ -43,9 +43,11 @@ const FarmActions = ({
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
 
-  const [lpInputValue, setLpInputValue] = useState(
-    formatStringWeiToStringEther(farmData.poolData.lpShares as string),
+  const lpInputValueInitialState = formatStringWeiToStringEther(
+    farmData.poolData.lpShares as string,
   );
+
+  const [lpInputValue, setLpInputValue] = useState(lpInputValueInitialState);
   const [loadingStake, setLoadingStake] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
   const [loadingExit, setLoadingExit] = useState(false);
@@ -110,6 +112,7 @@ const FarmActions = ({
 
       if (success) {
         toast.success('Success! Exit was successful.');
+        setTabState(TabStates.STAKE);
       } else {
         toast.error(getErrorMessage(error.status ? error.status : error));
       }
@@ -147,6 +150,10 @@ const FarmActions = ({
       setLoadingApprove(false);
     }
   };
+
+  useEffect(() => {
+    setLpInputValue(lpInputValueInitialState);
+  }, [farmData.poolData.lpShares, lpInputValueInitialState]);
 
   // Helper methods
   const getStakeButtonLabel = () => {
