@@ -91,20 +91,18 @@ export const getProcessedFarms = (
   ): IUserStakingData => {
     const { userStakingData, rewardsData } = currentFarm;
 
-    if (userStakingData?.stakedAmount === '0') {
+    if (userStakingData.stakedAmount === '0') {
       return {
         stakedAmount: '0',
         stakedAmountUSD: '0',
         rewardsAccumulated: [],
       };
     } else {
-      const userStakedFormatted = formatStringWeiToStringEther(
-        userStakingData?.stakedAmount || '0',
-      );
+      const userStakedFormatted = formatStringWeiToStringEther(userStakingData.stakedAmount || '0');
 
       const rewardsProcessed =
         userStakingData.rewardsAccumulated!.length > 0
-          ? userStakingData?.rewardsAccumulated!.map(reward => {
+          ? userStakingData.rewardsAccumulated!.map(reward => {
               const rewardValueUSD = getTokenPrice(pools, reward.address, hbarPrice);
               const rewardAmountWei = reward.totalAccumulated;
               const rewardDecimals = rewardsData.find(

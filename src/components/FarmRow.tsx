@@ -70,7 +70,7 @@ const FarmRow = ({ farmData, index, handleRowClick, setCurrentFarmIndex }: IFarm
       <div className="table-pools-cell justify-content-end">
         <span className="text-small text-numeric">
           {formatStringToPrice(
-            stripStringToFixedDecimals(farmData.userStakingData?.userStakedUSD || '0', 2),
+            stripStringToFixedDecimals(farmData.userStakingData.stakedAmountUSD || '0', 2),
           )}
         </span>
       </div>

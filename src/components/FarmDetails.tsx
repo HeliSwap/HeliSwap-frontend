@@ -50,7 +50,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
 
     if (Number(totalStaked) === 0) return '0';
 
-    return ((Number(userStakingData?.stakedAmount) / Number(totalStaked)) * 100).toString();
+    return ((Number(userStakingData.stakedAmount) / Number(totalStaked)) * 100).toString();
   }, [farmData]);
 
   // Handlers
@@ -100,7 +100,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
     return <div className="d-flex align-items-center">{dateContent}</div>;
   };
 
-  const hasUserStaked = farmData.userStakingData?.stakedAmount !== '0';
+  const hasUserStaked = farmData.userStakingData.stakedAmount !== '0';
   const hasUserProvided = farmData.poolData.lpShares !== '0';
   const campaignEnded = farmData.campaignEndDate < Date.now();
 
@@ -230,7 +230,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                       <span className="text-secondary text-main">
                         {formatStringETHtoPriceFormatted(
                           formatStringWeiToStringEther(
-                            farmData.userStakingData?.stakedAmount || '0',
+                            farmData.userStakingData.stakedAmount || '0',
                           ),
                         )}
                       </span>

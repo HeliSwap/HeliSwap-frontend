@@ -271,7 +271,7 @@ const FarmActions = ({
                   inputTokenComponent={
                     <InputToken
                       value={formatStringWeiToStringEther(
-                        farmData.userStakingData?.stakedAmount as string,
+                        farmData.userStakingData.stakedAmount as string,
                       )}
                       disabled={true}
                       isCompact={true}
