@@ -212,6 +212,7 @@ export const GET_FARMS = gql`
         decimals
         rewardEnd
         totalAmount
+        duration
       }
       userStakingData {
         stakedAmount
