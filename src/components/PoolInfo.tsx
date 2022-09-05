@@ -296,6 +296,11 @@ const PoolInfo = ({
                 >
                   Transfer
                 </Button>
+                {poolData.hasCampaign ? (
+                  <Link className="btn btn-sm btn-outline-primary ms-4" to="/farms">
+                    Stake
+                  </Link>
+                ) : null}
               </div>
               <span className="text-small text-numeric">
                 {formatStringETHtoPriceFormatted(poolData.lpSharesFormatted as string)}
