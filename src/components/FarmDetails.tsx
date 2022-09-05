@@ -109,7 +109,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
       <div className="container-max-with-1042">
         <PageHeader title="Manage Farm" handleBackClick={() => setShowFarmDetails(false)} />
         <div className="row">
-          <div className="col-8">
+          <div className="col-7">
             <div className="container-blue-neutral-800 rounded p-5">
               <div className="d-flex justify-content-between align-items-start">
                 <div className="d-flex align-items-center">

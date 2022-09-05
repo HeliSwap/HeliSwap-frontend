@@ -257,8 +257,9 @@
     @include transition-color;
 
     &.is-compact {
-      max-width: 190px;
-      flex: 0 1 190px;
+      max-width: 270px;
+      flex: 0 1 270px;
+      font-size: 22px;
     }
 
     &::placeholder {

@@ -162,7 +162,7 @@ const FarmActions = ({
   };
 
   return (
-    <div className="col-4">
+    <div className="col-5">
       <div className="container-blue-neutral-900 rounded p-5 heigth-100 d-flex flex-column">
         <div>
           <span
