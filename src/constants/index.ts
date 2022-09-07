@@ -38,12 +38,16 @@ export enum SORT_OPTIONS_ENUM {
   TVL = 'tvl',
   VOL_7 = 'volume7',
   VOL_24 = 'volume24',
+  TOTAL_STAKED = 'totalStakedUSD',
+  APR = 'APR',
 }
 
 export type SORT_OPTIONS =
   | SORT_OPTIONS_ENUM.TVL
   | SORT_OPTIONS_ENUM.VOL_7
-  | SORT_OPTIONS_ENUM.VOL_24;
+  | SORT_OPTIONS_ENUM.VOL_24
+  | SORT_OPTIONS_ENUM.TOTAL_STAKED
+  | SORT_OPTIONS_ENUM.APR;
 
 export enum SORT_DIRECTION {
   ASC = 'asc',
