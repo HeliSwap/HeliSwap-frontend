@@ -20,6 +20,7 @@ import { formatStringWeiToStringEther } from '../utils/numberUtils';
 import getErrorMessage from '../content/errors';
 
 import { MAX_UINT_ERC20 } from '../constants';
+import { requestIdFromAddress } from '../utils/tokenUtils';
 
 interface IFarmActionsProps {
   farmData: IFarmData;
@@ -126,13 +127,16 @@ const FarmActions = ({
   const handleApproveButtonClick = async (campaignAddress: string, poolAddress: string) => {
     setLoadingApprove(true);
     const amount = MAX_UINT_ERC20.toString();
+    const lpTokenId = await requestIdFromAddress(poolAddress);
+
     try {
-      const receipt = await sdk.approveTokenStake(
+      const receipt = await sdk.approveToken(
         hashconnectConnectorInstance,
-        campaignAddress,
         amount,
         userId,
-        poolAddress,
+        lpTokenId,
+        false,
+        campaignAddress,
       );
       const {
         response: { success, error },

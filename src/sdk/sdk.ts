@@ -42,8 +42,9 @@ class SDK {
     userId: string,
     tokenId: string | ContractId,
     isHTS: boolean,
+    spender?: string,
   ) {
-    const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
+    const spenderAddress = spender ? spender : (process.env.REACT_APP_ROUTER_ADDRESS as string);
 
     const amountToApproveBN = formatStringToBigNumber(amount);
     const maxGas = isHTS ? TRANSACTION_MAX_FEES.APPROVE_HTS : TRANSACTION_MAX_FEES.APPROVE_ERC20;
@@ -56,33 +57,7 @@ class SDK {
       //Set the contract function to call
       .setFunction(
         'approve',
-        new ContractFunctionParameters()
-          .addAddress(routerContractAddress)
-          .addUint256(amountToApproveBN),
-      );
-
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
-  }
-
-  async approveTokenStake(
-    hashconnectConnectorInstance: Hashconnect,
-    contractAddress: string,
-    amount: string,
-    userId: string,
-    tokenAddress: string,
-  ) {
-    const amountToApproveBN = formatStringToBigNumber(amount);
-    const maxGas = TRANSACTION_MAX_FEES.APPROVE_ERC20;
-    const trans = new ContractExecuteTransaction()
-      //Set the ID of the contract
-      .setContractId(await requestIdFromAddress(tokenAddress))
-      //Set the gas for the contract call
-      .setGas(maxGas)
-
-      //Set the contract function to call
-      .setFunction(
-        'approve',
-        new ContractFunctionParameters().addAddress(contractAddress).addUint256(amountToApproveBN),
+        new ContractFunctionParameters().addAddress(spenderAddress).addUint256(amountToApproveBN),
       );
 
     return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
@@ -499,8 +474,6 @@ class SDK {
       userId,
       false,
     );
-    // @ts-ignore
-    console.log('mitko', response?.response?.transactionId);
 
     const responseData: any = {
       response,
