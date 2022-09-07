@@ -5,19 +5,20 @@ $darkest: #272727;
 $black: #000000;
 $white: #ffffff;
 
-$primary-900: #0B0349;
+$primary-900: #0b0349;
 $primary-800: #3520da;
-$primary-700: #1B0B9A;
-$primary-600: #2411C0;
-$primary-500: #2F18E5;
-$primary-400: #2B2EF8;
-$primary-300: #4D5FFF;
-$primary-200: #7391FF;
-$primary-100: #99BCFF;
+$primary-700: #1b0b9a;
+$primary-600: #2411c0;
+$primary-500: #2f18e5;
+$primary-400: #2b2ef8;
+$primary-300: #4d5fff;
+$primary-200: #7391ff;
+$primary-100: #99bcff;
 
-$positive-400: #29BC63;
+$positive-400: #29bc63;
+$positive-600: #048b3a;
 
-$error-500: #EA1548;
+$error-500: #ea1548;
 
 $neutral-900: #101011;
 $neutral-850: #1a1a1c95;
@@ -29,31 +30,31 @@ $neutral-400: #6f6f77;
 $neutral-300: #9d9daa;
 $neutral-100: #f9f9f9;
 
-$blue-neutral-100: #FAFAFF;
+$blue-neutral-100: #fafaff;
 $blue-neutral-200: #7391ff;
-$blue-neutral-300: #9797C2;
-$blue-neutral-400: #7979A3;
-$blue-neutral-500: #3D3D58;
-$blue-neutral-600: #2A2A43;
-$blue-neutral-700: #1F1F3A;
-$blue-neutral-800: #19193F;
-$blue-neutral-850: #080C24;
+$blue-neutral-300: #9797c2;
+$blue-neutral-400: #7979a3;
+$blue-neutral-500: #3d3d58;
+$blue-neutral-600: #2a2a43;
+$blue-neutral-700: #1f1f3a;
+$blue-neutral-800: #19193f;
+$blue-neutral-850: #080c24;
 $blue-neutral-900: #030617;
-$blue-neutral-950: #01030F;
+$blue-neutral-950: #01030f;
 
-$secondary-800: #68106D;
+$secondary-800: #68106d;
 
-$warning-300: #FFA053;
+$warning-300: #ffa053;
 
-$error-500: #EA1548;
-$error-400: #FD2B5E;
+$error-500: #ea1548;
+$error-400: #fd2b5e;
 
 $primary: #2f18e5;
 $secondary: $blue-neutral-400;
 $success: #0da048;
 $danger: $error-500;
 $warning: $warning-300;
-$info: #2B2EF8;
+$info: #2b2ef8;
 $gray: $blue-neutral-300;
 
 // Add custom colors to theme-colors map
@@ -312,8 +313,8 @@ $input-font-size: 14px;
 $input-disabled-bg: $blue-neutral-800;
 $input-disabled-border-color: $blue-neutral-800;
 
-$input-padding-y-sm:                    7px;
-$input-padding-x-sm:                    12px;
+$input-padding-y-sm: 7px;
+$input-padding-x-sm: 12px;
 
 $form-select-indicator: none;
 
@@ -349,6 +350,6 @@ $pagination-padding-y: 0.175rem;
 $pagination-border-width: 0;
 
 // Alerts
-$alert-bg-scale:                -70% !default;
-$alert-border-scale:            40% !default;
-$alert-color-scale:             60% !default;
+$alert-bg-scale: -70% !default;
+$alert-border-scale: 40% !default;
+$alert-color-scale: 60% !default;

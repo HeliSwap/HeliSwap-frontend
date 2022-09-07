@@ -93,6 +93,17 @@
   }
 }
 
+.link-tab {
+  cursor: pointer;
+  color: $blue-neutral-400;
+
+  transition: color 0.15s linear;
+
+  &.is-active {
+    color: $blue-neutral-100;
+  }
+}
+
 .cursor-pointer {
   cursor: pointer;
 }

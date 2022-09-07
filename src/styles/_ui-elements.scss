@@ -3,6 +3,10 @@
   background-color: $secondary-800;
 }
 
+.bg-success-600 {
+  background-color: $positive-600;
+}
+
 /* Buttons */
 .btn {
   text-transform: uppercase;
@@ -143,7 +147,19 @@
   border-radius: 50%;
 
   &.is-running {
-    background-color: #29bc63;
+    background-color: $positive-400;
+  }
+}
+
+.icon-campaign-status {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: $danger;
+
+  &.is-active {
+    background-color: $positive-400;
   }
 }
 
@@ -191,6 +207,24 @@
   padding: 16px;
 }
 
+.container-blue-neutral {
+  background-color: #25255f;
+}
+
+.container-blue-neutral-800 {
+  background-color: $blue-neutral-800;
+}
+
+.container-blue-neutral-900 {
+  background-color: $blue-neutral-900;
+}
+
+.container-border-rounded-bn-500 {
+  border: 1px solid $blue-neutral-500;
+  border-radius: $border-radius;
+  padding: 16px;
+}
+
 .container-input-token {
   background-color: $blue-neutral-700;
   border-radius: $border-radius;
@@ -222,6 +256,12 @@
     flex: 0 1 250px;
     @include transition-color;
 
+    &.is-compact {
+      max-width: 270px;
+      flex: 0 1 270px;
+      font-size: 22px;
+    }
+
     &::placeholder {
       color: $blue-neutral-100;
     }
@@ -242,7 +282,7 @@
   width: 100%;
 }
 
-.container-pools {
+.container-max-with-1042 {
   width: 100%;
   max-width: 1042px;
   margin: 0 24px;
@@ -283,6 +323,12 @@
   }
 }
 
+.container-campaign-status {
+  border: 1px solid $blue-neutral-500;
+  border-radius: $border-radius;
+  padding: 4px 8px;
+}
+
 /* Tables */
 .table-pools {
   display: grid;
@@ -307,7 +353,11 @@
     }
 
     &.with-6-columns {
-      grid-template-columns: 30px 2fr 1fr 1fr 1fr 1fr;
+      grid-template-columns: 20px 3fr 1fr 1fr 1fr 1fr;
+    }
+
+    &.with-6-columns-farms {
+      grid-template-columns: 20px 2fr 1fr 1fr 1fr 2fr;
     }
 
     &.is-opened {

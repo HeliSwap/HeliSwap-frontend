@@ -42,8 +42,9 @@ class SDK {
     userId: string,
     tokenId: string | ContractId,
     isHTS: boolean,
+    spender?: string,
   ) {
-    const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
+    const spenderAddress = spender ? spender : (process.env.REACT_APP_ROUTER_ADDRESS as string);
 
     const amountToApproveBN = formatStringToBigNumber(amount);
     const maxGas = isHTS ? TRANSACTION_MAX_FEES.APPROVE_HTS : TRANSACTION_MAX_FEES.APPROVE_ERC20;
@@ -56,9 +57,7 @@ class SDK {
       //Set the contract function to call
       .setFunction(
         'approve',
-        new ContractFunctionParameters()
-          .addAddress(routerContractAddress)
-          .addUint256(amountToApproveBN),
+        new ContractFunctionParameters().addAddress(spenderAddress).addUint256(amountToApproveBN),
       );
 
     return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
@@ -203,13 +202,13 @@ class SDK {
     const tokenAmountMin = getAmountWithSlippage(tokenAmount, tokenDecimals, slippage, true);
     const HBARAmountMin = getAmountWithSlippage(HBARAmount, WHBARDecimal, slippage, true);
     const tokensLpAmountBN = formatStringToBigNumberWei(tokensLpAmount, 18);
-    const maxFee = TRANSACTION_MAX_FEES.REMOVE_NATIVE_LIQUIDITY;
+    const maxGas = TRANSACTION_MAX_FEES.REMOVE_NATIVE_LIQUIDITY;
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(routerContractAddress))
       //Set the gas for the contract call
-      .setGas(maxFee)
+      .setGas(maxGas)
       //Set the contract function to call
       .setFunction(
         'removeLiquidityHBAR',
@@ -245,12 +244,12 @@ class SDK {
 
     const tokens0AmountMin = getAmountWithSlippage(tokens0Amount, token0Decimals, slippage, true);
     const tokens1AmountMin = getAmountWithSlippage(tokens1Amount, token1ecimals, slippage, true);
-    const maxFee = TRANSACTION_MAX_FEES.REMOVE_LIQUIDITY;
+    const maxGas = TRANSACTION_MAX_FEES.REMOVE_LIQUIDITY;
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(routerContractAddress))
       //Set the gas for the contract call
-      .setGas(maxFee)
+      .setGas(maxGas)
       //Set the contract function to call
       .setFunction(
         'removeLiquidity',
@@ -351,12 +350,12 @@ class SDK {
 
   async wrapHBAR(hashconnectConnectorInstance: Hashconnect, userId: string, HBARIn: string) {
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
-    const maxFee = TRANSACTION_MAX_FEES.WRAP_HBAR;
+    const maxGas = TRANSACTION_MAX_FEES.WRAP_HBAR;
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(WHBARAddress))
       //Set the gas for the contract call
-      .setGas(maxFee)
+      .setGas(maxGas)
       //Amount of HBAR we want to provide
       .setPayableAmount(HBARIn)
       //Set the contract function to call
@@ -372,12 +371,12 @@ class SDK {
   ) {
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
     const tokenAmountInNum = formatStringToBigNumberWei(tokenAmountIn, 8);
-    const maxFee = TRANSACTION_MAX_FEES.UNWRAP_WHBAR;
+    const maxGas = TRANSACTION_MAX_FEES.UNWRAP_WHBAR;
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(WHBARAddress))
       //Set the gas for the contract call
-      .setGas(maxFee)
+      .setGas(maxGas)
       //Set the contract function to call
       .setFunction('withdraw', new ContractFunctionParameters().addUint256(tokenAmountInNum));
 
@@ -394,17 +393,68 @@ class SDK {
   ) {
     const tokenAAmount = formatStringToBigNumberWei(amount, decimals);
     const tokenId = await requestIdFromAddress(tokenAddress);
-    const maxFee = TRANSACTION_MAX_FEES.TRANSFER_ERC20;
+    const maxGas = TRANSACTION_MAX_FEES.TRANSFER_ERC20;
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(tokenId)
       //Set the gas for the contract call
-      .setGas(maxFee)
+      .setGas(maxGas)
       //Set the contract function to call
       .setFunction(
         'transfer',
         new ContractFunctionParameters().addAddress(to).addUint256(tokenAAmount),
       );
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
+  async stakeLP(
+    hashconnectConnectorInstance: Hashconnect,
+    stakeAmount: string,
+    campaignAddress: string,
+    userId: string,
+  ) {
+    const tokensLpAmountBN = formatStringToBigNumberWei(stakeAmount, 18);
+    const maxGas = TRANSACTION_MAX_FEES.STAKE_LP_TOKEN;
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(campaignAddress))
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction('stake', new ContractFunctionParameters().addUint256(tokensLpAmountBN));
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
+  async collectRewards(
+    hashconnectConnectorInstance: Hashconnect,
+    campaignAddress: string,
+    userId: string,
+  ) {
+    const maxGas = TRANSACTION_MAX_FEES.COLLECT_REWARDS;
+
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(campaignAddress))
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction('getReward', new ContractFunctionParameters());
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
+  async exit(hashconnectConnectorInstance: Hashconnect, campaignAddress: string, userId: string) {
+    const maxGas = TRANSACTION_MAX_FEES.EXIT_CAMPAIGN;
+
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(campaignAddress))
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction('exit', new ContractFunctionParameters());
 
     return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }

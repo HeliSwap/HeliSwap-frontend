@@ -2,6 +2,7 @@ import React from 'react';
 import { ReactComponent as ArrowDown } from '../icons/system/arrow-down.svg';
 import { ReactComponent as ArrowUp } from '../icons/system/arrow-up.svg';
 import { ReactComponent as ArrowLeft } from '../icons/system/arrow-left.svg';
+import { ReactComponent as ArrowRight } from '../icons/system/arrow-right.svg';
 import { ReactComponent as Check } from '../icons/system/check.svg';
 import { ReactComponent as Cancel } from '../icons/system/cancel.svg';
 import { ReactComponent as ChevronUp } from '../icons/system/chevron-up.svg';
@@ -10,6 +11,7 @@ import { ReactComponent as Hint } from '../icons/system/hint.svg';
 import { ReactComponent as Loader } from '../icons/system/loader.svg';
 import { ReactComponent as More } from '../icons/system/more.svg';
 import { ReactComponent as Pools } from '../icons/system/pools.svg';
+import { ReactComponent as Farms } from '../icons/system/farms.svg';
 import { ReactComponent as SpeachBubble } from '../icons/system/speech-bubble.svg';
 import { ReactComponent as Star } from '../icons/system/star.svg';
 import { ReactComponent as Swap } from '../icons/system/swap.svg';
@@ -54,10 +56,12 @@ const icons: IIconMapping = {
   'arrow-down': ArrowDown,
   'arrow-up': ArrowUp,
   'arrow-left': ArrowLeft,
+  'arrow-right': ArrowRight,
   hint: Hint,
   loader: Loader,
   more: More,
   pools: Pools,
+  farms: Farms,
   'speach-bubble': SpeachBubble,
   star: Star,
   swap: Swap,

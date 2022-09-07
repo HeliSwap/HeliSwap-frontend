@@ -3,7 +3,11 @@ import BigNumber from 'bignumber.js';
 import { hethers } from '@hashgraph/hethers';
 
 export const formatStringToPrice = (stringToFormat: string) => {
-  return `$${numeral(stringToFormat).format('0.0a')}`;
+  return `$${numeral(stringToFormat).format('0.00a')}`;
+};
+
+export const formatStringToPercentage = (stringToFormat: string) => {
+  return `${numeral(stringToFormat).format('0.0a')}%`;
 };
 
 export const formatHBARStringToPrice = (stringToFormat: string) => {
