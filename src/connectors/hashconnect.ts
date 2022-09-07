@@ -1,11 +1,10 @@
-import { AccountId, Transaction, TransactionId, TransactionReceipt } from '@hashgraph/sdk';
+import { AccountId, Transaction, TransactionId } from '@hashgraph/sdk';
 import { HashConnect, HashConnectTypes, MessageTypes } from 'hashconnect';
 import { Transaction, AccountId, TransactionId } from '@hashgraph/sdk';
 import { randomIntFromInterval } from '../utils/numberUtils';
 import { HashConnectConnectionState } from 'hashconnect/dist/types';
 
 class Hashconnect {
-  // @ts-ignore
   hashconnect: HashConnect;
 
   appMetadata: HashConnectTypes.AppMetadata = {
@@ -13,14 +12,9 @@ class Hashconnect {
     description: 'An example hedera dApp',
     icon: 'https://www.hashpack.app/img/logo.svg',
   };
-  // @ts-ignore
-  availableExtension: HashConnectTypes.WalletMetadata;
 
-  state: HashConnectConnectionState = HashConnectConnectionState.Disconnected;
-  // @ts-ignore
-  topic: string;
-  // @ts-ignore
-  pairingString: string;
+  topic: string = '';
+  pairingString: string = '';
   pairingData: HashConnectTypes.SavedPairingData | null = null;
 
   setUserId: (userId: string) => void;
@@ -66,7 +60,7 @@ class Hashconnect {
     //Saved pairings will return here, generally you will only have one unless you are doing something advanced
     this.pairingData = initData.savedPairings[0];
 
-    if (this.pairingData) {
+    if (this.pairingData && this.pairingData.accountIds[0]) {
       this.setUserId(this.pairingData.accountIds[0]);
       this.setConnected(true);
     }
