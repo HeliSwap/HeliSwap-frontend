@@ -12,6 +12,9 @@ import PageHeader from './PageHeader';
 import Button from './Button';
 import ToasterWrapper from './ToasterWrapper';
 import FarmActions from './FarmActions';
+import Modal from './Modal';
+import ConfirmTransactionModalContent from './Modals/ConfirmTransactionModalContent';
+import Confirmation from './Confirmation';
 
 import { formatIcons } from '../utils/iconUtils';
 import {
@@ -36,6 +39,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
   const { userId, hashconnectConnectorInstance } = connection;
 
   const [loadingHarvest, setLoadingHarvest] = useState(false);
+  const [showHarvestModal, setShowHarvestModal] = useState(false);
 
   const userRewardsUSD = useMemo(() => {
     const { userStakingData } = farmData;
@@ -54,7 +58,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
   }, [farmData]);
 
   // Handlers
-  const handleHarvestClick = async () => {
+  const handleHarvestConfirm = async () => {
     setLoadingHarvest(true);
     try {
       const receipt = await sdk.collectRewards(
@@ -76,6 +80,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
       toast('Error on harvest');
     } finally {
       setLoadingHarvest(false);
+      setShowHarvestModal(false);
     }
   };
 
@@ -249,7 +254,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                       <div className="d-flex justify-content-end">
                         <Button
                           loading={loadingHarvest}
-                          onClick={handleHarvestClick}
+                          onClick={() => setShowHarvestModal(true)}
                           size="small"
                           type="primary"
                         >
@@ -291,6 +296,26 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                         })}
                       </div>
                     </div>
+
+                    {showHarvestModal ? (
+                      <Modal show={showHarvestModal} closeModal={() => setShowHarvestModal(false)}>
+                        <ConfirmTransactionModalContent
+                          modalTitle="Confirm harvest"
+                          closeModal={() => setShowHarvestModal(false)}
+                          confirmTansaction={handleHarvestConfirm}
+                          confirmButtonLabel="Confirm"
+                          isLoading={loadingHarvest}
+                        >
+                          {loadingHarvest ? (
+                            <Confirmation confirmationText={'Harversting rewards'} />
+                          ) : (
+                            <>
+                              <div>Harvest modal content</div>
+                            </>
+                          )}
+                        </ConfirmTransactionModalContent>
+                      </Modal>
+                    ) : null}
                   </>
                 ) : campaignEnded ? (
                   <div>

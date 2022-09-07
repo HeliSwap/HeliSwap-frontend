@@ -14,6 +14,9 @@ import InputToken from './InputToken';
 import InputTokenSelector from './InputTokenSelector';
 import WalletBalance from './WalletBalance';
 import Icon from './Icon';
+import Modal from './Modal';
+import Confirmation from './Confirmation';
+import ConfirmTransactionModalContent from './Modals/ConfirmTransactionModalContent';
 
 import { formatStringWeiToStringEther } from '../utils/numberUtils';
 
@@ -57,6 +60,9 @@ const FarmActions = ({
 
   const [lpApproved, setLpApproved] = useState(false);
 
+  const [showStakeModal, setShowStakeModal] = useState(false);
+  const [showExitModal, setShowExitModal] = useState(false);
+
   const getInsufficientTokenBalance = useCallback(() => {
     const {
       poolData: { lpShares },
@@ -76,7 +82,7 @@ const FarmActions = ({
     setLpInputValue(value);
   };
 
-  const handleStakeClick = async () => {
+  const handleStakeConfirm = async () => {
     setLoadingStake(true);
     try {
       const receipt = await sdk.stakeLP(
@@ -99,10 +105,11 @@ const FarmActions = ({
       toast.error('Error on stake');
     } finally {
       setLoadingStake(false);
+      setShowStakeModal(false);
     }
   };
 
-  const handleExitButtonClick = async () => {
+  const handleExitConfirm = async () => {
     setLoadingExit(true);
 
     try {
@@ -121,6 +128,7 @@ const FarmActions = ({
       console.error(err);
     } finally {
       setLoadingExit(false);
+      setShowExitModal(false);
     }
   };
 
@@ -247,7 +255,7 @@ const FarmActions = ({
                       <Button
                         disabled={getInsufficientTokenBalance()}
                         loading={loadingStake}
-                        onClick={handleStakeClick}
+                        onClick={() => setShowStakeModal(true)}
                       >
                         {getStakeButtonLabel()}
                       </Button>
@@ -289,12 +297,51 @@ const FarmActions = ({
               </div>
 
               <div className="d-grid">
-                <Button loading={loadingExit} onClick={handleExitButtonClick}>
+                <Button loading={loadingExit} onClick={() => setShowExitModal(true)}>
                   Unstake
                 </Button>
               </div>
             </>
           )}
+          {showStakeModal ? (
+            <Modal show={showStakeModal} closeModal={() => setShowStakeModal(false)}>
+              <ConfirmTransactionModalContent
+                modalTitle="Confirm stake"
+                closeModal={() => setShowStakeModal(false)}
+                confirmTansaction={handleStakeConfirm}
+                confirmButtonLabel="Confirm"
+                isLoading={loadingStake}
+              >
+                {loadingStake ? (
+                  <Confirmation confirmationText={'Waiting for staking confirmation'} />
+                ) : (
+                  <>
+                    <div>Stake modal content</div>
+                  </>
+                )}
+              </ConfirmTransactionModalContent>
+            </Modal>
+          ) : null}
+
+          {showExitModal ? (
+            <Modal show={showExitModal} closeModal={() => setShowExitModal(false)}>
+              <ConfirmTransactionModalContent
+                modalTitle="Confirm exit"
+                closeModal={() => setShowExitModal(false)}
+                confirmTansaction={handleExitConfirm}
+                confirmButtonLabel="Confirm"
+                isLoading={loadingStake}
+              >
+                {loadingStake ? (
+                  <Confirmation confirmationText={'Waiting for exit confirmation'} />
+                ) : (
+                  <>
+                    <div>Exit stake modal content</div>
+                  </>
+                )}
+              </ConfirmTransactionModalContent>
+            </Modal>
+          ) : null}
         </div>
       </div>
     </div>
