@@ -59,24 +59,24 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
 
   const haveFarms = farms.length > 0;
 
-  return showFarmDetails ? (
-    <FarmDetails
-      setShowFarmDetails={setShowFarmDetails}
-      farmData={currentItems[currentFarmIndex]}
-    />
-  ) : (
-    <div className="d-flex justify-content-center">
-      <div className="container-max-with-1042">
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <div className="d-flex">
-            <h2 className={`text-subheader tab-title is-active mx-4 `}>Farms</h2>
+  return connected && !isHashpackLoading ? (
+    showFarmDetails ? (
+      <FarmDetails
+        setShowFarmDetails={setShowFarmDetails}
+        farmData={currentItems[currentFarmIndex]}
+      />
+    ) : (
+      <div className="d-flex justify-content-center">
+        <div className="container-max-with-1042">
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <div className="d-flex">
+              <h2 className={`text-subheader tab-title is-active mx-4 `}>Farms</h2>
+            </div>
           </div>
-        </div>
 
-        <hr />
+          <hr />
 
-        {connected && !isHashpackLoading ? (
-          loadingFarms ? (
+          {loadingFarms ? (
             <p className="text-info">Loading farms...</p>
           ) : haveFarms ? (
             <>
@@ -139,22 +139,22 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
             <div className="text-center mt-8">
               <p className="text-small">There are no active farms at this moment</p>
             </div>
-          )
-        ) : (
-          <div className="text-center mt-8">
-            <p>Your active liquidity positions will appear here.</p>
-            <div className="mt-4">
-              <Button
-                disabled={isHashpackLoading}
-                size="small"
-                onClick={() => setShowConnectModal(true)}
-                type="primary"
-              >
-                Connect Wallet
-              </Button>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
+      </div>
+    )
+  ) : (
+    <div className="text-center mt-8">
+      <p>Active Yeild farming campaigns will appear here.</p>
+      <div className="mt-4">
+        <Button
+          disabled={isHashpackLoading}
+          size="small"
+          onClick={() => setShowConnectModal(true)}
+          type="primary"
+        >
+          Connect Wallet
+        </Button>
       </div>
     </div>
   );
