@@ -8,9 +8,9 @@ class Hashconnect {
   hashconnect: HashConnect;
 
   appMetadata: HashConnectTypes.AppMetadata = {
-    name: 'dApp Example',
-    description: 'An example hedera dApp',
-    icon: 'https://www.hashpack.app/img/logo.svg',
+    name: 'HeliSwap DEX',
+    description: 'HeliSwap DEX',
+    icon: 'https://absolute.url/to/icon.png',
   };
 
   topic: string = '';
