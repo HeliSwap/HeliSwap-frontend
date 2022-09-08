@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 
 import ReactPaginate from 'react-paginate';
 
@@ -21,7 +21,6 @@ import {
   useQueryOptionsPolling,
 } from '../constants';
 import BigNumber from 'bignumber.js';
-import Icon from '../components/Icon';
 
 interface IFarmsProps {
   itemsPerPage: number;
@@ -39,8 +38,8 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
   const [itemOffset, setItemOffset] = useState(0);
   const [currentFarmIndex, setCurrentFarmIndex] = useState(0);
   const [showFarmDetails, setShowFarmDetails] = useState(false);
-  const [sortDirection, setSortDirection] = useState<SORT_DIRECTION>(SORT_DIRECTION.DESC);
-  const [farmsSortBy, setPoolsSortBy] = useState<SORT_OPTIONS>(SORT_OPTIONS_ENUM.APR);
+  const [sortDirection] = useState<SORT_DIRECTION>(SORT_DIRECTION.DESC);
+  const [farmsSortBy] = useState<SORT_OPTIONS>(SORT_OPTIONS_ENUM.APR);
 
   const { poolsByTokenList: pools } = usePoolsByTokensList(
     useQueryOptionsPolling,
@@ -49,6 +48,18 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
   );
 
   const { farms, loading: loadingFarms } = useFarms(useQueryOptions, userId, pools);
+
+  const sortFarms = useMemo(
+    () => (farmA: IFarmData, farmB: IFarmData, direction: SORT_DIRECTION) => {
+      const valueABN = new BigNumber(farmA[farmsSortBy]);
+      const valueBBN = new BigNumber(farmB[farmsSortBy]);
+
+      return direction === SORT_DIRECTION.ASC
+        ? Number(valueABN.minus(valueBBN))
+        : Number(valueBBN.minus(valueABN));
+    },
+    [farmsSortBy],
+  );
 
   // Handlers
   const handlePageClick = (event: any) => {
@@ -60,39 +71,32 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
     setShowFarmDetails(prev => !prev);
   };
 
-  const handleSortClick = (sortBy: SORT_OPTIONS) => {
-    if (sortBy === farmsSortBy) {
-      setSortDirection(
-        sortDirection === SORT_DIRECTION.ASC ? SORT_DIRECTION.DESC : SORT_DIRECTION.ASC,
-      );
-    } else {
-      setPoolsSortBy(sortBy);
-    }
-  };
-
   useEffect(() => {
     const endOffset = itemOffset + itemsPerPage;
-    const sortedFarms = (farms || []).sort((a: IFarmData, b: IFarmData) =>
-      sortFarms(a[farmsSortBy as string], b[farmsSortBy as string], sortDirection),
+
+    const userCampaigns: IFarmData[] = [];
+    const otherCampaigns: IFarmData[] = [];
+
+    ([...farms] || []).forEach((farm: IFarmData) => {
+      if (Number(farm.userStakingData.stakedAmount) !== 0) {
+        userCampaigns.push(farm);
+      } else {
+        otherCampaigns.push(farm);
+      }
+    });
+
+    const sortedUserCampaigns = [...userCampaigns].sort((a: IFarmData, b: IFarmData) =>
+      sortFarms(a, b, sortDirection),
     );
+
+    const sortedOtherCampaigns = [...otherCampaigns].sort((a: IFarmData, b: IFarmData) =>
+      sortFarms(a, b, sortDirection),
+    );
+    const sortedFarms = sortedUserCampaigns.concat(sortedOtherCampaigns);
+
     setCurrentItems(sortedFarms.slice(itemOffset, endOffset));
     setPageCount(Math.ceil(sortedFarms.length / itemsPerPage));
-  }, [itemOffset, itemsPerPage, farms, sortDirection, farmsSortBy]);
-
-  const sortFarms = (valueA: string, valueB: string, direction: SORT_DIRECTION) => {
-    const valueABN = new BigNumber(valueA);
-    const valueBBN = new BigNumber(valueB);
-
-    return direction === SORT_DIRECTION.ASC
-      ? Number(valueABN.minus(valueBBN))
-      : Number(valueBBN.minus(valueABN));
-  };
-
-  const getSortIcon = (option: SORT_OPTIONS) => {
-    const icon = <Icon name={`arrow-${sortDirection === SORT_DIRECTION.ASC ? 'up' : 'down'}`} />;
-
-    return option === farmsSortBy ? icon : null;
-  };
+  }, [itemOffset, itemsPerPage, farms, sortDirection, farmsSortBy, sortFarms]);
 
   const haveFarms = farms.length > 0;
 
@@ -125,21 +129,11 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
                   <div className="table-pools-cell">
                     <span className="text-small">Pair Name</span>
                   </div>
-                  <div
-                    className="table-pools-cell justify-content-end"
-                    onClick={() => handleSortClick(SORT_OPTIONS_ENUM.TOTAL_STAKED)}
-                  >
-                    <span className="text-small ws-no-wrap">
-                      Total Staked {getSortIcon(SORT_OPTIONS_ENUM.TOTAL_STAKED)}
-                    </span>
+                  <div className="table-pools-cell justify-content-end">
+                    <span className="text-small ws-no-wrap">Total Staked</span>
                   </div>
-                  <div
-                    className="table-pools-cell justify-content-end"
-                    onClick={() => handleSortClick(SORT_OPTIONS_ENUM.APR)}
-                  >
-                    <span className="text-small ws-no-wrap">
-                      Total APR {getSortIcon(SORT_OPTIONS_ENUM.APR)}
-                    </span>
+                  <div className="table-pools-cell justify-content-end">
+                    <span className="text-small ws-no-wrap">Total APR</span>
                   </div>
                   <div className="table-pools-cell justify-content-end">
                     <span className="text-small ws-no-wrap">Your Stake</span>
