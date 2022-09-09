@@ -79,8 +79,13 @@ enum ADD_LIQUIDITY_TITLES {
 const Create = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk, tokensWhitelisted } = contextValue;
-  const { userId, hashconnectConnectorInstance, connected, connectWallet, isHashpackLoading } =
-    connection;
+  const {
+    userId,
+    hashconnectConnectorInstance,
+    connected,
+    setShowConnectModal,
+    isHashpackLoading,
+  } = connection;
 
   const { token0, token1 } = useParams();
   const navigate = useNavigate();
@@ -957,7 +962,7 @@ const Create = () => {
       </div>
     ) : (
       <div className="d-grid mt-4">
-        <Button disabled={isHashpackLoading} onClick={() => connectWallet()}>
+        <Button disabled={isHashpackLoading} onClick={() => setShowConnectModal(true)}>
           Connect wallet
         </Button>
       </div>
