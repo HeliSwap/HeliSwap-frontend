@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 
 import { GlobalContext } from '../providers/Global';
 
-import { IFarmData, IReward } from '../interfaces/tokens';
+import { IFarmData, IReward, IRewardsAccumulated } from '../interfaces/tokens';
 
 import Icon from './Icon';
 import IconToken from './IconToken';
@@ -300,17 +300,39 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                     {showHarvestModal ? (
                       <Modal show={showHarvestModal} closeModal={() => setShowHarvestModal(false)}>
                         <ConfirmTransactionModalContent
-                          modalTitle="Confirm harvest"
+                          modalTitle="Harvest Pending Reward"
                           closeModal={() => setShowHarvestModal(false)}
                           confirmTansaction={handleHarvestConfirm}
                           confirmButtonLabel="Confirm"
                           isLoading={loadingHarvest}
                         >
                           {loadingHarvest ? (
-                            <Confirmation confirmationText={'Harversting rewards'} />
+                            <Confirmation confirmationText={'Harvesting reward tokens'} />
                           ) : (
                             <>
-                              <div>Harvest modal content</div>
+                              <div className="m-4 text-small">Estimated pending rewards</div>
+                              {farmData.rewardsData.map((reward: IReward) => {
+                                const userReward =
+                                  farmData.userStakingData.rewardsAccumulated?.find(
+                                    (currReward: IRewardsAccumulated) =>
+                                      currReward.address === reward.address,
+                                  );
+                                return (
+                                  <div className="d-flex justify-content-between align-items-center px-3 m-4">
+                                    <div className="d-flex align-items-center">
+                                      <IconToken symbol={reward.symbol} />
+                                      <span className="text-main ms-3">{reward.symbol}</span>
+                                    </div>
+
+                                    <div className="text-main text-numeric">
+                                      {formatStringWeiToStringEther(
+                                        userReward?.totalAccumulated || '0',
+                                        reward.decimals,
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              })}
                             </>
                           )}
                         </ConfirmTransactionModalContent>

@@ -24,6 +24,7 @@ import getErrorMessage from '../content/errors';
 
 import { MAX_UINT_ERC20 } from '../constants';
 import { requestIdFromAddress } from '../utils/tokenUtils';
+import IconToken from './IconToken';
 
 interface IFarmActionsProps {
   farmData: IFarmData;
@@ -306,17 +307,33 @@ const FarmActions = ({
           {showStakeModal ? (
             <Modal show={showStakeModal} closeModal={() => setShowStakeModal(false)}>
               <ConfirmTransactionModalContent
-                modalTitle="Confirm stake"
+                modalTitle="Stake Your LP Tokens"
                 closeModal={() => setShowStakeModal(false)}
                 confirmTansaction={handleStakeConfirm}
                 confirmButtonLabel="Confirm"
                 isLoading={loadingStake}
               >
                 {loadingStake ? (
-                  <Confirmation confirmationText={'Waiting for staking confirmation'} />
+                  <Confirmation
+                    confirmationText={`Staking ${formatStringWeiToStringEther(
+                      farmData.poolData.lpShares || '0',
+                    )} LP tokens`}
+                  />
                 ) : (
                   <>
-                    <div>Stake modal content</div>
+                    <div className="m-4 text-small">LP token count</div>
+
+                    <div className="d-flex justify-content-between align-items-center px-3 m-4">
+                      <div className="d-flex align-items-center">
+                        <IconToken symbol="LP" />
+
+                        <span className="text-main ms-3">LP Token</span>
+                      </div>
+
+                      <div className="text-main text-numeric">
+                        {formatStringWeiToStringEther(farmData.poolData.lpShares || '0')}
+                      </div>
+                    </div>
                   </>
                 )}
               </ConfirmTransactionModalContent>
@@ -326,17 +343,35 @@ const FarmActions = ({
           {showExitModal ? (
             <Modal show={showExitModal} closeModal={() => setShowExitModal(false)}>
               <ConfirmTransactionModalContent
-                modalTitle="Confirm exit"
+                modalTitle="Unstake Your LP Tokens"
                 closeModal={() => setShowExitModal(false)}
                 confirmTansaction={handleExitConfirm}
                 confirmButtonLabel="Confirm"
                 isLoading={loadingStake}
               >
-                {loadingStake ? (
-                  <Confirmation confirmationText={'Waiting for exit confirmation'} />
+                {loadingExit ? (
+                  <Confirmation
+                    confirmationText={`Unstaking ${formatStringWeiToStringEther(
+                      farmData.userStakingData.stakedAmount as string,
+                    )} LP tokens`}
+                  />
                 ) : (
                   <>
-                    <div>Exit stake modal content</div>
+                    <div className="m-4 text-small">LP token count</div>
+
+                    <div className="d-flex justify-content-between align-items-center px-3 m-4">
+                      <div className="d-flex align-items-center">
+                        <IconToken symbol="LP" />
+
+                        <span className="text-main ms-3">LP Token</span>
+                      </div>
+
+                      <div className="text-main text-numeric">
+                        {formatStringWeiToStringEther(
+                          farmData.userStakingData.stakedAmount as string,
+                        )}
+                      </div>
+                    </div>
                   </>
                 )}
               </ConfirmTransactionModalContent>
