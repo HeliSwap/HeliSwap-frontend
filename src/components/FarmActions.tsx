@@ -347,7 +347,7 @@ const FarmActions = ({
                 closeModal={() => setShowExitModal(false)}
                 confirmTansaction={handleExitConfirm}
                 confirmButtonLabel="Confirm"
-                isLoading={loadingStake}
+                isLoading={loadingExit}
               >
                 {loadingExit ? (
                   <Confirmation

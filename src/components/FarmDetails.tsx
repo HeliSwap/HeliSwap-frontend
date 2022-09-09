@@ -300,7 +300,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                     {showHarvestModal ? (
                       <Modal show={showHarvestModal} closeModal={() => setShowHarvestModal(false)}>
                         <ConfirmTransactionModalContent
-                          modalTitle="Harvest Pending Reward"
+                          modalTitle="Harvest Pending Rewards"
                           closeModal={() => setShowHarvestModal(false)}
                           confirmTansaction={handleHarvestConfirm}
                           confirmButtonLabel="Confirm"
