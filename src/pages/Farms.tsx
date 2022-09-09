@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 
 import ReactPaginate from 'react-paginate';
 
@@ -13,7 +13,14 @@ import Button from '../components/Button';
 import useFarms from '../hooks/useFarms';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 
-import { useQueryOptions, useQueryOptionsPolling } from '../constants';
+import {
+  SORT_DIRECTION,
+  SORT_OPTIONS,
+  SORT_OPTIONS_ENUM,
+  useQueryOptions,
+  useQueryOptionsPolling,
+} from '../constants';
+import BigNumber from 'bignumber.js';
 
 interface IFarmsProps {
   itemsPerPage: number;
@@ -31,6 +38,8 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
   const [itemOffset, setItemOffset] = useState(0);
   const [currentFarmIndex, setCurrentFarmIndex] = useState(0);
   const [showFarmDetails, setShowFarmDetails] = useState(false);
+  const [sortDirection] = useState<SORT_DIRECTION>(SORT_DIRECTION.DESC);
+  const [farmsSortBy] = useState<SORT_OPTIONS>(SORT_OPTIONS_ENUM.APR);
 
   const { poolsByTokenList: pools } = usePoolsByTokensList(
     useQueryOptionsPolling,
@@ -39,6 +48,18 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
   );
 
   const { farms, loading: loadingFarms } = useFarms(useQueryOptions, userId, pools);
+
+  const sortFarms = useMemo(
+    () => (farmA: IFarmData, farmB: IFarmData, direction: SORT_DIRECTION) => {
+      const valueABN = new BigNumber(farmA[farmsSortBy]);
+      const valueBBN = new BigNumber(farmB[farmsSortBy]);
+
+      return direction === SORT_DIRECTION.ASC
+        ? Number(valueABN.minus(valueBBN))
+        : Number(valueBBN.minus(valueABN));
+    },
+    [farmsSortBy],
+  );
 
   // Handlers
   const handlePageClick = (event: any) => {
@@ -53,9 +74,29 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
   useEffect(() => {
     const endOffset = itemOffset + itemsPerPage;
 
-    setCurrentItems(farms.slice(itemOffset, endOffset));
-    setPageCount(Math.ceil(farms.length / itemsPerPage));
-  }, [itemOffset, itemsPerPage, farms]);
+    const userCampaigns: IFarmData[] = [];
+    const otherCampaigns: IFarmData[] = [];
+
+    ([...farms] || []).forEach((farm: IFarmData) => {
+      if (Number(farm.userStakingData.stakedAmount) !== 0) {
+        userCampaigns.push(farm);
+      } else {
+        otherCampaigns.push(farm);
+      }
+    });
+
+    const sortedUserCampaigns = [...userCampaigns].sort((a: IFarmData, b: IFarmData) =>
+      sortFarms(a, b, sortDirection),
+    );
+
+    const sortedOtherCampaigns = [...otherCampaigns].sort((a: IFarmData, b: IFarmData) =>
+      sortFarms(a, b, sortDirection),
+    );
+    const sortedFarms = sortedUserCampaigns.concat(sortedOtherCampaigns);
+
+    setCurrentItems(sortedFarms.slice(itemOffset, endOffset));
+    setPageCount(Math.ceil(sortedFarms.length / itemsPerPage));
+  }, [itemOffset, itemsPerPage, farms, sortDirection, farmsSortBy, sortFarms]);
 
   const haveFarms = farms.length > 0;
 

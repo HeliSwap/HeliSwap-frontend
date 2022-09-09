@@ -98,6 +98,7 @@ export interface IFarmData extends IFarmDataRaw {
   APR: string;
   totalRewardsUSD: string;
   campaignEndDate: number;
+  [key: string]: any;
 }
 
 export interface IRewardRaw {
