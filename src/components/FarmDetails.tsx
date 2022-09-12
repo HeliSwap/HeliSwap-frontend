@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 
 import { GlobalContext } from '../providers/Global';
 
-import { IFarmData, IReward } from '../interfaces/tokens';
+import { IFarmData, IReward, IRewardsAccumulated, IUserStakingData } from '../interfaces/tokens';
 
 import Icon from './Icon';
 import IconToken from './IconToken';
@@ -12,6 +12,9 @@ import PageHeader from './PageHeader';
 import Button from './Button';
 import ToasterWrapper from './ToasterWrapper';
 import FarmActions from './FarmActions';
+import Modal from './Modal';
+import ConfirmTransactionModalContent from './Modals/ConfirmTransactionModalContent';
+import Confirmation from './Confirmation';
 
 import { formatIcons } from '../utils/iconUtils';
 import {
@@ -36,6 +39,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
   const { userId, hashconnectConnectorInstance } = connection;
 
   const [loadingHarvest, setLoadingHarvest] = useState(false);
+  const [showHarvestModal, setShowHarvestModal] = useState(false);
 
   const userRewardsUSD = useMemo(() => {
     const { userStakingData } = farmData;
@@ -54,7 +58,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
   }, [farmData]);
 
   // Handlers
-  const handleHarvestClick = async () => {
+  const handleHarvestConfirm = async () => {
     setLoadingHarvest(true);
     try {
       const receipt = await sdk.collectRewards(
@@ -76,6 +80,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
       toast('Error on harvest');
     } finally {
       setLoadingHarvest(false);
+      setShowHarvestModal(false);
     }
   };
 
@@ -245,11 +250,20 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                 {hasUserStaked ? (
                   <>
                     <div className="d-flex justify-content-between align-items-start">
-                      <p className="text-small text-bold">Pending rewards</p>
+                      <div className="d-flex align-items-center">
+                        <p className="text-small text-bold">Pending rewards</p>
+                        <Tippy
+                          content={`Your pending rewards are calculated in real time. The amount shown is a time-sensitive estimation, and might slightly differ from the actual amount. Before and after actions are taken, it takes 5-10 secs for the amounts to update.`}
+                        >
+                          <span className="ms-2">
+                            <Icon name="hint" />
+                          </span>
+                        </Tippy>
+                      </div>
                       <div className="d-flex justify-content-end">
                         <Button
                           loading={loadingHarvest}
-                          onClick={handleHarvestClick}
+                          onClick={() => setShowHarvestModal(true)}
                           size="small"
                           type="primary"
                         >
@@ -259,38 +273,86 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                     </div>
 
                     <div className="mt-5">
-                      <p className="text-title text-numeric">
+                      <p className="text-title text-success text-numeric">
                         {formatStringToPrice(userRewardsUSD as string)}
                       </p>
 
-                      <div className="d-flex align-items-center mt-4">
-                        {farmData.userStakingData.rewardsAccumulated?.map(reward => {
-                          const rewardData =
-                            farmData.rewardsData.find((rewardSingle: IReward) => {
-                              return rewardSingle.address === reward.address;
-                            }) || ({} as IReward);
+                      <hr className="my-4" />
 
-                          const rewardSymbol = rewardData.symbol;
-                          const rewardDecimals = rewardData.decimals;
+                      <div className="mt-4">
+                        {farmData.rewardsData?.map(reward => {
+                          const userRewardData =
+                            farmData.userStakingData.rewardsAccumulated?.find(
+                              (rewardSingle: IUserStakingData) => {
+                                return rewardSingle.address === reward.address;
+                              },
+                            ) || ({} as IUserStakingData);
+
+                          const rewardSymbol = reward.symbol;
+                          const rewardDecimals = reward.decimals;
 
                           return (
                             <p
                               key={rewardSymbol}
-                              className="text-main text-secondary d-flex align-items-center me-3"
+                              className="text-main d-flex justify-content-between align-items-center mt-4"
                             >
-                              <span className="text-numeric me-3">
+                              <span className="d-flex align-items-center text-secondary">
+                                <IconToken symbol={rewardSymbol} />
+                                <span className="ms-3">{rewardSymbol}</span>
+                              </span>
+                              <span className="text-numeric ms-3">
                                 {formatStringWeiToStringEther(
-                                  reward.totalAccumulated || '0',
+                                  userRewardData.totalAccumulated || '0',
                                   rewardDecimals,
                                 )}
                               </span>
-                              <IconToken symbol={rewardSymbol} />
-                              <span className="ms-3">{rewardSymbol}</span>
                             </p>
                           );
                         })}
                       </div>
                     </div>
+
+                    {showHarvestModal ? (
+                      <Modal show={showHarvestModal} closeModal={() => setShowHarvestModal(false)}>
+                        <ConfirmTransactionModalContent
+                          modalTitle="Harvest Pending Rewards"
+                          closeModal={() => setShowHarvestModal(false)}
+                          confirmTansaction={handleHarvestConfirm}
+                          confirmButtonLabel="Confirm"
+                          isLoading={loadingHarvest}
+                        >
+                          {loadingHarvest ? (
+                            <Confirmation confirmationText={'Harvesting reward tokens'} />
+                          ) : (
+                            <>
+                              <div className="text-small">Estimated pending rewards:</div>
+                              {farmData.rewardsData.map((reward: IReward) => {
+                                const userReward =
+                                  farmData.userStakingData.rewardsAccumulated?.find(
+                                    (currReward: IRewardsAccumulated) =>
+                                      currReward.address === reward.address,
+                                  );
+                                return (
+                                  <div className="d-flex justify-content-between align-items-center mt-4">
+                                    <div className="d-flex align-items-center">
+                                      <IconToken symbol={reward.symbol} />
+                                      <span className="text-main ms-3">{reward.symbol}</span>
+                                    </div>
+
+                                    <div className="text-main text-numeric">
+                                      {formatStringWeiToStringEther(
+                                        userReward?.totalAccumulated || '0',
+                                        reward.decimals,
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </>
+                          )}
+                        </ConfirmTransactionModalContent>
+                      </Modal>
+                    ) : null}
                   </>
                 ) : campaignEnded ? (
                   <div>

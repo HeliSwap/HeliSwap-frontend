@@ -36,7 +36,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
   const [currentItems, setCurrentItems] = useState<IFarmData[]>([]);
   const [pageCount, setPageCount] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
-  const [currentFarmIndex, setCurrentFarmIndex] = useState(0);
+  const [currentFarm, setCurrentFarm] = useState('');
   const [showFarmDetails, setShowFarmDetails] = useState(false);
   const [sortDirection] = useState<SORT_DIRECTION>(SORT_DIRECTION.DESC);
   const [farmsSortBy] = useState<SORT_OPTIONS>(SORT_OPTIONS_ENUM.APR);
@@ -104,7 +104,9 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
     showFarmDetails ? (
       <FarmDetails
         setShowFarmDetails={setShowFarmDetails}
-        farmData={currentItems[currentFarmIndex]}
+        farmData={
+          currentItems.find((farm: IFarmData) => farm.address === currentFarm) || ({} as IFarmData)
+        }
       />
     ) : (
       <div className="d-flex justify-content-center">
@@ -150,7 +152,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
                       index={index}
                       farmData={item}
                       handleRowClick={handleRowClick}
-                      setCurrentFarmIndex={setCurrentFarmIndex}
+                      setCurrentFarm={setCurrentFarm}
                     />
                   ))}
                 </>

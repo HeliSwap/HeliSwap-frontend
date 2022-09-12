@@ -14,6 +14,10 @@ import InputToken from './InputToken';
 import InputTokenSelector from './InputTokenSelector';
 import WalletBalance from './WalletBalance';
 import Icon from './Icon';
+import Modal from './Modal';
+import Confirmation from './Confirmation';
+import ConfirmTransactionModalContent from './Modals/ConfirmTransactionModalContent';
+import IconToken from './IconToken';
 
 import { formatStringWeiToStringEther } from '../utils/numberUtils';
 
@@ -57,6 +61,9 @@ const FarmActions = ({
 
   const [lpApproved, setLpApproved] = useState(false);
 
+  const [showStakeModal, setShowStakeModal] = useState(false);
+  const [showExitModal, setShowExitModal] = useState(false);
+
   const getInsufficientTokenBalance = useCallback(() => {
     const {
       poolData: { lpShares },
@@ -76,7 +83,7 @@ const FarmActions = ({
     setLpInputValue(value);
   };
 
-  const handleStakeClick = async () => {
+  const handleStakeConfirm = async () => {
     setLoadingStake(true);
     try {
       const receipt = await sdk.stakeLP(
@@ -99,10 +106,11 @@ const FarmActions = ({
       toast.error('Error on stake');
     } finally {
       setLoadingStake(false);
+      setShowStakeModal(false);
     }
   };
 
-  const handleExitButtonClick = async () => {
+  const handleExitConfirm = async () => {
     setLoadingExit(true);
 
     try {
@@ -121,6 +129,7 @@ const FarmActions = ({
       console.error(err);
     } finally {
       setLoadingExit(false);
+      setShowExitModal(false);
     }
   };
 
@@ -247,7 +256,7 @@ const FarmActions = ({
                       <Button
                         disabled={getInsufficientTokenBalance()}
                         loading={loadingStake}
-                        onClick={handleStakeClick}
+                        onClick={() => setShowStakeModal(true)}
                       >
                         {getStakeButtonLabel()}
                       </Button>
@@ -289,12 +298,85 @@ const FarmActions = ({
               </div>
 
               <div className="d-grid">
-                <Button loading={loadingExit} onClick={handleExitButtonClick}>
+                <Button loading={loadingExit} onClick={() => setShowExitModal(true)}>
                   Unstake
                 </Button>
               </div>
             </>
           )}
+          {showStakeModal ? (
+            <Modal show={showStakeModal} closeModal={() => setShowStakeModal(false)}>
+              <ConfirmTransactionModalContent
+                modalTitle="Stake Your LP Tokens"
+                closeModal={() => setShowStakeModal(false)}
+                confirmTansaction={handleStakeConfirm}
+                confirmButtonLabel="Confirm"
+                isLoading={loadingStake}
+              >
+                {loadingStake ? (
+                  <Confirmation
+                    confirmationText={`Staking ${formatStringWeiToStringEther(
+                      farmData.poolData.lpShares || '0',
+                    )} LP tokens`}
+                  />
+                ) : (
+                  <>
+                    <div className="text-small">LP token count</div>
+
+                    <div className="d-flex justify-content-between align-items-center mt-4">
+                      <div className="d-flex align-items-center">
+                        <IconToken symbol="LP" />
+
+                        <span className="text-main ms-3">LP Token</span>
+                      </div>
+
+                      <div className="text-main text-numeric">
+                        {formatStringWeiToStringEther(farmData.poolData.lpShares || '0')}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </ConfirmTransactionModalContent>
+            </Modal>
+          ) : null}
+
+          {showExitModal ? (
+            <Modal show={showExitModal} closeModal={() => setShowExitModal(false)}>
+              <ConfirmTransactionModalContent
+                modalTitle="Unstake Your LP Tokens"
+                closeModal={() => setShowExitModal(false)}
+                confirmTansaction={handleExitConfirm}
+                confirmButtonLabel="Confirm"
+                isLoading={loadingExit}
+              >
+                {loadingExit ? (
+                  <Confirmation
+                    confirmationText={`Unstaking ${formatStringWeiToStringEther(
+                      farmData.userStakingData.stakedAmount as string,
+                    )} LP tokens`}
+                  />
+                ) : (
+                  <>
+                    <div className="text-small">LP token count</div>
+
+                    <div className="d-flex justify-content-between align-items-center mt-4">
+                      <div className="d-flex align-items-center">
+                        <IconToken symbol="LP" />
+
+                        <span className="text-main ms-3">LP Token</span>
+                      </div>
+
+                      <div className="text-main text-numeric">
+                        {formatStringWeiToStringEther(
+                          farmData.userStakingData.stakedAmount as string,
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </ConfirmTransactionModalContent>
+            </Modal>
+          ) : null}
         </div>
       </div>
     </div>
