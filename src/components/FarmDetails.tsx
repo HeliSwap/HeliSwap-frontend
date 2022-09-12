@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 
 import { GlobalContext } from '../providers/Global';
 
-import { IFarmData, IReward, IRewardsAccumulated } from '../interfaces/tokens';
+import { IFarmData, IReward, IRewardsAccumulated, IUserStakingData } from '../interfaces/tokens';
 
 import Icon from './Icon';
 import IconToken from './IconToken';
@@ -273,33 +273,39 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                     </div>
 
                     <div className="mt-5">
-                      <p className="text-title text-numeric">
+                      <p className="text-title text-success text-numeric">
                         {formatStringToPrice(userRewardsUSD as string)}
                       </p>
 
-                      <div className="d-flex align-items-center mt-4">
-                        {farmData.userStakingData.rewardsAccumulated?.map(reward => {
-                          const rewardData =
-                            farmData.rewardsData.find((rewardSingle: IReward) => {
-                              return rewardSingle.address === reward.address;
-                            }) || ({} as IReward);
+                      <hr className="my-4" />
 
-                          const rewardSymbol = rewardData.symbol;
-                          const rewardDecimals = rewardData.decimals;
+                      <div className="mt-4">
+                        {farmData.rewardsData?.map(reward => {
+                          const userRewardData =
+                            farmData.userStakingData.rewardsAccumulated?.find(
+                              (rewardSingle: IUserStakingData) => {
+                                return rewardSingle.address === reward.address;
+                              },
+                            ) || ({} as IReward);
+
+                          const rewardSymbol = reward.symbol;
+                          const rewardDecimals = reward.decimals;
 
                           return (
                             <p
                               key={rewardSymbol}
-                              className="text-main text-secondary d-flex align-items-center me-3"
+                              className="text-main d-flex justify-content-between align-items-center mt-4"
                             >
-                              <span className="text-numeric me-3">
+                              <span className="d-flex align-items-center text-secondary">
+                                <IconToken symbol={rewardSymbol} />
+                                <span className="ms-3">{rewardSymbol}</span>
+                              </span>
+                              <span className="text-numeric ms-3">
                                 {formatStringWeiToStringEther(
-                                  reward.totalAccumulated || '0',
+                                  userRewardData.totalAccumulated || '0',
                                   rewardDecimals,
                                 )}
                               </span>
-                              <IconToken symbol={rewardSymbol} />
-                              <span className="ms-3">{rewardSymbol}</span>
                             </p>
                           );
                         })}
