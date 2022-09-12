@@ -333,7 +333,10 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                                       currReward.address === reward.address,
                                   );
                                 return (
-                                  <div className="d-flex justify-content-between align-items-center mt-4">
+                                  <div
+                                    key={reward.address}
+                                    className="d-flex justify-content-between align-items-center mt-4"
+                                  >
                                     <div className="d-flex align-items-center">
                                       <IconToken symbol={reward.symbol} />
                                       <span className="text-main ms-3">{reward.symbol}</span>
