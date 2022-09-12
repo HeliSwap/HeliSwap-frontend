@@ -250,7 +250,16 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                 {hasUserStaked ? (
                   <>
                     <div className="d-flex justify-content-between align-items-start">
-                      <p className="text-small text-bold">Pending rewards</p>
+                      <div className="d-flex align-items-center">
+                        <p className="text-small text-bold">Pending rewards</p>
+                        <Tippy
+                          content={`Your pending rewards are calculated in real time. The amount shown is a time-sensitive estimation, and might slightly differ from the actual amount. Before and after actions are taken, it takes 5-10 secs for the amounts to update.`}
+                        >
+                          <span className="ms-2">
+                            <Icon name="hint" />
+                          </span>
+                        </Tippy>
+                      </div>
                       <div className="d-flex justify-content-end">
                         <Button
                           loading={loadingHarvest}
