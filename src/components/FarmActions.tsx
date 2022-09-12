@@ -17,6 +17,7 @@ import Icon from './Icon';
 import Modal from './Modal';
 import Confirmation from './Confirmation';
 import ConfirmTransactionModalContent from './Modals/ConfirmTransactionModalContent';
+import IconToken from './IconToken';
 
 import { formatStringWeiToStringEther } from '../utils/numberUtils';
 
@@ -24,7 +25,6 @@ import getErrorMessage from '../content/errors';
 
 import { MAX_UINT_ERC20 } from '../constants';
 import { requestIdFromAddress } from '../utils/tokenUtils';
-import IconToken from './IconToken';
 
 interface IFarmActionsProps {
   farmData: IFarmData;
