@@ -310,7 +310,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                             <Confirmation confirmationText={'Harvesting reward tokens'} />
                           ) : (
                             <>
-                              <div className="m-4 text-small">Estimated pending rewards</div>
+                              <div className="text-small">Estimated pending rewards:</div>
                               {farmData.rewardsData.map((reward: IReward) => {
                                 const userReward =
                                   farmData.userStakingData.rewardsAccumulated?.find(
@@ -318,7 +318,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                                       currReward.address === reward.address,
                                   );
                                 return (
-                                  <div className="d-flex justify-content-between align-items-center px-3 m-4">
+                                  <div className="d-flex justify-content-between align-items-center mt-4">
                                     <div className="d-flex align-items-center">
                                       <IconToken symbol={reward.symbol} />
                                       <span className="text-main ms-3">{reward.symbol}</span>

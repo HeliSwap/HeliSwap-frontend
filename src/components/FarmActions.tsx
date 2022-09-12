@@ -321,9 +321,9 @@ const FarmActions = ({
                   />
                 ) : (
                   <>
-                    <div className="m-4 text-small">LP token count</div>
+                    <div className="text-small">LP token count</div>
 
-                    <div className="d-flex justify-content-between align-items-center px-3 m-4">
+                    <div className="d-flex justify-content-between align-items-center mt-4">
                       <div className="d-flex align-items-center">
                         <IconToken symbol="LP" />
 
@@ -357,9 +357,9 @@ const FarmActions = ({
                   />
                 ) : (
                   <>
-                    <div className="m-4 text-small">LP token count</div>
+                    <div className="text-small">LP token count</div>
 
-                    <div className="d-flex justify-content-between align-items-center px-3 m-4">
+                    <div className="d-flex justify-content-between align-items-center mt-4">
                       <div className="d-flex align-items-center">
                         <IconToken symbol="LP" />
 
