@@ -286,7 +286,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                               (rewardSingle: IUserStakingData) => {
                                 return rewardSingle.address === reward.address;
                               },
-                            ) || ({} as IReward);
+                            ) || ({} as IUserStakingData);
 
                           const rewardSymbol = reward.symbol;
                           const rewardDecimals = reward.decimals;
