@@ -252,8 +252,8 @@
     line-height: 40px;
     background-color: $blue-neutral-700;
     border: none;
-    max-width: 250px;
-    flex: 0 1 250px;
+    max-width: 230px;
+    flex: 0 1 230px;
     @include transition-color;
 
     &.is-compact {
