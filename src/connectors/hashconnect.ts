@@ -181,7 +181,7 @@ class Hashconnect {
     if (process.env.REACT_APP_NETWORK_TYPE === 'testnet') {
       nodeId = randomIntFromInterval(3, 7);
     } else if (process.env.REACT_APP_NETWORK_TYPE === 'mainnet') {
-      nodeId = randomIntFromInterval(3, 28);
+      nodeId = randomIntFromInterval(3, 20);
     }
 
     trans.setNodeAccountIds([new AccountId(nodeId)]);
