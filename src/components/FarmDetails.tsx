@@ -274,7 +274,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
 
                     <div className="mt-5">
                       <p className="text-title text-success text-numeric">
-                        {formatStringToPrice(userRewardsUSD as string)}
+                        {formatStringToPrice(userRewardsUSD as string, true)}
                       </p>
 
                       <hr className="my-4" />
