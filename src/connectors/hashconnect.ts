@@ -177,7 +177,7 @@ class Hashconnect {
     trans.setTransactionId(transId);
 
     let nodeId = 3;
-    //Choose random node depending on the network selected
+    //Choose random node depending on the network selected (we exclude some of the nodes as the current hashgraph/sdk version 2.16.2 used by hashconnect doesn't support all of the available hedera nodes)
     if (process.env.REACT_APP_NETWORK_TYPE === 'testnet') {
       nodeId = randomIntFromInterval(3, 7);
     } else if (process.env.REACT_APP_NETWORK_TYPE === 'mainnet') {
