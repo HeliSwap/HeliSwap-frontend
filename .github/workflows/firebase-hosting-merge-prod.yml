@@ -4,9 +4,9 @@
 name: Deploy to Firebase Hosting on merge Production
 env:
   CI: false
-  REACT_APP_MIRROR_NODE_URL: https://mainnet.mirrornode.hedera.com
+  REACT_APP_MIRROR_NODE_URL: https://mainnet-public.mirrornode.hedera.com/
   REACT_APP_COINGECKO_URL: https://api.coingecko.com/api/v3
-  REACT_APP_TOKEN_LIST_URL: https://ipfs.io/ipfs/QmRb5kBMfMwH7WRHcPxNQ3rFCQHdSKBSqhnb6c6aT9NY54/mainnet.tokenlist.json
+  REACT_APP_TOKEN_LIST_URL: https://heliswap.infura-ipfs.io/ipfs/QmVzoxFYWb7ZP93ue9mNwhan9PmjRFXoVATekr6Tdk7M6b
   REACT_APP_NETWORK_TYPE: mainnet
   REACT_APP_GRAPHQL_URI: https://api.heliswap.io/query
 'on':
@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Set prod ENV
         run: |
-          echo "REACT_APP_ROUTER_ADDRESS=0x0000000000000000000000000000000002d97cbe" >> $GITHUB_ENV
+          echo "REACT_APP_ROUTER_ADDRESS=0x000000000000000000000000000000000013422e" >> $GITHUB_ENV
           echo "REACT_APP_WHBAR_ADDRESS=0x00000000000000000000000000000000000f7e89" >> $GITHUB_ENV
       - name: Build
         run: yarn install --frozen-lockfile && yarn run build
