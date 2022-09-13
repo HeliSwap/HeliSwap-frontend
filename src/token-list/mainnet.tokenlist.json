@@ -17,6 +17,62 @@
       "symbol": "WHBAR",
       "decimals": 8,
       "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/WHBAR.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x000000000000000000000000000000000008437c",
+      "name": "Wrapped Ether[hts]",
+      "symbol": "WETH[hts]",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/WETH.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x0000000000000000000000000000000000101ae3",
+      "name": "USD Coin",
+      "symbol": "USDC[hts]",
+      "decimals": 6,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/USDC.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x0000000000000000000000000000000000101af0",
+      "name": "Tether USD",
+      "symbol": "USDT[hts]",
+      "decimals": 6,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/USDT.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x0000000000000000000000000000000000101afb",
+      "name": "Wrapped BTC",
+      "symbol": "WBTC[hts]",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/WBTC.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x0000000000000000000000000000000000107d76",
+      "name": "MANTRA DAO",
+      "symbol": "OM",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/OM.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x0000000000000000000000000000000000101af5",
+      "name": "Dai Stablecoin",
+      "symbol": "DAI[hts]",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/DAI.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x0000000000000000000000000000000000083e9e",
+      "name": "Wrapped Matic[hts]",
+      "symbol": "WMATIC[hts]",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/WMATIC.png"
     }
   ]
 }
