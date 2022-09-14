@@ -7,7 +7,7 @@
     "patch": 0
   },
   "tags": {},
-  "logoURI": "ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/HELI.png",
+  "logoURI": "ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/HELI.png",
   "keywords": ["heliswap", "default"],
   "tokens": [
     {
@@ -16,7 +16,7 @@
       "name": "Wrapped HBAR",
       "symbol": "WHBAR",
       "decimals": 8,
-      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/WHBAR.png"
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/WHBAR.png"
     },
     {
       "chainId": 295,
@@ -24,7 +24,7 @@
       "name": "Wrapped Ether[hts]",
       "symbol": "WETH[hts]",
       "decimals": 8,
-      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/WETH.png"
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/ETH.svg"
     },
     {
       "chainId": 295,
@@ -32,7 +32,7 @@
       "name": "USD Coin",
       "symbol": "USDC[hts]",
       "decimals": 6,
-      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/USDC.png"
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/USDC.png"
     },
     {
       "chainId": 295,
@@ -40,7 +40,7 @@
       "name": "Tether USD",
       "symbol": "USDT[hts]",
       "decimals": 6,
-      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/USDT.png"
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/USDT.png"
     },
     {
       "chainId": 295,
@@ -48,7 +48,7 @@
       "name": "Wrapped BTC",
       "symbol": "WBTC[hts]",
       "decimals": 8,
-      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/WBTC.png"
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/WBTC.png"
     },
     {
       "chainId": 295,
@@ -56,7 +56,7 @@
       "name": "MANTRA DAO",
       "symbol": "OM",
       "decimals": 8,
-      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/OM.png"
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/OM.png"
     },
     {
       "chainId": 295,
@@ -64,7 +64,7 @@
       "name": "Dai Stablecoin",
       "symbol": "DAI[hts]",
       "decimals": 8,
-      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/DAI.png"
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/DAI.png"
     },
     {
       "chainId": 295,
@@ -72,7 +72,7 @@
       "name": "Wrapped Matic[hts]",
       "symbol": "WMATIC[hts]",
       "decimals": 8,
-      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/WMATIC.png"
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/WMATIC.webp"
     }
   ]
 }
