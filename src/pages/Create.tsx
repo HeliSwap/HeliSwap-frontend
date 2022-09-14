@@ -307,6 +307,14 @@ const Create = () => {
       } else {
         const tokens = await getUserAssociatedTokens(userId);
         setUserAssociatedTokens(tokens);
+
+        const newBalance = await getTokenBalance(userId, token);
+        const tokenToSet = token.address === tokensData.tokenA.address ? 'tokenA' : 'tokenB';
+
+        setTokenBalances({
+          ...tokenBalances,
+          [tokenToSet]: newBalance,
+        });
         toast.success('Success! Token was associated.');
       }
     } catch (err) {

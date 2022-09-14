@@ -250,9 +250,9 @@ export const getTokenBalance = async (userId: string, tokenData: ITokenData) => 
     const accountTokens = await getUserHTSData(userId);
     const balance = accountTokens?.get(tokenData.hederaId);
     const tokenDecimals = tokenData?.decimals || 8;
-    tokenBalance = balance
-      ? formatStringWeiToStringEther(balance.toString(), tokenDecimals).toString()
-      : '0';
+
+    if (balance)
+      tokenBalance = formatStringWeiToStringEther(balance.toString(), tokenDecimals).toString();
   }
   // Currently we don't have a way getting the balance of ERC20 tokens
   return tokenBalance;
