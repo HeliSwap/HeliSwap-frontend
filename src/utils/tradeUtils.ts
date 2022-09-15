@@ -188,19 +188,11 @@ const getPath = (poolsArray: IPoolData[], startingCurreny: string) => {
 
 export const tradeComparator = (a: Trade, b: Trade) => {
   const ioComp = inputOutputComparator(a, b);
+
   if (ioComp !== 0) {
     return ioComp;
   }
-  //TODO: consider if we could perform this check
 
-  // consider lowest slippage next, since these are less likely to fail
-  // if (a.priceImpact.lessThan(b.priceImpact)) {
-  //   return -1;
-  // } else if (a.priceImpact.greaterThan(b.priceImpact)) {
-  //   return 1;
-  // }
-
-  // finally consider the number of hops since each hop costs gas
   return a.path.length - b.path.length;
 };
 

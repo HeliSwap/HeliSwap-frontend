@@ -26,7 +26,6 @@ import ToasterWrapper from './ToasterWrapper';
 import {
   formatStringWeiToStringEther,
   formatStringToStringWei,
-  formatStringToBigNumberWei,
   formatStringETHtoPriceFormatted,
 } from '../utils/numberUtils';
 import {
@@ -34,6 +33,7 @@ import {
   addressToContractId,
   calculateShareByPercentage,
   calculatePercentageByShare,
+  invalidInputTokensData,
 } from '../utils/tokenUtils';
 import {
   getTransactionSettings,
@@ -86,15 +86,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
   const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
-    const initialLpInputValueBNWei = formatStringToBigNumberWei(maxLpInputValue, 18);
-    const valueBNWei = formatStringToBigNumberWei(value, 18);
-    const inputGtInitialValue = valueBNWei.gt(initialLpInputValueBNWei);
-
-    // TODO make this common for every token input
-    // TODO make validation for more than 18 decs!!
-    const invalidInputTokensData = !value || isNaN(Number(value)) || inputGtInitialValue;
-
-    if (invalidInputTokensData) {
+    if (invalidInputTokensData(value, maxLpInputValue, 18)) {
       setLpInputValue(formatStringWeiToStringEther(pairData.lpShares as string));
       setSliderValue(SLIDER_INITIAL_VALUE);
       recalculateReserves(formatStringWeiToStringEther(pairData.lpShares as string));

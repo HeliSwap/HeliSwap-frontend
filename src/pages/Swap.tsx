@@ -37,6 +37,7 @@ import {
   getTokenBalance,
   getUserAssociatedTokens,
   hasFeesOrKeys,
+  invalidInputTokensData,
   NATIVE_TOKEN,
 } from '../utils/tokenUtils';
 import { getTransactionSettings } from '../utils/transactionUtils';
@@ -263,11 +264,7 @@ const Swap = () => {
         return tokenANotSelected || tokenBNotSelected || sameTokenSelected;
       };
 
-      const invalidInputTokensData = () => {
-        return !value || isNaN(Number(value));
-      };
-
-      if (invalidInputTokensData()) {
+      if (invalidInputTokensData(value)) {
         setBestPath([]);
         setSwapPriceImpact(0);
         setSwapData(prev => ({ ...prev, amountIn: '', amountOut: '' }));

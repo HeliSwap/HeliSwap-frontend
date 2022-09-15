@@ -14,7 +14,6 @@ import InputTokenSelector from './InputTokenSelector';
 
 import {
   formatStringETHtoPriceFormatted,
-  formatStringToBigNumberWei,
   formatStringToPrice,
   formatStringWeiToStringEther,
 } from '../utils/numberUtils';
@@ -31,7 +30,7 @@ import ToasterWrapper from './ToasterWrapper';
 import { GlobalContext } from '../providers/Global';
 import getErrorMessage from '../content/errors';
 import toast from 'react-hot-toast';
-import { idToAddress, isHederaIdValid } from '../utils/tokenUtils';
+import { idToAddress, invalidInputTokensData, isHederaIdValid } from '../utils/tokenUtils';
 
 interface IPoolInfoProps {
   poolData: IPoolExtendedData;
@@ -89,16 +88,7 @@ const PoolInfo = ({
   const handleInputLPAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
-    const initialLpInputValueBNWei = formatStringToBigNumberWei(maxLpInputValue, 18);
-    const valueBNWei = formatStringToBigNumberWei(value, 18);
-    const inputGtInitialValue = valueBNWei.gt(initialLpInputValueBNWei);
-
-    // TODO make this common for every token input
-    // TODO make validation for more than 18 decs!!
-    const invalidInputTokensData =
-      !value || isNaN(Number(value)) || inputGtInitialValue || Number(value) === 0;
-
-    if (invalidInputTokensData) {
+    if (invalidInputTokensData(value, maxLpInputValue, 18)) {
       setInputLPAmount(formatStringWeiToStringEther(poolData.lpShares as string));
       setInputLPAMountValid(false);
       return;
