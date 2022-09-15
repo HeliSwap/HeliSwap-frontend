@@ -24,7 +24,7 @@ import { formatStringWeiToStringEther } from '../utils/numberUtils';
 import getErrorMessage from '../content/errors';
 
 import { MAX_UINT_ERC20 } from '../constants';
-import { requestIdFromAddress } from '../utils/tokenUtils';
+import { invalidInputTokensData, requestIdFromAddress } from '../utils/tokenUtils';
 
 interface IFarmActionsProps {
   farmData: IFarmData;
@@ -80,7 +80,11 @@ const FarmActions = ({
   };
 
   const hanleLpInputChange = (value: string) => {
-    setLpInputValue(value);
+    if (invalidInputTokensData(value)) {
+      setLpInputValue(formatStringWeiToStringEther(farmData.poolData.lpShares || '0'));
+    } else {
+      setLpInputValue(value);
+    }
   };
 
   const handleStakeConfirm = async () => {
@@ -314,11 +318,7 @@ const FarmActions = ({
                 isLoading={loadingStake}
               >
                 {loadingStake ? (
-                  <Confirmation
-                    confirmationText={`Staking ${formatStringWeiToStringEther(
-                      farmData.poolData.lpShares || '0',
-                    )} LP tokens`}
-                  />
+                  <Confirmation confirmationText={`Staking ${lpInputValue || '0'} LP tokens`} />
                 ) : (
                   <>
                     <div className="text-small">LP token count</div>
@@ -330,9 +330,7 @@ const FarmActions = ({
                         <span className="text-main ms-3">LP Token</span>
                       </div>
 
-                      <div className="text-main text-numeric">
-                        {formatStringWeiToStringEther(farmData.poolData.lpShares || '0')}
-                      </div>
+                      <div className="text-main text-numeric">{lpInputValue || '0'}</div>
                     </div>
                   </>
                 )}

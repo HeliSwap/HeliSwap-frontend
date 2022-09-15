@@ -39,6 +39,7 @@ import {
   NATIVE_TOKEN,
   getUserAssociatedTokens,
   hasFeesOrKeys,
+  invalidInputTokensData,
 } from '../utils/tokenUtils';
 import {
   formatStringETHtoPriceFormatted,
@@ -230,11 +231,7 @@ const Create = () => {
       const inputToken = name === 'tokenAAmount' ? tokenA : tokenB;
       setInputTokenA(name === 'tokenAAmount');
 
-      const invalidInputTokensData = () => {
-        return !value || isNaN(Number(value));
-      };
-
-      if (invalidInputTokensData()) {
+      if (invalidInputTokensData(value)) {
         setReadyToProvide(false);
         setCreatePairData(prev => ({ ...prev, tokenAAmount: '', tokenBAmount: '' }));
         return;

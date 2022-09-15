@@ -383,3 +383,13 @@ export const NATIVE_TOKEN: ITokenData = {
   decimals: 8,
   type: TokenType.HBAR,
 };
+
+export const invalidInputTokensData = (value: string, maxValue?: string, decimals?: number) => {
+  let inputGtMaxValue = false;
+  if (maxValue && decimals) {
+    const maxValueWei = formatStringToBigNumberWei(maxValue, decimals);
+    const valueBNWei = formatStringToBigNumberWei(value, decimals);
+    inputGtMaxValue = valueBNWei.gt(maxValueWei);
+  }
+  return !value || isNaN(Number(value)) || inputGtMaxValue;
+};
