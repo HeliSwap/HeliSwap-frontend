@@ -602,7 +602,6 @@ const Create = () => {
 
   // Final check before create
   useEffect(() => {
-    //TODO: rafactor this function
     let isReady = true;
 
     const { tokenAAmount, tokenBAmount } = createPairData;
