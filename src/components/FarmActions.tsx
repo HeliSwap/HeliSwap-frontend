@@ -80,11 +80,11 @@ const FarmActions = ({
   };
 
   const hanleLpInputChange = (value: string) => {
-    if (invalidInputTokensData(value)) {
-      setLpInputValue(formatStringWeiToStringEther(farmData.poolData.lpShares || '0'));
-    } else {
-      setLpInputValue(value);
-    }
+    const inputValue = invalidInputTokensData(value)
+      ? formatStringWeiToStringEther(farmData.poolData.lpShares || '0')
+      : value;
+
+    setLpInputValue(inputValue);
   };
 
   const handleStakeConfirm = async () => {
