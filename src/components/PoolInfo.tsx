@@ -424,7 +424,7 @@ const PoolInfo = ({
           {poolData.hasProblematicToken ? (
             <Tippy content={generalFeesAndKeysWarning}>
               <span className="ms-3">
-                <Icon name="warning" color="warning" />
+                <Icon name="info" color="info" />
               </span>
             </Tippy>
           ) : null}

@@ -9,6 +9,7 @@ import { IFarmData } from '../interfaces/tokens';
 import FarmDetails from '../components/FarmDetails';
 import FarmRow from '../components/FarmRow';
 import Button from '../components/Button';
+import Loader from '../components/Loader';
 
 import useFarms from '../hooks/useFarms';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
@@ -120,7 +121,9 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
           <hr />
 
           {loadingFarms ? (
-            <p className="text-info">Loading farms...</p>
+            <div className="d-flex justify-content-center my-6">
+              <Loader />
+            </div>
           ) : haveFarms ? (
             <>
               <div className="table-pools">

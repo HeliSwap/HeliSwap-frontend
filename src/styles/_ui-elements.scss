@@ -106,6 +106,12 @@
     }
   }
 
+  &.is-info {
+    path {
+      fill: $primary-100;
+    }
+  }
+
   &.is-gradient {
     path {
       fill: linear-gradient(139.83deg, #f32fd7 0%, #3845fb 100%);
