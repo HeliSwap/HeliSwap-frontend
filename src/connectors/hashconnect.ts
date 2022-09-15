@@ -1,8 +1,6 @@
 import { AccountId, Transaction, TransactionId } from '@hashgraph/sdk';
 import { HashConnect, HashConnectTypes, MessageTypes } from 'hashconnect';
-import { Transaction, AccountId, TransactionId } from '@hashgraph/sdk';
 import { randomIntFromInterval } from '../utils/numberUtils';
-import { HashConnectConnectionState } from 'hashconnect/dist/types';
 
 class Hashconnect {
   hashconnect: HashConnect;
