@@ -106,6 +106,12 @@
     }
   }
 
+  &.is-info {
+    path {
+      fill: $primary-100;
+    }
+  }
+
   &.is-gradient {
     path {
       fill: linear-gradient(139.83deg, #f32fd7 0%, #3845fb 100%);
@@ -252,8 +258,8 @@
     line-height: 40px;
     background-color: $blue-neutral-700;
     border: none;
-    max-width: 250px;
-    flex: 0 1 250px;
+    max-width: 230px;
+    flex: 0 1 230px;
     @include transition-color;
 
     &.is-compact {
