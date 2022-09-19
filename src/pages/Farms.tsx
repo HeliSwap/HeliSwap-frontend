@@ -144,7 +144,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
                     <span className="text-small ws-no-wrap">Your Stake</span>
                   </div>
                   <div className="table-pools-cell justify-content-end">
-                    <span className="text-small">Closed Campaigns</span>
+                    <span className="text-small">Campaign Status</span>
                   </div>
                 </div>
 
