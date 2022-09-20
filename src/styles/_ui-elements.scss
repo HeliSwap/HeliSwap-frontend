@@ -345,7 +345,7 @@
   .table-pools-row {
     display: grid;
     gap: 1em;
-    grid-template-columns: 30px 3fr 1fr;
+    grid-template-columns: 20px 3fr 1fr;
     transition: background-color 0.1s linear;
     border-bottom: 1px solid $blue-neutral-500;
     cursor: pointer;
