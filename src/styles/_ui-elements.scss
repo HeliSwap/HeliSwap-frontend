@@ -1,3 +1,12 @@
+/* Helpers */
+.bg-secondary-800 {
+  background-color: $secondary-800;
+}
+
+.bg-success-600 {
+  background-color: $positive-600;
+}
+
 /* Buttons */
 .btn {
   text-transform: uppercase;
@@ -20,39 +29,39 @@
   }
 
   &.with-background {
-    background-color: $primary-700;
+    background-color: $blue-neutral-700;
   }
 
   &.with-border {
-    border: 1px solid $primary-400;
+    border: 1px solid $blue-neutral-400;
   }
 
   &:hover:not(.is-disabled) {
-    background-color: $primary-500;
+    background-color: $blue-neutral-500;
 
     &.with-border {
-      border-color: $primary-500;
+      border-color: $blue-neutral-500;
     }
   }
 }
 
 .btn-percentage {
   cursor: pointer;
-  border: 1px solid $primary-300;
+  border: 1px solid $blue-neutral-300;
   border-radius: $border-radius;
   font-size: 12px;
   line-height: 16px;
-  color: $primary-100;
+  color: $blue-neutral-100;
   padding: 4px 12px;
   transition: background-color 0.15s linear;
 
   &.is-active {
-    background-color: $primary-300;
+    background-color: $blue-neutral-300;
   }
 }
 
 .btn-connect-wallet {
-  background-color: $primary-700;
+  background-color: $blue-neutral-700;
   border-radius: $border-radius;
   display: flex;
   justify-content: space-between;
@@ -62,7 +71,7 @@
   transition: background-color 0.15s linear;
 
   &:hover {
-    background-color: $primary-500;
+    background-color: $blue-neutral-500;
   }
 }
 
@@ -75,7 +84,31 @@
 
   &.is-gray {
     path {
-      fill: $primary-400;
+      fill: $blue-neutral-300;
+    }
+  }
+
+  &.is-danger {
+    path {
+      fill: $error-400;
+    }
+  }
+
+  &.is-success {
+    path {
+      fill: $positive-400;
+    }
+  }
+
+  &.is-warning {
+    path {
+      fill: $warning-300;
+    }
+  }
+
+  &.is-info {
+    path {
+      fill: $primary-100;
     }
   }
 
@@ -83,6 +116,11 @@
     path {
       fill: linear-gradient(139.83deg, #f32fd7 0%, #3845fb 100%);
     }
+  }
+
+  &.is-small {
+    width: 20px;
+    height: 20px;
   }
 }
 
@@ -115,7 +153,19 @@
   border-radius: 50%;
 
   &.is-running {
-    background-color: #29bc63;
+    background-color: $positive-400;
+  }
+}
+
+.icon-campaign-status {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: $danger;
+
+  &.is-active {
+    background-color: $positive-400;
   }
 }
 
@@ -127,7 +177,7 @@
 
 /* Containers */
 .container-connected {
-  background-color: $primary-700;
+  background-color: $blue-neutral-700;
   box-shadow: 0px 2px 16px rgba(0, 0, 0, 0.05);
   border-radius: $border-radius;
   padding: 3px 3px 3px 12px;
@@ -136,7 +186,7 @@
 }
 
 .container-address {
-  background-color: $primary-500;
+  background-color: $blue-neutral-500;
   border-radius: 2px;
   padding: 4px 8px;
   margin-left: 12px;
@@ -146,12 +196,12 @@
   align-items: center;
 
   &:hover {
-    background-color: $primary-600;
+    background-color: $blue-neutral-600;
   }
 }
 
 .container-dark {
-  background-color: $primary-950;
+  background-color: $blue-neutral-950;
   box-shadow: 0px 5px 20px rgba(9, 10, 20, 0.45);
   padding: 16px;
   border-radius: 6px;
@@ -163,11 +213,29 @@
   padding: 16px;
 }
 
+.container-blue-neutral {
+  background-color: #25255f;
+}
+
+.container-blue-neutral-800 {
+  background-color: $blue-neutral-800;
+}
+
+.container-blue-neutral-900 {
+  background-color: $blue-neutral-900;
+}
+
+.container-border-rounded-bn-500 {
+  border: 1px solid $blue-neutral-500;
+  border-radius: $border-radius;
+  padding: 16px;
+}
+
 .container-input-token {
-  background-color: $primary-700;
+  background-color: $blue-neutral-700;
   border-radius: $border-radius;
   padding: 12px;
-  border: 1px solid $primary-700;
+  border: 1px solid $blue-neutral-700;
   transition: border 0.15s linear;
 
   &:not(.is-readonly) {
@@ -176,7 +244,7 @@
 
   &:focus-within:not(.is-readonly),
   &:hover:not(.is-readonly) {
-    border-color: $primary-500;
+    border-color: $blue-neutral-500;
   }
 
   &.is-invalid {
@@ -184,22 +252,28 @@
   }
 
   .input-token {
-    color: $primary-100;
+    color: $blue-neutral-100;
     font-family: $font-family-numeric;
     font-size: 28px;
     line-height: 40px;
-    background-color: $primary-700;
+    background-color: $blue-neutral-700;
     border: none;
-    max-width: 250px;
-    flex: 0 1 250px;
+    max-width: 230px;
+    flex: 0 1 230px;
     @include transition-color;
 
+    &.is-compact {
+      max-width: 270px;
+      flex: 0 1 270px;
+      font-size: 22px;
+    }
+
     &::placeholder {
-      color: $primary-100;
+      color: $blue-neutral-100;
     }
 
     &:focus {
-      color: $primary-100;
+      color: $blue-neutral-100;
     }
 
     &:focus-visible {
@@ -214,7 +288,7 @@
   width: 100%;
 }
 
-.container-pools {
+.container-max-with-1042 {
   width: 100%;
   max-width: 1042px;
   margin: 0 24px;
@@ -223,11 +297,11 @@
 .container-pool-details {
   padding: 0 20px 20px 20px;
   background-color: #1f1f4d;
-  border-bottom: 1px solid $primary-500;
+  border-bottom: 1px solid $blue-neutral-500;
 }
 
 .container-transparent-border {
-  padding: 18px 12px;
+  padding: 12px;
   border-radius: $border-radius;
   border: 1px solid #3d3d58;
 }
@@ -240,19 +314,40 @@
   animation: 0.75s linear infinite spinner-border;
 }
 
+.container-sidebar-menu {
+  background-color: $blue-neutral-600;
+  box-shadow: 0px 5px 20px rgba(9, 10, 20, 0.45);
+  border-radius: $border-radius;
+  padding: 18px;
+  min-width: 200px;
+  position: absolute;
+  bottom: 0;
+  left: 48px;
+
+  @include media-breakpoint-up(xxxl) {
+    left: 110px;
+  }
+}
+
+.container-campaign-status {
+  border: 1px solid $blue-neutral-500;
+  border-radius: $border-radius;
+  padding: 4px 8px;
+}
+
 /* Tables */
 .table-pools {
   display: grid;
   grid-auto-rows: auto;
   border-radius: 4px 4px 0px 0px;
-  background-color: $primary-800;
+  background-color: $blue-neutral-800;
 
   .table-pools-row {
     display: grid;
     gap: 1em;
-    grid-template-columns: 30px 3fr 1fr;
+    grid-template-columns: 20px 3fr 1fr;
     transition: background-color 0.1s linear;
-    border-bottom: 1px solid $primary-500;
+    border-bottom: 1px solid $blue-neutral-500;
     cursor: pointer;
 
     &:hover {
@@ -264,7 +359,11 @@
     }
 
     &.with-6-columns {
-      grid-template-columns: 30px 2fr 1fr 1fr 1fr 1fr;
+      grid-template-columns: 20px 3fr 1fr 1fr 1fr 1fr;
+    }
+
+    &.with-6-columns-farms {
+      grid-template-columns: 20px 2fr 1fr 1fr 1fr 2fr;
     }
 
     &.is-opened {
@@ -332,7 +431,16 @@
   transition: background-color 0.15s linear;
 
   &:hover {
-    background-color: $primary-700;
+    background-color: $blue-neutral-700;
+  }
+}
+
+.list-default {
+  padding-left: 24px;
+  list-style-type: circle;
+
+  li {
+    margin: 4px 0;
   }
 }
 
@@ -347,13 +455,13 @@
   @include transition-color;
 
   &.is-active {
-    color: $primary-100;
+    color: $blue-neutral-100;
 
     &:after {
       content: '';
       display: block;
       height: 1px;
-      background-color: $primary-100;
+      background-color: $blue-neutral-100;
       transform: translateY(17px);
     }
   }
@@ -364,4 +472,62 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
+}
+
+// Overwrites
+.tippy-box {
+  background-color: $blue-neutral-400;
+  padding: 12px;
+}
+
+.tippy-arrow {
+  color: $blue-neutral-400;
+}
+
+// Pagination
+.page-item {
+  &:first-child,
+  &:last-child {
+    display: none;
+  }
+
+  margin: 0 2px;
+}
+
+.page-link {
+  border-radius: $border-radius;
+  font-size: 14px;
+}
+
+// Toasts
+.toast-success {
+  color: $positive-400;
+}
+
+.toast-error {
+  color: $error-500;
+}
+
+// Alerts
+.alert {
+  background-color: transparent !important;
+  font-size: 14px;
+
+  &.alert-warning {
+    border-color: $warning-300;
+    color: $warning-300;
+  }
+
+  &.alert-danger {
+    border-color: $error-400;
+    color: $error-400;
+  }
+
+  .alert-icon {
+    flex-basis: 32px;
+  }
+
+  .alert-message {
+    flex: 1;
+  }
 }

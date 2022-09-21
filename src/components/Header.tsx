@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import { GlobalContext } from '../providers/Global';
 import { Md5 } from 'ts-md5/dist/md5';
@@ -8,8 +8,10 @@ import Modal from './Modal';
 import ConnectModalContent from './Modals/ConnectModalContent';
 import UserAccountModalContent from './Modals/UserAccountModalContent';
 
-import { formatStringETHtoPriceFormatted } from '../utils/numberUtils';
+import { formatHBARStringToPrice, formatStringETHtoPriceFormatted } from '../utils/numberUtils';
 import { getHBarPrice } from '../utils/tokenUtils';
+
+import { BALLANCE_FETCH_INTERVAL } from '../constants';
 
 const Header = () => {
   const contextValue = useContext(GlobalContext);
@@ -32,33 +34,41 @@ const Header = () => {
     setShowConnectModal(true);
   };
 
+  const getUserTokensData = useCallback(async () => {
+    if (userId) {
+      const provider = hethers.providers.getDefaultProvider(process.env.REACT_APP_NETWORK_TYPE);
+      const userBalanceBN = await provider.getBalance(userId);
+      const tokenBalance = hethers.utils.formatHbar(userBalanceBN);
+
+      setUserBalance(formatStringETHtoPriceFormatted(tokenBalance));
+    }
+  }, [userId]);
+
+  const getHBARPrice = useCallback(async () => {
+    const hbarPrice = await getHBarPrice();
+    setHbarPrice(hbarPrice);
+  }, []);
+
   useEffect(() => {
-    const getUserTokensData = async () => {
-      if (userId) {
-        const provider = hethers.providers.getDefaultProvider(process.env.REACT_APP_NETWORK_TYPE);
-        const userBalanceBN = await provider.getBalance(userId);
-        const tokenBalance = hethers.utils.formatHbar(userBalanceBN);
-
-        setUserBalance(formatStringETHtoPriceFormatted(tokenBalance));
-      }
-    };
-
     getUserTokensData();
     document.addEventListener('transaction-response-received', getUserTokensData);
 
     return () => {
       document.removeEventListener('transaction-response-received', getUserTokensData);
     };
-  }, [userId]);
+  }, [userId, getUserTokensData]);
 
   useEffect(() => {
-    const getHBARPrice = async () => {
-      const hbarPrice = await getHBarPrice();
-      setHbarPrice(hbarPrice);
-    };
-
     getHBARPrice();
-  }, []);
+
+    const fetchInterval = setInterval(() => {
+      getHBARPrice();
+      getUserTokensData();
+    }, BALLANCE_FETCH_INTERVAL);
+    return () => {
+      clearInterval(fetchInterval);
+    };
+  }, [getHBARPrice, getUserTokensData]);
 
   return (
     <div className="p-5">
@@ -75,7 +85,9 @@ const Header = () => {
                 </span>
               </div>
               <div className="container-connected">
-                <div className="text-small">{userBalance} HBAR</div>
+                <div className="text-small">
+                  <span className="text-numeric">{formatHBARStringToPrice(userBalance)}</span> HBAR
+                </div>
                 <div className="container-address" onClick={() => setShowUserAccountModal(true)}>
                   <div className="text-small">{userId}</div>
                   <img

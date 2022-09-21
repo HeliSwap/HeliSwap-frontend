@@ -7,8 +7,13 @@ import {
   Transaction,
 } from '@hashgraph/sdk';
 import Hashconnect from '../connectors/hashconnect';
-import { ICreatePairData } from '../interfaces/tokens';
-import { addressToId, idToAddress } from '../utils/tokenUtils';
+import { ICreatePairData, TokenType } from '../interfaces/tokens';
+import {
+  addressToId,
+  requestAddressFromId,
+  idToAddress,
+  requestIdFromAddress,
+} from '../utils/tokenUtils';
 import {
   getAmountWithSlippage,
   getExpirationTime,
@@ -37,8 +42,9 @@ class SDK {
     userId: string,
     tokenId: string | ContractId,
     isHTS: boolean,
+    spender?: string,
   ) {
-    const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
+    const spenderAddress = spender ? spender : (process.env.REACT_APP_ROUTER_ADDRESS as string);
 
     const amountToApproveBN = formatStringToBigNumber(amount);
     const maxGas = isHTS ? TRANSACTION_MAX_FEES.APPROVE_HTS : TRANSACTION_MAX_FEES.APPROVE_ERC20;
@@ -51,9 +57,7 @@ class SDK {
       //Set the contract function to call
       .setFunction(
         'approve',
-        new ContractFunctionParameters()
-          .addAddress(routerContractAddress)
-          .addUint256(amountToApproveBN),
+        new ContractFunctionParameters().addAddress(spenderAddress).addUint256(amountToApproveBN),
       );
 
     return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
@@ -66,6 +70,7 @@ class SDK {
     slippage: number,
     expiresAfter: number,
     poolExists: boolean,
+    typeType: TokenType,
   ) {
     const {
       tokenAAmount: tokenAAmountString,
@@ -79,7 +84,8 @@ class SDK {
     const tokenDecimals = tokenAId ? tokenADecimals : tokenBDecimals;
     const tokenAmountString = tokenAId ? tokenAAmountString : tokenBAmountString;
     const HBARAmountString = tokenAId ? tokenBAmountString : tokenAAmountString;
-    const tokenAddress = idToAddress(tokenId);
+    const tokenAddress =
+      typeType === TokenType.HTS ? idToAddress(tokenId) : await requestAddressFromId(tokenId);
 
     const HBARAmount = formatStringToBigNumberWei(HBARAmountString, 0);
     const tokenAmount = formatStringToBigNumberWei(tokenAmountString, tokenDecimals);
@@ -99,7 +105,7 @@ class SDK {
       //Amount of HBAR we want to provide
       .setPayableAmount(HBARAmount)
       .setFunction(
-        'addLiquidityETH',
+        'addLiquidityHBAR',
         new ContractFunctionParameters()
           .addAddress(tokenAddress)
           .addUint256(tokenAmount)
@@ -119,6 +125,8 @@ class SDK {
     slippage: number,
     expiresAfter: number,
     poolExists: boolean,
+    typeA: TokenType,
+    typeB: TokenType,
   ) {
     const {
       tokenAAmount: tokenAAmountString,
@@ -128,9 +136,10 @@ class SDK {
       tokenADecimals,
       tokenBDecimals,
     } = createPairData;
-
-    const tokenAAddress = idToAddress(tokenAId);
-    const tokenBAddress = idToAddress(tokenBId);
+    const tokenAAddress =
+      typeA === TokenType.HTS ? idToAddress(tokenAId) : await requestAddressFromId(tokenAId);
+    const tokenBAddress =
+      typeB === TokenType.HTS ? idToAddress(tokenBId) : await requestAddressFromId(tokenBId);
 
     const tokenAAmount = formatStringToBigNumberWei(tokenAAmountString, tokenADecimals);
     const tokenBAmount = formatStringToBigNumberWei(tokenBAmountString, tokenBDecimals);
@@ -193,16 +202,16 @@ class SDK {
     const tokenAmountMin = getAmountWithSlippage(tokenAmount, tokenDecimals, slippage, true);
     const HBARAmountMin = getAmountWithSlippage(HBARAmount, WHBARDecimal, slippage, true);
     const tokensLpAmountBN = formatStringToBigNumberWei(tokensLpAmount, 18);
-    const maxFee = TRANSACTION_MAX_FEES.REMOVE_NATIVE_LIQUIDITY;
+    const maxGas = TRANSACTION_MAX_FEES.REMOVE_NATIVE_LIQUIDITY;
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(routerContractAddress))
       //Set the gas for the contract call
-      .setGas(maxFee)
+      .setGas(maxGas)
       //Set the contract function to call
       .setFunction(
-        'removeLiquidityETH',
+        'removeLiquidityHBAR',
         new ContractFunctionParameters()
           .addAddress(tokenAddress)
           .addUint256(tokensLpAmountBN)
@@ -235,12 +244,12 @@ class SDK {
 
     const tokens0AmountMin = getAmountWithSlippage(tokens0Amount, token0Decimals, slippage, true);
     const tokens1AmountMin = getAmountWithSlippage(tokens1Amount, token1ecimals, slippage, true);
-    const maxFee = TRANSACTION_MAX_FEES.REMOVE_LIQUIDITY;
+    const maxGas = TRANSACTION_MAX_FEES.REMOVE_LIQUIDITY;
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(routerContractAddress))
       //Set the gas for the contract call
-      .setGas(maxFee)
+      .setGas(maxGas)
       //Set the contract function to call
       .setFunction(
         'removeLiquidity',
@@ -274,15 +283,15 @@ class SDK {
     const getTransactionName = () => {
       if (exactAmountIn) {
         return tokenInIsNative
-          ? 'swapExactETHForTokens'
+          ? 'swapExactHBARForTokens'
           : tokenOutIsNative
-          ? 'swapExactTokensForETH'
+          ? 'swapExactTokensForHBAR'
           : 'swapExactTokensForTokens';
       } else {
         return tokenInIsNative
-          ? 'swapETHForExactTokens'
+          ? 'swapHBARForExactTokens'
           : tokenOutIsNative
-          ? 'swapTokensForExactETH'
+          ? 'swapTokensForExactHBAR'
           : 'swapTokensForExactTokens';
       }
     };
@@ -341,12 +350,12 @@ class SDK {
 
   async wrapHBAR(hashconnectConnectorInstance: Hashconnect, userId: string, HBARIn: string) {
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
-    const maxFee = TRANSACTION_MAX_FEES.WRAP_HBAR;
+    const maxGas = TRANSACTION_MAX_FEES.WRAP_HBAR;
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(WHBARAddress))
       //Set the gas for the contract call
-      .setGas(maxFee)
+      .setGas(maxGas)
       //Amount of HBAR we want to provide
       .setPayableAmount(HBARIn)
       //Set the contract function to call
@@ -362,14 +371,90 @@ class SDK {
   ) {
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
     const tokenAmountInNum = formatStringToBigNumberWei(tokenAmountIn, 8);
-    const maxFee = TRANSACTION_MAX_FEES.UNWRAP_WHBAR;
+    const maxGas = TRANSACTION_MAX_FEES.UNWRAP_WHBAR;
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(WHBARAddress))
       //Set the gas for the contract call
-      .setGas(maxFee)
+      .setGas(maxGas)
       //Set the contract function to call
       .setFunction('withdraw', new ContractFunctionParameters().addUint256(tokenAmountInNum));
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
+  async transferERC20(
+    hashconnectConnectorInstance: Hashconnect,
+    userId: string,
+    tokenAddress: string,
+    amount: string,
+    to: string,
+    decimals: number = 18,
+  ) {
+    const tokenAAmount = formatStringToBigNumberWei(amount, decimals);
+    const tokenId = await requestIdFromAddress(tokenAddress);
+    const maxGas = TRANSACTION_MAX_FEES.TRANSFER_ERC20;
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(tokenId)
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction(
+        'transfer',
+        new ContractFunctionParameters().addAddress(to).addUint256(tokenAAmount),
+      );
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
+  async stakeLP(
+    hashconnectConnectorInstance: Hashconnect,
+    stakeAmount: string,
+    campaignAddress: string,
+    userId: string,
+  ) {
+    const tokensLpAmountBN = formatStringToBigNumberWei(stakeAmount, 18);
+    const maxGas = TRANSACTION_MAX_FEES.STAKE_LP_TOKEN;
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(campaignAddress))
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction('stake', new ContractFunctionParameters().addUint256(tokensLpAmountBN));
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
+  async collectRewards(
+    hashconnectConnectorInstance: Hashconnect,
+    campaignAddress: string,
+    userId: string,
+  ) {
+    const maxGas = TRANSACTION_MAX_FEES.COLLECT_REWARDS;
+
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(campaignAddress))
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction('getReward', new ContractFunctionParameters());
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
+  async exit(hashconnectConnectorInstance: Hashconnect, campaignAddress: string, userId: string) {
+    const maxGas = TRANSACTION_MAX_FEES.EXIT_CAMPAIGN;
+
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(campaignAddress))
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction('exit', new ContractFunctionParameters());
 
     return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }

@@ -7,7 +7,29 @@ export interface ITokenData {
   address: string;
   decimals: number;
   type: TokenType;
-  details?: any;
+  keys?: IKeys;
+  hasFees?: boolean;
+  isHTS?: boolean;
+}
+
+export interface IKeys {
+  adminKey: boolean;
+  supplyKey: boolean;
+  wipeKey: boolean;
+  pauseKey: boolean;
+  freezeKey: boolean;
+  feeScheduleKey: boolean;
+  kycKey: boolean;
+  [key: string]: boolean;
+}
+
+export interface ITokenListData {
+  address: string;
+  chainId: number;
+  decimals: number;
+  logoURI: string;
+  name: string;
+  symbol: string;
 }
 
 export interface ITokensData {
@@ -32,20 +54,92 @@ export interface IPoolData {
   token1Symbol: string;
   token1Decimals: number;
   lpShares?: string;
+  poolPercenatage?: string;
   icons?: string[];
   volume7d: string;
   volume24h: string;
+  fee0?: string;
+  fee1?: string;
+  hasProblematicToken?: boolean;
+  hasCampaign: boolean;
 }
 
 export interface IPoolExtendedData extends IPoolData {
   token0AmountFormatted: string;
   token1AmountFormatted: string;
+  fee0AmountFormatted?: string;
+  fee1AmountFormatted?: string;
+  lpSharesFormatted?: string;
   tvlBN: BigNumber;
   tvl: string;
   volume24Num?: number;
   volume24?: string;
   volume7Num?: number;
   volume7?: string;
+  feesNum?: number;
+  feesStr?: string;
+  tokensPriceEvaluated?: boolean;
+  [key: string]: any;
+}
+
+export interface IFarmDataRaw {
+  address: string;
+  poolData: IPoolData;
+  totalStaked: string;
+  rewardsData: IRewardRaw[];
+  stakingTokenAddress: string;
+  userStakingData: IUserStakingDataRaw;
+}
+
+export interface IFarmData extends IFarmDataRaw {
+  totalStakedUSD: string;
+  rewardsData: IReward[];
+  userStakingData: IUserStakingData;
+  APR: string;
+  totalRewardsUSD: string;
+  campaignEndDate: number;
+  [key: string]: any;
+}
+
+export interface IRewardRaw {
+  address: string;
+  symbol: string;
+  decimals: number;
+  totalAmount: string;
+  duration: number;
+  totalAccumulated: string;
+  rewardEnd: number;
+}
+
+export interface IReward extends IRewardRaw {
+  totalAmountUSD: string;
+  totalAccumulatedUSD: string;
+}
+
+export interface IUserStakingDataRaw {
+  stakedAmount?: string;
+  rewardsAccumulated?: IRewardsAccumulatedRaw[];
+  [key: string]: any;
+}
+
+export interface IUserStakingData extends IUserStakingDataRaw {
+  stakedAmountUSD?: string;
+  rewardsAccumulated?: IRewardsAccumulated[];
+}
+
+export interface IRewardsAccumulatedRaw {
+  address: string;
+  totalAccumulated: string;
+}
+
+export interface IRewardsAccumulated extends IRewardsAccumulatedRaw {
+  totalAccumulatedUSD: string;
+}
+
+export interface IUserReward {
+  address: string;
+  symbol: string;
+  pendingAmount: string;
 }
 
 export enum TokenType {
@@ -60,8 +154,6 @@ export interface IUserToken {
 }
 
 export interface ISwapTokenData {
-  tokenIdIn: string;
-  tokenIdOut: string;
   amountIn: string;
   amountOut: string;
 }

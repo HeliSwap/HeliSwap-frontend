@@ -2,8 +2,18 @@ import numeral from 'numeral';
 import BigNumber from 'bignumber.js';
 import { hethers } from '@hashgraph/hethers';
 
-export const formatStringToPrice = (stringToFormat: string) => {
-  return `$${numeral(stringToFormat).format('0.0a')}`;
+export const formatStringToPrice = (stringToFormat: string, floor: boolean = false) => {
+  return floor && Number(stringToFormat) < 1000
+    ? `$${numeral(stringToFormat).format('0.00a', Math.floor)}`
+    : `$${numeral(stringToFormat).format('0.00a')}`;
+};
+
+export const formatStringToPercentage = (stringToFormat: string) => {
+  return `${numeral(stringToFormat).format('0.0a')}%`;
+};
+
+export const formatHBARStringToPrice = (stringToFormat: string) => {
+  return `${numeral(stringToFormat).format('0,0.0000')}`;
 };
 
 export const formatNumberToBigNumber = (numberToFormat: number) => {
@@ -136,4 +146,9 @@ export const getExpirationTime = (minutes: number) => {
 export const stripStringToFixedDecimals = (decimalString: string, decimals: number) => {
   const decPosition = decimalString.indexOf('.');
   return decPosition !== -1 ? decimalString.slice(0, decPosition + decimals + 1) : decimalString;
+};
+
+export const randomIntFromInterval = (min: number, max: number): number => {
+  // min and max included
+  return Math.floor(Math.random() * (max - min + 1) + min);
 };
