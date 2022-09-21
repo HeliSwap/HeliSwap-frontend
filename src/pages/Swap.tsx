@@ -204,48 +204,64 @@ const Swap = () => {
 
   const swapPath = useMemo(() => {
     return bestPath.length !== 0 ? (
-      <div className="d-flex justify-content-center my-5">
-        {bestPath.map((currentAddress: string, index: number) => {
-          let currentTokenSymbol =
-            mergedTokensData.find((token: ITokenData) => token.address === currentAddress)
-              ?.symbol || '';
+      <div>
+        <div className="d-flex justify-content-center my-5">
+          {bestPath.map((currentAddress: string, index: number) => {
+            let currentTokenSymbol =
+              mergedTokensData.find((token: ITokenData) => token.address === currentAddress)
+                ?.symbol || '';
 
-          if (!currentTokenSymbol) {
-            for (let index = 0; index < mergedPoolsData.length; index++) {
-              const currentPool = mergedPoolsData[index];
+            if (!currentTokenSymbol) {
+              for (let index = 0; index < mergedPoolsData.length; index++) {
+                const currentPool = mergedPoolsData[index];
 
-              if (currentPool.token0 === currentAddress || currentPool.token1 === currentAddress) {
-                currentTokenSymbol =
-                  currentPool.token0 === currentAddress
-                    ? currentPool.token0Symbol
-                    : currentPool.token1Symbol;
+                if (
+                  currentPool.token0 === currentAddress ||
+                  currentPool.token1 === currentAddress
+                ) {
+                  currentTokenSymbol =
+                    currentPool.token0 === currentAddress
+                      ? currentPool.token0Symbol
+                      : currentPool.token1Symbol;
+                }
+
+                if (currentTokenSymbol) break;
               }
-
-              if (currentTokenSymbol) break;
             }
-          }
 
-          if (
-            currentAddress === process.env.REACT_APP_WHBAR_ADDRESS &&
-            ((tokenInIsNative && index === 0) ||
-              (tokenOutIsNative && index === bestPath.length - 1))
-          ) {
-            currentTokenSymbol = NATIVE_TOKEN.symbol;
-          }
+            if (
+              currentAddress === process.env.REACT_APP_WHBAR_ADDRESS &&
+              ((tokenInIsNative && index === 0) ||
+                (tokenOutIsNative && index === bestPath.length - 1))
+            ) {
+              currentTokenSymbol = NATIVE_TOKEN.symbol;
+            }
 
-          return (
-            <div className="d-flex align-items-center" key={index}>
-              {index !== 0 ? <span className="mx-3">{'>'}</span> : null}
-              <IconToken symbol={currentTokenSymbol} />
-              <div className="d-flex flex-column ms-3">
-                <span className="text-main text-bold">{currentTokenSymbol}</span>
+            return (
+              <div className="d-flex align-items-center" key={index}>
+                {index !== 0 ? <span className="mx-3">{'>'}</span> : null}
+                <IconToken symbol={currentTokenSymbol} />
+                <div className="d-flex flex-column ms-3">
+                  <span className="text-main text-bold">{currentTokenSymbol}</span>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+        <div className="d-flex justify-content-between m-4">
+          <span className="text-small">Price Impact:</span>
+          <span className="text-small text-numeric text-bold">{swapPriceImpact.toFixed(2)}%</span>
+        </div>
       </div>
     ) : null;
-  }, [bestPath, mergedTokensData, tokenInIsNative, tokenOutIsNative, mergedPoolsData]);
+  }, [
+    bestPath,
+    mergedTokensData,
+    tokenInIsNative,
+    tokenOutIsNative,
+    mergedPoolsData,
+    swapPriceImpact,
+  ]);
 
   // Handlers
   const handleInputChange = useCallback(
