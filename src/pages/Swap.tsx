@@ -203,49 +203,62 @@ const Swap = () => {
   }, [swapData, tokenBalances]);
 
   const swapPath = useMemo(() => {
+    const renderBestPath = (currentAddress: string, index: number) => {
+      let currentTokenSymbol =
+        mergedTokensData.find((token: ITokenData) => token.address === currentAddress)?.symbol ||
+        '';
+
+      if (!currentTokenSymbol) {
+        for (let index = 0; index < mergedPoolsData.length; index++) {
+          const currentPool = mergedPoolsData[index];
+          const { token0, token1, token0Symbol, token1Symbol } = currentPool;
+
+          if (token0 === currentAddress || token1 === currentAddress) {
+            currentTokenSymbol = token0 === currentAddress ? token0Symbol : token1Symbol;
+          }
+
+          if (currentTokenSymbol) break;
+        }
+      }
+
+      if (
+        currentAddress === process.env.REACT_APP_WHBAR_ADDRESS &&
+        ((tokenInIsNative && index === 0) || (tokenOutIsNative && index === bestPath.length - 1))
+      ) {
+        currentTokenSymbol = NATIVE_TOKEN.symbol;
+      }
+
+      return (
+        <div className="d-flex align-items-center" key={index}>
+          {index !== 0 ? <span className="mx-3">{'>'}</span> : null}
+          <IconToken symbol={currentTokenSymbol} />
+          <div className="d-flex flex-column ms-3">
+            <span className="text-main text-bold">{currentTokenSymbol}</span>
+          </div>
+        </div>
+      );
+    };
+
     return bestPath.length !== 0 ? (
-      <div className="d-flex justify-content-center my-5">
-        {bestPath.map((currentAddress: string, index: number) => {
-          let currentTokenSymbol =
-            mergedTokensData.find((token: ITokenData) => token.address === currentAddress)
-              ?.symbol || '';
+      <div className="rounded border border-secondary p-4 mt-4">
+        <div className="d-flex justify-content-center">{bestPath.map(renderBestPath)}</div>
 
-          if (!currentTokenSymbol) {
-            for (let index = 0; index < mergedPoolsData.length; index++) {
-              const currentPool = mergedPoolsData[index];
+        <hr className="my-4" />
 
-              if (currentPool.token0 === currentAddress || currentPool.token1 === currentAddress) {
-                currentTokenSymbol =
-                  currentPool.token0 === currentAddress
-                    ? currentPool.token0Symbol
-                    : currentPool.token1Symbol;
-              }
-
-              if (currentTokenSymbol) break;
-            }
-          }
-
-          if (
-            currentAddress === process.env.REACT_APP_WHBAR_ADDRESS &&
-            ((tokenInIsNative && index === 0) ||
-              (tokenOutIsNative && index === bestPath.length - 1))
-          ) {
-            currentTokenSymbol = NATIVE_TOKEN.symbol;
-          }
-
-          return (
-            <div className="d-flex align-items-center" key={index}>
-              {index !== 0 ? <span className="mx-3">{'>'}</span> : null}
-              <IconToken symbol={currentTokenSymbol} />
-              <div className="d-flex flex-column ms-3">
-                <span className="text-main text-bold">{currentTokenSymbol}</span>
-              </div>
-            </div>
-          );
-        })}
+        <div className="mt-4 d-flex justify-content-between">
+          <span className="text-small">Price Impact:</span>
+          <span className="text-small text-numeric text-bold">{swapPriceImpact.toFixed(2)}%</span>
+        </div>
       </div>
     ) : null;
-  }, [bestPath, mergedTokensData, tokenInIsNative, tokenOutIsNative, mergedPoolsData]);
+  }, [
+    bestPath,
+    mergedTokensData,
+    tokenInIsNative,
+    tokenOutIsNative,
+    mergedPoolsData,
+    swapPriceImpact,
+  ]);
 
   // Handlers
   const handleInputChange = useCallback(
