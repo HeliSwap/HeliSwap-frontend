@@ -18,13 +18,19 @@ import Modal from './Modal';
 import Confirmation from './Confirmation';
 import ConfirmTransactionModalContent from './Modals/ConfirmTransactionModalContent';
 import IconToken from './IconToken';
+import InputSlider from './InputSlider';
 
-import { formatStringWeiToStringEther } from '../utils/numberUtils';
+import { formatStringWeiToStringEther, stripStringToFixedDecimals } from '../utils/numberUtils';
 
 import getErrorMessage from '../content/errors';
 
-import { MAX_UINT_ERC20 } from '../constants';
-import { invalidInputTokensData, requestIdFromAddress } from '../utils/tokenUtils';
+import { MAX_UINT_ERC20, SLIDER_INITIAL_VALUE } from '../constants';
+import {
+  calculatePercentageByShare,
+  calculateShareByPercentage,
+  invalidInputTokensData,
+  requestIdFromAddress,
+} from '../utils/tokenUtils';
 
 interface IFarmActionsProps {
   farmData: IFarmData;
@@ -48,11 +54,11 @@ const FarmActions = ({
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
 
-  const lpInputValueInitialState = formatStringWeiToStringEther(
-    farmData.poolData.lpShares as string,
-  );
+  const maxLpInputValue = formatStringWeiToStringEther(farmData.poolData.lpShares as string);
 
-  const [lpInputValue, setLpInputValue] = useState(lpInputValueInitialState);
+  const [lpInputValue, setLpInputValue] = useState(maxLpInputValue);
+  const [sliderValue, setSliderValue] = useState(SLIDER_INITIAL_VALUE);
+
   const [loadingStake, setLoadingStake] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
   const [loadingExit, setLoadingExit] = useState(false);
@@ -79,12 +85,17 @@ const FarmActions = ({
     setTabState(value);
   };
 
-  const hanleLpInputChange = (value: string) => {
-    const inputValue = invalidInputTokensData(value)
-      ? formatStringWeiToStringEther(farmData.poolData.lpShares || '0')
-      : value;
+  const handleLpInputChange = (value: string) => {
+    if (invalidInputTokensData(value, maxLpInputValue, 18)) {
+      setLpInputValue(formatStringWeiToStringEther(farmData.poolData.lpShares as string));
+      setSliderValue(SLIDER_INITIAL_VALUE);
+      return;
+    }
 
-    setLpInputValue(inputValue);
+    const percentage = calculatePercentageByShare(maxLpInputValue, value);
+    setSliderValue(percentage);
+
+    setLpInputValue(value);
   };
 
   const handleStakeConfirm = async () => {
@@ -111,6 +122,7 @@ const FarmActions = ({
     } finally {
       setLoadingStake(false);
       setShowStakeModal(false);
+      setSliderValue(SLIDER_INITIAL_VALUE);
     }
   };
 
@@ -134,6 +146,7 @@ const FarmActions = ({
     } finally {
       setLoadingExit(false);
       setShowExitModal(false);
+      setSliderValue(SLIDER_INITIAL_VALUE);
     }
   };
 
@@ -168,9 +181,24 @@ const FarmActions = ({
     }
   };
 
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { target } = e;
+    const { value } = target;
+
+    setSliderValue(value);
+    const calculatedShare = calculateShareByPercentage(maxLpInputValue, value);
+    setLpInputValue(calculatedShare);
+  };
+
+  const handleButtonClick = (value: string) => {
+    setSliderValue(value);
+    const calculatedShare = calculateShareByPercentage(maxLpInputValue, value);
+    setLpInputValue(calculatedShare);
+  };
+
   useEffect(() => {
-    setLpInputValue(lpInputValueInitialState);
-  }, [farmData.poolData.lpShares, lpInputValueInitialState]);
+    setLpInputValue(maxLpInputValue);
+  }, [farmData.poolData.lpShares, maxLpInputValue]);
 
   // Helper methods
   const getStakeButtonLabel = () => {
@@ -206,6 +234,14 @@ const FarmActions = ({
           {tabState === TabStates.STAKE ? (
             <>
               <div>
+                {!campaignEnded && hasUserProvided ? (
+                  <InputSlider
+                    handleSliderChange={handleSliderChange}
+                    handleButtonClick={handleButtonClick}
+                    sliderValue={sliderValue}
+                  />
+                ) : null}
+
                 <p className="text-small text-bold">Enter LP Token Amount</p>
                 <InputTokenSelector
                   className="mt-4"
@@ -216,7 +252,8 @@ const FarmActions = ({
                       value={lpInputValue}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         const { value } = e.target;
-                        hanleLpInputChange(value);
+                        const strippedValue = stripStringToFixedDecimals(value, 18);
+                        handleLpInputChange(strippedValue);
                       }}
                       isCompact={true}
                       name="amountIn"
@@ -233,7 +270,7 @@ const FarmActions = ({
                           farmData.poolData.lpShares || '0',
                         )}
                         onMaxButtonClick={(maxValue: string) => {
-                          hanleLpInputChange(maxValue);
+                          handleLpInputChange(maxValue);
                         }}
                       />
                     ) : null
