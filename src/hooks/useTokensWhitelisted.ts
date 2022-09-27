@@ -11,7 +11,7 @@ const useTokensWhitelisted = () => {
   useEffect(() => {
     const getTokens = async () => {
       const url = process.env.REACT_APP_TOKEN_LIST_URL as string;
-      const network = process.env.REACT_APP_NETWORK_TYPE;
+      const network = process.env.REACT_APP_NETWORK_TYPE as string;
 
       const fallbackTokenList =
         network === 'mainnet' ? mainnetTokenList.tokens : testnetTokenList.tokens;
