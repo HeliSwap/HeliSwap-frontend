@@ -34,6 +34,7 @@ import ToasterWrapper from '../components/ToasterWrapper';
 
 import {
   checkAllowanceHTS,
+  getAmountToApprove,
   getTokenBalance,
   getUserAssociatedTokens,
   hasFeesOrKeys,
@@ -63,8 +64,6 @@ import getErrorMessage from '../content/errors';
 import { generalFeesAndKeysWarning } from '../content/messages';
 
 import {
-  MAX_UINT_ERC20,
-  MAX_UINT_HTS,
   ASYNC_SEARCH_THRESHOLD,
   initialTokensDataSwap,
   initialSwapData,
@@ -413,9 +412,8 @@ const Swap = () => {
 
   const handleApproveClick = async () => {
     const { tokenA } = tokensData;
-
-    const amount =
-      tokenA.type === TokenType.ERC20 ? MAX_UINT_ERC20.toString() : MAX_UINT_HTS.toString();
+    const { hederaId, type } = tokenA;
+    const amount = await getAmountToApprove(hederaId, type === TokenType.HTS);
 
     setLoadingApprove(true);
 
