@@ -27,6 +27,7 @@ import {
   formatStringWeiToStringEther,
   formatStringToStringWei,
   formatStringETHtoPriceFormatted,
+  stripStringToFixedDecimals,
 } from '../utils/numberUtils';
 import {
   calculateReserves,
@@ -83,9 +84,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
   const [loadingApprove, setLoadingApprove] = useState(false);
 
   // Handlers
-  const hanleLpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-
+  const handleLpInputChange = (value: string) => {
     if (invalidInputTokensData(value, maxLpInputValue, 18)) {
       setLpInputValue(formatStringWeiToStringEther(pairData.lpShares as string));
       setSliderValue(SLIDER_INITIAL_VALUE);
@@ -369,7 +368,15 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
         <InputTokenSelector
           inputTokenComponent={
-            <InputToken value={lpInputValue} onChange={hanleLpInputChange} name="amountIn" />
+            <InputToken
+              value={lpInputValue}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const { value } = e.target;
+                const strippedValue = stripStringToFixedDecimals(value, 18);
+                handleLpInputChange(strippedValue);
+              }}
+              name="amountIn"
+            />
           }
           buttonSelectorComponent={
             <ButtonSelector disabled selectedToken="LP" selectorText="Select a token" />
