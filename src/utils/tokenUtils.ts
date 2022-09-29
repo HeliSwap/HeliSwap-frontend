@@ -251,7 +251,7 @@ export const getTokenBalance = async (userId: string, tokenData: ITokenData) => 
   } else if (tokenData.type === TokenType.HTS) {
     const accountTokens = await getUserHTSData(userId);
     const balance = accountTokens?.get(tokenData.hederaId);
-    const tokenDecimals = tokenData?.decimals || 8;
+    const tokenDecimals = tokenData?.decimals;
 
     if (balance)
       tokenBalance = formatStringWeiToStringEther(balance.toString(), tokenDecimals).toString();
