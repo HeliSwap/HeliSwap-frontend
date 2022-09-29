@@ -10,6 +10,7 @@ export interface ITokenData {
   keys?: IKeys;
   hasFees?: boolean;
   isHTS?: boolean;
+  maxSupply?: string;
 }
 
 export interface IKeys {

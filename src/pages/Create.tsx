@@ -40,6 +40,7 @@ import {
   getUserAssociatedTokens,
   hasFeesOrKeys,
   invalidInputTokensData,
+  getAmountToApprove,
 } from '../utils/tokenUtils';
 import {
   formatStringETHtoPriceFormatted,
@@ -59,8 +60,6 @@ import getErrorMessage from '../content/errors';
 import { generalFeesAndKeysWarning } from '../content/messages';
 
 import {
-  MAX_UINT_ERC20,
-  MAX_UINT_HTS,
   POOLS_FEE,
   ASYNC_SEARCH_THRESHOLD,
   initialTokensDataCreate,
@@ -323,7 +322,7 @@ const Create = () => {
 
   const handleApproveClick = async (key: string) => {
     const { hederaId, type } = tokensData[key];
-    const amount = type === TokenType.ERC20 ? MAX_UINT_ERC20.toString() : MAX_UINT_HTS.toString();
+    const amount = await getAmountToApprove(hederaId, type === TokenType.HTS);
 
     setLoadingApprove(true);
 
