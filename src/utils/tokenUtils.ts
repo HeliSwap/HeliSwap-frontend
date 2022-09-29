@@ -131,7 +131,6 @@ export const checkAllowanceHTS = async (
 
   if (allowances.length > 0) {
     const currentAllowance = allowances[0].amount_granted;
-    console.log('mitko allowance', currentAllowance);
     const currentAllowanceBN = formatNumberToBigNumber(currentAllowance);
     const amountToSpendBN = formatStringToBigNumberWei(amountToSpend, token.decimals);
 
