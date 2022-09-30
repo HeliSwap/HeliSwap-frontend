@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { GlobalContext } from '../providers/Global';
 
 import { QueryHookOptions, useLazyQuery } from '@apollo/client';
 import { GET_POOLS_FILTERED } from '../GraphQL/Queries';
 
 import { IPoolExtendedData } from '../interfaces/tokens';
 
-import { getHBarPrice } from '../utils/tokenUtils';
 import { getProcessedPools } from '../utils/poolUtils';
 
 const usePoolsByFilter = (
@@ -13,7 +13,9 @@ const usePoolsByFilter = (
   getExtended: boolean,
   restPools: IPoolExtendedData[] = [],
 ) => {
-  const [hbarPrice, setHbarPrice] = useState(0);
+  const contextValue = useContext(GlobalContext);
+  const { hbarPrice } = contextValue;
+
   const [filteredPools, setFilteredPools] = useState<IPoolExtendedData[]>([]);
 
   const [
@@ -25,15 +27,6 @@ const usePoolsByFilter = (
       error: filteredPoolsError,
     },
   ] = useLazyQuery(GET_POOLS_FILTERED, useQueryOptions);
-
-  useEffect(() => {
-    const getHBARPrice = async () => {
-      const hbarPrice = await getHBarPrice();
-      setHbarPrice(hbarPrice);
-    };
-
-    getExtended && getHBARPrice();
-  }, [getExtended]);
 
   useEffect(() => {
     if (filteredPoolsData) {

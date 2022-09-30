@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { GlobalContext } from '../providers/Global';
 
 import { QueryHookOptions, useQuery } from '@apollo/client';
 import { GET_POOLS_WHITELISTED } from '../GraphQL/Queries';
@@ -6,7 +7,6 @@ import { REFRESH_TIME } from '../constants';
 
 import { IPoolExtendedData } from '../interfaces/tokens';
 
-import { getHBarPrice } from '../utils/tokenUtils';
 import { getProcessedPools } from '../utils/poolUtils';
 
 const usePoolsByTokensList = (
@@ -14,7 +14,9 @@ const usePoolsByTokensList = (
   getExtended = false,
   tokensList: string[] = [],
 ) => {
-  const [hbarPrice, setHbarPrice] = useState(0);
+  const contextValue = useContext(GlobalContext);
+  const { hbarPrice } = contextValue;
+
   const [pools, setPools] = useState<IPoolExtendedData[]>([]);
   const { loading, data, error, startPolling, stopPolling, refetch } = useQuery(
     GET_POOLS_WHITELISTED,
@@ -25,15 +27,6 @@ const usePoolsByTokensList = (
       ...useQueryOptions,
     },
   );
-
-  useEffect(() => {
-    const getHBARPrice = async () => {
-      const hbarPrice = await getHBarPrice();
-      setHbarPrice(hbarPrice);
-    };
-
-    getExtended && getHBARPrice();
-  }, [getExtended]);
 
   useEffect(() => {
     startPolling(useQueryOptions.pollInterval || REFRESH_TIME);

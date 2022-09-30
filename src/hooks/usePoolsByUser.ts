@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { GlobalContext } from '../providers/Global';
+
 import BigNumber from 'bignumber.js';
 
 import { QueryHookOptions, useQuery } from '@apollo/client';
@@ -10,7 +12,6 @@ import { IPoolData, IPoolExtendedData } from '../interfaces/tokens';
 
 import {
   getTokenPrice,
-  getHBarPrice,
   idToAddress,
   calculateReserves,
   calculatePercentageByShare,
@@ -22,7 +23,9 @@ const usePoolsByUser = (
   userId: string,
   poolsExtended: IPoolExtendedData[],
 ) => {
-  const [hbarPrice, setHbarPrice] = useState(0);
+  const contextValue = useContext(GlobalContext);
+  const { hbarPrice } = contextValue;
+
   const [poolsByUser, setPoolsByUser] = useState<IPoolExtendedData[]>([]);
 
   const address = userId ? idToAddress(userId) : '';
@@ -32,15 +35,6 @@ const usePoolsByUser = (
     ...useQueryOptions,
     skip: !userId,
   });
-
-  useEffect(() => {
-    const getHBARPrice = async () => {
-      const hbarPrice = await getHBarPrice();
-      setHbarPrice(hbarPrice);
-    };
-
-    getHBARPrice();
-  }, []);
 
   useEffect(() => {
     startPolling(useQueryOptions.pollInterval || REFRESH_TIME);
