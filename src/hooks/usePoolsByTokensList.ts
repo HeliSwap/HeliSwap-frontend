@@ -25,6 +25,7 @@ const usePoolsByTokensList = (
         tokens: tokensList,
       },
       ...useQueryOptions,
+      skip: tokensList.length === 0,
     },
   );
 
