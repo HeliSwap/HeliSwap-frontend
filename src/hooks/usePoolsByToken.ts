@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { GlobalContext } from '../providers/Global';
 
 import { QueryHookOptions, useLazyQuery } from '@apollo/client';
 import { GET_POOL_BY_TOKEN } from '../GraphQL/Queries';
 
 import { IPoolExtendedData } from '../interfaces/tokens';
 
-import { getHBarPrice } from '../utils/tokenUtils';
 import { getProcessedPools } from '../utils/poolUtils';
 import { REFRESH_TIME } from '../constants';
 
@@ -14,7 +14,9 @@ const usePoolsByToken = (
   token: string,
   getExtended: boolean,
 ) => {
-  const [hbarPrice, setHbarPrice] = useState(0);
+  const contextValue = useContext(GlobalContext);
+  const { hbarPrice } = contextValue;
+
   const [filteredPools, setFilteredPools] = useState<IPoolExtendedData[]>([]);
 
   const [
@@ -35,15 +37,6 @@ const usePoolsByToken = (
       stopPolling();
     };
   }, [startPolling, stopPolling, useQueryOptions]);
-
-  useEffect(() => {
-    const getHBARPrice = async () => {
-      const hbarPrice = await getHBarPrice();
-      setHbarPrice(hbarPrice);
-    };
-
-    getExtended && getHBARPrice();
-  }, [getExtended]);
 
   useEffect(() => {
     if (token)
