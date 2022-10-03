@@ -31,6 +31,8 @@ export interface ITokenListData {
   logoURI: string;
   name: string;
   symbol: string;
+  price?: string;
+  tvl?: string;
 }
 
 export interface ITokensData {
