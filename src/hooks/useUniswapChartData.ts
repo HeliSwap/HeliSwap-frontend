@@ -200,6 +200,29 @@ export function getTransformedVolumeData(
     return [];
   }
 }
+
+export function getTransformedTvlData(chartData: ChartDayData[], type: 'month' | 'week') {
+  if (chartData) {
+    const data: Record<string, GenericChartEntry> = {};
+
+    chartData.forEach(({ date, tvlUSD }: { date: number; tvlUSD: number }) => {
+      const group = unixToType(date, type);
+      if (data[group]) {
+        data[group].value += tvlUSD;
+      } else {
+        data[group] = {
+          time: unixToDate(date),
+          value: tvlUSD,
+        };
+      }
+    });
+
+    return Object.values(data);
+  } else {
+    return [];
+  }
+}
+
 function unixToType(unix: number, type: 'month' | 'week') {
   const date = dayjs.unix(unix).utc();
 

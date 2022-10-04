@@ -1,0 +1,163 @@
+import { useEffect, useState } from 'react';
+
+import BigNumber from 'bignumber.js';
+import ReactPaginate from 'react-paginate';
+
+import { ITokenListData } from '../../../interfaces/tokens';
+
+import Icon from '../../Icon';
+import IconToken from '../../IconToken';
+
+import { formatStringToPrice } from '../../../utils/numberUtils';
+
+import {
+  SORT_DIRECTION,
+  SORT_OPTIONS,
+  SORT_OPTIONS_ENUM,
+  TOKENS_PER_PAGE,
+} from '../../../constants';
+
+interface ITopTokens {
+  tokens: ITokenListData[];
+}
+
+const TopTokens = ({ tokens }: ITopTokens) => {
+  const [offset, setOffset] = useState(0);
+  const [currentItems, setCurrentItems] = useState<any[]>([]);
+  const [sortBy, setSortBy] = useState<SORT_OPTIONS>(SORT_OPTIONS_ENUM.TVL);
+  const [sortDirection, setSortDirection] = useState<SORT_DIRECTION>(SORT_DIRECTION.DESC);
+  const [pageCount, setPageCount] = useState(0);
+
+  // Handlers
+  const handleSortClick = (_sortBy: SORT_OPTIONS) => {
+    if (_sortBy === sortBy) {
+      setSortDirection(
+        sortDirection === SORT_DIRECTION.ASC ? SORT_DIRECTION.DESC : SORT_DIRECTION.ASC,
+      );
+    } else {
+      setSortBy(_sortBy);
+    }
+  };
+
+  const handlePageClick = (event: any) => {
+    const newOffset = (event.selected * TOKENS_PER_PAGE) % tokens.length;
+    setOffset(newOffset);
+  };
+
+  const getSortIcon = (option: SORT_OPTIONS) => {
+    const icon = <Icon name={`arrow-${sortDirection === SORT_DIRECTION.ASC ? 'up' : 'down'}`} />;
+
+    return option === sortBy ? icon : null;
+  };
+
+  useEffect(() => {
+    const endOffset = offset + TOKENS_PER_PAGE;
+    const sortedTokensToShow = (tokens || []).sort((a: any, b: any) =>
+      sortTokens(a[sortBy as string], b[sortBy as string], sortDirection),
+    );
+
+    setCurrentItems(sortedTokensToShow.slice(offset, endOffset));
+    setPageCount(Math.ceil(sortedTokensToShow.length / TOKENS_PER_PAGE));
+  }, [offset, sortBy, sortDirection, tokens]);
+
+  // Helpers
+  const sortTokens = (valueA: string, valueB: string, direction: SORT_DIRECTION) => {
+    const valueABN = new BigNumber(valueA);
+    const valueBBN = new BigNumber(valueB);
+
+    return direction === SORT_DIRECTION.ASC
+      ? Number(valueABN.minus(valueBBN))
+      : Number(valueBBN.minus(valueABN));
+  };
+
+  const haveTokens = currentItems.length;
+
+  return haveTokens ? (
+    <div className="table-pools">
+      <div className="table-pools-row with-6-columns">
+        <div className="table-pools-cell">#</div>
+        <div className="table-pools-cell">Name</div>
+        <div
+          className="table-pools-cell justify-content-end"
+          // onClick={() => handleSortClick(SORT_OPTIONS_ENUM.)}
+        >
+          Price
+        </div>
+        <div
+          className="table-pools-cell justify-content-end ws-no-wrap"
+          // onClick={() => handleSortClick(SORT_OPTIONS_ENUM.)}
+        >
+          Price Change
+        </div>
+        <div
+          className="table-pools-cell justify-content-end ws-no-wrap"
+          onClick={() => handleSortClick(SORT_OPTIONS_ENUM.VOL_24)}
+        >
+          Volume 24H
+          {getSortIcon(SORT_OPTIONS_ENUM.VOL_24)}
+        </div>
+        <div
+          className="table-pools-cell justify-content-end"
+          onClick={() => handleSortClick(SORT_OPTIONS_ENUM.TVL)}
+        >
+          <span>TVL {getSortIcon(SORT_OPTIONS_ENUM.TVL)}</span>
+        </div>
+      </div>
+      {currentItems && currentItems.length
+        ? currentItems.map((token: ITokenListData, index: number) => {
+            const tokenNum = index + 1;
+            return (
+              <div key={token.address} className="table-pools-row with-6-columns">
+                <div className="table-pools-cell">
+                  <span className="text-small">{tokenNum}</span>
+                </div>
+                <div className="table-pools-cell">
+                  <IconToken symbol={token.symbol} />
+                  <p className="text-small ms-3">
+                    <span className="me-2">{token.name}</span>
+                    <span className="text-gray">({token.symbol})</span>
+                  </p>
+                </div>
+                <div className="table-pools-cell justify-content-end">
+                  <span className="text-numeric">{formatStringToPrice(token.price || '')}</span>
+                </div>
+                <div className="table-pools-cell justify-content-end text-positive-400">
+                  <Icon color="success" name="arrow-up" size="small" />
+                  <span className="text-numeric">23.45%</span>
+                </div>
+                <div className="table-pools-cell justify-content-end">
+                  <span className="text-numeric">$10.11k</span>
+                </div>
+                <div className="table-pools-cell justify-content-end">
+                  <span className="text-numeric">{formatStringToPrice(token.tvl || '')}</span>
+                </div>
+              </div>
+            );
+          })
+        : null}
+      <div className="d-flex container-blue-neutral-800 py-4 ps-6 align-items-center text-small mb-4 justify-content-center">
+        <ReactPaginate
+          breakLabel="..."
+          onPageChange={handlePageClick}
+          pageRangeDisplayed={5}
+          pageCount={pageCount}
+          renderOnZeroPageCount={undefined}
+          breakClassName={'page-item'}
+          breakLinkClassName={'page-link'}
+          containerClassName={'pagination'}
+          pageClassName={'page-item'}
+          pageLinkClassName={'page-link'}
+          previousClassName={'page-item'}
+          previousLinkClassName={'page-link'}
+          nextClassName={'page-item'}
+          nextLinkClassName={'page-link'}
+          activeClassName={'active'}
+        />
+      </div>
+    </div>
+  ) : (
+    <p>There are no tokens at this moment.</p>
+  );
+};
+
+export default TopTokens;
