@@ -395,3 +395,18 @@ export const getAmountToApprove = async (
     return isHTS ? MAX_UINT_HTS.toString() : MAX_UINT_ERC20.toString();
   }
 };
+
+export const getProcessedTokens = (tokensData: ITokenData[]): ITokenData[] => {
+  return tokensData.map(
+    ({ hederaId, name, symbol, address, decimals, isHTS, keys, hasFees }: ITokenData) => ({
+      hederaId,
+      name,
+      symbol: symbol === 'WHBAR' ? 'HBAR' : symbol,
+      address,
+      decimals,
+      keys,
+      hasFees,
+      type: isHTS ? TokenType.HTS : TokenType.ERC20,
+    }),
+  );
+};

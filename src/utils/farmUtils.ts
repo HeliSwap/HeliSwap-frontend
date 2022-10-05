@@ -197,6 +197,17 @@ export const getProcessedFarms = (
       APR,
       totalRewardsUSD,
       campaignEndDate,
+      poolData: {
+        ...currentFarm.poolData,
+        token0Symbol:
+          currentFarm.poolData.token0Symbol === 'WHBAR'
+            ? 'HBAR'
+            : currentFarm.poolData.token0Symbol,
+        token1Symbol:
+          currentFarm.poolData.token1Symbol === 'WHBAR'
+            ? 'HBAR'
+            : currentFarm.poolData.token1Symbol,
+      },
     };
 
     return formatted;
