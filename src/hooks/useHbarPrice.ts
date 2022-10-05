@@ -16,14 +16,15 @@ const useHbarPrice = () => {
           vs_currencies: 'usd',
         },
       });
-      setHbarPrice(response.data['hedera-hashgraph']['usd']);
+
+      setHbarPrice(response.status === 200 ? response.data['hedera-hashgraph']['usd'] : hbarPrice);
     } catch (e) {
       console.error(e);
-      setHbarPrice(0);
+      setHbarPrice(hbarPrice);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [hbarPrice]);
 
   useEffect(() => {
     getHBARPrice();
