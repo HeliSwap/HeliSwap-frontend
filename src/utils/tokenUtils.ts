@@ -401,7 +401,7 @@ export const getProcessedTokens = (tokensData: ITokenData[]): ITokenData[] => {
     ({ hederaId, name, symbol, address, decimals, isHTS, keys, hasFees }: ITokenData) => ({
       hederaId,
       name,
-      symbol: symbol === 'WHBAR' ? 'HBAR' : symbol,
+      symbol,
       address,
       decimals,
       keys,
