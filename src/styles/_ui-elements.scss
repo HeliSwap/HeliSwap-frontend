@@ -501,11 +501,11 @@
 
 // Toasts
 .toast-success {
-  color: $positive-400;
+  color: $positive-400 !important;
 }
 
 .toast-error {
-  color: $error-500;
+  color: $error-500 !important;
 }
 
 // Alerts

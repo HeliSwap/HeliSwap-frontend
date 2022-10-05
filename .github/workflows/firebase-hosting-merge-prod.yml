@@ -6,7 +6,7 @@ env:
   CI: false
   REACT_APP_MIRROR_NODE_URL: https://mainnet-public.mirrornode.hedera.com/
   REACT_APP_COINGECKO_URL: https://api.coingecko.com/api/v3
-  REACT_APP_TOKEN_LIST_URL: https://heliswap.infura-ipfs.io/ipfs/QmQifjxVdKoUpiWTdNiMGubsq3zZitrPdzZzvnnW4zaiCm
+  REACT_APP_TOKEN_LIST_URL: https://heliswap.infura-ipfs.io/ipfs/QmWDKSFX54SB39pxw6GaRVojyzXZwyvNZnu4i3ceyzJy32
   REACT_APP_NETWORK_TYPE: mainnet
   REACT_APP_GRAPHQL_URI: https://api.heliswap.io/query
 'on':
@@ -21,7 +21,7 @@ jobs:
       - name: Set prod ENV
         run: |
           echo "REACT_APP_ROUTER_ADDRESS=0x000000000000000000000000000000000013422e" >> $GITHUB_ENV
-          echo "REACT_APP_WHBAR_ADDRESS=0x00000000000000000000000000000000000f7e89" >> $GITHUB_ENV
+          echo "REACT_APP_WHBAR_ADDRESS=0x00000000000000000000000000000000000F7e89" >> $GITHUB_ENV
       - name: Build
         run: yarn install --frozen-lockfile && yarn run build
       - uses: FirebaseExtended/action-hosting-deploy@v0

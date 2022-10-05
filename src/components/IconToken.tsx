@@ -15,6 +15,11 @@ import WBTC from '../icons/tokens/WBTC.png';
 import OM from '../icons/tokens/OM.png';
 import DAI from '../icons/tokens/DAI.png';
 import WMATIC from '../icons/tokens/WMATIC.webp';
+import HBARX from '../icons/tokens/HBARX.svg';
+import HST from '../icons/tokens/HST.png';
+import CLXY from '../icons/tokens/CLXY.png';
+import DOVU from '../icons/tokens/DOVU.png';
+import CREAM from '../icons/tokens/CREAM.svg';
 
 interface IIconTokenProps {
   symbol: string;
@@ -47,6 +52,11 @@ const tokenMapping: ITokenMapping = {
   'DAI[hts]': DAI,
   WMATIC: WMATIC,
   'WMATIC[hts]': WMATIC,
+  HBARX: HBARX,
+  HST: HST,
+  CLXY: CLXY,
+  'DOV[hts]': DOVU,
+  CREAM: CREAM,
   LP: LP,
 };
 

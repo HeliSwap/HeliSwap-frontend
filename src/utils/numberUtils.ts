@@ -31,6 +31,7 @@ export const formatStringToBigNumber = (numberToFormat: string) => {
 // Used to format values (string | ETH) into BN / wei (used for native contract calls)
 export const formatStringToBigNumberWei = (numberToFormat: string, decimals: number = 18) => {
   const numberToFormatBN = new BigNumber(numberToFormat);
+
   const tenPowDec = new BigNumber(10).pow(decimals);
 
   return numberToFormatBN.times(tenPowDec);
@@ -39,6 +40,7 @@ export const formatStringToBigNumberWei = (numberToFormat: string, decimals: num
 // Used to format input values (string | ETH) into Hethers BN / wei
 export const formatStringToBigNumberEthersWei = (numberToFormat: string, decimals: number = 18) => {
   const numberToFormatBN = new BigNumber(numberToFormat);
+
   const tenPowDec = new BigNumber(10).pow(decimals);
 
   const numberToFormatBNPowed = numberToFormatBN.times(tenPowDec);

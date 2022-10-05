@@ -14,6 +14,7 @@ const useTokensByListIds = (
   const { loading, data, error } = useQuery(GET_TOKENS_WHITELISTED, {
     variables: { addresses: tokensWhitelistedIds },
     ...useQueryOptions,
+    skip: tokensWhitelistedIds.length === 0,
   });
 
   useEffect(() => {

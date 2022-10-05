@@ -12,7 +12,7 @@ import {
   stripStringToFixedDecimals,
 } from './numberUtils';
 import { getPossibleTradesExactIn, tradeComparator } from './tradeUtils';
-import { HUNDRED_BN } from '../constants';
+import { HUNDRED_BN, MAX_UINT_ERC20, MAX_UINT_HTS } from '../constants';
 
 export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
   const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/tokens/${tokenId}`;
@@ -25,6 +25,7 @@ export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
         symbol,
         decimals,
         total_supply: totalSupply,
+        max_supply: maxSupply,
         expiry_timestamp: expiryTimestamp,
         admin_key,
         custom_fees: customFees,
@@ -50,6 +51,7 @@ export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
       address: idToAddress(hederaId),
       type: TokenType.HTS,
       hasFees,
+      maxSupply,
       keys: {
         adminKey: admin_key !== null,
         freezeKey: freeze_key !== null,
@@ -249,29 +251,13 @@ export const getTokenBalance = async (userId: string, tokenData: ITokenData) => 
   } else if (tokenData.type === TokenType.HTS) {
     const accountTokens = await getUserHTSData(userId);
     const balance = accountTokens?.get(tokenData.hederaId);
-    const tokenDecimals = tokenData?.decimals || 8;
+    const tokenDecimals = tokenData?.decimals;
 
     if (balance)
       tokenBalance = formatStringWeiToStringEther(balance.toString(), tokenDecimals).toString();
   }
   // Currently we don't have a way getting the balance of ERC20 tokens
   return tokenBalance;
-};
-
-export const getHBarPrice = async () => {
-  const coingeckoURL = process.env.REACT_APP_COINGECKO_URL + `/simple/price`;
-  try {
-    const response = await axios.get(coingeckoURL, {
-      params: {
-        ids: 'hedera-hashgraph',
-        vs_currencies: 'usd',
-      },
-    });
-    return response.data['hedera-hashgraph']['usd'];
-  } catch (e) {
-    console.error(e);
-    return 0;
-  }
 };
 
 export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbarPrice: number) => {
@@ -392,4 +378,20 @@ export const invalidInputTokensData = (value: string, maxValue?: string, decimal
     inputGtMaxValue = valueBNWei.gt(maxValueWei);
   }
   return !value || isNaN(Number(value)) || inputGtMaxValue;
+};
+
+export const getAmountToApprove = async (
+  tokenId: string,
+  isHTS: boolean = false,
+): Promise<string> => {
+  try {
+    if (!isHTS) {
+      return MAX_UINT_ERC20.toString();
+    } else {
+      const maxSupply = (await getHTSTokenInfo(tokenId)).maxSupply;
+      return maxSupply && parseInt(maxSupply) !== 0 ? maxSupply : MAX_UINT_HTS.toString();
+    }
+  } catch (e) {
+    return isHTS ? MAX_UINT_HTS.toString() : MAX_UINT_ERC20.toString();
+  }
 };

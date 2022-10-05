@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { GlobalContext } from '../providers/Global';
 
 import { QueryHookOptions, useQuery } from '@apollo/client';
 import { GET_FARMS } from '../GraphQL/Queries';
@@ -6,14 +7,16 @@ import { GET_FARMS } from '../GraphQL/Queries';
 import { IFarmData, IFarmDataRaw, IPoolData } from '../interfaces/tokens';
 
 import { getProcessedFarms } from '../utils/farmUtils';
-import { getHBarPrice, idToAddress } from '../utils/tokenUtils';
+import { idToAddress } from '../utils/tokenUtils';
 
 import { REFRESH_TIME } from '../constants';
 
 const useFarms = (useQueryOptions: QueryHookOptions = {}, userId: string, pools: IPoolData[]) => {
+  const contextValue = useContext(GlobalContext);
+  const { hbarPrice } = contextValue;
+
   const [farmsRaw, setFarmsRaw] = useState<IFarmDataRaw[]>([]);
   const [farms, setFarms] = useState<IFarmData[]>([]);
-  const [hbarPrice, setHbarPrice] = useState(0);
 
   const address = userId ? idToAddress(userId) : '';
 
@@ -38,15 +41,6 @@ const useFarms = (useQueryOptions: QueryHookOptions = {}, userId: string, pools:
       stopPolling();
     };
   }, [startPolling, stopPolling, useQueryOptions]);
-
-  useEffect(() => {
-    const getHBARPrice = async () => {
-      const hbarPrice = await getHBarPrice();
-      setHbarPrice(hbarPrice);
-    };
-
-    getHBARPrice();
-  }, []);
 
   useEffect(() => {
     if (farmsRaw.length > 0 && pools.length && hbarPrice !== 0) {
