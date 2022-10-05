@@ -32,8 +32,6 @@ export const formatStringToBigNumber = (numberToFormat: string) => {
 export const formatStringToBigNumberWei = (numberToFormat: string, decimals: number = 18) => {
   const numberToFormatBN = new BigNumber(numberToFormat);
 
-  if (decimals === 0) return numberToFormatBN;
-
   const tenPowDec = new BigNumber(10).pow(decimals);
 
   return numberToFormatBN.times(tenPowDec);
@@ -42,8 +40,6 @@ export const formatStringToBigNumberWei = (numberToFormat: string, decimals: num
 // Used to format input values (string | ETH) into Hethers BN / wei
 export const formatStringToBigNumberEthersWei = (numberToFormat: string, decimals: number = 18) => {
   const numberToFormatBN = new BigNumber(numberToFormat);
-
-  if (decimals === 0) return hethers.BigNumber.from(numberToFormat);
 
   const tenPowDec = new BigNumber(10).pow(decimals);
 
@@ -56,8 +52,6 @@ export const formatStringToBigNumberEthersWei = (numberToFormat: string, decimal
 
 // Used to format values (string | ETH) into String / wei
 export const formatStringToStringWei = (numberToFormat: string, decimals: number = 18) => {
-  if (decimals === 0) return numberToFormat;
-
   const numberToFormatBN = new BigNumber(numberToFormat);
   const tenPowDec = new BigNumber(10).pow(decimals);
 
@@ -69,8 +63,6 @@ export const formatStringToStringWei = (numberToFormat: string, decimals: number
 
 // Used to convert values (string | wei) into string / ether
 export const formatStringWeiToStringEther = (numberToFormat: string, decimals: number = 18) => {
-  if (decimals === 0) return numberToFormat;
-
   const numberToFormatBN = new BigNumber(numberToFormat);
   const tenPowDec = new BigNumber(10).pow(decimals);
 

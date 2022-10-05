@@ -98,6 +98,7 @@ const Swap = () => {
   const [willUnwrapTokens, setWillUnwrapTokens] = useState(false);
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
   const [insufficientLiquidity, setInsufficientLiquidity] = useState(false);
+  const [insufficientInAmount, setInsufficientInAmount] = useState(false);
 
   //State for tokens whitelist
   const [tokensWhitelistedIds, setTokensWhitelistedIds] = useState<string[]>([]);
@@ -263,6 +264,7 @@ const Swap = () => {
   const handleInputChange = useCallback(
     (value: string, name: string, inputTokensData: ITokensData = tokensData) => {
       setInsufficientLiquidity(false);
+      setInsufficientInAmount(false);
       const { tokenA, tokenB } = inputTokensData;
 
       const tokenData = {
@@ -339,6 +341,16 @@ const Swap = () => {
             return;
           }
           const bestTrade = sortedTrades[0];
+
+          if (parseFloat(bestTrade.amountOut) === 0) {
+            setBestPath([]);
+            setSwapPriceImpact(0);
+            setSwapData(prev => ({ ...prev, ...tokenData, amountOut: '' }));
+            setTokenInExactAmount(true);
+            setInsufficientInAmount(true);
+            return;
+          }
+
           setBestPath(bestTrade.path);
           setSwapPriceImpact(getTradePriceImpact(bestTrade));
           setTokenInExactAmount(true);
@@ -622,11 +634,20 @@ const Swap = () => {
       Object.keys(tokensData.tokenA).length !== 0 &&
       !isNaN(Number(swapData.amountIn)) &&
       Number(swapData.amountIn) > 0 &&
-      !insufficientLiquidity;
+      !insufficientLiquidity &&
+      !insufficientInAmount;
     setReadyToApprove(readyToApprove);
 
     setReadyToSwap(ready);
-  }, [swapData, approved, getInsufficientTokenIn, tokensData, insufficientLiquidity, needApproval]);
+  }, [
+    swapData,
+    approved,
+    getInsufficientTokenIn,
+    tokensData,
+    insufficientLiquidity,
+    needApproval,
+    insufficientInAmount,
+  ]);
 
   // Check for prepopulated tokens in url
   useEffect(() => {
@@ -716,6 +737,7 @@ const Swap = () => {
       return 'Select a token';
     if (getInsufficientTokenIn()) return `Insufficient ${tokenA.symbol} balance`;
     if (insufficientLiquidity) return 'Insufficient liquidity for this trade.';
+    if (insufficientInAmount) return `Insufficient ${tokenA.symbol} provided`;
     return willWrapTokens ? 'wrap' : willUnwrapTokens ? 'unwrap' : 'swap';
   };
 
