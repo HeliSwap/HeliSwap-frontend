@@ -46,7 +46,7 @@ const tokenMapping: ITokenMapping = {
   'USDT[hts]': USDT,
   WBTC: WBTC,
   'WBTC[hts]': WBTC,
-  WHBAR: WHBAR,
+  WHBAR: HBAR,
   OM: OM,
   DAI: DAI,
   'DAI[hts]': DAI,
