@@ -6,7 +6,7 @@ env:
   CI: false
   REACT_APP_MIRROR_NODE_URL: https://mainnet-public.mirrornode.hedera.com/
   REACT_APP_COINGECKO_URL: https://api.coingecko.com/api/v3
-  REACT_APP_TOKEN_LIST_URL: https://heliswap.infura-ipfs.io/ipfs/QmQifjxVdKoUpiWTdNiMGubsq3zZitrPdzZzvnnW4zaiCm
+  REACT_APP_TOKEN_LIST_URL: https://heliswap.infura-ipfs.io/ipfs/QmPanAUiGDDwHf3zJNuuznDuoNs4ehZ1Hthet32QiciSVd
   REACT_APP_NETWORK_TYPE: mainnet
   REACT_APP_GRAPHQL_URI: https://api.heliswap.io/query
 'on':

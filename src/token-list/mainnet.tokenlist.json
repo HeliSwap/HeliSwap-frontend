@@ -73,6 +73,46 @@
       "symbol": "WMATIC[hts]",
       "decimals": 8,
       "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/WMATIC.webp"
+    },
+    {
+      "chainId": 295,
+      "address": "0x00000000000000000000000000000000000cba44",
+      "name": "HBARX",
+      "symbol": "HBARX",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/HBARX.svg"
+    },
+    {
+      "chainId": 295,
+      "address": "0x00000000000000000000000000000000000ec585",
+      "name": "HeadStarter",
+      "symbol": "HST",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/HST.svg"
+    },
+    {
+      "chainId": 295,
+      "address": "0x00000000000000000000000000000000000d1ea6",
+      "name": "Calaxy Tokens",
+      "symbol": "CLXY",
+      "decimals": 6,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/CLXY.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x0000000000000000000000000000000000098779",
+      "name": "DOVU",
+      "symbol": "DOV[hts]",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/DOVU.webp"
+    },
+    {
+      "chainId": 295,
+      "address": "0x00000000000000000000000000000000000e22b1",
+      "name": "CREAM",
+      "symbol": "CREAM",
+      "decimals": 0,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/CREAM.svg"
     }
   ]
 }
