@@ -12,7 +12,7 @@
   "tokens": [
     {
       "chainId": 295,
-      "address": "0x00000000000000000000000000000000000f7e89",
+      "address": "0x00000000000000000000000000000000000F7e89",
       "name": "Wrapped HBAR",
       "symbol": "WHBAR",
       "decimals": 8,
@@ -28,7 +28,7 @@
     },
     {
       "chainId": 295,
-      "address": "0x0000000000000000000000000000000000101ae3",
+      "address": "0x0000000000000000000000000000000000101Ae3",
       "name": "USD Coin",
       "symbol": "USDC[hts]",
       "decimals": 6,
@@ -36,7 +36,15 @@
     },
     {
       "chainId": 295,
-      "address": "0x0000000000000000000000000000000000101af0",
+      "address": "0x000000000000000000000000000000000006f89a",
+      "name": "USD Coin",
+      "symbol": "USDC",
+      "decimals": 6,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/USDC.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x0000000000000000000000000000000000101aF0",
       "name": "Tether USD",
       "symbol": "USDT[hts]",
       "decimals": 6,
@@ -44,7 +52,7 @@
     },
     {
       "chainId": 295,
-      "address": "0x0000000000000000000000000000000000101afb",
+      "address": "0x0000000000000000000000000000000000101aFb",
       "name": "Wrapped BTC",
       "symbol": "WBTC[hts]",
       "decimals": 8,
@@ -60,7 +68,7 @@
     },
     {
       "chainId": 295,
-      "address": "0x0000000000000000000000000000000000101af5",
+      "address": "0x0000000000000000000000000000000000101Af5",
       "name": "Dai Stablecoin",
       "symbol": "DAI[hts]",
       "decimals": 8,
@@ -68,7 +76,7 @@
     },
     {
       "chainId": 295,
-      "address": "0x0000000000000000000000000000000000083e9e",
+      "address": "0x0000000000000000000000000000000000083E9E",
       "name": "Wrapped Matic[hts]",
       "symbol": "WMATIC[hts]",
       "decimals": 8,
@@ -76,7 +84,7 @@
     },
     {
       "chainId": 295,
-      "address": "0x00000000000000000000000000000000000cba44",
+      "address": "0x00000000000000000000000000000000000cbA44",
       "name": "HBARX",
       "symbol": "HBARX",
       "decimals": 8,
@@ -84,7 +92,7 @@
     },
     {
       "chainId": 295,
-      "address": "0x00000000000000000000000000000000000ec585",
+      "address": "0x00000000000000000000000000000000000Ec585",
       "name": "HeadStarter",
       "symbol": "HST",
       "decimals": 8,
@@ -92,7 +100,7 @@
     },
     {
       "chainId": 295,
-      "address": "0x00000000000000000000000000000000000d1ea6",
+      "address": "0x00000000000000000000000000000000000D1ea6",
       "name": "Calaxy Tokens",
       "symbol": "CLXY",
       "decimals": 6,
@@ -108,7 +116,7 @@
     },
     {
       "chainId": 295,
-      "address": "0x00000000000000000000000000000000000e22b1",
+      "address": "0x00000000000000000000000000000000000E22B1",
       "name": "CREAM",
       "symbol": "CREAM",
       "decimals": 0,
