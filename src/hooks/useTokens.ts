@@ -24,12 +24,14 @@ const useTokens = (useQueryOptions: QueryHookOptions = {}) => {
 
       if (getTokensData.length > 0) {
         const foundTokenDataList = getTokensData.map(
-          ({ hederaId, name, symbol, address, decimals, isHTS }: any) => ({
+          ({ hederaId, name, symbol, address, decimals, isHTS, keys, hasFees }: any) => ({
             hederaId,
             name,
             symbol,
             address,
             decimals,
+            keys,
+            hasFees,
             type: isHTS ? TokenType.HTS : TokenType.ERC20,
           }),
         );

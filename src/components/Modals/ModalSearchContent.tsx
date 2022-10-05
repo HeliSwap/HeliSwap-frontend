@@ -5,15 +5,22 @@ import { ITokenData, TokenType } from '../../interfaces/tokens';
 import {
   addressToId,
   getHTSTokenInfo,
-  idToAddress,
   isAddressValid,
   isHederaIdValid,
+  requestAddressFromId,
+  requestIdFromAddress,
 } from '../../utils/tokenUtils';
+
+import { ASYNC_SEARCH_THRESHOLD } from '../../constants';
+
 import IconToken from '../IconToken';
 import Button from '../Button';
 import Icon from '../Icon';
+import Loader from '../Loader';
 
 import search from '../../icons/system/search-gradient.svg';
+import useDebounce from '../../hooks/useDebounce';
+import { concatWarningMessage } from '../../content/messages';
 
 interface IModalProps {
   modalTitle?: string;
@@ -23,6 +30,8 @@ interface IModalProps {
   canImport?: boolean;
   tokenDataList: ITokenData[];
   loadingTDL: boolean;
+  searchFunc?: (value: string) => void;
+  itemToExlude?: ITokenData;
 }
 
 const ModalSearchContent = ({
@@ -33,6 +42,8 @@ const ModalSearchContent = ({
   canImport = true,
   tokenDataList,
   loadingTDL,
+  searchFunc,
+  itemToExlude,
 }: IModalProps) => {
   const networkType = process.env.REACT_APP_NETWORK_TYPE as string;
   const hashScanUrl = `https://hashscan.io/#/${networkType}/token/`;
@@ -43,15 +54,23 @@ const ModalSearchContent = ({
   const [showNotFound, setShowNotFound] = useState(false);
   const [readyToImport, setReadyToImport] = useState(false);
   const [readyToImportERC, setReadyToImportERC] = useState(false);
-  const [warningMessage, setWarningMessage] = useState('');
+  const [warningMessage, setWarningMessage] = useState<JSX.Element[]>([]);
 
   const [tokenList, setTokenList] = useState<ITokenData[]>([]);
+  const [searchingResults, setSearchingResults] = useState(false);
 
   const onSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-
+    setSearchingResults(value.length > ASYNC_SEARCH_THRESHOLD);
     setSearchInputValue(value);
   };
+  const debouncedSearchTerm: string = useDebounce(searchInputValue, 1000);
+
+  useEffect(() => {
+    if (debouncedSearchTerm && searchFunc) {
+      searchFunc(debouncedSearchTerm);
+    }
+  }, [debouncedSearchTerm, searchFunc]);
 
   const handleDecimalsInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -72,14 +91,22 @@ const ModalSearchContent = ({
     closeModal();
   };
 
-  const handleImportERC20ButtonClick = () => {
+  const handleImportERC20ButtonClick = async () => {
+    const searchValueIsAddress = isAddressValid(searchInputValue.trim());
+    const hederaId = searchValueIsAddress
+      ? await requestIdFromAddress(searchInputValue.trim())
+      : searchInputValue;
+    const address = searchValueIsAddress
+      ? searchInputValue.trim()
+      : await requestAddressFromId(searchInputValue);
+
     const sampleERC20 = {
-      hederaId: searchInputValue,
+      hederaId,
       type: TokenType.ERC20,
       symbol: 'ERC20',
       name: 'Possible ERC20 Token',
       decimals,
-      address: idToAddress(searchInputValue),
+      address,
     };
 
     setTokensData((prev: any) => ({
@@ -95,7 +122,7 @@ const ModalSearchContent = ({
     setSearchInputValue('');
     setReadyToImportERC(false);
     setReadyToImport(false);
-    setWarningMessage('');
+    setWarningMessage([]);
     tokenDataList && setTokenList(tokenDataList);
   };
 
@@ -112,10 +139,12 @@ const ModalSearchContent = ({
     const hasResults = Object.keys(result).length > 0;
 
     if (hasResults) {
-      const { details } = result;
-      const { hasFees } = details;
+      const messageList = concatWarningMessage(result);
 
-      setWarningMessage(hasFees ? 'Token has fees!' : '');
+      if (messageList.length > 0) {
+        setWarningMessage(messageList);
+      }
+
       setTokenList([result]);
     }
 
@@ -131,13 +160,15 @@ const ModalSearchContent = ({
       setReadyToImportERC(false);
     }
 
-    setWarningMessage('');
+    setWarningMessage([]);
 
     const isId = !!isHederaIdValid(searchInputValue.trim());
     const isAddress = !!isAddressValid(searchInputValue.trim());
 
     const foundItem = tokenDataList.find(
-      (item: ITokenData) => item.hederaId === searchInputValue || item.address === searchInputValue,
+      (item: ITokenData) =>
+        item.hederaId === searchInputValue ||
+        item.address.toLowerCase() === searchInputValue.toLowerCase(),
     );
     const foundItemArray = foundItem ? [foundItem] : [];
 
@@ -146,8 +177,8 @@ const ModalSearchContent = ({
         ? foundItemArray
         : tokenDataList?.filter(
             (item: ITokenData) =>
-              item.symbol.toLowerCase().includes(searchInputValue) ||
-              item.name.toLowerCase().includes(searchInputValue),
+              item.symbol.toLowerCase().includes(searchInputValue.toLowerCase()) ||
+              item.name.toLowerCase().includes(searchInputValue.toLowerCase()),
           ) || [];
 
     const haveResults = foundItems.length > 0;
@@ -162,14 +193,52 @@ const ModalSearchContent = ({
       setTokenList(tokenDataList);
     }
 
-    setReadyToImport(!haveResults && (isId || isAddress));
-  }, [searchInputValue, tokenDataList]);
+    const searchAddressExluded = isAddress && searchInputValue.trim() === itemToExlude?.address;
+    const searchIdExluded = isId && searchInputValue.trim() === itemToExlude?.hederaId;
+
+    setReadyToImport(
+      !haveResults && (isId || isAddress) && !searchAddressExluded && !searchIdExluded,
+    );
+  }, [searchInputValue, tokenDataList, itemToExlude]);
 
   useEffect(() => {
-    if (tokenDataList) {
-      setTokenList(tokenDataList);
-    }
+    setSearchingResults(false);
   }, [tokenDataList]);
+
+  const renderWarningTooltip = (token: ITokenData) => {
+    if (token.type === TokenType.HBAR) return null;
+
+    const messageList = concatWarningMessage(token);
+
+    if (messageList.length > 0) {
+      return (
+        <Tippy
+          content={
+            <div>
+              <div className="d-flex align-items-center">
+                <Icon name="info" color="info" />
+                <p className="text-bold ms-3">Warning!</p>
+              </div>
+              <p className="mt-3">
+                This token contains additional properites that could cause potential issues:
+              </p>
+              <ul className="list-default mt-2">
+                {messageList.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          }
+        >
+          <span className="ms-2">
+            <Icon color="info" name="info" />
+          </span>
+        </Tippy>
+      );
+    } else {
+      return null;
+    }
+  };
 
   const hasTokenList = tokenList && tokenList.length > 0;
   const showImportButton = canImport && readyToImport;
@@ -206,9 +275,30 @@ const ModalSearchContent = ({
           />
         </div>
 
-        {warningMessage ? <div className="alert alert-warning mt-5">{warningMessage}</div> : null}
+        {warningMessage.length > 0 ? (
+          <div className="alert alert-warning mt-5">
+            <div className="d-flex align-items-center">
+              <Icon name="warning" color="warning" />
+              <p className="text-bold ms-3">Warning!</p>
+            </div>
+            <p className="mt-3">
+              This token contains additional properites that could cause potential issues:
+            </p>
+            <ul className="list-default mt-2">
+              {warningMessage.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
 
-        {showNotFound ? (
+        {searchingResults ? (
+          <div className="d-flex justify-content-center my-6">
+            <Loader />
+          </div>
+        ) : null}
+
+        {showNotFound && !searchingResults ? (
           <div className="text-center mt-5">
             <img src={search} alt="" />
             <h2 className="text-subheader mt-4">Not Found</h2>
@@ -230,7 +320,7 @@ const ModalSearchContent = ({
                   </p>
                   <Tippy content="This token is not in our database, but you can add it by providing its tokenID or token address. After clicking Import, please specify the number of decimals for this token (i.e. ERC-20 = 18 decimals). Make sure you are providing the correct number of decimals. ">
                     <span className="ms-2">
-                      <Icon color="gray" name="hint" />
+                      <Icon size="small" color="gray" name="hint" />
                     </span>
                   </Tippy>
                 </div>
@@ -266,7 +356,7 @@ const ModalSearchContent = ({
           </div>
         ) : null}
 
-        {showTokenList ? (
+        {showTokenList && !searchingResults ? (
           <div className="mt-7">
             <h3 className="text-small">Token name</h3>
             <div className="mt-3">
@@ -276,11 +366,21 @@ const ModalSearchContent = ({
                   className="cursor-pointer list-token-item d-flex align-items-center"
                   key={index}
                 >
-                  <IconToken symbol={token.symbol} />
-                  <div className="d-flex flex-column ms-3">
-                    <span className="text-main">{token.symbol}</span>
-                    <span className="text-small text-secondary">{token.name}</span>
-                  </div>
+                  <>
+                    <div className="d-flex align-items-center">
+                      <IconToken symbol={token.symbol} />
+                      <div className="ms-3">
+                        <div className="d-flex align-items-center">
+                          <p className="text-main">{token.symbol}</p>
+                          {renderWarningTooltip(token)}
+                        </div>
+                        <p className="text-small text-secondary">
+                          {token.name}{' '}
+                          {token.type !== TokenType.HBAR ? <span>({token.hederaId})</span> : null}
+                        </p>
+                      </div>
+                    </div>
+                  </>
                 </div>
               ))}
             </div>

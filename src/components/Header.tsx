@@ -9,12 +9,13 @@ import ConnectModalContent from './Modals/ConnectModalContent';
 import UserAccountModalContent from './Modals/UserAccountModalContent';
 
 import { formatHBARStringToPrice, formatStringETHtoPriceFormatted } from '../utils/numberUtils';
-import { getHBarPrice } from '../utils/tokenUtils';
 
 import { BALLANCE_FETCH_INTERVAL } from '../constants';
 
 const Header = () => {
   const contextValue = useContext(GlobalContext);
+  const { hbarPrice } = contextValue;
+
   const {
     connected,
     connectWallet,
@@ -28,7 +29,6 @@ const Header = () => {
 
   const [showUserAccountModal, setShowUserAccountModal] = useState(false);
   const [userBalance, setUserBalance] = useState('0.0');
-  const [hbarPrice, setHbarPrice] = useState(0);
 
   const handleConnectButtonClick = () => {
     setShowConnectModal(true);
@@ -44,11 +44,6 @@ const Header = () => {
     }
   }, [userId]);
 
-  const getHBARPrice = useCallback(async () => {
-    const hbarPrice = await getHBarPrice();
-    setHbarPrice(hbarPrice);
-  }, []);
-
   useEffect(() => {
     getUserTokensData();
     document.addEventListener('transaction-response-received', getUserTokensData);
@@ -59,16 +54,13 @@ const Header = () => {
   }, [userId, getUserTokensData]);
 
   useEffect(() => {
-    getHBARPrice();
-
     const fetchInterval = setInterval(() => {
-      getHBARPrice();
       getUserTokensData();
     }, BALLANCE_FETCH_INTERVAL);
     return () => {
       clearInterval(fetchInterval);
     };
-  }, [getHBARPrice, getUserTokensData]);
+  }, [getUserTokensData]);
 
   return (
     <div className="p-5">

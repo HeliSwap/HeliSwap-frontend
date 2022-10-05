@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { GlobalContext } from '../providers/Global';
+
 import BigNumber from 'bignumber.js';
 
 import { QueryHookOptions, useQuery } from '@apollo/client';
@@ -8,14 +10,22 @@ import { REFRESH_TIME } from '../constants';
 
 import { IPoolData, IPoolExtendedData } from '../interfaces/tokens';
 
-import { getTokenPrice, getHBarPrice, idToAddress, calculateReserves } from '../utils/tokenUtils';
+import {
+  getTokenPrice,
+  idToAddress,
+  calculateReserves,
+  calculatePercentageByShare,
+} from '../utils/tokenUtils';
+import { formatStringWeiToStringEther } from '../utils/numberUtils';
 
 const usePoolsByUser = (
   useQueryOptions: QueryHookOptions = {},
   userId: string,
   poolsExtended: IPoolExtendedData[],
 ) => {
-  const [hbarPrice, setHbarPrice] = useState(0);
+  const contextValue = useContext(GlobalContext);
+  const { hbarPrice } = contextValue;
+
   const [poolsByUser, setPoolsByUser] = useState<IPoolExtendedData[]>([]);
 
   const address = userId ? idToAddress(userId) : '';
@@ -25,15 +35,6 @@ const usePoolsByUser = (
     ...useQueryOptions,
     skip: !userId,
   });
-
-  useEffect(() => {
-    const getHBARPrice = async () => {
-      const hbarPrice = await getHBarPrice();
-      setHbarPrice(hbarPrice);
-    };
-
-    getHBARPrice();
-  }, []);
 
   useEffect(() => {
     startPolling(useQueryOptions.pollInterval || REFRESH_TIME);
@@ -57,6 +58,8 @@ const usePoolsByUser = (
             token1,
             lpShares,
             pairSupply,
+            fee0,
+            fee1,
           } = pool;
 
           const { reserve0ShareStr, reserve1ShareStr } = calculateReserves(
@@ -70,18 +73,57 @@ const usePoolsByUser = (
 
           const token0Price = getTokenPrice(poolsExtended, token0, hbarPrice);
           const token1Price = getTokenPrice(poolsExtended, token1, hbarPrice);
+          const token0PriceNum = Number(token0Price);
+          const token1PriceNum = Number(token1Price);
 
-          const token0Value = Number(reserve0ShareStr) * Number(token0Price);
-          const token1Value = Number(reserve1ShareStr) * Number(token1Price);
-          const totalLpValue = token0Value + token1Value;
+          const fee0Formatted = formatStringWeiToStringEther(fee0 as string, token0Decimals);
+          const fee1Formatted = formatStringWeiToStringEther(fee1 as string, token1Decimals);
+          const lpSharesFormatted = formatStringWeiToStringEther(lpShares as string, 18);
+
+          let totalFeeValue = 0;
+          let totalLpValue = 0;
+
+          let fee0Value, fee1Value, token0Value, token1Value;
+
+          if (token0PriceNum !== 0 && token1PriceNum !== 0) {
+            fee0Value = Number(fee0Formatted) * token0PriceNum;
+            fee1Value = Number(fee1Formatted) * token1PriceNum;
+            totalFeeValue = fee0Value + fee1Value;
+
+            token0Value = Number(reserve0ShareStr) * token0PriceNum;
+            token1Value = Number(reserve1ShareStr) * token1PriceNum;
+            totalLpValue = token0Value + token1Value;
+          } else if (token0PriceNum !== 0) {
+            fee0Value = Number(fee0Formatted) * token0PriceNum;
+            totalFeeValue = 2 * fee0Value;
+
+            token0Value = Number(reserve0ShareStr) * token0PriceNum;
+            totalLpValue = 2 * token0Value;
+          } else if (token1PriceNum !== 0) {
+            fee1Value = Number(fee1Formatted) * token1PriceNum;
+            totalFeeValue = 2 * fee1Value;
+
+            token1Value = Number(reserve1ShareStr) * token1PriceNum;
+            totalLpValue = 2 * token1Value;
+          }
+
+          const totalFeeValueString = totalFeeValue.toString();
           const totalLpValueStr = totalLpValue.toFixed(2);
+
+          const userPercentageShare = calculatePercentageByShare(pairSupply, lpShares as string);
 
           const poolData: IPoolExtendedData = {
             ...pool,
             token0AmountFormatted: reserve0ShareStr,
             token1AmountFormatted: reserve1ShareStr,
+            lpSharesFormatted,
             tvl: totalLpValueStr,
             tvlBN: new BigNumber(totalLpValueStr),
+            feesNum: totalFeeValue,
+            feesStr: totalFeeValueString,
+            poolPercenatage: userPercentageShare,
+            fee0AmountFormatted: fee0Formatted,
+            fee1AmountFormatted: fee1Formatted,
           };
 
           return poolData;

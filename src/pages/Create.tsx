@@ -1,8 +1,14 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+
+import toast from 'react-hot-toast';
+import Tippy from '@tippyjs/react';
+
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
-import Tippy from '@tippyjs/react';
+import _ from 'lodash';
+
+import { GlobalContext } from '../providers/Global';
 
 import {
   ITokenData,
@@ -12,7 +18,6 @@ import {
   ITokensData,
   IfaceInitialBalanceData,
 } from '../interfaces/tokens';
-import { GlobalContext } from '../providers/Global';
 
 import Button from '../components/Button';
 import Modal from '../components/Modal';
@@ -27,13 +32,15 @@ import IconToken from '../components/IconToken';
 import Confirmation from '../components/Confirmation';
 import Icon from '../components/Icon';
 
-import errorMessages from '../content/errors';
 import {
   checkAllowanceHTS,
   getTokenBalance,
   idToAddress,
   NATIVE_TOKEN,
   getUserAssociatedTokens,
+  hasFeesOrKeys,
+  invalidInputTokensData,
+  getAmountToApprove,
 } from '../utils/tokenUtils';
 import {
   formatStringETHtoPriceFormatted,
@@ -44,9 +51,24 @@ import {
 import { getTransactionSettings } from '../utils/transactionUtils';
 import { formatIcons } from '../utils/iconUtils';
 
-import usePools from '../hooks/usePools';
-import useTokens from '../hooks/useTokens';
-import { MAX_UINT_ERC20, MAX_UINT_HTS, POOLS_FEE, REFRESH_TIME } from '../constants';
+import usePoolsByToken from '../hooks/usePoolsByToken';
+import useTokensByListIds from '../hooks/useTokensByListIds';
+import useTokensByFilter from '../hooks/useTokensByFilter';
+import ToasterWrapper from '../components/ToasterWrapper';
+
+import getErrorMessage from '../content/errors';
+import { generalFeesAndKeysWarning } from '../content/messages';
+
+import {
+  POOLS_FEE,
+  ASYNC_SEARCH_THRESHOLD,
+  initialTokensDataCreate,
+  initialCreateData,
+  initialApproveData,
+  initialNeedApprovalData,
+  useQueryOptionsPolling,
+  useQueryOptions,
+} from '../constants';
 
 enum ADD_LIQUIDITY_TITLES {
   CREATE_POOL = 'Create pool',
@@ -56,61 +78,40 @@ enum ADD_LIQUIDITY_TITLES {
 
 const Create = () => {
   const contextValue = useContext(GlobalContext);
-  const { connection, sdk } = contextValue;
-  const { userId, hashconnectConnectorInstance, connected, connectWallet, isHashpackLoading } =
-    connection;
-  const { address } = useParams();
+  const { connection, sdk, tokensWhitelisted } = contextValue;
+  const {
+    userId,
+    hashconnectConnectorInstance,
+    connected,
+    setShowConnectModal,
+    isHashpackLoading,
+  } = connection;
+
+  const { token0, token1 } = useParams();
   const navigate = useNavigate();
+
+  //State for tokens whitelist
+  const [tokensWhitelistedIds, setTokensWhitelistedIds] = useState<string[]>([]);
 
   // State for modals
   const [showModalA, setShowModalA] = useState(false);
   const [showModalB, setShowModalB] = useState(false);
   const [showModalConfirmProvide, setShowModalConfirmProvide] = useState(false);
 
-  const initialTokensData = {
-    tokenA: {} as ITokenData,
-    tokenB: {} as ITokenData,
-  };
-
   // State for token inputs
-  const [tokensData, setTokensData] = useState<ITokensData>(initialTokensData);
+  const [tokensData, setTokensData] = useState<ITokensData>(initialTokensDataCreate);
   const [inputTokenA, setInputTokenA] = useState(true);
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
   const [loadingAssociate, setLoadingAssociate] = useState(false);
 
-  // State for pools
-  const { pools: poolsData } = usePools({
-    fetchPolicy: 'network-only',
-    pollInterval: REFRESH_TIME,
-  });
-
-  const { loading: loadingTDL, tokens: tokenDataList } = useTokens({
-    fetchPolicy: 'network-only',
-    pollInterval: REFRESH_TIME,
-  });
-
-  const initialCreateData: ICreatePairData = {
-    tokenAAmount: '',
-    tokenBAmount: '',
-    tokenAId: '',
-    tokenBId: '',
-    tokenADecimals: 18,
-    tokenBDecimals: 18,
-  };
+  //State for tokens data
+  const [selectedTokensIds, setSelectedTokensIds] = useState<string[]>([]);
+  const [mergedTokensData, setMergedTokensData] = useState<ITokenData[]>([] as ITokenData[]);
 
   // State for Create/Provide
   const [createPairData, setCreatePairData] = useState<ICreatePairData>(initialCreateData);
   const tokenAValue = createPairData.tokenAAmount;
   const tokenBValue = createPairData.tokenBAmount;
-  const initialApproveData = {
-    tokenA: false,
-    tokenB: false,
-  };
-
-  const initialNeedApprovalData = {
-    tokenA: true,
-    tokenB: true,
-  };
 
   // State for approved
   const [approved, setApproved] = useState(initialApproveData);
@@ -136,14 +137,66 @@ const Create = () => {
   const [provideNative, setProvideNative] = useState(false);
   const [pageTitle, setPageTitle] = useState(ADD_LIQUIDITY_TITLES.CREATE_POOL);
 
-  // State for general error
-  const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  //State for loading data
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
 
   // State for preset tokens from choosen pool
   const [tokensDerivedFromPool, setTokensDerivedFromPool] = useState(false);
+
+  //Get pools by token A
+  const { filteredPools: poolsData } = usePoolsByToken(
+    useQueryOptionsPolling,
+    tokensData.tokenA.address || (process.env.REACT_APP_WHBAR_ADDRESS as string),
+    false,
+  );
+
+  //Get whitelisted tokens
+  const { loading: loadingTDL, tokens: tokenDataList } = useTokensByListIds(
+    tokensWhitelistedIds,
+    useQueryOptions,
+  );
+
+  // Get selected tokens
+  const { tokens: selectedTokens } = useTokensByListIds(selectedTokensIds, useQueryOptions);
+
+  //Get tokens by filter
+  const { filteredTokens, loadFilteredTokens } = useTokensByFilter(useQueryOptions);
+
+  // Memoizing functions
+  const searchTokensFunc = useMemo(
+    () => (value: string) => {
+      if (value.length > ASYNC_SEARCH_THRESHOLD)
+        loadFilteredTokens({ variables: { keyword: value } });
+    },
+    [loadFilteredTokens],
+  );
+
+  const getFilteredTokens = (mergedTokensData: ITokenData[], filterBy: ITokenData) => {
+    return (
+      mergedTokensData.filter((token: ITokenData) => {
+        if (
+          filterBy.type === TokenType.HBAR ||
+          filterBy.address === process.env.REACT_APP_WHBAR_ADDRESS
+        ) {
+          return (
+            token.type !== TokenType.HBAR && token.address !== process.env.REACT_APP_WHBAR_ADDRESS
+          );
+        }
+        return token.address !== filterBy.address;
+      }) || []
+    );
+  };
+
+  const tokenAFilteredData = useMemo(
+    () => getFilteredTokens(mergedTokensData, tokensData.tokenB),
+    [mergedTokensData, tokensData.tokenB],
+  );
+
+  const tokenBFilteredData = useMemo(
+    () => getFilteredTokens(mergedTokensData, tokensData.tokenA),
+    [mergedTokensData, tokensData.tokenA],
+  );
 
   const invalidTokenData = useCallback(() => {
     const { tokenA, tokenB } = tokensData;
@@ -170,17 +223,14 @@ const Create = () => {
     return tokenB && tokenBAmount && new BigNumber(tokenBAmount).gt(new BigNumber(tokenB));
   }, [tokenBalances, createPairData]);
 
+  // Handlers
   const handleInputChange = useCallback(
     (value: string, name: string, inputSelectedPoolData: IPoolData = selectedPoolData) => {
       const { tokenA, tokenB } = tokensData;
       const inputToken = name === 'tokenAAmount' ? tokenA : tokenB;
       setInputTokenA(name === 'tokenAAmount');
 
-      const invalidInputTokensData = () => {
-        return !value || isNaN(Number(value));
-      };
-
-      if (invalidInputTokensData()) {
+      if (invalidInputTokensData(value)) {
         setReadyToProvide(false);
         setCreatePairData(prev => ({ ...prev, tokenAAmount: '', tokenBAmount: '' }));
         return;
@@ -249,16 +299,22 @@ const Create = () => {
       } = receipt;
 
       if (!success) {
-        setError(true);
-        setErrorMessage(error);
+        toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         const tokens = await getUserAssociatedTokens(userId);
         setUserAssociatedTokens(tokens);
+
+        const newBalance = await getTokenBalance(userId, token);
+        const tokenToSet = token.address === tokensData.tokenA.address ? 'tokenA' : 'tokenB';
+
+        setTokenBalances({
+          ...tokenBalances,
+          [tokenToSet]: newBalance,
+        });
+        toast.success('Success! Token was associated.');
       }
     } catch (err) {
-      console.error(err);
-      setError(true);
-      setErrorMessage('Error on associate');
+      toast.error('Associate Token transaction resulted in an error. ');
     } finally {
       setLoadingAssociate(false);
     }
@@ -266,7 +322,7 @@ const Create = () => {
 
   const handleApproveClick = async (key: string) => {
     const { hederaId, type } = tokensData[key];
-    const amount = type === TokenType.ERC20 ? MAX_UINT_ERC20.toString() : MAX_UINT_HTS.toString();
+    const amount = await getAmountToApprove(hederaId, type === TokenType.HTS);
 
     setLoadingApprove(true);
 
@@ -283,15 +339,13 @@ const Create = () => {
       } = receipt;
 
       if (!success) {
-        setError(true);
-        setErrorMessage(error);
+        toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         setApproved(prev => ({ ...prev, [key]: true }));
+        toast.success('Success! Token was approved.');
       }
     } catch (err) {
-      console.error(err);
-      setError(true);
-      setErrorMessage('Error on create');
+      toast.error('Approve Token transaction resulted in an error.');
     } finally {
       setLoadingApprove(false);
     }
@@ -303,9 +357,11 @@ const Create = () => {
 
   const handleProvideConfirm = async () => {
     const { provideSlippage, transactionExpiration } = getTransactionSettings();
+    const {
+      tokenA: { type: typeA },
+      tokenB: { type: typeB },
+    } = tokensData;
 
-    setError(false);
-    setErrorMessage('');
     setLoadingCreate(true);
 
     try {
@@ -317,6 +373,7 @@ const Create = () => {
             provideSlippage,
             transactionExpiration,
             tokensInSamePool,
+            typeA === TokenType.HBAR ? typeB : typeA,
           )
         : await sdk.addLiquidity(
             hashconnectConnectorInstance,
@@ -325,22 +382,23 @@ const Create = () => {
             provideSlippage,
             transactionExpiration,
             tokensInSamePool,
+            typeA,
+            typeB,
           );
       const {
         response: { success, error },
       } = receipt;
 
       if (!success) {
-        setError(true);
-        setErrorMessage(error);
+        toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         setCreatePairData({ ...createPairData, tokenAAmount: '', tokenBAmount: '' });
         setReadyToProvide(false);
+        toast.success('Success! Liquidity was added.');
       }
     } catch (err) {
       console.error(err);
-      setError(true);
-      setErrorMessage('Error on create');
+      toast.error('Add Liquidity transaction resulted in an error.');
     } finally {
       setLoadingCreate(false);
       setShowModalConfirmProvide(false);
@@ -477,32 +535,42 @@ const Create = () => {
 
     //Set selected pool address in the URL
     if (poolsDataLoaded && tokenASelected && tokenBSelected) {
-      navigate(`/create/${selectedPoolData[0] ? selectedPoolData[0].pairAddress : ''}`);
+      navigate(
+        `/create/${
+          selectedPoolData[0] ? `${selectedPoolData[0].token0}/${selectedPoolData[0].token1}` : ''
+        }`,
+      );
     }
-    //TODO: Additional request will be needed in order to get info regarding pool shares
   }, [tokensData, poolsData, navigate, invalidTokenData]);
 
   // Check for address in url
   useEffect(() => {
     try {
-      if (address && poolsData.length !== 0 && tokenDataList && !tokensDerivedFromPool) {
-        const chosenPool =
-          poolsData.find((pool: IPoolData) => pool.pairAddress === address) || ({} as IPoolData);
-        const { token0: token0Address, token1: token1Address } = chosenPool;
+      if (
+        !tokensDerivedFromPool &&
+        token0 &&
+        token1 &&
+        poolsData.length !== 0 &&
+        mergedTokensData
+      ) {
+        const token0Found = mergedTokensData.some((token: ITokenData) => token.address === token0);
+        const token1Found = mergedTokensData.some((token: ITokenData) => token.address === token1);
 
-        // Check if one of tokens is WHBAR - to be switched for HBAR
-        const isTokenAWrappedHBAR =
-          token0Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
-        const isTokenBWrappedHBAR =
-          token1Address === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+        if (!token0Found || !token1Found) {
+          //Load data for the tokens chosen
+          setSelectedTokensIds([token0, token1]);
+          return;
+        }
+        const isTokenAWrappedHBAR = token0 === (process.env.REACT_APP_WHBAR_ADDRESS as string);
+        const isTokenBWrappedHBAR = token1 === (process.env.REACT_APP_WHBAR_ADDRESS as string);
 
         const tokenA = isTokenAWrappedHBAR
           ? NATIVE_TOKEN
-          : tokenDataList.find((token: ITokenData) => token.address === token0Address) ||
+          : mergedTokensData.find((token: ITokenData) => token.address === token0) ||
             ({} as ITokenData);
         const tokenB = isTokenBWrappedHBAR
           ? NATIVE_TOKEN
-          : tokenDataList.find((token: ITokenData) => token.address === token1Address) ||
+          : mergedTokensData.find((token: ITokenData) => token.address === token1) ||
             ({} as ITokenData);
 
         setTokensData({ tokenA, tokenB });
@@ -512,7 +580,7 @@ const Create = () => {
     } catch (err) {
       console.error(err);
     }
-  }, [poolsData, tokenDataList, address, tokensDerivedFromPool]);
+  }, [poolsData, mergedTokensData, token0, token1, tokensDerivedFromPool]);
 
   // Cache input values
   useEffect(() => {
@@ -533,7 +601,6 @@ const Create = () => {
 
   // Final check before create
   useEffect(() => {
-    //TODO: rafactor this function
     let isReady = true;
 
     const { tokenAAmount, tokenBAmount } = createPairData;
@@ -568,6 +635,21 @@ const Create = () => {
     tokensData,
   ]);
 
+  // Update whitelisted tokens ids when whitelisted tokens list changes
+  useEffect(() => {
+    if (tokensWhitelisted && tokensWhitelisted.length !== 0) {
+      const tokensWhitelistedIds = tokensWhitelisted.map(item => item.address);
+      setTokensWhitelistedIds(tokensWhitelistedIds);
+    }
+  }, [tokensWhitelisted]);
+
+  //Merge token lists comming from BE
+  useEffect(() => {
+    const mergedTokensData = _.unionBy(tokenDataList, selectedTokens, filteredTokens, 'address');
+    setMergedTokensData(mergedTokensData);
+  }, [tokenDataList, selectedTokens, filteredTokens]);
+
+  // Helper functions
   const getTokenIsAssociated = (token: ITokenData) => {
     const notHTS =
       Object.keys(token).length === 0 ||
@@ -576,17 +658,52 @@ const Create = () => {
     return notHTS || userAssociatedTokens?.includes(token.hederaId);
   };
 
-  //Render methods
-  const getErrorMessage = () => {
-    return error ? (
-      <div className="alert alert-danger my-5" role="alert">
-        <strong>Something went wrong!</strong>
-        <p>{errorMessages[errorMessage]}</p>
-      </div>
-    ) : null;
+  const getPoolShare = () => {
+    if (Object.keys(selectedPoolData).length === 0) return '100';
+
+    //Calculating the pool share using one of the pool's provision tokens as no info for the LP token is available
+    const { token0Amount, token1Amount, token0 } = selectedPoolData;
+    const { tokenAAmount, tokenAId, tokenADecimals } = createPairData;
+
+    const token0Id =
+      provideNative && !tokenAId ? (process.env.REACT_APP_WHBAR_ADDRESS as string) : tokenAId;
+
+    const tokenATotalAmountBN =
+      token0 === idToAddress(token0Id) ? new BigNumber(token0Amount) : new BigNumber(token1Amount);
+
+    const tokenAAmountBN = formatStringToBigNumberWei(tokenAAmount, tokenADecimals);
+
+    return tokenAAmountBN
+      .div(tokenATotalAmountBN.plus(tokenAAmountBN))
+      .times(new BigNumber(100))
+      .toFixed(4);
   };
 
-  const getProvideSection = () => {
+  const getProvideButtonLabel = () => {
+    const {
+      tokenA: { symbol: symbolA },
+      tokenB: { symbol: symbolB },
+    } = tokensData;
+
+    if (getInsufficientTokenA()) return `Insufficient ${symbolA} balance`;
+    if (getInsufficientTokenB()) return `Insufficient ${symbolB} balance`;
+    if (invalidTokenData()) return 'Invalid pool';
+    return tokensInSamePool ? 'Provide' : 'Create';
+  };
+
+  //Render methods
+  const renderWarningMessage = () => {
+    if (hasFeesOrKeys(tokensData.tokenA) || hasFeesOrKeys(tokensData.tokenB)) {
+      return (
+        <div className="alert alert-info my-4 d-flex align-items-center" role="alert">
+          <Icon className="alert-icon" name="info" color="info" />{' '}
+          <p className="ms-3 alert-message">{generalFeesAndKeysWarning}</p>
+        </div>
+      );
+    }
+  };
+
+  const renderProvideSection = () => {
     return (
       <div className="container-dark">
         <div className="mb-4 text-small text-bold">Enter amount</div>
@@ -635,8 +752,10 @@ const Create = () => {
               }
             }}
             closeModal={() => setShowModalA(false)}
-            tokenDataList={tokenDataList || []}
+            tokenDataList={tokenAFilteredData}
             loadingTDL={loadingTDL}
+            searchFunc={searchTokensFunc}
+            itemToExlude={tokensData.tokenB}
           />
         </Modal>
 
@@ -686,19 +805,21 @@ const Create = () => {
               }
             }}
             closeModal={() => setShowModalB(false)}
-            tokenDataList={tokenDataList || []}
+            tokenDataList={tokenBFilteredData}
             loadingTDL={loadingTDL}
+            searchFunc={searchTokensFunc}
+            itemToExlude={tokensData.tokenA}
           />
         </Modal>
-        {getFeesInfo()}
+        {renderFeesInfo()}
         <hr className="my-4" />
-        {getTokensRatioSection()}
-        {getActionButtons()}
+        {renderTokensRatioSection()}
+        {renderActionButtons()}
       </div>
     );
   };
 
-  const getFeesInfo = () => {
+  const renderFeesInfo = () => {
     return (
       <div className="d-flex my-4 justify-content-between align-items-center ">
         <span className="text-small text-bold">Liquidity provider fee:</span>
@@ -716,7 +837,7 @@ const Create = () => {
     );
   };
 
-  const getTokensRatioSection = () => {
+  const renderTokensRatioSection = () => {
     return readyToProvide ? (
       <div className="my-4">
         <div className="mt-3 d-flex justify-content-around">
@@ -748,40 +869,7 @@ const Create = () => {
     ) : null;
   };
 
-  const getPoolShare = () => {
-    if (Object.keys(selectedPoolData).length === 0) return '100';
-
-    //Calculating the pool share using one of the pool's provision tokens as no info for the LP token is available
-    const { token0Amount, token1Amount, token0 } = selectedPoolData;
-    const { tokenAAmount, tokenAId, tokenADecimals } = createPairData;
-
-    const token0Id =
-      provideNative && !tokenAId ? (process.env.REACT_APP_WHBAR_ADDRESS as string) : tokenAId;
-
-    const tokenATotalAmountBN =
-      token0 === idToAddress(token0Id) ? new BigNumber(token0Amount) : new BigNumber(token1Amount);
-
-    const tokenAAmountBN = formatStringToBigNumberWei(tokenAAmount, tokenADecimals);
-
-    return tokenAAmountBN
-      .div(tokenATotalAmountBN.plus(tokenAAmountBN))
-      .times(new BigNumber(100))
-      .toFixed(4);
-  };
-
-  const getProvideButtonLabel = () => {
-    const {
-      tokenA: { symbol: symbolA },
-      tokenB: { symbol: symbolB },
-    } = tokensData;
-
-    if (getInsufficientTokenA()) return `Insufficient ${symbolA} balance`;
-    if (getInsufficientTokenB()) return `Insufficient ${symbolB} balance`;
-    if (invalidTokenData()) return 'Invalid pool';
-    return tokensInSamePool ? 'Provide' : 'Create';
-  };
-
-  const getActionButtons = () => {
+  const renderActionButtons = () => {
     return connected && !isHashpackLoading ? (
       <div className="mt-5">
         {!getTokenIsAssociated(tokensData.tokenA) ? (
@@ -868,23 +956,23 @@ const Create = () => {
               modalTitle={pageTitle}
               closeModal={() => setShowModalConfirmProvide(false)}
               confirmTansaction={handleProvideConfirm}
-              confirmButtonLabel="Confirm provide"
+              confirmButtonLabel="Confirm"
             >
-              {getProvideConfirmationModalContent()}
+              {renderProvideConfirmationModalContent()}
             </ConfirmTransactionModalContent>
           </Modal>
         ) : null}
       </div>
     ) : (
       <div className="d-grid mt-4">
-        <Button disabled={isHashpackLoading} onClick={() => connectWallet()}>
+        <Button disabled={isHashpackLoading} onClick={() => setShowConnectModal(true)}>
           Connect wallet
         </Button>
       </div>
     );
   };
 
-  const getProvideConfirmationModalContent = () => {
+  const renderProvideConfirmationModalContent = () => {
     const hasSelectedPool = Object.keys(selectedPoolData).length;
     const token0Symbol = hasSelectedPool ? selectedPoolData.token0Symbol : tokensData.tokenA.symbol;
     const token1Symbol = hasSelectedPool ? selectedPoolData.token1Symbol : tokensData.tokenB.symbol;
@@ -925,9 +1013,10 @@ const Create = () => {
                 </div>
               </div>
             </div>
-            <div className="mt-4 rounded border border-secondary justify-content-between ">
-              {getTokensRatioSection()}
+            <div className="mt-4 rounded border border-secondary justify-content-between">
+              {renderTokensRatioSection()}
             </div>
+            {renderWarningMessage()}
           </>
         )}
       </>
@@ -943,8 +1032,8 @@ const Create = () => {
     <div className="d-flex justify-content-center">
       <div className="container-action">
         <PageHeader handleBackClick={handleBackClick} slippage="create" title={pageTitle} />
-        {getErrorMessage()}
-        {getProvideSection()}
+        {renderProvideSection()}
+        <ToasterWrapper />
       </div>
     </div>
   );

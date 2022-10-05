@@ -1,0 +1,126 @@
+{
+  "name": "HeliSwap Whitelisted",
+  "timestamp": "2022-07-29T15:57:01.868Z",
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  },
+  "tags": {},
+  "logoURI": "ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/HELI.png",
+  "keywords": ["heliswap", "default"],
+  "tokens": [
+    {
+      "chainId": 295,
+      "address": "0x00000000000000000000000000000000000F7e89",
+      "name": "Wrapped HBAR",
+      "symbol": "WHBAR",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/WHBAR.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x000000000000000000000000000000000008437c",
+      "name": "Wrapped Ether[hts]",
+      "symbol": "WETH[hts]",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/ETH.svg"
+    },
+    {
+      "chainId": 295,
+      "address": "0x0000000000000000000000000000000000101Ae3",
+      "name": "USD Coin",
+      "symbol": "USDC[hts]",
+      "decimals": 6,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/USDC.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x000000000000000000000000000000000006f89a",
+      "name": "USD Coin",
+      "symbol": "USDC",
+      "decimals": 6,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/USDC.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x0000000000000000000000000000000000101aF0",
+      "name": "Tether USD",
+      "symbol": "USDT[hts]",
+      "decimals": 6,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/USDT.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x0000000000000000000000000000000000101aFb",
+      "name": "Wrapped BTC",
+      "symbol": "WBTC[hts]",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/WBTC.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x0000000000000000000000000000000000107d76",
+      "name": "MANTRA DAO",
+      "symbol": "OM",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/OM.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x0000000000000000000000000000000000101Af5",
+      "name": "Dai Stablecoin",
+      "symbol": "DAI[hts]",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/DAI.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x0000000000000000000000000000000000083E9E",
+      "name": "Wrapped Matic[hts]",
+      "symbol": "WMATIC[hts]",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/WMATIC.webp"
+    },
+    {
+      "chainId": 295,
+      "address": "0x00000000000000000000000000000000000cbA44",
+      "name": "HBARX",
+      "symbol": "HBARX",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/HBARX.svg"
+    },
+    {
+      "chainId": 295,
+      "address": "0x00000000000000000000000000000000000Ec585",
+      "name": "HeadStarter",
+      "symbol": "HST",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/HST.svg"
+    },
+    {
+      "chainId": 295,
+      "address": "0x00000000000000000000000000000000000D1ea6",
+      "name": "Calaxy Tokens",
+      "symbol": "CLXY",
+      "decimals": 6,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/CLXY.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x0000000000000000000000000000000000098779",
+      "name": "DOVU",
+      "symbol": "DOV[hts]",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/DOVU.webp"
+    },
+    {
+      "chainId": 295,
+      "address": "0x00000000000000000000000000000000000E22B1",
+      "name": "CREAM",
+      "symbol": "CREAM",
+      "decimals": 0,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/CREAM.svg"
+    }
+  ]
+}

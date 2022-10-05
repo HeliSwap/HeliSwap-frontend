@@ -114,8 +114,7 @@
 
   &:hover {
     color: $text-color;
-    background-color: $active-background;
-    border-color: $active-border;
+    border-color: $btn-primary-outline-border-hover;
   }
 
   .btn-check:focus + &,
@@ -128,8 +127,7 @@
   &:active,
   &.active,
   &.dropdown-toggle.show {
-    color: $active-color;
-    background-color: $active-background;
+    color: $text-color;
     border-color: $active-border;
 
     &:focus {

@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import Hashconnect from '../connectors/hashconnect';
 import { HEALTH_CHECK_INTERVAL } from '../constants';
 import useHealthCheck from '../hooks/useHealthCheck';
+import useTokensWhitelisted from '../hooks/useTokensWhitelisted';
+import useHbarPrice from '../hooks/useHbarPrice';
+import { ITokenListData } from '../interfaces/tokens';
 import SDK from '../sdk/sdk';
 
 const contextInitialValue = {
@@ -17,8 +20,10 @@ const contextInitialValue = {
     showConnectModal: false,
     setShowConnectModal: (show: boolean) => {},
   },
+  tokensWhitelisted: [] as ITokenListData[],
   isRunning: false,
   lastUpdated: '',
+  hbarPrice: 0,
 };
 
 export const GlobalContext = React.createContext(contextInitialValue);
@@ -40,6 +45,10 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
     fetchPolicy: 'network-only',
     pollInterval: HEALTH_CHECK_INTERVAL,
   });
+
+  const { tokens: tokensWhitelisted } = useTokensWhitelisted();
+
+  const { hbarPrice } = useHbarPrice();
 
   const lastUpdated = new Date(Number(timestamp) * 1000).toString();
 
@@ -71,7 +80,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
     showConnectModal,
     setShowConnectModal,
   };
-  const contextValue = { sdk, connection, isRunning, lastUpdated };
+  const contextValue = { sdk, connection, isRunning, lastUpdated, tokensWhitelisted, hbarPrice };
 
   useEffect(() => {
     const initHashconnectConnector = async () => {

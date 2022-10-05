@@ -8,6 +8,7 @@ import { getApolloClient } from '../utils/apolloUtils';
 import Swap from '../pages/Swap';
 import Create from '../pages/Create';
 import Pools from '../pages/Pools';
+import Farms from '../pages/Farms';
 import Tokens from '../pages/Tokens';
 import Styleguide from '../pages/Styleguide';
 
@@ -31,10 +32,11 @@ function App() {
                   <div className="container py-5 py-lg-7">
                     <Routes>
                       <Route path="/" element={<Swap />} />
-                      <Route path="/:address" element={<Swap />} />
+                      <Route path="/:token0/:token1" element={<Swap />} />
                       <Route path="create/" element={<Create />} />
-                      <Route path="create/:address" element={<Create />} />
-                      <Route path="pools" element={<Pools />} />
+                      <Route path="create/:token0/:token1" element={<Create />} />
+                      <Route path="pools" element={<Pools itemsPerPage={10} />} />
+                      <Route path="farms" element={<Farms itemsPerPage={10} />} />
                       <Route path="tokens" element={<Tokens />} />
                       <Route path="styleguide" element={<Styleguide />} />
                     </Routes>
