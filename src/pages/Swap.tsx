@@ -506,7 +506,6 @@ const Swap = () => {
         toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         setSwapData(initialSwapData);
-        setTokensData(initialTokensDataSwap);
         setApproved(false);
         refetch();
         toast.success('Success! Tokens were swapped.');
