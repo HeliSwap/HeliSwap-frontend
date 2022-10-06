@@ -102,7 +102,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
       <>
         <span
           className={`icon-campaign-status ${
-            !campaignEnded && !campaignNotStarted ? 'is-active' : ''
+            !campaignNotStarted ? (!campaignEnded ? 'is-active' : '') : 'not-started'
           }`}
         ></span>
         <span className="text-micro ms-3">{statusLabel}</span>
