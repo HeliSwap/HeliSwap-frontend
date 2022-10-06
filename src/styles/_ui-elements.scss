@@ -167,6 +167,10 @@
   &.is-active {
     background-color: $positive-400;
   }
+
+  &.not-started {
+    background-color: $warning-300;
+  }
 }
 
 .icon-hashpack {
