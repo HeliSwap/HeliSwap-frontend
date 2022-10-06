@@ -191,7 +191,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
     )
   ) : (
     <div className="text-center mt-8">
-      <p>Active Yeild farming campaigns will appear here.</p>
+      <p>Active Yield farming campaigns will appear here.</p>
       <div className="mt-4">
         <Button
           disabled={isHashpackLoading}
