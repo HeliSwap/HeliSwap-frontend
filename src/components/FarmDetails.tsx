@@ -84,21 +84,28 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
     }
   };
 
-  const renderCampaignEndDate = (campaignEndDate: number) => {
+  const renderCampaignEndDate = (campaignEndDate: number, rewardsData: IReward[]) => {
     const campaignEnded = campaignEndDate < Date.now();
+    const campaignNotStarted = rewardsData.length === 0;
+
+    const statusLabel = campaignNotStarted ? (
+      'Campaign not started'
+    ) : campaignEnded ? (
+      'Campaign Ended'
+    ) : (
+      <>
+        Until <span className="text-bold">{timestampToDate(campaignEndDate)}</span>
+      </>
+    );
 
     const dateContent = (
       <>
-        <span className={`icon-campaign-status ${!campaignEnded ? 'is-active' : ''}`}></span>
-        <span className="text-micro ms-3">
-          {campaignEnded ? (
-            'Campaign Ended'
-          ) : (
-            <>
-              Active until <span className="text-bold">{timestampToDate(campaignEndDate)}</span>
-            </>
-          )}
-        </span>
+        <span
+          className={`icon-campaign-status ${
+            !campaignEnded && !campaignNotStarted ? 'is-active' : ''
+          }`}
+        ></span>
+        <span className="text-micro ms-3">{statusLabel}</span>
       </>
     );
 
@@ -128,7 +135,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                 </div>
 
                 <div className="container-campaign-status d-flex align-items-center">
-                  {renderCampaignEndDate(farmData.campaignEndDate)}
+                  {renderCampaignEndDate(farmData.campaignEndDate, farmData.rewardsData)}
                 </div>
               </div>
 
