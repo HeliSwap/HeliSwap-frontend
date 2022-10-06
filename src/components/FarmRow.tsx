@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { IFarmData } from '../interfaces/tokens';
+import { IFarmData, IReward } from '../interfaces/tokens';
 
 import { formatIcons } from '../utils/iconUtils';
 import {
@@ -25,21 +25,28 @@ const FarmRow = ({ farmData, index, handleRowClick, setCurrentFarm }: IFarmRowPr
     setCurrentFarm(farmData.address);
   };
 
-  const renderCampaignEndDate = (campaignEndDate: number) => {
+  const renderCampaignEndDate = (campaignEndDate: number, rewardsData: IReward[]) => {
     const campaignEnded = campaignEndDate < Date.now();
+    const campaignNotStarted = rewardsData.length === 0;
+
+    const statusLabel = campaignNotStarted ? (
+      'Campaign not started'
+    ) : campaignEnded ? (
+      'Campaign Ended'
+    ) : (
+      <>
+        Until <span className="text-bold">{timestampToDate(campaignEndDate)}</span>
+      </>
+    );
 
     const dateContent = (
       <>
-        <span className={`icon-campaign-status ${!campaignEnded ? 'is-active' : ''}`}></span>
-        <span className="text-micro ms-3">
-          {campaignEnded ? (
-            'Campaign Ended'
-          ) : (
-            <>
-              Until <span className="text-bold">{timestampToDate(campaignEndDate)}</span>
-            </>
-          )}
-        </span>
+        <span
+          className={`icon-campaign-status ${
+            !campaignEnded && !campaignNotStarted ? 'is-active' : ''
+          }`}
+        ></span>
+        <span className="text-micro ms-3">{statusLabel}</span>
       </>
     );
 
@@ -75,7 +82,7 @@ const FarmRow = ({ farmData, index, handleRowClick, setCurrentFarm }: IFarmRowPr
         </span>
       </div>
       <div className="table-pools-cell d-flex justify-content-end">
-        {renderCampaignEndDate(farmData.campaignEndDate)}
+        {renderCampaignEndDate(farmData.campaignEndDate, farmData.rewardsData)}
       </div>
     </div>
   );
