@@ -321,7 +321,7 @@ const Swap = () => {
           setSwapData(prev => ({ ...prev, amountIn: '', amountOut: '' }));
         }
       } else {
-        if (name === 'amountIn') {
+        if (name === 'amountIn' && parseFloat(amountIn) !== 0) {
           const trades = getPossibleTradesExactIn(
             mergedPoolsData || [],
             amountIn,
@@ -355,7 +355,9 @@ const Swap = () => {
           setSwapPriceImpact(getTradePriceImpact(bestTrade));
           setTokenInExactAmount(true);
           setSwapData(prev => ({ ...prev, ...tokenData, amountOut: bestTrade.amountOut }));
-        } else if (name === 'amountOut') {
+        } else if (name === 'amountIn' && parseFloat(amountIn) === 0) {
+          setSwapData(prev => ({ ...prev, ...tokenData, amountOut: '' }));
+        } else if (name === 'amountOut' && parseFloat(amountOut) !== 0) {
           const trades = getPossibleTradesExactOut(
             mergedPoolsData || [],
             amountOut,
@@ -381,6 +383,8 @@ const Swap = () => {
           setSwapPriceImpact(getTradePriceImpact(bestTrade));
           setTokenInExactAmount(false);
           setSwapData(prev => ({ ...prev, ...tokenData, amountIn: bestTrade.amountIn }));
+        } else if (name === 'amountOut' && parseFloat(amountOut) === 0) {
+          setSwapData(prev => ({ ...prev, ...tokenData, amountIn: '' }));
         }
       }
     },
