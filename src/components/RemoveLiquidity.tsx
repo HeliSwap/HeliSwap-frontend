@@ -385,7 +385,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
         <div className="mt-4">
           {hasWrappedHBAR ? (
-            <div>
+            <div className="d-none">
               <label>
                 <input
                   type="checkbox"

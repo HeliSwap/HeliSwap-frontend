@@ -124,6 +124,8 @@ const usePoolsByUser = (
             poolPercenatage: userPercentageShare,
             fee0AmountFormatted: fee0Formatted,
             fee1AmountFormatted: fee1Formatted,
+            token0Symbol: pool.token0Symbol === 'WHBAR' ? 'HBAR' : pool.token0Symbol,
+            token1Symbol: pool.token1Symbol === 'WHBAR' ? 'HBAR' : pool.token1Symbol,
           };
 
           return poolData;
