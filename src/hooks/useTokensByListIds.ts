@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { ITokenData, TokenType } from '../interfaces/tokens';
+import { ITokenData } from '../interfaces/tokens';
 
 import { QueryHookOptions, useQuery } from '@apollo/client';
 import { GET_TOKENS_WHITELISTED } from '../GraphQL/Queries';
-import { NATIVE_TOKEN } from '../utils/tokenUtils';
+import { getProcessedTokens, NATIVE_TOKEN } from '../utils/tokenUtils';
 
 const useTokensByListIds = (
   tokensWhitelistedIds: string[],
@@ -22,18 +22,7 @@ const useTokensByListIds = (
       const { getWhitelistedTokens: tokensData } = data;
 
       if (tokensData.length > 0) {
-        const foundTokenDataList = tokensData.map(
-          ({ hederaId, name, symbol, address, decimals, isHTS, keys, hasFees }: ITokenData) => ({
-            hederaId,
-            name,
-            symbol,
-            address,
-            decimals,
-            keys,
-            hasFees,
-            type: isHTS ? TokenType.HTS : TokenType.ERC20,
-          }),
-        );
+        const foundTokenDataList = getProcessedTokens(tokensData);
 
         setTokens([NATIVE_TOKEN, ...foundTokenDataList]);
       } else {
