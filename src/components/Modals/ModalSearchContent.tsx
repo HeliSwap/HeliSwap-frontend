@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactNode } from 'react';
 import Tippy from '@tippyjs/react';
 import { ITokenData, TokenType } from '../../interfaces/tokens';
 
@@ -360,29 +360,37 @@ const ModalSearchContent = ({
           <div className="mt-7">
             <h3 className="text-small">Token name</h3>
             <div className="mt-3">
-              {tokenList.map((token: ITokenData, index: number) => (
-                <div
-                  onClick={() => handleTokenListClick(token)}
-                  className="cursor-pointer list-token-item d-flex align-items-center"
-                  key={index}
-                >
-                  <>
-                    <div className="d-flex align-items-center">
-                      <IconToken symbol={token.symbol} />
-                      <div className="ms-3">
+              {tokenList.reduce((acc: ReactNode[], token: ITokenData, index: number) => {
+                //Currently we don't want to show WHBAR
+                if (token.address !== process.env.REACT_APP_WHBAR_ADDRESS) {
+                  acc.push(
+                    <div
+                      onClick={() => handleTokenListClick(token)}
+                      className="cursor-pointer list-token-item d-flex align-items-center"
+                      key={index}
+                    >
+                      <>
                         <div className="d-flex align-items-center">
-                          <p className="text-main">{token.symbol}</p>
-                          {renderWarningTooltip(token)}
+                          <IconToken symbol={token.symbol} />
+                          <div className="ms-3">
+                            <div className="d-flex align-items-center">
+                              <p className="text-main">{token.symbol}</p>
+                              {renderWarningTooltip(token)}
+                            </div>
+                            <p className="text-small text-secondary">
+                              {token.name}{' '}
+                              {token.type !== TokenType.HBAR ? (
+                                <span>({token.hederaId})</span>
+                              ) : null}
+                            </p>
+                          </div>
                         </div>
-                        <p className="text-small text-secondary">
-                          {token.name}{' '}
-                          {token.type !== TokenType.HBAR ? <span>({token.hederaId})</span> : null}
-                        </p>
-                      </div>
-                    </div>
-                  </>
-                </div>
-              ))}
+                      </>
+                    </div>,
+                  );
+                }
+                return acc;
+              }, [])}
             </div>
           </div>
         ) : null}
