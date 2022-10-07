@@ -152,7 +152,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
                   {currentItems.map((item, index) => (
                     <FarmRow
                       key={index}
-                      index={index}
+                      index={index + itemOffset}
                       farmData={item}
                       handleRowClick={handleRowClick}
                       setCurrentFarm={setCurrentFarm}

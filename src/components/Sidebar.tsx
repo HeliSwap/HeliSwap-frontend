@@ -135,6 +135,39 @@ const Sidebar = () => {
                     <span className="ms-3">GitHub</span>
                   </a>
                 </li>
+                <li className="py-3">
+                  <a
+                    className="text-main link d-flex align-items-center"
+                    target="_blank"
+                    rel="noreferrer"
+                    href="https://discord.gg/wVrkMwBKsm"
+                  >
+                    <Icon name="discord" />
+                    <span className="ms-3">Discord</span>
+                  </a>
+                </li>
+                <li className="py-3">
+                  <a
+                    className="text-main link d-flex align-items-center"
+                    target="_blank"
+                    rel="noreferrer"
+                    href="https://medium.com/@heliswap"
+                  >
+                    <Icon name="medium" />
+                    <span className="ms-3">Medium</span>
+                  </a>
+                </li>
+                <li className="py-3">
+                  <a
+                    className="text-main link d-flex align-items-center"
+                    target="_blank"
+                    rel="noreferrer"
+                    href="https://www.youtube.com/channel/UCPYjXlmxIXYmKJ72ajplrfg"
+                  >
+                    <Icon name="youtube" />
+                    <span className="ms-3">Youtube</span>
+                  </a>
+                </li>
               </ul>
             </div>
           ) : null}
