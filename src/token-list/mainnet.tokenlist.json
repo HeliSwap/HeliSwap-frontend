@@ -12,14 +12,6 @@
   "tokens": [
     {
       "chainId": 295,
-      "address": "0x00000000000000000000000000000000000F7e89",
-      "name": "Wrapped HBAR",
-      "symbol": "WHBAR",
-      "decimals": 8,
-      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/WHBAR.png"
-    },
-    {
-      "chainId": 295,
       "address": "0x000000000000000000000000000000000008437c",
       "name": "Wrapped Ether[hts]",
       "symbol": "WETH[hts]",

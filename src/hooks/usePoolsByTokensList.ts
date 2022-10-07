@@ -22,7 +22,7 @@ const usePoolsByTokensList = (
     GET_POOLS_WHITELISTED,
     {
       variables: {
-        tokens: tokensList,
+        tokens: [...tokensList, process.env.REACT_APP_WHBAR_ADDRESS],
       },
       ...useQueryOptions,
       skip: tokensList.length === 0,

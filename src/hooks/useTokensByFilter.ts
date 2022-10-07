@@ -22,8 +22,17 @@ const useTokensByFilter = (useQueryOptions: QueryHookOptions = {}) => {
   useEffect(() => {
     if (filteredTokensData) {
       const { getTokensFilter } = filteredTokensData;
+      const filteredTokens = [...getTokensFilter];
 
-      const foundTokenDataList = getProcessedTokens(getTokensFilter);
+      const whbarIndex = getTokensFilter.findIndex(
+        (token: ITokenData) => token.address === process.env.REACT_APP_WHBAR_ADDRESS,
+      );
+
+      //We want to remove WHBAR from token selectors
+      if (whbarIndex !== -1) filteredTokens.splice(whbarIndex, 1);
+
+      const foundTokenDataList = getProcessedTokens(filteredTokens);
+
       setFilteredTokens(foundTokenDataList);
     }
   }, [filteredTokensData]);
