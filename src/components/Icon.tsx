@@ -25,6 +25,9 @@ import { ReactComponent as Telegram } from '../icons/system/telegram.svg';
 import { ReactComponent as Github } from '../icons/system/github.svg';
 import { ReactComponent as Warning } from '../icons/system/warning.svg';
 import { ReactComponent as Info } from '../icons/system/info.svg';
+import { ReactComponent as Discord } from '../icons/system/discord.svg';
+import { ReactComponent as Medium } from '../icons/system/medium.svg';
+import { ReactComponent as Youtube } from '../icons/system/youtube.svg';
 
 interface IIconProps {
   name: string;
@@ -74,6 +77,9 @@ const icons: IIconMapping = {
   twitter: Twitter,
   telegram: Telegram,
   github: Github,
+  discord: Discord,
+  medium: Medium,
+  youtube: Youtube,
   warning: Warning,
   info: Info,
 };
