@@ -27,6 +27,7 @@ import {
 
 import getErrorMessage from '../content/errors';
 import { timestampToDate } from '../utils/timeUtils';
+import { NATIVE_TOKEN } from '../utils/tokenUtils';
 
 interface IFarmDetailsProps {
   farmData: IFarmData;
@@ -191,12 +192,18 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                   </div>
                   <div className="col-4 d-flex align-items-center">
                     {farmData.rewardsData.length > 0 &&
-                      farmData.rewardsData.map((reward, index) => (
-                        <div key={index} className="d-flex align-items-center me-4">
-                          <IconToken symbol={reward.symbol} />{' '}
-                          <span className="text-main ms-3">{reward.symbol}</span>
-                        </div>
-                      ))}
+                      farmData.rewardsData.map((reward, index) => {
+                        const rewardSymbol =
+                          reward.address === process.env.REACT_APP_WHBAR_ADDRESS
+                            ? NATIVE_TOKEN.symbol
+                            : reward.symbol;
+                        return (
+                          <div key={index} className="d-flex align-items-center me-4">
+                            <IconToken symbol={reward.symbol} />{' '}
+                            <span className="text-main ms-3">{rewardSymbol}</span>
+                          </div>
+                        );
+                      })}
                   </div>
                 </div>
 
@@ -295,9 +302,12 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                               },
                             ) || ({} as IUserStakingData);
 
-                          const rewardSymbol = reward.symbol;
+                          const rewardAddress = reward.address;
                           const rewardDecimals = reward.decimals;
-
+                          const rewardSymbol =
+                            rewardAddress === process.env.REACT_APP_WHBAR_ADDRESS
+                              ? NATIVE_TOKEN.symbol
+                              : reward.symbol;
                           return (
                             <p
                               key={rewardSymbol}
