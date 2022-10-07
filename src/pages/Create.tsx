@@ -822,14 +822,17 @@ const Create = () => {
   const renderFeesInfo = () => {
     return (
       <div className="d-flex my-4 justify-content-between align-items-center ">
-        <span className="text-small text-bold">{`${POOLS_FEE} swap fee within this pool, awarded to liquidity providers proportional to their contribution`}</span>
-        <Tippy
-          content={`The liquidity provider fee is predefined. You'll earn ${POOLS_FEE} of all trades on this pair proportional to your share of the pool. Fees are added to the pool, accrue in real time and can be claimed by withdrawing your liquidity.`}
-        >
-          <span className="ms-2">
-            <Icon color="gray" name="hint" />
-          </span>
-        </Tippy>
+        <span className="text-small text-bold">Liquidity provider fee:</span>
+        <div className="d-flex align-items-center">
+          <span className="text-small text-numeric">{POOLS_FEE}</span>
+          <Tippy
+            content={`The liquidity provider fee is predefined. You'll earn ${POOLS_FEE} of all trades on this pair proportional to your share of the pool. Fees are added to the pool, accrue in real time and can be claimed by withdrawing your liquidity.`}
+          >
+            <span className="ms-2">
+              <Icon color="gray" name="hint" />
+            </span>
+          </Tippy>
+        </div>
       </div>
     );
   };
