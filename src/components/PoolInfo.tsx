@@ -404,7 +404,11 @@ const PoolInfo = ({
           <p className="text-small ms-3">
             {poolData.token0Symbol}/{poolData.token1Symbol}
           </p>
-          <span className="text-micro text-numeric badge bg-secondary-800 ms-3">{POOLS_FEE}</span>
+          <Tippy
+            content={`${POOLS_FEE} swap fee within this pool, awarded to liquidity providers proportional to their contribution`}
+          >
+            <span className="text-micro text-numeric badge bg-secondary-800 ms-3">{POOLS_FEE}</span>
+          </Tippy>
           {poolData.hasCampaign ? (
             <span className="text-micro text-uppercase badge bg-success-600 ms-3">
               Yield farming
