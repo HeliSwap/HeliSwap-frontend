@@ -1,5 +1,7 @@
 import React, { useState, useCallback, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+
+import Tippy from '@tippyjs/react';
 import toast from 'react-hot-toast';
 
 import BigNumber from 'bignumber.js';
@@ -290,30 +292,39 @@ const FarmActions = ({
                 ) : null}
               </div>
 
-              <div className="d-grid">
-                {!campaignEnded ? (
-                  hasUserProvided ? (
-                    lpApproved ? (
+              {!campaignEnded ? (
+                hasUserProvided ? (
+                  <div className="d-grid">
+                    {!lpApproved ? (
                       <Button
-                        disabled={getInsufficientTokenBalance()}
-                        loading={loadingStake}
-                        onClick={() => setShowStakeModal(true)}
-                      >
-                        {getStakeButtonLabel()}
-                      </Button>
-                    ) : (
-                      <Button
+                        className="mb-3"
                         loading={loadingApprove}
                         onClick={() =>
                           handleApproveButtonClick(farmData.address, farmData.poolData.pairAddress)
                         }
                       >
-                        Approve
+                        <>
+                          Approve LP
+                          <Tippy
+                            content={`You must give the HeliSwap smart contracts permission to use your LP tokens.`}
+                          >
+                            <span className="ms-2">
+                              <Icon name="hint" />
+                            </span>
+                          </Tippy>
+                        </>
                       </Button>
-                    )
-                  ) : null
-                ) : null}
-              </div>
+                    ) : null}
+                    <Button
+                      disabled={getInsufficientTokenBalance() || !lpApproved}
+                      loading={loadingStake}
+                      onClick={() => setShowStakeModal(true)}
+                    >
+                      <>{getStakeButtonLabel()}</>
+                    </Button>
+                  </div>
+                ) : null
+              ) : null}
             </>
           ) : (
             <>
