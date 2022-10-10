@@ -37,6 +37,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
   const [currentItems, setCurrentItems] = useState<IFarmData[]>([]);
   const [pageCount, setPageCount] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
   const [currentFarm, setCurrentFarm] = useState('');
   const [showFarmDetails, setShowFarmDetails] = useState(false);
   const [sortDirection] = useState<SORT_DIRECTION>(SORT_DIRECTION.DESC);
@@ -65,6 +66,8 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
   // Handlers
   const handlePageClick = (event: any) => {
     const newOffset = (event.selected * itemsPerPage) % farms.length;
+
+    setCurrentPage(event.selected);
     setItemOffset(newOffset);
   };
 
@@ -163,6 +166,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
 
               <div className="d-flex justify-content-center mt-4">
                 <ReactPaginate
+                  forcePage={currentPage}
                   breakLabel="..."
                   onPageChange={handlePageClick}
                   pageRangeDisplayed={5}
