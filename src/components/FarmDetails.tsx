@@ -37,7 +37,8 @@ interface IFarmDetailsProps {
 const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
-  const { userId, hashconnectConnectorInstance } = connection;
+  const { userId, hashconnectConnectorInstance, isHashpackLoading, setShowConnectModal } =
+    connection;
 
   const [loadingHarvest, setLoadingHarvest] = useState(false);
   const [showHarvestModal, setShowHarvestModal] = useState(false);
@@ -263,7 +264,6 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                   </>
                 ) : null}
               </div>
-
               {userId ? (
                 <div className="container-blue-neutral rounded p-5 mt-5">
                   {hasUserStaked ? (
@@ -396,18 +396,21 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                     </div>
                   )}
                 </div>
-              ) : null}
+              ) : (
+                <div className="d-grid mt-4">
+                  <Button disabled={isHashpackLoading} onClick={() => setShowConnectModal(true)}>
+                    Connect wallet
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
-
-          {userId ? (
-            <FarmActions
-              campaignEnded={campaignEnded}
-              hasUserStaked={hasUserStaked}
-              hasUserProvided={hasUserProvided}
-              farmData={farmData}
-            />
-          ) : null}
+          <FarmActions
+            campaignEnded={campaignEnded}
+            hasUserStaked={hasUserStaked}
+            hasUserProvided={hasUserProvided}
+            farmData={farmData}
+          />
         </div>
       </div>
       <ToasterWrapper />
