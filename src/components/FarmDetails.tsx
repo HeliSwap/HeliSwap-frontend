@@ -37,8 +37,13 @@ interface IFarmDetailsProps {
 const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
-  const { userId, hashconnectConnectorInstance, isHashpackLoading, setShowConnectModal } =
-    connection;
+  const {
+    userId,
+    hashconnectConnectorInstance,
+    isHashpackLoading,
+    setShowConnectModal,
+    connected,
+  } = connection;
 
   const [loadingHarvest, setLoadingHarvest] = useState(false);
   const [showHarvestModal, setShowHarvestModal] = useState(false);
@@ -208,7 +213,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                   </div>
                 </div>
 
-                {userId ? (
+                {connected && !isHashpackLoading ? (
                   <>
                     <hr className="my-5" />
 
@@ -264,9 +269,10 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                   </>
                 ) : null}
               </div>
-              {userId ? (
-                <div className="container-blue-neutral rounded p-5 mt-5">
-                  {hasUserStaked ? (
+
+              <div className="container-blue-neutral rounded p-5 mt-5">
+                {connected && !isHashpackLoading ? (
+                  hasUserStaked ? (
                     <>
                       <div className="d-flex justify-content-between align-items-start">
                         <div className="d-flex align-items-center">
@@ -394,15 +400,19 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                         Stake Your LP Tokens and Earn Rewards
                       </p>
                     </div>
-                  )}
-                </div>
-              ) : (
-                <div className="d-grid mt-4">
-                  <Button disabled={isHashpackLoading} onClick={() => setShowConnectModal(true)}>
-                    Connect wallet
-                  </Button>
-                </div>
-              )}
+                  )
+                ) : (
+                  <div className="text-center">
+                    <Button
+                      size="small"
+                      disabled={isHashpackLoading}
+                      onClick={() => setShowConnectModal(true)}
+                    >
+                      Connect wallet
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           <FarmActions
