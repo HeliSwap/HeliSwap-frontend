@@ -30,7 +30,7 @@ interface IFarmsProps {
 const Farms = ({ itemsPerPage }: IFarmsProps) => {
   const contextValue = useContext(GlobalContext);
   const { tokensWhitelisted, connection } = contextValue;
-  const { userId, connected, isHashpackLoading, setShowConnectModal } = connection;
+  const { userId, isHashpackLoading, setShowConnectModal } = connection;
 
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
 
@@ -104,7 +104,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
 
   const haveFarms = farms.length > 0;
 
-  return connected && !isHashpackLoading ? (
+  return !isHashpackLoading ? (
     showFarmDetails ? (
       <FarmDetails
         setShowFarmDetails={setShowFarmDetails}
@@ -143,9 +143,11 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
                   <div className="table-pools-cell justify-content-end">
                     <span className="text-small ws-no-wrap">Total APR</span>
                   </div>
-                  <div className="table-pools-cell justify-content-end">
-                    <span className="text-small ws-no-wrap">Your Stake</span>
-                  </div>
+                  {userId ? (
+                    <div className="table-pools-cell justify-content-end">
+                      <span className="text-small ws-no-wrap">Your Stake</span>
+                    </div>
+                  ) : null}
                   <div className="table-pools-cell justify-content-end">
                     <span className="text-small">Campaign Status</span>
                   </div>

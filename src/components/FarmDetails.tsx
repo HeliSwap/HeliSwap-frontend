@@ -207,194 +207,207 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                   </div>
                 </div>
 
-                <hr className="my-5" />
-
-                <div className="row mt-4">
-                  <div className="col-4 d-flex align-items-center">
-                    <p className="d-flex align-items-center">
-                      <span className="text-secondary text-small">Your share</span>
-                      <Tippy content="Your staked amount in this farm pool, expressed as a percentage.">
-                        <span className="ms-2">
-                          <Icon name="hint" color="gray" size="small" />
-                        </span>
-                      </Tippy>
-                    </p>
-                  </div>
-                  <div className="col-4 d-flex align-items-center">
-                    <p className="text-main">{stripStringToFixedDecimals(userShare, 2)}%</p>
-                  </div>
-                </div>
-
-                <div className="row mt-4">
-                  <div className="col-4 d-flex align-items-center">
-                    <p className="d-flex align-items-center">
-                      <span className="text-secondary text-small">Staked LP Tokens</span>
-                      <Tippy content="The amount of your staked tokens in $USD, as well as staked tokens count.">
-                        <span className="ms-2">
-                          <Icon name="hint" color="gray" size="small" />
-                        </span>
-                      </Tippy>
-                    </p>
-                  </div>
-                  <div className="col-8 d-flex align-items-center">
-                    <p className="text-subheader text-numeric">
-                      {formatStringToPrice(
-                        stripStringToFixedDecimals(
-                          farmData.userStakingData.stakedAmountUSD as string,
-                          2,
-                        ),
-                      )}
-                    </p>
-                    <p className="d-flex align-items-center ms-3 mt-2">
-                      <span className="text-secondary text-main">
-                        {formatStringETHtoPriceFormatted(
-                          formatStringWeiToStringEther(
-                            farmData.userStakingData.stakedAmount || '0',
-                          ),
-                        )}
-                      </span>
-
-                      <IconToken className="ms-3" symbol="LP" />
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="container-blue-neutral rounded p-5 mt-5">
-                {hasUserStaked ? (
+                {userId ? (
                   <>
-                    <div className="d-flex justify-content-between align-items-start">
-                      <div className="d-flex align-items-center">
-                        <p className="text-small text-bold">Pending rewards</p>
-                        <Tippy
-                          content={`Your pending rewards are calculated in real time. The amount shown is a time-sensitive estimation, and might slightly differ from the actual amount. Before and after actions are taken, it takes 5-10 secs for the amounts to update.`}
-                        >
-                          <span className="ms-2">
-                            <Icon name="hint" />
-                          </span>
-                        </Tippy>
+                    <hr className="my-5" />
+
+                    <div className="row mt-4">
+                      <div className="col-4 d-flex align-items-center">
+                        <p className="d-flex align-items-center">
+                          <span className="text-secondary text-small">Your share</span>
+                          <Tippy content="Your staked amount in this farm pool, expressed as a percentage.">
+                            <span className="ms-2">
+                              <Icon name="hint" color="gray" size="small" />
+                            </span>
+                          </Tippy>
+                        </p>
                       </div>
-                      <div className="d-flex justify-content-end">
-                        <Button
-                          loading={loadingHarvest}
-                          onClick={() => setShowHarvestModal(true)}
-                          size="small"
-                          type="primary"
-                        >
-                          Harvest
-                        </Button>
+                      <div className="col-4 d-flex align-items-center">
+                        <p className="text-main">{stripStringToFixedDecimals(userShare, 2)}%</p>
                       </div>
                     </div>
 
-                    <div className="mt-5">
-                      <p className="text-title text-success text-numeric">
-                        {formatStringToPrice(userRewardsUSD as string, true)}
-                      </p>
-
-                      <hr className="my-4" />
-
-                      <div className="mt-4">
-                        {farmData.rewardsData?.map(reward => {
-                          const userRewardData =
-                            farmData.userStakingData.rewardsAccumulated?.find(
-                              (rewardSingle: IUserStakingData) => {
-                                return rewardSingle.address === reward.address;
-                              },
-                            ) || ({} as IUserStakingData);
-
-                          const rewardAddress = reward.address;
-                          const rewardDecimals = reward.decimals;
-                          const rewardSymbol =
-                            rewardAddress === process.env.REACT_APP_WHBAR_ADDRESS
-                              ? NATIVE_TOKEN.symbol
-                              : reward.symbol;
-                          return (
-                            <p
-                              key={rewardSymbol}
-                              className="text-main d-flex justify-content-between align-items-center mt-4"
-                            >
-                              <span className="d-flex align-items-center text-secondary">
-                                <IconToken symbol={rewardSymbol} />
-                                <span className="ms-3">{rewardSymbol}</span>
-                              </span>
-                              <span className="text-numeric ms-3">
-                                {formatStringWeiToStringEther(
-                                  userRewardData.totalAccumulated || '0',
-                                  rewardDecimals,
-                                )}
-                              </span>
-                            </p>
-                          );
-                        })}
+                    <div className="row mt-4">
+                      <div className="col-4 d-flex align-items-center">
+                        <p className="d-flex align-items-center">
+                          <span className="text-secondary text-small">Staked LP Tokens</span>
+                          <Tippy content="The amount of your staked tokens in $USD, as well as staked tokens count.">
+                            <span className="ms-2">
+                              <Icon name="hint" color="gray" size="small" />
+                            </span>
+                          </Tippy>
+                        </p>
                       </div>
-                    </div>
-
-                    {showHarvestModal ? (
-                      <Modal show={showHarvestModal} closeModal={() => setShowHarvestModal(false)}>
-                        <ConfirmTransactionModalContent
-                          modalTitle="Harvest Pending Rewards"
-                          closeModal={() => setShowHarvestModal(false)}
-                          confirmTansaction={handleHarvestConfirm}
-                          confirmButtonLabel="Confirm"
-                          isLoading={loadingHarvest}
-                        >
-                          {loadingHarvest ? (
-                            <Confirmation confirmationText={'Harvesting reward tokens'} />
-                          ) : (
-                            <>
-                              <div className="text-small">Estimated pending rewards:</div>
-                              {farmData.rewardsData.map((reward: IReward) => {
-                                const userReward =
-                                  farmData.userStakingData.rewardsAccumulated?.find(
-                                    (currReward: IRewardsAccumulated) =>
-                                      currReward.address === reward.address,
-                                  );
-                                return (
-                                  <div
-                                    key={reward.address}
-                                    className="d-flex justify-content-between align-items-center mt-4"
-                                  >
-                                    <div className="d-flex align-items-center">
-                                      <IconToken symbol={reward.symbol} />
-                                      <span className="text-main ms-3">{reward.symbol}</span>
-                                    </div>
-
-                                    <div className="text-main text-numeric">
-                                      {formatStringWeiToStringEther(
-                                        userReward?.totalAccumulated || '0',
-                                        reward.decimals,
-                                      )}
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </>
+                      <div className="col-8 d-flex align-items-center">
+                        <p className="text-subheader text-numeric">
+                          {formatStringToPrice(
+                            stripStringToFixedDecimals(
+                              farmData.userStakingData.stakedAmountUSD as string,
+                              2,
+                            ),
                           )}
-                        </ConfirmTransactionModalContent>
-                      </Modal>
-                    ) : null}
+                        </p>
+                        <p className="d-flex align-items-center ms-3 mt-2">
+                          <span className="text-secondary text-main">
+                            {formatStringETHtoPriceFormatted(
+                              formatStringWeiToStringEther(
+                                farmData.userStakingData.stakedAmount || '0',
+                              ),
+                            )}
+                          </span>
+
+                          <IconToken className="ms-3" symbol="LP" />
+                        </p>
+                      </div>
+                    </div>
                   </>
-                ) : campaignEnded ? (
-                  <div>
-                    <p className="text-small text-bold text-center my-5">Campaign is not active</p>
-                  </div>
-                ) : (
-                  <div>
-                    <p className="text-small text-bold text-center my-5">
-                      Stake Your LP Tokens and Earn Rewards
-                    </p>
-                  </div>
-                )}
+                ) : null}
               </div>
+
+              {userId ? (
+                <div className="container-blue-neutral rounded p-5 mt-5">
+                  {hasUserStaked ? (
+                    <>
+                      <div className="d-flex justify-content-between align-items-start">
+                        <div className="d-flex align-items-center">
+                          <p className="text-small text-bold">Pending rewards</p>
+                          <Tippy
+                            content={`Your pending rewards are calculated in real time. The amount shown is a time-sensitive estimation, and might slightly differ from the actual amount. Before and after actions are taken, it takes 5-10 secs for the amounts to update.`}
+                          >
+                            <span className="ms-2">
+                              <Icon name="hint" />
+                            </span>
+                          </Tippy>
+                        </div>
+                        <div className="d-flex justify-content-end">
+                          <Button
+                            loading={loadingHarvest}
+                            onClick={() => setShowHarvestModal(true)}
+                            size="small"
+                            type="primary"
+                          >
+                            Harvest
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="mt-5">
+                        <p className="text-title text-success text-numeric">
+                          {formatStringToPrice(userRewardsUSD as string, true)}
+                        </p>
+
+                        <hr className="my-4" />
+
+                        <div className="mt-4">
+                          {farmData.rewardsData?.map(reward => {
+                            const userRewardData =
+                              farmData.userStakingData.rewardsAccumulated?.find(
+                                (rewardSingle: IUserStakingData) => {
+                                  return rewardSingle.address === reward.address;
+                                },
+                              ) || ({} as IUserStakingData);
+
+                            const rewardAddress = reward.address;
+                            const rewardDecimals = reward.decimals;
+                            const rewardSymbol =
+                              rewardAddress === process.env.REACT_APP_WHBAR_ADDRESS
+                                ? NATIVE_TOKEN.symbol
+                                : reward.symbol;
+                            return (
+                              <p
+                                key={rewardSymbol}
+                                className="text-main d-flex justify-content-between align-items-center mt-4"
+                              >
+                                <span className="d-flex align-items-center text-secondary">
+                                  <IconToken symbol={rewardSymbol} />
+                                  <span className="ms-3">{rewardSymbol}</span>
+                                </span>
+                                <span className="text-numeric ms-3">
+                                  {formatStringWeiToStringEther(
+                                    userRewardData.totalAccumulated || '0',
+                                    rewardDecimals,
+                                  )}
+                                </span>
+                              </p>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {showHarvestModal ? (
+                        <Modal
+                          show={showHarvestModal}
+                          closeModal={() => setShowHarvestModal(false)}
+                        >
+                          <ConfirmTransactionModalContent
+                            modalTitle="Harvest Pending Rewards"
+                            closeModal={() => setShowHarvestModal(false)}
+                            confirmTansaction={handleHarvestConfirm}
+                            confirmButtonLabel="Confirm"
+                            isLoading={loadingHarvest}
+                          >
+                            {loadingHarvest ? (
+                              <Confirmation confirmationText={'Harvesting reward tokens'} />
+                            ) : (
+                              <>
+                                <div className="text-small">Estimated pending rewards:</div>
+                                {farmData.rewardsData.map((reward: IReward) => {
+                                  const userReward =
+                                    farmData.userStakingData.rewardsAccumulated?.find(
+                                      (currReward: IRewardsAccumulated) =>
+                                        currReward.address === reward.address,
+                                    );
+                                  return (
+                                    <div
+                                      key={reward.address}
+                                      className="d-flex justify-content-between align-items-center mt-4"
+                                    >
+                                      <div className="d-flex align-items-center">
+                                        <IconToken symbol={reward.symbol} />
+                                        <span className="text-main ms-3">{reward.symbol}</span>
+                                      </div>
+
+                                      <div className="text-main text-numeric">
+                                        {formatStringWeiToStringEther(
+                                          userReward?.totalAccumulated || '0',
+                                          reward.decimals,
+                                        )}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </>
+                            )}
+                          </ConfirmTransactionModalContent>
+                        </Modal>
+                      ) : null}
+                    </>
+                  ) : campaignEnded ? (
+                    <div>
+                      <p className="text-small text-bold text-center my-5">
+                        Campaign is not active
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-small text-bold text-center my-5">
+                        Stake Your LP Tokens and Earn Rewards
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : null}
             </div>
           </div>
 
-          <FarmActions
-            campaignEnded={campaignEnded}
-            hasUserStaked={hasUserStaked}
-            hasUserProvided={hasUserProvided}
-            farmData={farmData}
-          />
+          {userId ? (
+            <FarmActions
+              campaignEnded={campaignEnded}
+              hasUserStaked={hasUserStaked}
+              hasUserProvided={hasUserProvided}
+              farmData={farmData}
+            />
+          ) : null}
         </div>
       </div>
       <ToasterWrapper />

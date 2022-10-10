@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { GlobalContext } from '../providers/Global';
 
 import { IFarmData, IReward } from '../interfaces/tokens';
 
@@ -20,6 +21,10 @@ interface IFarmRowProps {
 }
 
 const FarmRow = ({ farmData, index, handleRowClick, setCurrentFarm }: IFarmRowProps) => {
+  const contextValue = useContext(GlobalContext);
+  const { connection } = contextValue;
+  const { userId } = connection;
+
   const handleViewDetailsRowClick = () => {
     handleRowClick();
     setCurrentFarm(farmData.address);
@@ -74,13 +79,17 @@ const FarmRow = ({ farmData, index, handleRowClick, setCurrentFarm }: IFarmRowPr
           {formatStringToPercentage(stripStringToFixedDecimals(farmData.APR, 2))}
         </span>
       </div>
-      <div className="table-pools-cell justify-content-end">
-        <span className="text-small text-numeric">
-          {formatStringToPrice(
-            stripStringToFixedDecimals(farmData.userStakingData.stakedAmountUSD || '0', 2),
-          )}
-        </span>
-      </div>
+
+      {userId ? (
+        <div className="table-pools-cell justify-content-end">
+          <span className="text-small text-numeric">
+            {formatStringToPrice(
+              stripStringToFixedDecimals(farmData.userStakingData.stakedAmountUSD || '0', 2),
+            )}
+          </span>
+        </div>
+      ) : null}
+
       <div className="table-pools-cell d-flex justify-content-end">
         {renderCampaignEndDate(farmData.campaignEndDate, farmData.rewardsData)}
       </div>

@@ -23,7 +23,6 @@ const useFarms = (useQueryOptions: QueryHookOptions = {}, userId: string, pools:
   const { loading, data, error, startPolling, stopPolling } = useQuery(GET_FARMS, {
     variables: { address },
     ...useQueryOptions,
-    skip: !userId,
   });
 
   useEffect(() => {
