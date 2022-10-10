@@ -59,7 +59,10 @@ const FarmRow = ({ farmData, index, handleRowClick, setCurrentFarm }: IFarmRowPr
   };
 
   return (
-    <div onClick={handleViewDetailsRowClick} className={`table-pools-row with-6-columns-farms`}>
+    <div
+      onClick={handleViewDetailsRowClick}
+      className={`table-pools-row with-${userId ? '6' : '5'}-columns-farms`}
+    >
       <div className="table-pools-cell">
         <span className="text-small">{index + 1}</span>
       </div>
