@@ -15,6 +15,7 @@ import Styleguide from '../pages/Styleguide';
 import Header from './Header';
 import Footer from './Footer';
 import Sidebar from './Sidebar';
+import MobileWarning from './MobileWarning';
 
 function App() {
   const apolloClient = getApolloClient();
@@ -27,12 +28,7 @@ function App() {
       <ApolloProvider client={apolloClient}>
         <GlobalProvider>
           {isMobile ? (
-            <div className="py-8">
-              <div className="container">
-                <h1>Mobile Version coming soon…</h1>
-                <p className="text-small mt-5">Please connect from Desktop</p>
-              </div>
-            </div>
+            <MobileWarning />
           ) : (
             <div className="d-flex">
               <Sidebar />
