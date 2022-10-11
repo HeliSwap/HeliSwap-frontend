@@ -23,9 +23,7 @@ const Sidebar = () => {
       </div>
 
       <div className="container-menu">
-        <div className="d-flex flex-column">
-          <Navigation />
-        </div>
+        <Navigation />
 
         <div className="position-relative">
           <div

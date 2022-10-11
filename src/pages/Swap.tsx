@@ -1000,7 +1000,7 @@ const Swap = () => {
           ) : null}
         </>
       ) : (
-        <div className="d-grid mt-4">
+        <div className="d-none d-md-grid mt-4">
           <Button disabled={isHashpackLoading} onClick={() => setShowConnectModal(true)}>
             Connect wallet
           </Button>

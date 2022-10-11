@@ -325,8 +325,15 @@
   padding: 18px;
   min-width: 200px;
   position: absolute;
-  bottom: 0;
-  left: 48px;
+  right: 0;
+  top: 50px;
+
+  @include media-breakpoint-up(md) {
+    right: auto;
+    top: auto;
+    bottom: 0;
+    left: 48px;
+  }
 
   @include media-breakpoint-up(xxxl) {
     left: 110px;
