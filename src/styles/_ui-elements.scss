@@ -242,8 +242,10 @@
   border: 1px solid $blue-neutral-700;
   transition: border 0.15s linear;
 
-  &:not(.is-readonly) {
-    height: 108px;
+  @include media-breakpoint-up(md) {
+    &:not(.is-readonly) {
+      height: 108px;
+    }
   }
 
   &:focus-within:not(.is-readonly),
@@ -258,13 +260,19 @@
   .input-token {
     color: $blue-neutral-100;
     font-family: $font-family-numeric;
-    font-size: 28px;
+    font-size: 20px;
     line-height: 40px;
     background-color: $blue-neutral-700;
     border: none;
-    max-width: 230px;
-    flex: 0 1 230px;
+    max-width: 150px;
+    flex: 0 1 150px;
     @include transition-color;
+
+    @include media-breakpoint-up(md) {
+      max-width: 230px;
+      flex: 0 1 230px;
+      font-size: 28px;
+    }
 
     &.is-compact {
       max-width: 270px;
