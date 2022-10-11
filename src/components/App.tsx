@@ -15,45 +15,37 @@ import Styleguide from '../pages/Styleguide';
 import Header from './Header';
 import Footer from './Footer';
 import Sidebar from './Sidebar';
-import MobileWarning from './MobileWarning';
 
 function App() {
   const apolloClient = getApolloClient();
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent,
-  );
 
   return (
     <BrowserRouter>
       <ApolloProvider client={apolloClient}>
         <GlobalProvider>
-          {isMobile ? (
-            <MobileWarning />
-          ) : (
-            <div className="d-flex">
-              <Sidebar />
-              <div className="wrapper flex-1">
-                <div className="main">
-                  <div className="flex-1">
-                    <Header />
-                    <div className="container py-5 py-lg-7">
-                      <Routes>
-                        <Route path="/" element={<Swap />} />
-                        <Route path="/:token0/:token1" element={<Swap />} />
-                        <Route path="create/" element={<Create />} />
-                        <Route path="create/:token0/:token1" element={<Create />} />
-                        <Route path="pools" element={<Pools itemsPerPage={10} />} />
-                        <Route path="farms" element={<Farms itemsPerPage={10} />} />
-                        <Route path="tokens" element={<Tokens />} />
-                        <Route path="styleguide" element={<Styleguide />} />
-                      </Routes>
-                    </div>
+          <div className="d-md-flex">
+            <Sidebar />
+            <div className="wrapper flex-1">
+              <div className="main">
+                <div className="flex-1">
+                  <Header />
+                  <div className="container py-5 py-lg-7">
+                    <Routes>
+                      <Route path="/" element={<Swap />} />
+                      <Route path="/:token0/:token1" element={<Swap />} />
+                      <Route path="create/" element={<Create />} />
+                      <Route path="create/:token0/:token1" element={<Create />} />
+                      <Route path="pools" element={<Pools itemsPerPage={10} />} />
+                      <Route path="farms" element={<Farms itemsPerPage={10} />} />
+                      <Route path="tokens" element={<Tokens />} />
+                      <Route path="styleguide" element={<Styleguide />} />
+                    </Routes>
                   </div>
                   <Footer />
                 </div>
               </div>
             </div>
-          )}
+          </div>
         </GlobalProvider>
       </ApolloProvider>
     </BrowserRouter>
