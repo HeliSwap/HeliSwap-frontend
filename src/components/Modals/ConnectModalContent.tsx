@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { GlobalContext } from '../../providers/Global';
 import Loader from '../Loader';
+import Icon from '../Icon';
 
 interface IConnectModalContentProps {
   closeModal: () => void;
@@ -16,6 +18,10 @@ const ConnectModalContent = ({
   isLoading,
   extensionFound,
 }: IConnectModalContentProps) => {
+  const contextValue = useContext(GlobalContext);
+  const { connection } = contextValue;
+  const { hashconnectConnectorInstance } = connection;
+
   const handleConnectButtonClick = () => {
     if (extensionFound) {
       connectWallet();
@@ -23,6 +29,10 @@ const ConnectModalContent = ({
       const newWindow = window.open('https://www.hashpack.app/', '_blank', 'noopener,noreferrer');
       if (newWindow) newWindow.opener = null;
     }
+  };
+
+  const handleCopyButtonClick = () => {
+    navigator.clipboard.writeText(hashconnectConnectorInstance.saveData.pairingString);
   };
 
   return (
@@ -54,6 +64,7 @@ const ConnectModalContent = ({
           </>
         ) : (
           <>
+            <p className="text-small text-bold mt-4 mb-4">Connect With Hashpack Extension</p>
             <div onClick={handleConnectButtonClick} className="btn-connect-wallet">
               <div>
                 <p className="text-main">Hashpack</p>
@@ -63,6 +74,18 @@ const ConnectModalContent = ({
               </div>
               <span className="icon-hashpack"></span>
             </div>
+            {hashconnectConnectorInstance && hashconnectConnectorInstance.saveData ? (
+              <>
+                <p className="text-small text-bold mt-4 mb-4">Connect With Code</p>
+                <div className="d-flex align-items-center" onClick={() => handleCopyButtonClick()}>
+                  <span className="link cursor-pointer">
+                    <Icon name="copy" />
+                    <span className="text-small ms-2">Copy Pairing Code</span>
+                  </span>
+                </div>
+              </>
+            ) : null}
+            <div></div>
             <p className="text-micro text-gray mt-4">
               By connecting a wallet, you agree to HeliSwap Terms of Service and acknowledge that
               you have read and understand the Heliswap Protocol Disclaimer.
