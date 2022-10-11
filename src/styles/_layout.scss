@@ -47,7 +47,6 @@ strong {
 .wrapper {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 76px);
 
   @include media-breakpoint-up(md) {
     min-height: 100vh;
