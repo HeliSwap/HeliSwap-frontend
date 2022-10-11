@@ -150,10 +150,6 @@ export const idToAddress = (tokenId: string) => {
   return hethers.utils.getChecksumAddress(hethers.utils.getAddressFromAccount(tokenId));
 };
 
-export const addressToContractId = (tokenAddress: string) => {
-  return ContractId.fromEvmAddress(0, 0, tokenAddress);
-};
-
 export const isHederaIdValid = (hederaId: string) => {
   return hederaId
     .toLowerCase()
