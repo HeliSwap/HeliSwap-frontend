@@ -51,7 +51,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
   const userRewardsUSD = useMemo(() => {
     const { userStakingData } = farmData;
 
-    return userStakingData.rewardsAccumulated?.reduce((acc: string, currentValue) => {
+    return userStakingData?.rewardsAccumulated?.reduce((acc: string, currentValue) => {
       return (Number(acc) + Number(currentValue.totalAccumulatedUSD)).toString();
     }, '0');
   }, [farmData]);
@@ -307,7 +307,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                         <div className="mt-4">
                           {farmData.rewardsData?.map(reward => {
                             const userRewardData =
-                              farmData.userStakingData.rewardsAccumulated?.find(
+                              farmData.userStakingData?.rewardsAccumulated?.find(
                                 (rewardSingle: IUserStakingData) => {
                                   return rewardSingle.address === reward.address;
                                 },
@@ -359,7 +359,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                                 <div className="text-small">Estimated pending rewards:</div>
                                 {farmData.rewardsData.map((reward: IReward) => {
                                   const userReward =
-                                    farmData.userStakingData.rewardsAccumulated?.find(
+                                    farmData.userStakingData?.rewardsAccumulated?.find(
                                       (currReward: IRewardsAccumulated) =>
                                         currReward.address === reward.address,
                                     );
