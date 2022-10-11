@@ -422,13 +422,13 @@ export const setApproveERC20LocalStorage = (hederaId: string, userId: string): v
   const erc20ApproveData = localStorage.getItem('erc20ApproveData');
   const erc20ApproveDataJSON = JSON.parse(erc20ApproveData || '{}');
   if (!erc20ApproveDataJSON[userId] || !erc20ApproveDataJSON[userId][hederaId]) {
-    const erc20 = {
+    const updatedErc20ApproveData = {
       ...erc20ApproveDataJSON,
       [userId]: {
         ...erc20ApproveDataJSON[userId],
         [hederaId]: true,
       },
     };
-    localStorage.setItem('erc20ApproveData', JSON.stringify(erc20));
+    localStorage.setItem('erc20ApproveData', JSON.stringify(updatedErc20ApproveData));
   }
 };
