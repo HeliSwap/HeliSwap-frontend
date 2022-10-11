@@ -31,10 +31,12 @@ import {
 } from '../utils/numberUtils';
 import {
   calculateReserves,
-  addressToContractId,
   calculateShareByPercentage,
   calculatePercentageByShare,
   invalidInputTokensData,
+  setApproveERC20LocalStorage,
+  requestIdFromAddress,
+  getApproveERC20LocalStorage,
 } from '../utils/tokenUtils';
 import {
   getTransactionSettings,
@@ -238,13 +240,13 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
     setLoadingApprove(true);
 
     try {
-      const contractId = addressToContractId(pairData.pairAddress);
+      const lpTokenId = await requestIdFromAddress(pairData.pairAddress);
 
       const receipt = await sdk.approveToken(
         hashconnectConnectorInstance,
         amount,
         userId,
-        contractId,
+        lpTokenId,
         false,
       );
 
@@ -255,6 +257,8 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
       if (success) {
         setLpApproved(true);
         toast.success('Success! Token was approved.');
+
+        setApproveERC20LocalStorage(lpTokenId, userId);
       } else {
         toast.error(getErrorMessage(error.status ? error.status : error));
       }
@@ -275,6 +279,12 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
   }, [pairData, removeLpData, sdk, userId]);
 
   useEffect(() => {
+    const getLPAllowanceData = async () => {
+      const lpTokenId = await requestIdFromAddress(pairData.pairAddress);
+      const canSpend = getApproveERC20LocalStorage(lpTokenId, userId);
+      setLpApproved(canSpend);
+    };
+
     const {
       pairSupply,
       token0Amount,
@@ -316,7 +326,13 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
       token0Decimals,
       token1Decimals,
     });
-  }, [pairData]);
+
+    getLPAllowanceData();
+
+    return () => {
+      setLpApproved(false);
+    };
+  }, [pairData, userId]);
 
   const canRemove = lpApproved && removeLpData.tokenInAddress !== '';
 
