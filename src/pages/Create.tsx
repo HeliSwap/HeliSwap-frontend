@@ -41,6 +41,8 @@ import {
   hasFeesOrKeys,
   invalidInputTokensData,
   getAmountToApprove,
+  setApproveERC20LocalStorage,
+  getApproveERC20LocalStorage,
 } from '../utils/tokenUtils';
 import {
   formatStringETHtoPriceFormatted,
@@ -343,6 +345,8 @@ const Create = () => {
       } else {
         setApproved(prev => ({ ...prev, [key]: true }));
         toast.success('Success! Token was approved.');
+
+        if (type === TokenType.ERC20) setApproveERC20LocalStorage(hederaId, userId);
       }
     } catch (err) {
       toast.error('Approve Token transaction resulted in an error.');
@@ -425,19 +429,23 @@ const Create = () => {
 
     if (tokenA.type === TokenType.HBAR) {
       setNeedApproval(prev => ({ ...prev, tokenA: false }));
-    } else {
-      setNeedApproval(prev => ({ ...prev, tokenA: true }));
-      if (tokensData.tokenA.type === TokenType.HTS && hasTokenAData && userId) {
+    } else if (hasTokenAData && userId) {
+      if (tokensData.tokenA.type === TokenType.HTS) {
         getAllowanceHTS(userId, tokenA, 'tokenA');
+      } else if (tokensData.tokenA.type === TokenType.ERC20) {
+        const canSpendTokenA = getApproveERC20LocalStorage(tokensData.tokenA.hederaId, userId);
+        setApproved(prev => ({ ...prev, tokenA: canSpendTokenA }));
       }
     }
 
     if (tokenB.type === TokenType.HBAR) {
       setNeedApproval(prev => ({ ...prev, tokenB: false }));
-    } else {
-      setNeedApproval(prev => ({ ...prev, tokenB: true }));
-      if (tokensData.tokenB.type === TokenType.HTS && hasTokenBData && userId) {
+    } else if (hasTokenBData && userId) {
+      if (tokensData.tokenB.type === TokenType.HTS) {
         getAllowanceHTS(userId, tokenB, 'tokenB');
+      } else if (tokensData.tokenB.type === TokenType.ERC20) {
+        const canSpendTokenB = getApproveERC20LocalStorage(tokensData.tokenB.hederaId, userId);
+        setApproved(prev => ({ ...prev, tokenB: canSpendTokenB }));
       }
     }
 

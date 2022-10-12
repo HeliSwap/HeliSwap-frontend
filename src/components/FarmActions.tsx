@@ -1,5 +1,7 @@
 import React, { useState, useCallback, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+
+import Tippy from '@tippyjs/react';
 import toast from 'react-hot-toast';
 
 import BigNumber from 'bignumber.js';
@@ -28,8 +30,10 @@ import { MAX_UINT_ERC20, SLIDER_INITIAL_VALUE } from '../constants';
 import {
   calculatePercentageByShare,
   calculateShareByPercentage,
+  getApproveERC20LocalStorage,
   invalidInputTokensData,
   requestIdFromAddress,
+  setApproveERC20LocalStorage,
 } from '../utils/tokenUtils';
 
 interface IFarmActionsProps {
@@ -171,6 +175,8 @@ const FarmActions = ({
       if (success) {
         toast.success('Success! Token was approved.');
         setLpApproved(true);
+
+        setApproveERC20LocalStorage(lpTokenId, userId);
       } else {
         toast.error(getErrorMessage(error.status ? error.status : error));
       }
@@ -199,6 +205,20 @@ const FarmActions = ({
   useEffect(() => {
     setLpInputValue(maxLpInputValue);
   }, [farmData.poolData.lpShares, maxLpInputValue]);
+
+  useEffect(() => {
+    const getLPAllowanceData = async () => {
+      const lpTokenId = await requestIdFromAddress(farmData.stakingTokenAddress);
+      const canSpend = getApproveERC20LocalStorage(lpTokenId, userId);
+      setLpApproved(canSpend);
+    };
+
+    getLPAllowanceData();
+
+    return () => {
+      setLpApproved(false);
+    };
+  }, [farmData.stakingTokenAddress, userId]);
 
   // Helper methods
   const getStakeButtonLabel = () => {
@@ -290,30 +310,39 @@ const FarmActions = ({
                 ) : null}
               </div>
 
-              <div className="d-grid">
-                {!campaignEnded ? (
-                  hasUserProvided ? (
-                    lpApproved ? (
+              {!campaignEnded ? (
+                hasUserProvided ? (
+                  <div className="d-grid">
+                    {!lpApproved ? (
                       <Button
-                        disabled={getInsufficientTokenBalance()}
-                        loading={loadingStake}
-                        onClick={() => setShowStakeModal(true)}
-                      >
-                        {getStakeButtonLabel()}
-                      </Button>
-                    ) : (
-                      <Button
+                        className="mb-3"
                         loading={loadingApprove}
                         onClick={() =>
                           handleApproveButtonClick(farmData.address, farmData.poolData.pairAddress)
                         }
                       >
-                        Approve
+                        <>
+                          Approve LP
+                          <Tippy
+                            content={`You must give the HeliSwap smart contracts permission to use your LP tokens.`}
+                          >
+                            <span className="ms-2">
+                              <Icon name="hint" />
+                            </span>
+                          </Tippy>
+                        </>
                       </Button>
-                    )
-                  ) : null
-                ) : null}
-              </div>
+                    ) : null}
+                    <Button
+                      disabled={getInsufficientTokenBalance() || !lpApproved}
+                      loading={loadingStake}
+                      onClick={() => setShowStakeModal(true)}
+                    >
+                      <>{getStakeButtonLabel()}</>
+                    </Button>
+                  </div>
+                ) : null
+              ) : null}
             </>
           ) : (
             <>

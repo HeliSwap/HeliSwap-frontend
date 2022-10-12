@@ -150,10 +150,6 @@ export const idToAddress = (tokenId: string) => {
   return hethers.utils.getChecksumAddress(hethers.utils.getAddressFromAccount(tokenId));
 };
 
-export const addressToContractId = (tokenAddress: string) => {
-  return ContractId.fromEvmAddress(0, 0, tokenAddress);
-};
-
 export const isHederaIdValid = (hederaId: string) => {
   return hederaId
     .toLowerCase()
@@ -409,4 +405,26 @@ export const getProcessedTokens = (tokensData: ITokenData[]): ITokenData[] => {
       type: isHTS ? TokenType.HTS : TokenType.ERC20,
     }),
   );
+};
+
+export const getApproveERC20LocalStorage = (hederaId: string, userId: string): boolean => {
+  const erc20ApproveData = localStorage.getItem('erc20ApproveData');
+  const erc20ApproveDataJSON = JSON.parse(erc20ApproveData || '{}');
+
+  return (erc20ApproveDataJSON[userId] && erc20ApproveDataJSON[userId][hederaId]) || false;
+};
+
+export const setApproveERC20LocalStorage = (hederaId: string, userId: string): void => {
+  const erc20ApproveData = localStorage.getItem('erc20ApproveData');
+  const erc20ApproveDataJSON = JSON.parse(erc20ApproveData || '{}');
+  if (!erc20ApproveDataJSON[userId] || !erc20ApproveDataJSON[userId][hederaId]) {
+    const updatedErc20ApproveData = {
+      ...erc20ApproveDataJSON,
+      [userId]: {
+        ...erc20ApproveDataJSON[userId],
+        [hederaId]: true,
+      },
+    };
+    localStorage.setItem('erc20ApproveData', JSON.stringify(updatedErc20ApproveData));
+  }
 };
