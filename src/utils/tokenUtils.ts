@@ -3,7 +3,7 @@ import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
 
 import { IAllowanceData, IPoolData, ITokenData, TokenType } from '../interfaces/tokens';
-import { Client, ContractId, AccountBalanceQuery } from '@hashgraph/sdk';
+import { Client, AccountBalanceQuery } from '@hashgraph/sdk';
 import {
   formatNumberToBigNumber,
   formatStringToBigNumber,
