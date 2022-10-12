@@ -41,8 +41,8 @@ function App() {
                       <Route path="styleguide" element={<Styleguide />} />
                     </Routes>
                   </div>
-                  <Footer />
                 </div>
+                <Footer />
               </div>
             </div>
           </div>
