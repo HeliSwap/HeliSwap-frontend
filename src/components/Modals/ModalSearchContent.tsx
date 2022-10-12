@@ -21,6 +21,7 @@ import Loader from '../Loader';
 import search from '../../icons/system/search-gradient.svg';
 import useDebounce from '../../hooks/useDebounce';
 import { concatWarningMessage } from '../../content/messages';
+import { hethers } from '@hashgraph/hethers';
 
 interface IModalProps {
   modalTitle?: string;
@@ -97,7 +98,7 @@ const ModalSearchContent = ({
       ? await requestIdFromAddress(searchInputValue.trim())
       : searchInputValue;
     const address = searchValueIsAddress
-      ? searchInputValue.trim()
+      ? hethers.utils.getChecksumAddress(searchInputValue.trim())
       : await requestAddressFromId(searchInputValue);
 
     const sampleERC20 = {
