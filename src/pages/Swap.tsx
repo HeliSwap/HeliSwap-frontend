@@ -570,19 +570,17 @@ const Swap = () => {
       tokenA: { type, hederaId },
     } = tokensData;
 
-    if (type === TokenType.HBAR) {
-      setNeedApproval(false);
-    }
-
     const hasTokenAData = hederaId && swapData.amountIn;
 
-    if (!hasTokenAData || !userId) return;
-
-    if (type === TokenType.HTS) {
-      getAllowanceHTS(userId);
-    } else if (type === TokenType.ERC20) {
-      const canSpend = getApproveERC20LocalStorage(hederaId, userId);
-      setApproved(canSpend);
+    if (type === TokenType.HBAR) {
+      setNeedApproval(false);
+    } else if (hasTokenAData && userId) {
+      if (type === TokenType.HTS) {
+        getAllowanceHTS(userId);
+      } else if (type === TokenType.ERC20) {
+        const canSpend = getApproveERC20LocalStorage(hederaId, userId);
+        setApproved(canSpend);
+      }
     }
   }, [swapData, userId, tokensData]);
 

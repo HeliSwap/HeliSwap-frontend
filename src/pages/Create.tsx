@@ -429,29 +429,23 @@ const Create = () => {
 
     if (tokenA.type === TokenType.HBAR) {
       setNeedApproval(prev => ({ ...prev, tokenA: false }));
-    } else {
-      setNeedApproval(prev => ({ ...prev, tokenA: true }));
-      if (hasTokenAData && userId) {
-        if (tokensData.tokenA.type === TokenType.HTS) {
-          getAllowanceHTS(userId, tokenA, 'tokenA');
-        } else if (tokensData.tokenA.type === TokenType.ERC20) {
-          const canSpendTokenA = getApproveERC20LocalStorage(tokensData.tokenA.hederaId, userId);
-          setApproved(prev => ({ ...prev, tokenA: canSpendTokenA }));
-        }
+    } else if (hasTokenAData && userId) {
+      if (tokensData.tokenA.type === TokenType.HTS) {
+        getAllowanceHTS(userId, tokenA, 'tokenA');
+      } else if (tokensData.tokenA.type === TokenType.ERC20) {
+        const canSpendTokenA = getApproveERC20LocalStorage(tokensData.tokenA.hederaId, userId);
+        setApproved(prev => ({ ...prev, tokenA: canSpendTokenA }));
       }
     }
 
     if (tokenB.type === TokenType.HBAR) {
       setNeedApproval(prev => ({ ...prev, tokenB: false }));
-    } else {
-      setNeedApproval(prev => ({ ...prev, tokenB: true }));
-      if (hasTokenBData && userId) {
-        if (tokensData.tokenB.type === TokenType.HTS) {
-          getAllowanceHTS(userId, tokenB, 'tokenB');
-        } else if (tokensData.tokenB.type === TokenType.ERC20) {
-          const canSpendTokenB = getApproveERC20LocalStorage(tokensData.tokenB.hederaId, userId);
-          setApproved(prev => ({ ...prev, tokenB: canSpendTokenB }));
-        }
+    } else if (hasTokenBData && userId) {
+      if (tokensData.tokenB.type === TokenType.HTS) {
+        getAllowanceHTS(userId, tokenB, 'tokenB');
+      } else if (tokensData.tokenB.type === TokenType.ERC20) {
+        const canSpendTokenB = getApproveERC20LocalStorage(tokensData.tokenB.hederaId, userId);
+        setApproved(prev => ({ ...prev, tokenB: canSpendTokenB }));
       }
     }
 
