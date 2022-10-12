@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import Icon from './Icon';
+import Navigation from './Navigation';
 
 const Sidebar = () => {
   const [menuOpened, setMenuOpened] = useState(false);
@@ -23,33 +24,7 @@ const Sidebar = () => {
 
       <div className="container-menu">
         <div className="d-flex flex-column">
-          <NavLink
-            to="/"
-            className={({ isActive }) => (isActive ? 'link-menu is-active' : 'link-menu')}
-          >
-            <span className="icon-menu">
-              <Icon color="gray" name="swap" />
-            </span>
-            <span className="ms-4 d-none d-xxxl-inline-block">Swap</span>
-          </NavLink>
-          <NavLink
-            className={({ isActive }) => (isActive ? 'link-menu is-active mt-4' : 'link-menu mt-4')}
-            to="/pools"
-          >
-            <span className="icon-menu">
-              <Icon color="gray" name="pools" />
-            </span>
-            <span className="ms-4 d-none d-xxxl-inline-block">Pools</span>
-          </NavLink>
-          <NavLink
-            className={({ isActive }) => (isActive ? 'link-menu is-active mt-4' : 'link-menu mt-4')}
-            to="/farms"
-          >
-            <span className="icon-menu">
-              <Icon color="gray" name="farms" />
-            </span>
-            <span className="ms-4 d-none d-xxxl-inline-block">Farms</span>
-          </NavLink>
+          <Navigation />
         </div>
 
         <div className="position-relative">

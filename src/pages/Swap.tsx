@@ -35,11 +35,13 @@ import ToasterWrapper from '../components/ToasterWrapper';
 import {
   checkAllowanceHTS,
   getAmountToApprove,
+  getApproveERC20LocalStorage,
   getTokenBalance,
   getUserAssociatedTokens,
   hasFeesOrKeys,
   invalidInputTokensData,
   NATIVE_TOKEN,
+  setApproveERC20LocalStorage,
 } from '../utils/tokenUtils';
 import { getTransactionSettings } from '../utils/transactionUtils';
 import {
@@ -450,6 +452,8 @@ const Swap = () => {
       } else {
         setApproved(true);
         toast.success('Success! Token was approved.');
+
+        if (type === TokenType.ERC20) setApproveERC20LocalStorage(hederaId, userId);
       }
     } catch (err) {
       console.error(err);
@@ -562,14 +566,21 @@ const Swap = () => {
       setApproved(canSpend);
     };
 
-    if (tokensData.tokenA.type === TokenType.HBAR) {
+    const {
+      tokenA: { type, hederaId },
+    } = tokensData;
+
+    const hasTokenAData = hederaId && swapData.amountIn;
+
+    if (type === TokenType.HBAR) {
       setNeedApproval(false);
-    }
-
-    const hasTokenAData = tokensData.tokenA.hederaId && swapData.amountIn;
-
-    if (tokensData.tokenA.type === TokenType.HTS && hasTokenAData && userId) {
-      getAllowanceHTS(userId);
+    } else if (hasTokenAData && userId) {
+      if (type === TokenType.HTS) {
+        getAllowanceHTS(userId);
+      } else if (type === TokenType.ERC20) {
+        const canSpend = getApproveERC20LocalStorage(hederaId, userId);
+        setApproved(canSpend);
+      }
     }
   }, [swapData, userId, tokensData]);
 
