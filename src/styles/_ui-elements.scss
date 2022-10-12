@@ -303,7 +303,10 @@
 .container-max-with-1042 {
   width: 100%;
   max-width: 1042px;
-  margin: 0 24px;
+
+  @include media-breakpoint-up(md) {
+    margin: 0 24px;
+  }
 }
 
 .container-pool-details {
@@ -356,18 +359,24 @@
 
 /* Tables */
 .table-pools {
-  display: grid;
-  grid-auto-rows: auto;
   border-radius: 4px 4px 0px 0px;
   background-color: $blue-neutral-800;
 
-  .table-pools-row {
+  @include media-breakpoint-up(md) {
     display: grid;
-    gap: 1em;
-    grid-template-columns: 20px 3fr 1fr;
+    grid-auto-rows: auto;
+  }
+
+  .table-pools-row {
     transition: background-color 0.1s linear;
     border-bottom: 1px solid $blue-neutral-500;
     cursor: pointer;
+
+    @include media-breakpoint-up(md) {
+      display: grid;
+      gap: 1em;
+      grid-template-columns: 20px 3fr 1fr;
+    }
 
     &:hover {
       background-color: #1f1f4d;
@@ -397,7 +406,11 @@
     .table-pools-cell {
       display: flex;
       align-items: center;
-      padding: 16px 24px;
+      padding: 8px 12px;
+
+      @include media-breakpoint-up(md) {
+        padding: 16px 24px;
+      }
     }
   }
 }
