@@ -1,6 +1,7 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import Tippy from '@tippyjs/react';
 import { ITokenData, TokenType } from '../../interfaces/tokens';
+import { hethers } from '@hashgraph/hethers';
 
 import {
   addressToId,
@@ -21,7 +22,6 @@ import Loader from '../Loader';
 import search from '../../icons/system/search-gradient.svg';
 import useDebounce from '../../hooks/useDebounce';
 import { concatWarningMessage } from '../../content/messages';
-import { hethers } from '@hashgraph/hethers';
 
 interface IModalProps {
   modalTitle?: string;
