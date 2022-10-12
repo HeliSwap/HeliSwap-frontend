@@ -366,6 +366,10 @@
       grid-template-columns: 20px 3fr 1fr 1fr 1fr 1fr;
     }
 
+    &.with-5-columns-farms {
+      grid-template-columns: 20px 2fr 1fr 1fr 2fr;
+    }
+
     &.with-6-columns-farms {
       grid-template-columns: 20px 2fr 1fr 1fr 1fr 2fr;
     }

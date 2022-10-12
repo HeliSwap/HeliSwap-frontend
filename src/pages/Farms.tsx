@@ -30,13 +30,14 @@ interface IFarmsProps {
 const Farms = ({ itemsPerPage }: IFarmsProps) => {
   const contextValue = useContext(GlobalContext);
   const { tokensWhitelisted, connection } = contextValue;
-  const { userId, connected, isHashpackLoading, setShowConnectModal } = connection;
+  const { userId, isHashpackLoading, setShowConnectModal } = connection;
 
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
 
   const [currentItems, setCurrentItems] = useState<IFarmData[]>([]);
   const [pageCount, setPageCount] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
   const [currentFarm, setCurrentFarm] = useState('');
   const [showFarmDetails, setShowFarmDetails] = useState(false);
   const [sortDirection] = useState<SORT_DIRECTION>(SORT_DIRECTION.DESC);
@@ -65,6 +66,8 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
   // Handlers
   const handlePageClick = (event: any) => {
     const newOffset = (event.selected * itemsPerPage) % farms.length;
+
+    setCurrentPage(event.selected);
     setItemOffset(newOffset);
   };
 
@@ -101,7 +104,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
 
   const haveFarms = farms.length > 0;
 
-  return connected && !isHashpackLoading ? (
+  return !isHashpackLoading ? (
     showFarmDetails ? (
       <FarmDetails
         setShowFarmDetails={setShowFarmDetails}
@@ -127,7 +130,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
           ) : haveFarms ? (
             <>
               <div className="table-pools">
-                <div className={`table-pools-row with-6-columns-farms`}>
+                <div className={`table-pools-row with-${userId ? '6' : '5'}-columns-farms`}>
                   <div className="table-pools-cell">
                     <span className="text-small">#</span>
                   </div>
@@ -140,9 +143,11 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
                   <div className="table-pools-cell justify-content-end">
                     <span className="text-small ws-no-wrap">Total APR</span>
                   </div>
-                  <div className="table-pools-cell justify-content-end">
-                    <span className="text-small ws-no-wrap">Your Stake</span>
-                  </div>
+                  {userId ? (
+                    <div className="table-pools-cell justify-content-end">
+                      <span className="text-small ws-no-wrap">Your Stake</span>
+                    </div>
+                  ) : null}
                   <div className="table-pools-cell justify-content-end">
                     <span className="text-small">Campaign Status</span>
                   </div>
@@ -163,6 +168,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
 
               <div className="d-flex justify-content-center mt-4">
                 <ReactPaginate
+                  forcePage={currentPage}
                   breakLabel="..."
                   onPageChange={handlePageClick}
                   pageRangeDisplayed={5}
