@@ -5515,21 +5515,22 @@ hash.js@1.1.7, hash.js@^1.0.0, hash.js@^1.0.3:
     inherits "^2.0.3"
     minimalistic-assert "^1.0.1"
 
-hashconnect@^0.2.2:
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/hashconnect/-/hashconnect-0.2.2.tgz#33c06d350dab02b1c2691a713200594c7a1da65f"
-  integrity sha512-1h4VClayyJR3XdqCUGDXfz2TecIMNFXIv1bRx1QT705BONKafRh6S2amoauvS9LF72gLi2ox/abK8TM9Xybcbg==
+hashconnect@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/hashconnect/-/hashconnect-0.2.3.tgz#5cd52f000a6c96481b524e87f65e0449847bbb33"
+  integrity sha512-E3MrJi50GPZYpc9FBtXaPC/4B7azhRTt49JCFK2IUIeqhWf91yr2tkSlNkOI9yeeGdo4uziD1WZ4dz8yZ+XLeA==
   dependencies:
     "@hashgraph/sdk" "^2.14.2"
     buffer "^6.0.3"
     crypto-es "^1.2.7"
     crypto-js "^4.1.1"
     i "^0.3.7"
+    isomorphic-ws "^5.0.0"
     protons "^2.0.3"
     simple-crypto-js "^3.0.1"
     ts-typed-events "3.0.0"
     uuid "^8.3.2"
-    ws "^8.5.0"
+    ws "^8.8.1"
 
 he@^1.2.0:
   version "1.2.0"
@@ -6004,6 +6005,11 @@ isexe@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/isexe/-/isexe-2.0.0.tgz#e8fbf374dc556ff8947a10dcb0572d633f2cfa10"
   integrity sha1-6PvzdNxVb/iUehDcsFctYz8s+hA=
+
+isomorphic-ws@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/isomorphic-ws/-/isomorphic-ws-5.0.0.tgz#e5529148912ecb9b451b46ed44d53dae1ce04bbf"
+  integrity sha512-muId7Zzn9ywDsyXgTIafTry2sV3nySZeUDe6YedVd1Hvuuep5AsIlqK+XefWpYTyJG5e503F2xIuT2lcU6rCSw==
 
 istanbul-lib-coverage@^3.0.0, istanbul-lib-coverage@^3.2.0:
   version "3.2.0"
@@ -10006,10 +10012,15 @@ ws@^7.4.6:
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.5.7.tgz#9e0ac77ee50af70d58326ecff7e85eb3fa375e67"
   integrity sha512-KMvVuFzpKBuiIXW3E4u3mySRO2/mCHSyZDJQM5NQ9Q9KHWHWh0NHgfbRMLLrceUK5qAL4ytALJbpRMjixFZh8A==
 
-ws@^8.4.2, ws@^8.5.0:
+ws@^8.4.2:
   version "8.6.0"
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.6.0.tgz#e5e9f1d9e7ff88083d0c0dd8281ea662a42c9c23"
   integrity sha512-AzmM3aH3gk0aX7/rZLYvjdvZooofDu3fFOzGqcSnQ1tOcTWwhM/o+q++E8mAyVVIyUdajrkzWUGftaVSDLn1bw==
+
+ws@^8.8.1:
+  version "8.9.0"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.9.0.tgz#2a994bb67144be1b53fe2d23c53c028adeb7f45e"
+  integrity sha512-Ja7nszREasGaYUYCI2k4lCKIRTt+y7XuqVoHR44YpI49TtryyqbqvDMn5eqfW7e6HzTukDRIsXqzVHScqRcafg==
 
 xml-name-validator@^3.0.0:
   version "3.0.0"
