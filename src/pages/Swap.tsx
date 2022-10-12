@@ -566,19 +566,23 @@ const Swap = () => {
       setApproved(canSpend);
     };
 
-    if (tokensData.tokenA.type === TokenType.HBAR) {
+    const {
+      tokenA: { type, hederaId },
+    } = tokensData;
+
+    if (type === TokenType.HBAR) {
       setNeedApproval(false);
     }
 
-    const hasTokenAData = tokensData.tokenA.hederaId && swapData.amountIn;
+    const hasTokenAData = hederaId && swapData.amountIn;
 
-    if (hasTokenAData && userId) {
-      if (tokensData.tokenA.type === TokenType.HTS) {
-        getAllowanceHTS(userId);
-      } else if (tokensData.tokenA.type === TokenType.ERC20) {
-        const canSpend = getApproveERC20LocalStorage(tokensData.tokenA.hederaId, userId);
-        setApproved(canSpend);
-      }
+    if (!hasTokenAData || !userId) return;
+
+    if (type === TokenType.HTS) {
+      getAllowanceHTS(userId);
+    } else if (type === TokenType.ERC20) {
+      const canSpend = getApproveERC20LocalStorage(hederaId, userId);
+      setApproved(canSpend);
     }
   }, [swapData, userId, tokensData]);
 
