@@ -36,7 +36,7 @@ import {
   invalidInputTokensData,
   setApproveERC20LocalStorage,
   requestIdFromAddress,
-  getApproveERC20LocalStorage,
+  // getApproveERC20LocalStorage,
 } from '../utils/tokenUtils';
 import {
   getTransactionSettings,
@@ -279,11 +279,11 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
   }, [pairData, removeLpData, sdk, userId]);
 
   useEffect(() => {
-    const getLPAllowanceData = async () => {
-      const lpTokenId = await requestIdFromAddress(pairData.pairAddress);
-      const canSpend = getApproveERC20LocalStorage(lpTokenId, userId);
-      setLpApproved(canSpend);
-    };
+    // const getLPAllowanceData = async () => {
+    //   const lpTokenId = await requestIdFromAddress(pairData.pairAddress);
+    //   const canSpend = getApproveERC20LocalStorage(lpTokenId, userId);
+    //   setLpApproved(canSpend);
+    // };
 
     const {
       pairSupply,
@@ -327,7 +327,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
       token1Decimals,
     });
 
-    getLPAllowanceData();
+    // getLPAllowanceData();
 
     return () => {
       setLpApproved(false);
