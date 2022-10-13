@@ -1,6 +1,7 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import Tippy from '@tippyjs/react';
 import { ITokenData, TokenType } from '../../interfaces/tokens';
+import { hethers } from '@hashgraph/hethers';
 
 import {
   addressToId,
@@ -97,7 +98,7 @@ const ModalSearchContent = ({
       ? await requestIdFromAddress(searchInputValue.trim())
       : searchInputValue;
     const address = searchValueIsAddress
-      ? searchInputValue.trim()
+      ? hethers.utils.getChecksumAddress(searchInputValue.trim())
       : await requestAddressFromId(searchInputValue);
 
     const sampleERC20 = {
