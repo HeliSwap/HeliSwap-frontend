@@ -42,7 +42,7 @@ import {
   invalidInputTokensData,
   getAmountToApprove,
   setApproveERC20LocalStorage,
-  getApproveERC20LocalStorage,
+  // getApproveERC20LocalStorage,
 } from '../utils/tokenUtils';
 import {
   formatStringETHtoPriceFormatted,
@@ -432,10 +432,11 @@ const Create = () => {
     } else if (hasTokenAData && userId) {
       if (tokensData.tokenA.type === TokenType.HTS) {
         getAllowanceHTS(userId, tokenA, 'tokenA');
-      } else if (tokensData.tokenA.type === TokenType.ERC20) {
-        const canSpendTokenA = getApproveERC20LocalStorage(tokensData.tokenA.hederaId, userId);
-        setApproved(prev => ({ ...prev, tokenA: canSpendTokenA }));
       }
+      // else if (tokensData.tokenA.type === TokenType.ERC20) {
+      //   const canSpendTokenA = getApproveERC20LocalStorage(tokensData.tokenA.hederaId, userId);
+      //   setApproved(prev => ({ ...prev, tokenA: canSpendTokenA }));
+      // }
     }
 
     if (tokenB.type === TokenType.HBAR) {
@@ -443,10 +444,11 @@ const Create = () => {
     } else if (hasTokenBData && userId) {
       if (tokensData.tokenB.type === TokenType.HTS) {
         getAllowanceHTS(userId, tokenB, 'tokenB');
-      } else if (tokensData.tokenB.type === TokenType.ERC20) {
-        const canSpendTokenB = getApproveERC20LocalStorage(tokensData.tokenB.hederaId, userId);
-        setApproved(prev => ({ ...prev, tokenB: canSpendTokenB }));
       }
+      // else if (tokensData.tokenB.type === TokenType.ERC20) {
+      //   const canSpendTokenB = getApproveERC20LocalStorage(tokensData.tokenB.hederaId, userId);
+      //   setApproved(prev => ({ ...prev, tokenB: canSpendTokenB }));
+      // }
     }
 
     return () => {
