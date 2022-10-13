@@ -14,20 +14,18 @@ import { timestampToDate } from '../utils/timeUtils';
 interface IFarmRowProps {
   farmData: IFarmData;
   index: number;
-  setCurrentFarm: React.Dispatch<React.SetStateAction<string>>;
   collapseAll?: boolean;
   setCollapseAll?: (collapsed: boolean) => void;
-  handleRowClick: () => void;
+  handleRowClick: (address: string) => void;
 }
 
-const FarmRow = ({ farmData, index, handleRowClick, setCurrentFarm }: IFarmRowProps) => {
+const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection } = contextValue;
   const { userId } = connection;
 
   const handleViewDetailsRowClick = () => {
-    handleRowClick();
-    setCurrentFarm(farmData.address);
+    handleRowClick(farmData.address);
   };
 
   const renderCampaignEndDate = (campaignEndDate: number, rewardsData: IReward[]) => {
