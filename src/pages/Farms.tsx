@@ -158,7 +158,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
 
             <div className="d-flex justify-content-center mt-4">
               <ReactPaginate
-                forcePage={currentPage}
+                forcePage={pageCount > 1 ? currentPage : -1}
                 breakLabel="..."
                 onPageChange={handlePageClick}
                 pageRangeDisplayed={5}

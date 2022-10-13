@@ -28,6 +28,7 @@ import {
   useQueryOptions,
   initialPoolsAnalyticsData,
 } from '../constants';
+import useFarms from '../hooks/useFarms';
 
 interface IPoolsProps {
   itemsPerPage: number;
@@ -71,6 +72,9 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     loading: loadingPoolsByUser,
     poolsByUser,
   } = usePoolsByUser(useQueryOptionsPolling, userId, pools);
+
+  //temporary solution until add farm addresses into pool data or implement getFarmsByTokenAddress query
+  const { farms } = useFarms(useQueryOptions, userId, pools);
 
   const searchFunc = useMemo(
     () => (value: string) => {
@@ -249,6 +253,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
                   setCurrentPoolIndex={setCurrentPoolIndex}
                   currentView={currentView}
                   renderEmptyPoolsState={renderEmptyPoolsState}
+                  farms={farms}
                 />
               ) : (
                 <MyPools
@@ -263,6 +268,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
                   renderEmptyPoolsState={renderEmptyPoolsState}
                   setShowConnectModal={setShowConnectModal}
                   itemsPerPage={itemsPerPage}
+                  farms={farms}
                 />
               )}
             </>

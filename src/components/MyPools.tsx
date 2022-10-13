@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js';
 import PoolInfo from './PoolInfo';
 import Button from '../components/Button';
 
-import { IPoolExtendedData } from '../interfaces/tokens';
+import { IFarmData, IPoolExtendedData } from '../interfaces/tokens';
 import { PageViews } from '../interfaces/common';
 
 import { SORT_DIRECTION, SORT_OPTIONS_ENUM } from '../constants/index';
@@ -22,6 +22,7 @@ interface IMyPoolsProps {
   setShowConnectModal: (show: boolean) => void;
   setShowRemoveContainer: React.Dispatch<React.SetStateAction<boolean>>;
   setCurrentPoolIndex: React.Dispatch<React.SetStateAction<number>>;
+  farms: IFarmData[];
 }
 
 const MyPools = ({
@@ -36,6 +37,7 @@ const MyPools = ({
   setShowConnectModal,
   setShowRemoveContainer,
   setCurrentPoolIndex,
+  farms,
 }: IMyPoolsProps) => {
   const [collapseAll, setCollapseAll] = useState<boolean>(false);
 
@@ -101,6 +103,7 @@ const MyPools = ({
                   view={currentView}
                   collapseAll={collapseAll}
                   setCollapseAll={setCollapseAll}
+                  farms={farms}
                 />
               ))}
           </>
