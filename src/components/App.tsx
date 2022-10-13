@@ -16,6 +16,7 @@ import Header from './Header';
 import Footer from './Footer';
 import Sidebar from './Sidebar';
 import MobileWarning from './MobileWarning';
+import FarmDetails from './FarmDetails';
 
 function App() {
   const apolloClient = getApolloClient();
@@ -44,6 +45,7 @@ function App() {
                         <Route path="create/:token0/:token1" element={<Create />} />
                         <Route path="pools" element={<Pools itemsPerPage={10} />} />
                         <Route path="farms" element={<Farms itemsPerPage={10} />} />
+                        <Route path="farms/:campaignAddress" element={<FarmDetails />} />
                         <Route path="tokens" element={<Tokens />} />
                         <Route path="styleguide" element={<Styleguide />} />
                       </Routes>
