@@ -11,6 +11,7 @@ import { idToAddress } from '../utils/tokenUtils';
 
 import { REFRESH_TIME } from '../constants';
 
+//This hook to be modified when getFarmByAddress query is implemented on the BE side
 const useFarmByAddress = (
   useQueryOptions: QueryHookOptions = {},
   userId: string,

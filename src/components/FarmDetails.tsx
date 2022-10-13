@@ -1,7 +1,7 @@
 import React, { useContext, useMemo, useState } from 'react';
 import Tippy from '@tippyjs/react';
 import toast from 'react-hot-toast';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import { GlobalContext } from '../providers/Global';
 
@@ -45,6 +45,7 @@ const FarmDetails = () => {
     connected,
   } = connection;
 
+  const navigate = useNavigate();
   const { campaignAddress } = useParams();
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
 
@@ -67,6 +68,8 @@ const FarmDetails = () => {
   const userRewardsUSD = useMemo(() => {
     if (Object.keys(farmData).length !== 0) {
       const { userStakingData } = farmData;
+
+      if (!userStakingData?.rewardsAccumulated) return '0';
 
       return userStakingData?.rewardsAccumulated?.reduce((acc: string, currentValue) => {
         return (Number(acc) + Number(currentValue.totalAccumulatedUSD)).toString();
@@ -147,8 +150,7 @@ const FarmDetails = () => {
     ) : Object.keys(farmData).length !== 0 ? (
       <div className="d-flex justify-content-center">
         <div className="container-max-with-1042">
-          {/* <PageHeader title="Manage Farm" handleBackClick={() => setShowFarmDetails(false)} /> */}
-          <PageHeader title="Manage Farm" />
+          <PageHeader title="Manage Farm" handleBackClick={() => navigate('/farms')} />
           <div className="row">
             <div className="col-7">
               <div className="container-blue-neutral-800 rounded p-5">

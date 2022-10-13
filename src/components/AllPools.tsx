@@ -6,7 +6,7 @@ import Icon from './Icon';
 import PoolInfo from './PoolInfo';
 import Loader from './Loader';
 
-import { IPoolExtendedData, IPoolsAnalytics } from '../interfaces/tokens';
+import { IPoolExtendedData, IPoolsAnalytics, IFarmData } from '../interfaces/tokens';
 import { PageViews } from '../interfaces/common';
 
 import { formatStringToPrice } from '../utils/numberUtils';
@@ -22,6 +22,7 @@ interface IAllPoolsProps {
   setShowRemoveContainer: React.Dispatch<React.SetStateAction<boolean>>;
   setCurrentPoolIndex: React.Dispatch<React.SetStateAction<number>>;
   poolsAnalytics: IPoolsAnalytics;
+  farms: IFarmData[];
 }
 
 const AllPools = ({
@@ -33,6 +34,7 @@ const AllPools = ({
   setShowRemoveContainer,
   setCurrentPoolIndex,
   poolsAnalytics,
+  farms,
 }: IAllPoolsProps) => {
   const [collapseAll, setCollapseAll] = useState<boolean>(false);
   const [sortDirection, setSortDirection] = useState<SORT_DIRECTION>(SORT_DIRECTION.DESC);
@@ -161,6 +163,7 @@ const AllPools = ({
               view={currentView}
               collapseAll={collapseAll}
               setCollapseAll={setCollapseAll}
+              farms={farms}
             />
           ))}
         </>

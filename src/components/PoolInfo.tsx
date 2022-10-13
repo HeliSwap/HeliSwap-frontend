@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import Tippy from '@tippyjs/react';
+import { useNavigate } from 'react-router-dom';
 
-import { IPoolExtendedData } from '../interfaces/tokens';
+import { IFarmData, IPoolExtendedData } from '../interfaces/tokens';
 import { PageViews } from '../interfaces/common';
 
 import Button from './Button';
@@ -40,6 +41,7 @@ interface IPoolInfoProps {
   view: PageViews;
   collapseAll?: boolean;
   setCollapseAll?: (collapsed: boolean) => void;
+  farms: IFarmData[];
 }
 
 const PoolInfo = ({
@@ -50,10 +52,13 @@ const PoolInfo = ({
   view,
   collapseAll,
   setCollapseAll,
+  farms,
 }: IPoolInfoProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
+
+  const navigate = useNavigate();
 
   const maxLpInputValue: string = formatStringWeiToStringEther(poolData?.lpShares as string);
 
@@ -133,6 +138,16 @@ const PoolInfo = ({
       toast('Error on transfer');
     } finally {
       setTransferLoading(false);
+    }
+  };
+
+  const handleRedirectToFarm = () => {
+    //Taking the first farm for the pool, in future this shoul be changed depending on requirements
+    const poolFarm = (farms || []).find(
+      (farm: IFarmData) => farm.stakingTokenAddress === poolData.pairAddress,
+    );
+    if (poolFarm?.address) {
+      navigate(`/farms/${poolFarm.address}`);
     }
   };
 
@@ -410,7 +425,10 @@ const PoolInfo = ({
             <span className="text-micro text-numeric badge bg-secondary-800 ms-3">{POOLS_FEE}</span>
           </Tippy>
           {poolData.hasCampaign ? (
-            <span className="text-micro text-uppercase badge bg-success-600 ms-3">
+            <span
+              className="text-micro text-uppercase badge bg-success-600 ms-3"
+              onClick={handleRedirectToFarm}
+            >
               Yield farming
             </span>
           ) : null}
