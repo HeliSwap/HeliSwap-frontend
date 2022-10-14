@@ -58,7 +58,7 @@ const FarmActions = ({
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
 
-  const maxLpInputValue = formatStringWeiToStringEther(farmData.poolData.lpShares as string);
+  const maxLpInputValue = formatStringWeiToStringEther(farmData.poolData?.lpShares as string);
 
   const [lpInputValue, setLpInputValue] = useState(maxLpInputValue);
   const [sliderValue, setSliderValue] = useState(SLIDER_INITIAL_VALUE);
@@ -91,7 +91,7 @@ const FarmActions = ({
 
   const handleLpInputChange = (value: string) => {
     if (invalidInputTokensData(value, maxLpInputValue, 18)) {
-      setLpInputValue(formatStringWeiToStringEther(farmData.poolData.lpShares as string));
+      setLpInputValue(formatStringWeiToStringEther(farmData.poolData?.lpShares as string));
       setSliderValue(SLIDER_INITIAL_VALUE);
       return;
     }
@@ -204,7 +204,7 @@ const FarmActions = ({
 
   useEffect(() => {
     setLpInputValue(maxLpInputValue);
-  }, [farmData.poolData.lpShares, maxLpInputValue]);
+  }, [farmData.poolData?.lpShares, maxLpInputValue]);
 
   // useEffect(() => {
   //   const getLPAllowanceData = async () => {
@@ -287,7 +287,7 @@ const FarmActions = ({
                       <WalletBalance
                         insufficientBallance={getInsufficientTokenBalance()}
                         walletBalance={formatStringWeiToStringEther(
-                          farmData.poolData.lpShares || '0',
+                          farmData.poolData?.lpShares || '0',
                         )}
                         onMaxButtonClick={(maxValue: string) => {
                           handleLpInputChange(maxValue);
@@ -301,7 +301,7 @@ const FarmActions = ({
                   <div className="text-center mt-6">
                     <Link
                       className="text-small text-bold link-primary d-inline-flex align-items-center"
-                      to={`/create/${farmData.poolData.token0}/${farmData.poolData.token1}`}
+                      to={`/create/${farmData.poolData?.token0}/${farmData.poolData?.token1}`}
                     >
                       <span className="me-2">Get LP tokens</span>
                       <Icon size="small" name="arrow-right" />
@@ -318,7 +318,7 @@ const FarmActions = ({
                         className="mb-3"
                         loading={loadingApprove}
                         onClick={() =>
-                          handleApproveButtonClick(farmData.address, farmData.poolData.pairAddress)
+                          handleApproveButtonClick(farmData.address, farmData.poolData?.pairAddress)
                         }
                       >
                         <>
@@ -354,7 +354,7 @@ const FarmActions = ({
                   inputTokenComponent={
                     <InputToken
                       value={formatStringWeiToStringEther(
-                        farmData.userStakingData.stakedAmount as string,
+                        farmData.userStakingData?.stakedAmount as string,
                       )}
                       disabled={true}
                       isCompact={true}
@@ -416,7 +416,7 @@ const FarmActions = ({
                 {loadingExit ? (
                   <Confirmation
                     confirmationText={`Unstaking ${formatStringWeiToStringEther(
-                      farmData.userStakingData.stakedAmount as string,
+                      farmData.userStakingData?.stakedAmount as string,
                     )} LP tokens`}
                   />
                 ) : (
@@ -432,7 +432,7 @@ const FarmActions = ({
 
                       <div className="text-main text-numeric">
                         {formatStringWeiToStringEther(
-                          farmData.userStakingData.stakedAmount as string,
+                          farmData.userStakingData?.stakedAmount as string,
                         )}
                       </div>
                     </div>
