@@ -16,6 +16,7 @@ import RemoveLiquidity from '../components/RemoveLiquidity';
 import Icon from '../components/Icon';
 
 import { filterPoolsByPattern } from '../utils/poolUtils';
+import { formatStringToPrice } from '../utils/numberUtils';
 
 import usePoolsByUser from '../hooks/usePoolsByUser';
 import usePoolsByFilter from '../hooks/usePoolsByFilter';
@@ -43,6 +44,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const [userPoolsToShow, setUserPoolsToShow] = useState<IPoolExtendedData[]>([]);
   const [havePools, setHavePools] = useState(false);
   const [haveUserPools, setHaveUserPools] = useState(false);
+  const [poolsTVL, setPoolTVL] = useState(0);
 
   //Search area state
   const [inputValue, setInputValue] = useState('');
@@ -125,6 +127,20 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     setSearchingResults(false);
   }, [filteredPools]);
 
+  useEffect(() => {
+    const calculatePoolsTVL = (pools: IPoolExtendedData[]) => {
+      const totalTVL = pools.reduce((acc: number, currentPool: IPoolExtendedData) => {
+        const { tvl } = currentPool;
+        acc = acc + Number(tvl);
+        return acc;
+      }, 0);
+
+      setPoolTVL(totalTVL);
+    };
+
+    pools && pools.length > 0 && calculatePoolsTVL(pools);
+  }, [pools]);
+
   // Render functions
   const renderEmptyPoolsState = (infoMessage: string) => (
     <div className="text-center mt-8">
@@ -201,6 +217,13 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
                     Create pool
                   </Link>
                 ) : null}
+              </div>
+
+              <div className="bg-secondary rounded p-3 my-5">
+                <p className="text-main">
+                  <span className="text-bold">TVL:</span>{' '}
+                  <span className="text-numeric">{formatStringToPrice(poolsTVL.toString())}</span>
+                </p>
               </div>
             </>
           ) : null}
