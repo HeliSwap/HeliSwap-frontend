@@ -33,6 +33,12 @@ interface IPoolsProps {
   itemsPerPage: number;
 }
 
+interface IPoolsAnalytics {
+  tvl: number;
+  volume24h: number;
+  volume7d: number;
+}
+
 const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection, tokensWhitelisted } = contextValue;
@@ -44,7 +50,11 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const [userPoolsToShow, setUserPoolsToShow] = useState<IPoolExtendedData[]>([]);
   const [havePools, setHavePools] = useState(false);
   const [haveUserPools, setHaveUserPools] = useState(false);
-  const [poolsTVL, setPoolTVL] = useState(0);
+  const [poolsAnalytics, setPoolsAnalytics] = useState({
+    tvl: 0,
+    volume24h: 0,
+    volume7d: 0,
+  });
 
   //Search area state
   const [inputValue, setInputValue] = useState('');
@@ -129,13 +139,26 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
 
   useEffect(() => {
     const calculatePoolsTVL = (pools: IPoolExtendedData[]) => {
-      const totalTVL = pools.reduce((acc: number, currentPool: IPoolExtendedData) => {
-        const { tvl } = currentPool;
-        acc = acc + Number(tvl);
-        return acc;
-      }, 0);
+      const allPoolsData = pools.reduce(
+        (acc: IPoolsAnalytics, currentPool: IPoolExtendedData) => {
+          const { tvl, volume24Num, volume7Num } = currentPool;
 
-      setPoolTVL(totalTVL);
+          acc = {
+            tvl: acc.tvl + Number(tvl),
+            volume24h: acc.volume24h + Number(volume24Num),
+            volume7d: acc.volume7d + Number(volume7Num),
+          };
+
+          return acc;
+        },
+        {
+          tvl: 0,
+          volume24h: 0,
+          volume7d: 0,
+        },
+      );
+
+      setPoolsAnalytics(allPoolsData);
     };
 
     pools && pools.length > 0 && calculatePoolsTVL(pools);
@@ -219,10 +242,24 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
                 ) : null}
               </div>
 
-              <div className="bg-secondary rounded p-3 my-5">
-                <p className="text-main">
-                  <span className="text-bold">TVL:</span>{' '}
-                  <span className="text-numeric">{formatStringToPrice(poolsTVL.toString())}</span>
+              <div className="container-blue-neutral-800 d-flex rounded py-4 px-5 my-5">
+                <p className="text-small">
+                  <span className="text-gray">TVL:</span>{' '}
+                  <span className="text-numeric text-bold">
+                    {formatStringToPrice(poolsAnalytics.tvl.toString())}
+                  </span>
+                </p>
+                <p className="text-small ms-7">
+                  <span className="text-gray">Volume 24h:</span>{' '}
+                  <span className="text-numeric text-bold">
+                    {formatStringToPrice(poolsAnalytics.volume24h.toString())}
+                  </span>
+                </p>
+                <p className="text-small ms-7">
+                  <span className="text-gray">Volume 7d:</span>{' '}
+                  <span className="text-numeric text-bold">
+                    {formatStringToPrice(poolsAnalytics.volume7d.toString())}
+                  </span>
                 </p>
               </div>
             </>
