@@ -539,3 +539,11 @@
     flex: 1;
   }
 }
+
+.separator-header {
+  width: 1px;
+  height: 36px;
+  background-color: $blue-neutral-400;
+  opacity: 0.5;
+  margin: 0 24px;
+}
