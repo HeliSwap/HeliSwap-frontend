@@ -435,17 +435,6 @@ export const setApproveERC20LocalStorage = (
         ? { ...erc20ApproveDataJSON[userId][spenderAddress], [tokenId]: true }
         : { [tokenId]: true };
 
-    //         Test
-    //         make pool
-    // Make campaign
-    // Approve and stake into campaign
-    // Check local storage
-    // Go to remove liquidity
-    // Check local storage
-    // Approve token
-    // Check local storage
-    // (Looks like the token doesn’t appear after approve for remove)
-
     const updatedErc20ApproveData = {
       ...erc20ApproveDataJSON,
       [userId]: {
