@@ -35,7 +35,7 @@ import ToasterWrapper from '../components/ToasterWrapper';
 import {
   checkAllowanceHTS,
   getAmountToApprove,
-  // getApproveERC20LocalStorage,
+  getApproveERC20LocalStorage,
   getTokenBalance,
   getUserAssociatedTokens,
   hasFeesOrKeys,
@@ -590,11 +590,10 @@ const Swap = () => {
     } else if (hasTokenAData && userId) {
       if (type === TokenType.HTS) {
         getAllowanceHTS(userId);
+      } else if (type === TokenType.ERC20) {
+        const canSpend = getApproveERC20LocalStorage(hederaId, userId);
+        setApproved(canSpend);
       }
-      // else if (type === TokenType.ERC20) {
-      //   const canSpend = getApproveERC20LocalStorage(hederaId, userId);
-      //   setApproved(canSpend);
-      // }
     }
   }, [swapData, userId, tokensData]);
 

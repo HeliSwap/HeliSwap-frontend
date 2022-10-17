@@ -30,7 +30,7 @@ import { MAX_UINT_ERC20, SLIDER_INITIAL_VALUE } from '../constants';
 import {
   calculatePercentageByShare,
   calculateShareByPercentage,
-  // getApproveERC20LocalStorage,
+  getApproveERC20LocalStorage,
   invalidInputTokensData,
   requestIdFromAddress,
   setApproveERC20LocalStorage,
@@ -176,7 +176,7 @@ const FarmActions = ({
         toast.success('Success! Token was approved.');
         setLpApproved(true);
 
-        setApproveERC20LocalStorage(lpTokenId, userId);
+        setApproveERC20LocalStorage(lpTokenId, userId, campaignAddress);
       } else {
         toast.error(getErrorMessage(error.status ? error.status : error));
       }
@@ -206,19 +206,19 @@ const FarmActions = ({
     setLpInputValue(maxLpInputValue);
   }, [farmData.poolData?.lpShares, maxLpInputValue]);
 
-  // useEffect(() => {
-  //   const getLPAllowanceData = async () => {
-  //     const lpTokenId = await requestIdFromAddress(farmData.stakingTokenAddress);
-  //     const canSpend = getApproveERC20LocalStorage(lpTokenId, userId);
-  //     setLpApproved(canSpend);
-  //   };
+  useEffect(() => {
+    const getLPAllowanceData = async () => {
+      const lpTokenId = await requestIdFromAddress(farmData.stakingTokenAddress);
+      const canSpend = getApproveERC20LocalStorage(lpTokenId, userId, farmData.address);
+      setLpApproved(canSpend);
+    };
 
-  //   getLPAllowanceData();
+    getLPAllowanceData();
 
-  //   return () => {
-  //     setLpApproved(false);
-  //   };
-  // }, [farmData.stakingTokenAddress, userId]);
+    return () => {
+      setLpApproved(false);
+    };
+  }, [farmData.stakingTokenAddress, userId, farmData.address]);
 
   // Helper methods
   const getStakeButtonLabel = () => {

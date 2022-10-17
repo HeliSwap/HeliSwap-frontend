@@ -402,24 +402,59 @@ export const getProcessedTokens = (tokensData: ITokenData[]): ITokenData[] => {
   );
 };
 
-export const getApproveERC20LocalStorage = (hederaId: string, userId: string): boolean => {
-  const erc20ApproveData = localStorage.getItem('erc20ApproveData');
+export const getApproveERC20LocalStorage = (
+  tokenId: string,
+  userId: string,
+  spenderAddress: string = process.env.REACT_APP_ROUTER_ADDRESS as string,
+): boolean => {
+  const erc20ApproveData = localStorage.getItem('erc20ApprovalData');
   const erc20ApproveDataJSON = JSON.parse(erc20ApproveData || '{}');
 
-  return (erc20ApproveDataJSON[userId] && erc20ApproveDataJSON[userId][hederaId]) || false;
+  return (
+    (erc20ApproveDataJSON[userId] &&
+      erc20ApproveDataJSON[userId][spenderAddress] &&
+      erc20ApproveDataJSON[userId][spenderAddress][tokenId]) ||
+    false
+  );
 };
 
-export const setApproveERC20LocalStorage = (hederaId: string, userId: string): void => {
-  const erc20ApproveData = localStorage.getItem('erc20ApproveData');
+export const setApproveERC20LocalStorage = (
+  tokenId: string,
+  userId: string,
+  spenderAddress: string = process.env.REACT_APP_ROUTER_ADDRESS as string,
+): void => {
+  const erc20ApproveData = localStorage.getItem('erc20ApprovalData');
   const erc20ApproveDataJSON = JSON.parse(erc20ApproveData || '{}');
-  if (!erc20ApproveDataJSON[userId] || !erc20ApproveDataJSON[userId][hederaId]) {
+  if (
+    !erc20ApproveDataJSON[userId] ||
+    !erc20ApproveDataJSON[userId][spenderAddress] ||
+    !erc20ApproveDataJSON[userId][spenderAddress][tokenId]
+  ) {
+    const newSpenderData =
+      erc20ApproveDataJSON[userId] && erc20ApproveDataJSON[userId][spenderAddress]
+        ? { ...erc20ApproveDataJSON[userId][spenderAddress], [tokenId]: true }
+        : { [tokenId]: true };
+
+    //         Test
+    //         make pool
+    // Make campaign
+    // Approve and stake into campaign
+    // Check local storage
+    // Go to remove liquidity
+    // Check local storage
+    // Approve token
+    // Check local storage
+    // (Looks like the token doesn’t appear after approve for remove)
+
     const updatedErc20ApproveData = {
       ...erc20ApproveDataJSON,
       [userId]: {
         ...erc20ApproveDataJSON[userId],
-        [hederaId]: true,
+        [spenderAddress]: {
+          ...newSpenderData,
+        },
       },
     };
-    localStorage.setItem('erc20ApproveData', JSON.stringify(updatedErc20ApproveData));
+    localStorage.setItem('erc20ApprovalData', JSON.stringify(updatedErc20ApproveData));
   }
 };
