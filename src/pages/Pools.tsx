@@ -16,6 +16,7 @@ import RemoveLiquidity from '../components/RemoveLiquidity';
 import Icon from '../components/Icon';
 
 import { filterPoolsByPattern } from '../utils/poolUtils';
+import { formatStringToPrice } from '../utils/numberUtils';
 
 import usePoolsByUser from '../hooks/usePoolsByUser';
 import usePoolsByFilter from '../hooks/usePoolsByFilter';
@@ -26,10 +27,17 @@ import {
   poolsPageInitialCurrentView,
   useQueryOptionsPolling,
   useQueryOptions,
+  initialPoolsAnalyticsData,
 } from '../constants';
 
 interface IPoolsProps {
   itemsPerPage: number;
+}
+
+interface IPoolsAnalytics {
+  tvl: number;
+  volume24h: number;
+  volume7d: number;
 }
 
 const Pools = ({ itemsPerPage }: IPoolsProps) => {
@@ -43,6 +51,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const [userPoolsToShow, setUserPoolsToShow] = useState<IPoolExtendedData[]>([]);
   const [havePools, setHavePools] = useState(false);
   const [haveUserPools, setHaveUserPools] = useState(false);
+  const [poolsAnalytics, setPoolsAnalytics] = useState(initialPoolsAnalyticsData);
 
   //Search area state
   const [inputValue, setInputValue] = useState('');
@@ -125,6 +134,26 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     setSearchingResults(false);
   }, [filteredPools]);
 
+  useEffect(() => {
+    const calculatePoolsTVL = (pools: IPoolExtendedData[]) => {
+      const allPoolsData = pools.reduce((acc: IPoolsAnalytics, currentPool: IPoolExtendedData) => {
+        const { tvl, volume24Num, volume7Num } = currentPool;
+
+        acc = {
+          tvl: acc.tvl + Number(tvl),
+          volume24h: acc.volume24h + Number(volume24Num),
+          volume7d: acc.volume7d + Number(volume7Num),
+        };
+
+        return acc;
+      }, initialPoolsAnalyticsData);
+
+      setPoolsAnalytics(allPoolsData);
+    };
+
+    pools && pools.length > 0 && calculatePoolsTVL(pools);
+  }, [pools]);
+
   // Render functions
   const renderEmptyPoolsState = (infoMessage: string) => (
     <div className="text-center mt-8">
@@ -201,6 +230,27 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
                     Create pool
                   </Link>
                 ) : null}
+              </div>
+
+              <div className="container-blue-neutral-800 d-flex rounded py-4 px-5 my-5">
+                <p className="text-small">
+                  <span className="text-gray">TVL:</span>{' '}
+                  <span className="text-numeric text-bold">
+                    {formatStringToPrice(poolsAnalytics.tvl.toString())}
+                  </span>
+                </p>
+                <p className="text-small ms-7">
+                  <span className="text-gray">Volume 24h:</span>{' '}
+                  <span className="text-numeric text-bold">
+                    {formatStringToPrice(poolsAnalytics.volume24h.toString())}
+                  </span>
+                </p>
+                <p className="text-small ms-7">
+                  <span className="text-gray">Volume 7d:</span>{' '}
+                  <span className="text-numeric text-bold">
+                    {formatStringToPrice(poolsAnalytics.volume7d.toString())}
+                  </span>
+                </p>
               </div>
             </>
           ) : null}
