@@ -27,6 +27,7 @@ import {
   poolsPageInitialCurrentView,
   useQueryOptionsPolling,
   useQueryOptions,
+  initialPoolsAnalyticsData,
 } from '../constants';
 
 interface IPoolsProps {
@@ -50,11 +51,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const [userPoolsToShow, setUserPoolsToShow] = useState<IPoolExtendedData[]>([]);
   const [havePools, setHavePools] = useState(false);
   const [haveUserPools, setHaveUserPools] = useState(false);
-  const [poolsAnalytics, setPoolsAnalytics] = useState({
-    tvl: 0,
-    volume24h: 0,
-    volume7d: 0,
-  });
+  const [poolsAnalytics, setPoolsAnalytics] = useState(initialPoolsAnalyticsData);
 
   //Search area state
   const [inputValue, setInputValue] = useState('');
@@ -139,24 +136,17 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
 
   useEffect(() => {
     const calculatePoolsTVL = (pools: IPoolExtendedData[]) => {
-      const allPoolsData = pools.reduce(
-        (acc: IPoolsAnalytics, currentPool: IPoolExtendedData) => {
-          const { tvl, volume24Num, volume7Num } = currentPool;
+      const allPoolsData = pools.reduce((acc: IPoolsAnalytics, currentPool: IPoolExtendedData) => {
+        const { tvl, volume24Num, volume7Num } = currentPool;
 
-          acc = {
-            tvl: acc.tvl + Number(tvl),
-            volume24h: acc.volume24h + Number(volume24Num),
-            volume7d: acc.volume7d + Number(volume7Num),
-          };
+        acc = {
+          tvl: acc.tvl + Number(tvl),
+          volume24h: acc.volume24h + Number(volume24Num),
+          volume7d: acc.volume7d + Number(volume7Num),
+        };
 
-          return acc;
-        },
-        {
-          tvl: 0,
-          volume24h: 0,
-          volume7d: 0,
-        },
-      );
+        return acc;
+      }, initialPoolsAnalyticsData);
 
       setPoolsAnalytics(allPoolsData);
     };
