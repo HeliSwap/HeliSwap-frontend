@@ -8,16 +8,19 @@ const useHbarPrice = () => {
 
   const getHBARPrice = useCallback(async () => {
     setLoading(true);
-    const coingeckoURL = process.env.REACT_APP_COINGECKO_URL + `/simple/price`;
-    try {
-      const response = await axios.get(coingeckoURL, {
-        params: {
-          ids: 'hedera-hashgraph',
-          vs_currencies: 'usd',
-        },
-      });
 
-      setHbarPrice(response.status === 200 ? response.data['hedera-hashgraph']['usd'] : hbarPrice);
+    const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/network/exchangerate`;
+
+    try {
+      const response = await axios.get(url);
+      const { data, status } = response;
+      const {
+        current_rate: { hbar_equivalent, cent_equivalent },
+      } = data;
+
+      const currentRate = cent_equivalent / hbar_equivalent / 100;
+
+      setHbarPrice(status === 200 ? currentRate : hbarPrice);
     } catch (e) {
       console.error(e);
       setHbarPrice(hbarPrice);
