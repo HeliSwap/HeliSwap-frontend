@@ -6,8 +6,10 @@ import Icon from './Icon';
 import PoolInfo from './PoolInfo';
 import Loader from './Loader';
 
-import { IPoolExtendedData } from '../interfaces/tokens';
+import { IPoolExtendedData, IPoolsAnalytics } from '../interfaces/tokens';
 import { PageViews } from '../interfaces/common';
+
+import { formatStringToPrice } from '../utils/numberUtils';
 
 import { SORT_DIRECTION, SORT_OPTIONS, SORT_OPTIONS_ENUM } from '../constants/index';
 
@@ -19,6 +21,7 @@ interface IAllPoolsProps {
   renderEmptyPoolsState: (message: string) => any;
   setShowRemoveContainer: React.Dispatch<React.SetStateAction<boolean>>;
   setCurrentPoolIndex: React.Dispatch<React.SetStateAction<number>>;
+  poolsAnalytics: IPoolsAnalytics;
 }
 
 const AllPools = ({
@@ -29,6 +32,7 @@ const AllPools = ({
   renderEmptyPoolsState,
   setShowRemoveContainer,
   setCurrentPoolIndex,
+  poolsAnalytics,
 }: IAllPoolsProps) => {
   const [collapseAll, setCollapseAll] = useState<boolean>(false);
   const [sortDirection, setSortDirection] = useState<SORT_DIRECTION>(SORT_DIRECTION.DESC);
@@ -90,6 +94,27 @@ const AllPools = ({
     </div>
   ) : havePools ? (
     <>
+      <div className="container-blue-neutral-800 d-flex rounded py-4 px-5 my-5">
+        <p className="text-small">
+          <span className="text-gray">TVL:</span>{' '}
+          <span className="text-numeric text-bold">
+            {formatStringToPrice(poolsAnalytics.tvl.toString())}
+          </span>
+        </p>
+        <p className="text-small ms-7">
+          <span className="text-gray">Volume 24h:</span>{' '}
+          <span className="text-numeric text-bold">
+            {formatStringToPrice(poolsAnalytics.volume24h.toString())}
+          </span>
+        </p>
+        <p className="text-small ms-7">
+          <span className="text-gray">Volume 7d:</span>{' '}
+          <span className="text-numeric text-bold">
+            {formatStringToPrice(poolsAnalytics.volume7d.toString())}
+          </span>
+        </p>
+      </div>
+
       <div className="table-pools">
         <div className={`table-pools-row with-6-columns`}>
           <div className="table-pools-cell">

@@ -83,6 +83,12 @@ export interface IPoolExtendedData extends IPoolData {
   [key: string]: any;
 }
 
+export interface IPoolsAnalytics {
+  tvl: number;
+  volume24h: number;
+  volume7d: number;
+}
+
 export interface IFarmDataRaw {
   address: string;
   poolData: IPoolData;
