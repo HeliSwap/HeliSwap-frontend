@@ -200,9 +200,9 @@ const PoolInfo = ({
   const renderMyPoolsDetails = () => {
     return (
       <div className="row align-items-center">
-        <div className="col-8">
+        <div className="col-md-8">
           <div className="row">
-            <div className="col-6">
+            <div className="col-md-6">
               <div className="container-rounded-dark">
                 <p className="text-small">Liquidity</p>
                 <p className="text-title text-numeric">{formatStringToPrice(poolData.tvl)}</p>
@@ -233,7 +233,7 @@ const PoolInfo = ({
               </div>
             </div>
 
-            <div className="col-6">
+            <div className="col-md-6 mt-4 mt-md-0">
               <div className="container-rounded-dark">
                 <p className="text-small">Unclaimed fees</p>
                 <p className="text-title text-numeric text-success">
@@ -356,7 +356,7 @@ const PoolInfo = ({
           </TransferLPModalContent>
         </Modal>
 
-        <div className="col-4">
+        <div className="col-md-4 mt-4 mt-md-0">
           <div>
             <Link
               className="d-block btn btn-sm btn-primary"
