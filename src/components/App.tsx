@@ -11,12 +11,12 @@ import Pools from '../pages/Pools';
 import Farms from '../pages/Farms';
 import Tokens from '../pages/Tokens';
 import Styleguide from '../pages/Styleguide';
+import FarmDetails from '../pages/FarmDetails';
 
 import Header from './Header';
 import Footer from './Footer';
 import Sidebar from './Sidebar';
 import MobileWarning from './MobileWarning';
-import FarmDetails from './FarmDetails';
 
 function App() {
   const apolloClient = getApolloClient();
