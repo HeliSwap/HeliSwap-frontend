@@ -245,6 +245,7 @@ export const getTokenBalance = async (userId: string, tokenData: ITokenData) => 
     const userBalanceBN = await provider.getBalance(userId);
     tokenBalance = hethers.utils.formatHbar(userBalanceBN);
   } else if (tokenData.type === TokenType.HTS) {
+    tokenBalance = '0';
     const accountTokens = await getUserHTSData(userId);
     const balance = accountTokens?.get(tokenData.hederaId);
     const tokenDecimals = tokenData?.decimals;
