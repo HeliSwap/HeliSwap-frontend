@@ -19,6 +19,7 @@ import HST from '../icons/tokens/HST.png';
 import CLXY from '../icons/tokens/CLXY.png';
 import DOVU from '../icons/tokens/DOVU.png';
 import CREAM from '../icons/tokens/CREAM.svg';
+import JAM from '../icons/tokens/JAM.png';
 
 interface IIconTokenProps {
   symbol: string;
@@ -56,6 +57,7 @@ const tokenMapping: ITokenMapping = {
   CLXY: CLXY,
   'DOV[hts]': DOVU,
   CREAM: CREAM,
+  JAM: JAM,
   LP: LP,
 };
 
