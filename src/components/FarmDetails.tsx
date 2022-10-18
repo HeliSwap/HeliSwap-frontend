@@ -59,9 +59,9 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
   const userShare = useMemo(() => {
     const { totalStaked, userStakingData } = farmData;
 
-    if (Number(totalStaked) === 0) return '0';
+    if (!userStakingData?.stakedAmount || !totalStaked || Number(totalStaked) === 0) return '0';
 
-    return ((Number(userStakingData.stakedAmount) / Number(totalStaked)) * 100).toString();
+    return ((Number(userStakingData?.stakedAmount) / Number(totalStaked)) * 100).toString();
   }, [farmData]);
 
   // Handlers
@@ -119,9 +119,9 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
     return <div className="d-flex align-items-center">{dateContent}</div>;
   };
 
-  const hasUserStaked = farmData.userStakingData.stakedAmount !== '0';
-  const hasUserProvided = farmData.poolData.lpShares !== '0';
-  const campaignEnded = farmData.campaignEndDate < Date.now();
+  const hasUserStaked = farmData.userStakingData?.stakedAmount !== '0';
+  const hasUserProvided = farmData.poolData?.lpShares !== '0';
+  const campaignEnded = farmData?.campaignEndDate < Date.now();
 
   return (
     <div className="d-flex justify-content-center">
@@ -133,11 +133,11 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
               <div className="d-flex justify-content-between align-items-start">
                 <div className="d-flex align-items-center">
                   {formatIcons(
-                    [farmData.poolData.token0Symbol, farmData.poolData.token1Symbol],
+                    [farmData.poolData?.token0Symbol, farmData.poolData?.token1Symbol],
                     'large',
                   )}
                   <p className="text-subheader text-light ms-4">
-                    {farmData.poolData.token0Symbol} / {farmData.poolData.token1Symbol}
+                    {farmData.poolData?.token0Symbol} / {farmData.poolData?.token1Symbol}
                   </p>
                 </div>
 
@@ -197,8 +197,8 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                     </p>
                   </div>
                   <div className="col-4 d-flex align-items-center">
-                    {farmData.rewardsData.length > 0 &&
-                      farmData.rewardsData.map((reward, index) => {
+                    {farmData.rewardsData?.length > 0 &&
+                      farmData.rewardsData?.map((reward, index) => {
                         const rewardSymbol =
                           reward.address === process.env.REACT_APP_WHBAR_ADDRESS
                             ? NATIVE_TOKEN.symbol
@@ -248,7 +248,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                         <p className="text-subheader text-numeric">
                           {formatStringToPrice(
                             stripStringToFixedDecimals(
-                              farmData.userStakingData.stakedAmountUSD as string,
+                              farmData.userStakingData?.stakedAmountUSD as string,
                               2,
                             ),
                           )}
@@ -257,7 +257,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                           <span className="text-secondary text-main">
                             {formatStringETHtoPriceFormatted(
                               formatStringWeiToStringEther(
-                                farmData.userStakingData.stakedAmount || '0',
+                                farmData.userStakingData?.stakedAmount || '0',
                               ),
                             )}
                           </span>
@@ -357,7 +357,7 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                             ) : (
                               <>
                                 <div className="text-small">Estimated pending rewards:</div>
-                                {farmData.rewardsData.map((reward: IReward) => {
+                                {farmData.rewardsData?.map((reward: IReward) => {
                                   const userReward =
                                     farmData.userStakingData?.rewardsAccumulated?.find(
                                       (currReward: IRewardsAccumulated) =>

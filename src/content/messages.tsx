@@ -65,7 +65,7 @@ export const tokenPropsMessages: IStringToHTMLElement = {
 };
 
 export const generalFeesAndKeysWarning =
-  'Be careful. One or both tokens in the pool you wish to supply to have custom keys or fees. By the HTS standard, this means issuers have certain control over the token and can trigger events with its key, such as wipe balances, freeze accounts and more, or can charge extra fees upon transfers without asking permission. Only lock funds in pools you trust.';
+  'Be careful, оne or both tokens in this pool have custom token keys. By the HTS standard, this means issuers still have certain control over the token and can trigger events with its key, depending on key type. Only lock funds in pools you trust.';
 
 export const concatWarningMessage = (token: ITokenData) => {
   const { keys: tokenKeys, hasFees } = token;

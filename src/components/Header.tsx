@@ -5,6 +5,7 @@ import { Md5 } from 'ts-md5/dist/md5';
 
 import Button from './Button';
 import Modal from './Modal';
+import Icon from './Icon';
 import ConnectModalContent from './Modals/ConnectModalContent';
 import UserAccountModalContent from './Modals/UserAccountModalContent';
 
@@ -68,9 +69,21 @@ const Header = () => {
         <div className="d-flex align-items-center">
           {connected && userId ? (
             <>
+              <div>
+                <a
+                  className="d-flex align-items-center link"
+                  target="_blank"
+                  rel="noreferrer"
+                  href="https://hashport.network/"
+                >
+                  <Icon name="hashport" />
+                  <span className="ms-3 text-small">Hashport Bridge</span>
+                </a>
+              </div>
+              <span className="separator-header"></span>
               <div className="me-5">
                 <span className="text-small">
-                  HBAR price:{' '}
+                  HBAR Price:{' '}
                   <span className="text-numeric">
                     ${formatStringETHtoPriceFormatted(hbarPrice.toString(), 3)}
                   </span>
