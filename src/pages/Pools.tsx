@@ -7,7 +7,7 @@ import _ from 'lodash';
 import { GlobalContext } from '../providers/Global';
 
 import { PageViews } from '../interfaces/common';
-import { IPoolExtendedData } from '../interfaces/tokens';
+import { IPoolExtendedData, IPoolsAnalytics } from '../interfaces/tokens';
 
 import SearchArea from '../components/SearchArea';
 import AllPools from '../components/AllPools';
@@ -16,7 +16,6 @@ import RemoveLiquidity from '../components/RemoveLiquidity';
 import Icon from '../components/Icon';
 
 import { filterPoolsByPattern } from '../utils/poolUtils';
-import { formatStringToPrice } from '../utils/numberUtils';
 
 import usePoolsByUser from '../hooks/usePoolsByUser';
 import usePoolsByFilter from '../hooks/usePoolsByFilter';
@@ -32,12 +31,6 @@ import {
 
 interface IPoolsProps {
   itemsPerPage: number;
-}
-
-interface IPoolsAnalytics {
-  tvl: number;
-  volume24h: number;
-  volume7d: number;
 }
 
 const Pools = ({ itemsPerPage }: IPoolsProps) => {
@@ -231,27 +224,6 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
                   </Link>
                 ) : null}
               </div>
-
-              <div className="container-blue-neutral-800 d-flex rounded py-4 px-5 my-5">
-                <p className="text-small">
-                  <span className="text-gray">TVL:</span>{' '}
-                  <span className="text-numeric text-bold">
-                    {formatStringToPrice(poolsAnalytics.tvl.toString())}
-                  </span>
-                </p>
-                <p className="text-small ms-7">
-                  <span className="text-gray">Volume 24h:</span>{' '}
-                  <span className="text-numeric text-bold">
-                    {formatStringToPrice(poolsAnalytics.volume24h.toString())}
-                  </span>
-                </p>
-                <p className="text-small ms-7">
-                  <span className="text-gray">Volume 7d:</span>{' '}
-                  <span className="text-numeric text-bold">
-                    {formatStringToPrice(poolsAnalytics.volume7d.toString())}
-                  </span>
-                </p>
-              </div>
             </>
           ) : null}
 
@@ -269,6 +241,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
             <>
               {currentView === PageViews.ALL_POOLS ? (
                 <AllPools
+                  poolsAnalytics={poolsAnalytics}
                   loadingPools={loadingPools || filteredPoolsLoading}
                   itemsPerPage={itemsPerPage}
                   pools={poolsToShow}

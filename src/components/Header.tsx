@@ -77,13 +77,13 @@ const Header = () => {
                   href="https://hashport.network/"
                 >
                   <Icon name="hashport" />
-                  <span className="ms-3 text-small">Hashport bridge</span>
+                  <span className="ms-3 text-small">Hashport Bridge</span>
                 </a>
               </div>
               <span className="separator-header"></span>
               <div className="me-5">
                 <span className="text-small">
-                  HBAR price:{' '}
+                  HBAR Price:{' '}
                   <span className="text-numeric">
                     ${formatStringETHtoPriceFormatted(hbarPrice.toString(), 3)}
                   </span>
