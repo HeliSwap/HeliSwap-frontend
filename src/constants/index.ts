@@ -90,6 +90,12 @@ export const initialNeedApprovalData = {
   tokenB: true,
 };
 
+export const initialPoolsAnalyticsData = {
+  tvl: 0,
+  volume24h: 0,
+  volume7d: 0,
+};
+
 export const poolsPageInitialCurrentView: PageViews = PageViews.ALL_POOLS;
 
 export const useQueryOptions = {

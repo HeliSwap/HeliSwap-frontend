@@ -7,7 +7,7 @@ import _ from 'lodash';
 import { GlobalContext } from '../providers/Global';
 
 import { PageViews } from '../interfaces/common';
-import { IPoolExtendedData } from '../interfaces/tokens';
+import { IPoolExtendedData, IPoolsAnalytics } from '../interfaces/tokens';
 
 import SearchArea from '../components/SearchArea';
 import AllPools from '../components/AllPools';
@@ -26,6 +26,7 @@ import {
   poolsPageInitialCurrentView,
   useQueryOptionsPolling,
   useQueryOptions,
+  initialPoolsAnalyticsData,
 } from '../constants';
 
 interface IPoolsProps {
@@ -43,6 +44,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const [userPoolsToShow, setUserPoolsToShow] = useState<IPoolExtendedData[]>([]);
   const [havePools, setHavePools] = useState(false);
   const [haveUserPools, setHaveUserPools] = useState(false);
+  const [poolsAnalytics, setPoolsAnalytics] = useState(initialPoolsAnalyticsData);
 
   //Search area state
   const [inputValue, setInputValue] = useState('');
@@ -124,6 +126,26 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   useEffect(() => {
     setSearchingResults(false);
   }, [filteredPools]);
+
+  useEffect(() => {
+    const calculatePoolsTVL = (pools: IPoolExtendedData[]) => {
+      const allPoolsData = pools.reduce((acc: IPoolsAnalytics, currentPool: IPoolExtendedData) => {
+        const { tvl, volume24Num, volume7Num } = currentPool;
+
+        acc = {
+          tvl: acc.tvl + Number(tvl),
+          volume24h: acc.volume24h + Number(volume24Num),
+          volume7d: acc.volume7d + Number(volume7Num),
+        };
+
+        return acc;
+      }, initialPoolsAnalyticsData);
+
+      setPoolsAnalytics(allPoolsData);
+    };
+
+    pools && pools.length > 0 && calculatePoolsTVL(pools);
+  }, [pools]);
 
   // Render functions
   const renderEmptyPoolsState = (infoMessage: string) => (
@@ -219,6 +241,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
             <>
               {currentView === PageViews.ALL_POOLS ? (
                 <AllPools
+                  poolsAnalytics={poolsAnalytics}
                   loadingPools={loadingPools || filteredPoolsLoading}
                   itemsPerPage={itemsPerPage}
                   pools={poolsToShow}
