@@ -2,6 +2,8 @@ import { AccountId, Transaction, TransactionId } from '@hashgraph/sdk';
 import { HashConnect, HashConnectTypes, MessageTypes } from 'hashconnect';
 import { randomIntFromInterval } from '../utils/numberUtils';
 
+type NetworkType = 'testnet' | 'mainnet' | 'previewnet';
+
 class Hashconnect {
   hashconnect: HashConnect;
 
@@ -50,7 +52,11 @@ class Hashconnect {
     this.setUpHashConnectEvents();
 
     //initialize and use returned data
-    let initData = await this.hashconnect.init(this.appMetadata, 'testnet', false);
+    let initData = await this.hashconnect.init(
+      this.appMetadata,
+      process.env.REACT_APP_NETWORK_TYPE as NetworkType,
+      false,
+    );
 
     this.topic = initData.topic;
     this.pairingString = initData.pairingString;
@@ -120,7 +126,7 @@ class Hashconnect {
   async requestAccountInfo() {
     let request: MessageTypes.AdditionalAccountRequest = {
       topic: this.topic,
-      network: 'mainnet',
+      network: process.env.REACT_APP_NETWORK_TYPE as NetworkType,
       multiAccount: true,
     };
 
