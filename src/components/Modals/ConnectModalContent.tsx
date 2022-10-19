@@ -33,7 +33,8 @@ const ConnectModalContent = ({
   };
 
   const handleCopyButtonClick = () => {
-    navigator.clipboard.writeText(hashconnectConnectorInstance.saveData.pairingString);
+    console.log('hashconnectConnectorInstance', hashconnectConnectorInstance);
+    navigator.clipboard.writeText(hashconnectConnectorInstance.pairingString);
   };
 
   return (
@@ -75,7 +76,7 @@ const ConnectModalContent = ({
               </div>
               <span className="icon-hashpack"></span>
             </div>
-            {hashconnectConnectorInstance && hashconnectConnectorInstance.saveData ? (
+            {hashconnectConnectorInstance && hashconnectConnectorInstance ? (
               <>
                 <p className="text-small text-bold mt-4 mb-4">Connect With Code</p>
                 <div className="d-flex align-items-center" onClick={() => handleCopyButtonClick()}>
@@ -88,7 +89,7 @@ const ConnectModalContent = ({
                 <div className="d-flex justify-content-center">
                   <QRCodeSVG
                     size={200}
-                    value={hashconnectConnectorInstance.saveData.pairingString}
+                    value={hashconnectConnectorInstance.pairingString}
                     includeMargin={true}
                   />
                 </div>
