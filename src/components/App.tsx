@@ -30,7 +30,7 @@ function App() {
               <div className="main">
                 <div className="flex-1">
                   <Header />
-                  <div className="container py-5 py-lg-7">
+                  <div className="container py-4 py-lg-7">
                     <Routes>
                       <Route path="/" element={<Swap />} />
                       <Route path="/:token0/:token1" element={<Swap />} />
