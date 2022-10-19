@@ -513,6 +513,14 @@ const Swap = () => {
         setApproved(false);
         refetch();
         toast.success('Success! Tokens were swapped.');
+
+        const newBalanceTokenA = await getTokenBalance(userId, tokensData.tokenA);
+        const newBalanceTokenB = await getTokenBalance(userId, tokensData.tokenB);
+
+        setTokenBalances({
+          tokenA: newBalanceTokenA,
+          tokenB: newBalanceTokenB,
+        });
       }
     } catch (err) {
       console.error(`[Error on swap]: ${err}`);
