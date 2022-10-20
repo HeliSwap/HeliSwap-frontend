@@ -55,7 +55,7 @@ const FarmDetails = () => {
     tokensWhitelistedAddresses,
   );
 
-  const { farm: farmData, loading: loadingFarmData } = useFarmByAddress(
+  const { farm: farmData, processingFarms } = useFarmByAddress(
     useQueryOptions,
     userId,
     pools,
@@ -147,7 +147,7 @@ const FarmDetails = () => {
 
   return isHashpackLoading ? (
     <Loader />
-  ) : loadingFarmData ? (
+  ) : processingFarms ? (
     <Loader />
   ) : haveFarm ? (
     <div className="d-flex justify-content-center">

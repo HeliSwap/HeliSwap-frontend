@@ -2,16 +2,15 @@ import { useContext, useEffect, useState } from 'react';
 import { GlobalContext } from '../providers/Global';
 
 import { QueryHookOptions, useQuery } from '@apollo/client';
-import { GET_FARMS } from '../GraphQL/Queries';
+import { GET_FARM_BY_ADDRESS } from '../GraphQL/Queries';
 
-import { IFarmData, IFarmDataRaw, IPoolData } from '../interfaces/tokens';
+import { IFarmData, IPoolData } from '../interfaces/tokens';
 
 import { getProcessedFarms } from '../utils/farmUtils';
 import { idToAddress } from '../utils/tokenUtils';
 
 import { REFRESH_TIME } from '../constants';
 
-//This hook to be modified when getFarmByAddress query is implemented on the BE side
 const useFarmByAddress = (
   useQueryOptions: QueryHookOptions = {},
   userId: string,
@@ -21,46 +20,43 @@ const useFarmByAddress = (
   const contextValue = useContext(GlobalContext);
   const { hbarPrice } = contextValue;
 
-  const [farmRaw, setFarmRaw] = useState<IFarmDataRaw>({} as IFarmDataRaw);
+  const [processingFarms, setProcessingFarms] = useState<boolean>(true);
   const [farm, setFarm] = useState<IFarmData>({} as IFarmData);
 
-  const address = userId ? idToAddress(userId) : '';
+  const userAddress = userId ? idToAddress(userId) : '';
 
-  const { loading, data, error, startPolling, stopPolling } = useQuery(GET_FARMS, {
-    variables: { address },
+  const { loading, data, error } = useQuery(GET_FARM_BY_ADDRESS, {
+    variables: { address: farmAddress, eoaAddress: userAddress },
     ...useQueryOptions,
     skip: !farmAddress,
+    pollInterval: useQueryOptions.pollInterval || REFRESH_TIME,
   });
 
   useEffect(() => {
-    const getFarmsData = () => {
-      const { getCampaignData } = data;
-      if (getCampaignData && getCampaignData.length > 0) {
-        const farmRaw = getCampaignData.find(
-          (currFarm: IFarmDataRaw) => currFarm.address === farmAddress,
-        );
-        setFarmRaw(farmRaw);
+    const getFarmData = () => {
+      const { getFarmDataByAddress } = data;
+      if (
+        getFarmDataByAddress &&
+        Object.keys(getFarmDataByAddress).length > 0 &&
+        pools.length &&
+        hbarPrice !== 0
+      ) {
+        const processedFarm = getProcessedFarms([getFarmDataByAddress], pools, hbarPrice);
+        setFarm(processedFarm[0]);
+        setProcessingFarms(false);
       }
     };
 
-    data && getFarmsData();
-  }, [data, farmAddress]);
+    data && getFarmData();
+  }, [data, farmAddress, pools, hbarPrice]);
 
   useEffect(() => {
-    startPolling(useQueryOptions.pollInterval || REFRESH_TIME);
-    return () => {
-      stopPolling();
-    };
-  }, [startPolling, stopPolling, useQueryOptions]);
-
-  useEffect(() => {
-    if (farmRaw && Object.keys(farmRaw).length !== 0 && pools.length && hbarPrice !== 0) {
-      const processedFarm = getProcessedFarms([farmRaw], pools, hbarPrice);
-      setFarm(processedFarm[0]);
+    if (!loading && error) {
+      setProcessingFarms(false);
     }
-  }, [farmRaw, pools, hbarPrice]);
+  }, [loading, error]);
 
-  return { farm, loading, error };
+  return { farm, loading, error, processingFarms };
 };
 
 export default useFarmByAddress;
