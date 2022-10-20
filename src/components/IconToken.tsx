@@ -20,6 +20,7 @@ import CLXY from '../icons/tokens/CLXY.png';
 import DOVU from '../icons/tokens/DOVU.png';
 import CREAM from '../icons/tokens/CREAM.svg';
 import JAM from '../icons/tokens/JAM.png';
+import QUACK from '../icons/tokens/QUACK.png';
 
 interface IIconTokenProps {
   symbol: string;
@@ -58,6 +59,7 @@ const tokenMapping: ITokenMapping = {
   'DOV[hts]': DOVU,
   CREAM: CREAM,
   JAM: JAM,
+  QUACK: QUACK,
   LP: LP,
 };
 
