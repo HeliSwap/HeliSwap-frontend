@@ -34,14 +34,14 @@ const useFarmByAddress = (
 
   useEffect(() => {
     const getFarmData = () => {
-      const { getFarmDataByAddress } = data;
+      const { getFarmDetails } = data;
       if (
-        getFarmDataByAddress &&
-        Object.keys(getFarmDataByAddress).length > 0 &&
+        getFarmDetails &&
+        Object.keys(getFarmDetails).length > 0 &&
         pools.length &&
         hbarPrice !== 0
       ) {
-        const processedFarm = getProcessedFarms([getFarmDataByAddress], pools, hbarPrice);
+        const processedFarm = getProcessedFarms([getFarmDetails], pools, hbarPrice);
         setFarm(processedFarm[0]);
         setProcessingFarms(false);
       }
