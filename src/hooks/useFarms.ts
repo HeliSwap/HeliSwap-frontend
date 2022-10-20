@@ -27,8 +27,8 @@ const useFarms = (useQueryOptions: QueryHookOptions = {}, userId: string, pools:
 
   useEffect(() => {
     const getFarmsData = () => {
-      const { getCampaignData } = data;
-      getCampaignData && getCampaignData.length > 0 && setFarmsRaw(getCampaignData);
+      const { getFarmsData } = data;
+      getFarmsData && getFarmsData.length > 0 && setFarmsRaw(getFarmsData);
     };
 
     data && getFarmsData();
