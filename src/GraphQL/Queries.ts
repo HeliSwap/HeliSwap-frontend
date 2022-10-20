@@ -201,8 +201,8 @@ export const GET_TOKENS_WHITELISTED = gql`
 `;
 
 export const GET_FARMS = gql`
-  query getFarmsData($address: String!) {
-    getFarmsData(eoaAddress: $address) {
+  query getFarmsOverview($userAddress: String!) {
+    getFarmsOverview(userAddress: $userAddress) {
       address
       totalStaked
       stakingTokenAddress
@@ -239,10 +239,10 @@ export const GET_FARMS = gql`
     }
   }
 `;
-
+//TODO: check parameters names
 export const GET_FARM_BY_ADDRESS = gql`
-  query getFarmDataByAddress($address: String!, $eoaAddress: String!) {
-    getFarmDataByAddress(address: $address, eoaAddress: $eoaAddress) {
+  query getFarmDetails($address: String!, $eoaAddress: String!) {
+    getFarmDetails(address: $address, eoaAddress: $eoaAddress) {
       address
       totalStaked
       stakingTokenAddress

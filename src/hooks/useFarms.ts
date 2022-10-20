@@ -18,17 +18,17 @@ const useFarms = (useQueryOptions: QueryHookOptions = {}, userId: string, pools:
   const [farmsRaw, setFarmsRaw] = useState<IFarmDataRaw[]>([]);
   const [farms, setFarms] = useState<IFarmData[]>([]);
 
-  const address = userId ? idToAddress(userId) : '';
+  const userAddress = userId ? idToAddress(userId) : '';
 
   const { loading, data, error, startPolling, stopPolling } = useQuery(GET_FARMS, {
-    variables: { address },
+    variables: { userAddress },
     ...useQueryOptions,
   });
 
   useEffect(() => {
     const getFarmsData = () => {
-      const { getFarmsData } = data;
-      getFarmsData && getFarmsData.length > 0 && setFarmsRaw(getFarmsData);
+      const { getFarmsOverview } = data;
+      getFarmsOverview && getFarmsOverview.length > 0 && setFarmsRaw(getFarmsOverview);
     };
 
     data && getFarmsData();
