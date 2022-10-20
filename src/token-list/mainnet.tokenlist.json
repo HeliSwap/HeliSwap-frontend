@@ -129,6 +129,14 @@
       "symbol": "JAM",
       "decimals": 8,
       "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/JAM.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x00000000000000000000000000000000001139fd",
+      "name": "QUACK",
+      "symbol": "QUACK",
+      "decimals": 0,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/QUACK.png"
     }
   ]
 }
