@@ -68,7 +68,7 @@ import {
   initialCreateData,
   initialApproveData,
   initialNeedApprovalData,
-  useQueryOptionsPolling,
+  useQueryOptionsProvideSwapRemove,
   useQueryOptions,
 } from '../constants';
 
@@ -148,7 +148,7 @@ const Create = () => {
 
   //Get pools by token A
   const { filteredPools: poolsData } = usePoolsByToken(
-    useQueryOptionsPolling,
+    useQueryOptionsProvideSwapRemove,
     tokensData.tokenA.address || (process.env.REACT_APP_WHBAR_ADDRESS as string),
     false,
   );

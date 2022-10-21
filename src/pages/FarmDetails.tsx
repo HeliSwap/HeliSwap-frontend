@@ -31,7 +31,7 @@ import { timestampToDate } from '../utils/timeUtils';
 import { NATIVE_TOKEN } from '../utils/tokenUtils';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import useFarmByAddress from '../hooks/useFarmByAddress';
-import { useQueryOptions, useQueryOptionsPolling } from '../constants';
+import { useQueryOptionsPoolsFarms } from '../constants';
 import Loader from '../components/Loader';
 
 const FarmDetails = () => {
@@ -50,13 +50,13 @@ const FarmDetails = () => {
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
 
   const { poolsByTokenList: pools } = usePoolsByTokensList(
-    useQueryOptionsPolling,
+    useQueryOptionsPoolsFarms,
     true,
     tokensWhitelistedAddresses,
   );
 
   const { farm: farmData, processingFarms } = useFarmByAddress(
-    useQueryOptions,
+    useQueryOptionsPoolsFarms,
     userId,
     pools,
     campaignAddress || '',

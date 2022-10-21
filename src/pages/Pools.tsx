@@ -24,7 +24,8 @@ import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import {
   ASYNC_SEARCH_THRESHOLD,
   poolsPageInitialCurrentView,
-  useQueryOptionsPolling,
+  useQueryOptionsPoolsFarms,
+  useQueryOptionsProvideSwapRemove,
   useQueryOptions,
   initialPoolsAnalyticsData,
 } from '../constants';
@@ -58,7 +59,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     poolsByTokenList: pools,
     loadingPoolsByTokenList: loadingPools,
     errorPoolsByTokenList: errorPoools,
-  } = usePoolsByTokensList(useQueryOptionsPolling, true, tokensWhitelistedAddresses);
+  } = usePoolsByTokensList(useQueryOptionsPoolsFarms, true, tokensWhitelistedAddresses);
 
   const { filteredPools, filteredPoolsLoading, loadExtraPools } = usePoolsByFilter(
     useQueryOptions,
@@ -70,7 +71,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     error: errorPooolsByUser,
     loading: loadingPoolsByUser,
     poolsByUser,
-  } = usePoolsByUser(useQueryOptionsPolling, userId, pools);
+  } = usePoolsByUser(useQueryOptionsProvideSwapRemove, userId, pools);
 
   const searchFunc = useMemo(
     () => (value: string) => {
