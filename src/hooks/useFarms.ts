@@ -4,7 +4,7 @@ import { GlobalContext } from '../providers/Global';
 import { QueryHookOptions, useQuery } from '@apollo/client';
 import { GET_FARMS } from '../GraphQL/Queries';
 
-import { IFarmData, IFarmDataRaw, IPoolData } from '../interfaces/tokens';
+import { IFarmData, IPoolData } from '../interfaces/tokens';
 
 import { getProcessedFarms } from '../utils/farmUtils';
 import { idToAddress } from '../utils/tokenUtils';
@@ -15,7 +15,7 @@ const useFarms = (useQueryOptions: QueryHookOptions = {}, userId: string, pools:
   const contextValue = useContext(GlobalContext);
   const { hbarPrice } = contextValue;
 
-  const [farmsRaw, setFarmsRaw] = useState<IFarmDataRaw[]>([]);
+  const [processingFarms, setProcessingFarms] = useState<boolean>(true);
   const [farms, setFarms] = useState<IFarmData[]>([]);
 
   const userAddress = userId ? idToAddress(userId) : '';
@@ -28,11 +28,26 @@ const useFarms = (useQueryOptions: QueryHookOptions = {}, userId: string, pools:
   useEffect(() => {
     const getFarmsData = () => {
       const { getFarmsOverview } = data;
-      getFarmsOverview && getFarmsOverview.length > 0 && setFarmsRaw(getFarmsOverview);
+
+      if (getFarmsOverview && getFarmsOverview.length > 0 && pools.length && hbarPrice !== 0) {
+        try {
+          const processedFarms = getProcessedFarms(getFarmsOverview, pools, hbarPrice);
+          setFarms(processedFarms);
+        } catch (e) {
+          console.error('Erron while processing campaigns data');
+        } finally {
+          setProcessingFarms(false);
+        }
+      }
     };
 
     data && getFarmsData();
-  }, [data]);
+  }, [data, pools, hbarPrice]);
+  useEffect(() => {
+    if (!loading && (error || !data.getFarmsOverview || data?.getFarmsOverview?.length === 0)) {
+      setProcessingFarms(false);
+    }
+  }, [loading, data, error]);
 
   useEffect(() => {
     startPolling(useQueryOptions.pollInterval || REFRESH_TIME);
@@ -41,14 +56,7 @@ const useFarms = (useQueryOptions: QueryHookOptions = {}, userId: string, pools:
     };
   }, [startPolling, stopPolling, useQueryOptions]);
 
-  useEffect(() => {
-    if (farmsRaw.length > 0 && pools.length && hbarPrice !== 0) {
-      const processedFarms = getProcessedFarms(farmsRaw, pools, hbarPrice);
-      setFarms(processedFarms);
-    }
-  }, [farmsRaw, pools, hbarPrice]);
-
-  return { farms, loading, error };
+  return { farms, loading, error, processingFarms };
 };
 
 export default useFarms;

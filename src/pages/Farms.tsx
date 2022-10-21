@@ -48,7 +48,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
     tokensWhitelistedAddresses,
   );
 
-  const { farms, loading: loadingFarms } = useFarms(useQueryOptions, userId, pools);
+  const { farms, processingFarms } = useFarms(useQueryOptions, userId, pools);
 
   const sortFarms = useMemo(
     () => (farmA: IFarmData, farmB: IFarmData, direction: SORT_DIRECTION) => {
@@ -114,7 +114,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
 
         <hr />
 
-        {loadingFarms ? (
+        {processingFarms ? (
           <div className="d-flex justify-content-center my-6">
             <Loader />
           </div>

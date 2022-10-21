@@ -41,9 +41,15 @@ const useFarmByAddress = (
         pools.length &&
         hbarPrice !== 0
       ) {
-        const processedFarm = getProcessedFarms([getFarmDetails], pools, hbarPrice);
-        setFarm(processedFarm[0]);
-        setProcessingFarms(false);
+        try {
+          const processedFarm = getProcessedFarms([getFarmDetails], pools, hbarPrice);
+          setFarm(processedFarm[0]);
+          setProcessingFarms(false);
+        } catch (error) {
+          console.error('Error while processing campaign data');
+        } finally {
+          setProcessingFarms(false);
+        }
       }
     };
 
@@ -51,10 +57,13 @@ const useFarmByAddress = (
   }, [data, farmAddress, pools, hbarPrice]);
 
   useEffect(() => {
-    if (!loading && error) {
+    if (
+      !loading &&
+      (error || !data.getFarmDetails || Object.keys(data.getFarmDetails).length !== 0)
+    ) {
       setProcessingFarms(false);
     }
-  }, [loading, error]);
+  }, [loading, error, data]);
 
   return { farm, loading, error, processingFarms };
 };
