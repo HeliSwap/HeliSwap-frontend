@@ -101,7 +101,7 @@ export const getProcessedFarms = (
       const userStakedFormatted = formatStringWeiToStringEther(userStakingData.stakedAmount || '0');
 
       const rewardsProcessed =
-        userStakingData?.rewardsAccumulated!.length > 0
+        userStakingData?.rewardsAccumulated && userStakingData?.rewardsAccumulated!.length > 0
           ? userStakingData?.rewardsAccumulated!.map(reward => {
               const rewardValueUSD = getTokenPrice(pools, reward.address, hbarPrice);
               const rewardAmountWei = reward.totalAccumulated;
