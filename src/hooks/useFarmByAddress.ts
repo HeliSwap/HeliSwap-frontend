@@ -25,11 +25,10 @@ const useFarmByAddress = (
 
   const userAddress = userId ? idToAddress(userId) : '';
 
-  const { loading, data, error } = useQuery(GET_FARM_BY_ADDRESS, {
+  const { loading, data, error, startPolling, stopPolling } = useQuery(GET_FARM_BY_ADDRESS, {
     variables: { farmAddress, userAddress },
     ...useQueryOptions,
     skip: !farmAddress,
-    pollInterval: useQueryOptions.pollInterval || REFRESH_TIME,
   });
 
   useEffect(() => {
@@ -59,11 +58,18 @@ const useFarmByAddress = (
   useEffect(() => {
     if (
       !loading &&
-      (error || !data.getFarmDetails || Object.keys(data.getFarmDetails).length !== 0)
+      (error || !data.getFarmDetails || Object.keys(data.getFarmDetails).length === 0)
     ) {
       setProcessingFarms(false);
     }
   }, [loading, error, data]);
+
+  useEffect(() => {
+    startPolling(useQueryOptions.pollInterval || REFRESH_TIME);
+    return () => {
+      stopPolling();
+    };
+  }, [startPolling, stopPolling, useQueryOptions]);
 
   return { farm, loading, error, processingFarms };
 };
