@@ -201,8 +201,48 @@ export const GET_TOKENS_WHITELISTED = gql`
 `;
 
 export const GET_FARMS = gql`
-  query getCampaignData($address: String!) {
-    getCampaignData(eoaAddress: $address) {
+  query getFarmsOverview($userAddress: String!) {
+    getFarmsOverview(userAddress: $userAddress) {
+      address
+      totalStaked
+      stakingTokenAddress
+      rewardsData {
+        address
+        symbol
+        decimals
+        rewardEnd
+        totalAmount
+        duration
+      }
+      userStakingData {
+        stakedAmount
+        rewardsAccumulated {
+          address
+          totalAccumulated
+        }
+      }
+      poolData {
+        pairSymbol
+        pairAddress
+        pairName
+        pairSupply
+        lpShares
+        token0
+        token0Amount
+        token0Decimals
+        token0Symbol
+        token1
+        token1Amount
+        token1Decimals
+        token1Symbol
+      }
+    }
+  }
+`;
+//TODO: check parameters names
+export const GET_FARM_BY_ADDRESS = gql`
+  query getFarmDetails($farmAddress: String!, $userAddress: String!) {
+    getFarmDetails(farmAddress: $farmAddress, userAddress: $userAddress) {
       address
       totalStaked
       stakingTokenAddress
