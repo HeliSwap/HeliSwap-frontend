@@ -241,8 +241,8 @@ export const GET_FARMS = gql`
 `;
 //TODO: check parameters names
 export const GET_FARM_BY_ADDRESS = gql`
-  query getFarmDetails($address: String!, $eoaAddress: String!) {
-    getFarmDetails(address: $address, eoaAddress: $eoaAddress) {
+  query getFarmDetails($farmAddress: String!, $userAddress: String!) {
+    getFarmDetails(farmAddress: $farmAddress, userAddress: $userAddress) {
       address
       totalStaked
       stakingTokenAddress
