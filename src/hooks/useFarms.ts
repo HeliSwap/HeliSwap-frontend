@@ -34,7 +34,7 @@ const useFarms = (useQueryOptions: QueryHookOptions = {}, userId: string, pools:
           const processedFarms = getProcessedFarms(getFarmsOverview, pools, hbarPrice);
           setFarms(processedFarms);
         } catch (e) {
-          console.error('Erron while processing campaigns data');
+          console.error('Error while processing campaigns data');
         } finally {
           setProcessingFarms(false);
         }

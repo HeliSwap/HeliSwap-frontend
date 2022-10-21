@@ -18,8 +18,7 @@ import {
   SORT_DIRECTION,
   SORT_OPTIONS,
   SORT_OPTIONS_ENUM,
-  useQueryOptions,
-  useQueryOptionsPolling,
+  useQueryOptionsPoolsFarms,
 } from '../constants';
 import BigNumber from 'bignumber.js';
 
@@ -43,12 +42,12 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
   const [farmsSortBy] = useState<SORT_OPTIONS>(SORT_OPTIONS_ENUM.APR);
 
   const { poolsByTokenList: pools } = usePoolsByTokensList(
-    useQueryOptionsPolling,
+    useQueryOptionsPoolsFarms,
     true,
     tokensWhitelistedAddresses,
   );
 
-  const { farms, processingFarms } = useFarms(useQueryOptions, userId, pools);
+  const { farms, processingFarms } = useFarms(useQueryOptionsPoolsFarms, userId, pools);
 
   const sortFarms = useMemo(
     () => (farmA: IFarmData, farmB: IFarmData, direction: SORT_DIRECTION) => {
