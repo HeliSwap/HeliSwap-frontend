@@ -26,7 +26,7 @@ const useFarmByAddress = (
   const userAddress = userId ? idToAddress(userId) : '';
 
   const { loading, data, error } = useQuery(GET_FARM_BY_ADDRESS, {
-    variables: { address: farmAddress, eoaAddress: userAddress },
+    variables: { farmAddress, userAddress },
     ...useQueryOptions,
     skip: !farmAddress,
     pollInterval: useQueryOptions.pollInterval || REFRESH_TIME,
