@@ -25,7 +25,7 @@ import { client, fetchPoolChartData } from '../../../hooks/useUniswapChartData';
 import {
   ASYNC_SEARCH_THRESHOLD,
   useQueryOptions,
-  useQueryOptionsPolling,
+  useQueryOptionsProvideSwapRemove,
 } from '../../../constants';
 
 const Overview = () => {
@@ -44,7 +44,7 @@ const Overview = () => {
     poolsByTokenList: pools,
     loadingPoolsByTokenList: loadingPools,
     errorPoolsByTokenList: errorPools,
-  } = usePoolsByTokensList(useQueryOptionsPolling, true, tokensWhitelistedAddresses);
+  } = usePoolsByTokensList(useQueryOptionsProvideSwapRemove, true, tokensWhitelistedAddresses);
   const { filteredPools, filteredPoolsLoading } = usePoolsByFilter(useQueryOptions, true, pools);
 
   // Merge whitelisted and pools by filter arrays
