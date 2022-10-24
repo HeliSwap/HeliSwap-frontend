@@ -32,8 +32,8 @@ export const tokenPropsMessages: IStringToHTMLElement = {
   ),
   pauseKey: (
     <span>
-      <span className="text-bold">Pause Key</span> - The key which can sign to freeze or unfreeze an
-      account for token transactions. If empty, freezing is not possible.
+      <span className="text-bold">Pause Key</span> - The key that has the authority to pause or
+      unpause a token. Pausing a token prevents the token from participating in all transactions.
     </span>
   ),
   supplyKey: (
