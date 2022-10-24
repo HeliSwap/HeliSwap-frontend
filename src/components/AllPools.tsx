@@ -41,6 +41,7 @@ const AllPools = ({
   const [currentItems, setCurrentItems] = useState<IPoolExtendedData[]>([]);
   const [pageCount, setPageCount] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
 
   const handleSortClick = (sortBy: SORT_OPTIONS) => {
     setCollapseAll(true);
@@ -75,12 +76,19 @@ const AllPools = ({
       sortPools(a[poolsSortBy as string], b[poolsSortBy as string], sortDirection),
     );
 
-    setCurrentItems(sortedPoolsToShow.slice(itemOffset, endOffset));
+    if (pools.length < itemOffset) {
+      setCurrentItems(sortedPoolsToShow.slice(0, itemsPerPage));
+      setCurrentPage(0);
+      setItemOffset(0);
+    } else {
+      setCurrentItems(sortedPoolsToShow.slice(itemOffset, endOffset));
+    }
     setPageCount(Math.ceil(sortedPoolsToShow.length / itemsPerPage));
   }, [itemOffset, itemsPerPage, poolsSortBy, sortDirection, pools]);
 
   const handlePageClick = (event: any) => {
     setCollapseAll(true);
+    setCurrentPage(event.selected);
 
     const newOffset = (event.selected * itemsPerPage) % pools.length;
     setItemOffset(newOffset);
@@ -168,6 +176,7 @@ const AllPools = ({
 
       <div className="d-flex justify-content-center mt-4">
         <ReactPaginate
+          forcePage={currentPage}
           breakLabel="..."
           onPageChange={handlePageClick}
           pageRangeDisplayed={5}
