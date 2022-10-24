@@ -40,6 +40,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [sortDirection] = useState<SORT_DIRECTION>(SORT_DIRECTION.DESC);
   const [farmsSortBy] = useState<SORT_OPTIONS>(SORT_OPTIONS_ENUM.APR);
+  const [showOnlyStaked, setShowOnlyStaked] = useState<boolean>(false);
 
   const { poolsByTokenList: pools } = usePoolsByTokensList(
     useQueryOptionsPoolsFarms,
@@ -94,11 +95,20 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
     const sortedOtherCampaigns = [...otherCampaigns].sort((a: IFarmData, b: IFarmData) =>
       sortFarms(a, b, sortDirection),
     );
-    const sortedFarms = sortedUserCampaigns.concat(sortedOtherCampaigns);
 
-    setCurrentItems(sortedFarms.slice(itemOffset, endOffset));
+    const sortedFarms: IFarmData[] = showOnlyStaked
+      ? sortedUserCampaigns
+      : sortedUserCampaigns.concat(sortedOtherCampaigns);
+
+    if (sortedFarms.length < itemOffset) {
+      setCurrentItems(sortedFarms.slice(0, itemsPerPage));
+      setCurrentPage(0);
+      setItemOffset(0);
+    } else {
+      setCurrentItems(sortedFarms.slice(itemOffset, endOffset));
+    }
     setPageCount(Math.ceil(sortedFarms.length / itemsPerPage));
-  }, [itemOffset, itemsPerPage, farms, sortDirection, farmsSortBy, sortFarms]);
+  }, [itemOffset, itemsPerPage, farms, sortDirection, farmsSortBy, sortFarms, showOnlyStaked]);
 
   const haveFarms = farms.length > 0;
 
@@ -108,6 +118,18 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
         <div className="d-flex justify-content-between align-items-center mb-4">
           <div className="d-flex">
             <h2 className={`text-subheader tab-title is-active mx-4 `}>Farms</h2>
+          </div>
+          <div className="form-check form-switch">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id="flexSwitchCheckChecked"
+              checked={showOnlyStaked}
+              onChange={() => setShowOnlyStaked(!showOnlyStaked)}
+            />
+            <label className="form-check-label" htmlFor="flexSwitchCheckChecked">
+              Show only staked
+            </label>
           </div>
         </div>
 
