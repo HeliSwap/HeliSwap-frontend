@@ -32,14 +32,14 @@ export const tokenPropsMessages: IStringToHTMLElement = {
   ),
   pauseKey: (
     <span>
-      <span className="text-bold">Pause Key</span> - The key which can sign to freeze or unfreeze an
-      account for token transactions. If empty, freezing is not possible.
+      <span className="text-bold">Pause Key</span> - The key that has the authority to pause or
+      unpause a token. Pausing a token prevents the token from participating in all transactions.
     </span>
   ),
   supplyKey: (
     <span>
       <span className="text-bold">Supply Key</span> - A Supply key is set and the supply operator
-      has special privileges that may result in Manipulating the Pair reserves, thus changing the
+      has special privileges that may result in manipulating the Pair reserves, thus changing the
       exchange rate and disrupting the Pool. Liquidity providers may suffer from great impermanent
       loss.
     </span>
@@ -47,9 +47,9 @@ export const tokenPropsMessages: IStringToHTMLElement = {
   wipeKey: (
     <span>
       <span className="text-bold">Wipe Key</span> - The key which can wipe the token balance of an
-      account. If empty, wipe is not possible Problem Wipe key can perform TokenWipe transactions.
-      If a user has balance of HTS token and TokenWipe is executed, his token balance will be burned
-      by the amount specified in the wipe operation without requesting permissions from the user.
+      account. If empty, wipe is not possible. Wipe key could perform TokenWipe transactions. If a
+      user has balance of HTS token and TokenWipe is executed, his token balance will be burned by
+      the amount specified in the wipe operation without requesting permissions from the user.
     </span>
   ),
 

@@ -5,7 +5,7 @@ name: Deploy to Firebase Hosting on merge Production
 env:
   CI: false
   REACT_APP_MIRROR_NODE_URL: https://mainnet-public.mirrornode.hedera.com
-  REACT_APP_TOKEN_LIST_URL: https://heliswap.infura-ipfs.io/ipfs/QmcUU2knS4kbZQ49TBpUeJCokJznAJKaVh6x5fkC2pKzfF
+  REACT_APP_TOKEN_LIST_URL: https://heliswap.infura-ipfs.io/ipfs/QmPuGdL54tqq4vPx15k7tLh2rzwJTRXBNYi92PJnrr39pY
   REACT_APP_NETWORK_TYPE: mainnet
   REACT_APP_GRAPHQL_URI: https://heliswap-prod-362307.oa.r.appspot.com/query
 'on':

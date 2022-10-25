@@ -69,7 +69,7 @@ import {
   ASYNC_SEARCH_THRESHOLD,
   initialTokensDataSwap,
   initialSwapData,
-  useQueryOptionsPolling,
+  useQueryOptionsProvideSwapRemove,
   useQueryOptions,
 } from '../constants';
 
@@ -150,18 +150,18 @@ const Swap = () => {
     poolsByTokenList: whitelistedPoolsData,
     loadingPoolsByTokenList: loadingPools,
     refetchPoolsByTokenList: refetch,
-  } = usePoolsByTokensList(useQueryOptionsPolling, false, tokensWhitelistedIds);
+  } = usePoolsByTokensList(useQueryOptionsProvideSwapRemove, false, tokensWhitelistedIds);
 
   //Get pools by token A
   const { filteredPools: filteredPoolsDataTokenA } = usePoolsByToken(
-    useQueryOptionsPolling,
+    useQueryOptionsProvideSwapRemove,
     tokensData.tokenA.address || (process.env.REACT_APP_WHBAR_ADDRESS as string),
     false,
   );
 
   //Get pools by token B
   const { filteredPools: filteredPoolsDataTokenB } = usePoolsByToken(
-    useQueryOptionsPolling,
+    useQueryOptionsProvideSwapRemove,
     tokensData.tokenB.address || (process.env.REACT_APP_WHBAR_ADDRESS as string),
     true,
   );
@@ -513,6 +513,14 @@ const Swap = () => {
         setApproved(false);
         refetch();
         toast.success('Success! Tokens were swapped.');
+
+        const newBalanceTokenA = await getTokenBalance(userId, tokensData.tokenA);
+        const newBalanceTokenB = await getTokenBalance(userId, tokensData.tokenB);
+
+        setTokenBalances({
+          tokenA: newBalanceTokenA,
+          tokenB: newBalanceTokenB,
+        });
       }
     } catch (err) {
       console.error(`[Error on swap]: ${err}`);

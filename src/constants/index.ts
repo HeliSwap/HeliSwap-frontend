@@ -10,6 +10,8 @@ export const MAX_UINT_HTS = 15908979783.594148;
 export const POOLS_FEE = '0.3%';
 export const HUNDRED_BN = new BigNumber('100');
 export const REFRESH_TIME = 10000;
+export const REFRESH_TIME_PROVIDE_SWAP_REMOVE = 10000;
+export const REFRESH_TIME_POOLS_FARMS = 30000;
 export const HEALTH_CHECK_INTERVAL = 10000;
 export const BALLANCE_FETCH_INTERVAL = 60000;
 export const SLIDER_INITIAL_VALUE = '100';
@@ -102,7 +104,12 @@ export const useQueryOptions = {
   fetchPolicy: 'network-only' as WatchQueryFetchPolicy,
 };
 
-export const useQueryOptionsPolling = {
+export const useQueryOptionsProvideSwapRemove = {
   fetchPolicy: 'network-only' as WatchQueryFetchPolicy,
-  pollInterval: REFRESH_TIME,
+  pollInterval: REFRESH_TIME_PROVIDE_SWAP_REMOVE,
+};
+
+export const useQueryOptionsPoolsFarms = {
+  fetchPolicy: 'network-only' as WatchQueryFetchPolicy,
+  pollInterval: REFRESH_TIME_POOLS_FARMS,
 };

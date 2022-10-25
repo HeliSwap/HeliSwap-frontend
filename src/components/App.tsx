@@ -11,6 +11,7 @@ import Pools from '../pages/Pools';
 import Farms from '../pages/Farms';
 import Tokens from '../pages/Tokens';
 import Styleguide from '../pages/Styleguide';
+import FarmDetails from '../pages/FarmDetails';
 
 import Header from './Header';
 import Footer from './Footer';
@@ -44,6 +45,7 @@ function App() {
                         <Route path="create/:token0/:token1" element={<Create />} />
                         <Route path="pools" element={<Pools itemsPerPage={10} />} />
                         <Route path="farms" element={<Farms itemsPerPage={10} />} />
+                        <Route path="farms/:campaignAddress" element={<FarmDetails />} />
                         <Route path="tokens" element={<Tokens />} />
                         <Route path="styleguide" element={<Styleguide />} />
                       </Routes>

@@ -1,20 +1,21 @@
 import React, { useContext, useMemo, useState } from 'react';
 import Tippy from '@tippyjs/react';
 import toast from 'react-hot-toast';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import { GlobalContext } from '../providers/Global';
 
-import { IFarmData, IReward, IRewardsAccumulated, IUserStakingData } from '../interfaces/tokens';
+import { IReward, IRewardsAccumulated, IUserStakingData } from '../interfaces/tokens';
 
-import Icon from './Icon';
-import IconToken from './IconToken';
-import PageHeader from './PageHeader';
-import Button from './Button';
-import ToasterWrapper from './ToasterWrapper';
-import FarmActions from './FarmActions';
-import Modal from './Modal';
-import ConfirmTransactionModalContent from './Modals/ConfirmTransactionModalContent';
-import Confirmation from './Confirmation';
+import Icon from '../components/Icon';
+import IconToken from '../components/IconToken';
+import PageHeader from '../components/PageHeader';
+import Button from '../components/Button';
+import ToasterWrapper from '../components/ToasterWrapper';
+import FarmActions from '../components/FarmActions';
+import Modal from '../components/Modal';
+import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
+import Confirmation from '../components/Confirmation';
 
 import { formatIcons } from '../utils/iconUtils';
 import {
@@ -28,15 +29,14 @@ import {
 import getErrorMessage from '../content/errors';
 import { timestampToDate } from '../utils/timeUtils';
 import { NATIVE_TOKEN } from '../utils/tokenUtils';
+import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
+import useFarmByAddress from '../hooks/useFarmByAddress';
+import { useQueryOptionsPoolsFarms } from '../constants';
+import Loader from '../components/Loader';
 
-interface IFarmDetailsProps {
-  farmData: IFarmData;
-  setShowFarmDetails: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
+const FarmDetails = () => {
   const contextValue = useContext(GlobalContext);
-  const { connection, sdk } = contextValue;
+  const { connection, sdk, tokensWhitelisted } = contextValue;
   const {
     userId,
     hashconnectConnectorInstance,
@@ -45,15 +45,36 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
     connected,
   } = connection;
 
+  const navigate = useNavigate();
+  const { campaignAddress } = useParams();
+  const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
+
+  const { poolsByTokenList: pools } = usePoolsByTokensList(
+    useQueryOptionsPoolsFarms,
+    true,
+    tokensWhitelistedAddresses,
+  );
+
+  const { farm: farmData, processingFarms } = useFarmByAddress(
+    useQueryOptionsPoolsFarms,
+    userId,
+    pools,
+    campaignAddress || '',
+  );
+
   const [loadingHarvest, setLoadingHarvest] = useState(false);
   const [showHarvestModal, setShowHarvestModal] = useState(false);
 
   const userRewardsUSD = useMemo(() => {
-    const { userStakingData } = farmData;
+    if (Object.keys(farmData).length !== 0) {
+      const { userStakingData } = farmData;
 
-    return userStakingData?.rewardsAccumulated?.reduce((acc: string, currentValue) => {
-      return (Number(acc) + Number(currentValue.totalAccumulatedUSD)).toString();
-    }, '0');
+      if (!userStakingData?.rewardsAccumulated) return '0';
+
+      return userStakingData?.rewardsAccumulated?.reduce((acc: string, currentValue) => {
+        return (Number(acc) + Number(currentValue.totalAccumulatedUSD)).toString();
+      }, '0');
+    }
   }, [farmData]);
 
   const userShare = useMemo(() => {
@@ -121,12 +142,17 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
 
   const hasUserStaked = farmData.userStakingData?.stakedAmount !== '0';
   const hasUserProvided = farmData.poolData?.lpShares !== '0';
-  const campaignEnded = farmData?.campaignEndDate < Date.now();
+  const campaignEnded = farmData.campaignEndDate < Date.now();
+  const haveFarm = Object.keys(farmData).length !== 0;
 
-  return (
+  return isHashpackLoading ? (
+    <Loader />
+  ) : processingFarms ? (
+    <Loader />
+  ) : haveFarm ? (
     <div className="d-flex justify-content-center">
       <div className="container-max-with-1042">
-        <PageHeader title="Manage Farm" handleBackClick={() => setShowFarmDetails(false)} />
+        <PageHeader title="Manage Farm" handleBackClick={() => navigate('/farms')} />
         <div className="row">
           <div className="col-7">
             <div className="container-blue-neutral-800 rounded p-5">
@@ -229,7 +255,9 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
                         </p>
                       </div>
                       <div className="col-4 d-flex align-items-center">
-                        <p className="text-main">{stripStringToFixedDecimals(userShare, 2)}%</p>
+                        <p className="text-main">
+                          {stripStringToFixedDecimals(userShare || '0', 2)}%
+                        </p>
                       </div>
                     </div>
 
@@ -424,6 +452,10 @@ const FarmDetails = ({ farmData, setShowFarmDetails }: IFarmDetailsProps) => {
         </div>
       </div>
       <ToasterWrapper />
+    </div>
+  ) : (
+    <div className="d-flex justify-content-center">
+      <div className="container-max-with-1042">This farm does not exist</div>
     </div>
   );
 };

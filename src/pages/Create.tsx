@@ -68,7 +68,7 @@ import {
   initialCreateData,
   initialApproveData,
   initialNeedApprovalData,
-  useQueryOptionsPolling,
+  useQueryOptionsProvideSwapRemove,
   useQueryOptions,
 } from '../constants';
 
@@ -148,7 +148,7 @@ const Create = () => {
 
   //Get pools by token A
   const { filteredPools: poolsData } = usePoolsByToken(
-    useQueryOptionsPolling,
+    useQueryOptionsProvideSwapRemove,
     tokensData.tokenA.address || (process.env.REACT_APP_WHBAR_ADDRESS as string),
     false,
   );
@@ -399,6 +399,14 @@ const Create = () => {
         setCreatePairData({ ...createPairData, tokenAAmount: '', tokenBAmount: '' });
         setReadyToProvide(false);
         toast.success('Success! Liquidity was added.');
+
+        const newBalanceTokenA = await getTokenBalance(userId, tokensData.tokenA);
+        const newBalanceTokenB = await getTokenBalance(userId, tokensData.tokenB);
+
+        setTokenBalances({
+          tokenA: newBalanceTokenA,
+          tokenB: newBalanceTokenB,
+        });
       }
     } catch (err) {
       console.error(err);
