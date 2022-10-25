@@ -61,8 +61,8 @@
     {
       "chainId": 295,
       "address": "0x0000000000000000000000000000000000107d76",
-      "name": "MANTRA DAO",
-      "symbol": "OM",
+      "name": "MANTRA",
+      "symbol": "OM[hts]",
       "decimals": 8,
       "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/OM.png"
     },
