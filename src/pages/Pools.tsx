@@ -192,7 +192,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
 
           {!isHashpackLoading ? (
             <>
-              <div className="d-flex justify-content-between align-items-center my-5">
+              <div className="d-md-flex justify-content-between align-items-center my-5">
                 {currentView === PageViews.ALL_POOLS ? (
                   <>
                     <div className="d-flex align-items-center">
@@ -212,7 +212,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
                       </Tippy>
                     </div>
                     {connected && havePools ? (
-                      <Link className="btn btn-sm btn-primary" to="/create">
+                      <Link className="btn btn-sm btn-primary mt-5 mt-md-0" to="/create">
                         Create pool
                       </Link>
                     ) : null}

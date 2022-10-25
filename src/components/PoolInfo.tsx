@@ -275,7 +275,7 @@ const PoolInfo = ({
           </div>
 
           <div className="container-rounded-dark mt-4">
-            <div className="d-flex justify-content-between align-items-center">
+            <div className="d-md-flex justify-content-between align-items-center">
               <div className="d-flex align-items-center">
                 <span className="text-small text-bold me-4">LP token count</span>
                 <Button

@@ -275,9 +275,15 @@
     }
 
     &.is-compact {
-      max-width: 270px;
-      flex: 0 1 270px;
-      font-size: 22px;
+      font-size: 16px;
+      max-width: 230px;
+      flex: 0 1 230px;
+
+      @include media-breakpoint-up(md) {
+        max-width: 270px;
+        flex: 0 1 270px;
+        font-size: 22px;
+      }
     }
 
     &::placeholder {
