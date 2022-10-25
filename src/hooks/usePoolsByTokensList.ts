@@ -18,10 +18,12 @@ const usePoolsByTokensList = (
   const { hbarPrice } = contextValue;
 
   const [pools, setPools] = useState<IPoolExtendedData[]>([]);
+  const [processingPools, setProcessingPools] = useState<boolean>(true);
   const { loading, data, error, startPolling, stopPolling, refetch } = useQuery(
     GET_POOLS_WHITELISTED,
     {
       variables: {
+        // tokens: ['asdasdas', 'asdasdas'],
         tokens: tokensList,
       },
       ...useQueryOptions,
@@ -39,16 +41,36 @@ const usePoolsByTokensList = (
   useEffect(() => {
     if (data) {
       const { poolsConsistingOf } = data;
-      const processedPools = getProcessedPools(poolsConsistingOf, getExtended, hbarPrice);
-      if (processedPools) setPools(processedPools);
+      if (poolsConsistingOf && poolsConsistingOf.length > 0 && hbarPrice !== 0) {
+        try {
+          const processedPools = getProcessedPools(poolsConsistingOf, getExtended, hbarPrice);
+          if (processedPools) setPools(processedPools);
+        } catch (error) {
+          console.error('Error while fetching pools data.');
+        } finally {
+          setProcessingPools(false);
+        }
+      }
     }
   }, [data, hbarPrice, getExtended]);
+
+  useEffect(() => {
+    if (
+      !loading &&
+      (error || (data && (!data.poolsConsistingOf || data?.poolsConsistingOf?.length === 0)))
+    ) {
+      setProcessingPools(false);
+    }
+  }, [loading, data, error]);
+
+  console.log('processingPools', processingPools);
 
   return {
     poolsByTokenList: pools,
     loadingPoolsByTokenList: loading,
     errorPoolsByTokenList: error,
     refetchPoolsByTokenList: refetch,
+    processingPools,
   };
 };
 

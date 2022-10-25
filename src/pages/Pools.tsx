@@ -57,8 +57,8 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
 
   const {
     poolsByTokenList: pools,
-    loadingPoolsByTokenList: loadingPools,
     errorPoolsByTokenList: errorPoools,
+    processingPools,
   } = usePoolsByTokensList(useQueryOptionsPoolsFarms, true, tokensWhitelistedAddresses);
 
   const { filteredPools, filteredPoolsLoading, loadExtraPools } = usePoolsByFilter(
@@ -100,7 +100,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     if (
       (pools.length !== 0 || filteredPools.length !== 0) &&
       !filteredPoolsLoading &&
-      !loadingPools &&
+      !processingPools &&
       !searchingResults
     ) {
       const whitelistedFilteredPools = filterPoolsByPattern(
@@ -114,7 +114,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     }
 
     setHavePools(pools && pools.length !== 0);
-  }, [pools, filteredPools, inputValue, filteredPoolsLoading, loadingPools, searchingResults]);
+  }, [pools, filteredPools, inputValue, filteredPoolsLoading, processingPools, searchingResults]);
 
   //Update user pools to show
   useEffect(() => {
@@ -243,7 +243,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
               {currentView === PageViews.ALL_POOLS ? (
                 <AllPools
                   poolsAnalytics={poolsAnalytics}
-                  loadingPools={loadingPools || filteredPoolsLoading}
+                  loadingPools={processingPools || filteredPoolsLoading}
                   itemsPerPage={itemsPerPage}
                   pools={poolsToShow}
                   setShowRemoveContainer={setShowRemoveContainer}

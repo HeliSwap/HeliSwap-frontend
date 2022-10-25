@@ -44,7 +44,10 @@ const useFarms = (useQueryOptions: QueryHookOptions = {}, userId: string, pools:
     data && getFarmsData();
   }, [data, pools, hbarPrice]);
   useEffect(() => {
-    if (!loading && (error || !data.getFarmsOverview || data?.getFarmsOverview?.length === 0)) {
+    if (
+      !loading &&
+      (error || (data && (!data.getFarmsOverview || data?.getFarmsOverview?.length === 0)))
+    ) {
       setProcessingFarms(false);
     }
   }, [loading, data, error]);
