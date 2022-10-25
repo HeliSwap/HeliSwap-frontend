@@ -21,6 +21,7 @@ import {
   useQueryOptionsPoolsFarms,
 } from '../constants';
 import BigNumber from 'bignumber.js';
+import Icon from '../components/Icon';
 
 interface IFarmsProps {
   itemsPerPage: number;
@@ -38,8 +39,8 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
   const [pageCount, setPageCount] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
-  const [sortDirection] = useState<SORT_DIRECTION>(SORT_DIRECTION.DESC);
-  const [farmsSortBy] = useState<SORT_OPTIONS>(SORT_OPTIONS_ENUM.APR);
+  const [sortDirection, setSortDirection] = useState<SORT_DIRECTION>(SORT_DIRECTION.DESC);
+  const [farmsSortBy, setFarmsSortby] = useState<SORT_OPTIONS>(SORT_OPTIONS_ENUM.APR);
   const [showOnlyStaked, setShowOnlyStaked] = useState<boolean>(false);
 
   const { poolsByTokenList: pools } = usePoolsByTokensList(
@@ -74,31 +75,35 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
     navigate(`/farms/${farmAddress}`);
   };
 
+  const handleSortClick = (sortBy: SORT_OPTIONS) => {
+    if (sortBy === farmsSortBy) {
+      setSortDirection(
+        sortDirection === SORT_DIRECTION.ASC ? SORT_DIRECTION.DESC : SORT_DIRECTION.ASC,
+      );
+    } else {
+      setFarmsSortby(sortBy);
+    }
+  };
+
   useEffect(() => {
     const endOffset = itemOffset + itemsPerPage;
 
-    const userCampaigns: IFarmData[] = [];
-    const otherCampaigns: IFarmData[] = [];
+    let sortedFarms: IFarmData[];
 
-    ([...farms] || []).forEach((farm: IFarmData) => {
-      if (Number(farm.userStakingData.stakedAmount) !== 0) {
-        userCampaigns.push(farm);
-      } else {
-        otherCampaigns.push(farm);
-      }
-    });
+    if (showOnlyStaked) {
+      const userCampaigns: IFarmData[] = [];
 
-    const sortedUserCampaigns = [...userCampaigns].sort((a: IFarmData, b: IFarmData) =>
-      sortFarms(a, b, sortDirection),
-    );
-
-    const sortedOtherCampaigns = [...otherCampaigns].sort((a: IFarmData, b: IFarmData) =>
-      sortFarms(a, b, sortDirection),
-    );
-
-    const sortedFarms: IFarmData[] = showOnlyStaked
-      ? sortedUserCampaigns
-      : sortedUserCampaigns.concat(sortedOtherCampaigns);
+      ([...farms] || []).forEach((farm: IFarmData) => {
+        if (Number(farm.userStakingData.stakedAmount) !== 0) {
+          userCampaigns.push(farm);
+        }
+      });
+      sortedFarms = [...userCampaigns].sort((a: IFarmData, b: IFarmData) =>
+        sortFarms(a, b, sortDirection),
+      );
+    } else {
+      sortedFarms = [...farms].sort((a: IFarmData, b: IFarmData) => sortFarms(a, b, sortDirection));
+    }
 
     if (sortedFarms.length < itemOffset) {
       setCurrentItems(sortedFarms.slice(0, itemsPerPage));
@@ -110,6 +115,16 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
     setPageCount(Math.ceil(sortedFarms.length / itemsPerPage));
   }, [itemOffset, itemsPerPage, farms, sortDirection, farmsSortBy, sortFarms, showOnlyStaked]);
 
+  useEffect(() => {
+    if (!userId) setShowOnlyStaked(false);
+  }, [userId]);
+
+  const getSortIcon = (option: SORT_OPTIONS) => {
+    const icon = <Icon name={`arrow-${sortDirection === SORT_DIRECTION.ASC ? 'up' : 'down'}`} />;
+
+    return option === farmsSortBy ? icon : null;
+  };
+
   const haveFarms = farms.length > 0;
 
   return !isHashpackLoading ? (
@@ -119,18 +134,20 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
           <div className="d-flex">
             <h2 className={`text-subheader tab-title is-active mx-4 `}>Farms</h2>
           </div>
-          <div className="form-check form-switch">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id="flexSwitchCheckChecked"
-              checked={showOnlyStaked}
-              onChange={() => setShowOnlyStaked(!showOnlyStaked)}
-            />
-            <label className="form-check-label" htmlFor="flexSwitchCheckChecked">
-              Show only staked
-            </label>
-          </div>
+          {userId ? (
+            <div className="form-check form-switch">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                id="flexSwitchCheckChecked"
+                checked={showOnlyStaked}
+                onChange={() => setShowOnlyStaked(!showOnlyStaked)}
+              />
+              <label className="text-small" htmlFor="flexSwitchCheckChecked">
+                Show only staked
+              </label>
+            </div>
+          ) : null}
         </div>
 
         <hr />
@@ -149,11 +166,21 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
                 <div className="table-pools-cell">
                   <span className="text-small">Pair Name</span>
                 </div>
-                <div className="table-pools-cell justify-content-end">
-                  <span className="text-small ws-no-wrap">Total Staked</span>
+                <div
+                  className="table-pools-cell justify-content-end"
+                  onClick={() => handleSortClick(SORT_OPTIONS_ENUM.TOTAL_STAKED)}
+                >
+                  <span className="text-small ws-no-wrap">
+                    Total Staked {getSortIcon(SORT_OPTIONS_ENUM.TOTAL_STAKED)}
+                  </span>
                 </div>
-                <div className="table-pools-cell justify-content-end">
-                  <span className="text-small ws-no-wrap">Total APR</span>
+                <div
+                  className="table-pools-cell justify-content-end"
+                  onClick={() => handleSortClick(SORT_OPTIONS_ENUM.APR)}
+                >
+                  <span className="text-small ws-no-wrap">
+                    Total APR {getSortIcon(SORT_OPTIONS_ENUM.APR)}
+                  </span>
                 </div>
                 {userId ? (
                   <div className="table-pools-cell justify-content-end">
