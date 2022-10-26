@@ -3,6 +3,8 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import ReactPaginate from 'react-paginate';
 import { useNavigate } from 'react-router-dom';
 
+import BigNumber from 'bignumber.js';
+
 import { GlobalContext } from '../providers/Global';
 
 import { IFarmData } from '../interfaces/tokens';
@@ -10,6 +12,7 @@ import { IFarmData } from '../interfaces/tokens';
 import FarmRow from '../components/FarmRow';
 import Button from '../components/Button';
 import Loader from '../components/Loader';
+import Icon from '../components/Icon';
 
 import useFarms from '../hooks/useFarms';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
@@ -20,8 +23,6 @@ import {
   SORT_OPTIONS_ENUM,
   useQueryOptionsPoolsFarms,
 } from '../constants';
-import BigNumber from 'bignumber.js';
-import Icon from '../components/Icon';
 
 interface IFarmsProps {
   itemsPerPage: number;
