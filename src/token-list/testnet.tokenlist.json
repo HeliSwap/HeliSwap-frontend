@@ -31,7 +31,7 @@
       "address": "0x0000000000000000000000000000000002121d92",
       "name": "Wrapped Ethereum",
       "symbol": "WETH",
-      "decimals": 18,
+      "decimals": 10,
       "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/WETH.png"
     },
     {
@@ -39,7 +39,7 @@
       "address": "0x0000000000000000000000000000000002121Db5",
       "name": "Wrapped Bitcoin",
       "symbol": "WBTC",
-      "decimals": 18,
+      "decimals": 8,
       "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/WBTC.png"
     }
   ]
