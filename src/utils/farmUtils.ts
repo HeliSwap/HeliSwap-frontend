@@ -185,9 +185,10 @@ export const getProcessedFarms = (
 
     const userStakingData = getUserStakingDataProcessed(currentFarm, lPValue);
 
-    const APR = getAPR(rewardsData, totalStakedUSD, totalRewardsUSD);
-
     const campaignEndDate = getCampaignEndDate(currentFarm);
+    const campaignEnded = getCampaignEndDate(currentFarm) < Date.now();
+
+    const APR = campaignEnded ? '0' : getAPR(rewardsData, totalStakedUSD, totalRewardsUSD);
 
     const formatted = {
       ...currentFarm,
