@@ -63,8 +63,6 @@ const usePoolsByTokensList = (
     }
   }, [loading, data, error]);
 
-  console.log('processingPools', processingPools);
-
   return {
     poolsByTokenList: pools,
     loadingPoolsByTokenList: loading,
