@@ -137,13 +137,13 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
           {userId ? (
             <div className="form-check form-switch">
               <input
-                className="form-check-input"
+                className="form-check-input cursor-pointer"
                 type="checkbox"
                 id="flexSwitchCheckChecked"
                 checked={showOnlyStaked}
                 onChange={() => setShowOnlyStaked(!showOnlyStaked)}
               />
-              <label className="text-small" htmlFor="flexSwitchCheckChecked">
+              <label className="text-small cursor-pointer" htmlFor="flexSwitchCheckChecked">
                 Show only staked
               </label>
             </div>
