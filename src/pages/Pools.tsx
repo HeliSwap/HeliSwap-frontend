@@ -243,7 +243,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
               {currentView === PageViews.ALL_POOLS ? (
                 <AllPools
                   poolsAnalytics={poolsAnalytics}
-                  loadingPools={processingPools || filteredPoolsLoading}
+                  loadingPools={processingPools || filteredPoolsLoading || searchingResults}
                   itemsPerPage={itemsPerPage}
                   pools={poolsToShow}
                   setShowRemoveContainer={setShowRemoveContainer}
