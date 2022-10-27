@@ -227,7 +227,7 @@ const FarmActions = ({
   };
 
   return (
-    <div className="col-5">
+    <div className="col-md-5 mt-4 mt-md-0">
       <div className="container-blue-neutral-900 rounded p-5 heigth-100 d-flex flex-column">
         <div>
           <span
@@ -367,7 +367,7 @@ const FarmActions = ({
                 />
               </div>
 
-              <div className="d-grid">
+              <div className="d-grid mt-4">
                 <Button loading={loadingExit} onClick={() => setShowExitModal(true)}>
                   Unstake
                 </Button>

@@ -61,7 +61,7 @@ const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
       onClick={handleViewDetailsRowClick}
       className={`table-pools-row with-${userId ? '6' : '5'}-columns-farms`}
     >
-      <div className="table-pools-cell">
+      <div className="d-none d-md-flex table-pools-cell">
         <span className="text-small">{index + 1}</span>
       </div>
       <div className="table-pools-cell">
@@ -70,19 +70,22 @@ const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
           {farmData.poolData.token0Symbol}/{farmData.poolData.token1Symbol}
         </p>
       </div>
-      <div className="table-pools-cell justify-content-end">
+      <div className="table-pools-cell justify-content-between justify-content-md-end">
+        <span className="d-md-none text-small">Total Staked</span>
         <span className="text-small text-numeric">
           {formatStringToPrice(stripStringToFixedDecimals(farmData.totalStakedUSD, 2))}
         </span>
       </div>
-      <div className="table-pools-cell justify-content-end">
+      <div className="table-pools-cell justify-content-between justify-content-md-end">
+        <span className="d-md-none text-small">Total APR</span>
         <span className="text-small text-numeric">
           {formatStringToPercentage(stripStringToFixedDecimals(farmData.APR, 2))}
         </span>
       </div>
 
       {userId ? (
-        <div className="table-pools-cell justify-content-end">
+        <div className="table-pools-cell justify-content-between justify-content-md-end">
+          <span className="d-md-none text-small">Your Stake</span>
           <span className="text-small text-numeric">
             {formatStringToPrice(
               stripStringToFixedDecimals(farmData.userStakingData.stakedAmountUSD || '0', 2),
@@ -91,7 +94,8 @@ const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
         </div>
       ) : null}
 
-      <div className="table-pools-cell d-flex justify-content-end">
+      <div className="table-pools-cell d-flex justify-content-between justify-content-md-end">
+        <span className="d-md-none text-small">Campaign Status</span>
         {renderCampaignEndDate(farmData.campaignEndDate, farmData.rewardsData)}
       </div>
     </div>

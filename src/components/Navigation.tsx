@@ -26,7 +26,7 @@ const Navigation = () => {
   const getClasses = (isActive: boolean, index: number) => {
     const classes = ['link-menu'];
     if (index) {
-      classes.push('mt-4');
+      classes.push('mt-md-4');
     }
     if (isActive) {
       classes.push('is-active');
@@ -35,7 +35,7 @@ const Navigation = () => {
   };
 
   return (
-    <div className="d-flex flex-column">
+    <div className="d-md-flex flex-md-column">
       {navigation.map((item, index) => {
         return (
           <NavLink

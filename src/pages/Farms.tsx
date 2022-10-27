@@ -160,7 +160,11 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
         ) : haveFarms ? (
           <>
             <div className="table-pools">
-              <div className={`table-pools-row with-${userId ? '6' : '5'}-columns-farms`}>
+              <div
+                className={`d-none d-md-grid table-pools-row with-${
+                  userId ? '6' : '5'
+                }-columns-farms`}
+              >
                 <div className="table-pools-cell">
                   <span className="text-small">#</span>
                 </div>

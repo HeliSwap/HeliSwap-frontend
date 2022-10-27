@@ -124,7 +124,7 @@ const AllPools = ({
       </div>
 
       <div className="table-pools">
-        <div className={`table-pools-row with-6-columns`}>
+        <div className={`d-none d-md-grid table-pools-row with-6-columns`}>
           <div className="table-pools-cell">
             <span className="text-small">#</span>
           </div>
