@@ -48,11 +48,11 @@
   cursor: pointer;
   transition: color 0.15s linear;
 
-  color: $primary-200;
+  color: $primary-200 !important;
   text-decoration: none;
 
   &:hover {
-    color: $primary;
+    color: $primary !important;
     text-decoration: none;
   }
 }
