@@ -360,7 +360,7 @@ const ModalSearchContent = ({
         {showTokenList && !searchingResults ? (
           <div className="mt-7">
             <h3 className="text-small">Token name</h3>
-            <div className="mt-3">
+            <div className="container-scroll mt-3">
               {tokenList.reduce((acc: ReactNode[], token: ITokenData, index: number) => {
                 //Currently we don't want to show WHBAR
                 if (token.address !== process.env.REACT_APP_WHBAR_ADDRESS) {

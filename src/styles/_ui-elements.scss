@@ -364,6 +364,11 @@
   padding: 4px 8px;
 }
 
+.container-scroll {
+  overflow-y: auto;
+  max-height: 50vh;
+}
+
 /* Tables */
 .table-pools {
   border-radius: 4px 4px 0px 0px;
