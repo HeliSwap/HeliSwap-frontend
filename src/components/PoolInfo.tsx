@@ -143,7 +143,7 @@ const PoolInfo = ({
   const renderAllPoolsDetails = () => {
     return (
       <div className="row align-items-center">
-        <div className="col-6">
+        <div className="col-md-6">
           <div className="container-rounded-dark">
             <p className="text-small">TVL</p>
             <p className="text-title text-numeric">{formatStringToPrice(poolData.tvl)}</p>
@@ -174,7 +174,7 @@ const PoolInfo = ({
           </div>
         </div>
 
-        <div className="col-6 d-flex">
+        <div className="col-md-6 mt-4 mt-md-0 d-flex">
           <div className="flex-1">
             <Link
               className="d-block btn btn-sm btn-primary ms-3"
@@ -200,9 +200,9 @@ const PoolInfo = ({
   const renderMyPoolsDetails = () => {
     return (
       <div className="row align-items-center">
-        <div className="col-8">
+        <div className="col-md-8">
           <div className="row">
-            <div className="col-6">
+            <div className="col-md-6">
               <div className="container-rounded-dark">
                 <p className="text-small">Liquidity</p>
                 <p className="text-title text-numeric">{formatStringToPrice(poolData.tvl)}</p>
@@ -233,7 +233,7 @@ const PoolInfo = ({
               </div>
             </div>
 
-            <div className="col-6">
+            <div className="col-md-6 mt-4 mt-md-0">
               <div className="container-rounded-dark">
                 <p className="text-small">Unclaimed fees</p>
                 <p className="text-title text-numeric text-success">
@@ -275,7 +275,7 @@ const PoolInfo = ({
           </div>
 
           <div className="container-rounded-dark mt-4">
-            <div className="d-flex justify-content-between align-items-center">
+            <div className="d-md-flex justify-content-between align-items-center">
               <div className="d-flex align-items-center">
                 <span className="text-small text-bold me-4">LP token count</span>
                 <Button
@@ -356,7 +356,7 @@ const PoolInfo = ({
           </TransferLPModalContent>
         </Modal>
 
-        <div className="col-4">
+        <div className="col-md-4 mt-4 mt-md-0">
           <div>
             <Link
               className="d-block btn btn-sm btn-primary"
@@ -396,7 +396,7 @@ const PoolInfo = ({
           view === PageViews.ALL_POOLS ? 'with-6-columns' : ''
         }`}
       >
-        <div className="table-pools-cell">
+        <div className="d-none d-md-flex table-pools-cell">
           <span className="text-small">{index + 1}</span>
         </div>
         <div className="table-pools-cell">
@@ -425,19 +425,22 @@ const PoolInfo = ({
         </div>
         {view === PageViews.ALL_POOLS ? (
           <>
-            <div className="table-pools-cell justify-content-end">
+            <div className="table-pools-cell justify-content-between justify-content-md-end">
+              <span className="d-md-none text-small">TVL</span>
               <span className="text-small text-numeric">
                 {poolData.tokensPriceEvaluated ? formatStringToPrice(poolData.tvl) : 'N/A'}
               </span>
             </div>
-            <div className="table-pools-cell justify-content-end">
+            <div className="table-pools-cell justify-content-between justify-content-md-end">
+              <span className="d-md-none text-small">Volume 24h</span>
               <span className="text-small text-numeric">
                 {poolData.tokensPriceEvaluated
                   ? formatStringToPrice(poolData.volume24 || '')
                   : 'N/A'}
               </span>
             </div>
-            <div className="table-pools-cell justify-content-end">
+            <div className="table-pools-cell justify-content-between justify-content-md-end">
+              <span className="d-md-none text-small">Volume 7d</span>
               <span className="text-small text-numeric">
                 {poolData.tokensPriceEvaluated
                   ? formatStringToPrice(poolData.volume7 || '')
@@ -446,7 +449,7 @@ const PoolInfo = ({
             </div>
           </>
         ) : null}
-        <div className="table-pools-cell d-flex justify-content-end">
+        <div className="table-pools-cell d-none d-md-flex justify-content-md-end">
           <p className="d-inline-flex align-items-center text-white">
             <span className="text-small text-bold me-2">{showPoolDetails ? 'Less' : 'More'}</span>
             <Icon name={`chevron-${showPoolDetails ? 'up' : 'down'}`} />

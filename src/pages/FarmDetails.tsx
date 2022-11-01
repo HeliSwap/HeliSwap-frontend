@@ -155,9 +155,9 @@ const FarmDetails = () => {
         <PageHeader title="Manage Farm" handleBackClick={() => navigate('/farms')} />
         {haveFarm ? (
           <div className="row">
-            <div className="col-7">
+            <div className="col-md-7">
               <div className="container-blue-neutral-800 rounded p-5">
-                <div className="d-flex justify-content-between align-items-start">
+                <div className="d-md-flex justify-content-between align-items-start">
                   <div className="d-flex align-items-center">
                     {formatIcons(
                       [farmData.poolData?.token0Symbol, farmData.poolData?.token1Symbol],
@@ -168,14 +168,14 @@ const FarmDetails = () => {
                     </p>
                   </div>
 
-                  <div className="container-campaign-status d-flex align-items-center">
+                  <div className="container-campaign-status mt-5 mt-md-0 d-flex align-items-center">
                     {renderCampaignEndDate(farmData.campaignEndDate, farmData.rewardsData)}
                   </div>
                 </div>
 
-                <div className="container-border-rounded-bn-500 mt-6">
+                <div className="container-border-rounded-bn-500 mt-4 mt-6">
                   <div className="row">
-                    <div className="col-4 d-flex align-items-center">
+                    <div className="col-6 col-md-4 d-flex align-items-center">
                       <p className="d-flex align-items-center">
                         <span className="text-secondary text-small">Total APR</span>
                         <Tippy content="Your annual rate of return, expressed as a percentage. Interest paid in previous periods is not accounted for.">
@@ -185,7 +185,7 @@ const FarmDetails = () => {
                         </Tippy>
                       </p>
                     </div>
-                    <div className="col-4">
+                    <div className="col-6 col-md-4">
                       <p className="text-subheader text-numeric">
                         {formatStringToPercentage(stripStringToFixedDecimals(farmData.APR, 2))}
                       </p>
@@ -193,7 +193,7 @@ const FarmDetails = () => {
                   </div>
 
                   <div className="row mt-4">
-                    <div className="col-4 d-flex align-items-center">
+                    <div className="col-6 col-md-4 d-flex align-items-center">
                       <p className="d-flex align-items-center">
                         <span className="text-secondary text-small">Total Staked</span>
                         <Tippy content="The total amount of staked tokens in this farm pool, denominated in $USD.">
@@ -203,7 +203,7 @@ const FarmDetails = () => {
                         </Tippy>
                       </p>
                     </div>
-                    <div className="col-4">
+                    <div className="col-6 col-md-4">
                       <p className="text-main text-numeric">
                         {formatStringToPrice(
                           stripStringToFixedDecimals(farmData.totalStakedUSD, 2),
@@ -215,7 +215,7 @@ const FarmDetails = () => {
                   <hr className="my-5" />
 
                   <div className="row mt-4">
-                    <div className="col-4 d-flex align-items-center">
+                    <div className="col-6 col-md-4 d-flex align-items-center">
                       <p className="d-flex align-items-center">
                         <span className="text-secondary text-small">Rewards</span>
                         <Tippy content="The tokens you will be rewarded with upon harvest.">
@@ -225,7 +225,7 @@ const FarmDetails = () => {
                         </Tippy>
                       </p>
                     </div>
-                    <div className="col-4 d-flex align-items-center">
+                    <div className="col-6 col-md-4 d-flex align-items-center">
                       {farmData.rewardsData?.length > 0 &&
                         farmData.rewardsData?.map((reward, index) => {
                           const rewardSymbol =
@@ -247,7 +247,7 @@ const FarmDetails = () => {
                       <hr className="my-5" />
 
                       <div className="row mt-4">
-                        <div className="col-4 d-flex align-items-center">
+                        <div className="col-6 col-md-4 d-flex align-items-center">
                           <p className="d-flex align-items-center">
                             <span className="text-secondary text-small">Your share</span>
                             <Tippy content="Your staked amount in this farm pool, expressed as a percentage.">
@@ -257,7 +257,7 @@ const FarmDetails = () => {
                             </Tippy>
                           </p>
                         </div>
-                        <div className="col-4 d-flex align-items-center">
+                        <div className="col-6 col-md-4 d-flex align-items-center">
                           <p className="text-main">
                             {stripStringToFixedDecimals(userShare || '0', 2)}%
                           </p>
@@ -265,7 +265,7 @@ const FarmDetails = () => {
                       </div>
 
                       <div className="row mt-4">
-                        <div className="col-4 d-flex align-items-center">
+                        <div className="col-6 col-md-4 d-flex align-items-center">
                           <p className="d-flex align-items-center">
                             <span className="text-secondary text-small">Staked LP Tokens</span>
                             <Tippy content="The amount of your staked tokens in $USD, as well as staked tokens count.">
@@ -275,7 +275,7 @@ const FarmDetails = () => {
                             </Tippy>
                           </p>
                         </div>
-                        <div className="col-8 d-flex align-items-center">
+                        <div className="col-6 col-md-8 d-md-flex align-items-center">
                           <p className="text-subheader text-numeric">
                             {formatStringToPrice(
                               stripStringToFixedDecimals(
@@ -284,7 +284,7 @@ const FarmDetails = () => {
                               ),
                             )}
                           </p>
-                          <p className="d-flex align-items-center ms-3 mt-2">
+                          <p className="d-flex align-items-center ms-md-3 mt-2">
                             <span className="text-secondary text-main">
                               {formatStringETHtoPriceFormatted(
                                 formatStringWeiToStringEther(

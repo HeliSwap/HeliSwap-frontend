@@ -64,12 +64,12 @@ const Header = () => {
   }, [getUserTokensData]);
 
   return (
-    <div className="p-5">
+    <div className="p-3 p-md-5">
       <div className="d-flex justify-content-end">
         <div className="d-flex align-items-center">
           {connected && userId ? (
             <>
-              <div>
+              <div className="d-none d-md-block">
                 <a
                   className="d-flex align-items-center link"
                   target="_blank"
@@ -80,8 +80,8 @@ const Header = () => {
                   <span className="ms-3 text-small">Hashport Bridge</span>
                 </a>
               </div>
-              <span className="separator-header"></span>
-              <div className="me-5">
+              <span className="separator-header d-none d-md-block"></span>
+              <div className="me-5 d-none d-md-block">
                 <span className="text-small">
                   HBAR Price:{' '}
                   <span className="text-numeric">

@@ -75,7 +75,7 @@ const MyPools = ({
     ) : havePools ? (
       <>
         <div className="table-pools">
-          <div className={`table-pools-row`}>
+          <div className={`d-none d-md-grid table-pools-row`}>
             <div className="table-pools-cell">
               <span className="text-small">#</span>
             </div>
