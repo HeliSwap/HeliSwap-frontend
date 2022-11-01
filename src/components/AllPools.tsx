@@ -20,7 +20,7 @@ interface IAllPoolsProps {
   currentView: PageViews;
   renderEmptyPoolsState: (message: string) => any;
   setShowRemoveContainer: React.Dispatch<React.SetStateAction<boolean>>;
-  setCurrentPoolIndex: React.Dispatch<React.SetStateAction<number>>;
+  setCurrentPoolAddress: React.Dispatch<React.SetStateAction<string>>;
   poolsAnalytics: IPoolsAnalytics;
 }
 
@@ -31,7 +31,7 @@ const AllPools = ({
   currentView,
   renderEmptyPoolsState,
   setShowRemoveContainer,
-  setCurrentPoolIndex,
+  setCurrentPoolAddress,
   poolsAnalytics,
 }: IAllPoolsProps) => {
   const [collapseAll, setCollapseAll] = useState<boolean>(false);
@@ -162,7 +162,7 @@ const AllPools = ({
           {currentItems.map((item, index) => (
             <PoolInfo
               setShowRemoveContainer={setShowRemoveContainer}
-              setCurrentPoolIndex={setCurrentPoolIndex}
+              setCurrentPoolAddress={setCurrentPoolAddress}
               index={index + itemOffset}
               key={index}
               poolData={item}
