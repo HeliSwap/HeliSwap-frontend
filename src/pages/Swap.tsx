@@ -81,7 +81,6 @@ const Swap = () => {
     hashconnectConnectorInstance,
     connected,
     setShowConnectModal,
-    extensionFound,
     isHashpackLoading,
   } = connection;
 
@@ -886,127 +885,123 @@ const Swap = () => {
   const renderActionButtons = () => {
     const confirmationText = `Swapping ${swapData.amountIn} ${tokensData.tokenA.symbol} for ${swapData.amountOut} ${tokensData.tokenB.symbol}`;
 
-    return extensionFound ? (
-      connected && !isHashpackLoading ? (
-        <>
-          {loadingPools ? (
-            <div className="d-flex justify-content-center mt-4">
-              <Loader />
-            </div>
-          ) : (
-            <>
-              {!getTokenIsAssociated(tokensData.tokenA) ? (
-                <div className="d-grid mt-4">
-                  <Button
-                    loading={loadingAssociate}
-                    onClick={() => handleAssociateClick(tokensData.tokenA)}
-                  >
-                    {`Associate ${tokensData.tokenA.symbol}`}
-                  </Button>
-                </div>
-              ) : null}
-
-              {!getTokenIsAssociated(tokensData.tokenB) ? (
-                <div className="d-grid mt-4">
-                  <Button
-                    loading={loadingAssociate}
-                    onClick={() => handleAssociateClick(tokensData.tokenB)}
-                  >
-                    {`Associate ${tokensData.tokenB.symbol}`}
-                  </Button>
-                </div>
-              ) : null}
-
-              {readyToApprove &&
-              needApproval &&
-              !approved &&
-              getTokenIsAssociated(tokensData.tokenA) ? (
-                <div className="d-grid mt-4">
-                  <Button
-                    loading={loadingApprove}
-                    disabled={Number(swapData.amountIn) <= 0}
-                    onClick={() => handleApproveClick()}
-                    className="d-flex justify-content-center align-items-center"
-                  >
-                    <span>{`Approve ${tokensData.tokenA.symbol}`}</span>
-                    <Tippy
-                      content={`You must give the HeliSwap smart contracts permission to use your ${tokensData.tokenA.symbol}.`}
-                    >
-                      <span className="ms-2">
-                        <Icon name="hint" />
-                      </span>
-                    </Tippy>
-                  </Button>
-                </div>
-              ) : null}
-
+    return connected && !isHashpackLoading ? (
+      <>
+        {loadingPools ? (
+          <div className="d-flex justify-content-center mt-4">
+            <Loader />
+          </div>
+        ) : (
+          <>
+            {!getTokenIsAssociated(tokensData.tokenA) ? (
               <div className="d-grid mt-4">
                 <Button
-                  loading={loadingSwap}
-                  disabled={renderSwapButtonDisabledState()}
-                  onClick={() => handleSwapClick()}
+                  loading={loadingAssociate}
+                  onClick={() => handleAssociateClick(tokensData.tokenA)}
                 >
-                  {getSwapButtonLabel()}
+                  {`Associate ${tokensData.tokenA.symbol}`}
                 </Button>
               </div>
-            </>
-          )}
+            ) : null}
 
-          {showModalConfirmSwap ? (
-            <Modal show={showModalConfirmSwap} closeModal={() => setShowModalConfirmSwap(false)}>
-              <ConfirmTransactionModalContent
-                modalTitle="Confirm swap"
-                closeModal={() => setShowModalConfirmSwap(false)}
-                confirmTansaction={handleSwapConfirm}
-                confirmButtonLabel="Confirm"
-                isLoading={loadingSwap}
+            {!getTokenIsAssociated(tokensData.tokenB) ? (
+              <div className="d-grid mt-4">
+                <Button
+                  loading={loadingAssociate}
+                  onClick={() => handleAssociateClick(tokensData.tokenB)}
+                >
+                  {`Associate ${tokensData.tokenB.symbol}`}
+                </Button>
+              </div>
+            ) : null}
+
+            {readyToApprove &&
+            needApproval &&
+            !approved &&
+            getTokenIsAssociated(tokensData.tokenA) ? (
+              <div className="d-grid mt-4">
+                <Button
+                  loading={loadingApprove}
+                  disabled={Number(swapData.amountIn) <= 0}
+                  onClick={() => handleApproveClick()}
+                  className="d-flex justify-content-center align-items-center"
+                >
+                  <span>{`Approve ${tokensData.tokenA.symbol}`}</span>
+                  <Tippy
+                    content={`You must give the HeliSwap smart contracts permission to use your ${tokensData.tokenA.symbol}.`}
+                  >
+                    <span className="ms-2">
+                      <Icon name="hint" />
+                    </span>
+                  </Tippy>
+                </Button>
+              </div>
+            ) : null}
+
+            <div className="d-grid mt-4">
+              <Button
+                loading={loadingSwap}
+                disabled={renderSwapButtonDisabledState()}
+                onClick={() => handleSwapClick()}
               >
-                {loadingSwap ? (
-                  <Confirmation confirmationText={confirmationText} />
-                ) : (
-                  <>
-                    <InputTokenSelector
-                      readonly={true}
-                      inputTokenComponent={<InputToken value={swapData.amountIn} disabled={true} />}
-                      buttonSelectorComponent={
-                        <ButtonSelector
-                          selectedToken={tokensData?.tokenA.symbol}
-                          selectorText="Select token"
-                          disabled={true}
-                        />
-                      }
-                    />
-                    <InputTokenSelector
-                      readonly={true}
-                      className="mt-5"
-                      inputTokenComponent={
-                        <InputToken value={swapData.amountOut} disabled={true} />
-                      }
-                      buttonSelectorComponent={
-                        <ButtonSelector
-                          selectedToken={tokensData?.tokenB.symbol}
-                          selectorText="Select token"
-                          disabled={true}
-                        />
-                      }
-                    />
-                    {renderTokensRatio()}
-                    {renderAdvancedSwapInfo()}
-                    {renderWarningMessage()}
-                  </>
-                )}
-              </ConfirmTransactionModalContent>
-            </Modal>
-          ) : null}
-        </>
-      ) : (
-        <div className="d-grid mt-4">
-          <Button disabled={isHashpackLoading} onClick={() => setShowConnectModal(true)}>
-            Connect wallet
-          </Button>
-        </div>
-      )
-    ) : null;
+                {getSwapButtonLabel()}
+              </Button>
+            </div>
+          </>
+        )}
+
+        {showModalConfirmSwap ? (
+          <Modal show={showModalConfirmSwap} closeModal={() => setShowModalConfirmSwap(false)}>
+            <ConfirmTransactionModalContent
+              modalTitle="Confirm swap"
+              closeModal={() => setShowModalConfirmSwap(false)}
+              confirmTansaction={handleSwapConfirm}
+              confirmButtonLabel="Confirm"
+              isLoading={loadingSwap}
+            >
+              {loadingSwap ? (
+                <Confirmation confirmationText={confirmationText} />
+              ) : (
+                <>
+                  <InputTokenSelector
+                    readonly={true}
+                    inputTokenComponent={<InputToken value={swapData.amountIn} disabled={true} />}
+                    buttonSelectorComponent={
+                      <ButtonSelector
+                        selectedToken={tokensData?.tokenA.symbol}
+                        selectorText="Select token"
+                        disabled={true}
+                      />
+                    }
+                  />
+                  <InputTokenSelector
+                    readonly={true}
+                    className="mt-5"
+                    inputTokenComponent={<InputToken value={swapData.amountOut} disabled={true} />}
+                    buttonSelectorComponent={
+                      <ButtonSelector
+                        selectedToken={tokensData?.tokenB.symbol}
+                        selectorText="Select token"
+                        disabled={true}
+                      />
+                    }
+                  />
+                  {renderTokensRatio()}
+                  {renderAdvancedSwapInfo()}
+                  {renderWarningMessage()}
+                </>
+              )}
+            </ConfirmTransactionModalContent>
+          </Modal>
+        ) : null}
+      </>
+    ) : (
+      <div className="d-grid mt-4">
+        <Button disabled={isHashpackLoading} onClick={() => setShowConnectModal(true)}>
+          Connect wallet
+        </Button>
+      </div>
+    );
   };
 
   const renderTokensRatio = () => {

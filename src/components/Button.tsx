@@ -16,7 +16,7 @@ const Button = ({
   type = 'primary',
   children,
   disabled = false,
-  className,
+  className = '',
   onClick,
   loading = false,
   loadingText,
