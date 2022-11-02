@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef, MutableRefObject } from 'react';
 
 interface IModalProps {
   show?: boolean;
@@ -7,6 +7,8 @@ interface IModalProps {
 }
 
 const Modal = ({ show = true, children, closeModal }: IModalProps) => {
+  const modalRef: MutableRefObject<null | HTMLDivElement> = useRef(null);
+
   const handleKeyDown = useCallback(
     (event: any) => {
       if (event.key === 'Escape' && closeModal) {
@@ -15,6 +17,19 @@ const Modal = ({ show = true, children, closeModal }: IModalProps) => {
     },
     [closeModal],
   );
+
+  useEffect(() => {
+    const handleClickOutside = (event: Event) => {
+      if (!modalRef.current?.contains(event.target as HTMLDivElement)) {
+        if (closeModal) closeModal();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [closeModal]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
@@ -33,7 +48,7 @@ const Modal = ({ show = true, children, closeModal }: IModalProps) => {
         aria-hidden="true"
         style={{ display: show ? 'block' : 'none' }}
       >
-        <div className="modal-dialog modal-dialog-centered">
+        <div className="modal-dialog modal-dialog-centered" ref={modalRef}>
           <div className="modal-content">{children}</div>
         </div>
       </div>

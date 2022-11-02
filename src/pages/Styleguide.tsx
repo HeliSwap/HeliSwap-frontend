@@ -339,9 +339,11 @@ const Styleguide = () => {
             Show modal
           </button>
 
-          <Modal show={showModal} closeModal={() => handleModalClose()}>
-            <ModalContent modalTitle="Modal title" closeModal={() => handleModalClose()} />
-          </Modal>
+          {showModal ? (
+            <Modal show={showModal} closeModal={() => handleModalClose()}>
+              <ModalContent modalTitle="Modal title" closeModal={() => handleModalClose()} />
+            </Modal>
+          ) : null}
         </div>
       </div>
 

@@ -299,62 +299,64 @@ const PoolInfo = ({
           </div>
         </div>
 
-        <Modal show={showTransferModal} closeModal={() => setShowTransferModal(false)}>
-          <TransferLPModalContent
-            closeModal={() => setShowTransferModal(false)}
-            modalTitle="Transfer LP Tokens"
-          >
-            <div>
-              <label className="text-small mb-2">Transfer to Wallet ID</label>
-              <input
-                onChange={handleInputIdChange}
-                value={inputId}
-                type="text"
-                className={`form-control ${!inputIdValid ? 'is-invalid' : ''}`}
-              />
+        {showTransferModal ? (
+          <Modal show={showTransferModal} closeModal={() => setShowTransferModal(false)}>
+            <TransferLPModalContent
+              closeModal={() => setShowTransferModal(false)}
+              modalTitle="Transfer LP Tokens"
+            >
+              <div>
+                <label className="text-small mb-2">Transfer to Wallet ID</label>
+                <input
+                  onChange={handleInputIdChange}
+                  value={inputId}
+                  type="text"
+                  className={`form-control ${!inputIdValid ? 'is-invalid' : ''}`}
+                />
 
-              <label className="text-small mt-5 mb-2">Enter amount</label>
+                <label className="text-small mt-5 mb-2">Enter amount</label>
 
-              <InputTokenSelector
-                inputTokenComponent={
-                  <InputToken
-                    value={inputLPAmount}
-                    onChange={handleInputLPAmountChange}
-                    name="amountOut"
-                  />
-                }
-                buttonSelectorComponent={
-                  <ButtonSelector selectorText="" disabled selectedToken="LP" />
-                }
-                walletBalanceComponent={
-                  poolData.lpShares !== '0' ? (
-                    <WalletBalance
-                      onMaxButtonClick={handleMaxButtonClick}
-                      walletBalance={formatStringWeiToStringEther(poolData.lpShares as string)}
+                <InputTokenSelector
+                  inputTokenComponent={
+                    <InputToken
+                      value={inputLPAmount}
+                      onChange={handleInputLPAmountChange}
+                      name="amountOut"
                     />
-                  ) : null
-                }
-              />
-
-              <div className="d-grid mt-5">
-                <Button
-                  onClick={() =>
-                    handleTransferButtonClick(
-                      poolData.pairAddress,
-                      inputLPAmount,
-                      idToAddress(inputId),
-                    )
                   }
-                  loading={transferLoading}
-                  type="primary"
-                  disabled={!canTransfer}
-                >
-                  Transfer
-                </Button>
+                  buttonSelectorComponent={
+                    <ButtonSelector selectorText="" disabled selectedToken="LP" />
+                  }
+                  walletBalanceComponent={
+                    poolData.lpShares !== '0' ? (
+                      <WalletBalance
+                        onMaxButtonClick={handleMaxButtonClick}
+                        walletBalance={formatStringWeiToStringEther(poolData.lpShares as string)}
+                      />
+                    ) : null
+                  }
+                />
+
+                <div className="d-grid mt-5">
+                  <Button
+                    onClick={() =>
+                      handleTransferButtonClick(
+                        poolData.pairAddress,
+                        inputLPAmount,
+                        idToAddress(inputId),
+                      )
+                    }
+                    loading={transferLoading}
+                    type="primary"
+                    disabled={!canTransfer}
+                  >
+                    Transfer
+                  </Button>
+                </div>
               </div>
-            </div>
-          </TransferLPModalContent>
-        </Modal>
+            </TransferLPModalContent>
+          </Modal>
+        ) : null}
 
         <div className="col-md-4 mt-4 mt-md-0">
           <div>
