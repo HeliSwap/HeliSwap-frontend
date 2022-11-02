@@ -17,7 +17,7 @@ const WalletBalance = ({
     <p className={`text-micro ${insufficientBallance ? 'text-danger' : 'text-gray'}`}>
       {insufficientBallance ? 'Insufficient ' : ''}Balance:{' '}
       <span className="text-numeric">{walletBalance}</span>
-      {parseFloat(walletBalance) > 0 && onMaxButtonClick && !insufficientBallance ? (
+      {parseFloat(walletBalance) > 0 && onMaxButtonClick ? (
         <span
           className="link-primary text-bold text-uppercase text-micro ms-2"
           onClick={() => onMaxButtonClick(walletBalance)}
