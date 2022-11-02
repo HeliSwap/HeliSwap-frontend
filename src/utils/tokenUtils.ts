@@ -386,7 +386,9 @@ export const getAmountToApprove = async (
       return MAX_UINT_ERC20.toString();
     } else {
       const maxSupply = (await getHTSTokenInfo(tokenId)).maxSupply;
-      return maxSupply && parseInt(maxSupply) !== 0 ? maxSupply : MAX_UINT_HTS.toString();
+      return maxSupply && parseInt(maxSupply) !== 0 && new BigNumber(maxSupply).lt(MAX_UINT_HTS)
+        ? maxSupply
+        : MAX_UINT_HTS.toString();
     }
   } catch (e) {
     return isHTS ? MAX_UINT_HTS.toString() : MAX_UINT_ERC20.toString();
