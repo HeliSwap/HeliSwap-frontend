@@ -21,7 +21,7 @@ interface IMyPoolsProps {
   renderEmptyPoolsState: (message: string) => any;
   setShowConnectModal: (show: boolean) => void;
   setShowRemoveContainer: React.Dispatch<React.SetStateAction<boolean>>;
-  setCurrentPoolIndex: React.Dispatch<React.SetStateAction<number>>;
+  setCurrentPoolAddress: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const MyPools = ({
@@ -35,7 +35,7 @@ const MyPools = ({
   renderEmptyPoolsState,
   setShowConnectModal,
   setShowRemoveContainer,
-  setCurrentPoolIndex,
+  setCurrentPoolAddress,
 }: IMyPoolsProps) => {
   const [collapseAll, setCollapseAll] = useState<boolean>(false);
 
@@ -94,7 +94,7 @@ const MyPools = ({
               .map((item, index) => (
                 <PoolInfo
                   setShowRemoveContainer={setShowRemoveContainer}
-                  setCurrentPoolIndex={setCurrentPoolIndex}
+                  setCurrentPoolAddress={setCurrentPoolAddress}
                   index={index + itemOffset}
                   key={index}
                   poolData={item}

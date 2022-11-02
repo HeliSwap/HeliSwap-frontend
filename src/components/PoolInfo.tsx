@@ -36,7 +36,7 @@ interface IPoolInfoProps {
   poolData: IPoolExtendedData;
   index: number;
   setShowRemoveContainer: React.Dispatch<React.SetStateAction<boolean>>;
-  setCurrentPoolIndex: React.Dispatch<React.SetStateAction<number>>;
+  setCurrentPoolAddress: React.Dispatch<React.SetStateAction<string>>;
   view: PageViews;
   collapseAll?: boolean;
   setCollapseAll?: (collapsed: boolean) => void;
@@ -46,7 +46,7 @@ const PoolInfo = ({
   poolData,
   index,
   setShowRemoveContainer,
-  setCurrentPoolIndex,
+  setCurrentPoolAddress,
   view,
   collapseAll,
   setCollapseAll,
@@ -70,7 +70,7 @@ const PoolInfo = ({
 
   const handleRemoveButtonClick = () => {
     setShowRemoveContainer(prev => !prev);
-    setCurrentPoolIndex(index);
+    setCurrentPoolAddress(poolData?.pairAddress);
   };
 
   const handleTransferModalButtonClick = () => {
