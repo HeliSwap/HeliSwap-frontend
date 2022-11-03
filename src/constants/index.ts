@@ -6,7 +6,8 @@ import { ICreatePairData, ISwapTokenData, ITokenData, ITokensData } from '../int
 import { NATIVE_TOKEN } from '../utils/tokenUtils';
 
 export const MAX_UINT_ERC20 = hethers.constants.MaxUint256;
-export const MAX_UINT_HTS = 15908979783.594148;
+//Maximum value for a 64-bit signed integer
+export const MAX_UINT_HTS = new BigNumber('9223372036854775807');
 export const POOLS_FEE = '0.3%';
 export const HUNDRED_BN = new BigNumber('100');
 export const REFRESH_TIME = 10000;
