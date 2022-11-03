@@ -1,15 +1,30 @@
-import { useState } from 'react';
+import { MutableRefObject, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import Icon from './Icon';
 import Navigation from './Navigation';
 
 const Sidebar = () => {
+  const sidebarMenuRef: MutableRefObject<null | HTMLDivElement> = useRef(null);
+
   const [menuOpened, setMenuOpened] = useState(false);
 
   const handleMoreButtonClick = () => {
     setMenuOpened(prev => !prev);
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event: Event) => {
+      if (!sidebarMenuRef.current?.contains(event.target as HTMLDivElement)) {
+        setMenuOpened(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="container-sidebar">
@@ -25,7 +40,7 @@ const Sidebar = () => {
       <div className="container-menu">
         <Navigation />
 
-        <div className="position-relative">
+        <div className="position-relative" ref={sidebarMenuRef}>
           <div
             className={`d-flex align-items-center link-menu cursor-pointer ${
               menuOpened ? 'is-active' : ''

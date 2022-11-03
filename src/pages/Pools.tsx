@@ -40,7 +40,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
   const { userId, connected, isHashpackLoading, setShowConnectModal } = connection;
 
   const [showRemoveContainer, setShowRemoveContainer] = useState(false);
-  const [currentPoolIndex, setCurrentPoolIndex] = useState(0);
+  const [currentPoolAddress, setCurrentPoolAddress] = useState('');
   const [poolsToShow, setPoolsToShow] = useState<IPoolExtendedData[]>([]);
   const [userPoolsToShow, setUserPoolsToShow] = useState<IPoolExtendedData[]>([]);
   const [havePools, setHavePools] = useState(false);
@@ -158,13 +158,18 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
     </div>
   );
 
+  const renderRemoveLiquidityComponent = () => {
+    const currentPool = poolsByUser.find(pool => pool.pairAddress === currentPoolAddress);
+
+    return currentPool ? (
+      <RemoveLiquidity pairData={currentPool} setShowRemoveContainer={setShowRemoveContainer} />
+    ) : null;
+  };
+
   return (
     <div className="d-flex justify-content-center">
-      {showRemoveContainer && poolsByUser[currentPoolIndex] ? (
-        <RemoveLiquidity
-          pairData={poolsByUser[currentPoolIndex]}
-          setShowRemoveContainer={setShowRemoveContainer}
-        />
+      {showRemoveContainer && poolsByUser.find(pool => pool.pairAddress === currentPoolAddress) ? (
+        renderRemoveLiquidityComponent()
       ) : (
         <div className="container-max-with-1042">
           <div className="d-flex justify-content-between align-items-center mb-4">
@@ -247,7 +252,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
                   itemsPerPage={itemsPerPage}
                   pools={poolsToShow}
                   setShowRemoveContainer={setShowRemoveContainer}
-                  setCurrentPoolIndex={setCurrentPoolIndex}
+                  setCurrentPoolAddress={setCurrentPoolAddress}
                   currentView={currentView}
                   renderEmptyPoolsState={renderEmptyPoolsState}
                 />
@@ -259,7 +264,7 @@ const Pools = ({ itemsPerPage }: IPoolsProps) => {
                   pools={userPoolsToShow}
                   havePools={haveUserPools}
                   setShowRemoveContainer={setShowRemoveContainer}
-                  setCurrentPoolIndex={setCurrentPoolIndex}
+                  setCurrentPoolAddress={setCurrentPoolAddress}
                   currentView={currentView}
                   renderEmptyPoolsState={renderEmptyPoolsState}
                   setShowConnectModal={setShowConnectModal}
