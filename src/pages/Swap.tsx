@@ -807,23 +807,25 @@ const Swap = () => {
             ) : null
           }
         />
-        <Modal show={showModalA} closeModal={() => setShowModalA(false)}>
-          <ModalSearchContent
-            modalTitle="Select a token"
-            tokenFieldId="tokenA"
-            setTokensData={newTokensData => {
-              setNeedApproval(true);
-              setApproved(false);
-              setTokensData(newTokensData);
-            }}
-            closeModal={() => setShowModalA(false)}
-            canImport={false}
-            tokenDataList={tokenAFilteredData}
-            loadingTDL={loadingTDL}
-            searchFunc={searchTokensFunc}
-            itemToExlude={tokensData.tokenB}
-          />
-        </Modal>
+        {showModalA ? (
+          <Modal show={showModalA} closeModal={() => setShowModalA(false)}>
+            <ModalSearchContent
+              modalTitle="Select a token"
+              tokenFieldId="tokenA"
+              setTokensData={newTokensData => {
+                setNeedApproval(true);
+                setApproved(false);
+                setTokensData(newTokensData);
+              }}
+              closeModal={() => setShowModalA(false)}
+              canImport={false}
+              tokenDataList={tokenAFilteredData}
+              loadingTDL={loadingTDL}
+              searchFunc={searchTokensFunc}
+              itemToExlude={tokensData.tokenB}
+            />
+          </Modal>
+        ) : null}
 
         <div className="d-flex justify-content-center my-4">
           <span className="d-block p-1" onClick={handleSwitchTokens}>
@@ -856,21 +858,23 @@ const Swap = () => {
             ) : null
           }
         />
-        <Modal show={showModalB} closeModal={() => setShowModalB(false)}>
-          <ModalSearchContent
-            modalTitle="Select token"
-            tokenFieldId="tokenB"
-            setTokensData={newTokensData => {
-              setTokensData(newTokensData);
-            }}
-            closeModal={() => setShowModalB(false)}
-            canImport={false}
-            tokenDataList={tokenBFilteredData}
-            loadingTDL={loadingTDL}
-            searchFunc={searchTokensFunc}
-            itemToExlude={tokensData.tokenA}
-          />
-        </Modal>
+        {showModalB ? (
+          <Modal show={showModalB} closeModal={() => setShowModalB(false)}>
+            <ModalSearchContent
+              modalTitle="Select token"
+              tokenFieldId="tokenB"
+              setTokensData={newTokensData => {
+                setTokensData(newTokensData);
+              }}
+              closeModal={() => setShowModalB(false)}
+              canImport={false}
+              tokenDataList={tokenBFilteredData}
+              loadingTDL={loadingTDL}
+              searchFunc={searchTokensFunc}
+              itemToExlude={tokensData.tokenA}
+            />
+          </Modal>
+        ) : null}
         {swapPath}
         {renderActionButtons()}
       </div>

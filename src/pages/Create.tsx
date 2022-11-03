@@ -757,25 +757,27 @@ const Create = () => {
             ) : null
           }
         />
-        <Modal show={showModalA} closeModal={() => setShowModalA(false)}>
-          <ModalSearchContent
-            modalTitle="Select a token"
-            tokenFieldId="tokenA"
-            setTokensData={tokensData => {
-              const { tokenA } = tokensData();
-              if (tokenA && typeof tokenA.hederaId !== 'undefined') {
-                setNeedApproval(prev => ({ ...prev, tokenA: true }));
-                setApproved(prev => ({ ...prev, tokenA: false }));
-                setTokensData(prev => ({ ...prev, tokenA }));
-              }
-            }}
-            closeModal={() => setShowModalA(false)}
-            tokenDataList={tokenAFilteredData}
-            loadingTDL={loadingTDL}
-            searchFunc={searchTokensFunc}
-            itemToExlude={tokensData.tokenB}
-          />
-        </Modal>
+        {showModalA ? (
+          <Modal show={showModalA} closeModal={() => setShowModalA(false)}>
+            <ModalSearchContent
+              modalTitle="Select a token"
+              tokenFieldId="tokenA"
+              setTokensData={tokensData => {
+                const { tokenA } = tokensData();
+                if (tokenA && typeof tokenA.hederaId !== 'undefined') {
+                  setNeedApproval(prev => ({ ...prev, tokenA: true }));
+                  setApproved(prev => ({ ...prev, tokenA: false }));
+                  setTokensData(prev => ({ ...prev, tokenA }));
+                }
+              }}
+              closeModal={() => setShowModalA(false)}
+              tokenDataList={tokenAFilteredData}
+              loadingTDL={loadingTDL}
+              searchFunc={searchTokensFunc}
+              itemToExlude={tokensData.tokenB}
+            />
+          </Modal>
+        ) : null}
 
         <InputTokenSelector
           isInvalid={getInsufficientTokenB() as boolean}
@@ -810,25 +812,27 @@ const Create = () => {
             ) : null
           }
         />
-        <Modal show={showModalB} closeModal={() => setShowModalB(false)}>
-          <ModalSearchContent
-            modalTitle="Select token"
-            tokenFieldId="tokenB"
-            setTokensData={tokensData => {
-              const { tokenB } = tokensData();
-              if (tokenB && typeof tokenB.hederaId !== 'undefined') {
-                setNeedApproval(prev => ({ ...prev, tokenB: true }));
-                setApproved(prev => ({ ...prev, tokenB: false }));
-                setTokensData(prev => ({ ...prev, tokenB }));
-              }
-            }}
-            closeModal={() => setShowModalB(false)}
-            tokenDataList={tokenBFilteredData}
-            loadingTDL={loadingTDL}
-            searchFunc={searchTokensFunc}
-            itemToExlude={tokensData.tokenA}
-          />
-        </Modal>
+        {showModalB ? (
+          <Modal show={showModalB} closeModal={() => setShowModalB(false)}>
+            <ModalSearchContent
+              modalTitle="Select token"
+              tokenFieldId="tokenB"
+              setTokensData={tokensData => {
+                const { tokenB } = tokensData();
+                if (tokenB && typeof tokenB.hederaId !== 'undefined') {
+                  setNeedApproval(prev => ({ ...prev, tokenB: true }));
+                  setApproved(prev => ({ ...prev, tokenB: false }));
+                  setTokensData(prev => ({ ...prev, tokenB }));
+                }
+              }}
+              closeModal={() => setShowModalB(false)}
+              tokenDataList={tokenBFilteredData}
+              loadingTDL={loadingTDL}
+              searchFunc={searchTokensFunc}
+              itemToExlude={tokensData.tokenA}
+            />
+          </Modal>
+        ) : null}
         {renderFeesInfo()}
         <hr className="my-4" />
         {renderTokensRatioSection()}

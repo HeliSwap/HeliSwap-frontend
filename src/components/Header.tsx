@@ -113,23 +113,27 @@ const Header = () => {
               Connect wallet
             </Button>
           )}
-          <Modal show={showConnectModal} closeModal={() => setShowConnectModal(false)}>
-            <ConnectModalContent
-              modalTitle="Connect wallet"
-              closeModal={() => setShowConnectModal(false)}
-              connectWallet={connectWallet}
-              isLoading={isHashpackLoading}
-              extensionFound={extensionFound}
-            />
-          </Modal>
-          <Modal show={showUserAccountModal} closeModal={() => setShowUserAccountModal(false)}>
-            <UserAccountModalContent
-              modalTitle="Account"
-              closeModal={() => setShowUserAccountModal(false)}
-              disconnectWallet={disconnectWallet}
-              userId={userId}
-            />
-          </Modal>
+          {showConnectModal ? (
+            <Modal show={showConnectModal} closeModal={() => setShowConnectModal(false)}>
+              <ConnectModalContent
+                modalTitle="Connect wallet"
+                closeModal={() => setShowConnectModal(false)}
+                connectWallet={connectWallet}
+                isLoading={isHashpackLoading}
+                extensionFound={extensionFound}
+              />
+            </Modal>
+          ) : null}
+          {showUserAccountModal ? (
+            <Modal show={showUserAccountModal} closeModal={() => setShowUserAccountModal(false)}>
+              <UserAccountModalContent
+                modalTitle="Account"
+                closeModal={() => setShowUserAccountModal(false)}
+                disconnectWallet={disconnectWallet}
+                userId={userId}
+              />
+            </Modal>
+          ) : null}
         </div>
       </div>
     </div>
