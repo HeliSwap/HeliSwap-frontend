@@ -109,7 +109,7 @@ export const getProcessedFarms = (
                 rewardDataItem => rewardDataItem.address === reward.address,
               )?.decimals;
               const rewardAmount = formatStringWeiToStringEther(rewardAmountWei, rewardDecimals);
-              const rewardAmountUSD = (Number(rewardValueUSD) * Number(rewardAmount)).toString();
+              const rewardAmountUSD = (Number(rewardValueUSD) * Number(rewardAmount)).toFixed(2);
 
               return {
                 address: reward.address,
