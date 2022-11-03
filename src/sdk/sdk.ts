@@ -484,8 +484,6 @@ class SDK {
       userId,
       false,
     );
-    //@ts-ignore
-    console.log('mitko', response?.response?.transactionId);
 
     const responseData: any = {
       response,
