@@ -47,7 +47,7 @@ const ModalSearchContent = ({
   itemToExlude,
 }: IModalProps) => {
   const networkType = process.env.REACT_APP_NETWORK_TYPE as string;
-  const hashScanUrl = `https://hashscan.io/#/${networkType}/token/`;
+  const hashScanUrl = `https://hashscan.io/${networkType}/token/`;
 
   const [searchInputValue, setSearchInputValue] = useState('');
 

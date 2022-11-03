@@ -25,7 +25,7 @@ const UserAccoutnModalContent = ({
     navigator.clipboard.writeText(userId);
   };
 
-  const hashscanLink = `https://hashscan.io/#/${process.env.REACT_APP_NETWORK_TYPE}/account/${userId}`;
+  const hashscanLink = `https://hashscan.io/${process.env.REACT_APP_NETWORK_TYPE}/account/${userId}`;
 
   return (
     <>
