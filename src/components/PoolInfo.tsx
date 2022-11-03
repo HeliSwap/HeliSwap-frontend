@@ -138,11 +138,10 @@ const PoolInfo = ({
   };
 
   const handleStakeButtonClick = () => {
-    const { farms } = poolData;
+    const { farmAddress } = poolData;
 
-    if (farms && farms?.length !== 0) {
-      //TODO: determine if this is what we want
-      navigate(`/farms/${farms[0]}`);
+    if (farmAddress) {
+      navigate(`/farms/${farmAddress}`);
     } else {
       navigate(`/farms/`);
     }

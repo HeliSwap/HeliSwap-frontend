@@ -73,7 +73,7 @@ export const GET_POOLS_BY_USER = gql`
       fee1
       hasProblematicToken
       hasCampaign
-      farms
+      farmAddress
     }
   }
 `;
