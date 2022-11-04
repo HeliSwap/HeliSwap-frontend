@@ -21,6 +21,7 @@ import DOVU from '../icons/tokens/DOVU.png';
 import CREAM from '../icons/tokens/CREAM.svg';
 import JAM from '../icons/tokens/JAM.png';
 import QUACK from '../icons/tokens/QUACK.png';
+import WHALE from '../icons/tokens/WHALE.png';
 
 interface IIconTokenProps {
   symbol: string;
@@ -61,6 +62,7 @@ const tokenMapping: ITokenMapping = {
   CREAM: CREAM,
   JAM: JAM,
   QUACK: QUACK,
+  WHALE: WHALE,
   LP: LP,
 };
 

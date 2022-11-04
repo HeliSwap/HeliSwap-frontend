@@ -137,6 +137,14 @@
       "symbol": "QUACK",
       "decimals": 0,
       "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/QUACK.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x00000000000000000000000000000000001176B5",
+      "name": "WHALE",
+      "symbol": "WHALE",
+      "decimals": 2,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/WHALE.png"
     }
   ]
 }
