@@ -74,7 +74,7 @@ const Header = () => {
                   className="d-flex align-items-center link"
                   target="_blank"
                   rel="noreferrer"
-                  href="https://hashport.network/"
+                  href="https://app.hashport.network/"
                 >
                   <Icon name="hashport" />
                   <span className="ms-3 text-small">Hashport Bridge</span>

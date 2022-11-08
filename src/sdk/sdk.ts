@@ -308,11 +308,21 @@ class SDK {
       : formatStringToBigNumberWei(amountOut, decOut);
 
     const extraSwaps = path.length - 2;
-    const maxGas =
-      TRANSACTION_MAX_FEES.BASE_SWAP +
-      extraSwaps * TRANSACTION_MAX_FEES.EXTRA_SWAP +
-      extraSwaps * TRANSACTION_MAX_FEES.TOKEN_OUT_EXACT_SWAP;
 
+    const baseFee =
+      tokenInIsNative ||
+      tokenOutIsNative ||
+      path.includes(process.env.REACT_APP_WHBAR_ADDRESS as string)
+        ? TRANSACTION_MAX_FEES.BASE_SWAP_NATIVE
+        : TRANSACTION_MAX_FEES.BASE_SWAP;
+
+    const exactOutGas = exactAmountIn
+      ? 0
+      : extraSwaps !== 0
+      ? extraSwaps * TRANSACTION_MAX_FEES.TOKEN_OUT_EXACT_SWAP
+      : TRANSACTION_MAX_FEES.TOKEN_OUT_EXACT_SWAP;
+
+    const maxGas = baseFee + extraSwaps * TRANSACTION_MAX_FEES.EXTRA_SWAP + exactOutGas;
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(routerContractAddress))
