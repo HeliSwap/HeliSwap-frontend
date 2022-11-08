@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState } from 'react';
+import React, { ReactNode, useContext, useMemo, useState } from 'react';
 import Tippy from '@tippyjs/react';
 import toast from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -227,18 +227,21 @@ const FarmDetails = () => {
                     </div>
                     <div className="col-6 col-md-4 d-flex align-items-center">
                       {farmData.rewardsData?.length > 0 &&
-                        farmData.rewardsData?.map((reward, index) => {
-                          const rewardSymbol =
-                            reward.address === process.env.REACT_APP_WHBAR_ADDRESS
-                              ? NATIVE_TOKEN.symbol
-                              : reward.symbol;
-                          return (
-                            <div key={index} className="d-flex align-items-center me-4">
-                              <IconToken symbol={reward.symbol} />{' '}
-                              <span className="text-main ms-3">{rewardSymbol}</span>
-                            </div>
-                          );
-                        })}
+                        farmData.rewardsData?.reduce((acc: ReactNode[], reward: IReward, index) => {
+                          if (reward.totalAmount && Number(reward.totalAmount) !== 0) {
+                            const rewardSymbol =
+                              reward.address === process.env.REACT_APP_WHBAR_ADDRESS
+                                ? NATIVE_TOKEN.symbol
+                                : reward.symbol;
+                            acc.push(
+                              <div key={index} className="d-flex align-items-center me-4">
+                                <IconToken symbol={reward.symbol} />{' '}
+                                <span className="text-main ms-3">{rewardSymbol}</span>
+                              </div>,
+                            );
+                          }
+                          return acc;
+                        }, [])}
                     </div>
                   </div>
 
@@ -336,38 +339,42 @@ const FarmDetails = () => {
                           <hr className="my-4" />
 
                           <div className="mt-4">
-                            {farmData.rewardsData?.map(reward => {
-                              const userRewardData =
-                                farmData.userStakingData?.rewardsAccumulated?.find(
-                                  (rewardSingle: IUserStakingData) => {
-                                    return rewardSingle.address === reward.address;
-                                  },
-                                ) || ({} as IUserStakingData);
+                            {farmData.rewardsData?.length > 0 &&
+                              farmData.rewardsData?.reduce((acc: ReactNode[], reward: IReward) => {
+                                if (reward.totalAmount && Number(reward.totalAmount) !== 0) {
+                                  const userRewardData =
+                                    farmData.userStakingData?.rewardsAccumulated?.find(
+                                      (rewardSingle: IUserStakingData) => {
+                                        return rewardSingle.address === reward.address;
+                                      },
+                                    ) || ({} as IUserStakingData);
 
-                              const rewardAddress = reward.address;
-                              const rewardDecimals = reward.decimals;
-                              const rewardSymbol =
-                                rewardAddress === process.env.REACT_APP_WHBAR_ADDRESS
-                                  ? NATIVE_TOKEN.symbol
-                                  : reward.symbol;
-                              return (
-                                <p
-                                  key={rewardSymbol}
-                                  className="text-main d-flex justify-content-between align-items-center mt-4"
-                                >
-                                  <span className="d-flex align-items-center text-secondary">
-                                    <IconToken symbol={rewardSymbol} />
-                                    <span className="ms-3">{rewardSymbol}</span>
-                                  </span>
-                                  <span className="text-numeric ms-3">
-                                    {formatStringWeiToStringEther(
-                                      userRewardData.totalAccumulated || '0',
-                                      rewardDecimals,
-                                    )}
-                                  </span>
-                                </p>
-                              );
-                            })}
+                                  const rewardAddress = reward.address;
+                                  const rewardDecimals = reward.decimals;
+                                  const rewardSymbol =
+                                    rewardAddress === process.env.REACT_APP_WHBAR_ADDRESS
+                                      ? NATIVE_TOKEN.symbol
+                                      : reward.symbol;
+                                  acc.push(
+                                    <p
+                                      key={rewardSymbol}
+                                      className="text-main d-flex justify-content-between align-items-center mt-4"
+                                    >
+                                      <span className="d-flex align-items-center text-secondary">
+                                        <IconToken symbol={rewardSymbol} />
+                                        <span className="ms-3">{rewardSymbol}</span>
+                                      </span>
+                                      <span className="text-numeric ms-3">
+                                        {formatStringWeiToStringEther(
+                                          userRewardData.totalAccumulated || '0',
+                                          rewardDecimals,
+                                        )}
+                                      </span>
+                                    </p>,
+                                  );
+                                }
+                                return acc;
+                              }, [])}
                           </div>
                         </div>
 
