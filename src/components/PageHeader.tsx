@@ -10,7 +10,7 @@ interface IPageHeaderProps {
 
 const PageHeader = ({ title, handleBackClick, slippage }: IPageHeaderProps) => {
   return (
-    <div className="d-flex justify-content-between align-items-center mb-6">
+    <div className="d-flex justify-content-between align-items-center mb-4 mb-lg-6">
       {handleBackClick ? (
         <span className="cursor-pointer" onClick={handleBackClick}>
           <Icon name="arrow-left" />
