@@ -232,10 +232,16 @@ const Swap = () => {
       return (
         <div className="d-flex align-items-center" key={index}>
           {index !== 0 ? <span className="mx-3">{'>'}</span> : null}
-          <IconToken symbol={currentTokenSymbol} />
-          <div className="d-flex flex-column ms-3">
-            <span className="text-main text-bold">{currentTokenSymbol}</span>
-          </div>
+          <Tippy content={currentTokenSymbol}>
+            <span>
+              <IconToken symbol={currentTokenSymbol} />
+            </span>
+          </Tippy>
+          {bestPath.length <= 3 ? (
+            <div className="d-flex flex-column ms-3">
+              <span className="text-main text-bold">{currentTokenSymbol}</span>
+            </div>
+          ) : null}
         </div>
       );
     };
