@@ -1,7 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 
 import BigNumber from 'bignumber.js';
-import _ from 'lodash';
 
 import { GlobalContext } from '../../../providers/Global';
 
@@ -21,15 +20,12 @@ import Loader from '../../Loader';
 import PoolsAnalytics from '../PoolsAnalytics';
 
 import { getTokenPrice } from '../../../utils/tokenUtils';
-import { filterPoolsByPattern } from '../../../utils/poolUtils';
 
 import usePoolsByTokensList from '../../../hooks/usePoolsByTokensList';
-import usePoolsByFilter from '../../../hooks/usePoolsByFilter';
 import { client, fetchPoolChartData } from '../../../hooks/useUniswapChartData';
 import useTokensByListIds from '../../../hooks/useTokensByListIds';
 
 import {
-  ASYNC_SEARCH_THRESHOLD,
   useQueryOptions,
   useQueryOptionsProvideSwapRemove,
   initialPoolsAnalyticsData,
@@ -43,7 +39,6 @@ const Overview = () => {
   const dataClient = client;
 
   const [chartData, setChartData] = useState<ChartDayData[]>([]);
-  const [poolsToShow, setPoolsToShow] = useState<IPoolExtendedData[]>([]);
   const [tokensToShow, setTokensToShow] = useState<ITokenDataAnalytics[]>([]);
   const [loadingTokens, setLoadingTokens] = useState(false);
   const [poolsAnalytics, setPoolsAnalytics] = useState(initialPoolsAnalyticsData);
@@ -54,28 +49,15 @@ const Overview = () => {
     errorPoolsByTokenList: errorPools,
   } = usePoolsByTokensList(useQueryOptionsProvideSwapRemove, true, tokensWhitelistedAddresses);
 
-  const { filteredPools, filteredPoolsLoading } = usePoolsByFilter(useQueryOptions, true, pools);
-
   const { tokens: tokenDataList } = useTokensByListIds(tokensWhitelistedAddresses, useQueryOptions);
-
-  // Merge whitelisted and pools by filter arrays
-  useEffect(() => {
-    if ((pools.length || filteredPools.length) && !filteredPoolsLoading && !loadingPools) {
-      const whitelistedFilteredPools = filterPoolsByPattern('', pools, ASYNC_SEARCH_THRESHOLD);
-      const visiblePools = _.unionBy(whitelistedFilteredPools, filteredPools, 'id');
-
-      setPoolsToShow(visiblePools);
-    }
-  }, [pools, filteredPools, filteredPoolsLoading, loadingPools]);
 
   useEffect(() => {
     setLoadingTokens(true);
 
-    if (tokenDataList && tokenDataList.length > 0 && poolsToShow.length > 0 && hbarPrice) {
-      // calculate TVL per token
+    if (tokenDataList && tokenDataList.length > 0 && pools.length > 0 && hbarPrice) {
       const tvlPerToken: any = {};
 
-      poolsToShow.forEach(pool => {
+      pools.forEach(pool => {
         const { token0, token0Amount } = pool;
         const { token1, token1Amount } = pool;
 
@@ -95,16 +77,18 @@ const Overview = () => {
         }
       });
 
-      // prepare local currentTokens state
       const tokensWithData = tokenDataList.map(token => {
         const tokenPrice =
           token.type === TokenType.HBAR
             ? hbarPrice.toString()
-            : getTokenPrice(poolsToShow, token.address, hbarPrice);
+            : getTokenPrice(pools, token.address, hbarPrice);
+
         let tvl;
+
         if (tvlPerToken[token.address]) {
           tvl = tvlPerToken[token.address].toString();
         }
+
         return {
           ...token,
           price: tokenPrice,
@@ -115,7 +99,7 @@ const Overview = () => {
       setLoadingTokens(false);
       setTokensToShow(tokensWithData);
     }
-  }, [tokensWhitelisted, poolsToShow, hbarPrice, tokenDataList]);
+  }, [tokensWhitelisted, pools, hbarPrice, tokenDataList]);
 
   useEffect(() => {
     const addresses = [
@@ -265,7 +249,7 @@ const Overview = () => {
             <Loader />
           </div>
         ) : (
-          <TopPools error={errorPools} pools={poolsToShow} />
+          <TopPools error={errorPools} pools={pools} />
         )}
       </section>
 
