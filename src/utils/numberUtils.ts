@@ -8,6 +8,15 @@ export const formatStringToPrice = (stringToFormat: string, floor: boolean = fal
     : `$${numeral(stringToFormat).format('0.00a')}`;
 };
 
+export const formatStringToPriceWithPrecision = (
+  stringToFormat: string,
+  floor: boolean = false,
+) => {
+  return floor && Number(stringToFormat) < 1000
+    ? `$${numeral(stringToFormat).format('0.0000a', Math.floor)}`
+    : `$${numeral(stringToFormat).format('0.0000a')}`;
+};
+
 export const formatStringToPercentage = (stringToFormat: string) => {
   return `${numeral(stringToFormat).format('0.0a')}%`;
 };

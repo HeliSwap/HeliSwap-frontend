@@ -3,12 +3,12 @@ import { useEffect, useState } from 'react';
 import BigNumber from 'bignumber.js';
 import ReactPaginate from 'react-paginate';
 
-import { ITokenListData } from '../../../interfaces/tokens';
+import { ITokenDataAnalytics } from '../../../interfaces/tokens';
 
 import Icon from '../../Icon';
 import IconToken from '../../IconToken';
 
-import { formatStringToPrice } from '../../../utils/numberUtils';
+import { formatStringToPrice, formatStringToPriceWithPrecision } from '../../../utils/numberUtils';
 
 import {
   SORT_DIRECTION,
@@ -17,11 +17,11 @@ import {
   TOKENS_PER_PAGE,
 } from '../../../constants';
 
-interface ITopTokens {
-  tokens: ITokenListData[];
+interface ITopTokensProps {
+  tokens: ITokenDataAnalytics[];
 }
 
-const TopTokens = ({ tokens }: ITopTokens) => {
+const TopTokens = ({ tokens }: ITopTokensProps) => {
   const [offset, setOffset] = useState(0);
   const [currentItems, setCurrentItems] = useState<any[]>([]);
   const [sortBy, setSortBy] = useState<SORT_OPTIONS>(SORT_OPTIONS_ENUM.TVL);
@@ -75,7 +75,7 @@ const TopTokens = ({ tokens }: ITopTokens) => {
   return haveTokens ? (
     <>
       <div className="table-pools">
-        <div className="table-pools-row with-6-columns">
+        <div className="table-pools-row with-5-columns">
           <div className="table-pools-cell">#</div>
           <div className="table-pools-cell">Name</div>
           <div
@@ -83,12 +83,6 @@ const TopTokens = ({ tokens }: ITopTokens) => {
             // onClick={() => handleSortClick(SORT_OPTIONS_ENUM.)}
           >
             Price
-          </div>
-          <div
-            className="table-pools-cell justify-content-end ws-no-wrap"
-            // onClick={() => handleSortClick(SORT_OPTIONS_ENUM.)}
-          >
-            Price Change
           </div>
           <div
             className="table-pools-cell justify-content-end ws-no-wrap"
@@ -106,10 +100,10 @@ const TopTokens = ({ tokens }: ITopTokens) => {
         </div>
 
         {currentItems && currentItems.length
-          ? currentItems.map((token: ITokenListData, index: number) => {
+          ? currentItems.map((token: ITokenDataAnalytics, index: number) => {
               const tokenNum = index + 1;
               return (
-                <div key={token.address} className="table-pools-row with-6-columns">
+                <div key={token.address} className="table-pools-row with-5-columns">
                   <div className="table-pools-cell">
                     <span className="text-small">{tokenNum}</span>
                   </div>
@@ -121,11 +115,9 @@ const TopTokens = ({ tokens }: ITopTokens) => {
                     </p>
                   </div>
                   <div className="table-pools-cell justify-content-end">
-                    <span className="text-numeric">{formatStringToPrice(token.price || '')}</span>
-                  </div>
-                  <div className="table-pools-cell justify-content-end text-positive-400">
-                    <Icon color="success" name="arrow-up" size="small" />
-                    <span className="text-numeric">23.45%</span>
+                    <span className="text-numeric">
+                      {formatStringToPriceWithPrecision(token.price || '')}
+                    </span>
                   </div>
                   <div className="table-pools-cell justify-content-end">
                     <span className="text-numeric">$10.11k</span>
