@@ -5,15 +5,15 @@ import _ from 'lodash';
 
 import { GlobalContext } from '../../../providers/Global';
 
-import { IPoolExtendedData, ITokenListData } from '../../../interfaces/tokens';
+import { IPoolExtendedData, IPoolsAnalytics, ITokenListData } from '../../../interfaces/tokens';
 import { ChartDayData, PoolChartEntry } from '../../../interfaces/common';
 
 import BarChart from '../../BarChart';
-import Icon from '../../Icon';
 import LineChart from '../../LineChart';
 import TopPools from './TopPools';
 import TopTokens from './TopTokens';
 import Loader from '../../Loader';
+import PoolsAnalytics from '../PoolsAnalytics';
 
 import { getTokenPrice } from '../../../utils/tokenUtils';
 import { filterPoolsByPattern } from '../../../utils/poolUtils';
@@ -26,6 +26,7 @@ import {
   ASYNC_SEARCH_THRESHOLD,
   useQueryOptions,
   useQueryOptionsProvideSwapRemove,
+  initialPoolsAnalyticsData,
 } from '../../../constants';
 
 const Overview = () => {
@@ -39,6 +40,7 @@ const Overview = () => {
   const [poolsToShow, setPoolsToShow] = useState<IPoolExtendedData[]>([]);
   const [tokensToShow, setTokensToShow] = useState<ITokenListData[]>([]);
   const [loadingTokens, setLoadingTokens] = useState(false);
+  const [poolsAnalytics, setPoolsAnalytics] = useState(initialPoolsAnalyticsData);
 
   const {
     poolsByTokenList: pools,
@@ -188,6 +190,26 @@ const Overview = () => {
     }
   }, [chartData, dataClient]);
 
+  useEffect(() => {
+    const calculatePoolsTVL = (pools: IPoolExtendedData[]) => {
+      const allPoolsData = pools.reduce((acc: IPoolsAnalytics, currentPool: IPoolExtendedData) => {
+        const { tvl, volume24Num, volume7Num } = currentPool;
+
+        acc = {
+          tvl: acc.tvl + Number(tvl),
+          volume24h: acc.volume24h + Number(volume24Num),
+          volume7d: acc.volume7d + Number(volume7Num),
+        };
+
+        return acc;
+      }, initialPoolsAnalyticsData);
+
+      setPoolsAnalytics(allPoolsData);
+    };
+
+    pools && pools.length > 0 && calculatePoolsTVL(pools);
+  }, [pools]);
+
   return (
     <div className="my-9">
       <div className="row">
@@ -216,36 +238,7 @@ const Overview = () => {
         </div>
       </div>
 
-      <section className="d-flex align-items-center container-blue-neutral-800 rounded mt-5 py-4 px-5 text-small">
-        <div className="me-5">
-          <span className="text-gray me-2">Volume 24h:</span>
-          <span className="text-bold me-2 text-numeric">$123.45m</span>
-          <span className="text-positive-400">
-            (
-            <Icon color="success" name="arrow-up" size="small" />
-            <span className="text-numeric">23.45%</span> )
-          </span>
-        </div>
-
-        <div className="me-5">
-          <span className="text-gray me-2">Fees 24h:</span>
-          <span className="text-bold me-2 text-numeric">$1.23m</span>
-          <span className="text-positive-400">
-            (
-            <Icon color="success" name="arrow-up" size="small" />
-            <span className="text-numeric">23.45%</span> )
-          </span>
-        </div>
-        <div className="me-5">
-          <span className="text-gray me-2">TVL:</span>
-          <span className="text-bold me-2 text-numeric">$1.23b</span>
-          <span className="text-positive-400">
-            (
-            <Icon color="success" name="arrow-up" size="small" />
-            <span className="text-numeric">3.45%</span> )
-          </span>
-        </div>
-      </section>
+      <PoolsAnalytics poolsAnalytics={poolsAnalytics} />
 
       <section className="d-flex my-5 flex-column text-small">
         <p className="text-small text-bold mb-4">Pools</p>
