@@ -127,7 +127,7 @@ const TopPools = ({ pools, error }: ITopPoolsProps) => {
           return (
             <div key={pool.id} className="table-pools-row with-5-columns">
               <div className="table-pools-cell">
-                <span className="text-small">{poolNum}</span>
+                <span className="text-small">{poolNum + offset}</span>
               </div>
               <div className="table-pools-cell">
                 {formatIcons([pool.token0Symbol, pool.token1Symbol])}

@@ -105,7 +105,7 @@ const TopTokens = ({ tokens }: ITopTokensProps) => {
               return (
                 <div key={token.address} className="table-pools-row with-5-columns">
                   <div className="table-pools-cell">
-                    <span className="text-small">{tokenNum}</span>
+                    <span className="text-small">{tokenNum + offset}</span>
                   </div>
                   <div className="table-pools-cell">
                     <IconToken symbol={token.symbol} />
