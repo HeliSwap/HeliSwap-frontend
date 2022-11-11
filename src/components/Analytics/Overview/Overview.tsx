@@ -149,10 +149,12 @@ const Overview = () => {
       '0xe15e6583425700993bd08f51bf6e7b73cd5da91b',
       '0x68082ecc5bbad8fe77c2cb9d0e3403d9a00ccbc2',
     ];
+
     async function fetchAll() {
       if (!addresses) {
         return;
       }
+
       // fetch all data for each pool
       const data = await addresses
         .slice(0, 20) // @TODO: must be replaced with aggregate with subgraph data fixed.
@@ -244,6 +246,7 @@ const Overview = () => {
           </span>
         </div>
       </section>
+
       <section className="d-flex my-5 flex-column text-small">
         <p className="text-small text-bold mb-4">Pools</p>
         {loadingPools ? (
@@ -265,47 +268,6 @@ const Overview = () => {
           <TopTokens tokens={tokensToShow} />
         )}
       </section>
-      {/* <section className="d-flex my-5 flex-column text-small">
-        <p>Transactions</p>
-        <ul className="container-blue-neutral-800 mt-4">
-          <li className="row border-bottom border-secondary p-5 m-0">
-            <div className="d-flex col-3 justify-content-between">
-              <span className="link-primary cursor-pointer text-bold">All</span>
-              <span className="text-gray cursor-pointer text-bold">Swaps</span>
-              <span className="text-gray cursor-pointer text-bold">Adds</span>
-              <span className="text-gray cursor-pointer text-bold">Removes</span>
-            </div>
-            <div className="col-2 text-end">Total Value</div>
-            <div className="col-2 text-end">Token Amount</div>
-            <div className="col-2 text-end">Token Amount</div>
-            <div className="col-2 text-end">Account</div>
-            <div className="col-1 text-end">
-              <span>Time</span>
-              <Icon name="arrow-down" size="small" />
-            </div>
-          </li>
-          <li className="row border-bottom border-secondary p-5 m-0">
-            <Link to={'/pools'} className="col-3 link-primary">
-              Add HBAR and HELI
-            </Link>
-            <div className="col-2 text-end text-numeric">$123.45k</div>
-            <div className="col-2 text-end text-numeric">12.34 HBAR</div>
-            <div className="col-2 text-end text-numeric">12.34 HELI</div>
-            <a
-              href={hashScanAccountUrl}
-              target={'_blank'}
-              className="col-2 text-end text-numeric link-primary"
-              rel="noopener noreferrer"
-            >
-              0.012345678
-            </a>
-            <div className="col-1 text-end text-numeric">54.32m</div>
-          </li>
-        </ul>
-        <div className="d-flex container-blue-neutral-800 py-4 ps-6 align-items-center text-small mb-4 justify-content-center">
-          pagination goes here
-        </div>
-      </section> */}
     </div>
   );
 };

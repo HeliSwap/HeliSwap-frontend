@@ -31,6 +31,7 @@ const Analytics = () => {
 
     return <Overview />;
   };
+
   return (
     <div className="d-flex justify-content-center">
       <div className="container-max-with-1042">
@@ -44,22 +45,6 @@ const Analytics = () => {
             >
               {viewTitleMapping[AnalyticsViews.OVERVIEW]}
             </h2>
-            {/* <h2
-              onClick={() => handleTabItemClick(AnalyticsViews.TOKENS)}
-              className={`text-subheader tab-title mx-4 ms-3 ${
-                AnalyticsViews.TOKENS === currentView ? 'is-active' : ''
-              }`}
-            >
-              {viewTitleMapping[AnalyticsViews.TOKENS]}
-            </h2>
-            <h2
-              onClick={() => handleTabItemClick(AnalyticsViews.FARMS)}
-              className={`text-subheader tab-title mx-4 ms-3 ${
-                AnalyticsViews.FARMS === currentView ? 'is-active' : ''
-              }`}
-            >
-              {viewTitleMapping[AnalyticsViews.FARMS]}
-            </h2> */}
           </div>
         </div>
         <hr />
