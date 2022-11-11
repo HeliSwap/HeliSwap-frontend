@@ -73,69 +73,72 @@ const TopTokens = ({ tokens }: ITopTokens) => {
   const haveTokens = currentItems.length;
 
   return haveTokens ? (
-    <div className="table-pools">
-      <div className="table-pools-row with-6-columns">
-        <div className="table-pools-cell">#</div>
-        <div className="table-pools-cell">Name</div>
-        <div
-          className="table-pools-cell justify-content-end"
-          // onClick={() => handleSortClick(SORT_OPTIONS_ENUM.)}
-        >
-          Price
+    <>
+      <div className="table-pools">
+        <div className="table-pools-row with-6-columns">
+          <div className="table-pools-cell">#</div>
+          <div className="table-pools-cell">Name</div>
+          <div
+            className="table-pools-cell justify-content-end"
+            // onClick={() => handleSortClick(SORT_OPTIONS_ENUM.)}
+          >
+            Price
+          </div>
+          <div
+            className="table-pools-cell justify-content-end ws-no-wrap"
+            // onClick={() => handleSortClick(SORT_OPTIONS_ENUM.)}
+          >
+            Price Change
+          </div>
+          <div
+            className="table-pools-cell justify-content-end ws-no-wrap"
+            onClick={() => handleSortClick(SORT_OPTIONS_ENUM.VOL_24)}
+          >
+            Volume 24H
+            {getSortIcon(SORT_OPTIONS_ENUM.VOL_24)}
+          </div>
+          <div
+            className="table-pools-cell justify-content-end"
+            onClick={() => handleSortClick(SORT_OPTIONS_ENUM.TVL)}
+          >
+            <span>TVL {getSortIcon(SORT_OPTIONS_ENUM.TVL)}</span>
+          </div>
         </div>
-        <div
-          className="table-pools-cell justify-content-end ws-no-wrap"
-          // onClick={() => handleSortClick(SORT_OPTIONS_ENUM.)}
-        >
-          Price Change
-        </div>
-        <div
-          className="table-pools-cell justify-content-end ws-no-wrap"
-          onClick={() => handleSortClick(SORT_OPTIONS_ENUM.VOL_24)}
-        >
-          Volume 24H
-          {getSortIcon(SORT_OPTIONS_ENUM.VOL_24)}
-        </div>
-        <div
-          className="table-pools-cell justify-content-end"
-          onClick={() => handleSortClick(SORT_OPTIONS_ENUM.TVL)}
-        >
-          <span>TVL {getSortIcon(SORT_OPTIONS_ENUM.TVL)}</span>
-        </div>
+
+        {currentItems && currentItems.length
+          ? currentItems.map((token: ITokenListData, index: number) => {
+              const tokenNum = index + 1;
+              return (
+                <div key={token.address} className="table-pools-row with-6-columns">
+                  <div className="table-pools-cell">
+                    <span className="text-small">{tokenNum}</span>
+                  </div>
+                  <div className="table-pools-cell">
+                    <IconToken symbol={token.symbol} />
+                    <p className="text-small ms-3">
+                      <span className="me-2">{token.name}</span>
+                      <span className="text-gray">({token.symbol})</span>
+                    </p>
+                  </div>
+                  <div className="table-pools-cell justify-content-end">
+                    <span className="text-numeric">{formatStringToPrice(token.price || '')}</span>
+                  </div>
+                  <div className="table-pools-cell justify-content-end text-positive-400">
+                    <Icon color="success" name="arrow-up" size="small" />
+                    <span className="text-numeric">23.45%</span>
+                  </div>
+                  <div className="table-pools-cell justify-content-end">
+                    <span className="text-numeric">$10.11k</span>
+                  </div>
+                  <div className="table-pools-cell justify-content-end">
+                    <span className="text-numeric">{formatStringToPrice(token.tvl || '')}</span>
+                  </div>
+                </div>
+              );
+            })
+          : null}
       </div>
-      {currentItems && currentItems.length
-        ? currentItems.map((token: ITokenListData, index: number) => {
-            const tokenNum = index + 1;
-            return (
-              <div key={token.address} className="table-pools-row with-6-columns">
-                <div className="table-pools-cell">
-                  <span className="text-small">{tokenNum}</span>
-                </div>
-                <div className="table-pools-cell">
-                  <IconToken symbol={token.symbol} />
-                  <p className="text-small ms-3">
-                    <span className="me-2">{token.name}</span>
-                    <span className="text-gray">({token.symbol})</span>
-                  </p>
-                </div>
-                <div className="table-pools-cell justify-content-end">
-                  <span className="text-numeric">{formatStringToPrice(token.price || '')}</span>
-                </div>
-                <div className="table-pools-cell justify-content-end text-positive-400">
-                  <Icon color="success" name="arrow-up" size="small" />
-                  <span className="text-numeric">23.45%</span>
-                </div>
-                <div className="table-pools-cell justify-content-end">
-                  <span className="text-numeric">$10.11k</span>
-                </div>
-                <div className="table-pools-cell justify-content-end">
-                  <span className="text-numeric">{formatStringToPrice(token.tvl || '')}</span>
-                </div>
-              </div>
-            );
-          })
-        : null}
-      <div className="d-flex container-blue-neutral-800 py-4 ps-6 align-items-center text-small mb-4 justify-content-center">
+      <div className="d-flex justify-content-center mt-4">
         <ReactPaginate
           breakLabel="..."
           onPageChange={handlePageClick}
@@ -154,7 +157,7 @@ const TopTokens = ({ tokens }: ITopTokens) => {
           activeClassName={'active'}
         />
       </div>
-    </div>
+    </>
   ) : (
     <p>There are no tokens at this moment.</p>
   );

@@ -6,10 +6,10 @@ import Tippy from '@tippyjs/react';
 
 import { IPoolExtendedData } from '../../../interfaces/tokens';
 
+import Icon from '../../Icon';
+
 import { formatIcons } from '../../../utils/iconUtils';
 import { formatStringToPrice } from '../../../utils/numberUtils';
-
-import Icon from '../../Icon';
 
 import { generalFeesAndKeysWarning } from '../../../content/messages';
 
@@ -121,6 +121,7 @@ const TopPools = ({ pools, error }: ITopPoolsProps) => {
             </span>
           </div>
         </div>
+
         {currentItems.map((pool: IPoolExtendedData, index) => {
           const poolNum = index + 1;
           return (
@@ -169,7 +170,8 @@ const TopPools = ({ pools, error }: ITopPoolsProps) => {
           );
         })}
       </div>
-      <div className="d-flex container-blue-neutral-800 py-4 ps-6 align-items-center text-small mb-4 justify-content-center">
+
+      <div className="d-flex justify-content-center mt-4">
         <ReactPaginate
           breakLabel="..."
           onPageChange={handlePageClick}
