@@ -145,6 +145,14 @@
       "symbol": "WHALE",
       "decimals": 2,
       "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/WHALE.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x0000000000000000000000000000000000107980",
+      "name": "LIL",
+      "symbol": "LIL",
+      "decimals": 0,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/LIL.png"
     }
   ]
 }
