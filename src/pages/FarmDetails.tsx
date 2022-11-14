@@ -156,7 +156,7 @@ const FarmDetails = () => {
         {haveFarm ? (
           <div className="row">
             <div className="col-md-7">
-              <div className="container-blue-neutral-800 rounded p-5">
+              <div className="container-blue-neutral-800 rounded p-4 p-lg-5">
                 <div className="d-md-flex justify-content-between align-items-start">
                   <div className="d-flex align-items-center">
                     {formatIcons(
@@ -168,12 +168,12 @@ const FarmDetails = () => {
                     </p>
                   </div>
 
-                  <div className="container-campaign-status mt-5 mt-md-0 d-flex align-items-center">
+                  <div className="container-campaign-status mt-4 mt-md-0 d-flex align-items-center">
                     {renderCampaignEndDate(farmData.campaignEndDate, farmData.rewardsData)}
                   </div>
                 </div>
 
-                <div className="container-border-rounded-bn-500 mt-4 mt-6">
+                <div className="container-border-rounded-bn-500 mt-4 mt-lg-6">
                   <div className="row">
                     <div className="col-6 col-md-4 d-flex align-items-center">
                       <p className="d-flex align-items-center">
@@ -225,7 +225,7 @@ const FarmDetails = () => {
                         </Tippy>
                       </p>
                     </div>
-                    <div className="col-6 col-md-4 d-flex align-items-center">
+                    <div className="col-6 col-md-4 d-md-flex align-items-center">
                       {farmData.rewardsData?.length > 0 &&
                         farmData.rewardsData?.reduce((acc: ReactNode[], reward: IReward, index) => {
                           if (reward.totalAmount && Number(reward.totalAmount) !== 0) {
@@ -234,7 +234,10 @@ const FarmDetails = () => {
                                 ? NATIVE_TOKEN.symbol
                                 : reward.symbol;
                             acc.push(
-                              <div key={index} className="d-flex align-items-center me-4">
+                              <div
+                                key={index}
+                                className="d-flex align-items-center mt-3 mt-lg-0 me-4"
+                              >
                                 <IconToken symbol={reward.symbol} />{' '}
                                 <span className="text-main ms-3">{rewardSymbol}</span>
                               </div>,
@@ -304,7 +307,7 @@ const FarmDetails = () => {
                   ) : null}
                 </div>
 
-                <div className="container-blue-neutral rounded p-5 mt-5">
+                <div className="container-blue-neutral rounded p-4 p-lg-5 mt-4 mt-lg-5">
                   {connected && !isHashpackLoading ? (
                     hasUserStaked ? (
                       <>
