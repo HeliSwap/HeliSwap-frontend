@@ -228,7 +228,7 @@ const FarmActions = ({
 
   return (
     <div className="col-md-5 mt-4 mt-md-0">
-      <div className="container-blue-neutral-900 rounded p-5 heigth-100 d-flex flex-column">
+      <div className="container-blue-neutral-900 rounded p-4 p-lg-5 heigth-100 d-flex flex-column">
         <div>
           <span
             onClick={() => handleTabButtonClick(TabStates.STAKE)}
@@ -298,7 +298,7 @@ const FarmActions = ({
                 />
 
                 {!campaignEnded ? (
-                  <div className="text-center mt-6">
+                  <div className="text-center my-4">
                     <Link
                       className="text-small text-bold link-primary d-inline-flex align-items-center"
                       to={`/create/${farmData.poolData?.token0}/${farmData.poolData?.token1}`}
