@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Tippy from '@tippyjs/react';
 
 import { IPoolExtendedData } from '../interfaces/tokens';
@@ -54,6 +54,7 @@ const PoolInfo = ({
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
   const { userId, hashconnectConnectorInstance } = connection;
+  const navigate = useNavigate();
 
   const maxLpInputValue: string = formatStringWeiToStringEther(poolData?.lpShares as string);
 
@@ -133,6 +134,16 @@ const PoolInfo = ({
       toast('Error on transfer');
     } finally {
       setTransferLoading(false);
+    }
+  };
+
+  const handleStakeButtonClick = () => {
+    const { farmAddress } = poolData;
+
+    if (farmAddress) {
+      navigate(`/farms/${farmAddress}`);
+    } else {
+      navigate(`/farms/`);
     }
   };
 
@@ -283,13 +294,14 @@ const PoolInfo = ({
                   size="small"
                   type="primary"
                   outline
+                  className="me-4"
                 >
                   Transfer
                 </Button>
                 {poolData.hasCampaign ? (
-                  <Link className="btn btn-sm btn-outline-primary ms-4" to="/farms">
+                  <Button onClick={handleStakeButtonClick} size="small" type="primary" outline>
                     Stake
-                  </Link>
+                  </Button>
                 ) : null}
               </div>
               <span className="text-small text-numeric">
