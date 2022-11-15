@@ -1,7 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
 
-import BigNumber from 'bignumber.js';
-
 import { GlobalContext } from '../../../providers/Global';
 
 import {
@@ -30,6 +28,7 @@ import {
   useQueryOptionsProvideSwapRemove,
   initialPoolsAnalyticsData,
 } from '../../../constants';
+import { formatStringWeiToStringEther } from '../../../utils/numberUtils';
 
 const Overview = () => {
   const contextValue = useContext(GlobalContext);
@@ -55,27 +54,45 @@ const Overview = () => {
     setLoadingTokens(true);
 
     if (tokenDataList && tokenDataList.length > 0 && pools.length > 0 && hbarPrice) {
-      const tvlPerToken: any = {};
+      const tvlPerToken = pools.reduce((acc: any, pool) => {
+        const {
+          token0,
+          token0Amount,
+          token0Decimals,
+          token1,
+          token1Amount,
+          token1Decimals,
+          pairName,
+        } = pool;
 
-      pools.forEach(pool => {
-        const { token0, token0Amount } = pool;
-        const { token1, token1Amount } = pool;
-
-        const token0AmountToBN = new BigNumber(token0Amount);
-        const token1AmountToBN = new BigNumber(token1Amount);
-
-        if (!tvlPerToken[token0]) {
-          tvlPerToken[token0] = token0AmountToBN;
-        } else {
-          tvlPerToken[token0] = tvlPerToken[token0].plus(new BigNumber(token0AmountToBN));
+        if (!acc[token0]) {
+          acc[token0] = 0;
         }
 
-        if (!tvlPerToken[token1]) {
-          tvlPerToken[token1] = token1AmountToBN;
-        } else {
-          tvlPerToken[token1] = tvlPerToken[token1].plus(new BigNumber(token1AmountToBN));
+        if (!acc[token1]) {
+          acc[token1] = 0;
         }
-      });
+
+        const token0Price = getTokenPrice(pools, token0, hbarPrice);
+        const token1Price = getTokenPrice(pools, token1, hbarPrice);
+
+        const token0AmountFormatted = formatStringWeiToStringEther(token0Amount, token0Decimals);
+        const token1AmountFormatted = formatStringWeiToStringEther(token1Amount, token1Decimals);
+        const token0Value = Number(token0AmountFormatted) * Number(token0Price);
+        const token1Value = Number(token1AmountFormatted) * Number(token1Price);
+
+        console.log('pairName', pairName);
+        console.log('token0Value', token0Value);
+        console.log('token1Value', token1Value);
+        console.log('poolTVL', token0Value + token1Value);
+
+        acc[token0] += acc[token0] + token0Value;
+        acc[token1] += acc[token1] + token1Value;
+
+        return acc;
+      }, {});
+
+      console.log('tvlPerToken', tvlPerToken);
 
       const tokensWithData = tokenDataList.map(token => {
         const tokenPrice =
