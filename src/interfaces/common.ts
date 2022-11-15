@@ -44,3 +44,9 @@ export enum VolumeChartView {
   weekly,
   monthly,
 }
+
+export interface IHistoricalData {
+  tvl: string;
+  time: string;
+  volume: string;
+}

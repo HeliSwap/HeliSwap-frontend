@@ -2,52 +2,31 @@ import { useMemo, useState } from 'react';
 import { XAxis, AreaChart, Area, Tooltip } from 'recharts';
 import dayjs from 'dayjs';
 
-import { ChartDayData, VolumeChartView } from '../interfaces/common';
+import { IHistoricalData } from '../interfaces/common';
 
 import Loader from './Loader';
-import Button from './Button';
 
 import { formatStringToPrice } from '../utils/numberUtils';
-
-import { getTransformedTvlData, unixToDate } from '../hooks/useUniswapChartData';
+import { getTransformedTvlData } from '../utils/metricsUtils';
 
 interface ILineChartProps {
-  chartData: ChartDayData[];
+  chartData: IHistoricalData[];
   aggregatedValue: number;
 }
 
 const Chart = ({ chartData, aggregatedValue }: ILineChartProps) => {
   const [value, setValue] = useState<number>(aggregatedValue);
-  const [chartView, setChartView] = useState(VolumeChartView.monthly);
   const [dateLabel, setDateLabel] = useState<string>('');
 
   const formattedTvlData = useMemo(() => {
-    if (chartData) {
-      switch (chartView) {
-        case VolumeChartView.weekly:
-          return getTransformedTvlData(chartData, 'week');
-
-        case VolumeChartView.monthly:
-          return getTransformedTvlData(chartData, 'month');
-
-        default:
-          return chartData.map(day => {
-            return {
-              time: unixToDate(day.date),
-              value: day.tvlUSD,
-            };
-          });
-      }
-    } else {
-      return [];
-    }
-  }, [chartData, chartView]);
+    return getTransformedTvlData(chartData);
+  }, [chartData]);
 
   return (
     <div style={{ minHeight: '392px' }}>
       <div className="d-flex justify-content-between align-items-start">
         <div>
-          <p className="text-main text-gray">TVL 24H</p>
+          <p className="text-main text-gray">TVL</p>
           <p className="text-headline text-bold mt-3">
             {formatStringToPrice(value?.toString() as string)}
           </p>
@@ -57,47 +36,6 @@ const Chart = ({ chartData, aggregatedValue }: ILineChartProps) => {
             <p className="text-small">-</p>
           )}
         </div>
-
-        {chartData.length !== 0 ? (
-          <div className="d-flex justify-content-end">
-            <Button
-              type={chartView === VolumeChartView.daily ? 'primary' : 'secondary'}
-              size="small"
-              className="mx-2"
-              onClick={() => {
-                if (chartView !== VolumeChartView.daily) {
-                  setChartView(VolumeChartView.daily);
-                }
-              }}
-            >
-              D
-            </Button>
-            <Button
-              type={chartView === VolumeChartView.weekly ? 'primary' : 'secondary'}
-              size="small"
-              className="mx-2"
-              onClick={() => {
-                if (chartView !== VolumeChartView.weekly) {
-                  setChartView(VolumeChartView.weekly);
-                }
-              }}
-            >
-              W
-            </Button>
-            <Button
-              type={chartView === VolumeChartView.monthly ? 'primary' : 'secondary'}
-              size="small"
-              className="mx-2"
-              onClick={() => {
-                if (chartView !== VolumeChartView.monthly) {
-                  setChartView(VolumeChartView.monthly);
-                }
-              }}
-            >
-              M
-            </Button>
-          </div>
-        ) : null}
       </div>
       {chartData.length !== 0 ? (
         <AreaChart

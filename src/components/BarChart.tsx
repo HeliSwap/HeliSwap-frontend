@@ -2,17 +2,16 @@ import { useMemo, useState } from 'react';
 import { XAxis, Tooltip, Bar, BarChart } from 'recharts';
 import dayjs from 'dayjs';
 
-import { ChartDayData, VolumeChartView } from '../interfaces/common';
+import { IHistoricalData, VolumeChartView } from '../interfaces/common';
 
 import Button from './Button';
 import Loader from './Loader';
 
 import { formatStringToPrice } from '../utils/numberUtils';
-
-import { unixToDate, getTransformedVolumeData } from '../hooks/useUniswapChartData';
+import { getTransformedVolumeData } from '../utils/metricsUtils';
 
 interface IBarChartProps {
-  chartData: ChartDayData[];
+  chartData: IHistoricalData[];
   aggregatedValue: number;
 }
 
@@ -22,25 +21,7 @@ const Chart = ({ chartData, aggregatedValue }: IBarChartProps) => {
   const [chartView, setChartView] = useState(VolumeChartView.monthly);
 
   const formattedVolumeData = useMemo(() => {
-    if (chartData) {
-      switch (chartView) {
-        case VolumeChartView.weekly:
-          return getTransformedVolumeData(chartData, 'week');
-
-        case VolumeChartView.monthly:
-          return getTransformedVolumeData(chartData, 'month');
-
-        default:
-          return chartData.map(day => {
-            return {
-              time: unixToDate(day.date),
-              value: day.volumeUSD,
-            };
-          });
-      }
-    } else {
-      return [];
-    }
+    return getTransformedVolumeData(chartData, chartView);
   }, [chartData, chartView]);
 
   return (

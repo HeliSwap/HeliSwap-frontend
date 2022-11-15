@@ -23,7 +23,6 @@ const usePoolsByTokensList = (
     GET_POOLS_WHITELISTED,
     {
       variables: {
-        // tokens: ['asdasdas', 'asdasdas'],
         tokens: tokensList,
       },
       ...useQueryOptions,
