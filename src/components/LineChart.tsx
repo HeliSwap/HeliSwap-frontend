@@ -11,11 +11,11 @@ import { getTransformedTvlData } from '../utils/metricsUtils';
 
 interface ILineChartProps {
   chartData: IHistoricalData[];
-  aggregatedValue: number;
+  aggregatedValue: string;
 }
 
 const Chart = ({ chartData, aggregatedValue }: ILineChartProps) => {
-  const [value, setValue] = useState<number>(aggregatedValue);
+  const [value, setValue] = useState<string>(aggregatedValue);
   const [dateLabel, setDateLabel] = useState<string>('');
 
   const formattedTvlData = useMemo(() => {

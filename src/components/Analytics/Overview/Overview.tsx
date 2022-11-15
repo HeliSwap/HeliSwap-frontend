@@ -28,6 +28,7 @@ import {
   initialPoolsAnalyticsData,
 } from '../../../constants';
 import { formatStringWeiToStringEther } from '../../../utils/numberUtils';
+import { IHistoricalData } from '../../../interfaces/common';
 
 const Overview = () => {
   const contextValue = useContext(GlobalContext);
@@ -38,6 +39,7 @@ const Overview = () => {
   const [tokensToShow, setTokensToShow] = useState<ITokenDataAnalytics[]>([]);
   const [loadingTokens, setLoadingTokens] = useState(false);
   const [poolsAnalytics, setPoolsAnalytics] = useState(initialPoolsAnalyticsData);
+  const [historicalDataToShow, setHistoricalDataToShow] = useState<IHistoricalData[]>([]);
 
   const {
     poolsByTokenList: pools,
@@ -115,7 +117,6 @@ const Overview = () => {
       setTokensToShow(tokensWithData);
     }
   }, [tokensWhitelisted, pools, hbarPrice, tokenDataList]);
-  console.log('tokensToShow', tokensToShow);
 
   useEffect(() => {
     const calculatePoolsTVL = (pools: IPoolExtendedData[]) => {
@@ -137,13 +138,28 @@ const Overview = () => {
     pools && pools.length > 0 && calculatePoolsTVL(pools);
   }, [pools]);
 
+  //Replace last historical tvl value with the current tvl
+  useEffect(() => {
+    if (poolsAnalytics && poolsAnalytics.tvl && historicalData && historicalData.length) {
+      const historicalDataToShow = [...historicalData];
+      historicalDataToShow[historicalDataToShow.length - 1] = {
+        ...historicalDataToShow[historicalDataToShow.length - 1],
+        tvl: poolsAnalytics.tvl.toString(),
+      };
+      setHistoricalDataToShow(historicalDataToShow);
+    }
+  }, [poolsAnalytics, historicalData]);
+
   return (
     <div className="my-9">
       <div className="row">
         <div className="col-6">
-          {historicalData.length ? (
+          {historicalDataToShow.length ? (
             <div className="container-blue-neutral-800 rounded p-4">
-              <LineChart chartData={historicalData} aggregatedValue={0} />
+              <LineChart
+                chartData={historicalDataToShow}
+                aggregatedValue={historicalDataToShow[historicalDataToShow.length - 1].tvl}
+              />
             </div>
           ) : (
             <div className="d-flex justify-content-center my-6">
