@@ -6,7 +6,6 @@ import {
   IPoolExtendedData,
   IPoolsAnalytics,
   ITokenDataAnalytics,
-  TokenType,
 } from '../../../interfaces/tokens';
 
 import BarChart from '../../BarChart';
@@ -16,7 +15,7 @@ import TopTokens from './TopTokens';
 import Loader from '../../Loader';
 import PoolsAnalytics from '../PoolsAnalytics';
 
-import { getTokenPrice } from '../../../utils/tokenUtils';
+import { getTokenPrice, NATIVE_TOKEN } from '../../../utils/tokenUtils';
 
 import usePoolsByTokensList from '../../../hooks/usePoolsByTokensList';
 import useTokensByListIds from '../../../hooks/useTokensByListIds';
@@ -47,7 +46,11 @@ const Overview = () => {
     errorPoolsByTokenList: errorPools,
   } = usePoolsByTokensList(useQueryOptionsProvideSwapRemove, true, tokensWhitelistedAddresses);
 
-  const { tokens: tokenDataList } = useTokensByListIds(tokensWhitelistedAddresses, useQueryOptions);
+  const { tokens: tokenDataList } = useTokensByListIds(
+    tokensWhitelistedAddresses,
+    useQueryOptions,
+    false,
+  );
   const { historicalData } = useHistoricalData(useQueryOptions);
 
   useEffect(() => {
@@ -55,15 +58,7 @@ const Overview = () => {
 
     if (tokenDataList && tokenDataList.length > 0 && pools.length > 0 && hbarPrice) {
       const tvlPerToken = pools.reduce((acc: any, pool) => {
-        const {
-          token0,
-          token0Amount,
-          token0Decimals,
-          token1,
-          token1Amount,
-          token1Decimals,
-          pairName,
-        } = pool;
+        const { token0, token0Amount, token0Decimals, token1, token1Amount, token1Decimals } = pool;
 
         if (!acc[token0]) {
           acc[token0] = 0;
@@ -88,10 +83,13 @@ const Overview = () => {
       }, {});
 
       const tokensWithData = tokenDataList.map(token => {
-        const tokenPrice =
-          token.type === TokenType.HBAR
-            ? hbarPrice.toString()
-            : getTokenPrice(pools, token.address, hbarPrice);
+        const tokenPrice = getTokenPrice(pools, token.address, hbarPrice);
+        const tokenName =
+          token.address === process.env.REACT_APP_WHBAR_ADDRESS ? NATIVE_TOKEN.name : token.name;
+        const tokenSymbol =
+          token.address === process.env.REACT_APP_WHBAR_ADDRESS
+            ? NATIVE_TOKEN.symbol
+            : token.symbol;
 
         let tvl;
 
@@ -101,6 +99,8 @@ const Overview = () => {
 
         return {
           ...token,
+          name: tokenName,
+          symbol: tokenSymbol,
           price: tokenPrice,
           tvl,
         };
@@ -162,9 +162,9 @@ const Overview = () => {
         </div>
 
         <div className="col-6">
-          {historicalData.length ? (
+          {poolsAnalytics.volume24h !== 0 && historicalData.length ? (
             <div className="container-blue-neutral-800 rounded p-4">
-              <BarChart chartData={historicalData} aggregatedValue={0} />
+              <BarChart chartData={historicalData} aggregatedValue={poolsAnalytics.volume24h} />
             </div>
           ) : (
             <div className="d-flex justify-content-center my-6">
