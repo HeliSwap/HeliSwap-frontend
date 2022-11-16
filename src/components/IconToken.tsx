@@ -22,6 +22,7 @@ import CREAM from '../icons/tokens/CREAM.svg';
 import JAM from '../icons/tokens/JAM.png';
 import QUACK from '../icons/tokens/QUACK.png';
 import WHALE from '../icons/tokens/WHALE.png';
+import LIL from '../icons/tokens/LIL.png';
 
 interface IIconTokenProps {
   symbol: string;
@@ -63,6 +64,7 @@ const tokenMapping: ITokenMapping = {
   JAM: JAM,
   QUACK: QUACK,
   WHALE: WHALE,
+  LIL: LIL,
   LP: LP,
 };
 
