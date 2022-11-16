@@ -75,7 +75,7 @@ const TopTokens = ({ tokens }: ITopTokensProps) => {
   return haveTokens ? (
     <>
       <div className="table-pools">
-        <div className="table-pools-row with-5-columns">
+        <div className="table-pools-row with-4-columns">
           <div className="table-pools-cell">#</div>
           <div className="table-pools-cell">Name</div>
           <div
@@ -84,13 +84,13 @@ const TopTokens = ({ tokens }: ITopTokensProps) => {
           >
             Price
           </div>
-          <div
+          {/* <div
             className="table-pools-cell justify-content-end ws-no-wrap"
             onClick={() => handleSortClick(SORT_OPTIONS_ENUM.VOL_24)}
           >
             Volume 24H
             {getSortIcon(SORT_OPTIONS_ENUM.VOL_24)}
-          </div>
+          </div> */}
           <div
             className="table-pools-cell justify-content-end"
             onClick={() => handleSortClick(SORT_OPTIONS_ENUM.TVL)}
@@ -103,7 +103,7 @@ const TopTokens = ({ tokens }: ITopTokensProps) => {
           ? currentItems.map((token: ITokenDataAnalytics, index: number) => {
               const tokenNum = index + 1;
               return (
-                <div key={token.address} className="table-pools-row with-5-columns">
+                <div key={token.address} className="table-pools-row with-4-columns">
                   <div className="table-pools-cell">
                     <span className="text-small">{tokenNum + offset}</span>
                   </div>
@@ -119,9 +119,9 @@ const TopTokens = ({ tokens }: ITopTokensProps) => {
                       {formatStringToPriceWithPrecision(token.price || '')}
                     </span>
                   </div>
-                  <div className="table-pools-cell justify-content-end">
+                  {/* <div className="table-pools-cell justify-content-end">
                     <span className="text-numeric">$10.11k</span>
-                  </div>
+                  </div> */}
                   <div className="table-pools-cell justify-content-end">
                     <span className="text-numeric">{formatStringToPrice(token.tvl || '')}</span>
                   </div>
