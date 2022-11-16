@@ -81,18 +81,11 @@ const Overview = () => {
         const token0Value = Number(token0AmountFormatted) * Number(token0Price);
         const token1Value = Number(token1AmountFormatted) * Number(token1Price);
 
-        console.log('pairName', pairName);
-        console.log('token0Value', token0Value);
-        console.log('token1Value', token1Value);
-        console.log('poolTVL', token0Value + token1Value);
-
-        acc[token0] += acc[token0] + token0Value;
-        acc[token1] += acc[token1] + token1Value;
+        acc[token0] += token0Value;
+        acc[token1] += token1Value;
 
         return acc;
       }, {});
-
-      console.log('tvlPerToken', tvlPerToken);
 
       const tokensWithData = tokenDataList.map(token => {
         const tokenPrice =
