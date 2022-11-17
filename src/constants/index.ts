@@ -1,7 +1,7 @@
 import { WatchQueryFetchPolicy } from '@apollo/client';
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
-import { PageViews } from '../interfaces/common';
+import { AnalyticsViews, PageViews } from '../interfaces/common';
 import { ICreatePairData, ISwapTokenData, ITokenData, ITokensData } from '../interfaces/tokens';
 import { NATIVE_TOKEN } from '../utils/tokenUtils';
 
@@ -102,6 +102,8 @@ export const initialPoolsAnalyticsData = {
 
 export const poolsPageInitialCurrentView: PageViews = PageViews.ALL_POOLS;
 
+export const analyticsPageInitialCurrentView: AnalyticsViews = AnalyticsViews.OVERVIEW;
+
 export const useQueryOptions = {
   fetchPolicy: 'network-only' as WatchQueryFetchPolicy,
 };
@@ -115,3 +117,8 @@ export const useQueryOptionsPoolsFarms = {
   fetchPolicy: 'network-only' as WatchQueryFetchPolicy,
   pollInterval: REFRESH_TIME_POOLS_FARMS,
 };
+
+export const HASHSCAN_ROOT_DOMAIN = 'https://hashscan.io';
+
+export const POOLS_PER_PAGE = 10;
+export const TOKENS_PER_PAGE = 10;

@@ -12,7 +12,7 @@ import {
   requestIdFromAddress,
 } from '../../utils/tokenUtils';
 
-import { ASYNC_SEARCH_THRESHOLD } from '../../constants';
+import { ASYNC_SEARCH_THRESHOLD, HASHSCAN_ROOT_DOMAIN } from '../../constants';
 
 import IconToken from '../IconToken';
 import Button from '../Button';
@@ -47,7 +47,7 @@ const ModalSearchContent = ({
   itemToExlude,
 }: IModalProps) => {
   const networkType = process.env.REACT_APP_NETWORK_TYPE as string;
-  const hashScanUrl = `https://hashscan.io/${networkType}/token/`;
+  const hashScanUrl = `${HASHSCAN_ROOT_DOMAIN}/${networkType}/token/`;
 
   const [searchInputValue, setSearchInputValue] = useState('');
 

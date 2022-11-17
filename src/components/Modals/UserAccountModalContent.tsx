@@ -2,6 +2,7 @@ import React from 'react';
 import Button from '../Button';
 import Icon from '../Icon';
 import { Md5 } from 'ts-md5/dist/md5';
+import { HASHSCAN_ROOT_DOMAIN } from '../../constants';
 
 interface IUserAccoutnModalContentProps {
   closeModal: () => void;
@@ -25,7 +26,7 @@ const UserAccoutnModalContent = ({
     navigator.clipboard.writeText(userId);
   };
 
-  const hashscanLink = `https://hashscan.io/${process.env.REACT_APP_NETWORK_TYPE}/account/${userId}`;
+  const hashscanLink = `${HASHSCAN_ROOT_DOMAIN}/${process.env.REACT_APP_NETWORK_TYPE}/account/${userId}`;
 
   return (
     <>
