@@ -24,6 +24,23 @@ const Chart = ({ chartData, aggregatedValue }: IBarChartProps) => {
     return getTransformedVolumeData(chartData, chartView);
   }, [chartData, chartView]);
 
+  const renderDateLabel = () => {
+    if (chartView === VolumeChartView.daily) {
+      return dayjs(dateLabel).format('MMM D, YYYY');
+    } else if (chartView === VolumeChartView.weekly) {
+      const endOfWeek = dayjs(dateLabel).endOf('week').format('MMM D, YYYY');
+      const endDateLabel = dayjs().isBefore(endOfWeek) ? 'Current' : endOfWeek;
+
+      return `${dayjs(dateLabel).format('MMM D')} - ${endDateLabel}`;
+    } else if (chartView === VolumeChartView.monthly) {
+      const startOfMonth = dayjs(dateLabel).startOf('month').format('MMM D, YYYY');
+      const endOfMonth = dayjs(dateLabel).endOf('month').format('MMM D, YYYY');
+      const endDateLabel = dayjs().isBefore(endOfMonth) ? 'Current' : endOfMonth;
+
+      return `${dayjs(startOfMonth).format('MMM D')} - ${endDateLabel}`;
+    }
+  };
+
   return (
     <div style={{ minHeight: '392px' }}>
       <div className="d-flex flex-row justify-content-between align-items-start">
@@ -34,7 +51,7 @@ const Chart = ({ chartData, aggregatedValue }: IBarChartProps) => {
               {formatStringToPrice(value?.toString() as string)}
             </p>
             {dateLabel ? (
-              <p className="text-small">{dayjs(dateLabel).format('MMM D, YYYY')}</p>
+              <p className="text-small">{renderDateLabel()}</p>
             ) : (
               <p className="text-small">-</p>
             )}
