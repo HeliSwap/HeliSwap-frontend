@@ -144,9 +144,9 @@ const Overview = () => {
   }, [poolsAnalytics, historicalData]);
 
   return (
-    <div className="my-9">
+    <div className="my-5 my-md-9">
       <div className="row">
-        <div className="col-6">
+        <div className="col-md-6">
           {historicalDataToShow.length ? (
             <div className="container-blue-neutral-800 rounded p-4">
               <LineChart
@@ -161,7 +161,7 @@ const Overview = () => {
           )}
         </div>
 
-        <div className="col-6">
+        <div className="col-md-6 mt-5 mt-md-0">
           {poolsAnalytics.volume24h !== 0 && historicalData.length ? (
             <div className="container-blue-neutral-800 rounded p-4">
               <BarChart chartData={historicalData} aggregatedValue={poolsAnalytics.volume24h} />

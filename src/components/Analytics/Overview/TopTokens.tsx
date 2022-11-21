@@ -75,7 +75,7 @@ const TopTokens = ({ tokens }: ITopTokensProps) => {
   return haveTokens ? (
     <>
       <div className="table-pools">
-        <div className="table-pools-row with-4-columns">
+        <div className="d-none d-md-grid table-pools-row with-4-columns">
           <div className="table-pools-cell">#</div>
           <div className="table-pools-cell">Name</div>
           <div
@@ -104,7 +104,7 @@ const TopTokens = ({ tokens }: ITopTokensProps) => {
               const tokenNum = index + 1;
               return (
                 <div key={token.address} className="table-pools-row with-4-columns">
-                  <div className="table-pools-cell">
+                  <div className="d-none d-md-flex table-pools-cell">
                     <span className="text-small">{tokenNum + offset}</span>
                   </div>
                   <div className="table-pools-cell">
@@ -114,15 +114,14 @@ const TopTokens = ({ tokens }: ITopTokensProps) => {
                       <span className="text-gray">({token.symbol})</span>
                     </p>
                   </div>
-                  <div className="table-pools-cell justify-content-end">
+                  <div className="table-pools-cell justify-content-between justify-content-md-end">
+                    <span className="d-md-none text-small">Price</span>
                     <span className="text-numeric">
                       {formatStringToPriceWithPrecision(token.price || '')}
                     </span>
                   </div>
-                  {/* <div className="table-pools-cell justify-content-end">
-                    <span className="text-numeric">$10.11k</span>
-                  </div> */}
-                  <div className="table-pools-cell justify-content-end">
+                  <div className="table-pools-cell justify-content-between justify-content-md-end">
+                    <span className="d-md-none text-small">TVL</span>
                     <span className="text-numeric">{formatStringToPrice(token.tvl || '')}</span>
                   </div>
                 </div>
