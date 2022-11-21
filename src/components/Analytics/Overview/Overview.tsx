@@ -162,9 +162,12 @@ const Overview = () => {
         </div>
 
         <div className="col-md-6 mt-5 mt-md-0">
-          {poolsAnalytics.volume24h !== 0 && historicalData.length ? (
+          {historicalData.length ? (
             <div className="container-blue-neutral-800 rounded p-4">
-              <BarChart chartData={historicalData} aggregatedValue={poolsAnalytics.volume24h} />
+              <BarChart
+                chartData={historicalData}
+                aggregatedValue={poolsAnalytics.volume24h || 0}
+              />
             </div>
           ) : (
             <div className="d-flex justify-content-center my-6">

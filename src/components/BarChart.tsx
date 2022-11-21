@@ -136,7 +136,7 @@ const Chart = ({ chartData, aggregatedValue }: IBarChartProps) => {
               }}
               minTickGap={10}
             />
-            <Tooltip cursor={{ fill: '#F7F8FA' }} contentStyle={{ display: 'none' }} />
+            <Tooltip cursor={{ fill: '#7979a3' }} contentStyle={{ display: 'none' }} />
             <Bar
               dataKey="value"
               fill={'white'}
