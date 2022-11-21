@@ -73,8 +73,9 @@ const Chart = ({ chartData, aggregatedValue }: ILineChartProps) => {
               dataKey="time"
               axisLine={false}
               tickLine={false}
-              tickFormatter={time => dayjs(time).format('DD')}
+              tickFormatter={time => dayjs(time).format('D')}
               minTickGap={10}
+              interval={0}
             />
             <Tooltip cursor={{ stroke: '#8884d8' }} contentStyle={{ display: 'none' }} />
             <Area dataKey="value" type="monotone" strokeWidth={2} stroke="#E541EE" fill="#19193F" />

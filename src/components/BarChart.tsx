@@ -132,9 +132,10 @@ const Chart = ({ chartData, aggregatedValue }: IBarChartProps) => {
               tickFormatter={time => {
                 return chartView === VolumeChartView.monthly
                   ? dayjs(time).format('MMM')
-                  : dayjs(time).format('DD');
+                  : dayjs(time).format('D');
               }}
               minTickGap={10}
+              interval={0}
             />
             <Tooltip cursor={{ fill: '#7979a3' }} contentStyle={{ display: 'none' }} />
             <Bar
