@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { XAxis, AreaChart, Area, Tooltip } from 'recharts';
+import { XAxis, AreaChart, Area, Tooltip, ResponsiveContainer } from 'recharts';
 import dayjs from 'dayjs';
 
 import { IHistoricalData } from '../interfaces/common';
@@ -38,46 +38,48 @@ const Chart = ({ chartData, aggregatedValue }: ILineChartProps) => {
         </div>
       </div>
       {chartData.length !== 0 ? (
-        <AreaChart
-          onMouseMove={(e: any) => {
-            if (e && e.activePayload) {
-              const { time: currTime, value: currValue } = e.activePayload[0]?.payload;
-              if (currTime !== dateLabel || value !== currValue) {
-                setValue(currValue);
-                setDateLabel(currTime);
+        <ResponsiveContainer height={300}>
+          <AreaChart
+            onMouseMove={(e: any) => {
+              if (e && e.activePayload) {
+                const { time: currTime, value: currValue } = e.activePayload[0]?.payload;
+                if (currTime !== dateLabel || value !== currValue) {
+                  setValue(currValue);
+                  setDateLabel(currTime);
+                }
               }
-            }
-          }}
-          width={500}
-          height={300}
-          data={formattedTvlData}
-          margin={{
-            top: 5,
-            right: 30,
-            left: 20,
-            bottom: 5,
-          }}
-          onMouseLeave={() => {
-            setValue(aggregatedValue);
-            setDateLabel('');
-          }}
-        >
-          <defs>
-            <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopOpacity={0.5} />
-              <stop offset="100%" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <XAxis
-            dataKey="time"
-            axisLine={false}
-            tickLine={false}
-            tickFormatter={time => dayjs(time).format('DD')}
-            minTickGap={10}
-          />
-          <Tooltip cursor={{ stroke: '#8884d8' }} contentStyle={{ display: 'none' }} />
-          <Area dataKey="value" type="monotone" strokeWidth={2} stroke="#E541EE" fill="#19193F" />
-        </AreaChart>
+            }}
+            width={500}
+            height={300}
+            data={formattedTvlData}
+            margin={{
+              top: 5,
+              right: 30,
+              left: 20,
+              bottom: 5,
+            }}
+            onMouseLeave={() => {
+              setValue(aggregatedValue);
+              setDateLabel('');
+            }}
+          >
+            <defs>
+              <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopOpacity={0.5} />
+                <stop offset="100%" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <XAxis
+              dataKey="time"
+              axisLine={false}
+              tickLine={false}
+              tickFormatter={time => dayjs(time).format('DD')}
+              minTickGap={10}
+            />
+            <Tooltip cursor={{ stroke: '#8884d8' }} contentStyle={{ display: 'none' }} />
+            <Area dataKey="value" type="monotone" strokeWidth={2} stroke="#E541EE" fill="#19193F" />
+          </AreaChart>
+        </ResponsiveContainer>
       ) : (
         <Loader />
       )}

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { XAxis, Tooltip, Bar, BarChart } from 'recharts';
+import { XAxis, Tooltip, Bar, BarChart, ResponsiveContainer } from 'recharts';
 import dayjs from 'dayjs';
 
 import { IHistoricalData, VolumeChartView } from '../interfaces/common';
@@ -100,58 +100,60 @@ const Chart = ({ chartData, aggregatedValue }: IBarChartProps) => {
       </div>
 
       {chartData.length !== 0 ? (
-        <BarChart
-          onMouseMove={(e: any) => {
-            if (e && e.activePayload) {
-              const { time: currTime, value: currValue } = e.activePayload[0]?.payload;
-              if (currTime !== dateLabel || value !== currValue) {
-                setValue(currValue);
-                setDateLabel(currTime);
+        <ResponsiveContainer height={300}>
+          <BarChart
+            onMouseMove={(e: any) => {
+              if (e && e.activePayload) {
+                const { time: currTime, value: currValue } = e.activePayload[0]?.payload;
+                if (currTime !== dateLabel || value !== currValue) {
+                  setValue(currValue);
+                  setDateLabel(currTime);
+                }
               }
-            }
-          }}
-          width={500}
-          height={300}
-          data={formattedVolumeData}
-          margin={{
-            top: 5,
-            right: 30,
-            left: 20,
-            bottom: 5,
-          }}
-          onMouseLeave={() => {
-            setValue(aggregatedValue);
-            setDateLabel('');
-          }}
-        >
-          <XAxis
-            dataKey="time"
-            axisLine={false}
-            tickLine={false}
-            tickFormatter={time => {
-              return chartView === VolumeChartView.monthly
-                ? dayjs(time).format('MMM')
-                : dayjs(time).format('DD');
             }}
-            minTickGap={10}
-          />
-          <Tooltip cursor={{ fill: '#F7F8FA' }} contentStyle={{ display: 'none' }} />
-          <Bar
-            dataKey="value"
-            fill={'white'}
-            shape={props => {
-              return (
-                <CustomBar
-                  height={props.height}
-                  width={props.width}
-                  x={props.x}
-                  y={props.y}
-                  fill={'#4D5FFF'}
-                />
-              );
+            width={500}
+            height={300}
+            data={formattedVolumeData}
+            margin={{
+              top: 5,
+              right: 30,
+              left: 20,
+              bottom: 5,
             }}
-          />
-        </BarChart>
+            onMouseLeave={() => {
+              setValue(aggregatedValue);
+              setDateLabel('');
+            }}
+          >
+            <XAxis
+              dataKey="time"
+              axisLine={false}
+              tickLine={false}
+              tickFormatter={time => {
+                return chartView === VolumeChartView.monthly
+                  ? dayjs(time).format('MMM')
+                  : dayjs(time).format('DD');
+              }}
+              minTickGap={10}
+            />
+            <Tooltip cursor={{ fill: '#F7F8FA' }} contentStyle={{ display: 'none' }} />
+            <Bar
+              dataKey="value"
+              fill={'white'}
+              shape={props => {
+                return (
+                  <CustomBar
+                    height={props.height}
+                    width={props.width}
+                    x={props.x}
+                    y={props.y}
+                    fill={'#4D5FFF'}
+                  />
+                );
+              }}
+            />
+          </BarChart>
+        </ResponsiveContainer>
       ) : (
         <Loader />
       )}

@@ -91,7 +91,7 @@ const TopPools = ({ pools, error }: ITopPoolsProps) => {
   return havePools ? (
     <>
       <div className="table-pools">
-        <div className="table-pools-row with-5-columns">
+        <div className="d-none d-md-grid table-pools-row with-5-columns">
           <div className="table-pools-cell">
             <span className="text-small">#</span>
           </div>
@@ -126,7 +126,7 @@ const TopPools = ({ pools, error }: ITopPoolsProps) => {
           const poolNum = index + 1;
           return (
             <div key={pool.id} className="table-pools-row with-5-columns">
-              <div className="table-pools-cell">
+              <div className="d-none d-md-flex table-pools-cell">
                 <span className="text-small">{poolNum + offset}</span>
               </div>
               <div className="table-pools-cell">
@@ -137,11 +137,6 @@ const TopPools = ({ pools, error }: ITopPoolsProps) => {
                 <span className="text-micro text-numeric badge bg-secondary-800 ms-3">
                   {POOLS_FEE}
                 </span>
-                {pool.hasCampaign ? (
-                  <span className="text-micro text-uppercase badge bg-success-600 ms-3">
-                    Yield farming
-                  </span>
-                ) : null}
 
                 {pool.hasProblematicToken ? (
                   <Tippy content={generalFeesAndKeysWarning}>
@@ -151,17 +146,20 @@ const TopPools = ({ pools, error }: ITopPoolsProps) => {
                   </Tippy>
                 ) : null}
               </div>
-              <div className="table-pools-cell justify-content-end">
+              <div className="table-pools-cell justify-content-between justify-content-md-end">
+                <span className="d-md-none text-small">TVL</span>
                 <span className="text-small text-numeric">
                   {pool.tokensPriceEvaluated ? formatStringToPrice(pool.tvl) : 'N/A'}
                 </span>
               </div>
-              <div className="table-pools-cell justify-content-end">
+              <div className="table-pools-cell justify-content-between justify-content-md-end">
+                <span className="d-md-none text-small">Volume 24h</span>
                 <span className="text-small text-numeric">
                   {pool.tokensPriceEvaluated ? formatStringToPrice(pool.volume24 || '') : 'N/A'}
                 </span>
               </div>
-              <div className="table-pools-cell justify-content-end">
+              <div className="table-pools-cell justify-content-between justify-content-md-end">
+                <span className="d-md-none text-small">Volume 7d</span>
                 <span className="text-small text-numeric">
                   {pool.tokensPriceEvaluated ? formatStringToPrice(pool.volume7 || '') : 'N/A'}
                 </span>
