@@ -135,7 +135,7 @@ const Chart = ({ chartData, aggregatedValue }: IBarChartProps) => {
                   : dayjs(time).format('D');
               }}
               minTickGap={10}
-              interval={0}
+              interval="preserveStart"
             />
             <Tooltip cursor={{ fill: '#7979a3' }} contentStyle={{ display: 'none' }} />
             <Bar
