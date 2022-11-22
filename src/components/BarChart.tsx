@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { XAxis, Tooltip, Bar, BarChart, ResponsiveContainer } from 'recharts';
 import dayjs from 'dayjs';
 
@@ -23,6 +23,10 @@ const Chart = ({ chartData, aggregatedValue }: IBarChartProps) => {
   const formattedVolumeData = useMemo(() => {
     return getTransformedVolumeData(chartData, chartView);
   }, [chartData, chartView]);
+
+  useEffect(() => {
+    setValue(aggregatedValue);
+  }, [aggregatedValue]);
 
   const renderDateLabel = () => {
     if (chartView === VolumeChartView.daily) {
