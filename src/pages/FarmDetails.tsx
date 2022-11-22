@@ -146,7 +146,8 @@ const FarmDetails = () => {
   const haveFarm = Object.keys(farmData).length !== 0;
   const campaignHasRewards = farmData.rewardsData?.length > 0;
   const campaignHasActiveRewards = campaignHasRewards
-    ? farmData.rewardsData.find(reward => reward.rewardEnd > Date.now()) !== undefined
+    ? Object.keys(farmData.rewardsData.find(reward => reward.rewardEnd > Date.now()) || {}).length >
+      0
     : false;
 
   return isHashpackLoading ? (
