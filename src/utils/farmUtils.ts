@@ -72,6 +72,7 @@ export const getProcessedFarms = (
         decimals,
         rewardEnd: rewardEndSeconds,
       } = currentReward;
+
       const rewardValueUSD = getTokenPrice(pools, address, hbarPrice);
       const rewardAmount = formatStringWeiToStringEther(totalAmount, decimals);
       const rewardEnd = formatEndDate(rewardEndSeconds);
@@ -179,26 +180,27 @@ export const getProcessedFarms = (
   };
 
   const farms: IFarmData[] = rawFarms.map((currentFarm: IFarmDataRaw): IFarmData => {
-    const { totalStaked } = currentFarm;
+    // This is needed, cause of discrepancies in the BE data regarding duration & rewardEnd, comming as strings in stead of numbers
+    const rewardsDataProcessed = currentFarm.rewardsData.map((rewardsData: IRewardRaw) => ({
+      ...rewardsData,
+      duration: Number(rewardsData.duration),
+      rewardEnd: Number(rewardsData.rewardEnd),
+    }));
+    const currentFarmProcessed = { ...currentFarm, rewardsData: rewardsDataProcessed };
 
+    const { totalStaked } = currentFarmProcessed;
     const totalStakedFormatted = formatStringWeiToStringEther(totalStaked || '0');
-
-    const lPValue = getLPValue(currentFarm);
-
+    const lPValue = getLPValue(currentFarmProcessed);
     const totalStakedUSD = (lPValue * Number(totalStakedFormatted)).toString();
-
-    const rewardsData = getRewardsProcessed(currentFarm);
+    const rewardsData = getRewardsProcessed(currentFarmProcessed);
     const totalRewardsUSD = getTotalRewardsUSD(rewardsData);
-
-    const userStakingData = getUserStakingDataProcessed(currentFarm, lPValue);
-
-    const campaignEndDate = getCampaignEndDate(currentFarm);
-    const campaignEnded = getCampaignEndDate(currentFarm) < Date.now();
-
+    const userStakingData = getUserStakingDataProcessed(currentFarmProcessed, lPValue);
+    const campaignEndDate = getCampaignEndDate(currentFarmProcessed);
+    const campaignEnded = getCampaignEndDate(currentFarmProcessed) < Date.now();
     const APR = campaignEnded ? '0' : getAPR(rewardsData, totalStakedUSD, totalRewardsUSD);
 
     const formatted = {
-      ...currentFarm,
+      ...currentFarmProcessed,
       totalStakedUSD,
       rewardsData,
       userStakingData,
@@ -206,15 +208,15 @@ export const getProcessedFarms = (
       totalRewardsUSD,
       campaignEndDate,
       poolData: {
-        ...currentFarm.poolData,
+        ...currentFarmProcessed.poolData,
         token0Symbol:
-          currentFarm.poolData.token0Symbol === 'WHBAR'
+          currentFarmProcessed.poolData.token0Symbol === 'WHBAR'
             ? 'HBAR'
-            : currentFarm.poolData.token0Symbol,
+            : currentFarmProcessed.poolData.token0Symbol,
         token1Symbol:
-          currentFarm.poolData.token1Symbol === 'WHBAR'
+          currentFarmProcessed.poolData.token1Symbol === 'WHBAR'
             ? 'HBAR'
-            : currentFarm.poolData.token1Symbol,
+            : currentFarmProcessed.poolData.token1Symbol,
       },
     };
 
