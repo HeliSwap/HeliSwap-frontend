@@ -30,7 +30,7 @@ const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
 
   const renderCampaignEndDate = (campaignEndDate: number, rewardsData: IReward[]) => {
     const campaignEnded = campaignEndDate < Date.now();
-    const campaignNotStarted = rewardsData.length === 0;
+    const campaignNotStarted = campaignEndDate === 0;
 
     const statusLabel = campaignNotStarted ? (
       'Campaign not started'

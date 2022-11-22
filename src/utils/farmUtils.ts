@@ -129,9 +129,13 @@ export const getProcessedFarms = (
 
   const getTotalRewardsUSD = (rewardsData: IReward[]) => {
     return rewardsData.reduce((acc: string, currentValue: IReward) => {
-      const { totalAmountUSD } = currentValue;
+      const { totalAmountUSD, rewardEnd } = currentValue;
+      // Check for active reward
+      const isActive = rewardEnd > Date.now();
 
-      return (Number(acc) + Number(totalAmountUSD)).toString();
+      const accNumber = isActive ? Number(acc) + Number(totalAmountUSD) : Number(acc);
+
+      return accNumber.toString();
     }, '0');
   };
 
@@ -141,8 +145,11 @@ export const getProcessedFarms = (
     if (Number(totalStakedUSD) === 0) return '0';
 
     rewardsData.forEach((reward: IReward) => {
-      const { duration } = reward;
-      if (duration > maxDuration) {
+      const { duration, rewardEnd } = reward;
+      // Check for active reward
+      const isActive = rewardEnd > Date.now();
+
+      if (duration > maxDuration && isActive) {
         maxDuration = duration;
       }
     });
