@@ -1,35 +1,20 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 import { AnalyticsViews } from '../interfaces/common';
 
-import Overview from '../components/Analytics/Overview/Overview';
-import Farms from '../components/Analytics/Farms';
-import Tokens from '../components/Analytics/Tokens';
+import { viewTitleMapping } from './Analytics';
 
 import { analyticsPageInitialCurrentView } from '../constants';
 
-export const viewTitleMapping = {
-  [AnalyticsViews.OVERVIEW]: 'Overview',
-  [AnalyticsViews.TOKENS]: 'Tokens',
-  [AnalyticsViews.FARMS]: 'Farms',
-};
+const AnalyticsPoolDetials = () => {
+  const { poolAddress } = useParams();
 
-const Analytics = () => {
   const [currentView, setCurrentView] = useState<AnalyticsViews>(analyticsPageInitialCurrentView);
 
   // Handlers
   const handleTabItemClick = (currentView: AnalyticsViews) => {
     setCurrentView(currentView);
-  };
-
-  const renderCurrentView = () => {
-    if (currentView === AnalyticsViews.TOKENS) {
-      return <Tokens />;
-    } else if (currentView === AnalyticsViews.FARMS) {
-      return <Farms />;
-    }
-
-    return <Overview />;
   };
 
   return (
@@ -47,11 +32,23 @@ const Analytics = () => {
             </h2>
           </div>
         </div>
+
         <hr />
-        {renderCurrentView()}
+
+        <div></div>
+
+        <div>
+          <div></div>
+          <div></div>
+        </div>
+
+        <div>
+          <div></div>
+          <div></div>
+        </div>
       </div>
     </div>
   );
 };
 
-export default Analytics;
+export default AnalyticsPoolDetials;

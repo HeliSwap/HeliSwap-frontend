@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import ReactPaginate from 'react-paginate';
 import BigNumber from 'bignumber.js';
@@ -32,6 +33,8 @@ const TopPools = ({ pools, error }: ITopPoolsProps) => {
   const [currentItems, setCurrentItems] = useState<IPoolExtendedData[]>([]);
   const [sortDirection, setSortDirection] = useState<SORT_DIRECTION>(SORT_DIRECTION.DESC);
   const [pageCount, setPageCount] = useState(0);
+
+  const navigate = useNavigate();
 
   // Handlers
   const handleSortClick = (_sortBy: SORT_OPTIONS) => {
@@ -125,7 +128,11 @@ const TopPools = ({ pools, error }: ITopPoolsProps) => {
         {currentItems.map((pool: IPoolExtendedData, index) => {
           const poolNum = index + 1;
           return (
-            <div key={pool.id} className="table-pools-row no-pointer with-5-columns">
+            <div
+              onClick={() => navigate(`pool/${pool.pairAddress}`)}
+              key={pool.id}
+              className="table-pools-row with-5-columns"
+            >
               <div className="d-none d-md-flex table-pools-cell">
                 <span className="text-small">{poolNum + offset}</span>
               </div>
