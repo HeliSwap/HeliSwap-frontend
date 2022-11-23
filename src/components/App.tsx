@@ -20,6 +20,7 @@ import Header from './Header';
 import Footer from './Footer';
 import Sidebar from './Sidebar';
 import GlobalMessage from './GlobalMessage';
+import MaintainFarms from '../pages/MaintainFarms';
 
 function App() {
   const apolloClient = getApolloClient();
@@ -51,6 +52,7 @@ function App() {
                         path="analytics/pool/:poolAddress"
                         element={<AnalyticsPoolDetials />}
                       />
+                      <Route path="deploy-farms" element={<MaintainFarms />} />
                       <Route path="styleguide" element={<Styleguide />} />
                     </Routes>
                   </div>
