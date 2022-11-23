@@ -100,14 +100,19 @@ interface IDeployFarmProps {
 const DeployFarm = ({ loadingDeploy, deployFarm }: IDeployFarmProps) => {
   const [tokenAddress, setFarmAddress] = useState<string>('');
   return (
-    <div className="d-flex justify-content-center m-4">
-      <InputToken
-        placeholder="Enter Token address"
-        onChange={(e: any) => setFarmAddress(e.target.value)}
-      />
-      <Button onClick={() => deployFarm(tokenAddress)} loading={loadingDeploy}>
-        Deploy farm
-      </Button>
+    <div className="m-4">
+      <div className="d-flex justify-content-end m-4">
+        <span className="m-4">Staking token address</span>
+        <InputToken
+          placeholder="Enter Token address"
+          onChange={(e: any) => setFarmAddress(e.target.value)}
+        />
+      </div>
+      <div className="d-flex justify-content-end m-4">
+        <Button onClick={() => deployFarm(tokenAddress)} loading={loadingDeploy}>
+          Deploy farm
+        </Button>
+      </div>
     </div>
   );
 };
@@ -121,28 +126,39 @@ const EnableReward = ({ loadingEnableReward, enableReward }: IEnableRewadProps) 
   const [rewardAddress, setRewardAddress] = useState<string>('');
   const [duration, setDuration] = useState<number>(0);
   return (
-    <div className="d-flex justify-content-center m-4">
-      <InputToken
-        value={farmAddress}
-        placeholder="Enter Farm address"
-        onChange={(e: any) => setFarmAddress(e.target.value)}
-      />
-      <InputToken
-        value={rewardAddress}
-        placeholder="Enter Reward address"
-        onChange={(e: any) => setRewardAddress(e.target.value)}
-      />
-      <InputToken
-        value={duration}
-        placeholder="Enter duration"
-        onChange={(e: any) => setDuration(e.target.value)}
-      />
-      <Button
-        onClick={() => enableReward(farmAddress, rewardAddress, duration)}
-        loading={loadingEnableReward}
-      >
-        Enable reward
-      </Button>
+    <div className="m-4">
+      <div className="d-flex justify-content-end m-4">
+        <span className="m-4">Farm address</span>
+        <InputToken
+          value={farmAddress}
+          placeholder="Enter Farm address"
+          onChange={(e: any) => setFarmAddress(e.target.value)}
+        />
+      </div>
+      <div className="d-flex justify-content-end m-4">
+        <span className="m-4">Reward address</span>
+        <InputToken
+          value={rewardAddress}
+          placeholder="Enter Reward address"
+          onChange={(e: any) => setRewardAddress(e.target.value)}
+        />
+      </div>
+      <div className="d-flex justify-content-end m-4">
+        <span className="m-4">Duration in seconds</span>
+        <InputToken
+          value={duration}
+          placeholder="Enter duration"
+          onChange={(e: any) => setDuration(e.target.value)}
+        />
+      </div>
+      <div className="d-flex justify-content-end m-4">
+        <Button
+          onClick={() => enableReward(farmAddress, rewardAddress, duration)}
+          loading={loadingEnableReward}
+        >
+          Enable reward
+        </Button>
+      </div>
     </div>
   );
 };
