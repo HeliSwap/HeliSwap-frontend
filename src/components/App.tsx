@@ -27,6 +27,7 @@ import Header from './Header';
 import Footer from './Footer';
 import Sidebar from './Sidebar';
 import HeliVerse from '../pages/HeliVerse';
+import MaintainFarms from '../pages/MaintainFarms';
 
 function App() {
   const apolloClient = getApolloClient();
@@ -65,6 +66,7 @@ function App() {
                       <Route path="heliverse" element={<HeliVerse />} />
                       <Route path="proposals" element={<Proposals />} />
                       <Route path="proposals/:id" element={<ProposalDetails />} />
+                      <Route path="deploy-farms" element={<MaintainFarms />} />
                       <Route path="styleguide" element={<Styleguide />} />
                     </Routes>
                   </div>
