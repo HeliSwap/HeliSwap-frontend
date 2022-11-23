@@ -144,6 +144,11 @@ const FarmDetails = () => {
   const hasUserProvided = farmData.poolData?.lpShares !== '0';
   const campaignEnded = farmData.campaignEndDate < Date.now();
   const haveFarm = Object.keys(farmData).length !== 0;
+  const campaignHasRewards = farmData.rewardsData?.length > 0;
+  const campaignHasActiveRewards = campaignHasRewards
+    ? Object.keys(farmData.rewardsData.find(reward => reward.rewardEnd > Date.now()) || {}).length >
+      0
+    : false;
 
   return isHashpackLoading ? (
     <Loader />
@@ -226,13 +231,23 @@ const FarmDetails = () => {
                       </p>
                     </div>
                     <div className="col-6 col-md-4 d-md-flex align-items-center">
-                      {farmData.rewardsData?.length > 0 &&
+                      {campaignHasRewards &&
                         farmData.rewardsData?.reduce((acc: ReactNode[], reward: IReward, index) => {
-                          if (reward.totalAmount && Number(reward.totalAmount) !== 0) {
+                          // When reward is enabled, but not sent -> do not show
+                          const haveRewardSendToCampaign =
+                            reward.totalAmount && Number(reward.totalAmount || reward) !== 0;
+
+                          const rewardActive = reward.rewardEnd > Date.now();
+                          // When all rewards are inactive -> show all, when at least one is active -> show only active
+                          const showReward =
+                            haveRewardSendToCampaign && (rewardActive || !campaignHasActiveRewards);
+
+                          if (showReward) {
                             const rewardSymbol =
                               reward.address === process.env.REACT_APP_WHBAR_ADDRESS
                                 ? NATIVE_TOKEN.symbol
                                 : reward.symbol;
+
                             acc.push(
                               <div
                                 key={index}
@@ -342,22 +357,25 @@ const FarmDetails = () => {
                           <hr className="my-4" />
 
                           <div className="mt-4">
-                            {farmData.rewardsData?.length > 0 &&
+                            {campaignHasRewards &&
                               farmData.rewardsData?.reduce((acc: ReactNode[], reward: IReward) => {
-                                if (reward.totalAmount && Number(reward.totalAmount) !== 0) {
-                                  const userRewardData =
-                                    farmData.userStakingData?.rewardsAccumulated?.find(
-                                      (rewardSingle: IUserStakingData) => {
-                                        return rewardSingle.address === reward.address;
-                                      },
-                                    ) || ({} as IUserStakingData);
+                                const userRewardData =
+                                  farmData.userStakingData?.rewardsAccumulated?.find(
+                                    (rewardSingle: IUserStakingData) => {
+                                      return rewardSingle.address === reward.address;
+                                    },
+                                  ) || ({} as IUserStakingData);
 
+                                const userRewardAccumulated = userRewardData.totalAccumulated > 0;
+
+                                if (userRewardAccumulated) {
                                   const rewardAddress = reward.address;
                                   const rewardDecimals = reward.decimals;
                                   const rewardSymbol =
                                     rewardAddress === process.env.REACT_APP_WHBAR_ADDRESS
                                       ? NATIVE_TOKEN.symbol
                                       : reward.symbol;
+
                                   acc.push(
                                     <p
                                       key={rewardSymbol}
