@@ -387,6 +387,15 @@ const FarmActions = ({
                   <Confirmation confirmationText={`Staking ${lpInputValue || '0'} LP tokens`} />
                 ) : (
                   <>
+                    <div className="mb-5 alert alert-info d-inline-flex align-items-center">
+                      <Icon className="me-3 alert-icon" name="info" color="info" />
+                      <p className="alert-message">
+                        You position will no longer be visible in My Positions, as your LP tokens
+                        are now staked in a yield farm. Once you unstake your LP tokens, your
+                        position will reappear.
+                      </p>
+                    </div>
+
                     <div className="text-small">LP token count</div>
 
                     <div className="d-flex justify-content-between align-items-center mt-4">
