@@ -4,7 +4,10 @@ import { addressToId } from '../utils/tokenUtils';
 import FactoryContractABI from './abis/FactoryABI.json';
 import MultirewardsContractABI from './abis/MultirewardsABI.json';
 
+// TODO: check if this appplies for both testnet and mainnet
 const LOCAL_NODE_ACCOUNT_IDS = ['0.0.1012', '0.0.1013', '0.0.1014', '0.0.1015'];
+
+type networkType = 'testnet' | 'mainnet';
 class FarmsSDK {
   factoryAddress: string;
   walletId: string;
@@ -17,15 +20,16 @@ class FarmsSDK {
   };
   factoryContract: hethers.Contract;
   connectedWallet: hethers.Wallet;
-  network: 'testnet' | 'mainnet';
+  network: networkType;
 
   constructor() {
     this.network = 'testnet';
-    this.factoryAddress = '0x0000000000000000000000000000000002eafc23';
-    this.walletId = '0.0.34226199';
-    this.walletAddress = '0x00000000000000000000000000000000020A4017';
-    this.walletPrivateKey = '0xb9ea0174648293031e3730c3a9b48aa075fe36343dbd5b3015595aeba36f547f';
-    this.provider = hethers.providers.getDefaultProvider('testnet');
+    // this.network = process.env.REACT_APP_NETWORK_TYPE as networkType;
+    this.factoryAddress = process.env.REACT_CAMPAIGN_FACTORY_ADDRESS as string;
+    this.walletAddress = process.env.REACT_DEPLOYER_ADDRESS as string;
+    this.walletId = addressToId(this.walletAddress);
+    this.walletPrivateKey = process.env.REACT_DEPLOYER_PK as string;
+    this.provider = hethers.providers.getDefaultProvider(this.network);
 
     this.eoaAccount = {
       account: this.walletId,
@@ -144,7 +148,7 @@ class FarmsSDK {
         gasLimit: 1000000,
       });
       loadingFunc(false);
-      console.log('send successful');
+      console.log('reward sent successfully');
     } catch (error) {
       console.log(error);
       loadingFunc(false);
