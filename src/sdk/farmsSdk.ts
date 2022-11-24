@@ -1,7 +1,10 @@
 import { hethers } from '@hashgraph/hethers';
+import { AccountAllowanceApproveTransaction, Client, PrivateKey } from '@hashgraph/sdk';
+import { addressToId } from '../utils/tokenUtils';
 import FactoryContractABI from './abis/FactoryABI.json';
 import MultirewardsContractABI from './abis/MultirewardsABI.json';
 
+const LOCAL_NODE_ACCOUNT_IDS = ['0.0.1012', '0.0.1013', '0.0.1014', '0.0.1015'];
 class FarmsSDK {
   factoryAddress: string;
   walletId: string;
@@ -14,8 +17,10 @@ class FarmsSDK {
   };
   factoryContract: hethers.Contract;
   connectedWallet: hethers.Wallet;
+  network: 'testnet' | 'mainnet';
 
   constructor() {
+    this.network = 'testnet';
     this.factoryAddress = '0x0000000000000000000000000000000002eafc23';
     this.walletId = '0.0.34226199';
     this.walletAddress = '0x00000000000000000000000000000000020A4017';
@@ -43,7 +48,7 @@ class FarmsSDK {
     loadingFunc(true);
     let farmAddress = '';
     try {
-      const deployTx = await this.factoryContract.deploy(this.walletAddress, tokenAddress, {
+      await this.factoryContract.deploy(this.walletAddress, tokenAddress, {
         gasLimit: 3000000,
       });
 
@@ -84,6 +89,62 @@ class FarmsSDK {
       console.log('success');
 
       loadingFunc(false);
+    } catch (error) {
+      console.log(error);
+      loadingFunc(false);
+    }
+  }
+
+  async approveToken(
+    spenderAccountAddress: string,
+    tokenAddress: string,
+    amount: number,
+    loadingFunc: (loading: boolean) => void,
+  ): Promise<void> {
+    loadingFunc(true);
+    try {
+      const spenderId = addressToId(spenderAccountAddress);
+      const tokenId = addressToId(tokenAddress);
+
+      const networkClient = this.network === 'mainnet' ? Client.forMainnet() : Client.forTestnet();
+      const client = networkClient.setOperator(
+        this.walletId || LOCAL_NODE_ACCOUNT_IDS[0],
+        this.walletPrivateKey,
+      );
+      const tokenApprove = await (
+        await new AccountAllowanceApproveTransaction()
+          .addTokenAllowance(tokenId, spenderId, amount)
+          .freezeWith(client)
+          .sign(PrivateKey.fromStringECDSA(this.walletPrivateKey))
+      ).execute(client);
+      const approveReceipt = await tokenApprove.getReceipt(client);
+      console.log(approveReceipt);
+      loadingFunc(false);
+    } catch (error) {
+      console.log(error);
+      loadingFunc(false);
+    }
+  }
+
+  async sendReward(
+    farmAddress: string,
+    rewardAddress: string,
+    amount: number,
+    loadingFunc: (loading: boolean) => void,
+  ): Promise<void> {
+    loadingFunc(true);
+    try {
+      loadingFunc(true);
+      const multirewardsContract = new hethers.Contract(
+        farmAddress,
+        MultirewardsContractABI,
+        this.connectedWallet,
+      );
+      await multirewardsContract.notifyRewardAmount(rewardAddress, amount, {
+        gasLimit: 1000000,
+      });
+      loadingFunc(false);
+      console.log('send successful');
     } catch (error) {
       console.log(error);
       loadingFunc(false);
