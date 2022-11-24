@@ -25,10 +25,12 @@ class FarmsSDK {
   constructor() {
     this.network = 'testnet';
     // this.network = process.env.REACT_APP_NETWORK_TYPE as networkType;
-    this.factoryAddress = process.env.REACT_CAMPAIGN_FACTORY_ADDRESS as string;
-    this.walletAddress = process.env.REACT_DEPLOYER_ADDRESS as string;
+    this.factoryAddress = process.env.REACT_APP_CAMPAIGN_FACTORY_ADDRESS as string;
+    this.walletAddress = process.env.REACT_APP_DEPLOYER_ADDRESS as string;
+    console.log(process.env.REACT_APP_DEPLOYER_ADDRESS);
+
     this.walletId = addressToId(this.walletAddress);
-    this.walletPrivateKey = process.env.REACT_DEPLOYER_PK as string;
+    this.walletPrivateKey = process.env.REACT_APP_DEPLOYER_PK as string;
     this.provider = hethers.providers.getDefaultProvider(this.network);
 
     this.eoaAccount = {
