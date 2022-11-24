@@ -22,6 +22,12 @@ const MaintainFarms = () => {
 
       <div className="d-flex justify-content-center">Enable reward</div>
       <EnableReward farmsSDK={farmsSDK} />
+      <hr />
+      <div className="d-flex justify-content-center">Approve token</div>
+      <ApproveToken farmsSDK={farmsSDK} />
+      <hr />
+      <div className="d-flex justify-content-center">Send reward</div>
+      <SendReward farmsSDK={farmsSDK} />
     </div>
   );
 };
@@ -115,6 +121,112 @@ const EnableReward = ({ farmsSDK }: IEnableRewadProps) => {
       <div className="d-flex justify-content-end m-4">
         <Button onClick={enableReward} loading={loadingEnableReward}>
           Enable reward
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+const ApproveToken = ({ farmsSDK }: IDeployFarmProps) => {
+  const [loadingApprove, setLoadingApprove] = useState<boolean>(false);
+  const [tokenAddress, setTokenAddress] = useState<string>('');
+  const [spenderAddress, setSpenderAddress] = useState<string>('');
+  const [amount, setAmount] = useState<number>(0);
+
+  const approveToken = async () => {
+    try {
+      await farmsSDK.approveToken(spenderAddress, tokenAddress, amount, setLoadingApprove);
+
+      setTokenAddress('');
+      setSpenderAddress('');
+      setAmount(0);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return (
+    <div className="m-4">
+      <div className="d-flex justify-content-end m-4">
+        <span className="m-4">Token address</span>
+        <InputToken
+          value={tokenAddress}
+          placeholder="Enter token address"
+          onChange={(e: any) => setTokenAddress(e.target.value)}
+        />
+      </div>
+      <div className="d-flex justify-content-end m-4">
+        <span className="m-4">Spender adddress</span>
+        <InputToken
+          value={spenderAddress}
+          placeholder="Enter spender address"
+          onChange={(e: any) => setSpenderAddress(e.target.value)}
+        />
+      </div>
+      <div className="d-flex justify-content-end m-4">
+        <span className="m-4">WEI amount</span>
+        <InputToken
+          value={amount}
+          placeholder="Enter WEI amount"
+          onChange={(e: any) => setAmount(e.target.value)}
+        />
+      </div>
+      <div className="d-flex justify-content-end m-4">
+        <Button onClick={approveToken} loading={loadingApprove}>
+          Approve token
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+const SendReward = ({ farmsSDK }: IDeployFarmProps) => {
+  const [loadingSendReward, setLoadingSendReward] = useState<boolean>(false);
+  const [farmAddress, setFarmAddress] = useState<string>('');
+  const [rewardAddress, setRewardAddress] = useState<string>('');
+  const [amount, setAmount] = useState<number>(0);
+
+  const sendReward = async () => {
+    try {
+      await farmsSDK.sendReward(farmAddress, rewardAddress, amount, setLoadingSendReward);
+
+      setFarmAddress('');
+      setRewardAddress('');
+      setAmount(0);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return (
+    <div className="m-4">
+      <div className="d-flex justify-content-end m-4">
+        <span className="m-4">Farm Address</span>
+        <InputToken
+          value={farmAddress}
+          placeholder="Enter farm address"
+          onChange={(e: any) => setFarmAddress(e.target.value)}
+        />
+      </div>
+      <div className="d-flex justify-content-end m-4">
+        <span className="m-4">Reward address</span>
+        <InputToken
+          value={rewardAddress}
+          placeholder="Enter reward address"
+          onChange={(e: any) => setRewardAddress(e.target.value)}
+        />
+      </div>
+      <div className="d-flex justify-content-end m-4">
+        <span className="m-4">WEI amount</span>
+        <InputToken
+          value={amount}
+          placeholder="Enter WEI amount"
+          onChange={(e: any) => setAmount(e.target.value)}
+        />
+      </div>
+      <div className="d-flex justify-content-end m-4">
+        <Button onClick={sendReward} loading={loadingSendReward}>
+          Send reward
         </Button>
       </div>
     </div>
