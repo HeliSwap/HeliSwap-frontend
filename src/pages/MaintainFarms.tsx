@@ -4,6 +4,7 @@ import InputToken from '../components/InputToken';
 import Button from '../components/Button';
 import toast from 'react-hot-toast';
 import FarmsSDK from '../sdk/farmsSdk';
+import ToasterWrapper from '../components/ToasterWrapper';
 
 const MaintainFarms = () => {
   const [farmsSDK, setFarmsSDK] = useState({} as FarmsSDK);
@@ -45,13 +46,16 @@ const DeployFarm = ({ farmsSDK }: IDeployFarmProps) => {
   const [loadingDeploy, setLoadingDeploy] = useState<boolean>(false);
 
   const deployFarm = async () => {
+    setLoadingDeploy(true);
     try {
-      const farmAddress = await farmsSDK.deployFarm(tokenAddress, setLoadingDeploy);
+      const farmAddress = await farmsSDK.deployFarm(tokenAddress);
 
       setNewFarmAddress(farmAddress as string);
       setTokenAddress('');
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoadingDeploy(false);
     }
   };
 
@@ -85,13 +89,16 @@ const EnableReward = ({ farmsSDK }: IEnableRewadProps) => {
   const [loadingEnableReward, setLoadingEnableReward] = useState<boolean>(false);
 
   const enableReward = async () => {
+    setLoadingEnableReward(true);
     try {
-      await farmsSDK.enableReward(farmAddress, rewardAddress, duration, setLoadingEnableReward);
+      await farmsSDK.enableReward(farmAddress, rewardAddress, duration);
       setFarmAddress('');
       setRewardAddress('');
       setDuration(0);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoadingEnableReward(false);
     }
   };
 
@@ -126,6 +133,7 @@ const EnableReward = ({ farmsSDK }: IEnableRewadProps) => {
           Enable reward
         </Button>
       </div>
+      <ToasterWrapper />
     </div>
   );
 };
@@ -137,14 +145,18 @@ const ApproveToken = ({ farmsSDK }: IDeployFarmProps) => {
   const [amount, setAmount] = useState<number>(0);
 
   const approveToken = async () => {
+    setLoadingApprove(true);
     try {
-      await farmsSDK.approveToken(spenderAddress, tokenAddress, amount, setLoadingApprove);
-
+      await farmsSDK.approveToken(spenderAddress, tokenAddress, amount);
+      toast.success('Success! Token was approved.');
       setTokenAddress('');
       setSpenderAddress('');
       setAmount(0);
     } catch (error) {
       console.log(error);
+      toast.error('Error while approving token');
+    } finally {
+      setLoadingApprove(false);
     }
   };
 
@@ -190,14 +202,17 @@ const SendReward = ({ farmsSDK }: IDeployFarmProps) => {
   const [amount, setAmount] = useState<number>(0);
 
   const sendReward = async () => {
+    setLoadingSendReward(true);
     try {
-      await farmsSDK.sendReward(farmAddress, rewardAddress, amount, setLoadingSendReward);
+      await farmsSDK.sendReward(farmAddress, rewardAddress, amount);
 
       setFarmAddress('');
       setRewardAddress('');
       setAmount(0);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoadingSendReward(false);
     }
   };
 
@@ -243,19 +258,20 @@ const SetRewardDuration = ({ farmsSDK }: IDeployFarmProps) => {
   const [duration, setDuration] = useState<number>(0);
 
   const sendReward = async () => {
-    try {
-      await farmsSDK.setRewardDuration(
-        farmAddress,
-        rewardAddress,
-        duration,
-        setLoadingChangeDuration,
-      );
+    setLoadingChangeDuration(true);
 
+    try {
+      await farmsSDK.setRewardDuration(farmAddress, rewardAddress, duration);
+
+      toast.success('Success! Reward duration set.');
       setFarmAddress('');
       setRewardAddress('');
       setDuration(0);
     } catch (error) {
+      toast.error('Error while settin duration.');
       console.log(error);
+    } finally {
+      setLoadingChangeDuration(false);
     }
   };
 
