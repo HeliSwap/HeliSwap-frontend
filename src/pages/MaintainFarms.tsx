@@ -28,6 +28,9 @@ const MaintainFarms = () => {
       <hr />
       <div className="d-flex justify-content-center">Send reward</div>
       <SendReward farmsSDK={farmsSDK} />
+      <hr />
+      <div className="d-flex justify-content-center">Set reward duration</div>
+      <SetRewardDuration farmsSDK={farmsSDK} />
     </div>
   );
 };
@@ -226,6 +229,64 @@ const SendReward = ({ farmsSDK }: IDeployFarmProps) => {
       </div>
       <div className="d-flex justify-content-end m-4">
         <Button onClick={sendReward} loading={loadingSendReward}>
+          Send reward
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+const SetRewardDuration = ({ farmsSDK }: IDeployFarmProps) => {
+  const [loadingChangeDuration, setLoadingChangeDuration] = useState<boolean>(false);
+  const [farmAddress, setFarmAddress] = useState<string>('');
+  const [rewardAddress, setRewardAddress] = useState<string>('');
+  const [duration, setDuration] = useState<number>(0);
+
+  const sendReward = async () => {
+    try {
+      await farmsSDK.setRewardDuration(
+        farmAddress,
+        rewardAddress,
+        duration,
+        setLoadingChangeDuration,
+      );
+
+      setFarmAddress('');
+      setRewardAddress('');
+      setDuration(0);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return (
+    <div className="m-4">
+      <div className="d-flex justify-content-end m-4">
+        <span className="m-4">Farm Address</span>
+        <InputToken
+          value={farmAddress}
+          placeholder="Enter farm address"
+          onChange={(e: any) => setFarmAddress(e.target.value)}
+        />
+      </div>
+      <div className="d-flex justify-content-end m-4">
+        <span className="m-4">Reward address</span>
+        <InputToken
+          value={rewardAddress}
+          placeholder="Enter reward address"
+          onChange={(e: any) => setRewardAddress(e.target.value)}
+        />
+      </div>
+      <div className="d-flex justify-content-end m-4">
+        <span className="m-4">Duration</span>
+        <InputToken
+          value={duration}
+          placeholder="Enter new duration"
+          onChange={(e: any) => setDuration(e.target.value)}
+        />
+      </div>
+      <div className="d-flex justify-content-end m-4">
+        <Button onClick={sendReward} loading={loadingChangeDuration}>
           Send reward
         </Button>
       </div>

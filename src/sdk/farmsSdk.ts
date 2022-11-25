@@ -156,6 +156,31 @@ class FarmsSDK {
       loadingFunc(false);
     }
   }
+
+  async setRewardDuration(
+    farmAddress: string,
+    rewardAddress: string,
+    duration: number,
+    loadingFunc: (loading: boolean) => void,
+  ): Promise<void> {
+    loadingFunc(true);
+    try {
+      loadingFunc(true);
+      const multirewardsContract = new hethers.Contract(
+        farmAddress,
+        MultirewardsContractABI,
+        this.connectedWallet,
+      );
+      await multirewardsContract.setRewardsDuration(rewardAddress, duration, {
+        gasLimit: 1000000,
+      });
+      loadingFunc(false);
+      console.log('changed reward duration successfully');
+    } catch (error) {
+      console.log(error);
+      loadingFunc(false);
+    }
+  }
 }
 
 export default FarmsSDK;
