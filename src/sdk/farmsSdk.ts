@@ -108,7 +108,7 @@ class FarmsSDK {
       this.connectedWallet,
     );
     await multirewardsContract.notifyRewardAmount(rewardAddress, amount, {
-      gasLimit: 100000,
+      gasLimit: 200000,
     });
     console.log('reward sent successfully');
   }
