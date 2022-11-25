@@ -1,4 +1,4 @@
-import React, { ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import React, { ReactNode, useContext, useEffect, useState } from 'react';
 import Tippy from '@tippyjs/react';
 import { useParams, useNavigate } from 'react-router-dom';
 
@@ -230,8 +230,8 @@ const FarmDetails = () => {
                     </div>
                   </div>
 
-                  <div className="m-4">
-                    <div className="d-flex justify-content-end m-4">
+                  <div className="m-4 d-flex justify-content-between">
+                    <div className=" m-4">
                       <span className="m-4">Reward address</span>
                       <InputToken
                         value={enableRewardAddress}
@@ -239,7 +239,7 @@ const FarmDetails = () => {
                         onChange={(e: any) => setEnableRewardAddress(e.target.value)}
                       />
                     </div>
-                    <div className="d-flex justify-content-end m-4">
+                    <div className=" m-4">
                       <span className="m-4">Duration in seconds</span>
                       <InputToken
                         value={enableRewardDuration}
@@ -247,7 +247,7 @@ const FarmDetails = () => {
                         onChange={(e: any) => setEnableRewardDuration(e.target.value)}
                       />
                     </div>
-                    <div className="d-flex justify-content-end m-4">
+                    <div className=" m-4">
                       <Button onClick={HandleEnableReward} loading={loadingEnableReward}>
                         Enable reward
                       </Button>
@@ -291,7 +291,7 @@ const FarmDetails = () => {
                                 <span className="text-main ms-3">Reward end date</span>
                                 <span className="text-main ms-3">
                                   {reward.rewardEnd !== 0
-                                    ? dayjs(reward.rewardEnd).format('YYYY-MM-DD HH-mm')
+                                    ? dayjs(reward.rewardEnd).format('YYYY-MM-DD HH:mm')
                                     : 'Not set'}
                                 </span>
                               </div>
