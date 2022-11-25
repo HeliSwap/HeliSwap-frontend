@@ -21,6 +21,7 @@ import Footer from './Footer';
 import Sidebar from './Sidebar';
 import GlobalMessage from './GlobalMessage';
 import MaintainFarms from '../pages/MaintainFarms';
+import MaintainFarmDetails from '../pages/MaintainFarmDetails';
 
 function App() {
   const apolloClient = getApolloClient();
@@ -53,6 +54,11 @@ function App() {
                         element={<AnalyticsPoolDetials />}
                       />
                       <Route path="deploy-farms" element={<MaintainFarms />} />
+                      <Route path="maintain-farms" element={<MaintainFarms />} />
+                      <Route
+                        path="maintain-farms/:campaignAddress"
+                        element={<MaintainFarmDetails />}
+                      />
                       <Route path="styleguide" element={<Styleguide />} />
                     </Routes>
                   </div>
