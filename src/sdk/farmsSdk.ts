@@ -52,16 +52,16 @@ class FarmsSDK {
   async deployFarm(tokenAddress: string) {
     let farmAddress = '';
     await this.factoryContract.deploy(this.walletAddress, tokenAddress, {
-      gasLimit: 3000000,
+      gasLimit: 250000,
     });
 
     const numberOfFarmsStr = await this.factoryContract.getCampaignsLength({
-      gasLimit: 300000,
+      gasLimit: 50000,
     });
     const numberOfFarms = parseInt(numberOfFarmsStr);
 
     farmAddress = await this.factoryContract.campaigns(numberOfFarms - 1, {
-      gasLimit: 300000,
+      gasLimit: 50000,
     });
 
     return farmAddress;
@@ -74,7 +74,7 @@ class FarmsSDK {
       this.connectedWallet,
     );
     await multirewardsContract.enableReward(rewardAddress, true, duration, {
-      gasLimit: 1000000,
+      gasLimit: 850000,
     });
   }
 
@@ -108,7 +108,7 @@ class FarmsSDK {
       this.connectedWallet,
     );
     await multirewardsContract.notifyRewardAmount(rewardAddress, amount, {
-      gasLimit: 1000000,
+      gasLimit: 100000,
     });
     console.log('reward sent successfully');
   }
@@ -124,7 +124,7 @@ class FarmsSDK {
       this.connectedWallet,
     );
     await multirewardsContract.setRewardsDuration(rewardAddress, duration, {
-      gasLimit: 1000000,
+      gasLimit: 100000,
     });
     console.log('changed reward duration successfully');
   }

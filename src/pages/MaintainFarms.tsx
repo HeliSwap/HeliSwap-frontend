@@ -52,8 +52,10 @@ const DeployFarm = ({ farmsSDK }: IDeployFarmProps) => {
 
       setNewFarmAddress(farmAddress as string);
       setTokenAddress('');
+      toast.success('Success! New farm was deployed.');
     } catch (error) {
       console.log(error);
+      toast.error('Error while deploying farm');
     } finally {
       setLoadingDeploy(false);
     }
@@ -95,8 +97,10 @@ const EnableReward = ({ farmsSDK }: IEnableRewadProps) => {
       setFarmAddress('');
       setRewardAddress('');
       setDuration(0);
+      toast.success('Success! Reward was enabled.');
     } catch (error) {
       console.log(error);
+      toast.error('Error while enabling reward');
     } finally {
       setLoadingEnableReward(false);
     }
@@ -209,8 +213,10 @@ const SendReward = ({ farmsSDK }: IDeployFarmProps) => {
       setFarmAddress('');
       setRewardAddress('');
       setAmount(0);
+      toast.success('Success! Reward was sent.');
     } catch (error) {
       console.log(error);
+      toast.error('Error while sending reward.');
     } finally {
       setLoadingSendReward(false);
     }
