@@ -207,6 +207,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
                     index={index + itemOffset}
                     farmData={item}
                     handleRowClick={handleRowClick}
+                    userId={userId}
                   />
                 ))}
               </>

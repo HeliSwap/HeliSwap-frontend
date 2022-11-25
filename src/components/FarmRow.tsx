@@ -1,5 +1,4 @@
-import React, { useContext } from 'react';
-import { GlobalContext } from '../providers/Global';
+import React from 'react';
 
 import { IFarmData, IReward } from '../interfaces/tokens';
 
@@ -18,13 +17,10 @@ interface IFarmRowProps {
   collapseAll?: boolean;
   setCollapseAll?: (collapsed: boolean) => void;
   handleRowClick: (address: string) => void;
+  userId?: string;
 }
 
-const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
-  const contextValue = useContext(GlobalContext);
-  const { connection } = contextValue;
-  const { userId } = connection;
-
+const FarmRow = ({ farmData, index, handleRowClick, userId = '' }: IFarmRowProps) => {
   const handleViewDetailsRowClick = () => {
     handleRowClick(farmData.address);
   };
