@@ -1,12 +1,29 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import InputToken from '../components/InputToken';
 import Button from '../components/Button';
 import toast from 'react-hot-toast';
 import FarmsSDK from '../sdk/farmsSdk';
 import ToasterWrapper from '../components/ToasterWrapper';
+import useFarms from '../hooks/useFarms';
+import { useQueryOptionsPoolsFarms } from '../constants';
+import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
+import { GlobalContext } from '../providers/Global';
+import Loader from '../components/Loader';
+import FarmRow from '../components/FarmRow';
 
 const MaintainFarms = () => {
+  const contextValue = useContext(GlobalContext);
+  const { tokensWhitelisted } = contextValue;
+  const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
+  const { poolsByTokenList: pools } = usePoolsByTokensList(
+    useQueryOptionsPoolsFarms,
+    true,
+    tokensWhitelistedAddresses,
+  );
+  const { farms, processingFarms } = useFarms(useQueryOptionsPoolsFarms, '', pools);
+  console.log('farms', farms);
+
   const [farmsSDK, setFarmsSDK] = useState({} as FarmsSDK);
 
   //Initialize farms SDK
@@ -15,23 +32,71 @@ const MaintainFarms = () => {
     setFarmsSDK(farmsSDK);
   }, []);
 
+  const haveFarms = farms.length > 0;
   return (
-    <div className="m-4">
-      <div className="d-flex justify-content-center">Deploy new farm</div>
-      <DeployFarm farmsSDK={farmsSDK} />
-      <hr />
+    <div className="">
+      <div className="container-max-with-1042">
+        <div className="d-flex justify-content-center">Deploy new farm</div>
+        <DeployFarm farmsSDK={farmsSDK} />
+        <hr />
+        <div className="d-flex justify-content-center">Enable reward</div>
+        <EnableReward farmsSDK={farmsSDK} />
+        <hr />
+        <div className="d-flex justify-content-center">Approve token</div>
+        <ApproveToken farmsSDK={farmsSDK} />
+        <hr />
+        <div className="d-flex justify-content-center">Send reward</div>
+        <SendReward farmsSDK={farmsSDK} />
+        <hr />
+        <div className="d-flex justify-content-center">Set reward duration</div>
+        <SetRewardDuration farmsSDK={farmsSDK} />
+      </div>
 
-      <div className="d-flex justify-content-center">Enable reward</div>
-      <EnableReward farmsSDK={farmsSDK} />
-      <hr />
-      <div className="d-flex justify-content-center">Approve token</div>
-      <ApproveToken farmsSDK={farmsSDK} />
-      <hr />
-      <div className="d-flex justify-content-center">Send reward</div>
-      <SendReward farmsSDK={farmsSDK} />
-      <hr />
-      <div className="d-flex justify-content-center">Set reward duration</div>
-      <SetRewardDuration farmsSDK={farmsSDK} />
+      <div className="d-flex justify-content-center">
+        {processingFarms ? (
+          <div className="d-flex justify-content-center my-6">
+            <Loader />
+          </div>
+        ) : haveFarms ? (
+          <>
+            <div className="table-pools">
+              <div className={`d-none d-md-grid table-pools-row with-5-columns-farms`}>
+                <div className="table-pools-cell">
+                  <span className="text-small">#</span>
+                </div>
+                <div className="table-pools-cell">
+                  <span className="text-small">Pair Name</span>
+                </div>
+                <div className="table-pools-cell justify-content-end">
+                  <span className="text-small ws-no-wrap">Total Staked</span>
+                </div>
+                <div className="table-pools-cell justify-content-end">
+                  <span className="text-small ws-no-wrap">Total APR</span>
+                </div>
+
+                <div className="table-pools-cell justify-content-end">
+                  <span className="text-small">Campaign Status</span>
+                </div>
+              </div>
+
+              <>
+                {farms.map((item, index) => (
+                  <FarmRow
+                    key={index}
+                    index={index}
+                    farmData={item}
+                    handleRowClick={() => console.log('clicked')}
+                  />
+                ))}
+              </>
+            </div>
+          </>
+        ) : (
+          <div className="text-center mt-8">
+            <p className="text-small">There are no active farms at this moment</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
