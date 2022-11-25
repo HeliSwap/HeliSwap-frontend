@@ -28,6 +28,7 @@ import Footer from './Footer';
 import Sidebar from './Sidebar';
 import HeliVerse from '../pages/HeliVerse';
 import MaintainFarms from '../pages/MaintainFarms';
+import MaintainFarmDetails from '../pages/MaintainFarmDetails';
 
 function App() {
   const apolloClient = getApolloClient();
@@ -67,6 +68,11 @@ function App() {
                       <Route path="proposals" element={<Proposals />} />
                       <Route path="proposals/:id" element={<ProposalDetails />} />
                       <Route path="deploy-farms" element={<MaintainFarms />} />
+                      <Route path="maintain-farms" element={<MaintainFarms />} />
+                      <Route
+                        path="maintain-farms/:campaignAddress"
+                        element={<MaintainFarmDetails />}
+                      />
                       <Route path="styleguide" element={<Styleguide />} />
                     </Routes>
                   </div>
