@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import InputToken from '../components/InputToken';
 import Button from '../components/Button';
@@ -13,18 +14,26 @@ import Loader from '../components/Loader';
 import FarmRow from '../components/FarmRow';
 
 const MaintainFarms = () => {
+  // Context values
   const contextValue = useContext(GlobalContext);
   const { tokensWhitelisted } = contextValue;
+  //Hooks
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
   const { poolsByTokenList: pools } = usePoolsByTokensList(
     useQueryOptionsPoolsFarms,
     true,
     tokensWhitelistedAddresses,
   );
-  const { farms, processingFarms } = useFarms(useQueryOptionsPoolsFarms, '', pools);
-  console.log('farms', farms);
+  const navigate = useNavigate();
 
+  // State
+  const { farms, processingFarms } = useFarms(useQueryOptionsPoolsFarms, '', pools);
   const [farmsSDK, setFarmsSDK] = useState({} as FarmsSDK);
+
+  // Handlers
+  const handleRowClick = (farmAddress: string) => {
+    navigate(`/maintain-farms/${farmAddress}`);
+  };
 
   //Initialize farms SDK
   useEffect(() => {
@@ -39,7 +48,7 @@ const MaintainFarms = () => {
         <div className="d-flex justify-content-center">Deploy new farm</div>
         <DeployFarm farmsSDK={farmsSDK} />
         <hr />
-        <div className="d-flex justify-content-center">Enable reward</div>
+        {/* <div className="d-flex justify-content-center">Enable reward</div>
         <EnableReward farmsSDK={farmsSDK} />
         <hr />
         <div className="d-flex justify-content-center">Approve token</div>
@@ -49,7 +58,7 @@ const MaintainFarms = () => {
         <SendReward farmsSDK={farmsSDK} />
         <hr />
         <div className="d-flex justify-content-center">Set reward duration</div>
-        <SetRewardDuration farmsSDK={farmsSDK} />
+        <SetRewardDuration farmsSDK={farmsSDK} /> */}
       </div>
 
       <div className="d-flex justify-content-center">
@@ -85,7 +94,7 @@ const MaintainFarms = () => {
                     key={index}
                     index={index}
                     farmData={item}
-                    handleRowClick={() => console.log('clicked')}
+                    handleRowClick={handleRowClick}
                   />
                 ))}
               </>
@@ -97,6 +106,7 @@ const MaintainFarms = () => {
           </div>
         )}
       </div>
+      <ToasterWrapper />
     </div>
   );
 };
@@ -202,7 +212,6 @@ const EnableReward = ({ farmsSDK }: IEnableRewadProps) => {
           Enable reward
         </Button>
       </div>
-      <ToasterWrapper />
     </div>
   );
 };
