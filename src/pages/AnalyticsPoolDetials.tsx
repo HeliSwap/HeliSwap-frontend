@@ -1,28 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link, useParams } from 'react-router-dom';
+
+import { GlobalContext } from '../providers/Global';
 
 import { AnalyticsViews } from '../interfaces/common';
 import { IPoolExtendedData } from '../interfaces/tokens';
 
 import IconToken from '../components/IconToken';
+import Loader from '../components/Loader';
 import { viewTitleMapping } from './Analytics';
 
 import { formatIcons } from '../utils/iconUtils';
-
-import usePools from '../hooks/usePools';
-
-import { analyticsPageInitialCurrentView, POOLS_FEE } from '../constants';
 import { formatStringETHtoPriceFormatted } from '../utils/numberUtils';
-import Loader from '../components/Loader';
+
+import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
+
+import {
+  analyticsPageInitialCurrentView,
+  POOLS_FEE,
+  useQueryOptionsProvideSwapRemove,
+} from '../constants';
 
 const AnalyticsPoolDetials = () => {
+  const contextValue = useContext(GlobalContext);
+  const { tokensWhitelisted } = contextValue;
+
   const { poolAddress } = useParams();
 
   const [currentView, setCurrentView] = useState<AnalyticsViews>(analyticsPageInitialCurrentView);
   const [poolData, setPoolData] = useState<IPoolExtendedData>();
 
   // TODO
-  const { pools, loading } = usePools();
+  const [tokensWhitelistedIds, setTokensWhitelistedIds] = useState<string[]>([]);
+
+  const { poolsByTokenList: whitelistedPoolsData, loadingPoolsByTokenList: loadingPools } =
+    usePoolsByTokensList(useQueryOptionsProvideSwapRemove, false, tokensWhitelistedIds);
 
   // Handlers
   const handleTabItemClick = (currentView: AnalyticsViews) => {
@@ -31,11 +43,18 @@ const AnalyticsPoolDetials = () => {
 
   // Use Effects
   useEffect(() => {
-    if (pools && pools.length > 0) {
-      const found = pools.find(item => item.pairAddress === poolAddress);
+    if (tokensWhitelisted && tokensWhitelisted.length !== 0) {
+      const tokensWhitelistedIds = tokensWhitelisted.map(item => item.address);
+      setTokensWhitelistedIds(tokensWhitelistedIds);
+    }
+  }, [tokensWhitelisted]);
+
+  useEffect(() => {
+    if (whitelistedPoolsData && whitelistedPoolsData.length > 0) {
+      const found = whitelistedPoolsData.find(item => item.pairAddress === poolAddress);
       if (found) setPoolData(found);
     }
-  }, [pools, poolAddress]);
+  }, [whitelistedPoolsData, poolAddress]);
 
   return (
     <div className="d-flex justify-content-center">
@@ -55,7 +74,7 @@ const AnalyticsPoolDetials = () => {
 
         <hr />
 
-        {loading ? (
+        {loadingPools ? (
           <div className="d-flex justify-content-center mt-5">
             <Loader />
           </div>
