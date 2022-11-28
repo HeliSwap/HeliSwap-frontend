@@ -230,25 +230,32 @@ const FarmDetails = () => {
                     </div>
                   </div>
 
-                  <div className="m-4 d-flex justify-content-between">
-                    <div className=" m-4">
-                      <span className="m-4">Reward address</span>
-                      <InputToken
-                        value={enableRewardAddress}
-                        placeholder="Enter Reward address"
-                        onChange={(e: any) => setEnableRewardAddress(e.target.value)}
-                      />
+                  <div className="m-4 d-flex justify-content-end align-items-end">
+                    <div className="m-4">
+                      <div>
+                        <span className="m-4">Reward address</span>
+                        <InputToken
+                          value={enableRewardAddress}
+                          placeholder="Enter Reward address"
+                          onChange={(e: any) => setEnableRewardAddress(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <span className="m-4">Duration in seconds</span>
+                        <InputToken
+                          value={enableRewardDuration}
+                          placeholder="Enter duration"
+                          onChange={(e: any) => setEnableRewardDuration(e.target.value)}
+                        />
+                      </div>
                     </div>
+
                     <div className=" m-4">
-                      <span className="m-4">Duration in seconds</span>
-                      <InputToken
-                        value={enableRewardDuration}
-                        placeholder="Enter duration"
-                        onChange={(e: any) => setEnableRewardDuration(e.target.value)}
-                      />
-                    </div>
-                    <div className=" m-4">
-                      <Button onClick={HandleEnableReward} loading={loadingEnableReward}>
+                      <Button
+                        onClick={HandleEnableReward}
+                        loading={loadingEnableReward}
+                        size="small"
+                      >
                         Enable reward
                       </Button>
                     </div>
@@ -304,7 +311,7 @@ const FarmDetails = () => {
                               {/* Actions */}
                               <div className=" m-4">
                                 <div className="d-flex m-4 justify-content-end">
-                                  <div className="d-flex justify-content-end m-4">
+                                  <div className="m-4">
                                     <span className="m-4">WEI amount</span>
                                     <InputToken
                                       value={approveRewardAmount}
@@ -312,17 +319,18 @@ const FarmDetails = () => {
                                       onChange={(e: any) => setApproveRewardAmount(e.target.value)}
                                     />
                                   </div>
-                                  <div className="d-flex justify-content-end m-4">
+                                  <div className="m-4">
                                     <Button
                                       onClick={() => handleApproveToken(reward.address)}
                                       loading={loadingApproveReward}
+                                      size="small"
                                     >
                                       Approve token
                                     </Button>
                                   </div>
                                 </div>
                                 <div className="d-flex m-4 justify-content-end">
-                                  <div className="d-flex justify-content-end m-4">
+                                  <div className="m-4">
                                     <span className="m-4">WEI amount</span>
                                     <InputToken
                                       value={sendRewardAmount}
@@ -330,10 +338,11 @@ const FarmDetails = () => {
                                       onChange={(e: any) => setSendRewardAmount(e.target.value)}
                                     />
                                   </div>
-                                  <div className="d-flex justify-content-end m-4">
+                                  <div className="m-4">
                                     <Button
                                       onClick={() => handleSendReward(reward.address)}
                                       loading={loadingSendReward}
+                                      size="small"
                                     >
                                       Send reward
                                     </Button>
@@ -341,7 +350,7 @@ const FarmDetails = () => {
                                 </div>
 
                                 <div className="d-flex m-4 justify-content-end">
-                                  <div className="d-flex justify-content-end m-4">
+                                  <div className="m-4">
                                     <span className="m-4">Duration</span>
                                     <InputToken
                                       value={changeRewardDuration}
@@ -349,10 +358,11 @@ const FarmDetails = () => {
                                       onChange={(e: any) => setChangeRewardDuration(e.target.value)}
                                     />
                                   </div>
-                                  <div className="d-flex justify-content-end m-4">
+                                  <div className="m-4">
                                     <Button
                                       onClick={() => handleChangeRewardDuration(reward.address)}
                                       loading={loadingChangeRewardDuration}
+                                      size="small"
                                     >
                                       Set Duration
                                     </Button>
