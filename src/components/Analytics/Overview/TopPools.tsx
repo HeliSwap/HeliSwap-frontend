@@ -125,7 +125,7 @@ const TopPools = ({ pools, error }: ITopPoolsProps) => {
         {currentItems.map((pool: IPoolExtendedData, index) => {
           const poolNum = index + 1;
           return (
-            <div key={pool.id} className="table-pools-row with-5-columns">
+            <div key={pool.id} className="table-pools-row no-pointer with-5-columns">
               <div className="d-none d-md-flex table-pools-cell">
                 <span className="text-small">{poolNum + offset}</span>
               </div>

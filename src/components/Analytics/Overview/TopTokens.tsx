@@ -103,7 +103,7 @@ const TopTokens = ({ tokens }: ITopTokensProps) => {
           ? currentItems.map((token: ITokenDataAnalytics, index: number) => {
               const tokenNum = index + 1;
               return (
-                <div key={token.address} className="table-pools-row with-4-columns">
+                <div key={token.address} className="table-pools-row no-pointer with-4-columns">
                   <div className="d-none d-md-flex table-pools-cell">
                     <span className="text-small">{tokenNum + offset}</span>
                   </div>

@@ -423,6 +423,10 @@
       border-bottom: none;
     }
 
+    &.no-pointer {
+      cursor: default;
+    }
+
     .table-pools-cell {
       display: flex;
       align-items: center;
