@@ -398,6 +398,14 @@
       border-bottom: none;
     }
 
+    &.with-4-columns {
+      grid-template-columns: 20px 3fr 1fr 1fr;
+    }
+
+    &.with-5-columns {
+      grid-template-columns: 20px 3fr 1fr 1fr 1fr;
+    }
+
     &.with-6-columns {
       grid-template-columns: 20px 3fr 1fr 1fr 1fr 1fr;
     }
@@ -413,6 +421,10 @@
     &.is-opened {
       background-color: #1f1f4d;
       border-bottom: none;
+    }
+
+    &.no-pointer {
+      cursor: default;
     }
 
     .table-pools-cell {

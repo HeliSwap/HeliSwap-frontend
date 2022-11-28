@@ -13,6 +13,11 @@ export interface ITokenData {
   maxSupply?: string;
 }
 
+export interface ITokenDataAnalytics extends ITokenData {
+  price: string;
+  tvl?: string;
+}
+
 export interface IKeys {
   adminKey: boolean;
   supplyKey: boolean;
@@ -31,6 +36,8 @@ export interface ITokenListData {
   logoURI: string;
   name: string;
   symbol: string;
+  price?: string;
+  tvl?: string;
 }
 
 export interface ITokensData {

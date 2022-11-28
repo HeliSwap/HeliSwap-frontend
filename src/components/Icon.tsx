@@ -29,6 +29,7 @@ import { ReactComponent as Discord } from '../icons/system/discord.svg';
 import { ReactComponent as Medium } from '../icons/system/medium.svg';
 import { ReactComponent as Youtube } from '../icons/system/youtube.svg';
 import { ReactComponent as Hashport } from '../icons/system/hashport.svg';
+import { ReactComponent as Analytics } from '../icons/system/analytics.svg';
 
 interface IIconProps {
   name: string;
@@ -84,6 +85,7 @@ const icons: IIconMapping = {
   warning: Warning,
   info: Info,
   hashport: Hashport,
+  analytics: Analytics,
 };
 
 const colorMapping: IColorMapping = {

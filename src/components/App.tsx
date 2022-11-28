@@ -12,6 +12,7 @@ import Farms from '../pages/Farms';
 import Tokens from '../pages/Tokens';
 import Styleguide from '../pages/Styleguide';
 import FarmDetails from '../pages/FarmDetails';
+import Analytics from '../pages/Analytics';
 
 import Header from './Header';
 import Footer from './Footer';
@@ -40,6 +41,7 @@ function App() {
                       <Route path="farms" element={<Farms itemsPerPage={10} />} />
                       <Route path="farms/:campaignAddress" element={<FarmDetails />} />
                       <Route path="tokens" element={<Tokens />} />
+                      <Route path="analytics" element={<Analytics />} />
                       <Route path="styleguide" element={<Styleguide />} />
                     </Routes>
                   </div>

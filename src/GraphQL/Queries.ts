@@ -125,6 +125,9 @@ export const GET_POOLS_WHITELISTED = gql`
       volume24h
       volume7d
       hasCampaign
+      volume24hUsd
+      volume7dUsd
+      tvl
     }
   }
 `;
@@ -292,5 +295,15 @@ export const GET_SWAP_RATE = gql`
 export const HEALTH_CHECK = gql`
   query {
     healthcheck
+  }
+`;
+
+export const GET_METRICS = gql`
+  query {
+    getMetrics {
+      tvl
+      time
+      volume
+    }
   }
 `;
