@@ -78,7 +78,7 @@ const AnalyticsPoolDetials = () => {
           <div className="d-flex justify-content-center mt-5">
             <Loader />
           </div>
-        ) : (
+        ) : poolData ? (
           <>
             <div className="mt-6 d-md-flex justify-content-between align-items-start">
               <div>
@@ -167,6 +167,8 @@ const AnalyticsPoolDetials = () => {
               </div>
             </div>
           </>
+        ) : (
+          <p>No pool found</p>
         )}
       </div>
     </div>
