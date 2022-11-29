@@ -70,6 +70,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
   const disconnectWallet = () => {
     hashconnectConnectorInstance?.clearPairings();
     setUserId('');
+    setConnected(false);
   };
 
   const connection = {

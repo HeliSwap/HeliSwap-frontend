@@ -99,6 +99,11 @@ class Hashconnect {
   }
 
   async connectToExtension() {
+    const hashconnectData = localStorage.getItem('hashconnectData');
+
+    if (!hashconnectData) {
+      await this.initHashconnect();
+    }
     //this will automatically pop up a pairing request in the HashPack extension
     this.hashconnect.connectToLocalWallet();
   }
