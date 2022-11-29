@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import InputToken from '../components/InputToken';
 import Button from '../components/Button';
 import toast from 'react-hot-toast';
 import FarmsSDK from '../sdk/farmsSdk';
@@ -17,6 +16,7 @@ const MaintainFarms = () => {
   // Context values
   const contextValue = useContext(GlobalContext);
   const { tokensWhitelisted } = contextValue;
+
   //Hooks
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
   const { poolsByTokenList: pools } = usePoolsByTokensList(
@@ -43,14 +43,20 @@ const MaintainFarms = () => {
 
   const haveFarms = farms.length > 0;
   return (
-    <div className="">
+    <div className="d-flex justify-content-center">
       <div className="container-max-with-1042">
-        <div className="d-flex justify-content-center">Deploy new farm</div>
-        <DeployFarm farmsSDK={farmsSDK} />
-        <hr />
-      </div>
+        <div className="mb-4">
+          <div className="d-flex">
+            <h2 className={`text-subheader tab-title is-active mx-4 `}>Manage Farms</h2>
+          </div>
+        </div>
 
-      <div className="d-flex justify-content-center">
+        <hr />
+
+        <DeployFarm farmsSDK={farmsSDK} />
+
+        <hr />
+
         {processingFarms ? (
           <div className="d-flex justify-content-center my-6">
             <Loader />
@@ -94,8 +100,8 @@ const MaintainFarms = () => {
             <p className="text-small">There are no active farms at this moment</p>
           </div>
         )}
+        <ToasterWrapper />
       </div>
-      <ToasterWrapper />
     </div>
   );
 };
@@ -126,18 +132,17 @@ const DeployFarm = ({ farmsSDK }: IDeployFarmProps) => {
   };
 
   return (
-    <div className="d-flex justify-content-end m-4">
-      <div className="m-4">
-        <span className="m-4">Staking token address</span>
-        <InputToken
+    <div className="m-4">
+      <h2 className={`text-main mb-3`}>Deploy new farm</h2>
+      <div className="d-flex align-items-center">
+        <input
+          className="form-control"
           value={tokenAddress}
-          placeholder="Enter Token address"
+          placeholder="Staking token address"
           onChange={(e: any) => setTokenAddress(e.target.value)}
         />
-      </div>
-      <div className="m-4">
-        <Button onClick={deployFarm} loading={loadingDeploy}>
-          Deploy farm
+        <Button className="ms-3" onClick={deployFarm} loading={loadingDeploy}>
+          Deploy
         </Button>
       </div>
       {newFarmAddress ? <div>{`New farm deployed at address: ${newFarmAddress}`}</div> : null}
