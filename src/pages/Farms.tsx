@@ -162,7 +162,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
             <div className="table-pools">
               <div
                 className={`d-none d-md-grid table-pools-row with-${
-                  userId ? '6' : '5'
+                  userId ? '7' : '6'
                 }-columns-farms`}
               >
                 <div className="table-pools-cell">
@@ -192,8 +192,11 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
                     <span className="text-small ws-no-wrap">Your Stake</span>
                   </div>
                 ) : null}
+                <div className="table-pools-cell">
+                  <span className="text-small">Rewards</span>
+                </div>
                 <div className="table-pools-cell justify-content-end">
-                  <span className="text-small">Campaign Status</span>
+                  <span className="text-small">Status</span>
                 </div>
               </div>
 
