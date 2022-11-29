@@ -27,12 +27,12 @@ import {
 } from '../utils/numberUtils';
 
 import getErrorMessage from '../content/errors';
-import { timestampToDate } from '../utils/timeUtils';
 import { NATIVE_TOKEN } from '../utils/tokenUtils';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import useFarmByAddress from '../hooks/useFarmByAddress';
 import { useQueryOptionsPoolsFarms } from '../constants';
 import Loader from '../components/Loader';
+import { renderCampaignEndDate } from '../utils/farmUtils';
 
 const FarmDetails = () => {
   const contextValue = useContext(GlobalContext);
@@ -112,34 +112,6 @@ const FarmDetails = () => {
     }
   };
 
-  const renderCampaignEndDate = (campaignEndDate: number, rewardsData: IReward[]) => {
-    const campaignEnded = campaignEndDate < Date.now();
-    const campaignNotStarted = campaignEndDate === 0;
-
-    const statusLabel = campaignNotStarted ? (
-      'Campaign not started'
-    ) : campaignEnded ? (
-      'Campaign Ended'
-    ) : (
-      <>
-        Until <span className="text-bold">{timestampToDate(campaignEndDate)}</span>
-      </>
-    );
-
-    const dateContent = (
-      <>
-        <span
-          className={`icon-campaign-status ${
-            !campaignNotStarted ? (!campaignEnded ? 'is-active' : '') : 'not-started'
-          }`}
-        ></span>
-        <span className="text-micro ms-3">{statusLabel}</span>
-      </>
-    );
-
-    return <div className="d-flex align-items-center">{dateContent}</div>;
-  };
-
   const hasUserStaked = farmData.userStakingData?.stakedAmount !== '0';
   const hasUserProvided = farmData.poolData?.lpShares !== '0';
   const campaignEnded = farmData.campaignEndDate < Date.now();
@@ -174,7 +146,7 @@ const FarmDetails = () => {
                   </div>
 
                   <div className="container-campaign-status mt-4 mt-md-0 d-flex align-items-center">
-                    {renderCampaignEndDate(farmData.campaignEndDate, farmData.rewardsData)}
+                    {renderCampaignEndDate(farmData.campaignEndDate)}
                   </div>
                 </div>
 

@@ -224,3 +224,23 @@ export const getProcessedFarms = (
   });
   return farms;
 };
+
+export const renderCampaignEndDate = (campaignEndDate: number) => {
+  const campaignEnded = campaignEndDate < Date.now();
+  const campaignNotStarted = campaignEndDate === 0;
+
+  const statusLabel = campaignNotStarted ? 'Not started' : campaignEnded ? 'Ended' : 'Active';
+
+  const dateContent = (
+    <>
+      <span
+        className={`icon-campaign-status ${
+          !campaignNotStarted ? (!campaignEnded ? 'is-active' : '') : 'not-started'
+        }`}
+      ></span>
+      <span className="text-micro ms-3">{statusLabel}</span>
+    </>
+  );
+
+  return <div className="d-flex align-items-center">{dateContent}</div>;
+};

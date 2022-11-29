@@ -415,7 +415,11 @@
     }
 
     &.with-6-columns-farms {
-      grid-template-columns: 20px 2fr 1fr 1fr 1fr 2fr;
+      grid-template-columns: 20px 2fr 1fr 1fr 1fr 1fr;
+    }
+
+    &.with-7-columns-farms {
+      grid-template-columns: 20px 2fr 1fr 1fr 1fr 1fr 1fr;
     }
 
     &.is-opened {
