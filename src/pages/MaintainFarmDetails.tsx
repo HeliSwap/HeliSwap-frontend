@@ -26,7 +26,6 @@ import { useQueryOptionsPoolsFarms } from '../constants';
 import Loader from '../components/Loader';
 import dayjs from 'dayjs';
 import FarmsSDK from '../sdk/farmsSdk';
-import InputToken from '../components/InputToken';
 import Button from '../components/Button';
 import toast from 'react-hot-toast';
 
@@ -172,211 +171,244 @@ const FarmDetails = () => {
       <div className="container-max-with-1042">
         <PageHeader title="Manage Farm" handleBackClick={() => navigate('/maintain-farms')} />
         {haveFarm ? (
-          <div className="row">
-            <div className="col-md-7">
-              <div className="container-blue-neutral-800 rounded p-4 p-lg-5">
-                <div className="d-md-flex justify-content-between align-items-start">
-                  <div className="d-flex align-items-center">
-                    {formatIcons(
-                      [farmData.poolData?.token0Symbol, farmData.poolData?.token1Symbol],
-                      'large',
-                    )}
-                    <p className="text-subheader text-light ms-4">
-                      {farmData.poolData?.token0Symbol} / {farmData.poolData?.token1Symbol}
-                    </p>
-                  </div>
+          <div className="container-blue-neutral-800 rounded p-4 p-lg-5">
+            <div className="d-md-flex justify-content-between align-items-start">
+              <div className="d-flex align-items-center">
+                {formatIcons(
+                  [farmData.poolData?.token0Symbol, farmData.poolData?.token1Symbol],
+                  'large',
+                )}
+                <p className="text-subheader text-light ms-4">
+                  {farmData.poolData?.token0Symbol} / {farmData.poolData?.token1Symbol}
+                </p>
+              </div>
 
-                  <div className="container-campaign-status mt-4 mt-md-0 d-flex align-items-center">
-                    {renderCampaignEndDate(farmData.campaignEndDate, farmData.rewardsData)}
-                  </div>
+              <div className="container-campaign-status mt-4 mt-md-0 d-flex align-items-center">
+                {renderCampaignEndDate(farmData.campaignEndDate, farmData.rewardsData)}
+              </div>
+            </div>
+
+            <div className="container-border-rounded-bn-500 mt-4 mt-lg-6">
+              <div className="row">
+                <div className="col-6 col-md-4 d-flex align-items-center">
+                  <p className="d-flex align-items-center">
+                    <span className="text-secondary text-small">Total APR</span>
+                    <Tippy content="Your annual rate of return, expressed as a percentage. Interest paid in previous periods is not accounted for.">
+                      <span className="ms-2">
+                        <Icon name="hint" color="gray" size="small" />
+                      </span>
+                    </Tippy>
+                  </p>
+                </div>
+                <div className="col-6 col-md-4">
+                  <p className="text-subheader text-numeric">
+                    {formatStringToPercentage(stripStringToFixedDecimals(farmData.APR, 2))}
+                  </p>
+                </div>
+              </div>
+
+              <div className="row mt-4">
+                <div className="col-6 col-md-4 d-flex align-items-center">
+                  <p className="d-flex align-items-center">
+                    <span className="text-secondary text-small">Total Staked</span>
+                    <Tippy content="The total amount of staked tokens in this farm pool, denominated in $USD.">
+                      <span className="ms-2">
+                        <Icon name="hint" color="gray" size="small" />
+                      </span>
+                    </Tippy>
+                  </p>
+                </div>
+                <div className="col-6 col-md-4">
+                  <p className="text-main text-numeric">
+                    {formatStringToPrice(stripStringToFixedDecimals(farmData.totalStakedUSD, 2))}
+                  </p>
+                </div>
+              </div>
+
+              <hr className="my-5" />
+
+              <div className="row">
+                <div className="col-6">
+                  <p className="text-small mb-3">Reward address</p>
+                  <input
+                    className="form-control"
+                    value={enableRewardAddress}
+                    placeholder="Enter Reward address"
+                    onChange={(e: any) => setEnableRewardAddress(e.target.value)}
+                  />
+                </div>
+                <div className="col-6">
+                  <p className="text-small mb-3">Duration in seconds</p>
+                  <input
+                    className="form-control"
+                    value={enableRewardDuration}
+                    placeholder="Enter duration"
+                    onChange={(e: any) => setEnableRewardDuration(e.target.value)}
+                  />
                 </div>
 
-                <div className="container-border-rounded-bn-500 mt-4 mt-lg-6">
-                  <div className="row">
-                    <div className="col-6 col-md-4 d-flex align-items-center">
-                      <p className="d-flex align-items-center">
-                        <span className="text-secondary text-small">Total APR</span>
-                        <Tippy content="Your annual rate of return, expressed as a percentage. Interest paid in previous periods is not accounted for.">
-                          <span className="ms-2">
-                            <Icon name="hint" color="gray" size="small" />
-                          </span>
-                        </Tippy>
-                      </p>
-                    </div>
-                    <div className="col-6 col-md-4">
-                      <p className="text-subheader text-numeric">
-                        {formatStringToPercentage(stripStringToFixedDecimals(farmData.APR, 2))}
-                      </p>
-                    </div>
-                  </div>
+                <div className="mt-4">
+                  <Button onClick={HandleEnableReward} loading={loadingEnableReward} size="small">
+                    Enable reward
+                  </Button>
+                </div>
+              </div>
 
-                  <div className="row mt-4">
-                    <div className="col-6 col-md-4 d-flex align-items-center">
-                      <p className="d-flex align-items-center">
-                        <span className="text-secondary text-small">Total Staked</span>
-                        <Tippy content="The total amount of staked tokens in this farm pool, denominated in $USD.">
-                          <span className="ms-2">
-                            <Icon name="hint" color="gray" size="small" />
-                          </span>
-                        </Tippy>
-                      </p>
-                    </div>
-                    <div className="col-6 col-md-4">
-                      <p className="text-main text-numeric">
-                        {formatStringToPrice(
-                          stripStringToFixedDecimals(farmData.totalStakedUSD, 2),
-                        )}
-                      </p>
-                    </div>
-                  </div>
+              <hr className="my-5" />
 
-                  <div className="m-4 d-flex justify-content-end align-items-end">
-                    <div className="m-4">
-                      <div>
-                        <span className="m-4">Reward address</span>
-                        <InputToken
-                          value={enableRewardAddress}
-                          placeholder="Enter Reward address"
-                          onChange={(e: any) => setEnableRewardAddress(e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <span className="m-4">Duration in seconds</span>
-                        <InputToken
-                          value={enableRewardDuration}
-                          placeholder="Enter duration"
-                          onChange={(e: any) => setEnableRewardDuration(e.target.value)}
-                        />
-                      </div>
-                    </div>
+              <div className="row mt-4">
+                <div className="col-6 col-md-4 d-flex align-items-center">
+                  <p className="d-flex align-items-center">
+                    <span className="text-secondary text-small">Rewards</span>
+                    <Tippy content="The tokens you will be rewarded with upon harvest.">
+                      <span className="ms-2">
+                        <Icon name="hint" color="gray" size="small" />
+                      </span>
+                    </Tippy>
+                  </p>
+                </div>
 
-                    <div className=" m-4">
-                      <Button
-                        onClick={HandleEnableReward}
-                        loading={loadingEnableReward}
-                        size="small"
-                      >
-                        Enable reward
-                      </Button>
-                    </div>
-                  </div>
+                <div>
+                  {campaignHasRewards &&
+                    farmData.rewardsData?.reduce((acc: ReactNode[], reward: IReward, index) => {
+                      const rewardSymbol =
+                        reward.address === process.env.REACT_APP_WHBAR_ADDRESS
+                          ? NATIVE_TOKEN.symbol
+                          : reward.symbol;
 
-                  <hr className="my-5" />
+                      acc.push(
+                        <div className="mt-3 container-dark p-4" key={index}>
+                          <div className="d-flex align-items-center mb-4">
+                            <IconToken symbol={reward.symbol} />{' '}
+                            <span className="text-main ms-3">{rewardSymbol}</span>
+                          </div>
 
-                  <div className="row mt-4">
-                    <div className="col-6 col-md-4 d-flex align-items-center">
-                      <p className="d-flex align-items-center">
-                        <span className="text-secondary text-small">Rewards</span>
-                        <Tippy content="The tokens you will be rewarded with upon harvest.">
-                          <span className="ms-2">
-                            <Icon name="hint" color="gray" size="small" />
-                          </span>
-                        </Tippy>
-                      </p>
-                    </div>
-                    <div className="m-4">
-                      {campaignHasRewards &&
-                        farmData.rewardsData?.reduce((acc: ReactNode[], reward: IReward, index) => {
-                          const rewardSymbol =
-                            reward.address === process.env.REACT_APP_WHBAR_ADDRESS
-                              ? NATIVE_TOKEN.symbol
-                              : reward.symbol;
+                          <div className="row mt-4">
+                            <div className="col-6 col-md-4 d-flex align-items-center">
+                              <p className="d-flex align-items-center">
+                                <span className="text-secondary text-small">Total amount USD</span>
+                              </p>
+                            </div>
+                            <div className="col-6 col-md-4">
+                              <p className="text-main text-numeric">{reward.totalAmountUSD}</p>
+                            </div>
+                          </div>
 
-                          acc.push(
-                            <div key={index} className="m-4">
-                              <IconToken symbol={reward.symbol} />{' '}
-                              <span className="text-main ms-3">{rewardSymbol}</span>
-                              <div className="d-flex justify-content-between m-4">
-                                <span className="text-main ms-3">Total amount USD</span>
-                                <span className="text-main ms-3">{reward.totalAmountUSD}</span>
-                              </div>
-                              <div className="d-flex justify-content-between m-4">
-                                <span className="text-main ms-3">Total amount tokens</span>
-                                <span className="text-main ms-3">{reward.totalAmount}</span>
-                              </div>
-                              <div className="d-flex justify-content-between m-4">
-                                <span className="text-main ms-3">Reward end date</span>
-                                <span className="text-main ms-3">
-                                  {reward.rewardEnd !== 0
-                                    ? dayjs(reward.rewardEnd).format('YYYY-MM-DD HH:mm')
-                                    : 'Not set'}
+                          <div className="row mt-4">
+                            <div className="col-6 col-md-4 d-flex align-items-center">
+                              <p className="d-flex align-items-center">
+                                <span className="text-secondary text-small">
+                                  Total amount tokens
                                 </span>
-                              </div>
-                              <div className="d-flex justify-content-between m-4">
-                                <span className="text-main ms-3">Reward duration in seconds</span>
-                                <span className="text-main ms-3">
-                                  {reward.duration !== 0 ? reward.duration : 'Not set'}
+                              </p>
+                            </div>
+                            <div className="col-6 col-md-4">
+                              <p className="text-main text-numeric">{reward.totalAmount}</p>
+                            </div>
+                          </div>
+
+                          <div className="row mt-4">
+                            <div className="col-6 col-md-4 d-flex align-items-center">
+                              <p className="d-flex align-items-center">
+                                <span className="text-secondary text-small">Reward end date</span>
+                              </p>
+                            </div>
+                            <div className="col-6 col-md-4">
+                              <p className="text-main text-numeric">
+                                {reward.rewardEnd !== 0
+                                  ? dayjs(reward.rewardEnd).format('YYYY-MM-DD HH:mm')
+                                  : 'Not set'}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="row mt-4">
+                            <div className="col-6 col-md-4 d-flex align-items-center">
+                              <p className="d-flex align-items-center">
+                                <span className="text-secondary text-small">
+                                  Reward duration in seconds
                                 </span>
-                              </div>
-                              {/* Actions */}
-                              <div className=" m-4">
-                                <div className="d-flex m-4 justify-content-end">
-                                  <div className="m-4">
-                                    <span className="m-4">WEI amount</span>
-                                    <InputToken
-                                      value={approveRewardAmount}
-                                      placeholder="Enter WEI amount"
-                                      onChange={(e: any) => setApproveRewardAmount(e.target.value)}
-                                    />
-                                  </div>
-                                  <div className="m-4">
-                                    <Button
-                                      onClick={() => handleApproveToken(reward.address)}
-                                      loading={loadingApproveReward}
-                                      size="small"
-                                    >
-                                      Approve token
-                                    </Button>
-                                  </div>
-                                </div>
-                                <div className="d-flex m-4 justify-content-end">
-                                  <div className="m-4">
-                                    <span className="m-4">WEI amount</span>
-                                    <InputToken
-                                      value={sendRewardAmount}
-                                      placeholder="Enter WEI amount"
-                                      onChange={(e: any) => setSendRewardAmount(e.target.value)}
-                                    />
-                                  </div>
-                                  <div className="m-4">
-                                    <Button
-                                      onClick={() => handleSendReward(reward.address)}
-                                      loading={loadingSendReward}
-                                      size="small"
-                                    >
-                                      Send reward
-                                    </Button>
-                                  </div>
-                                </div>
+                              </p>
+                            </div>
+                            <div className="col-6 col-md-4">
+                              <p className="text-main text-numeric">
+                                {reward.duration !== 0 ? reward.duration : 'Not set'}
+                              </p>
+                            </div>
+                          </div>
 
-                                <div className="d-flex m-4 justify-content-end">
-                                  <div className="m-4">
-                                    <span className="m-4">Duration</span>
-                                    <InputToken
-                                      value={changeRewardDuration}
-                                      placeholder="Enter new duration"
-                                      onChange={(e: any) => setChangeRewardDuration(e.target.value)}
-                                    />
-                                  </div>
-                                  <div className="m-4">
-                                    <Button
-                                      onClick={() => handleChangeRewardDuration(reward.address)}
-                                      loading={loadingChangeRewardDuration}
-                                      size="small"
-                                    >
-                                      Set Duration
-                                    </Button>
-                                  </div>
-                                </div>
-                              </div>
-                              <hr />
-                            </div>,
-                          );
+                          <hr className="my-5" />
 
-                          return acc;
-                        }, [])}
-                    </div>
-                  </div>
+                          {/* Actions */}
+                          <div className="row">
+                            <div className="col-4">
+                              <div>
+                                <p className="text-small mb-3">WEI amount</p>
+                                <input
+                                  className="form-control"
+                                  value={approveRewardAmount}
+                                  placeholder="Enter WEI amount"
+                                  onChange={(e: any) => setApproveRewardAmount(e.target.value)}
+                                />
+                              </div>
+                              <div className="mt-4">
+                                <Button
+                                  onClick={() => handleApproveToken(reward.address)}
+                                  loading={loadingApproveReward}
+                                  size="small"
+                                >
+                                  Approve token
+                                </Button>
+                              </div>
+                            </div>
+
+                            <div className="col-4">
+                              <div>
+                                <p className="text-small mb-3">WEI amount</p>
+                                <input
+                                  className="form-control"
+                                  value={sendRewardAmount}
+                                  placeholder="Enter WEI amount"
+                                  onChange={(e: any) => setSendRewardAmount(e.target.value)}
+                                />
+                              </div>
+                              <div className="mt-4">
+                                <Button
+                                  onClick={() => handleSendReward(reward.address)}
+                                  loading={loadingSendReward}
+                                  size="small"
+                                >
+                                  Send reward
+                                </Button>
+                              </div>
+                            </div>
+
+                            <div className="col-4">
+                              <div>
+                                <p className="text-small mb-3">Duration</p>
+                                <input
+                                  className="form-control"
+                                  value={changeRewardDuration}
+                                  placeholder="Enter new duration"
+                                  onChange={(e: any) => setChangeRewardDuration(e.target.value)}
+                                />
+                              </div>
+                              <div className="mt-4">
+                                <Button
+                                  onClick={() => handleChangeRewardDuration(reward.address)}
+                                  loading={loadingChangeRewardDuration}
+                                  size="small"
+                                >
+                                  Set Duration
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>,
+                      );
+
+                      return acc;
+                    }, [])}
                 </div>
               </div>
             </div>
