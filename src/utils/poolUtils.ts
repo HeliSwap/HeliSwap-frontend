@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import { IPoolData, IPoolExtendedData } from '../interfaces/tokens';
 import { formatStringWeiToStringEther } from './numberUtils';
-import { getTokenPrice } from './tokenUtils';
+import { getTokenPrice, mapHBARTokenSymbol } from './tokenUtils';
 
 export const getProcessedPools = (
   pools: IPoolExtendedData[],
@@ -66,8 +66,8 @@ export const getProcessedPools = (
 
         const poolData: IPoolExtendedData = {
           ...pool,
-          token0Symbol: pool.token0Symbol === 'WHBAR' ? 'HBAR' : pool.token0Symbol,
-          token1Symbol: pool.token1Symbol === 'WHBAR' ? 'HBAR' : pool.token1Symbol,
+          token0Symbol: mapHBARTokenSymbol(pool.token0Symbol),
+          token1Symbol: mapHBARTokenSymbol(pool.token1Symbol),
           token0AmountFormatted,
           token1AmountFormatted,
           tvlBN: new BigNumber(totalLpValueStr),

@@ -12,6 +12,7 @@ import { viewTitleMapping } from './Analytics';
 
 import { formatIcons } from '../utils/iconUtils';
 import { formatStringETHtoPriceFormatted } from '../utils/numberUtils';
+import { mapHBARTokenSymbol } from '../utils/tokenUtils';
 
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 
@@ -56,6 +57,11 @@ const AnalyticsPoolDetials = () => {
     }
   }, [whitelistedPoolsData, poolAddress]);
 
+  const calculateReservePrice = (reserve0: string, reserve1: string) => {
+    const result = Number(reserve0) / Number(reserve1);
+    return result.toString();
+  };
+
   return (
     <div className="d-flex justify-content-center">
       <div className="container-max-with-1042">
@@ -88,7 +94,8 @@ const AnalyticsPoolDetials = () => {
                     'large',
                   )}
                   <p className="text-title text-light mt-3 mt-md-0 ms-md-4">
-                    {poolData?.token0Symbol} / {poolData?.token1Symbol}
+                    {mapHBARTokenSymbol(poolData.token0Symbol)} /{' '}
+                    {mapHBARTokenSymbol(poolData.token1Symbol)}
                   </p>
 
                   <span className="text-main text-normal text-numeric badge bg-secondary-800 ms-5 d-none d-md-inline-block">
@@ -100,16 +107,18 @@ const AnalyticsPoolDetials = () => {
                   <div className="container-blue-neutral-700 rounded py-2 px-3 d-flex align-items-center">
                     <IconToken symbol={poolData?.token0Symbol as string} />
                     <span className="ms-3">
-                      1 {poolData?.token0Symbol as string} = {}
-                      {poolData?.token1Symbol as string}
+                      1 {mapHBARTokenSymbol(poolData.token0Symbol)} ={' '}
+                      {calculateReservePrice(poolData.token1Amount, poolData.token0Amount)}{' '}
+                      {mapHBARTokenSymbol(poolData.token1Symbol)}
                     </span>
                   </div>
 
                   <div className="container-blue-neutral-700 rounded py-2 px-3 d-flex align-items-center ms-md-4 mt-3 mt-md-0">
                     <IconToken symbol={poolData?.token1Symbol as string} />
                     <span className="ms-3">
-                      1 {poolData?.token1Symbol as string} = {}
-                      {poolData?.token0Symbol as string}
+                      1 {mapHBARTokenSymbol(poolData.token0Symbol)} ={' '}
+                      {calculateReservePrice(poolData.token0Amount, poolData.token1Amount)}{' '}
+                      {mapHBARTokenSymbol(poolData.token1Symbol)}
                     </span>
                   </div>
                 </div>
@@ -157,9 +166,11 @@ const AnalyticsPoolDetials = () => {
 
                   <p className="text-small text-gray mt-5">TVL</p>
                   <p className="text-subheader">{poolData?.tvl}</p>
+                  <p className="text-small text-numeric text-success">(3.45%)</p>
 
                   <p className="text-small text-gray mt-5">Volume 24H</p>
                   <p className="text-subheader">{poolData?.volume24h}</p>
+                  <p className="text-small text-numeric text-success">(3.45%)</p>
                 </div>
               </div>
               <div className="col-md-9 mt-4 mt-md-0">
