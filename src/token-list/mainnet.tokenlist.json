@@ -153,6 +153,14 @@
       "symbol": "LIL",
       "decimals": 0,
       "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/LIL.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x0000000000000000000000000000000000163748",
+      "name": "HASHTREE",
+      "symbol": "HASHTREE",
+      "decimals": 0,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/HASHTREE.png"
     }
   ]
 }
