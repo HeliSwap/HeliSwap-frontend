@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { GlobalContext } from '../../providers/Global';
 import Loader from '../Loader';
@@ -36,6 +36,18 @@ const ConnectModalContent = ({
     console.log('hashconnectConnectorInstance', hashconnectConnectorInstance);
     navigator.clipboard.writeText(hashconnectConnectorInstance.pairingString);
   };
+
+  useEffect(() => {
+    const initHashconnect = async () => {
+      //Check if hashconnect is initialised on open connect wallet modal
+      const hashconnectData = localStorage.getItem('hashconnectData');
+
+      if (!hashconnectData) {
+        await hashconnectConnectorInstance.initHashconnect();
+      }
+    };
+    initHashconnect();
+  }, []);
 
   return (
     <>
