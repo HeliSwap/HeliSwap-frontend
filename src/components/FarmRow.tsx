@@ -9,7 +9,8 @@ import {
   formatStringToPrice,
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
-import { timestampToDate } from '../utils/timeUtils';
+import { NATIVE_TOKEN } from '../utils/tokenUtils';
+import { renderCampaignEndDate } from '../utils/farmUtils';
 
 interface IFarmRowProps {
   farmData: IFarmData;
@@ -28,38 +29,43 @@ const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
     handleRowClick(farmData.address);
   };
 
-  const renderCampaignEndDate = (campaignEndDate: number, rewardsData: IReward[]) => {
-    const campaignEnded = campaignEndDate < Date.now();
-    const campaignNotStarted = campaignEndDate === 0;
+  const renderCampaignRewards = (farmData: IFarmData) => {
+    const campaignHasRewards = farmData.rewardsData?.length > 0;
+    const campaignHasActiveRewards = campaignHasRewards
+      ? Object.keys(farmData.rewardsData.find(reward => reward.rewardEnd > Date.now()) || {})
+          .length > 0
+      : false;
 
-    const statusLabel = campaignNotStarted ? (
-      'Campaign not started'
-    ) : campaignEnded ? (
-      'Campaign Ended'
-    ) : (
-      <>
-        Until <span className="text-bold">{timestampToDate(campaignEndDate)}</span>
-      </>
-    );
+    const rewardsSymbols = campaignHasRewards
+      ? farmData.rewardsData?.reduce((acc: string[], reward: IReward, index) => {
+          // When reward is enabled, but not sent -> do not show
+          const haveRewardSendToCampaign =
+            reward.totalAmount && Number(reward.totalAmount || reward) !== 0;
 
-    const dateContent = (
-      <>
-        <span
-          className={`icon-campaign-status ${
-            !campaignNotStarted ? (!campaignEnded ? 'is-active' : '') : 'not-started'
-          }`}
-        ></span>
-        <span className="text-micro ms-3">{statusLabel}</span>
-      </>
-    );
+          const rewardActive = reward.rewardEnd > Date.now();
+          // When all rewards are inactive -> show all, when at least one is active -> show only active
+          const showReward =
+            haveRewardSendToCampaign && (rewardActive || !campaignHasActiveRewards);
 
-    return <div className="d-flex align-items-center">{dateContent}</div>;
+          if (showReward) {
+            const rewardSymbol =
+              reward.address === process.env.REACT_APP_WHBAR_ADDRESS
+                ? NATIVE_TOKEN.symbol
+                : reward.symbol;
+
+            acc.push(rewardSymbol);
+          }
+          return acc;
+        }, [])
+      : [];
+
+    return formatIcons(rewardsSymbols);
   };
 
   return (
     <div
       onClick={handleViewDetailsRowClick}
-      className={`table-pools-row with-${userId ? '6' : '5'}-columns-farms`}
+      className={`table-pools-row with-${userId ? '7' : '6'}-columns-farms`}
     >
       <div className="d-none d-md-flex table-pools-cell">
         <span className="text-small">{index + 1}</span>
@@ -94,9 +100,11 @@ const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
         </div>
       ) : null}
 
+      <div className="d-none d-md-flex table-pools-cell">{renderCampaignRewards(farmData)}</div>
+
       <div className="table-pools-cell d-flex justify-content-between justify-content-md-end">
         <span className="d-md-none text-small">Campaign Status</span>
-        {renderCampaignEndDate(farmData.campaignEndDate, farmData.rewardsData)}
+        {renderCampaignEndDate(farmData.campaignEndDate)}
       </div>
     </div>
   );
