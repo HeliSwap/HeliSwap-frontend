@@ -132,6 +132,46 @@ export const GET_POOLS_WHITELISTED = gql`
   }
 `;
 
+export const GET_POOL_BY_ADDRESS = gql`
+  query getPoolByAddress($poolAddress: String!, $tokens: [String]!) {
+    getPoolByAddress(poolAddress: $poolAddress, tokens: $tokens) {
+      id
+      pairName
+      pairSymbol
+      pairAddress
+      pairSupply
+      token0
+      token0Name
+      token0Amount
+      token0Symbol
+      token0Decimals
+      token1
+      token1Name
+      token1Symbol
+      token1Amount
+      token1Decimals
+      volume24h
+      volume7d
+      hasCampaign
+      volume24hUsd
+      volume7dUsd
+      tvl
+      historicalData {
+        time
+        tvl
+        volume
+      }
+      fees {
+        amount
+      }
+      diff {
+        tvl
+        volume
+      }
+    }
+  }
+`;
+
 export const GET_TOKENS = gql`
   query {
     getTokensData {

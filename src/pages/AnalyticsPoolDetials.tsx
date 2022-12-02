@@ -9,12 +9,13 @@ import { IPoolExtendedData } from '../interfaces/tokens';
 import IconToken from '../components/IconToken';
 import Loader from '../components/Loader';
 import { viewTitleMapping } from './Analytics';
+import Icon from '../components/Icon';
 
 import { formatIcons } from '../utils/iconUtils';
-import { formatStringETHtoPriceFormatted } from '../utils/numberUtils';
+import { formatStringETHtoPriceFormatted, formatStringToPrice } from '../utils/numberUtils';
 import { mapHBARTokenSymbol } from '../utils/tokenUtils';
 
-import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
+import usePoolByAddress from '../hooks/usePoolByAddress';
 
 import {
   analyticsPageInitialCurrentView,
@@ -31,11 +32,14 @@ const AnalyticsPoolDetials = () => {
   const [currentView, setCurrentView] = useState<AnalyticsViews>(analyticsPageInitialCurrentView);
   const [poolData, setPoolData] = useState<IPoolExtendedData>();
 
-  // TODO
   const [tokensWhitelistedIds, setTokensWhitelistedIds] = useState<string[]>([]);
 
-  const { poolsByTokenList: whitelistedPoolsData, loadingPoolsByTokenList: loadingPools } =
-    usePoolsByTokensList(useQueryOptionsProvideSwapRemove, false, tokensWhitelistedIds);
+  const { pool, loadingPoolsByTokenList: loadingPools } = usePoolByAddress(
+    useQueryOptionsProvideSwapRemove,
+    true,
+    poolAddress as string,
+    tokensWhitelistedIds,
+  );
 
   // Handlers
   const handleTabItemClick = (currentView: AnalyticsViews) => {
@@ -51,15 +55,24 @@ const AnalyticsPoolDetials = () => {
   }, [tokensWhitelisted]);
 
   useEffect(() => {
-    if (whitelistedPoolsData && whitelistedPoolsData.length > 0) {
-      const found = whitelistedPoolsData.find(item => item.pairAddress === poolAddress);
-      if (found) setPoolData(found);
+    if (pool && Object.keys(pool).length > 0) {
+      setPoolData(pool);
     }
-  }, [whitelistedPoolsData, poolAddress]);
+  }, [pool, poolAddress]);
 
   const calculateReservePrice = (reserve0: string, reserve1: string) => {
     const result = Number(reserve0) / Number(reserve1);
     return result.toString();
+  };
+
+  const determineColorClass = (value: number) => {
+    return value >= 0 ? 'text-success' : 'text-danger';
+  };
+
+  const determineIconProps = (value: number) => {
+    return value >= 0
+      ? { name: 'arrow-up', color: 'success' }
+      : { name: 'arrow-down', color: 'danger' };
   };
 
   return (
@@ -150,7 +163,9 @@ const AnalyticsPoolDetials = () => {
 
                       <span className="text-small">
                         {poolData?.token0Amount &&
-                          formatStringETHtoPriceFormatted(poolData?.token0Amount as string)}
+                          formatStringETHtoPriceFormatted(
+                            poolData?.token0AmountFormatted as string,
+                          )}
                       </span>
                     </div>
 
@@ -159,18 +174,49 @@ const AnalyticsPoolDetials = () => {
 
                       <span className="text-small">
                         {poolData?.token1Amount &&
-                          formatStringETHtoPriceFormatted(poolData?.token1Amount as string)}
+                          formatStringETHtoPriceFormatted(
+                            poolData?.token1AmountFormatted as string,
+                          )}
                       </span>
                     </div>
                   </div>
 
                   <p className="text-small text-gray mt-5">TVL</p>
-                  <p className="text-subheader">{poolData?.tvl}</p>
-                  <p className="text-small text-numeric text-success">(3.45%)</p>
+                  <p className="text-subheader">{formatStringToPrice(poolData?.tvl)}</p>
+                  <p
+                    className={`text-small text-numeric ${determineColorClass(poolData.diff.tvl)}`}
+                  >
+                    (
+                    <Icon
+                      size="small"
+                      color={determineIconProps(poolData.diff.tvl).color}
+                      name={determineIconProps(poolData.diff.tvl).name}
+                    />
+                    {Math.abs(poolData.diff.tvl)}%)
+                  </p>
 
                   <p className="text-small text-gray mt-5">Volume 24H</p>
-                  <p className="text-subheader">{poolData?.volume24h}</p>
-                  <p className="text-small text-numeric text-success">(3.45%)</p>
+                  <p className="text-subheader">
+                    {formatStringToPrice(poolData?.volume24Num?.toString() as string)}
+                  </p>
+                  <p
+                    className={`text-small text-numeric ${determineColorClass(
+                      poolData.diff.volume,
+                    )}`}
+                  >
+                    (
+                    <Icon
+                      size="small"
+                      color={determineIconProps(poolData.diff.volume).color}
+                      name={determineIconProps(poolData.diff.volume).name}
+                    />
+                    {Math.abs(poolData.diff.volume)}%)
+                  </p>
+
+                  <p className="text-small text-gray mt-5">Fees 24H</p>
+                  <p className="text-subheader">
+                    {formatStringToPrice(poolData?.fees.amount?.toString() as string)}
+                  </p>
                 </div>
               </div>
               <div className="col-md-9 mt-4 mt-md-0">
