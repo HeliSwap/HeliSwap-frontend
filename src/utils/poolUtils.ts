@@ -24,6 +24,9 @@ export const getProcessedPools = (
           token1,
           volume7d: volume7dWei,
           volume24h: volume24hWei,
+          tvl: tvlUsd,
+          volume24hUsd,
+          volume7dUsd,
         } = pool;
 
         const token0Price = getTokenPrice(mergedPools, token0, hbarPrice);
@@ -77,6 +80,9 @@ export const getProcessedPools = (
           volume7: volume7dValueStr,
           volume7Num: volume7dValue,
           tokensPriceEvaluated,
+          tvlUsd,
+          volume24hUsd,
+          volume7dUsd,
         };
 
         return poolData;

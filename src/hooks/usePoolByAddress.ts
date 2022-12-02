@@ -14,7 +14,6 @@ const usePoolByAddress = (
   getExtended = false,
   poolAddress: string,
   tokensList: string[] = [],
-  restPools: IPoolExtendedData[] = [],
 ) => {
   const contextValue = useContext(GlobalContext);
   const { hbarPrice } = contextValue;
@@ -43,14 +42,9 @@ const usePoolByAddress = (
   useEffect(() => {
     if (data) {
       const { getPoolByAddress } = data;
-      if (getPoolByAddress && hbarPrice !== 0 && restPools.length !== 0) {
+      if (getPoolByAddress && hbarPrice !== 0) {
         try {
-          const processedPools = getProcessedPools(
-            [getPoolByAddress],
-            getExtended,
-            hbarPrice,
-            restPools,
-          );
+          const processedPools = getProcessedPools([getPoolByAddress], getExtended, hbarPrice);
           if (processedPools) setPool(processedPools[0]);
         } catch (error) {
           console.error('Error while fetching pools data.');
@@ -59,7 +53,7 @@ const usePoolByAddress = (
         }
       }
     }
-  }, [data, hbarPrice, getExtended, restPools]);
+  }, [data, hbarPrice, getExtended]);
 
   useEffect(() => {
     if (

@@ -22,7 +22,6 @@ import {
   POOLS_FEE,
   useQueryOptionsProvideSwapRemove,
 } from '../constants';
-import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import LineChart from '../components/LineChart';
 import Button from '../components/Button';
 import BarChart from '../components/BarChart';
@@ -46,18 +45,11 @@ const AnalyticsPoolDetials = () => {
   }
   const [chartToShow, setChartToShow] = useState<ChartToShowEnum>(ChartToShowEnum.tvl);
 
-  const { poolsByTokenList: pools } = usePoolsByTokensList(
-    useQueryOptionsProvideSwapRemove,
-    true,
-    tokensWhitelistedIds,
-  );
-
   const { pool, loadingPoolsByTokenList: loadingPool } = usePoolByAddress(
     useQueryOptionsProvideSwapRemove,
     true,
     poolAddress as string,
     tokensWhitelistedIds,
-    pools,
   );
 
   // Handlers
@@ -81,15 +73,15 @@ const AnalyticsPoolDetials = () => {
 
   //Replace last historical tvl value with the current tvl
   useEffect(() => {
-    if (poolData?.tvl && poolData?.historicalData) {
+    if (poolData?.tvlUsd && poolData?.historicalData) {
       const historicalDataToShow = [...poolData?.historicalData];
       historicalDataToShow[historicalDataToShow.length - 1] = {
         ...historicalDataToShow[historicalDataToShow.length - 1],
-        tvl: poolData?.tvl,
+        tvl: poolData?.tvlUsd,
       };
       setHistoricalDataToShow(historicalDataToShow);
     }
-  }, [poolData?.tvl, poolData?.historicalData]);
+  }, [poolData?.tvlUsd, poolData?.historicalData]);
 
   const calculateReservePrice = (reserve0: string, reserve1: string) => {
     const result = Number(reserve0) / Number(reserve1);
@@ -219,7 +211,7 @@ const AnalyticsPoolDetials = () => {
                   </div>
 
                   <p className="text-small text-gray mt-5">TVL</p>
-                  <p className="text-subheader">{formatStringToPrice(poolData?.tvl)}</p>
+                  <p className="text-subheader">{formatStringToPrice(poolData?.tvlUsd)}</p>
                   <p
                     className={`text-small text-numeric ${determineColorClass(poolData.diff.tvl)}`}
                   >
@@ -234,7 +226,7 @@ const AnalyticsPoolDetials = () => {
 
                   <p className="text-small text-gray mt-5">Volume 24H</p>
                   <p className="text-subheader">
-                    {formatStringToPrice(poolData?.volume24Num?.toString() as string)}
+                    {formatStringToPrice(poolData?.volume24hUsd as string)}
                   </p>
                   <p
                     className={`text-small text-numeric ${determineColorClass(
@@ -283,15 +275,22 @@ const AnalyticsPoolDetials = () => {
                     Volume
                   </Button>
                 </div>
-                {poolData?.historicalData.length ? (
+                {poolData?.historicalData ? (
                   <div className="p-4">
-                    {chartToShow === ChartToShowEnum.tvl ? (
-                      <LineChart chartData={historicalDataToShow} aggregatedValue={poolData?.tvl} />
+                    {poolData?.historicalData.length !== 0 ? (
+                      chartToShow === ChartToShowEnum.tvl ? (
+                        <LineChart
+                          chartData={historicalDataToShow}
+                          aggregatedValue={poolData?.tvlUsd}
+                        />
+                      ) : (
+                        <BarChart
+                          chartData={poolData?.historicalData}
+                          aggregatedValue={Number(poolData.volume24hUsd)}
+                        />
+                      )
                     ) : (
-                      <BarChart
-                        chartData={poolData?.historicalData}
-                        aggregatedValue={Number(poolData.volume24)}
-                      />
+                      <span className="text-small">No historical data for this pool</span>
                     )}
                   </div>
                 ) : (
