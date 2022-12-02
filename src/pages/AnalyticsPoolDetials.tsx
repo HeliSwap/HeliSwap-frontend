@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 
 import { GlobalContext } from '../providers/Global';
 
@@ -28,6 +28,7 @@ const AnalyticsPoolDetials = () => {
   const { tokensWhitelisted } = contextValue;
 
   const { poolAddress } = useParams();
+  const navigate = useNavigate();
 
   const [currentView, setCurrentView] = useState<AnalyticsViews>(analyticsPageInitialCurrentView);
   const [poolData, setPoolData] = useState<IPoolExtendedData>();
@@ -92,6 +93,12 @@ const AnalyticsPoolDetials = () => {
         </div>
 
         <hr />
+
+        <div className="mt-6">
+          <span className="cursor-pointer" onClick={() => navigate('/analytics')}>
+            <Icon name="arrow-left" />
+          </span>
+        </div>
 
         {loadingPools ? (
           <div className="d-flex justify-content-center mt-5">
@@ -225,7 +232,7 @@ const AnalyticsPoolDetials = () => {
             </div>
           </>
         ) : (
-          <p>No pool found</p>
+          <p className="text-center my-6">No pool found</p>
         )}
       </div>
     </div>
