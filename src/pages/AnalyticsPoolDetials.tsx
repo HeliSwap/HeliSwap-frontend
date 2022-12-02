@@ -3,7 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 
 import { GlobalContext } from '../providers/Global';
 
-import { AnalyticsViews } from '../interfaces/common';
+import { AnalyticsViews, IHistoricalData } from '../interfaces/common';
 import { IPoolExtendedData } from '../interfaces/tokens';
 
 import IconToken from '../components/IconToken';
@@ -22,6 +22,10 @@ import {
   POOLS_FEE,
   useQueryOptionsProvideSwapRemove,
 } from '../constants';
+import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
+import LineChart from '../components/LineChart';
+import Button from '../components/Button';
+import BarChart from '../components/BarChart';
 
 const AnalyticsPoolDetials = () => {
   const contextValue = useContext(GlobalContext);
@@ -34,12 +38,26 @@ const AnalyticsPoolDetials = () => {
   const [poolData, setPoolData] = useState<IPoolExtendedData>();
 
   const [tokensWhitelistedIds, setTokensWhitelistedIds] = useState<string[]>([]);
+  const [historicalDataToShow, setHistoricalDataToShow] = useState<IHistoricalData[]>([]);
 
-  const { pool, loadingPoolsByTokenList: loadingPools } = usePoolByAddress(
+  enum ChartToShowEnum {
+    tvl,
+    volume,
+  }
+  const [chartToShow, setChartToShow] = useState<ChartToShowEnum>(ChartToShowEnum.tvl);
+
+  const { poolsByTokenList: pools } = usePoolsByTokensList(
+    useQueryOptionsProvideSwapRemove,
+    true,
+    tokensWhitelistedIds,
+  );
+
+  const { pool, loadingPoolsByTokenList: loadingPool } = usePoolByAddress(
     useQueryOptionsProvideSwapRemove,
     true,
     poolAddress as string,
     tokensWhitelistedIds,
+    pools,
   );
 
   // Handlers
@@ -60,6 +78,18 @@ const AnalyticsPoolDetials = () => {
       setPoolData(pool);
     }
   }, [pool, poolAddress]);
+
+  //Replace last historical tvl value with the current tvl
+  useEffect(() => {
+    if (poolData?.tvl && poolData?.historicalData) {
+      const historicalDataToShow = [...poolData?.historicalData];
+      historicalDataToShow[historicalDataToShow.length - 1] = {
+        ...historicalDataToShow[historicalDataToShow.length - 1],
+        tvl: poolData?.tvl,
+      };
+      setHistoricalDataToShow(historicalDataToShow);
+    }
+  }, [poolData?.tvl, poolData?.historicalData]);
 
   const calculateReservePrice = (reserve0: string, reserve1: string) => {
     const result = Number(reserve0) / Number(reserve1);
@@ -100,7 +130,7 @@ const AnalyticsPoolDetials = () => {
           </span>
         </div>
 
-        {loadingPools ? (
+        {loadingPool ? (
           <div className="d-flex justify-content-center mt-5">
             <Loader />
           </div>
@@ -226,8 +256,49 @@ const AnalyticsPoolDetials = () => {
                   </p>
                 </div>
               </div>
-              <div className="col-md-9 mt-4 mt-md-0">
-                <div className="container-blue-neutral-800 rounded p-2 p-md-4 heigth-100"></div>
+              <div className="col-md-9 mt-4 mt-md-0 container-blue-neutral-800 rounded p-4">
+                <div className="d-flex justify-content-end">
+                  <Button
+                    type={chartToShow === ChartToShowEnum.tvl ? 'primary' : 'secondary'}
+                    size="small"
+                    className="mx-2"
+                    onClick={() => {
+                      if (chartToShow !== ChartToShowEnum.tvl) {
+                        setChartToShow(ChartToShowEnum.tvl);
+                      }
+                    }}
+                  >
+                    TVL
+                  </Button>
+                  <Button
+                    type={chartToShow === ChartToShowEnum.volume ? 'primary' : 'secondary'}
+                    size="small"
+                    className="mx-2"
+                    onClick={() => {
+                      if (chartToShow !== ChartToShowEnum.volume) {
+                        setChartToShow(ChartToShowEnum.volume);
+                      }
+                    }}
+                  >
+                    Volume
+                  </Button>
+                </div>
+                {poolData?.historicalData.length ? (
+                  <div className="p-4">
+                    {chartToShow === ChartToShowEnum.tvl ? (
+                      <LineChart chartData={historicalDataToShow} aggregatedValue={poolData?.tvl} />
+                    ) : (
+                      <BarChart
+                        chartData={poolData?.historicalData}
+                        aggregatedValue={Number(poolData.volume24)}
+                      />
+                    )}
+                  </div>
+                ) : (
+                  <div className="d-flex justify-content-center my-6">
+                    <Loader />
+                  </div>
+                )}
               </div>
             </div>
           </>
