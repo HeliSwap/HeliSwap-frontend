@@ -278,7 +278,7 @@ export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbar
   //Handle special case where for 1 token in you get 0 tokens out because of big difference of the amounts and decimals
   if (Number(sortedTrades[0].amountOut) === 0) {
     let determinedPrice = false;
-    let multiplier = 2;
+    let multiplier = 100;
     const step = 2;
 
     //Set a threshold in order to avoid infinit loop
@@ -299,7 +299,7 @@ export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbar
         multiplier = step * multiplier;
       } else {
         determinedPrice = true;
-        bestTradeAmount = sortedTradesMultiplied[0].amountOut;
+        bestTradeAmount = (Number(sortedTradesMultiplied[0].amountOut) / multiplier).toString();
       }
     }
   }
