@@ -261,7 +261,8 @@ export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbar
   if (hbarPrice === 0) return '0';
   if (tokenAddress === process.env.REACT_APP_WHBAR_ADDRESS) return hbarPrice.toString();
 
-  const tradesIn = getPossibleTradesExactIn(
+  // Calculate the target token mount for 1 HBAR
+  let tradesIn = getPossibleTradesExactIn(
     poolsData || [],
     '1',
     process.env.REACT_APP_WHBAR_ADDRESS || '',
@@ -269,42 +270,33 @@ export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbar
     false,
   );
 
-  const sortedTrades = tradesIn.sort(tradeComparator);
+  let sortedTrades = tradesIn.sort(tradeComparator);
 
   if (sortedTrades.length === 0) return '0';
 
-  let bestTradeAmount = sortedTrades[0].amountOut;
+  let bestTradeAmount = new BigNumber(sortedTrades[0].amountOut);
 
   //Handle special case where for 1 token in you get 0 tokens out because of big difference of the amounts and decimals
   if (Number(sortedTrades[0].amountOut) === 0) {
-    let determinedPrice = false;
-    let multiplier = 100;
-    const step = 2;
+    // Calculate the HBARs token amount for 1 target token
+    tradesIn = getPossibleTradesExactIn(
+      poolsData || [],
+      '1',
+      tokenAddress,
+      process.env.REACT_APP_WHBAR_ADDRESS || '',
+      false,
+    );
 
-    //Set a threshold in order to avoid infinit loop
-    const threshold = 1000;
+    sortedTrades = tradesIn.sort(tradeComparator);
 
-    while (!determinedPrice && multiplier < threshold) {
-      const tradesInMultiplied = getPossibleTradesExactIn(
-        poolsData || [],
-        multiplier.toString(),
-        process.env.REACT_APP_WHBAR_ADDRESS || '',
-        tokenAddress,
-        false,
-      );
+    if (sortedTrades.length === 0 || Number(sortedTrades[0].amountOut) === 0) return '0';
 
-      const sortedTradesMultiplied = tradesInMultiplied.sort(tradeComparator);
+    bestTradeAmount = new BigNumber(sortedTrades[0].amountOut);
 
-      if (Number(sortedTradesMultiplied[0].amountOut) === 0) {
-        multiplier = step * multiplier;
-      } else {
-        determinedPrice = true;
-        bestTradeAmount = (Number(sortedTradesMultiplied[0].amountOut) / multiplier).toString();
-      }
-    }
+    return new BigNumber(hbarPrice).times(bestTradeAmount).toString();
+  } else {
+    return new BigNumber(hbarPrice).div(bestTradeAmount).toString();
   }
-
-  return new BigNumber(hbarPrice).div(new BigNumber(bestTradeAmount)).toString();
 };
 
 const getUserHTSData = async (userId: string) => {
