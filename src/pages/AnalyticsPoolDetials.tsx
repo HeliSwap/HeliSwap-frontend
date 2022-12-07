@@ -12,7 +12,11 @@ import { viewTitleMapping } from './Analytics';
 import Icon from '../components/Icon';
 
 import { formatIcons } from '../utils/iconUtils';
-import { formatStringETHtoPriceFormatted, formatStringToPrice } from '../utils/numberUtils';
+import {
+  formatStringETHtoPriceFormatted,
+  formatStringToPrice,
+  stripStringToFixedDecimals,
+} from '../utils/numberUtils';
 import { mapHBARTokenSymbol } from '../utils/tokenUtils';
 
 import usePoolByAddress from '../hooks/usePoolByAddress';
@@ -224,7 +228,7 @@ const AnalyticsPoolDetials = () => {
                         color={determineIconProps(poolData.diff.tvl).color}
                         name={determineIconProps(poolData.diff.tvl).name}
                       />
-                      {Math.abs(poolData.diff.tvl)}%)
+                      {stripStringToFixedDecimals(Math.abs(poolData.diff.tvl).toString(), 2)}%)
                     </p>
 
                     <p className="text-small text-gray mt-5">Volume 24H</p>
@@ -242,7 +246,7 @@ const AnalyticsPoolDetials = () => {
                         color={determineIconProps(poolData.diff.volume).color}
                         name={determineIconProps(poolData.diff.volume).name}
                       />
-                      {Math.abs(poolData.diff.volume)}%)
+                      {stripStringToFixedDecimals(Math.abs(poolData.diff.volume).toString(), 2)}%)
                     </p>
 
                     <p className="text-small text-gray mt-5">Fees 24H</p>
