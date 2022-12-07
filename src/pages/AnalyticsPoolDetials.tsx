@@ -285,7 +285,7 @@ const AnalyticsPoolDetials = () => {
                   </Button>
                 </div>
                 {poolData?.historicalData ? (
-                  <div className="p-4">
+                  <div className="mt-6">
                     {poolData?.historicalData.length !== 0 ? (
                       chartToShow === ChartToShowEnum.tvl ? (
                         <LineChart
