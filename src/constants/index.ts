@@ -1,7 +1,7 @@
 import { WatchQueryFetchPolicy } from '@apollo/client';
 import { hethers } from '@hashgraph/hethers';
 import BigNumber from 'bignumber.js';
-import { PageViews } from '../interfaces/common';
+import { AnalyticsViews, PageViews } from '../interfaces/common';
 import { ICreatePairData, ISwapTokenData, ITokenData, ITokensData } from '../interfaces/tokens';
 import { NATIVE_TOKEN } from '../utils/tokenUtils';
 
@@ -20,22 +20,22 @@ export const MAX_SLIPPAGE_VALUE = 50;
 export const MAX_EXPIRATION_VALUE = 4000;
 
 export const TRANSACTION_MAX_FEES = {
-  APPROVE_HTS: 850000,
-  APPROVE_ERC20: 60000,
-  PROVIDE_LIQUIDITY: 250000,
-  CREATE_POOL: 2300000,
-  REMOVE_NATIVE_LIQUIDITY: 1800000,
-  REMOVE_LIQUIDITY: 160000,
-  BASE_SWAP: 120000,
-  BASE_SWAP_NATIVE: 200000,
-  EXTRA_SWAP: 50000,
-  TOKEN_OUT_EXACT_SWAP: 20000,
-  WRAP_HBAR: 60000,
-  UNWRAP_WHBAR: 80000,
-  TRANSFER_ERC20: 60000,
-  STAKE_LP_TOKEN: 230000,
-  COLLECT_REWARDS: 300000,
-  EXIT_CAMPAIGN: 300000,
+  APPROVE_HTS: 1000000,
+  APPROVE_ERC20: 72000,
+  PROVIDE_LIQUIDITY: 300000,
+  CREATE_POOL: 2760000,
+  REMOVE_NATIVE_LIQUIDITY: 2160000,
+  REMOVE_LIQUIDITY: 192000,
+  BASE_SWAP: 144000,
+  BASE_SWAP_NATIVE: 240000,
+  EXTRA_SWAP: 60000,
+  TOKEN_OUT_EXACT_SWAP: 24000,
+  WRAP_HBAR: 72000,
+  UNWRAP_WHBAR: 96000,
+  TRANSFER_ERC20: 72000,
+  STAKE_LP_TOKEN: 276000,
+  COLLECT_REWARDS: 360000,
+  EXIT_CAMPAIGN: 360000,
 };
 
 export enum SORT_OPTIONS_ENUM {
@@ -102,6 +102,8 @@ export const initialPoolsAnalyticsData = {
 
 export const poolsPageInitialCurrentView: PageViews = PageViews.ALL_POOLS;
 
+export const analyticsPageInitialCurrentView: AnalyticsViews = AnalyticsViews.OVERVIEW;
+
 export const useQueryOptions = {
   fetchPolicy: 'network-only' as WatchQueryFetchPolicy,
 };
@@ -115,3 +117,8 @@ export const useQueryOptionsPoolsFarms = {
   fetchPolicy: 'network-only' as WatchQueryFetchPolicy,
   pollInterval: REFRESH_TIME_POOLS_FARMS,
 };
+
+export const HASHSCAN_ROOT_DOMAIN = 'https://hashscan.io';
+
+export const POOLS_PER_PAGE = 10;
+export const TOKENS_PER_PAGE = 10;

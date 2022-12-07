@@ -8,6 +8,7 @@ import { getProcessedTokens, NATIVE_TOKEN } from '../utils/tokenUtils';
 const useTokensByListIds = (
   tokensWhitelistedIds: string[],
   useQueryOptions: QueryHookOptions = {},
+  addNativeToken: boolean = true,
 ) => {
   const [tokens, setTokens] = useState<ITokenData[]>();
 
@@ -24,12 +25,12 @@ const useTokensByListIds = (
       if (tokensData.length > 0) {
         const foundTokenDataList = getProcessedTokens(tokensData);
 
-        setTokens([NATIVE_TOKEN, ...foundTokenDataList]);
+        setTokens(addNativeToken ? [NATIVE_TOKEN, ...foundTokenDataList] : foundTokenDataList);
       } else {
-        setTokens([NATIVE_TOKEN]);
+        setTokens(addNativeToken ? [NATIVE_TOKEN] : []);
       }
     }
-  }, [data]);
+  }, [data, addNativeToken]);
 
   return { tokens, loading, error };
 };

@@ -20,6 +20,12 @@ const navigation = [
     color: 'gray',
     text: 'Farms',
   },
+  {
+    link: '/analytics',
+    name: 'analytics',
+    color: 'gray',
+    text: 'Analytics',
+  },
 ];
 
 const Navigation = () => {

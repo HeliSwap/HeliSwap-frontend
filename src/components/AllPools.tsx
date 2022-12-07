@@ -9,7 +9,7 @@ import Loader from './Loader';
 import { IPoolExtendedData, IPoolsAnalytics } from '../interfaces/tokens';
 import { PageViews } from '../interfaces/common';
 
-import { formatStringToPrice } from '../utils/numberUtils';
+import PoolsAnalytics from './Analytics/PoolsAnalytics';
 
 import { SORT_DIRECTION, SORT_OPTIONS, SORT_OPTIONS_ENUM } from '../constants/index';
 
@@ -102,26 +102,7 @@ const AllPools = ({
     </div>
   ) : havePools ? (
     <>
-      <div className="container-blue-neutral-800 d-flex rounded py-4 px-5 my-5">
-        <p className="text-small">
-          <span className="text-gray">TVL:</span>{' '}
-          <span className="text-numeric text-bold">
-            {formatStringToPrice(poolsAnalytics.tvl.toString())}
-          </span>
-        </p>
-        <p className="text-small ms-7">
-          <span className="text-gray">Volume 24h:</span>{' '}
-          <span className="text-numeric text-bold">
-            {formatStringToPrice(poolsAnalytics.volume24h.toString())}
-          </span>
-        </p>
-        <p className="text-small ms-7">
-          <span className="text-gray">Volume 7d:</span>{' '}
-          <span className="text-numeric text-bold">
-            {formatStringToPrice(poolsAnalytics.volume7d.toString())}
-          </span>
-        </p>
-      </div>
+      <PoolsAnalytics poolsAnalytics={poolsAnalytics} />
 
       <div className="table-pools">
         <div className={`d-none d-md-grid table-pools-row with-6-columns`}>
