@@ -15,6 +15,7 @@ import { formatIcons } from '../utils/iconUtils';
 import {
   formatStringETHtoPriceFormatted,
   formatStringToPrice,
+  formatStringWeiToStringEther,
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
 import { mapHBARTokenSymbol } from '../utils/tokenUtils';
@@ -87,8 +88,16 @@ const AnalyticsPoolDetials = () => {
     }
   }, [poolData?.tvlUsd, poolData?.historicalData]);
 
-  const calculateReservePrice = (reserve0: string, reserve1: string) => {
-    const result = Number(reserve0) / Number(reserve1);
+  const calculateReservePrice = (
+    reserve0: string,
+    reserve1: string,
+    token0Decimals: number,
+    token1Decimals: number,
+  ) => {
+    const token0AmountFormatted = formatStringWeiToStringEther(reserve0, token0Decimals);
+    const token1AmountFormatted = formatStringWeiToStringEther(reserve1, token1Decimals);
+
+    const result = Number(token0AmountFormatted) / Number(token1AmountFormatted);
     return result.toString();
   };
 
@@ -154,7 +163,12 @@ const AnalyticsPoolDetials = () => {
                     <IconToken symbol={poolData?.token0Symbol as string} />
                     <span className="ms-3">
                       1 {mapHBARTokenSymbol(poolData.token0Symbol)} ={' '}
-                      {calculateReservePrice(poolData.token1Amount, poolData.token0Amount)}{' '}
+                      {calculateReservePrice(
+                        poolData.token1Amount,
+                        poolData.token0Amount,
+                        poolData.token1Decimals,
+                        poolData.token0Decimals,
+                      )}{' '}
                       {mapHBARTokenSymbol(poolData.token1Symbol)}
                     </span>
                   </div>
@@ -163,7 +177,12 @@ const AnalyticsPoolDetials = () => {
                     <IconToken symbol={poolData?.token1Symbol as string} />
                     <span className="ms-3">
                       1 {mapHBARTokenSymbol(poolData.token0Symbol)} ={' '}
-                      {calculateReservePrice(poolData.token0Amount, poolData.token1Amount)}{' '}
+                      {calculateReservePrice(
+                        poolData.token0Amount,
+                        poolData.token1Amount,
+                        poolData.token0Decimals,
+                        poolData.token1Decimals,
+                      )}{' '}
                       {mapHBARTokenSymbol(poolData.token1Symbol)}
                     </span>
                   </div>
