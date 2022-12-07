@@ -47,7 +47,7 @@ const ConnectModalContent = ({
       }
     };
     initHashconnect();
-  }, []);
+  }, [hashconnectConnectorInstance]);
 
   return (
     <>
