@@ -18,7 +18,7 @@ interface IBarChartProps {
 const Chart = ({ chartData, aggregatedValue }: IBarChartProps) => {
   const [value, setValue] = useState<number>(aggregatedValue);
   const [dateLabel, setDateLabel] = useState<string>('');
-  const [chartView, setChartView] = useState(VolumeChartView.weekly);
+  const [chartView, setChartView] = useState(VolumeChartView.daily);
 
   const formattedVolumeData = useMemo(() => {
     return getTransformedVolumeData(chartData, chartView);
