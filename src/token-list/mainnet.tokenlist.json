@@ -169,6 +169,14 @@
       "symbol": "KHK",
       "decimals": 0,
       "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/KHK.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x000000000000000000000000000000000012E088",
+      "name": "SOF",
+      "symbol": "SOF",
+      "decimals": 7,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/SOF.png"
     }
   ]
 }
