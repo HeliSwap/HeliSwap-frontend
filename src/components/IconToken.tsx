@@ -25,6 +25,7 @@ import WHALE from '../icons/tokens/WHALE.png';
 import LIL from '../icons/tokens/LIL.png';
 import HASHTREE from '../icons/tokens/HASHTREE.png';
 import KHK from '../icons/tokens/KHK.png';
+import SOF from '../icons/tokens/SOF.png';
 
 interface IIconTokenProps {
   symbol: string;
@@ -69,6 +70,7 @@ const tokenMapping: ITokenMapping = {
   LIL: LIL,
   HASHTREE: HASHTREE,
   KHK: KHK,
+  SOF: SOF,
   LP: LP,
 };
 
