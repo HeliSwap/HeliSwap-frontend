@@ -70,6 +70,9 @@ export interface IPoolData {
   fee1?: string;
   hasProblematicToken?: boolean;
   hasCampaign: boolean;
+  tvl?: string;
+  volume7dUsd?: string;
+  volume24hUsd?: string;
 }
 
 export interface IPoolExtendedData extends IPoolData {
