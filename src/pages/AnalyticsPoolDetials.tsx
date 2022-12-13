@@ -236,8 +236,9 @@ const AnalyticsPoolDetials = () => {
                   <div>
                     <p className="text-small text-gray mt-5">TVL</p>
                     <p className="text-subheader">{formatStringToPrice(poolData?.tvlUsd)}</p>
+                    {/* d-none classe to be removed when backend is ready with diff calculations */}
                     <p
-                      className={`text-small text-numeric ${determineColorClass(
+                      className={`d-none text-small text-numeric ${determineColorClass(
                         poolData.diff.tvl,
                       )}`}
                     >
@@ -254,8 +255,9 @@ const AnalyticsPoolDetials = () => {
                     <p className="text-subheader">
                       {formatStringToPrice(poolData?.volume24hUsd as string)}
                     </p>
+                    {/* d-none classe to be removed when backend is ready with diff calculations */}
                     <p
-                      className={`text-small text-numeric ${determineColorClass(
+                      className={`d-none text-small text-numeric ${determineColorClass(
                         poolData.diff.volume,
                       )}`}
                     >
