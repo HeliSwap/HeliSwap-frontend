@@ -3,7 +3,8 @@ import ReactPaginate from 'react-paginate';
 import BigNumber from 'bignumber.js';
 
 import PoolInfo from './PoolInfo';
-import Button from '../components/Button';
+import Button from './Button';
+import Loader from './Loader';
 
 import { IPoolExtendedData } from '../interfaces/tokens';
 import { PageViews } from '../interfaces/common';
@@ -71,7 +72,9 @@ const MyPools = ({
 
   return connected && !isHashpackLoading ? (
     loadingPools ? (
-      <p className="text-info">Loading pools...</p>
+      <div className="d-flex justify-content-center my-6">
+        <Loader />
+      </div>
     ) : havePools ? (
       <>
         <div className="table-pools">
