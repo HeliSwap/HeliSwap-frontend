@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { XAxis, Tooltip, Bar, BarChart, ResponsiveContainer } from 'recharts';
+
 import dayjs from 'dayjs';
 
 import { IHistoricalData, VolumeChartView } from '../interfaces/common';
@@ -9,6 +10,8 @@ import Loader from './Loader';
 
 import { formatStringToPrice } from '../utils/numberUtils';
 import { getTransformedVolumeData } from '../utils/metricsUtils';
+
+import { INITIAL_CHART_LABELS } from '../constants';
 
 const labelChartViewMapping = {
   [VolumeChartView.daily]: 'daily',
@@ -25,7 +28,7 @@ const Chart = ({ chartData, aggregatedValue }: IBarChartProps) => {
   const [value, setValue] = useState<number>(aggregatedValue);
   const [dateLabel, setDateLabel] = useState<string>('');
   const [chartView, setChartView] = useState(VolumeChartView.daily);
-  const [labelValue, setLabelValue] = useState('Volume 24H');
+  const [labelValue, setLabelValue] = useState(INITIAL_CHART_LABELS.VOLUME_BAR_CHART as string);
 
   const formattedVolumeData = useMemo(() => {
     return getTransformedVolumeData(chartData, chartView);

@@ -122,3 +122,8 @@ export const HASHSCAN_ROOT_DOMAIN = 'https://hashscan.io';
 
 export const POOLS_PER_PAGE = 10;
 export const TOKENS_PER_PAGE = 10;
+
+export enum INITIAL_CHART_LABELS {
+  TVL_LINE_CHART = 'TVL',
+  VOLUME_BAR_CHART = 'Volume 24H',
+}

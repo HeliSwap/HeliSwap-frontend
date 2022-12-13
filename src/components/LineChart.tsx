@@ -1,13 +1,18 @@
 import { useMemo, useState } from 'react';
 import { XAxis, AreaChart, Area, Tooltip, ResponsiveContainer } from 'recharts';
+import Tippy from '@tippyjs/react';
+
 import dayjs from 'dayjs';
 
 import { IHistoricalData } from '../interfaces/common';
 
 import Loader from './Loader';
+import Icon from './Icon';
 
 import { formatStringToPrice } from '../utils/numberUtils';
 import { getTransformedTvlData } from '../utils/metricsUtils';
+
+import { INITIAL_CHART_LABELS } from '../constants';
 
 interface ILineChartProps {
   chartData: IHistoricalData[];
@@ -26,7 +31,14 @@ const Chart = ({ chartData, aggregatedValue }: ILineChartProps) => {
     <div style={{ minHeight: '392px' }}>
       <div className="d-flex justify-content-between align-items-start">
         <div>
-          <p className="text-main text-gray">TVL</p>
+          <p className="text-main text-gray d-flex align-items-center">
+            {INITIAL_CHART_LABELS.TVL_LINE_CHART}{' '}
+            <Tippy content={`Total value locked`}>
+              <span className="ms-2">
+                <Icon color="gray" name="hint" />
+              </span>
+            </Tippy>
+          </p>
           <p className="text-headline text-bold mt-3">
             {formatStringToPrice(value?.toString() as string)}
           </p>
