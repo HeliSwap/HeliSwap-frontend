@@ -74,6 +74,18 @@ const Header = () => {
                   className="d-flex align-items-center link"
                   target="_blank"
                   rel="noreferrer"
+                  href="https://forms.gle/iPStDiwSVRUFB5o3A"
+                >
+                  <Icon name="heli" />
+                  <span className="ms-3 text-small">Token Sale</span>
+                </a>
+              </div>
+              <span className="separator-header d-none d-md-block"></span>
+              <div className="d-none d-md-block">
+                <a
+                  className="d-flex align-items-center link"
+                  target="_blank"
+                  rel="noreferrer"
                   href="https://app.hashport.network/"
                 >
                   <Icon name="hashport" />

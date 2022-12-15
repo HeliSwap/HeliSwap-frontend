@@ -373,6 +373,20 @@
   max-height: 50vh;
 }
 
+.container-global-message {
+  padding: 4px;
+  background-image: linear-gradient(139.83deg, #f32fd7 0%, #3845fb 100%);
+
+  @include media-breakpoint-up(md) {
+    margin-left: 100px;
+    padding: 8px;
+  }
+
+  @include media-breakpoint-up(xxxl) {
+    margin-left: 252px;
+  }
+}
+
 /* Tables */
 .table-pools {
   border-radius: 4px 4px 0px 0px;
