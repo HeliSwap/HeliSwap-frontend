@@ -74,7 +74,7 @@ const Header = () => {
                   className="d-flex align-items-center link"
                   target="_blank"
                   rel="noreferrer"
-                  href="https://forms.gle/iPStDiwSVRUFB5o3A"
+                  href="https://forms.gle/2pM7wEGKWAVy6qwP7"
                 >
                   <Icon name="heli" />
                   <span className="ms-3 text-small">Token Sale</span>
