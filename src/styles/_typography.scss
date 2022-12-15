@@ -61,6 +61,19 @@
   }
 }
 
+.link-white {
+  cursor: pointer;
+  transition: color 0.15s linear;
+
+  color: $white !important;
+  text-decoration: none;
+
+  &:hover {
+    color: $white !important;
+    text-decoration: underline;
+  }
+}
+
 .link-menu {
   color: $blue-neutral-400;
   text-decoration: none;

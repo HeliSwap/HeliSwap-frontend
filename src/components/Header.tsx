@@ -64,11 +64,23 @@ const Header = () => {
   }, [getUserTokensData]);
 
   return (
-    <div className="p-3 p-md-5">
+    <div className="container-header with-message p-3 p-md-5">
       <div className="d-flex justify-content-end">
         <div className="d-flex align-items-center">
           {connected && userId ? (
             <>
+              <div className="d-none d-md-block">
+                <a
+                  className="d-flex align-items-center link"
+                  target="_blank"
+                  rel="noreferrer"
+                  href="https://forms.gle/2pM7wEGKWAVy6qwP7"
+                >
+                  <Icon name="heli" />
+                  <span className="ms-3 text-small">Token Sale</span>
+                </a>
+              </div>
+              <span className="separator-header d-none d-md-block"></span>
               <div className="d-none d-md-block">
                 <a
                   className="d-flex align-items-center link"
