@@ -423,3 +423,7 @@ export const setApproveERC20LocalStorage = (hederaId: string, userId: string): v
     localStorage.setItem('erc20ApproveData', JSON.stringify(updatedErc20ApproveData));
   }
 };
+
+export const mapHBARTokenSymbol = (tokenSymbol: string) => {
+  return tokenSymbol === 'WHBAR' ? 'HBAR' : tokenSymbol;
+};

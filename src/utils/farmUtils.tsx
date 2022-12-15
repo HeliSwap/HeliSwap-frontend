@@ -7,7 +7,7 @@ import {
   IUserStakingData,
 } from '../interfaces/tokens';
 import { formatStringWeiToStringEther } from './numberUtils';
-import { getTokenPrice } from './tokenUtils';
+import { getTokenPrice, mapHBARTokenSymbol } from './tokenUtils';
 
 export const getProcessedFarms = (
   rawFarms: IFarmDataRaw[],
@@ -209,14 +209,8 @@ export const getProcessedFarms = (
       campaignEndDate,
       poolData: {
         ...currentFarmProcessed.poolData,
-        token0Symbol:
-          currentFarmProcessed.poolData.token0Symbol === 'WHBAR'
-            ? 'HBAR'
-            : currentFarmProcessed.poolData.token0Symbol,
-        token1Symbol:
-          currentFarmProcessed.poolData.token1Symbol === 'WHBAR'
-            ? 'HBAR'
-            : currentFarmProcessed.poolData.token1Symbol,
+        token0Symbol: mapHBARTokenSymbol(currentFarmProcessed.poolData.token0Symbol),
+        token1Symbol: mapHBARTokenSymbol(currentFarmProcessed.poolData.token1Symbol),
       },
     };
 
