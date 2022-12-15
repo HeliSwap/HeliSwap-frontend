@@ -30,6 +30,7 @@ import { MAX_UINT_ERC20, SLIDER_INITIAL_VALUE } from '../constants';
 import {
   calculatePercentageByShare,
   calculateShareByPercentage,
+  checkAllowanceERC20,
   // getApproveERC20LocalStorage,
   invalidInputTokensData,
   requestIdFromAddress,
@@ -64,7 +65,7 @@ const FarmActions = ({
   const [sliderValue, setSliderValue] = useState(SLIDER_INITIAL_VALUE);
 
   const [loadingStake, setLoadingStake] = useState(false);
-  const [loadingApprove, setLoadingApprove] = useState(false);
+  const [loadingApprove, setLoadingApprove] = useState(true);
   const [loadingExit, setLoadingExit] = useState(false);
 
   const [tabState, setTabState] = useState(TabStates.STAKE);
@@ -206,19 +207,20 @@ const FarmActions = ({
     setLpInputValue(maxLpInputValue);
   }, [farmData.poolData?.lpShares, maxLpInputValue]);
 
-  // useEffect(() => {
-  //   const getLPAllowanceData = async () => {
-  //     const lpTokenId = await requestIdFromAddress(farmData.stakingTokenAddress);
-  //     const canSpend = getApproveERC20LocalStorage(lpTokenId, userId);
-  //     setLpApproved(canSpend);
-  //   };
+  useEffect(() => {
+    const getLPAllowanceData = async () => {
+      const lpTokenId = await requestIdFromAddress(farmData.stakingTokenAddress);
+      const canSpend = await checkAllowanceERC20(lpTokenId, userId, farmData.address, lpInputValue);
+      setLpApproved(canSpend);
+      setLoadingApprove(false);
+    };
 
-  //   getLPAllowanceData();
+    getLPAllowanceData();
 
-  //   return () => {
-  //     setLpApproved(false);
-  //   };
-  // }, [farmData.stakingTokenAddress, userId]);
+    return () => {
+      setLpApproved(false);
+    };
+  }, [farmData.stakingTokenAddress, farmData.address, userId, lpInputValue]);
 
   // Helper methods
   const getStakeButtonLabel = () => {

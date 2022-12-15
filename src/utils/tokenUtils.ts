@@ -1,18 +1,24 @@
 import axios from 'axios';
 import { hethers } from '@hashgraph/hethers';
+import { ethers } from 'ethers';
+import { Client, AccountBalanceQuery } from '@hashgraph/sdk';
 import BigNumber from 'bignumber.js';
 
 import { IAllowanceData, IPoolData, ITokenData, TokenType } from '../interfaces/tokens';
-import { Client, AccountBalanceQuery } from '@hashgraph/sdk';
+
 import {
   formatNumberToBigNumber,
   formatStringToBigNumber,
+  formatStringToBigNumberEthersWei,
   formatStringToBigNumberWei,
   formatStringWeiToStringEther,
   stripStringToFixedDecimals,
 } from './numberUtils';
 import { getPossibleTradesExactIn, tradeComparator } from './tradeUtils';
+
 import { HUNDRED_BN, MAX_UINT_ERC20, MAX_UINT_HTS } from '../constants';
+
+const ERC20 = require('../abi/ERC20.json');
 
 export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
   const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/tokens/${tokenId}`;
@@ -119,6 +125,24 @@ export const getTokenAllowance = async (
     console.error(e);
     return [];
   }
+};
+
+export const checkAllowanceERC20 = async (
+  tokenId: string,
+  userId: string,
+  spenderId: string,
+  amountToSpend: string,
+) => {
+  const provider = new ethers.providers.JsonRpcProvider('https://testnet.hashio.io/api');
+
+  const tokenContract = new ethers.Contract(idToAddress(tokenId), ERC20.abi, provider);
+
+  const allowance = await tokenContract.allowance(idToAddress(userId), idToAddress(spenderId));
+  const amountToSpendBN = formatStringToBigNumberEthersWei(amountToSpend);
+
+  const canSpend = amountToSpendBN.lte(allowance);
+
+  return canSpend;
 };
 
 export const checkAllowanceHTS = async (
