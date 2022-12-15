@@ -330,6 +330,7 @@ const Swap = () => {
       } else {
         if (name === 'amountIn' && parseFloat(amountIn) !== 0) {
           const trades = getPossibleTradesExactIn(
+            true,
             mergedPoolsData || [],
             amountIn,
             tokenInAddress,

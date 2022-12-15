@@ -263,6 +263,7 @@ export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbar
 
   // Calculate the target token mount for 1 HBAR
   let tradesIn = getPossibleTradesExactIn(
+    false,
     poolsData || [],
     '1',
     process.env.REACT_APP_WHBAR_ADDRESS || '',
@@ -280,6 +281,7 @@ export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbar
   if (Number(sortedTrades[0].amountOut) === 0) {
     // Calculate the HBARs token amount for 1 target token
     tradesIn = getPossibleTradesExactIn(
+      false,
       poolsData || [],
       '1',
       tokenAddress,

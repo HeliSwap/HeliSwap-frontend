@@ -21,6 +21,7 @@ interface Trade {
 }
 
 export const getPossibleTradesExactIn = (
+  bestPrice: boolean,
   pools: IPoolData[],
   amountIn: string,
   currencyIn: string,
@@ -56,6 +57,21 @@ export const getPossibleTradesExactIn = (
 
     const currentMidPrice = tokenOutQuot.div(tokenInQuot).toString();
 
+    if (!bestPrice) {
+      if (otherTokenInPool === currencyOut) {
+        possibleTrades.push({
+          pools: [...currentPools, currentPool],
+          currencyIn,
+          currencyOut,
+          amountIn,
+          amountOut: amountOut,
+          path: getPath([currentPool], currencyIn),
+          midPricesArr: [...midPrices, currentMidPrice],
+        });
+        return possibleTrades;
+      }
+    }
+
     if (otherTokenInPool === currencyOut) {
       possibleTrades.push({
         pools: [...currentPools, currentPool],
@@ -70,6 +86,7 @@ export const getPossibleTradesExactIn = (
       const poolsExcludingThisPool = pools.slice(0, i).concat(pools.slice(i + 1, pools.length));
 
       getPossibleTradesExactIn(
+        bestPrice,
         poolsExcludingThisPool,
         amountIn,
         currencyIn,
