@@ -76,7 +76,7 @@ const Header = () => {
                   rel="noreferrer"
                   href="https://forms.gle/iPStDiwSVRUFB5o3A"
                 >
-                  <Icon name="external" />
+                  <Icon name="heli" />
                   <span className="ms-3 text-small">Token sale</span>
                 </a>
               </div>

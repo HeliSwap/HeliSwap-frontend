@@ -30,6 +30,7 @@ import { ReactComponent as Medium } from '../icons/system/medium.svg';
 import { ReactComponent as Youtube } from '../icons/system/youtube.svg';
 import { ReactComponent as Hashport } from '../icons/system/hashport.svg';
 import { ReactComponent as Analytics } from '../icons/system/analytics.svg';
+import { ReactComponent as Heli } from '../icons/system/heli.svg';
 
 interface IIconProps {
   name: string;
@@ -86,6 +87,7 @@ const icons: IIconMapping = {
   info: Info,
   hashport: Hashport,
   analytics: Analytics,
+  heli: Heli,
 };
 
 const colorMapping: IColorMapping = {

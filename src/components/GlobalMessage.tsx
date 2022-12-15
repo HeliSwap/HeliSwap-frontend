@@ -7,12 +7,12 @@ const GlobalMessage = () => {
         $HELI Token is launching soon. Be an Early Participant and secure your own $HELI at a great
         discount!{' '}
         <a
-          className="link-primary"
+          className="link-white"
           href="https://forms.gle/iPStDiwSVRUFB5o3A"
           target="_blank"
           rel="noreferrer"
         >
-          Sign Up NOW!
+          <span className="text-bold">Sign Up NOW!</span>
         </a>
       </p>
     </div>
