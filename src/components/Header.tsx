@@ -77,7 +77,7 @@ const Header = () => {
                   href="https://forms.gle/iPStDiwSVRUFB5o3A"
                 >
                   <Icon name="heli" />
-                  <span className="ms-3 text-small">Token sale</span>
+                  <span className="ms-3 text-small">Token Sale</span>
                 </a>
               </div>
               <span className="separator-header d-none d-md-block"></span>
