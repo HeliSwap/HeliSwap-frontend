@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import { IPoolData, IPoolExtendedData } from '../interfaces/tokens';
 import { formatStringWeiToStringEther } from './numberUtils';
-import { getTokenPrice } from './tokenUtils';
+import { getTokenPrice, mapHBARTokenSymbol } from './tokenUtils';
 
 export const getProcessedPools = (
   pools: IPoolExtendedData[],
@@ -24,6 +24,9 @@ export const getProcessedPools = (
           token1,
           volume7d: volume7dWei,
           volume24h: volume24hWei,
+          tvl: tvlUsd,
+          volume24hUsd,
+          volume7dUsd,
         } = pool;
 
         const token0Price = getTokenPrice(mergedPools, token0, hbarPrice);
@@ -66,8 +69,8 @@ export const getProcessedPools = (
 
         const poolData: IPoolExtendedData = {
           ...pool,
-          token0Symbol: pool.token0Symbol === 'WHBAR' ? 'HBAR' : pool.token0Symbol,
-          token1Symbol: pool.token1Symbol === 'WHBAR' ? 'HBAR' : pool.token1Symbol,
+          token0Symbol: mapHBARTokenSymbol(pool.token0Symbol),
+          token1Symbol: mapHBARTokenSymbol(pool.token1Symbol),
           token0AmountFormatted,
           token1AmountFormatted,
           tvlBN: new BigNumber(totalLpValueStr),
@@ -77,6 +80,9 @@ export const getProcessedPools = (
           volume7: volume7dValueStr,
           volume7Num: volume7dValue,
           tokensPriceEvaluated,
+          tvlUsd,
+          volume24hUsd,
+          volume7dUsd,
         };
 
         return poolData;

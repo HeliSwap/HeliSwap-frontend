@@ -42,7 +42,7 @@ const Overview = () => {
 
   const {
     poolsByTokenList: pools,
-    loadingPoolsByTokenList: loadingPools,
+    processingPools: loadingPools,
     errorPoolsByTokenList: errorPools,
   } = usePoolsByTokensList(useQueryOptionsProvideSwapRemove, true, tokensWhitelistedAddresses);
 

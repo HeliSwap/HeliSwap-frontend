@@ -8,7 +8,7 @@ import Tokens from '../components/Analytics/Tokens';
 
 import { analyticsPageInitialCurrentView } from '../constants';
 
-const viewTitleMapping = {
+export const viewTitleMapping = {
   [AnalyticsViews.OVERVIEW]: 'Overview',
   [AnalyticsViews.TOKENS]: 'Tokens',
   [AnalyticsViews.FARMS]: 'Farms',

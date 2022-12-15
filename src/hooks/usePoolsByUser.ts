@@ -15,6 +15,7 @@ import {
   idToAddress,
   calculateReserves,
   calculatePercentageByShare,
+  mapHBARTokenSymbol,
 } from '../utils/tokenUtils';
 import { formatStringWeiToStringEther } from '../utils/numberUtils';
 
@@ -124,8 +125,8 @@ const usePoolsByUser = (
             poolPercenatage: userPercentageShare,
             fee0AmountFormatted: fee0Formatted,
             fee1AmountFormatted: fee1Formatted,
-            token0Symbol: pool.token0Symbol === 'WHBAR' ? 'HBAR' : pool.token0Symbol,
-            token1Symbol: pool.token1Symbol === 'WHBAR' ? 'HBAR' : pool.token1Symbol,
+            token0Symbol: mapHBARTokenSymbol(pool.token0Symbol),
+            token1Symbol: mapHBARTokenSymbol(pool.token1Symbol),
           };
 
           return poolData;

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { XAxis, Tooltip, Bar, BarChart, ResponsiveContainer } from 'recharts';
+
 import dayjs from 'dayjs';
 
 import { IHistoricalData, VolumeChartView } from '../interfaces/common';
@@ -10,6 +11,14 @@ import Loader from './Loader';
 import { formatStringToPrice } from '../utils/numberUtils';
 import { getTransformedVolumeData } from '../utils/metricsUtils';
 
+import { INITIAL_CHART_LABELS } from '../constants';
+
+const labelChartViewMapping = {
+  [VolumeChartView.daily]: 'daily',
+  [VolumeChartView.weekly]: 'weekly',
+  [VolumeChartView.monthly]: 'monthly',
+};
+
 interface IBarChartProps {
   chartData: IHistoricalData[];
   aggregatedValue: number;
@@ -18,7 +27,8 @@ interface IBarChartProps {
 const Chart = ({ chartData, aggregatedValue }: IBarChartProps) => {
   const [value, setValue] = useState<number>(aggregatedValue);
   const [dateLabel, setDateLabel] = useState<string>('');
-  const [chartView, setChartView] = useState(VolumeChartView.weekly);
+  const [chartView, setChartView] = useState(VolumeChartView.daily);
+  const [labelValue, setLabelValue] = useState(INITIAL_CHART_LABELS.VOLUME_BAR_CHART as string);
 
   const formattedVolumeData = useMemo(() => {
     return getTransformedVolumeData(chartData, chartView);
@@ -50,7 +60,7 @@ const Chart = ({ chartData, aggregatedValue }: IBarChartProps) => {
       <div className="d-flex flex-row justify-content-between align-items-start">
         <div className="d-flex justify-content-between">
           <div>
-            <p className="text-main text-gray">Volume 24H</p>
+            <p className="text-main text-gray">{labelValue}</p>
             <p className="text-headline text-bold mt-3">
               {formatStringToPrice(value?.toString() as string)}
             </p>
@@ -112,6 +122,7 @@ const Chart = ({ chartData, aggregatedValue }: IBarChartProps) => {
                 if (currTime !== dateLabel || value !== currValue) {
                   setValue(currValue);
                   setDateLabel(currTime);
+                  setLabelValue(`Volume ${labelChartViewMapping[chartView]}`);
                 }
               }
             }}
@@ -127,6 +138,7 @@ const Chart = ({ chartData, aggregatedValue }: IBarChartProps) => {
             onMouseLeave={() => {
               setValue(aggregatedValue);
               setDateLabel('');
+              setLabelValue('Volume 24H');
             }}
           >
             <XAxis
