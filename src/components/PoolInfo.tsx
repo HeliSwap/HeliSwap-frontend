@@ -203,6 +203,15 @@ const PoolInfo = ({
               Add Liquidity
             </Link>
           </div>
+
+          <div className="flex-1">
+            <Link
+              className="d-block btn btn-sm btn-outline-primary ms-3"
+              to={`/analytics/pool/${poolData.pairAddress}`}
+            >
+              View analytics
+            </Link>
+          </div>
         </div>
       </div>
     );
