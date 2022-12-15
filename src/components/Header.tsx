@@ -64,7 +64,7 @@ const Header = () => {
   }, [getUserTokensData]);
 
   return (
-    <div className="p-3 p-md-5">
+    <div className="container-header with-message p-3 p-md-5">
       <div className="d-flex justify-content-end">
         <div className="d-flex align-items-center">
           {connected && userId ? (
