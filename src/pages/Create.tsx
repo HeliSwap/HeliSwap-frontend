@@ -41,8 +41,6 @@ import {
   hasFeesOrKeys,
   invalidInputTokensData,
   getAmountToApprove,
-  setApproveERC20LocalStorage,
-  // getApproveERC20LocalStorage,
 } from '../utils/tokenUtils';
 import {
   formatStringETHtoPriceFormatted,
@@ -345,8 +343,6 @@ const Create = () => {
       } else {
         setApproved(prev => ({ ...prev, [key]: true }));
         toast.success('Success! Token was approved.');
-
-        if (type === TokenType.ERC20) setApproveERC20LocalStorage(hederaId, userId);
       }
     } catch (err) {
       toast.error('Approve Token transaction resulted in an error.');

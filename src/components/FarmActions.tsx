@@ -31,10 +31,8 @@ import {
   calculatePercentageByShare,
   calculateShareByPercentage,
   checkAllowanceERC20,
-  // getApproveERC20LocalStorage,
   invalidInputTokensData,
   requestIdFromAddress,
-  setApproveERC20LocalStorage,
 } from '../utils/tokenUtils';
 
 interface IFarmActionsProps {
@@ -176,8 +174,6 @@ const FarmActions = ({
       if (success) {
         toast.success('Success! Token was approved.');
         setLpApproved(true);
-
-        setApproveERC20LocalStorage(lpTokenId, userId);
       } else {
         toast.error(getErrorMessage(error.status ? error.status : error));
       }
@@ -209,8 +205,12 @@ const FarmActions = ({
 
   useEffect(() => {
     const getLPAllowanceData = async () => {
-      const lpTokenId = await requestIdFromAddress(farmData.stakingTokenAddress);
-      const canSpend = await checkAllowanceERC20(lpTokenId, userId, farmData.address, lpInputValue);
+      const canSpend = await checkAllowanceERC20(
+        farmData.stakingTokenAddress,
+        userId,
+        farmData.address,
+        lpInputValue,
+      );
       setLpApproved(canSpend);
       setLoadingApprove(false);
     };
