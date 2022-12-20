@@ -21,7 +21,6 @@ interface Trade {
 }
 
 export const getPossibleTradesExactIn = (
-  bestPrice: boolean,
   pools: IPoolData[],
   amountIn: string,
   currencyIn: string,
@@ -57,21 +56,6 @@ export const getPossibleTradesExactIn = (
 
     const currentMidPrice = tokenOutQuot.div(tokenInQuot).toString();
 
-    if (!bestPrice) {
-      if (otherTokenInPool === currencyOut) {
-        possibleTrades.push({
-          pools: [...currentPools, currentPool],
-          currencyIn,
-          currencyOut,
-          amountIn,
-          amountOut: amountOut,
-          path: getPath([currentPool], currencyIn),
-          midPricesArr: [...midPrices, currentMidPrice],
-        });
-        return possibleTrades;
-      }
-    }
-
     if (otherTokenInPool === currencyOut) {
       possibleTrades.push({
         pools: [...currentPools, currentPool],
@@ -86,7 +70,6 @@ export const getPossibleTradesExactIn = (
       const poolsExcludingThisPool = pools.slice(0, i).concat(pools.slice(i + 1, pools.length));
 
       getPossibleTradesExactIn(
-        bestPrice,
         poolsExcludingThisPool,
         amountIn,
         currencyIn,
@@ -203,14 +186,16 @@ const getPath = (poolsArray: IPoolData[], startingCurreny: string) => {
   return path;
 };
 
-export const tradeComparator = (a: Trade, b: Trade) => {
+export const tradeComparator = (a: Trade, b: Trade, shortestPath: boolean) => {
   const ioComp = inputOutputComparator(a, b);
 
-  if (ioComp !== 0) {
+  const tradesLengthDiff = a.path.length - b.path.length;
+
+  if (shortestPath || ioComp === 0) {
+    return tradesLengthDiff === 0 ? ioComp : tradesLengthDiff;
+  } else {
     return ioComp;
   }
-
-  return a.path.length - b.path.length;
 };
 
 const inputOutputComparator = (a: Trade, b: Trade): number => {

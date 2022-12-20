@@ -263,7 +263,6 @@ export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbar
 
   // Calculate the target token mount for 1 HBAR
   let tradesIn = getPossibleTradesExactIn(
-    false,
     poolsData || [],
     '1',
     process.env.REACT_APP_WHBAR_ADDRESS || '',
@@ -271,8 +270,7 @@ export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbar
     false,
   );
 
-  let sortedTrades = tradesIn.sort(tradeComparator);
-
+  let sortedTrades = tradesIn.sort((a, b) => tradeComparator(a, b, true));
   if (sortedTrades.length === 0) return '0';
 
   let bestTradeAmount = new BigNumber(sortedTrades[0].amountOut);
@@ -281,7 +279,6 @@ export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbar
   if (Number(sortedTrades[0].amountOut) === 0) {
     // Calculate the HBARs token amount for 1 target token
     tradesIn = getPossibleTradesExactIn(
-      false,
       poolsData || [],
       '1',
       tokenAddress,
@@ -289,7 +286,7 @@ export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbar
       false,
     );
 
-    sortedTrades = tradesIn.sort(tradeComparator);
+    sortedTrades = tradesIn.sort((a, b) => tradeComparator(a, b, true));
 
     if (sortedTrades.length === 0 || Number(sortedTrades[0].amountOut) === 0) return '0';
 

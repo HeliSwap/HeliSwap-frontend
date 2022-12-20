@@ -330,7 +330,6 @@ const Swap = () => {
       } else {
         if (name === 'amountIn' && parseFloat(amountIn) !== 0) {
           const trades = getPossibleTradesExactIn(
-            true,
             mergedPoolsData || [],
             amountIn,
             tokenInAddress,
@@ -338,7 +337,7 @@ const Swap = () => {
             true,
           );
 
-          const sortedTrades = trades.sort(tradeComparator);
+          const sortedTrades = trades.sort((a, b) => tradeComparator(a, b, false));
 
           if (sortedTrades.length === 0) {
             setBestPath([]);
@@ -374,7 +373,7 @@ const Swap = () => {
             true,
           );
 
-          const sortedTrades = trades.sort(tradeComparator);
+          const sortedTrades = trades.sort((a, b) => tradeComparator(a, b, false));
 
           if (sortedTrades.length === 0) {
             setBestPath([]);
