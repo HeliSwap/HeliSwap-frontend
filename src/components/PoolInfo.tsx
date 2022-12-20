@@ -351,9 +351,12 @@ const PoolInfo = ({
                 ) : null}
               </div>
               <div>
-                <p className="text-small text-numeric text-end">
-                  {formatStringETHtoPriceFormatted(poolData.lpSharesFormatted as string)}
-                </p>
+                {Number(poolData.lpSharesFormatted) > 0 ? (
+                  <p className="text-small text-numeric text-end">
+                    {formatStringETHtoPriceFormatted(poolData.lpSharesFormatted as string)}
+                  </p>
+                ) : null}
+
                 {haveStakedTokens ? (
                   <div className="d-flex align-items-center">
                     <Tippy content={`Staked LP tokens`}>
@@ -457,8 +460,6 @@ const PoolInfo = ({
 
   const canTransfer = inputIdValid && inputId !== '' && inputLPAmountValid;
   const haveStakedTokens = Number(poolData.stakedBalance) > 0;
-
-  console.log('poolData', poolData);
 
   return (
     <>

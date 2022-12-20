@@ -137,7 +137,12 @@ const usePoolsByUser = (
           const totalLpValueStr = totalLpValue.toFixed(2);
           const totalStakedLpValueStr = totalStakedLpValue.toFixed(2);
 
-          const userPercentageShare = calculatePercentageByShare(pairSupply, lpShares as string);
+          const totalUserShare = Number(lpShares) + Number(stakedBalance);
+
+          const userPercentageShare = calculatePercentageByShare(
+            pairSupply,
+            totalUserShare.toString(),
+          );
 
           const poolData: IPoolExtendedData = {
             ...pool,
