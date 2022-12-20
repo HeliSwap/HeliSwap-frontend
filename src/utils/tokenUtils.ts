@@ -281,8 +281,17 @@ export const getTokenBalance = async (userId: string, tokenData: ITokenData) => 
 
     if (balance)
       tokenBalance = formatStringWeiToStringEther(balance.toString(), tokenDecimals).toString();
+  } else if (tokenData.type === TokenType.ERC20) {
+    tokenBalance = '0';
+    const provider = getProvider();
+    const tokenContract = new ethers.Contract(tokenData.address, ERC20.abi, provider);
+
+    const balance = await tokenContract.balanceOf(idToAddress(userId));
+    const tokenDecimals = tokenData?.decimals;
+
+    if (balance) tokenBalance = ethers.utils.formatUnits(balance, tokenDecimals).toString();
   }
-  // Currently we don't have a way getting the balance of ERC20 tokens
+
   return tokenBalance;
 };
 
