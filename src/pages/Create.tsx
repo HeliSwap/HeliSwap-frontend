@@ -41,6 +41,7 @@ import {
   hasFeesOrKeys,
   invalidInputTokensData,
   getAmountToApprove,
+  checkAllowanceERC20,
 } from '../utils/tokenUtils';
 import {
   formatStringETHtoPriceFormatted,
@@ -139,6 +140,7 @@ const Create = () => {
 
   //State for loading data
   const [loadingCreate, setLoadingCreate] = useState(false);
+  const [loadingCheckApprove, setLoadingCheckApprove] = useState(true);
   const [loadingApprove, setLoadingApprove] = useState(false);
 
   // State for preset tokens from choosen pool
@@ -427,6 +429,20 @@ const Create = () => {
       setApproved(prev => ({ ...prev, [index]: canSpend }));
     };
 
+    const getAllowanceERC20 = async (userId: string, tokenA: ITokenData, index: string) => {
+      const key = `${index}Amount`;
+      const amountToSpend = createPairData[key as keyof ICreatePairData] as string;
+      const spenderAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
+      const canSpend = await checkAllowanceERC20(
+        tokenA.address,
+        userId,
+        spenderAddress,
+        amountToSpend,
+      );
+      setApproved(prev => ({ ...prev, [index]: canSpend }));
+      setLoadingCheckApprove(false);
+    };
+
     const { tokenA, tokenB } = tokensData;
     const hasTokenAData = createPairData.tokenAId && createPairData.tokenAAmount;
     const hasTokenBData = createPairData.tokenBId && createPairData.tokenBAmount;
@@ -436,11 +452,9 @@ const Create = () => {
     } else if (hasTokenAData && userId) {
       if (tokensData.tokenA.type === TokenType.HTS) {
         getAllowanceHTS(userId, tokenA, 'tokenA');
+      } else if (tokensData.tokenA.type === TokenType.ERC20) {
+        getAllowanceERC20(userId, tokenA, 'tokenA');
       }
-      // else if (tokensData.tokenA.type === TokenType.ERC20) {
-      //   const canSpendTokenA = getApproveERC20LocalStorage(tokensData.tokenA.hederaId, userId);
-      //   setApproved(prev => ({ ...prev, tokenA: canSpendTokenA }));
-      // }
     }
 
     if (tokenB.type === TokenType.HBAR) {
@@ -448,11 +462,9 @@ const Create = () => {
     } else if (hasTokenBData && userId) {
       if (tokensData.tokenB.type === TokenType.HTS) {
         getAllowanceHTS(userId, tokenB, 'tokenB');
+      } else if (tokensData.tokenB.type === TokenType.ERC20) {
+        getAllowanceERC20(userId, tokenB, 'tokenB');
       }
-      // else if (tokensData.tokenB.type === TokenType.ERC20) {
-      //   const canSpendTokenB = getApproveERC20LocalStorage(tokensData.tokenB.hederaId, userId);
-      //   setApproved(prev => ({ ...prev, tokenB: canSpendTokenB }));
-      // }
     }
 
     return () => {
@@ -920,7 +932,7 @@ const Create = () => {
           <div className="d-grid mt-4">
             <Button
               className="d-flex justify-content-center align-items-center"
-              loading={loadingApprove}
+              loading={loadingApprove || loadingCheckApprove}
               onClick={() => handleApproveClick('tokenA')}
             >
               <span>{`Approve ${tokensData.tokenA.symbol}`}</span>
@@ -943,7 +955,7 @@ const Create = () => {
           <div className="d-grid mt-4">
             <Button
               className="d-flex justify-content-center align-items-center"
-              loading={loadingApprove}
+              loading={loadingApprove || loadingCheckApprove}
               onClick={() => handleApproveClick('tokenB')}
             >
               <span>{`Approve ${tokensData.tokenB.symbol}`}</span>

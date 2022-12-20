@@ -136,13 +136,13 @@ export const getTokenAllowance = async (
 export const checkAllowanceERC20 = async (
   tokenAddress: string,
   userId: string,
-  spenderId: string,
+  spenderAddress: string,
   amountToSpend: string,
 ) => {
   const provider = getProvider();
   const tokenContract = new ethers.Contract(tokenAddress, ERC20.abi, provider);
 
-  const allowance = await tokenContract.allowance(idToAddress(userId), idToAddress(spenderId));
+  const allowance = await tokenContract.allowance(idToAddress(userId), spenderAddress);
   const amountToSpendBN = formatStringToBigNumberEthersWei(amountToSpend);
 
   const canSpend = amountToSpendBN.lte(allowance);
