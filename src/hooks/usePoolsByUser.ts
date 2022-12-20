@@ -93,6 +93,7 @@ const usePoolsByUser = (
           const fee0Formatted = formatStringWeiToStringEther(fee0 as string, token0Decimals);
           const fee1Formatted = formatStringWeiToStringEther(fee1 as string, token1Decimals);
           const lpSharesFormatted = formatStringWeiToStringEther(lpShares as string, 18);
+          const stakedBalanceFormatted = formatStringWeiToStringEther(stakedBalance as string, 18);
 
           let totalFeeValue = 0;
           let totalLpValue = 0;
@@ -145,6 +146,7 @@ const usePoolsByUser = (
             stakedToken0AmountFormatted: stakedReserve0ShareStr,
             stakedToken1AmountFormatted: stakedReserve1ShareStr,
             lpSharesFormatted,
+            stakedBalanceFormatted,
             tvl: totalLpValueStr,
             tvlBN: new BigNumber(totalLpValueStr),
             stakedTvl: totalStakedLpValueStr,

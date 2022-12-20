@@ -257,7 +257,7 @@ const PoolInfo = ({
               {haveStakedTokens ? (
                 <div className="container-rounded-dark">
                   <p className="text-small">Staked Liquidity</p>
-                  <p className="text-title text-numeric">
+                  <p className="text-title text-numeric text-warning">
                     {formatStringToPrice(poolData.stakedTvl as string)}
                   </p>
 
@@ -350,9 +350,23 @@ const PoolInfo = ({
                   </Button>
                 ) : null}
               </div>
-              <span className="text-small text-numeric">
-                {formatStringETHtoPriceFormatted(poolData.lpSharesFormatted as string)}
-              </span>
+              <div>
+                <p className="text-small text-numeric text-end">
+                  {formatStringETHtoPriceFormatted(poolData.lpSharesFormatted as string)}
+                </p>
+                {haveStakedTokens ? (
+                  <div className="d-flex align-items-center">
+                    <Tippy content={`Staked LP tokens`}>
+                      <span className="me-2">
+                        <Icon size="small" color="warning" name="hint" />
+                      </span>
+                    </Tippy>
+                    <p className="text-small text-numeric text-end text-warning">
+                      {formatStringETHtoPriceFormatted(poolData.stakedBalanceFormatted as string)}
+                    </p>
+                  </div>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>
