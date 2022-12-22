@@ -427,6 +427,7 @@ const Create = () => {
       const canSpend = await checkAllowanceHTS(userId, token, amountToSpend);
 
       setApproved(prev => ({ ...prev, [index]: canSpend }));
+      setLoadingCheckApprove(false);
     };
 
     const getAllowanceERC20 = async (userId: string, tokenA: ITokenData, index: string) => {
