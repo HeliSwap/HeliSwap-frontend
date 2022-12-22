@@ -269,10 +269,15 @@ const Swap = () => {
 
   // Handlers
   const handleInputChange = useCallback(
-    (value: string, name: string, inputTokensData: ITokensData = tokensData) => {
+    (rawValue: string, name: string, inputTokensData: ITokensData = tokensData) => {
       setInsufficientLiquidity(false);
       setInsufficientInAmount(false);
       const { tokenA, tokenB } = inputTokensData;
+
+      const value = stripStringToFixedDecimals(
+        rawValue,
+        name === 'amountIn' ? tokenA.decimals : tokenB.decimals,
+      );
 
       const tokenData = {
         [name]: value,
@@ -364,6 +369,7 @@ const Swap = () => {
           setSwapData(prev => ({ ...prev, ...tokenData, amountOut: bestTrade.amountOut }));
         } else if (name === 'amountIn' && parseFloat(amountIn) === 0) {
           setSwapData(prev => ({ ...prev, ...tokenData, amountOut: '' }));
+          setBestPath([]);
         } else if (name === 'amountOut' && parseFloat(amountOut) !== 0) {
           const trades = getPossibleTradesExactOut(
             mergedPoolsData || [],
@@ -392,6 +398,7 @@ const Swap = () => {
           setSwapData(prev => ({ ...prev, ...tokenData, amountIn: bestTrade.amountIn }));
         } else if (name === 'amountOut' && parseFloat(amountOut) === 0) {
           setSwapData(prev => ({ ...prev, ...tokenData, amountIn: '' }));
+          setBestPath([]);
         }
       }
     },

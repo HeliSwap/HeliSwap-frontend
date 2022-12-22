@@ -156,7 +156,8 @@ export const getExpirationTime = (minutes: number) => {
 
 export const stripStringToFixedDecimals = (decimalString: string, decimals: number) => {
   const decPosition = decimalString.indexOf('.');
-  return decPosition !== -1 ? decimalString.slice(0, decPosition + decimals + 1) : decimalString;
+  const cutPosition = decimals === 0 ? decimals : decimals + 1;
+  return decPosition !== -1 ? decimalString.slice(0, decPosition + cutPosition) : decimalString;
 };
 
 export const randomIntFromInterval = (min: number, max: number): number => {

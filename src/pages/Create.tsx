@@ -227,10 +227,15 @@ const Create = () => {
 
   // Handlers
   const handleInputChange = useCallback(
-    (value: string, name: string, inputSelectedPoolData: IPoolData = selectedPoolData) => {
+    (rawValue: string, name: string, inputSelectedPoolData: IPoolData = selectedPoolData) => {
       const { tokenA, tokenB } = tokensData;
       const inputToken = name === 'tokenAAmount' ? tokenA : tokenB;
       setInputTokenA(name === 'tokenAAmount');
+
+      const value = stripStringToFixedDecimals(
+        rawValue,
+        name === 'tokenAAmount' ? tokenA.decimals : tokenB.decimals,
+      );
 
       if (invalidInputTokensData(value)) {
         setReadyToProvide(false);
@@ -632,7 +637,12 @@ const Create = () => {
 
     const { tokenAAmount, tokenBAmount } = createPairData;
 
-    if (!tokenAAmount || !tokenBAmount) {
+    if (
+      !tokenAAmount ||
+      parseFloat(tokenAAmount) === 0 ||
+      !tokenBAmount ||
+      parseFloat(tokenBAmount) === 0
+    ) {
       isReady = false;
     }
 
