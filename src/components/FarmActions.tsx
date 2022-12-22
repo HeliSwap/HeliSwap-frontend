@@ -30,10 +30,9 @@ import { MAX_UINT_ERC20, SLIDER_INITIAL_VALUE } from '../constants';
 import {
   calculatePercentageByShare,
   calculateShareByPercentage,
-  // getApproveERC20LocalStorage,
+  checkAllowanceERC20,
   invalidInputTokensData,
   requestIdFromAddress,
-  setApproveERC20LocalStorage,
 } from '../utils/tokenUtils';
 
 interface IFarmActionsProps {
@@ -64,7 +63,7 @@ const FarmActions = ({
   const [sliderValue, setSliderValue] = useState(SLIDER_INITIAL_VALUE);
 
   const [loadingStake, setLoadingStake] = useState(false);
-  const [loadingApprove, setLoadingApprove] = useState(false);
+  const [loadingApprove, setLoadingApprove] = useState(true);
   const [loadingExit, setLoadingExit] = useState(false);
 
   const [tabState, setTabState] = useState(TabStates.STAKE);
@@ -175,8 +174,6 @@ const FarmActions = ({
       if (success) {
         toast.success('Success! Token was approved.');
         setLpApproved(true);
-
-        setApproveERC20LocalStorage(lpTokenId, userId);
       } else {
         toast.error(getErrorMessage(error.status ? error.status : error));
       }
@@ -206,19 +203,24 @@ const FarmActions = ({
     setLpInputValue(maxLpInputValue);
   }, [farmData.poolData?.lpShares, maxLpInputValue]);
 
-  // useEffect(() => {
-  //   const getLPAllowanceData = async () => {
-  //     const lpTokenId = await requestIdFromAddress(farmData.stakingTokenAddress);
-  //     const canSpend = getApproveERC20LocalStorage(lpTokenId, userId);
-  //     setLpApproved(canSpend);
-  //   };
+  useEffect(() => {
+    const getLPAllowanceData = async () => {
+      const canSpend = await checkAllowanceERC20(
+        farmData.stakingTokenAddress,
+        userId,
+        farmData.address,
+        lpInputValue,
+      );
+      setLpApproved(canSpend);
+      setLoadingApprove(false);
+    };
 
-  //   getLPAllowanceData();
+    getLPAllowanceData();
 
-  //   return () => {
-  //     setLpApproved(false);
-  //   };
-  // }, [farmData.stakingTokenAddress, userId]);
+    return () => {
+      setLpApproved(false);
+    };
+  }, [farmData.stakingTokenAddress, farmData.address, userId, lpInputValue]);
 
   // Helper methods
   const getStakeButtonLabel = () => {

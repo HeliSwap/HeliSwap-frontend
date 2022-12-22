@@ -33,15 +33,14 @@ import IconToken from '../components/IconToken';
 import ToasterWrapper from '../components/ToasterWrapper';
 
 import {
+  checkAllowanceERC20,
   checkAllowanceHTS,
   getAmountToApprove,
-  // getApproveERC20LocalStorage,
   getTokenBalance,
   getUserAssociatedTokens,
   hasFeesOrKeys,
   invalidInputTokensData,
   NATIVE_TOKEN,
-  setApproveERC20LocalStorage,
 } from '../utils/tokenUtils';
 import { getTransactionSettings } from '../utils/transactionUtils';
 import {
@@ -139,6 +138,7 @@ const Swap = () => {
   // State for loading
   const [loadingSwap, setLoadingSwap] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
+  const [loadingCheckApprove, setLoadingCheckApprove] = useState(true);
   const [loadingAssociate, setLoadingAssociate] = useState(false);
 
   // State for preset tokens from choosen pool
@@ -457,8 +457,6 @@ const Swap = () => {
       } else {
         setApproved(true);
         toast.success('Success! Token was approved.');
-
-        if (type === TokenType.ERC20) setApproveERC20LocalStorage(hederaId, userId);
       }
     } catch (err) {
       console.error(err);
@@ -577,10 +575,23 @@ const Swap = () => {
 
       const canSpend = await checkAllowanceHTS(userId, tokenAData, amountToSpend);
       setApproved(canSpend);
+      setLoadingCheckApprove(false);
+    };
+
+    const getAllowanceERC20 = async (userId: string) => {
+      const spenderAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
+      const canSpend = await checkAllowanceERC20(
+        address,
+        userId,
+        spenderAddress,
+        swapData.amountIn,
+      );
+      setApproved(canSpend);
+      setLoadingCheckApprove(false);
     };
 
     const {
-      tokenA: { type, hederaId },
+      tokenA: { type, hederaId, address },
     } = tokensData;
 
     const hasTokenAData = hederaId && swapData.amountIn;
@@ -590,11 +601,9 @@ const Swap = () => {
     } else if (hasTokenAData && userId) {
       if (type === TokenType.HTS) {
         getAllowanceHTS(userId);
+      } else if (type === TokenType.ERC20) {
+        getAllowanceERC20(userId);
       }
-      // else if (type === TokenType.ERC20) {
-      //   const canSpend = getApproveERC20LocalStorage(hederaId, userId);
-      //   setApproved(canSpend);
-      // }
     }
   }, [swapData, userId, tokensData]);
 
@@ -931,7 +940,7 @@ const Swap = () => {
             getTokenIsAssociated(tokensData.tokenA) ? (
               <div className="d-grid mt-4">
                 <Button
-                  loading={loadingApprove}
+                  loading={loadingApprove || loadingCheckApprove}
                   disabled={Number(swapData.amountIn) <= 0}
                   onClick={() => handleApproveClick()}
                   className="d-flex justify-content-center align-items-center"
