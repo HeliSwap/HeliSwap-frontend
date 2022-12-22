@@ -21,6 +21,7 @@
     "bignumber.js": "^9.0.2",
     "bootstrap": "^5.2.2",
     "dayjs": "^1.11.5",
+    "ethers": "^5.7.2",
     "graphql": "^16.5.0",
     "hashconnect": "^0.2.3",
     "lodash": "^4.17.21",

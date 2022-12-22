@@ -4,6 +4,7 @@
 name: Build project on PR
 env:
   CI: false
+  REACT_APP_PROVIDER_URL: https://testnet.hashio.io/api
   REACT_APP_MIRROR_NODE_URL: https://testnet.mirrornode.hedera.com
   REACT_APP_TOKEN_LIST_URL: https://ipfs.io/ipfs/QmRb5kBMfMwH7WRHcPxNQ3rFCQHdSKBSqhnb6c6aT9NY54/testnet.tokenlist.json
   REACT_APP_NETWORK_TYPE: testnet

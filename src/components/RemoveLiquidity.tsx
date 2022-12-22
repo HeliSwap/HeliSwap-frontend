@@ -34,9 +34,8 @@ import {
   calculateShareByPercentage,
   calculatePercentageByShare,
   invalidInputTokensData,
-  setApproveERC20LocalStorage,
   requestIdFromAddress,
-  // getApproveERC20LocalStorage,
+  checkAllowanceERC20,
 } from '../utils/tokenUtils';
 import {
   getTransactionSettings,
@@ -84,6 +83,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
   const [showModalConfirmRemove, setShowModalConfirmRemove] = useState(false);
 
   const [loadingApprove, setLoadingApprove] = useState(false);
+  const [loadingCheckApprove, setLoadingCheckApprove] = useState(true);
 
   // Handlers
   const handleLpInputChange = (value: string) => {
@@ -257,8 +257,6 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
       if (success) {
         setLpApproved(true);
         toast.success('Success! Token was approved.');
-
-        setApproveERC20LocalStorage(lpTokenId, userId);
       } else {
         toast.error(getErrorMessage(error.status ? error.status : error));
       }
@@ -279,11 +277,17 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
   }, [pairData, removeLpData, sdk, userId]);
 
   useEffect(() => {
-    // const getLPAllowanceData = async () => {
-    //   const lpTokenId = await requestIdFromAddress(pairData.pairAddress);
-    //   const canSpend = getApproveERC20LocalStorage(lpTokenId, userId);
-    //   setLpApproved(canSpend);
-    // };
+    const getLPAllowanceData = async (amountToSpend: string) => {
+      const spenderAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
+      const canSpend = await checkAllowanceERC20(
+        pairData.pairAddress,
+        userId,
+        spenderAddress,
+        amountToSpend,
+      );
+      setLpApproved(canSpend);
+      setLoadingCheckApprove(false);
+    };
 
     const {
       pairSupply,
@@ -327,7 +331,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
       token1Decimals,
     });
 
-    // getLPAllowanceData();
+    getLPAllowanceData(newInputValue);
 
     return () => {
       setLpApproved(false);
@@ -441,7 +445,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
             {!lpApproved ? (
               <Button
                 className="d-flex justify-content-center align-items-center mb-3"
-                loading={loadingApprove}
+                loading={loadingApprove || loadingCheckApprove}
                 onClick={hanleApproveLPClick}
               >
                 <span>Approve LP</span>

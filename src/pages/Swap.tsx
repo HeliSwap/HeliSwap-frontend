@@ -33,15 +33,14 @@ import IconToken from '../components/IconToken';
 import ToasterWrapper from '../components/ToasterWrapper';
 
 import {
+  checkAllowanceERC20,
   checkAllowanceHTS,
   getAmountToApprove,
-  // getApproveERC20LocalStorage,
   getTokenBalance,
   getUserAssociatedTokens,
   hasFeesOrKeys,
   invalidInputTokensData,
   NATIVE_TOKEN,
-  setApproveERC20LocalStorage,
 } from '../utils/tokenUtils';
 import { getTransactionSettings } from '../utils/transactionUtils';
 import {
@@ -139,6 +138,7 @@ const Swap = () => {
   // State for loading
   const [loadingSwap, setLoadingSwap] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(false);
+  const [loadingCheckApprove, setLoadingCheckApprove] = useState(true);
   const [loadingAssociate, setLoadingAssociate] = useState(false);
 
   // State for preset tokens from choosen pool
@@ -269,10 +269,15 @@ const Swap = () => {
 
   // Handlers
   const handleInputChange = useCallback(
-    (value: string, name: string, inputTokensData: ITokensData = tokensData) => {
+    (rawValue: string, name: string, inputTokensData: ITokensData = tokensData) => {
       setInsufficientLiquidity(false);
       setInsufficientInAmount(false);
       const { tokenA, tokenB } = inputTokensData;
+
+      const value = stripStringToFixedDecimals(
+        rawValue,
+        name === 'amountIn' ? tokenA.decimals : tokenB.decimals,
+      );
 
       const tokenData = {
         [name]: value,
@@ -364,6 +369,7 @@ const Swap = () => {
           setSwapData(prev => ({ ...prev, ...tokenData, amountOut: bestTrade.amountOut }));
         } else if (name === 'amountIn' && parseFloat(amountIn) === 0) {
           setSwapData(prev => ({ ...prev, ...tokenData, amountOut: '' }));
+          setBestPath([]);
         } else if (name === 'amountOut' && parseFloat(amountOut) !== 0) {
           const trades = getPossibleTradesExactOut(
             mergedPoolsData || [],
@@ -392,6 +398,7 @@ const Swap = () => {
           setSwapData(prev => ({ ...prev, ...tokenData, amountIn: bestTrade.amountIn }));
         } else if (name === 'amountOut' && parseFloat(amountOut) === 0) {
           setSwapData(prev => ({ ...prev, ...tokenData, amountIn: '' }));
+          setBestPath([]);
         }
       }
     },
@@ -457,8 +464,6 @@ const Swap = () => {
       } else {
         setApproved(true);
         toast.success('Success! Token was approved.');
-
-        if (type === TokenType.ERC20) setApproveERC20LocalStorage(hederaId, userId);
       }
     } catch (err) {
       console.error(err);
@@ -577,10 +582,23 @@ const Swap = () => {
 
       const canSpend = await checkAllowanceHTS(userId, tokenAData, amountToSpend);
       setApproved(canSpend);
+      setLoadingCheckApprove(false);
+    };
+
+    const getAllowanceERC20 = async (userId: string) => {
+      const spenderAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
+      const canSpend = await checkAllowanceERC20(
+        address,
+        userId,
+        spenderAddress,
+        swapData.amountIn,
+      );
+      setApproved(canSpend);
+      setLoadingCheckApprove(false);
     };
 
     const {
-      tokenA: { type, hederaId },
+      tokenA: { type, hederaId, address },
     } = tokensData;
 
     const hasTokenAData = hederaId && swapData.amountIn;
@@ -590,11 +608,9 @@ const Swap = () => {
     } else if (hasTokenAData && userId) {
       if (type === TokenType.HTS) {
         getAllowanceHTS(userId);
+      } else if (type === TokenType.ERC20) {
+        getAllowanceERC20(userId);
       }
-      // else if (type === TokenType.ERC20) {
-      //   const canSpend = getApproveERC20LocalStorage(hederaId, userId);
-      //   setApproved(canSpend);
-      // }
     }
   }, [swapData, userId, tokensData]);
 
@@ -931,7 +947,7 @@ const Swap = () => {
             getTokenIsAssociated(tokensData.tokenA) ? (
               <div className="d-grid mt-4">
                 <Button
-                  loading={loadingApprove}
+                  loading={loadingApprove || loadingCheckApprove}
                   disabled={Number(swapData.amountIn) <= 0}
                   onClick={() => handleApproveClick()}
                   className="d-flex justify-content-center align-items-center"

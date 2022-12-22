@@ -1,18 +1,30 @@
 import axios from 'axios';
 import { hethers } from '@hashgraph/hethers';
+import { ethers } from 'ethers';
+import { Client, AccountBalanceQuery } from '@hashgraph/sdk';
 import BigNumber from 'bignumber.js';
 
 import { IAllowanceData, IPoolData, ITokenData, TokenType } from '../interfaces/tokens';
-import { Client, AccountBalanceQuery } from '@hashgraph/sdk';
+
 import {
   formatNumberToBigNumber,
   formatStringToBigNumber,
+  formatStringToBigNumberEthersWei,
   formatStringToBigNumberWei,
   formatStringWeiToStringEther,
   stripStringToFixedDecimals,
 } from './numberUtils';
 import { getPossibleTradesExactIn, tradeComparator } from './tradeUtils';
+
 import { HUNDRED_BN, MAX_UINT_ERC20, MAX_UINT_HTS } from '../constants';
+
+const ERC20 = require('../abi/ERC20.json');
+
+export const getProvider = () => {
+  const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER_URL);
+
+  return provider;
+};
 
 export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
   const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/tokens/${tokenId}`;
@@ -119,6 +131,23 @@ export const getTokenAllowance = async (
     console.error(e);
     return [];
   }
+};
+
+export const checkAllowanceERC20 = async (
+  tokenAddress: string,
+  userId: string,
+  spenderAddress: string,
+  amountToSpend: string,
+) => {
+  const provider = getProvider();
+  const tokenContract = new ethers.Contract(tokenAddress, ERC20.abi, provider);
+
+  const allowance = await tokenContract.allowance(idToAddress(userId), spenderAddress);
+  const amountToSpendBN = formatStringToBigNumberEthersWei(amountToSpend);
+
+  const canSpend = amountToSpendBN.lte(allowance);
+
+  return canSpend;
 };
 
 export const checkAllowanceHTS = async (
@@ -252,8 +281,17 @@ export const getTokenBalance = async (userId: string, tokenData: ITokenData) => 
 
     if (balance)
       tokenBalance = formatStringWeiToStringEther(balance.toString(), tokenDecimals).toString();
+  } else if (tokenData.type === TokenType.ERC20) {
+    tokenBalance = '0';
+    const provider = getProvider();
+    const tokenContract = new ethers.Contract(tokenData.address, ERC20.abi, provider);
+
+    const balance = await tokenContract.balanceOf(idToAddress(userId));
+    const tokenDecimals = tokenData?.decimals;
+
+    if (balance) tokenBalance = ethers.utils.formatUnits(balance, tokenDecimals).toString();
   }
-  // Currently we don't have a way getting the balance of ERC20 tokens
+
   return tokenBalance;
 };
 
@@ -400,28 +438,6 @@ export const getProcessedTokens = (tokensData: ITokenData[]): ITokenData[] => {
       type: isHTS ? TokenType.HTS : TokenType.ERC20,
     }),
   );
-};
-
-export const getApproveERC20LocalStorage = (hederaId: string, userId: string): boolean => {
-  const erc20ApproveData = localStorage.getItem('erc20ApproveData');
-  const erc20ApproveDataJSON = JSON.parse(erc20ApproveData || '{}');
-
-  return (erc20ApproveDataJSON[userId] && erc20ApproveDataJSON[userId][hederaId]) || false;
-};
-
-export const setApproveERC20LocalStorage = (hederaId: string, userId: string): void => {
-  const erc20ApproveData = localStorage.getItem('erc20ApproveData');
-  const erc20ApproveDataJSON = JSON.parse(erc20ApproveData || '{}');
-  if (!erc20ApproveDataJSON[userId] || !erc20ApproveDataJSON[userId][hederaId]) {
-    const updatedErc20ApproveData = {
-      ...erc20ApproveDataJSON,
-      [userId]: {
-        ...erc20ApproveDataJSON[userId],
-        [hederaId]: true,
-      },
-    };
-    localStorage.setItem('erc20ApproveData', JSON.stringify(updatedErc20ApproveData));
-  }
 };
 
 export const mapHBARTokenSymbol = (tokenSymbol: string) => {
