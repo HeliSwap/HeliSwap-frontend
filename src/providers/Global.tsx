@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Hashconnect from '../connectors/hashconnect';
+import { ethers } from 'ethers';
 import { HEALTH_CHECK_INTERVAL } from '../constants';
 import useHealthCheck from '../hooks/useHealthCheck';
 import useTokensWhitelisted from '../hooks/useTokensWhitelisted';
@@ -9,6 +10,7 @@ import SDK from '../sdk/sdk';
 
 const contextInitialValue = {
   sdk: {} as SDK,
+  provider: {} as ethers.providers.JsonRpcProvider,
   connection: {
     userId: '',
     connected: false,
@@ -34,6 +36,7 @@ interface IGlobalProps {
 
 export const GlobalProvider = ({ children }: IGlobalProps) => {
   const [sdk, setSdk] = useState({} as SDK);
+  const [provider, setProvider] = useState({} as ethers.providers.JsonRpcProvider);
   const [connected, setConnected] = useState(false);
   const [isHashpackLoading, setIsHashpackLoading] = useState(false);
   const [extensionFound, setExtensionFound] = useState(false);
@@ -80,7 +83,15 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
     showConnectModal,
     setShowConnectModal,
   };
-  const contextValue = { sdk, connection, isRunning, lastUpdated, tokensWhitelisted, hbarPrice };
+  const contextValue = {
+    sdk,
+    connection,
+    isRunning,
+    lastUpdated,
+    tokensWhitelisted,
+    hbarPrice,
+    provider,
+  };
 
   useEffect(() => {
     const initHashconnectConnector = async () => {
@@ -99,7 +110,9 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
     initHashconnectConnector();
 
     const sdk = new SDK();
+    const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER_URL);
     setSdk(sdk);
+    setProvider(provider);
   }, []);
 
   return <GlobalContext.Provider value={contextValue}>{children}</GlobalContext.Provider>;
