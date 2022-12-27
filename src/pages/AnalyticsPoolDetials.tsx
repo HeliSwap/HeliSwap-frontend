@@ -176,14 +176,14 @@ const AnalyticsPoolDetials = () => {
                   <div className="container-blue-neutral-700 rounded py-2 px-3 d-flex align-items-center ms-md-4 mt-3 mt-md-0">
                     <IconToken symbol={poolData?.token1Symbol as string} />
                     <span className="ms-3">
-                      1 {mapHBARTokenSymbol(poolData.token0Symbol)} ={' '}
+                      1 {mapHBARTokenSymbol(poolData.token1Symbol)} ={' '}
                       {calculateReservePrice(
                         poolData.token0Amount,
                         poolData.token1Amount,
                         poolData.token0Decimals,
                         poolData.token1Decimals,
                       )}{' '}
-                      {mapHBARTokenSymbol(poolData.token1Symbol)}
+                      {mapHBARTokenSymbol(poolData.token0Symbol)}
                     </span>
                   </div>
                 </div>
