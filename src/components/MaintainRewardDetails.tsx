@@ -59,6 +59,22 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
     }
   };
 
+  const handleWrapAndApproveToken = async (rewardAddress: string, rewardAmount: string) => {
+    setLoadingApproveReward(true);
+    try {
+      await farmsSDK.wrapHBAR(rewardAmount);
+
+      await farmsSDK.approveToken(farmAddress, rewardAddress, approveRewardAmount);
+      toast.success('Success! Token was approved.');
+      setApproveRewardAmount(0);
+    } catch (error) {
+      console.log(error);
+      toast.error('Error while approving token');
+    } finally {
+      setLoadingApproveReward(false);
+    }
+  };
+
   const handleApproveToken = async (rewardAddress: string) => {
     setLoadingApproveReward(true);
     try {
@@ -72,6 +88,7 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
       setLoadingApproveReward(false);
     }
   };
+
   return (
     <div className="mt-3 container-dark p-4" key={index}>
       <div className="d-flex align-items-center mb-4">
@@ -134,7 +151,9 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
       <div className="row">
         <div className="col-4">
           <div>
-            <p className="text-small mb-3">WEI amount</p>
+            <p className="text-small mb-3">
+              {process.env.REACT_APP_WHBAR_ADDRESS === reward.address ? 'ETH amount' : 'WEI amount'}
+            </p>
             <input
               className="form-control"
               value={approveRewardAmount}
@@ -144,11 +163,17 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
           </div>
           <div className="mt-4">
             <Button
-              onClick={() => handleApproveToken(reward.address)}
+              onClick={() =>
+                process.env.REACT_APP_WHBAR_ADDRESS === reward.address
+                  ? handleWrapAndApproveToken(approveRewardAmount.toString(), reward.address)
+                  : handleApproveToken(reward.address)
+              }
               loading={loadingApproveReward}
               size="small"
             >
-              Approve token
+              {process.env.REACT_APP_WHBAR_ADDRESS === reward.address
+                ? 'Wrap and Approve'
+                : 'Approve token'}
             </Button>
           </div>
         </div>

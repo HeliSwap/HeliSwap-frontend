@@ -3,6 +3,7 @@ import { AccountAllowanceApproveTransaction, Client, PrivateKey } from '@hashgra
 import { addressToId } from '../utils/tokenUtils';
 import FactoryContractABI from './abis/FactoryABI.json';
 import MultirewardsContractABI from './abis/MultirewardsABI.json';
+import WHBARABI from './abis/WHBARABI.json';
 
 // TODO: check if this appplies for both testnet and mainnet
 const LOCAL_NODE_ACCOUNT_IDS = ['0.0.1012', '0.0.1013', '0.0.1014', '0.0.1015'];
@@ -127,6 +128,17 @@ class FarmsSDK {
       gasLimit: 100000,
     });
     console.log('changed reward duration successfully');
+  }
+
+  async wrapHBAR(hbarAmount: string) {
+    // THIS VALUE IS IN HBARS not TINYBARS!!!
+    const WHBAR = new hethers.Contract(
+      process.env.REACT_APP_WHBAR_ADDRESS as string,
+      WHBARABI,
+      this.connectedWallet,
+    );
+    const depositTx = await WHBAR.deposit({ value: hbarAmount, gasLimit: 150_000 });
+    await depositTx.wait();
   }
 }
 
