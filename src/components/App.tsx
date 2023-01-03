@@ -54,9 +54,9 @@ function App() {
                         element={<AnalyticsPoolDetials />}
                       />
                       <Route path="deploy-farms" element={<MaintainFarms />} />
-                      <Route path="maintain-farms" element={<MaintainFarms />} />
+                      <Route path="manage-farms" element={<MaintainFarms />} />
                       <Route
-                        path="maintain-farms/:campaignAddress"
+                        path="manage-farms/:campaignAddress"
                         element={<MaintainFarmDetails />}
                       />
                       <Route path="styleguide" element={<Styleguide />} />

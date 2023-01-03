@@ -120,7 +120,7 @@ const FarmDetails = () => {
   ) : (
     <div className="d-flex justify-content-center">
       <div className="container-max-with-1042">
-        <PageHeader title="Manage Farm" handleBackClick={() => navigate('/maintain-farms')} />
+        <PageHeader title="Manage Farm" handleBackClick={() => navigate('/manage-farms')} />
         {haveFarm ? (
           <div className="container-blue-neutral-800 rounded p-4 p-lg-5">
             <div className="d-md-flex justify-content-between align-items-start">
