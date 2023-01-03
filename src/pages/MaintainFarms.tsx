@@ -36,7 +36,7 @@ const MaintainFarms = () => {
 
   // Handlers
   const handleRowClick = (farmAddress: string) => {
-    navigate(`/maintain-farms/${farmAddress}`);
+    navigate(`/manage-farms/${farmAddress}`);
   };
 
   //Initialize farms SDK
