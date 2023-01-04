@@ -63,7 +63,7 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
     setLoadingApproveReward(true);
     try {
       await farmsSDK.wrapHBAR(rewardAmount);
-      await farmsSDK.approveERC20(farmAddress, approveRewardAmount.toString());
+      await farmsSDK.approveToken(rewardAddress, farmAddress, approveRewardAmount.toString());
       toast.success('Success! Token was approved.');
       setApproveRewardAmount(0);
     } catch (error) {
@@ -77,7 +77,7 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
   const handleApproveToken = async (rewardAddress: string) => {
     setLoadingApproveReward(true);
     try {
-      await farmsSDK.approveToken(farmAddress, rewardAddress, approveRewardAmount);
+      await farmsSDK.approveToken(rewardAddress, farmAddress, approveRewardAmount.toString());
       toast.success('Success! Token was approved.');
       setApproveRewardAmount(0);
     } catch (error) {
