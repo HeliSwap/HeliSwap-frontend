@@ -1,9 +1,11 @@
 import { hethers } from '@hashgraph/hethers';
-import { AccountAllowanceApproveTransaction, Client, PrivateKey } from '@hashgraph/sdk';
+import { AccountAllowanceApproveTransaction, Client, Hbar, PrivateKey } from '@hashgraph/sdk';
+import { formatStringWeiToStringEther } from '../utils/numberUtils';
 import { addressToId } from '../utils/tokenUtils';
 import FactoryContractABI from './abis/FactoryABI.json';
 import MultirewardsContractABI from './abis/MultirewardsABI.json';
 import WHBARABI from './abis/WHBARABI.json';
+import ERC20 from '../abi/ERC20.json';
 
 // TODO: check if this appplies for both testnet and mainnet
 const LOCAL_NODE_ACCOUNT_IDS = ['0.0.1012', '0.0.1013', '0.0.1014', '0.0.1015'];
@@ -88,10 +90,9 @@ class FarmsSDK {
     const tokenId = addressToId(tokenAddress);
 
     const networkClient = this.network === 'mainnet' ? Client.forMainnet() : Client.forTestnet();
-    const client = networkClient.setOperator(
-      this.walletId || LOCAL_NODE_ACCOUNT_IDS[0],
-      this.walletPrivateKey,
-    );
+    const client = networkClient
+      .setOperator(this.walletId || LOCAL_NODE_ACCOUNT_IDS[0], this.walletPrivateKey)
+      .setMaxTransactionFee(new Hbar(1));
     const tokenApprove = await (
       await new AccountAllowanceApproveTransaction()
         .addTokenAllowance(tokenId, spenderId, amount)
@@ -131,14 +132,33 @@ class FarmsSDK {
   }
 
   async wrapHBAR(hbarAmount: string) {
-    // THIS VALUE IS IN HBARS not TINYBARS!!!
+    const hbarAmountETH = formatStringWeiToStringEther(hbarAmount, 8);
     const WHBAR = new hethers.Contract(
       process.env.REACT_APP_WHBAR_ADDRESS as string,
       WHBARABI,
       this.connectedWallet,
     );
-    const depositTx = await WHBAR.deposit({ value: hbarAmount, gasLimit: 150_000 });
+
+    const depositTx = await WHBAR.deposit({
+      value: hbarAmountETH,
+      gasLimit: 150_000,
+    });
+
     await depositTx.wait();
+  }
+
+  async approveERC20(spenderAddress: string, amountToApprove: string) {
+    const WHBAR = new hethers.Contract(
+      process.env.REACT_APP_WHBAR_ADDRESS as string,
+      ERC20.abi,
+      this.connectedWallet,
+    );
+
+    const approveTX = await WHBAR.approve(spenderAddress, amountToApprove, {
+      gasLimit: 150_000,
+    });
+
+    await approveTX.wait();
   }
 }
 
