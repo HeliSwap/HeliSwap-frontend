@@ -63,8 +63,7 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
     setLoadingApproveReward(true);
     try {
       await farmsSDK.wrapHBAR(rewardAmount);
-
-      await farmsSDK.approveToken(farmAddress, rewardAddress, approveRewardAmount);
+      await farmsSDK.approveERC20(farmAddress, approveRewardAmount.toString());
       toast.success('Success! Token was approved.');
       setApproveRewardAmount(0);
     } catch (error) {
@@ -151,9 +150,7 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
       <div className="row">
         <div className="col-4">
           <div>
-            <p className="text-small mb-3">
-              {process.env.REACT_APP_WHBAR_ADDRESS === reward.address ? 'ETH amount' : 'WEI amount'}
-            </p>
+            <p className="text-small mb-3">WEI amount</p>
             <input
               className="form-control"
               value={approveRewardAmount}
@@ -165,7 +162,7 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
             <Button
               onClick={() =>
                 process.env.REACT_APP_WHBAR_ADDRESS === reward.address
-                  ? handleWrapAndApproveToken(approveRewardAmount.toString(), reward.address)
+                  ? handleWrapAndApproveToken(reward.address, approveRewardAmount.toString())
                   : handleApproveToken(reward.address)
               }
               loading={loadingApproveReward}
