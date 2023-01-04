@@ -1,14 +1,10 @@
 import { hethers } from '@hashgraph/hethers';
-import { AccountAllowanceApproveTransaction, Client, Hbar, PrivateKey } from '@hashgraph/sdk';
 import { formatStringWeiToStringEther } from '../utils/numberUtils';
 import { addressToId } from '../utils/tokenUtils';
 import FactoryContractABI from './abis/FactoryABI.json';
 import MultirewardsContractABI from './abis/MultirewardsABI.json';
 import WHBARABI from './abis/WHBARABI.json';
 import ERC20 from '../abi/ERC20.json';
-
-// TODO: check if this appplies for both testnet and mainnet
-const LOCAL_NODE_ACCOUNT_IDS = ['0.0.1012', '0.0.1013', '0.0.1014', '0.0.1015'];
 
 type networkType = 'testnet' | 'mainnet';
 class FarmsSDK {
@@ -81,28 +77,6 @@ class FarmsSDK {
     });
   }
 
-  async approveToken(
-    spenderAccountAddress: string,
-    tokenAddress: string,
-    amount: number,
-  ): Promise<void> {
-    const spenderId = addressToId(spenderAccountAddress);
-    const tokenId = addressToId(tokenAddress);
-
-    const networkClient = this.network === 'mainnet' ? Client.forMainnet() : Client.forTestnet();
-    const client = networkClient
-      .setOperator(this.walletId || LOCAL_NODE_ACCOUNT_IDS[0], this.walletPrivateKey)
-      .setMaxTransactionFee(new Hbar(1));
-    const tokenApprove = await (
-      await new AccountAllowanceApproveTransaction()
-        .addTokenAllowance(tokenId, spenderId, amount)
-        .freezeWith(client)
-        .sign(PrivateKey.fromStringECDSA(this.walletPrivateKey))
-    ).execute(client);
-    const approveReceipt = await tokenApprove.getReceipt(client);
-    console.log(approveReceipt);
-  }
-
   async sendReward(farmAddress: string, rewardAddress: string, amount: number): Promise<void> {
     const multirewardsContract = new hethers.Contract(
       farmAddress,
@@ -147,15 +121,11 @@ class FarmsSDK {
     await depositTx.wait();
   }
 
-  async approveERC20(spenderAddress: string, amountToApprove: string) {
-    const WHBAR = new hethers.Contract(
-      process.env.REACT_APP_WHBAR_ADDRESS as string,
-      ERC20.abi,
-      this.connectedWallet,
-    );
+  async approveToken(tokenAddress: string, spenderAddress: string, amountToApprove: string) {
+    const tokenContract = new hethers.Contract(tokenAddress, ERC20.abi, this.connectedWallet);
 
-    const approveTX = await WHBAR.approve(spenderAddress, amountToApprove, {
-      gasLimit: 150_000,
+    const approveTX = await tokenContract.approve(spenderAddress, amountToApprove, {
+      gasLimit: 1000000,
     });
 
     await approveTX.wait();
