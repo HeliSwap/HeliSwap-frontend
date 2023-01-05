@@ -296,14 +296,45 @@ export const getTokenBalance = async (userId: string, tokenData: ITokenData) => 
 };
 
 export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbarPrice: number) => {
-  if (hbarPrice === 0) return '0';
-  if (tokenAddress === process.env.REACT_APP_WHBAR_ADDRESS) return hbarPrice.toString();
+  const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS;
+  const minLiquidity = Number(process.env.REACT_APP_POOL_MIN_LIQUIDITY as string);
 
-  // Calculate the target token mount for 1 HBAR
+  if (hbarPrice === 0) return '0';
+  if (tokenAddress === WHBARAddress) return hbarPrice.toString();
+
+  // Filter pools with WHBAR not deep enough in order to not distort price calculation
+  const filteredPoolsData = poolsData.filter(pool => {
+    const { token0, token0Amount, token0Decimals, token1, token1Amount, token1Decimals } = pool;
+
+    const token0AmountFormattedNumber = Number(
+      formatStringWeiToStringEther(token0Amount, token0Decimals),
+    );
+    const token1AmountFormattedNumber = Number(
+      formatStringWeiToStringEther(token1Amount, token1Decimals),
+    );
+
+    const token0AmountValueInUSD = token0AmountFormattedNumber * hbarPrice;
+    const token1AmountValueInUSD = token1AmountFormattedNumber * hbarPrice;
+
+    const hasToken0AmountEnough = token0AmountValueInUSD >= minLiquidity;
+    const hasToken1AmountEnough = token1AmountValueInUSD >= minLiquidity;
+
+    if (token0 === WHBARAddress) {
+      return hasToken0AmountEnough;
+    }
+
+    if (token1 === WHBARAddress) {
+      return hasToken1AmountEnough;
+    }
+
+    return true;
+  });
+
+  // Calculate the target token amount for 1 HBAR
   let tradesIn = getPossibleTradesExactIn(
-    poolsData || [],
+    filteredPoolsData || [],
     '1',
-    process.env.REACT_APP_WHBAR_ADDRESS || '',
+    WHBARAddress || '',
     tokenAddress,
     false,
   );
@@ -318,10 +349,10 @@ export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbar
   if (Number(sortedTrades[0].amountOut) === 0) {
     // Calculate the HBARs token amount for 1 target token
     tradesIn = getPossibleTradesExactIn(
-      poolsData || [],
+      filteredPoolsData || [],
       '1',
       tokenAddress,
-      process.env.REACT_APP_WHBAR_ADDRESS || '',
+      WHBARAddress || '',
       false,
     );
 
