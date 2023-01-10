@@ -73,6 +73,7 @@ export interface IPoolData {
   tvl?: string;
   volume7dUsd?: string;
   volume24hUsd?: string;
+  stakedBalance?: string;
 }
 
 export interface IPoolExtendedData extends IPoolData {
@@ -81,8 +82,12 @@ export interface IPoolExtendedData extends IPoolData {
   fee0AmountFormatted?: string;
   fee1AmountFormatted?: string;
   lpSharesFormatted?: string;
+  stakedBalanceFormatted?: string;
+  stakedToken0AmountFormatted?: string;
+  stakedToken1AmountFormatted?: string;
   tvlBN: BigNumber;
   tvl: string;
+  stakedTvl?: string;
   volume24Num?: number;
   volume24?: string;
   volume7Num?: number;
