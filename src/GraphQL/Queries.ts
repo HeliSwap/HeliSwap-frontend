@@ -74,6 +74,7 @@ export const GET_POOLS_BY_USER = gql`
       hasProblematicToken
       hasCampaign
       farmAddress
+      stakedBalance
     }
   }
 `;
