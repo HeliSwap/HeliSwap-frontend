@@ -61,10 +61,23 @@ const usePoolsByUser = (
             pairSupply,
             fee0,
             fee1,
+            stakedBalance,
           } = pool;
 
           const { reserve0ShareStr, reserve1ShareStr } = calculateReserves(
             lpShares as string,
+            pairSupply,
+            token0Amount,
+            token1Amount,
+            token0Decimals,
+            token1Decimals,
+          );
+
+          const {
+            reserve0ShareStr: stakedReserve0ShareStr,
+            reserve1ShareStr: stakedReserve1ShareStr,
+          } = calculateReserves(
+            stakedBalance as string,
             pairSupply,
             token0Amount,
             token1Amount,
@@ -80,11 +93,13 @@ const usePoolsByUser = (
           const fee0Formatted = formatStringWeiToStringEther(fee0 as string, token0Decimals);
           const fee1Formatted = formatStringWeiToStringEther(fee1 as string, token1Decimals);
           const lpSharesFormatted = formatStringWeiToStringEther(lpShares as string, 18);
+          const stakedBalanceFormatted = formatStringWeiToStringEther(stakedBalance as string, 18);
 
           let totalFeeValue = 0;
           let totalLpValue = 0;
+          let totalStakedLpValue = 0;
 
-          let fee0Value, fee1Value, token0Value, token1Value;
+          let fee0Value, fee1Value, token0Value, token1Value, stakedToken0Value, stakedToken1Value;
 
           if (token0PriceNum !== 0 && token1PriceNum !== 0) {
             fee0Value = Number(fee0Formatted) * token0PriceNum;
@@ -94,32 +109,52 @@ const usePoolsByUser = (
             token0Value = Number(reserve0ShareStr) * token0PriceNum;
             token1Value = Number(reserve1ShareStr) * token1PriceNum;
             totalLpValue = token0Value + token1Value;
+
+            stakedToken0Value = Number(stakedReserve0ShareStr) * token0PriceNum;
+            stakedToken1Value = Number(stakedReserve1ShareStr) * token1PriceNum;
+            totalStakedLpValue = stakedToken0Value + stakedToken1Value;
           } else if (token0PriceNum !== 0) {
             fee0Value = Number(fee0Formatted) * token0PriceNum;
             totalFeeValue = 2 * fee0Value;
 
             token0Value = Number(reserve0ShareStr) * token0PriceNum;
             totalLpValue = 2 * token0Value;
+
+            stakedToken0Value = Number(stakedReserve0ShareStr) * token0PriceNum;
+            totalStakedLpValue = 2 * stakedToken0Value;
           } else if (token1PriceNum !== 0) {
             fee1Value = Number(fee1Formatted) * token1PriceNum;
             totalFeeValue = 2 * fee1Value;
 
             token1Value = Number(reserve1ShareStr) * token1PriceNum;
             totalLpValue = 2 * token1Value;
+
+            stakedToken1Value = Number(stakedReserve1ShareStr) * token1PriceNum;
+            totalStakedLpValue = 2 * stakedToken1Value;
           }
 
           const totalFeeValueString = totalFeeValue.toString();
           const totalLpValueStr = totalLpValue.toFixed(2);
+          const totalStakedLpValueStr = totalStakedLpValue.toFixed(2);
 
-          const userPercentageShare = calculatePercentageByShare(pairSupply, lpShares as string);
+          const totalUserShare = Number(lpShares) + Number(stakedBalance);
+
+          const userPercentageShare = calculatePercentageByShare(
+            pairSupply,
+            totalUserShare.toString(),
+          );
 
           const poolData: IPoolExtendedData = {
             ...pool,
             token0AmountFormatted: reserve0ShareStr,
             token1AmountFormatted: reserve1ShareStr,
+            stakedToken0AmountFormatted: stakedReserve0ShareStr,
+            stakedToken1AmountFormatted: stakedReserve1ShareStr,
             lpSharesFormatted,
+            stakedBalanceFormatted,
             tvl: totalLpValueStr,
             tvlBN: new BigNumber(totalLpValueStr),
+            stakedTvl: totalStakedLpValueStr,
             feesNum: totalFeeValue,
             feesStr: totalFeeValueString,
             poolPercenatage: userPercentageShare,

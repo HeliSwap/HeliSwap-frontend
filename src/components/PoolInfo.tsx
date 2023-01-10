@@ -254,36 +254,73 @@ const PoolInfo = ({
             </div>
 
             <div className="col-md-6 mt-4 mt-md-0">
-              <div className="container-rounded-dark">
-                <p className="text-small">Unclaimed fees</p>
-                <p className="text-title text-numeric text-success">
-                  ${formatStringETHtoPriceFormatted(poolData.feesStr as string)}
-                </p>
+              {haveStakedTokens ? (
+                <div className="container-rounded-dark">
+                  <p className="text-small">Staked Liquidity</p>
+                  <p className="text-title text-numeric text-warning">
+                    {formatStringToPrice(poolData.stakedTvl as string)}
+                  </p>
 
-                <hr className="my-4" />
+                  <hr className="my-4" />
 
-                <div className="d-flex justify-content-between align-items-center">
-                  <div className="d-flex align-items-center">
-                    <IconToken symbol={poolData.token0Symbol} />
-                    <span className="text-main text-bold ms-3">{poolData.token0Symbol}</span>
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div className="d-flex align-items-center">
+                      <IconToken symbol={poolData.token0Symbol} />
+                      <span className="text-main text-bold ms-3">{poolData.token0Symbol}</span>
+                    </div>
+
+                    <span className="text-numeric text-small">
+                      {formatStringETHtoPriceFormatted(
+                        poolData.stakedToken0AmountFormatted as string,
+                      )}
+                    </span>
                   </div>
 
-                  <span className="text-numeric text-small">
-                    {formatStringETHtoPriceFormatted(poolData.fee0AmountFormatted as string)}
-                  </span>
-                </div>
+                  <div className="d-flex justify-content-between align-items-center mt-3">
+                    <div className="d-flex align-items-center">
+                      <IconToken symbol={poolData.token1Symbol} />
+                      <span className="text-main text-bold ms-3">{poolData.token1Symbol}</span>
+                    </div>
 
-                <div className="d-flex justify-content-between align-items-center mt-3">
-                  <div className="d-flex align-items-center">
-                    <IconToken symbol={poolData.token1Symbol} />
-                    <span className="text-main text-bold ms-3">{poolData.token1Symbol}</span>
+                    <span className="text-numeric text-small">
+                      {formatStringETHtoPriceFormatted(
+                        poolData.stakedToken1AmountFormatted as string,
+                      )}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="container-rounded-dark">
+                  <p className="text-small">Unclaimed fees</p>
+                  <p className="text-title text-numeric text-success">
+                    ${formatStringETHtoPriceFormatted(poolData.feesStr as string)}
+                  </p>
+
+                  <hr className="my-4" />
+
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div className="d-flex align-items-center">
+                      <IconToken symbol={poolData.token0Symbol} />
+                      <span className="text-main text-bold ms-3">{poolData.token0Symbol}</span>
+                    </div>
+
+                    <span className="text-numeric text-small">
+                      {formatStringETHtoPriceFormatted(poolData.fee0AmountFormatted as string)}
+                    </span>
                   </div>
 
-                  <span className="text-numeric text-small">
-                    {formatStringETHtoPriceFormatted(poolData.fee1AmountFormatted as string)}
-                  </span>
+                  <div className="d-flex justify-content-between align-items-center mt-3">
+                    <div className="d-flex align-items-center">
+                      <IconToken symbol={poolData.token1Symbol} />
+                      <span className="text-main text-bold ms-3">{poolData.token1Symbol}</span>
+                    </div>
+
+                    <span className="text-numeric text-small">
+                      {formatStringETHtoPriceFormatted(poolData.fee1AmountFormatted as string)}
+                    </span>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
 
@@ -313,9 +350,26 @@ const PoolInfo = ({
                   </Button>
                 ) : null}
               </div>
-              <span className="text-small text-numeric">
-                {formatStringETHtoPriceFormatted(poolData.lpSharesFormatted as string)}
-              </span>
+              <div>
+                {Number(poolData.lpSharesFormatted) > 0 ? (
+                  <p className="text-small text-numeric text-end">
+                    {formatStringETHtoPriceFormatted(poolData.lpSharesFormatted as string)}
+                  </p>
+                ) : null}
+
+                {haveStakedTokens ? (
+                  <div className="d-flex align-items-center">
+                    <Tippy content={`Staked LP tokens`}>
+                      <span className="me-2">
+                        <Icon size="small" color="warning" name="hint" />
+                      </span>
+                    </Tippy>
+                    <p className="text-small text-numeric text-end text-warning">
+                      {formatStringETHtoPriceFormatted(poolData.stakedBalanceFormatted as string)}
+                    </p>
+                  </div>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>
@@ -405,6 +459,7 @@ const PoolInfo = ({
   };
 
   const canTransfer = inputIdValid && inputId !== '' && inputLPAmountValid;
+  const haveStakedTokens = Number(poolData.stakedBalance) > 0;
 
   return (
     <>
