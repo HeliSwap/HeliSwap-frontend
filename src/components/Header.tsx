@@ -1,5 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { hethers } from '@hashgraph/hethers';
+// import { hethers } from '@hashgraph/hethers';
+import axios from 'axios';
 import { GlobalContext } from '../providers/Global';
 import { Md5 } from 'ts-md5/dist/md5';
 
@@ -9,7 +10,11 @@ import Icon from './Icon';
 import ConnectModalContent from './Modals/ConnectModalContent';
 import UserAccountModalContent from './Modals/UserAccountModalContent';
 
-import { formatHBARStringToPrice, formatStringETHtoPriceFormatted } from '../utils/numberUtils';
+import {
+  formatHBARStringToPrice,
+  formatStringETHtoPriceFormatted,
+  formatStringWeiToStringEther,
+} from '../utils/numberUtils';
 
 import { BALLANCE_FETCH_INTERVAL } from '../constants';
 
@@ -37,9 +42,25 @@ const Header = () => {
 
   const getUserTokensData = useCallback(async () => {
     if (userId) {
-      const provider = hethers.providers.getDefaultProvider(process.env.REACT_APP_NETWORK_TYPE);
-      const userBalanceBN = await provider.getBalance(userId);
-      const tokenBalance = hethers.utils.formatHbar(userBalanceBN);
+      // const provider = hethers.providers.getDefaultProvider(process.env.REACT_APP_NETWORK_TYPE);
+      // const userBalanceBN = await provider.getBalance(userId);
+      // const tokenBalance = hethers.utils.formatHbar(userBalanceBN);
+
+      const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/accounts/${userId}`;
+
+      let tokenBalance = '0';
+
+      try {
+        const {
+          data: { balance },
+        } = await axios(url);
+
+        const { balance: hbarBalance } = balance;
+
+        tokenBalance = formatStringWeiToStringEther(hbarBalance.toString(), 8);
+      } catch (e) {
+        console.log('e', e);
+      }
 
       setUserBalance(formatStringETHtoPriceFormatted(tokenBalance));
     }
