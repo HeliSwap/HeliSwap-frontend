@@ -107,9 +107,13 @@ export const getHTSTokenWalletBalance = async (
 };
 
 export const getUserAssociatedTokens = async (userId: string): Promise<string[]> => {
-  const tokens = (await getUserHTSData(userId)) || [];
-  const keys: string[] = [];
-  tokens.forEach((_, key) => keys.push(key as string));
+  // TEMP FIX, to removed when nodes are okay
+  const tokens = (await getUserHTSDataAlt(userId)) || [];
+  const keys = tokens.map((item: any) => item.token_id);
+
+  // const tokens = (await getUserHTSData(userId)) || [];
+  // const keys: string[] = [];
+  // tokens.forEach((_, key) => keys.push(key as string));
 
   return keys;
 };
@@ -270,13 +274,31 @@ export const getTokenBalance = async (userId: string, tokenData: ITokenData) => 
   let tokenBalance;
 
   if (tokenData.type === TokenType.HBAR && userId) {
-    const provider = hethers.providers.getDefaultProvider(process.env.REACT_APP_NETWORK_TYPE);
-    const userBalanceBN = await provider.getBalance(userId);
-    tokenBalance = hethers.utils.formatHbar(userBalanceBN);
+    // const provider = hethers.providers.getDefaultProvider(process.env.REACT_APP_NETWORK_TYPE);
+    // const userBalanceBN = await provider.getBalance(userId);
+    // tokenBalance = hethers.utils.formatHbar(userBalanceBN);
+
+    const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/accounts/${userId}`;
+
+    tokenBalance = '0';
+
+    try {
+      const {
+        data: { balance },
+      } = await axios(url);
+
+      const { balance: hbarBalance } = balance;
+
+      tokenBalance = formatStringWeiToStringEther(hbarBalance.toString(), 8);
+    } catch (e) {
+      console.error(e);
+      return '0';
+    }
   } else if (tokenData.type === TokenType.HTS) {
     tokenBalance = '0';
-    const accountTokens = await getUserHTSData(userId);
-    const balance = accountTokens?.get(tokenData.hederaId);
+    // const accountTokens = await getUserHTSData(userId);
+    const accountTokens = await getUserHTSDataAlt(userId);
+    const balance = accountTokens.find((item: any) => item.token_id === tokenData.hederaId).balance;
     const tokenDecimals = tokenData?.decimals;
 
     if (balance)
@@ -373,6 +395,23 @@ const getUserHTSData = async (userId: string) => {
   const client = networkType === 'testnet' ? Client.forTestnet() : Client.forMainnet();
   const { tokens } = await new AccountBalanceQuery().setAccountId(userId).execute(client);
   return tokens?._map;
+};
+
+const getUserHTSDataAlt = async (userId: string) => {
+  const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/accounts/${userId}`;
+
+  try {
+    const {
+      data: { balance },
+    } = await axios(url);
+
+    const { tokens } = balance;
+
+    return tokens;
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
 };
 
 export const requestIdFromAddress = async (id: string) => {
