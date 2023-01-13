@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 
-import BigNumber from 'bignumber.js';
 import ReactPaginate from 'react-paginate';
+import { useNavigate } from 'react-router-dom';
+
+import BigNumber from 'bignumber.js';
 
 import { ITokenDataAnalytics } from '../../../interfaces/tokens';
 
@@ -27,6 +29,8 @@ const TopTokens = ({ tokens }: ITopTokensProps) => {
   const [sortBy, setSortBy] = useState<SORT_OPTIONS>(SORT_OPTIONS_ENUM.TVL);
   const [sortDirection, setSortDirection] = useState<SORT_DIRECTION>(SORT_DIRECTION.DESC);
   const [pageCount, setPageCount] = useState(0);
+
+  const navigate = useNavigate();
 
   // Handlers
   const handleSortClick = (_sortBy: SORT_OPTIONS) => {
@@ -103,7 +107,11 @@ const TopTokens = ({ tokens }: ITopTokensProps) => {
           ? currentItems.map((token: ITokenDataAnalytics, index: number) => {
               const tokenNum = index + 1;
               return (
-                <div key={token.address} className="table-pools-row no-pointer with-4-columns">
+                <div
+                  onClick={() => navigate(`token/${token.address}`)}
+                  key={token.address}
+                  className="table-pools-row with-4-columns"
+                >
                   <div className="d-none d-md-flex table-pools-cell">
                     <span className="text-small">{tokenNum + offset}</span>
                   </div>

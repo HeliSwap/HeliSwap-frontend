@@ -26,6 +26,7 @@ import {
   analyticsPageInitialCurrentView,
   POOLS_FEE,
   useQueryOptionsProvideSwapRemove,
+  CHART_DATA,
 } from '../constants';
 import LineChart from '../components/LineChart';
 import Button from '../components/Button';
@@ -314,6 +315,7 @@ const AnalyticsPoolDetials = () => {
                         <LineChart
                           chartData={historicalDataToShow}
                           aggregatedValue={poolData?.tvlUsd}
+                          dataType={CHART_DATA.TVL}
                         />
                       ) : (
                         <BarChart

@@ -53,6 +53,14 @@ export interface IHistoricalData {
   volume: string;
 }
 
+export interface ITokenHistoricalData {
+  time: string;
+  address: string;
+  name: string;
+  symbol: string;
+  price: string;
+}
+
 export enum LOCKDROP_STATE {
   DEPOSIT,
   WITHDRAW,

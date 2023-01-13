@@ -173,3 +173,8 @@ export const tokenWeights: { [key: string]: number } = {
   USDC: 97,
   'USDC[hts]': 96,
 };
+
+export enum CHART_DATA {
+  TVL = 'TVL',
+  TOKEN = 'Token',
+}
