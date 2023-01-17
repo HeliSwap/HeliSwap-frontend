@@ -54,11 +54,16 @@ export interface IHistoricalData {
 }
 
 export interface ITokenHistoricalData {
+  price: string;
   time: string;
+  tvl: string;
+}
+
+export interface ITokenData {
   address: string;
   name: string;
   symbol: string;
-  price: string;
+  data: ITokenHistoricalData[];
 }
 
 export enum LOCKDROP_STATE {

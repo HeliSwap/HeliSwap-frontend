@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 
 import { AnalyticsViews } from '../interfaces/common';
 
@@ -7,16 +7,28 @@ import Loader from '../components/Loader';
 import { viewTitleMapping } from './Analytics';
 import Icon from '../components/Icon';
 import LineChart from '../components/LineChart';
+import PriceChart from '../components/PriceChart';
+import BarChart from '../components/BarChart';
+import Button from '../components/Button';
+
+import { formatStringToPrice } from '../utils/numberUtils';
+import { formatIcons } from '../utils/iconUtils';
 
 import useHistoricalTokenData from '../hooks/useHistoricalTokenData';
 
-import { analyticsPageInitialCurrentView, useQueryOptions, CHART_DATA } from '../constants';
+import { analyticsPageInitialCurrentView, useQueryOptions } from '../constants';
 
 const AnalyticsTokenDetials = () => {
   const { tokenAddress } = useParams();
 
   const [currentView, setCurrentView] = useState<AnalyticsViews>(analyticsPageInitialCurrentView);
   const [currentPrice, setCurrentPrice] = useState('');
+  enum ChartToShowEnum {
+    tvl,
+    volume,
+    price,
+  }
+  const [chartToShow, setChartToShow] = useState<ChartToShowEnum>(ChartToShowEnum.price);
 
   const navigate = useNavigate();
   const { tokenData, loadingTokenData } = useHistoricalTokenData(
@@ -31,10 +43,31 @@ const AnalyticsTokenDetials = () => {
 
   // useEffects
   useEffect(() => {
-    if (tokenData.length) {
-      setCurrentPrice(tokenData[tokenData.length - 1].price);
+    if (tokenData && tokenData.data?.length) {
+      setCurrentPrice(tokenData.data[tokenData.data.length - 1].price);
     }
   }, [tokenData]);
+
+  const determineColorClass = (value: number) => {
+    return value >= 0 ? 'text-success' : 'text-danger';
+  };
+
+  const renderChart = () => {
+    if (currentPrice) {
+      if (chartToShow === ChartToShowEnum.tvl) {
+        return (
+          <LineChart
+            chartData={tokenData.data}
+            aggregatedValue={tokenData.data[tokenData.data.length - 1].tvl}
+          />
+        );
+      } else if (chartToShow === ChartToShowEnum.volume) {
+        return <BarChart chartData={tokenData.data} aggregatedValue={Number(tokenData.volume)} />;
+      } else if (chartToShow === ChartToShowEnum.price) {
+        return <PriceChart chartData={tokenData.data} aggregatedValue={currentPrice} />;
+      } else return null;
+    }
+  };
 
   return (
     <div className="d-flex justify-content-center">
@@ -66,73 +99,118 @@ const AnalyticsTokenDetials = () => {
             <div className="mt-6 d-md-flex justify-content-between align-items-start">
               <div>
                 <div className="d-md-flex align-items-center">
-                  {/* {formatIcons(
-                    [tokenData?.symbol as string, poolData?.token1Symbol as string],
-                    'large',
-                  )}
+                  {formatIcons([currentPrice && (tokenData.symbol as string)], 'large')}
                   <p className="text-title text-light mt-3 mt-md-0 ms-md-4">
-                    {mapHBARTokenSymbol(poolData.token0Symbol)} /{' '}
-                    {mapHBARTokenSymbol(poolData.token1Symbol)}
-                  </p> */}
-                </div>
-
-                <div className="d-md-flex mt-5">
-                  <div className="container-blue-neutral-700 rounded py-2 px-3 d-flex align-items-center">
-                    {/* <IconToken symbol={poolData?.token0Symbol as string} />
-                    <span className="ms-3">
-                      1 {mapHBARTokenSymbol(poolData.token0Symbol)} ={' '}
-                      {calculateReservePrice(
-                        poolData.token1Amount,
-                        poolData.token0Amount,
-                        poolData.token1Decimals,
-                        poolData.token0Decimals,
-                      )}{' '}
-                      {mapHBARTokenSymbol(poolData.token1Symbol)}
-                    </span> */}
-                  </div>
-
-                  <div className="container-blue-neutral-700 rounded py-2 px-3 d-flex align-items-center ms-md-4 mt-3 mt-md-0">
-                    {/* <IconToken symbol={poolData?.token1Symbol as string} />
-                    <span className="ms-3">
-                      1 {mapHBARTokenSymbol(poolData.token1Symbol)} ={' '}
-                      {calculateReservePrice(
-                        poolData.token0Amount,
-                        poolData.token1Amount,
-                        poolData.token0Decimals,
-                        poolData.token1Decimals,
-                      )}{' '}
-                      {mapHBARTokenSymbol(poolData.token0Symbol)}
-                    </span> */}
-                  </div>
+                    {currentPrice && tokenData.name}
+                  </p>
                 </div>
               </div>
-
               <div className="d-md-flex align-items-center mt-4 mt-md-0">
-                {/* <Link
-                  to={`/${poolData?.token0}/${poolData?.token1}`}
-                  className="btn btn-sm btn-secondary d-block d-sm-inline-block"
-                >
+                <Link to={`/`} className="btn btn-sm btn-secondary d-block d-sm-inline-block">
                   Trade
                 </Link>
                 <Link
-                  to={`/create/${poolData?.token0}/${poolData?.token1}`}
+                  to={`/`}
                   className="btn btn-sm btn-primary d-block d-sm-inline-block mt-3 mt-sm-0 ms-sm-3"
                 >
                   Add Liquidity
-                </Link> */}
+                </Link>
               </div>
             </div>
-
             <div className="row mt-4 mt-md-5">
+              <div className="col-md-3">
+                <div className="container-blue-neutral-800 heigth-100 rounded d-flex flex-column justify-content-between p-3 p-md-4">
+                  <div>
+                    <p className="text-small text-gray mt-5">TVL</p>
+                    <p className="text-subheader">
+                      {formatStringToPrice(
+                        currentPrice && tokenData.data?.[tokenData.data.length - 1].tvl,
+                      )}
+                    </p>
+                    {/* d-none classe to be removed when backend is ready with diff calculations */}
+                    <p
+                      className={`d-none text-small text-numeric ${determineColorClass(
+                        tokenData.tvl,
+                      )}`}
+                    >
+                      (
+                      {/* <Icon
+                        size="small"
+                        color={determineIconProps(poolData.diff.tvl).color}
+                        name={determineIconProps(poolData.diff.tvl).name}
+                      />
+                      {stripStringToFixedDecimals(Math.abs(poolData.diff.tvl).toString(), 2)}%) */}
+                    </p>
+
+                    <p className="text-small text-gray mt-5">Volume 24H</p>
+                    <p className="text-subheader">
+                      {/* {formatStringToPrice(poolData?.volume24hUsd as string)} */}
+                    </p>
+                    {/* d-none classe to be removed when backend is ready with diff calculations */}
+                    {/* <p
+                      className={`d-none text-small text-numeric ${determineColorClass(
+                        poolData.diff.volume,
+                      )}`}
+                    >
+                      (
+                      <Icon
+                        size="small"
+                        color={determineIconProps(poolData.diff.volume).color}
+                        name={determineIconProps(poolData.diff.volume).name}
+                      />
+                      {stripStringToFixedDecimals(Math.abs(poolData.diff.volume).toString(), 2)}%)
+                    </p> */}
+                    {/*
+                    <p className="text-small text-gray mt-5">Fees 24H</p>
+                    <p className="text-subheader">
+                      {formatStringToPrice(poolData?.fees.amount?.toString() as string)}
+                    </p> */}
+                  </div>
+                </div>
+              </div>
               <div className="col-md-9 mt-4 mt-md-0 container-blue-neutral-800 rounded p-4">
+                <div className="d-flex justify-content-end">
+                  <Button
+                    type={chartToShow === ChartToShowEnum.tvl ? 'primary' : 'secondary'}
+                    size="small"
+                    className="mx-2"
+                    onClick={() => {
+                      if (chartToShow !== ChartToShowEnum.tvl) {
+                        setChartToShow(ChartToShowEnum.tvl);
+                      }
+                    }}
+                  >
+                    TVL
+                  </Button>
+                  <Button
+                    type={chartToShow === ChartToShowEnum.volume ? 'primary' : 'secondary'}
+                    size="small"
+                    className="mx-2"
+                    onClick={() => {
+                      if (chartToShow !== ChartToShowEnum.volume) {
+                        setChartToShow(ChartToShowEnum.volume);
+                      }
+                    }}
+                  >
+                    Volume
+                  </Button>
+                  <Button
+                    type={chartToShow === ChartToShowEnum.price ? 'primary' : 'secondary'}
+                    size="small"
+                    className="mx-2"
+                    onClick={() => {
+                      if (chartToShow !== ChartToShowEnum.price) {
+                        setChartToShow(ChartToShowEnum.price);
+                      }
+                    }}
+                  >
+                    Price
+                  </Button>
+                </div>
                 {tokenData ? (
                   <div className="mt-6">
-                    {tokenData.length ? (
-                      <LineChart
-                        chartData={tokenData}
-                        aggregatedValue={currentPrice}
-                        dataType={CHART_DATA.TOKEN}
-                      />
+                    {tokenData.data?.length ? (
+                      renderChart()
                     ) : (
                       <span className="text-small">No historical data for this token</span>
                     )}

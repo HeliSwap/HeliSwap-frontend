@@ -25,7 +25,6 @@ import {
   useQueryOptions,
   useQueryOptionsProvideSwapRemove,
   initialPoolsAnalyticsData,
-  CHART_DATA,
 } from '../../../constants';
 import { formatStringWeiToStringEther } from '../../../utils/numberUtils';
 import { IHistoricalData } from '../../../interfaces/common';
@@ -150,7 +149,6 @@ const Overview = () => {
               <LineChart
                 chartData={historicalDataToShow}
                 aggregatedValue={historicalDataToShow[historicalDataToShow.length - 1].tvl}
-                dataType={CHART_DATA.TVL}
               />
             </div>
           ) : (

@@ -129,6 +129,12 @@ export enum INITIAL_CHART_LABELS {
   VOLUME_BAR_CHART = 'Volume 24H',
 }
 
+export enum CHART_DATA {
+  TVL = 'TVL',
+  TOKEN = 'Token',
+  TOKEN_BAR_CHART = 'Price',
+}
+
 export const C14BaseURL =
   'https://pay.c14.money/?targetAssetIdLock=true&clientId=Fdea9e6b-b7fd-4772-bf1c-c3c9e4d09308&targetAssetId=';
 
@@ -173,8 +179,3 @@ export const tokenWeights: { [key: string]: number } = {
   USDC: 97,
   'USDC[hts]': 96,
 };
-
-export enum CHART_DATA {
-  TVL = 'TVL',
-  TOKEN = 'Token',
-}
