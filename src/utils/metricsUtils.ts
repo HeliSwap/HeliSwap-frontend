@@ -60,7 +60,7 @@ export function getTransformedTvlData(chartData: IHistoricalData[]) {
   }
 }
 
-export function getTransformedTokenData(chartData: ITokenHistoricalData[]) {
+export function getTransformedPriceData(chartData: ITokenHistoricalData[]) {
   if (chartData) {
     return chartData.map(day => {
       return {

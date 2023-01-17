@@ -1,61 +1,43 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { XAxis, AreaChart, Area, Tooltip, ResponsiveContainer } from 'recharts';
 import Tippy from '@tippyjs/react';
 
 import dayjs from 'dayjs';
 
-import { IHistoricalData, ITokenHistoricalData } from '../interfaces/common';
+import { IHistoricalData } from '../interfaces/common';
 
 import Loader from './Loader';
 import Icon from './Icon';
 
 import { formatStringToPrice } from '../utils/numberUtils';
-import { getTransformedTvlData, getTransformedTokenData } from '../utils/metricsUtils';
+import { getTransformedTvlData } from '../utils/metricsUtils';
 
-import { INITIAL_CHART_LABELS, CHART_DATA } from '../constants';
+import { INITIAL_CHART_LABELS } from '../constants';
 
 interface ILineChartProps {
-  chartData: IHistoricalData[] | ITokenHistoricalData[];
+  chartData: IHistoricalData[];
   aggregatedValue: string;
-  dataType: string;
 }
 
-const Chart = ({ chartData, aggregatedValue, dataType }: ILineChartProps) => {
-  const [value, setValue] = useState(aggregatedValue);
-  const [dateLabel, setDateLabel] = useState('');
-  const [chartLabel, setChartLabel] = useState('');
+const Chart = ({ chartData, aggregatedValue }: ILineChartProps) => {
+  const [value, setValue] = useState<string>(aggregatedValue);
+  const [dateLabel, setDateLabel] = useState<string>('');
 
   const formattedTvlData = useMemo(() => {
-    if (dataType === CHART_DATA.TVL) {
-      return getTransformedTvlData(chartData as IHistoricalData[]);
-    } else if (dataType === CHART_DATA.TOKEN) {
-      return getTransformedTokenData(chartData as ITokenHistoricalData[]);
-    }
-  }, [chartData, dataType]);
-
-  useEffect(() => {
-    if (chartData.length) {
-      if (dataType === CHART_DATA.TVL) {
-        setChartLabel(INITIAL_CHART_LABELS.TVL_LINE_CHART);
-      } else if (dataType === CHART_DATA.TOKEN) {
-        setChartLabel((chartData[0] as ITokenHistoricalData).symbol);
-      }
-    }
-  }, [dataType, chartData]);
+    return getTransformedTvlData(chartData);
+  }, [chartData]);
 
   return (
     <div style={{ minHeight: '392px' }}>
       <div className="d-flex justify-content-between align-items-start">
         <div>
           <p className="text-main text-gray d-flex align-items-center">
-            {chartLabel}{' '}
-            {dataType === CHART_DATA.TVL && (
-              <Tippy content={`Total value locked`}>
-                <span className="ms-2">
-                  <Icon color="gray" name="hint" />
-                </span>
-              </Tippy>
-            )}
+            {INITIAL_CHART_LABELS.TVL_LINE_CHART}{' '}
+            <Tippy content={`Total value locked`}>
+              <span className="ms-2">
+                <Icon color="gray" name="hint" />
+              </span>
+            </Tippy>
           </p>
           <p className="text-headline text-bold mt-3">
             {formatStringToPrice(value?.toString() as string)}

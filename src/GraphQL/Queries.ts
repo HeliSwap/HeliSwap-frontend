@@ -401,8 +401,11 @@ export const GET_TOKEN_PRICE = gql`
       address
       name
       symbol
-      price
-      time
+      data {
+        price
+        time
+        tvl
+      }
     }
   }
 `;
