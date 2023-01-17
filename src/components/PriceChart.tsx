@@ -36,10 +36,14 @@ const Chart = ({ chartData, aggregatedValue }: ICandleChartProps) => {
           <div>
             <p className="text-main text-gray">{INITIAL_CHART_LABELS.TOKEN_BAR_CHART}</p>
             <p className="text-headline text-bold mt-3">{formatStringToPrice(value)}</p>
+            {dateLabel ? (
+              <p className="text-small">{dayjs(dateLabel).format('MMM D, YYYY')}</p>
+            ) : (
+              <p className="text-small">-</p>
+            )}
           </div>
         </div>
       </div>
-
       {chartData.length !== 0 ? (
         <ResponsiveContainer height={300}>
           <BarChart
@@ -70,7 +74,7 @@ const Chart = ({ chartData, aggregatedValue }: ICandleChartProps) => {
               dataKey="time"
               axisLine={false}
               tickLine={false}
-              tickFormatter={time => dayjs(time).format('MMM')}
+              tickFormatter={time => dayjs(time).format('DD')}
               minTickGap={10}
               interval="preserveStart"
             />
