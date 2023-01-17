@@ -146,25 +146,10 @@ const AnalyticsTokenDetials = () => {
                     <p className="text-subheader">
                       {/* {formatStringToPrice(poolData?.volume24hUsd as string)} */}
                     </p>
-                    {/* d-none classe to be removed when backend is ready with diff calculations */}
-                    {/* <p
-                      className={`d-none text-small text-numeric ${determineColorClass(
-                        poolData.diff.volume,
-                      )}`}
-                    >
-                      (
-                      <Icon
-                        size="small"
-                        color={determineIconProps(poolData.diff.volume).color}
-                        name={determineIconProps(poolData.diff.volume).name}
-                      />
-                      {stripStringToFixedDecimals(Math.abs(poolData.diff.volume).toString(), 2)}%)
-                    </p> */}
-                    {/*
                     <p className="text-small text-gray mt-5">Fees 24H</p>
                     <p className="text-subheader">
-                      {formatStringToPrice(poolData?.fees.amount?.toString() as string)}
-                    </p> */}
+                      {/* {formatStringToPrice(poolData?.fees.amount?.toString() as string)} */}
+                    </p>
                   </div>
                 </div>
               </div>
