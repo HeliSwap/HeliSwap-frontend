@@ -401,10 +401,18 @@ export const GET_TOKEN_PRICE = gql`
       address
       name
       symbol
-      data {
+      metrics {
         price
         time
         tvl
+        volume
+      }
+      priceCandles {
+        time
+        open
+        close
+        high
+        low
       }
     }
   }

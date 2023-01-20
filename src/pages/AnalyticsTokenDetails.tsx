@@ -7,7 +7,7 @@ import Loader from '../components/Loader';
 import { viewTitleMapping } from './Analytics';
 import Icon from '../components/Icon';
 import LineChart from '../components/LineChart';
-import PriceChart from '../components/PriceChart';
+import CandleChart from '../components/CandleChart';
 import BarChart from '../components/BarChart';
 import Button from '../components/Button';
 
@@ -23,6 +23,7 @@ const AnalyticsTokenDetials = () => {
 
   const [currentView, setCurrentView] = useState<AnalyticsViews>(analyticsPageInitialCurrentView);
   const [currentPrice, setCurrentPrice] = useState('');
+
   enum ChartToShowEnum {
     tvl,
     volume,
@@ -43,28 +44,24 @@ const AnalyticsTokenDetials = () => {
 
   // useEffects
   useEffect(() => {
-    if (tokenData && tokenData.data?.length) {
-      setCurrentPrice(tokenData.data[tokenData.data.length - 1].price);
+    if (tokenData && tokenData.metrics?.length) {
+      setCurrentPrice(tokenData.metrics[tokenData.metrics.length - 1].price);
     }
   }, [tokenData]);
 
   const determineColorClass = (value: number) => {
     return value >= 0 ? 'text-success' : 'text-danger';
   };
-
   const renderChart = () => {
     if (currentPrice) {
       if (chartToShow === ChartToShowEnum.tvl) {
-        return (
-          <LineChart
-            chartData={tokenData.data}
-            aggregatedValue={tokenData.data[tokenData.data.length - 1].tvl}
-          />
-        );
+        const aggregatedValue = tokenData.metrics[tokenData.metrics.length - 1].tvl;
+        return <LineChart chartData={tokenData.metrics} aggregatedValue={aggregatedValue} />;
       } else if (chartToShow === ChartToShowEnum.volume) {
-        return <BarChart chartData={tokenData.data} aggregatedValue={Number(tokenData.volume)} />;
+        const aggregatedValue = tokenData.metrics[tokenData.metrics.length - 1].volume;
+        return <BarChart chartData={tokenData.metrics} aggregatedValue={Number(aggregatedValue)} />;
       } else if (chartToShow === ChartToShowEnum.price) {
-        return <PriceChart chartData={tokenData.data} aggregatedValue={currentPrice} />;
+        return <CandleChart chartData={tokenData.priceCandles} />;
       } else return null;
     }
   };
@@ -194,7 +191,7 @@ const AnalyticsTokenDetials = () => {
                 </div>
                 {tokenData ? (
                   <div className="mt-6">
-                    {tokenData.data?.length ? (
+                    {tokenData.metrics?.length ? (
                       renderChart()
                     ) : (
                       <span className="text-small">No historical data for this token</span>

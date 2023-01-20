@@ -59,11 +59,20 @@ export interface ITokenHistoricalData {
   tvl: string;
 }
 
+export interface ITokenCandleData {
+  time: string;
+  open: string;
+  close: string;
+  high: string;
+  low: string;
+}
+
 export interface ITokenData {
   address: string;
   name: string;
   symbol: string;
-  data: ITokenHistoricalData[];
+  metrics: ITokenHistoricalData[];
+  priceCandles: ITokenCandleData[];
 }
 
 export enum LOCKDROP_STATE {
