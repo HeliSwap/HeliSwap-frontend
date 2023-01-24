@@ -128,12 +128,12 @@ const AnalyticsTokenDetials = () => {
                       {stripStringToFixedDecimals(Math.abs(poolData.diff.tvl).toString(), 2)}%) */}
                     </p>
 
-                    <p className="text-small text-gray mt-5">Volume 24H</p>
+                    {/* <p className="text-small text-gray mt-5">Volume 24H</p>
                     <p className="text-subheader">
                       {formatStringToPrice(
                         tokenData && tokenData.metrics?.[tokenData.metrics.length - 1].volume,
                       )}
-                    </p>
+                    </p> */}
                     {/* <p className="text-small text-gray mt-5">Fees 24H</p>
                     <p className="text-subheader">
                       {formatStringToPrice(poolData?.fees.amount?.toString() as string)}
