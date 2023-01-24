@@ -211,6 +211,16 @@ $headings-font-family: $font-family-primary;
 $headings-font-weight: $font-weight-normal;
 
 $texts: (
+  huge: (
+    default: (
+      font-size: 48px,
+      line-height: 48px,
+    ),
+    md: (
+      font-size: 48px,
+      line-height: 48px,
+    ),
+  ),
   display: (
     default: (
       font-size: 40px,
