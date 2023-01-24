@@ -397,6 +397,56 @@
   }
 }
 
+.container-expandable {
+  background-color: $blue-neutral-800;
+  border-radius: 8px;
+  padding: 32px;
+}
+
+.container-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  column-gap: 4px;
+}
+
+.container-days-labels {
+  display: grid;
+  grid-template-columns: 5fr 2fr;
+  column-gap: 4px;
+}
+
+.container-day {
+  background-color: $blue-neutral-600;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  text-align: center;
+
+  &.is-day-6 {
+    background: linear-gradient(90deg, #f32fd7 0%, #3845fb 203.97%);
+  }
+
+  &.is-day-7 {
+    background: linear-gradient(90deg, #f32fd7 -104.53%, #3845fb 100%);
+  }
+}
+
+.container-lockdrop {
+  background-image: url('../../public/lockdrop-bg.png');
+  background-repeat: no-repeat;
+  background-position: center -90px;
+}
+
+.container-lockdrop-progress {
+  width: 320px;
+  height: 320px;
+  border: 1px solid $blue-neutral-600;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /* Tables */
 .table-pools {
   border-radius: 4px 4px 0px 0px;
@@ -630,4 +680,10 @@
   background-color: $blue-neutral-400;
   opacity: 0.5;
   margin: 0 24px;
+}
+
+.separator-expand {
+  border: 0;
+  height: 1px;
+  background-color: $blue-neutral-500;
 }

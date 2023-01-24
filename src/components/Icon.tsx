@@ -31,6 +31,8 @@ import { ReactComponent as Youtube } from '../icons/system/youtube.svg';
 import { ReactComponent as Hashport } from '../icons/system/hashport.svg';
 import { ReactComponent as Analytics } from '../icons/system/analytics.svg';
 import { ReactComponent as Heli } from '../icons/system/heli.svg';
+import { ReactComponent as Plus } from '../icons/system/plus.svg';
+import { ReactComponent as Minus } from '../icons/system/minus.svg';
 
 interface IIconProps {
   name: string;
@@ -88,6 +90,8 @@ const icons: IIconMapping = {
   hashport: Hashport,
   analytics: Analytics,
   heli: Heli,
+  plus: Plus,
+  minus: Minus,
 };
 
 const colorMapping: IColorMapping = {
