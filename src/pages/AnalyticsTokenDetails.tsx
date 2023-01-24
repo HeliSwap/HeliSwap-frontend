@@ -102,17 +102,6 @@ const AnalyticsTokenDetials = () => {
                   </p>
                 </div>
               </div>
-              <div className="d-md-flex align-items-center mt-4 mt-md-0">
-                <Link to={`/`} className="btn btn-sm btn-secondary d-block d-sm-inline-block">
-                  Trade
-                </Link>
-                <Link
-                  to={`/`}
-                  className="btn btn-sm btn-primary d-block d-sm-inline-block mt-3 mt-sm-0 ms-sm-3"
-                >
-                  Add Liquidity
-                </Link>
-              </div>
             </div>
             <div className="row mt-4 mt-md-5">
               <div className="col-md-3">
