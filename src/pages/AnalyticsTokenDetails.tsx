@@ -121,7 +121,7 @@ const AnalyticsTokenDetials = () => {
                     <p className="text-small text-gray mt-5">TVL</p>
                     <p className="text-subheader">
                       {formatStringToPrice(
-                        currentPrice && tokenData.data?.[tokenData.data.length - 1].tvl,
+                        currentPrice && tokenData.metrics?.[tokenData.metrics.length - 1].tvl,
                       )}
                     </p>
                     {/* d-none classe to be removed when backend is ready with diff calculations */}
