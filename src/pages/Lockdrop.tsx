@@ -90,7 +90,7 @@ const Lockdrop = () => {
   }, [userId, initialBallanceData]);
 
   return (
-    <div className="container py-4 py-lg-7">
+    <div className="container container-lockdrop py-4 py-lg-7">
       <h1 className="text-display text-bold text-center">HELI LockDrop</h1>
       {currentState >= LOCKDROP_STATE.NOT_STARTED && currentState < LOCKDROP_STATE.FINISHED ? (
         <p className="text-main text-center mt-4">

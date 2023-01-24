@@ -431,6 +431,12 @@
   }
 }
 
+.container-lockdrop {
+  background-image: url('../../public/lockdrop-bg.png');
+  background-repeat: no-repeat;
+  background-position: center -90px;
+}
+
 /* Tables */
 .table-pools {
   border-radius: 4px 4px 0px 0px;
