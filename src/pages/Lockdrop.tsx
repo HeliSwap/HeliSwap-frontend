@@ -7,7 +7,7 @@ import LockdropForm from '../components/LockdropForm';
 import { LOCKDROP_STATE } from '../interfaces/common';
 
 const Lockdrop = () => {
-  const countdownEnd = 1674567900000;
+  const countdownEnd = 1676548800000; //Thursday, 16 February 2023 12:00:00
   const [currentState, setCurrentState] = useState(LOCKDROP_STATE.NOT_STARTED);
 
   useEffect(() => {
@@ -72,7 +72,7 @@ const Lockdrop = () => {
       {/* Deposit, Withdrtaw & Claim form */}
 
       {/* Lockdrop stats */}
-      <LockdropCounter countdownEnd={countdownEnd} />
+      <LockdropCounter currentState={currentState} countdownEnd={countdownEnd} />
       {/* Lockdrop stats */}
 
       {/* How it works */}
