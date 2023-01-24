@@ -130,12 +130,14 @@ const AnalyticsTokenDetials = () => {
 
                     <p className="text-small text-gray mt-5">Volume 24H</p>
                     <p className="text-subheader">
-                      {/* {formatStringToPrice(poolData?.volume24hUsd as string)} */}
+                      {formatStringToPrice(
+                        tokenData && tokenData.metrics?.[tokenData.metrics.length - 1].volume,
+                      )}
                     </p>
-                    <p className="text-small text-gray mt-5">Fees 24H</p>
+                    {/* <p className="text-small text-gray mt-5">Fees 24H</p>
                     <p className="text-subheader">
-                      {/* {formatStringToPrice(poolData?.fees.amount?.toString() as string)} */}
-                    </p>
+                      {formatStringToPrice(poolData?.fees.amount?.toString() as string)}
+                    </p> */}
                   </div>
                 </div>
               </div>
