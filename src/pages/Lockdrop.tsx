@@ -32,13 +32,15 @@ const Lockdrop = () => {
   const [loadingContractData, setLoadingContractData] = useState(true);
 
   const lockDropInitialData = {
-    heliAmountRaw: '100000000000',
-    heliAmount: '1000000',
+    heliAmountRaw: '0',
+    heliAmount: '0',
     hbarAmount: '0',
     hbarAmountRaw: '0',
     lockedHbarAmount: '0',
     endTimestamp: 0,
   };
+
+  const [lockDropData, setLockDropData] = useState<ILockdropData>(lockDropInitialData);
 
   const getContractData = useCallback(async () => {
     setLoadingContractData(true);
@@ -83,8 +85,6 @@ const Lockdrop = () => {
       setLoadingContractData(false);
     }
   }, [lockDropContract, userId]);
-
-  const [lockDropData, setLockDropData] = useState<ILockdropData>(lockDropInitialData);
 
   useEffect(() => {
     setCurrentState(LOCKDROP_STATE.NOT_STARTED);
@@ -174,7 +174,6 @@ const Lockdrop = () => {
           {currentState >= LOCKDROP_STATE.NOT_STARTED && lockDropData ? (
             <LockdropForm
               getContractData={getContractData}
-              countdownEnd={countdownEnd}
               lockDropData={lockDropData}
               currentState={currentState}
             />
