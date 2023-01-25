@@ -16,7 +16,6 @@ import { LOCKDROP_STATE, ILockdropData } from '../interfaces/common';
 
 import { stripStringToFixedDecimals } from '../utils/numberUtils';
 import { getTokenBalance, NATIVE_TOKEN } from '../utils/tokenUtils';
-import { getCountdownReturnValues } from '../utils/timeUtils';
 
 enum ActionTab {
   'Deposit',
@@ -27,9 +26,16 @@ interface ILockdropFormProps {
   currentState: LOCKDROP_STATE;
   lockDropData: ILockdropData;
   countdownEnd: number;
+  getContractData: () => void;
 }
 
-const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFormProps) => {
+const LockdropForm = ({
+  currentState,
+  lockDropData,
+  countdownEnd,
+  getContractData,
+}: ILockdropFormProps) => {
+  const lockDropContractAddress = process.env.REACT_APP_LOCKDROP_ADDRESS;
   const contextValue = useContext(GlobalContext);
   const { connection } = contextValue;
   const { userId, connected, setShowConnectModal, isHashpackLoading } = connection;
@@ -42,6 +48,8 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
   const [depositValue, setDepositValue] = useState('0');
   const [withdrawValue, setWithdrawValue] = useState('0');
   const [claimValue, setClaimValue] = useState('0');
+
+  const [loadingButton, setLoadingButton] = useState(false);
 
   const handleDepositInputChange = (rawValue: string) => {
     setDepositValue(rawValue);
@@ -59,7 +67,43 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
     setActionTab(target);
   };
 
-  const handleDepositButtonClick = () => {};
+  const handleDepositButtonClick = async () => {
+    setLoadingButton(true);
+
+    try {
+      await sdk.depositHBAR(
+        hashconnectConnectorInstance,
+        lockDropContractAddress as string,
+        userId,
+        depositValue,
+      );
+
+      await getContractData();
+    } catch (e) {
+      console.log('e', e);
+    } finally {
+      setLoadingButton(false);
+    }
+  };
+
+  const handleWithdrawButtonClick = async () => {
+    setLoadingButton(true);
+
+    try {
+      await sdk.withdrawHBAR(
+        hashconnectConnectorInstance,
+        lockDropContractAddress as string,
+        userId,
+        withdrawValue,
+      );
+
+      await getContractData();
+    } catch (e) {
+      console.log('e', e);
+    } finally {
+      setLoadingButton(false);
+    }
+  };
 
   const getInsufficientToken = useCallback(() => {
     return (
@@ -85,10 +129,6 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
   //     1 HELI = {Number(lockDropData.hbarAmount) / Number(lockDropData.heliAmount)} HBAR
   //   </p>
   // );
-
-  const timeLeft = countdownEnd - new Date().getTime();
-  const formDisabled = timeLeft > 0;
-  const disabledButtonText = `${getCountdownReturnValues(timeLeft).days.toString()} days left`;
 
   return (
     <div className="d-flex flex-column align-items-center py-20 container-lockdrop">
@@ -131,12 +171,10 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
                       <InputToken
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           const { value } = e.target;
-                          const strippedValue = stripStringToFixedDecimals(value, 6);
+                          const strippedValue = stripStringToFixedDecimals(value, 8);
                           handleDepositInputChange(strippedValue);
                         }}
                         value={depositValue}
-                        disabled={formDisabled}
-                        name="amountOut"
                       />
                     }
                     buttonSelectorComponent={
@@ -147,9 +185,9 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
                         <WalletBalance
                           insufficientBallance={getInsufficientToken() as boolean}
                           walletBalance={hbarBalance}
-                          // onMaxButtonClick={(maxValue: string) => {
-                          //   handleDepositInputChange(maxValue);
-                          // }}
+                          onMaxButtonClick={(maxValue: string) => {
+                            handleDepositInputChange(maxValue);
+                          }}
                         />
                       ) : null
                     }
@@ -176,7 +214,7 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
                       <InputToken
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           const { value } = e.target;
-                          const strippedValue = stripStringToFixedDecimals(value, 6);
+                          const strippedValue = stripStringToFixedDecimals(value, 8);
                           handleWithdrawInputChange(strippedValue);
                         }}
                         value={withdrawValue}
@@ -204,12 +242,12 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
               {connected && !isHashpackLoading ? (
                 <div className="d-grid mt-5">
                   {actionTab === ActionTab.Deposit ? (
-                    <Button disabled={formDisabled} onClick={handleDepositButtonClick}>
-                      {formDisabled ? disabledButtonText : 'DEPOSIT HBAR'}
+                    <Button loading={loadingButton} onClick={handleDepositButtonClick}>
+                      DEPOSIT HBAR
                     </Button>
                   ) : (
-                    <Button disabled={formDisabled} onClick={handleDepositButtonClick}>
-                      {formDisabled ? disabledButtonText : 'WITHDRAW HBAR'}
+                    <Button loading={loadingButton} onClick={handleWithdrawButtonClick}>
+                      WITHDRAW HBAR
                     </Button>
                   )}
                 </div>
@@ -289,7 +327,6 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
                       handleClaimInputChange(strippedValue);
                     }}
                     value={claimValue}
-                    name="amountOut"
                   />
                 }
                 buttonSelectorComponent={

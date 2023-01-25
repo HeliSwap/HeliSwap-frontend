@@ -60,7 +60,10 @@ export enum LOCKDROP_STATE {
 }
 
 export interface ILockdropData {
+  heliAmountRaw: string;
   heliAmount: string;
   hbarAmount: string;
+  hbarAmountRaw: string;
   lockedHbarAmount: string;
+  endTimestamp: number;
 }
