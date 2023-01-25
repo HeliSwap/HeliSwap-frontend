@@ -4,7 +4,7 @@ import { QueryHookOptions, useQuery } from '@apollo/client';
 import { GET_TOKEN_PRICE } from '../GraphQL/Queries';
 
 const useHistoricalTokenData = (tokenAddress: string, useQueryOptions: QueryHookOptions = {}) => {
-  const [tokenData, setTokenData] = useState<any>([]);
+  const [tokenData, setTokenData] = useState<any>();
   const { loading, data, error, refetch } = useQuery(GET_TOKEN_PRICE, {
     variables: { token: tokenAddress },
     ...useQueryOptions,
