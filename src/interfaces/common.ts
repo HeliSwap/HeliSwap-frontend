@@ -58,3 +58,9 @@ export enum LOCKDROP_STATE {
   DAY_7,
   FINISHED,
 }
+
+export interface ILockdropData {
+  heliAmount: string;
+  hbarAmount: string;
+  lockedHbarAmount: string;
+}

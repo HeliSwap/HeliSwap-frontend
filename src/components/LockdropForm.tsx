@@ -12,7 +12,7 @@ import IconToken from '../components/IconToken';
 import Button from '../components/Button';
 import Icon from '../components/Icon';
 
-import { LOCKDROP_STATE } from '../interfaces/common';
+import { LOCKDROP_STATE, ILockdropData } from '../interfaces/common';
 
 import { stripStringToFixedDecimals } from '../utils/numberUtils';
 import { getTokenBalance, NATIVE_TOKEN } from '../utils/tokenUtils';
@@ -24,9 +24,10 @@ enum ActionTab {
 
 interface ILockdropFormProps {
   currentState: LOCKDROP_STATE;
+  lockDropData: ILockdropData;
 }
 
-const LockdropForm = ({ currentState }: ILockdropFormProps) => {
+const LockdropForm = ({ currentState, lockDropData }: ILockdropFormProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
   const {
@@ -84,7 +85,7 @@ const LockdropForm = ({ currentState }: ILockdropFormProps) => {
   }, [userId, initialBallanceData]);
 
   return (
-    <div className="d-flex justify-content-center mt-8">
+    <div className="d-flex justify-content-center my-5 py-20 container-lockdrop">
       <div className="container-action">
         <div className="container-dark">
           {currentState < LOCKDROP_STATE.FINISHED ? (
@@ -141,7 +142,10 @@ const LockdropForm = ({ currentState }: ILockdropFormProps) => {
                     }
                   />
 
-                  <p className="text-numeric text-small mt-6">1 HELI = 1.00 HBAR</p>
+                  <p className="text-numeric text-small mt-6">
+                    1 HELI = {Number(lockDropData.hbarAmount) / Number(lockDropData.heliAmount)}{' '}
+                    HBAR
+                  </p>
 
                   <div className="mt-6 rounded border border-secondary justify-content-between">
                     <p className="text-small text-bold m-4">Estimate reward after the LockDrop:</p>
@@ -178,7 +182,7 @@ const LockdropForm = ({ currentState }: ILockdropFormProps) => {
                       connected && !isHashpackLoading ? (
                         <WalletBalance
                           insufficientBallance={getInsufficientToken() as boolean}
-                          walletBalance={hbarBalance}
+                          walletBalance={lockDropData.lockedHbarAmount}
                           onMaxButtonClick={(maxValue: string) => {
                             handleWithdrawInputChange(maxValue);
                           }}

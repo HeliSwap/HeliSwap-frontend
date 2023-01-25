@@ -1,14 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import numeral from 'numeral';
 
-import { LOCKDROP_STATE } from '../interfaces/common';
+import { GlobalContext } from '../providers/Global';
+
+import { LOCKDROP_STATE, ILockdropData } from '../interfaces/common';
+import { calculateLPTokens, formatStringETHtoPriceFormatted } from '../utils/numberUtils';
 
 interface ILockdropCounterProps {
   countdownEnd: number;
   currentState: LOCKDROP_STATE;
+  lockDropData: ILockdropData;
 }
 
-const LockdropCounter = ({ countdownEnd, currentState }: ILockdropCounterProps) => {
+const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdropCounterProps) => {
+  const contextValue = useContext(GlobalContext);
+  const { hbarPrice } = contextValue;
+
   const [isEnded, setIsEnded] = useState(false);
   const [countDown, setCountDown] = useState(countdownEnd - new Date().getTime());
 
@@ -24,7 +31,8 @@ const LockdropCounter = ({ countdownEnd, currentState }: ILockdropCounterProps) 
   const renderHELIDistribution = () => (
     <div>
       <h3 className="text-subheader text-bold">
-        <span className="text-numeric">{numeral(heliTokenDistribution).format('0,0.00')}</span> HELI
+        <span className="text-numeric">{numeral(lockDropData.heliAmount).format('0,0.00')}</span>{' '}
+        HELI
       </h3>
       <p className="text-micro text-secondary mt-2">
         Total HELI amount that is going to given to Lockdrop.
@@ -46,7 +54,11 @@ const LockdropCounter = ({ countdownEnd, currentState }: ILockdropCounterProps) 
   }, [countDown]);
 
   const notStarted = currentState === LOCKDROP_STATE.NOT_STARTED;
-  const heliTokenDistribution = 1_000_000;
+  const heliEstimatedPrice =
+    (Number(lockDropData.heliAmount) / Number(lockDropData.hbarAmount)) * hbarPrice;
+  const LPEstimatedTokens = calculateLPTokens(lockDropData.heliAmount, lockDropData.hbarAmount);
+
+  console.log('LPEstimatedTokens', LPEstimatedTokens);
 
   return (
     <div>
@@ -55,18 +67,17 @@ const LockdropCounter = ({ countdownEnd, currentState }: ILockdropCounterProps) 
       </h2>
       <div className="row mt-6 mt-lg-8">
         <div className="col-lg-3 offset-md-1 mt-lg-7">
-          {!notStarted ? (
-            <>
-              {renderHELIDistribution()}
-              <div className="mt-5 mt-lg-15">
-                <h3 className="text-subheader text-bold">
-                  <span className="text-numeric">465,000,000.00</span> HBAR
-                </h3>
-                <p className="text-micro text-secondary mt-2">Total liquidity added to Lockdrop.</p>
-                <hr />
-              </div>
-            </>
-          ) : null}
+          {renderHELIDistribution()}
+          <div className="mt-5 mt-lg-15">
+            <h3 className="text-subheader text-bold">
+              <span className="text-numeric">
+                {numeral(lockDropData.hbarAmount).format('0,0.00')}
+              </span>{' '}
+              HBAR
+            </h3>
+            <p className="text-micro text-secondary mt-2">Total liquidity added to Lockdrop.</p>
+            <hr />
+          </div>
         </div>
 
         <div className="col-lg-4 d-flex flex-column align-items-center">
@@ -77,19 +88,25 @@ const LockdropCounter = ({ countdownEnd, currentState }: ILockdropCounterProps) 
                 <div className="mt-3 d-flex justify-content-center">
                   <div className="mx-3">
                     <p className="text-numeric text-huge text-bold">
-                      {getCountdownReturnValues(countDown).days}
+                      {getCountdownReturnValues(countDown).days < 10
+                        ? `0${getCountdownReturnValues(countDown).days}`
+                        : getCountdownReturnValues(countDown).days}
                     </p>
                     <p className="text-micro text-secondary text-uppercase mt-2">days</p>
                   </div>
                   <div className="mx-3">
                     <p className="text-numeric text-huge text-bold">
-                      {getCountdownReturnValues(countDown).hours}
+                      {getCountdownReturnValues(countDown).hours < 10
+                        ? `0${getCountdownReturnValues(countDown).hours}`
+                        : getCountdownReturnValues(countDown).hours}
                     </p>
                     <p className="text-micro text-secondary text-uppercase mt-2">hours</p>
                   </div>
                   <div className="mx-3">
                     <p className="text-numeric text-huge text-bold">
-                      {getCountdownReturnValues(countDown).minutes}
+                      {getCountdownReturnValues(countDown).minutes < 10
+                        ? `0${getCountdownReturnValues(countDown).minutes}`
+                        : getCountdownReturnValues(countDown).minutes}
                     </p>
                     <p className="text-micro text-secondary text-uppercase mt-2">minutes</p>
                   </div>
@@ -107,42 +124,41 @@ const LockdropCounter = ({ countdownEnd, currentState }: ILockdropCounterProps) 
           </div>
 
           <div className="text-center mt-6 mt-lg-10">
-            {notStarted ? (
-              renderHELIDistribution()
-            ) : (
-              <>
-                <p className="text-micro text-secondary mb-2">Estimated HELI Price After Launch</p>
-                <h3 className="text-subheader text-bold">
-                  $<span className="text-numeric"> 0.25</span>
-                </h3>
-                <hr />
-              </>
-            )}
+            <p className="text-micro text-secondary mb-2">Estimated HELI Price After Launch</p>
+            <h3 className="text-subheader text-bold">
+              $
+              <span className="text-numeric">
+                {' '}
+                {Number(lockDropData.hbarAmount) > 0
+                  ? formatStringETHtoPriceFormatted(heliEstimatedPrice.toString(), 3)
+                  : '-'}
+              </span>
+            </h3>
+            <hr />
           </div>
         </div>
 
         <div className="col-lg-3 mt-lg-7">
-          {!notStarted ? (
-            <>
-              <div className="text-end">
-                <h3 className="text-subheader text-bold">
-                  <span className="text-numeric">123,000.00</span> HBAR
-                </h3>
-                <p className="text-micro text-secondary mt-2">My liquidity added to Lockdrop</p>
-                <hr />
-              </div>
+          <div className="text-end">
+            <h3 className="text-subheader text-bold">
+              <span className="text-numeric">
+                {numeral(lockDropData.lockedHbarAmount).format('0,0.00')}
+              </span>{' '}
+              HBAR
+            </h3>
+            <p className="text-micro text-secondary mt-2">My liquidity added to Lockdrop</p>
+            <hr />
+          </div>
 
-              <div className="text-end mt-5 mt-lg-15">
-                <h3 className="text-subheader text-bold">
-                  <span className="text-numeric">0.05%</span> LP TOKENS
-                </h3>
-                <p className="text-micro text-secondary mt-2">
-                  My estimated LP Tokens reward following current investment.
-                </p>
-                <hr />
-              </div>
-            </>
-          ) : null}
+          <div className="text-end mt-5 mt-lg-15">
+            <h3 className="text-subheader text-bold">
+              <span className="text-numeric">0.05%</span> LP TOKENS
+            </h3>
+            <p className="text-micro text-secondary mt-2">
+              My estimated LP Tokens reward following current investment.
+            </p>
+            <hr />
+          </div>
         </div>
       </div>
     </div>

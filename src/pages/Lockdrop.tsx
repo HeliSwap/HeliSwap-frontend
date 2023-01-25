@@ -4,22 +4,28 @@ import ExpandContent from '../components/ExpandContent';
 import LockdropCounter from '../components/LockdropCounter';
 import LockdropForm from '../components/LockdropForm';
 
-import { LOCKDROP_STATE } from '../interfaces/common';
+import { ILockdropData, LOCKDROP_STATE } from '../interfaces/common';
 
 const Lockdrop = () => {
   const countdownEnd = 1676548800000; //Thursday, 16 February 2023 12:00:00
   const [currentState, setCurrentState] = useState(LOCKDROP_STATE.NOT_STARTED);
+
+  const lockDropInitialData = {
+    heliAmountRaw: '100000000000',
+    heliAmount: '1000000',
+    hbarAmount: '0',
+    hbarAmountRaw: '0',
+    lockedHbarAmount: '0',
+  };
+
+  const [lockDropData, setLockDropData] = useState<ILockdropData>(lockDropInitialData);
 
   useEffect(() => {
     setCurrentState(LOCKDROP_STATE.NOT_STARTED);
   }, []);
 
   return (
-    <div
-      className={`container ${
-        currentState > LOCKDROP_STATE.NOT_STARTED ? 'container-lockdrop' : ''
-      } py-4 py-lg-7`}
-    >
+    <div className="container py-4 py-lg-7">
       <h1 className="text-display text-bold text-center">HELI LockDrop</h1>
 
       {currentState > LOCKDROP_STATE.NOT_STARTED ? (
@@ -65,16 +71,21 @@ const Lockdrop = () => {
         </a>
       </p>
 
-      {/* Deposit, Withdrtaw & Claim form */}
-      {currentState > LOCKDROP_STATE.NOT_STARTED ? (
-        <LockdropForm currentState={currentState} />
+      {/* Lockdrop stats */}
+      {lockDropData ? (
+        <LockdropCounter
+          lockDropData={lockDropData}
+          currentState={currentState}
+          countdownEnd={countdownEnd}
+        />
       ) : null}
+      {/* Lockdrop stats */}
 
       {/* Deposit, Withdrtaw & Claim form */}
-
-      {/* Lockdrop stats */}
-      <LockdropCounter currentState={currentState} countdownEnd={countdownEnd} />
-      {/* Lockdrop stats */}
+      {currentState >= LOCKDROP_STATE.NOT_STARTED && lockDropData ? (
+        <LockdropForm lockDropData={lockDropData} currentState={currentState} />
+      ) : null}
+      {/* Deposit, Withdrtaw & Claim form */}
 
       {/* How it works */}
       <h2 id="how-it-works" className="text-subheader text-bold text-center mt-7 mt-lg-20">
