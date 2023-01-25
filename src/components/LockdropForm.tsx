@@ -16,6 +16,7 @@ import { LOCKDROP_STATE, ILockdropData } from '../interfaces/common';
 
 import { stripStringToFixedDecimals } from '../utils/numberUtils';
 import { getTokenBalance, NATIVE_TOKEN } from '../utils/tokenUtils';
+import { getCountdownReturnValues } from '../utils/timeUtils';
 
 enum ActionTab {
   'Deposit',
@@ -25,9 +26,10 @@ enum ActionTab {
 interface ILockdropFormProps {
   currentState: LOCKDROP_STATE;
   lockDropData: ILockdropData;
+  countdownEnd: number;
 }
 
-const LockdropForm = ({ currentState, lockDropData }: ILockdropFormProps) => {
+const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFormProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
   const {
@@ -84,9 +86,25 @@ const LockdropForm = ({ currentState, lockDropData }: ILockdropFormProps) => {
     getHbarBalance();
   }, [userId, initialBallanceData]);
 
+  const renderHELIHBARRatio = () => (
+    <p className="text-numeric text-small mt-6">
+      1 HELI = {Number(lockDropData.hbarAmount) / Number(lockDropData.heliAmount)} HBAR
+    </p>
+  );
+
+  const timeLeft = countdownEnd - new Date().getTime();
+  const formDisabled = timeLeft > 0;
+  const disabledButtonText = `${getCountdownReturnValues(timeLeft).days.toString()} days left`;
+
   return (
-    <div className="d-flex justify-content-center my-5 py-20 container-lockdrop">
+    <div className="d-flex flex-column align-items-center py-20 container-lockdrop">
+      <h2 className="text-subheader text-bold text-center my-7 mt-lg-10">Deposit HBAR</h2>
       <div className="container-action">
+        <p className="text-small mb-5">
+          This is where you will be able to deposit and withdraw your HBAR. Simply pick between
+          “deposit” and “withdraw” and choose how many HBAR. The bottom shows you the estimated
+          amount of LP tokens you would receive if the lockdrop ended in that moment.
+        </p>
         <div className="container-dark">
           {currentState < LOCKDROP_STATE.FINISHED ? (
             <>
@@ -123,6 +141,7 @@ const LockdropForm = ({ currentState, lockDropData }: ILockdropFormProps) => {
                           handleDepositInputChange(strippedValue);
                         }}
                         value={depositValue}
+                        disabled={formDisabled}
                         name="amountOut"
                       />
                     }
@@ -134,25 +153,22 @@ const LockdropForm = ({ currentState, lockDropData }: ILockdropFormProps) => {
                         <WalletBalance
                           insufficientBallance={getInsufficientToken() as boolean}
                           walletBalance={hbarBalance}
-                          onMaxButtonClick={(maxValue: string) => {
-                            handleDepositInputChange(maxValue);
-                          }}
+                          // onMaxButtonClick={(maxValue: string) => {
+                          //   handleDepositInputChange(maxValue);
+                          // }}
                         />
                       ) : null
                     }
                   />
 
-                  <p className="text-numeric text-small mt-6">
-                    1 HELI = {Number(lockDropData.hbarAmount) / Number(lockDropData.heliAmount)}{' '}
-                    HBAR
-                  </p>
+                  {renderHELIHBARRatio()}
 
                   <div className="mt-6 rounded border border-secondary justify-content-between">
                     <p className="text-small text-bold m-4">Estimate reward after the LockDrop:</p>
                     <div className="d-flex justify-content-between align-items-center m-4">
                       <p className="text-small">LP Tokens</p>
                       <div className="d-flex align-items-center">
-                        <p className="text-numeric text-small me-3">1000</p>
+                        <p className="text-numeric text-small me-3">0</p>
                         <IconToken symbol="LP" />
                       </div>
                     </div>
@@ -191,16 +207,20 @@ const LockdropForm = ({ currentState, lockDropData }: ILockdropFormProps) => {
                     }
                   />
 
-                  <p className="text-numeric text-small mt-6">1 HELI = 1.00 HBAR</p>
+                  {renderHELIHBARRatio()}
                 </>
               )}
 
               {connected && !isHashpackLoading ? (
                 <div className="d-grid mt-5">
                   {actionTab === ActionTab.Deposit ? (
-                    <Button onClick={handleDepositButtonClick}>DEPOSIT HBAR</Button>
+                    <Button disabled={formDisabled} onClick={handleDepositButtonClick}>
+                      {formDisabled ? disabledButtonText : 'DEPOSIT HBAR'}
+                    </Button>
                   ) : (
-                    <Button onClick={handleDepositButtonClick}>WITHDRAW HBAR</Button>
+                    <Button disabled={formDisabled} onClick={handleDepositButtonClick}>
+                      {formDisabled ? disabledButtonText : 'WITHDRAW HBAR'}
+                    </Button>
                   )}
                 </div>
               ) : (

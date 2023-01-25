@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
 import numeral from 'numeral';
+import Tippy from '@tippyjs/react';
 
 import { GlobalContext } from '../providers/Global';
 
 import { LOCKDROP_STATE, ILockdropData } from '../interfaces/common';
 import { calculateLPTokens, formatStringETHtoPriceFormatted } from '../utils/numberUtils';
+import { getCountdownReturnValues, formatTimeNumber } from '../utils/timeUtils';
+import Icon from './Icon';
 
 interface ILockdropCounterProps {
   countdownEnd: number;
@@ -19,24 +22,22 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
   const [isEnded, setIsEnded] = useState(false);
   const [countDown, setCountDown] = useState(countdownEnd - new Date().getTime());
 
-  const getCountdownReturnValues = (countDown: number) => {
-    const days = Math.floor(countDown / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((countDown % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((countDown % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((countDown % (1000 * 60)) / 1000);
-
-    return { days, hours, minutes, seconds };
-  };
-
   const renderHELIDistribution = () => (
     <div>
       <h3 className="text-subheader text-bold">
         <span className="text-numeric">{numeral(lockDropData.heliAmount).format('0,0.00')}</span>{' '}
         HELI
       </h3>
-      <p className="text-micro text-secondary mt-2">
-        Total HELI amount that is going to given to Lockdrop.
-      </p>
+      <div className="d-flex align-items-center">
+        <p className="text-micro text-secondary mt-2">Total HELI amount distributed in Lockdrop</p>
+        <Tippy
+          content={`This is the amount that will be distributed to anyone who locks up HBAR in the lockdrop pool. We match your HBAR with HELI following your share of total contribution to create LP tokens.`}
+        >
+          <span className="ms-2">
+            <Icon size="small" color="gray" name="hint" />
+          </span>
+        </Tippy>
+      </div>
       <hr />
     </div>
   );
@@ -58,8 +59,6 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
     (Number(lockDropData.heliAmount) / Number(lockDropData.hbarAmount)) * hbarPrice;
   const LPEstimatedTokens = calculateLPTokens(lockDropData.heliAmount, lockDropData.hbarAmount);
 
-  console.log('LPEstimatedTokens', LPEstimatedTokens);
-
   return (
     <div>
       <h2 className="text-subheader text-center mt-7 mt-lg-20">
@@ -75,7 +74,18 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
               </span>{' '}
               HBAR
             </h3>
-            <p className="text-micro text-secondary mt-2">Total liquidity added to Lockdrop.</p>
+            <div className="d-flex align-items-center">
+              <p className="text-micro text-secondary mt-2">
+                Total HBAR deposited to the Lockdrop Pool
+              </p>
+              <Tippy
+                content={`This is the amount of HBAR that the community currently has locked into the HELI Lockdrop pool. Please be aware, that this number is not final as more users may deposit, or users may deposit more or withdraw their HBAR again. Please read below to understand the mechanism.`}
+              >
+                <span className="ms-2">
+                  <Icon size="small" color="gray" name="hint" />
+                </span>
+              </Tippy>
+            </div>
             <hr />
           </div>
         </div>
@@ -88,25 +98,19 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
                 <div className="mt-3 d-flex justify-content-center">
                   <div className="mx-3">
                     <p className="text-numeric text-huge text-bold">
-                      {getCountdownReturnValues(countDown).days < 10
-                        ? `0${getCountdownReturnValues(countDown).days}`
-                        : getCountdownReturnValues(countDown).days}
+                      {formatTimeNumber(getCountdownReturnValues(countDown).days)}
                     </p>
                     <p className="text-micro text-secondary text-uppercase mt-2">days</p>
                   </div>
                   <div className="mx-3">
                     <p className="text-numeric text-huge text-bold">
-                      {getCountdownReturnValues(countDown).hours < 10
-                        ? `0${getCountdownReturnValues(countDown).hours}`
-                        : getCountdownReturnValues(countDown).hours}
+                      {formatTimeNumber(getCountdownReturnValues(countDown).hours)}
                     </p>
                     <p className="text-micro text-secondary text-uppercase mt-2">hours</p>
                   </div>
                   <div className="mx-3">
                     <p className="text-numeric text-huge text-bold">
-                      {getCountdownReturnValues(countDown).minutes < 10
-                        ? `0${getCountdownReturnValues(countDown).minutes}`
-                        : getCountdownReturnValues(countDown).minutes}
+                      {formatTimeNumber(getCountdownReturnValues(countDown).minutes)}
                     </p>
                     <p className="text-micro text-secondary text-uppercase mt-2">minutes</p>
                   </div>
@@ -125,15 +129,24 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
 
           <div className="text-center mt-6 mt-lg-10">
             <p className="text-micro text-secondary mb-2">Estimated HELI Price After Launch</p>
-            <h3 className="text-subheader text-bold">
-              $
-              <span className="text-numeric">
-                {' '}
-                {Number(lockDropData.hbarAmount) > 0
-                  ? formatStringETHtoPriceFormatted(heliEstimatedPrice.toString(), 3)
-                  : '-'}
-              </span>
-            </h3>
+            <div className="d-flex justify-content-center align-items-center">
+              <h3 className="text-subheader text-bold">
+                $
+                <span className="text-numeric">
+                  {' '}
+                  {Number(lockDropData.hbarAmount) > 0
+                    ? formatStringETHtoPriceFormatted(heliEstimatedPrice.toString(), 3)
+                    : '-'}
+                </span>
+              </h3>
+              <Tippy
+                content={`After 7 days, the lockdrop closes and the LP tokens are created to build the initial liquidity. This is the HELI price in the moment of launch. It depends on the ratio of HBAR committed to Total HELI in the lock drop at the end of day 7.`}
+              >
+                <span className="ms-2">
+                  <Icon size="small" color="gray" name="hint" />
+                </span>
+              </Tippy>
+            </div>
             <hr />
           </div>
         </div>
@@ -146,17 +159,33 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
               </span>{' '}
               HBAR
             </h3>
-            <p className="text-micro text-secondary mt-2">My liquidity added to Lockdrop</p>
+            <div className="d-flex justify-content-end align-items-center">
+              <p className="text-micro text-secondary mt-2">My liquidity added to Lockdrop</p>
+              <Tippy
+                content={`This is how many HBAR you have deposited into the pool in total. You may deposit more or withdraw a portion of it. Only commit an amount that you are comfortable with. For more information read below.`}
+              >
+                <span className="ms-2">
+                  <Icon size="small" color="gray" name="hint" />
+                </span>
+              </Tippy>
+            </div>
             <hr />
           </div>
 
           <div className="text-end mt-5 mt-lg-15">
             <h3 className="text-subheader text-bold">
-              <span className="text-numeric">0.05%</span> LP TOKENS
+              <span className="text-numeric">0.00</span> LP TOKENS
             </h3>
-            <p className="text-micro text-secondary mt-2">
-              My estimated LP Tokens reward following current investment.
-            </p>
+            <div className="d-flex justify-content-end align-items-center">
+              <p className="text-micro text-secondary mt-2">My estimated LP Token allocation</p>
+              <Tippy
+                content={`This is an estimate based on your current deposit compared to the total HBAR that was deposited into the pool. It may change depending on either of these metrics increasing or decreasing.`}
+              >
+                <span className="ms-2">
+                  <Icon size="small" color="gray" name="hint" />
+                </span>
+              </Tippy>
+            </div>
             <hr />
           </div>
         </div>
