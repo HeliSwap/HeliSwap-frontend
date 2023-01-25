@@ -164,3 +164,17 @@ export const randomIntFromInterval = (min: number, max: number): number => {
   // min and max included
   return Math.floor(Math.random() * (max - min + 1) + min);
 };
+
+export const calculateLPTokens = (
+  token0Amount: string,
+  token1Amount: string,
+  token0Decimals: number = 8,
+  token1Decimals: number = 8,
+): string => {
+  const token0AmountBN = formatStringToBigNumberWei(token0Amount, token0Decimals);
+  const token1AmountBN = formatStringToBigNumberWei(token1Amount, token1Decimals);
+
+  const amountLP = token0AmountBN.times(token1AmountBN).sqrt().toString();
+
+  return amountLP;
+};

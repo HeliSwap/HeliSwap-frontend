@@ -44,6 +44,7 @@ import {
   checkAllowanceERC20,
 } from '../utils/tokenUtils';
 import {
+  calculateLPTokens,
   formatStringETHtoPriceFormatted,
   formatStringToBigNumberEthersWei,
   formatStringToBigNumberWei,
@@ -700,7 +701,10 @@ const Create = () => {
 
     //Calculating the pool share using one of the pool's provision tokens as no info for the LP token is available
     const { token0Amount, token1Amount, token0 } = selectedPoolData;
-    const { tokenAAmount, tokenAId, tokenADecimals } = createPairData;
+    const { tokenAAmount, tokenAId, tokenADecimals, tokenBDecimals } = createPairData;
+
+    const lptokens = calculateLPTokens(token0Amount, token1Amount, tokenADecimals, tokenBDecimals);
+    console.log('lptokens', lptokens);
 
     const token0Id =
       provideNative && !tokenAId ? (process.env.REACT_APP_WHBAR_ADDRESS as string) : tokenAId;
