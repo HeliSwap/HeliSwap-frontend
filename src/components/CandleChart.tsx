@@ -35,6 +35,10 @@ const CandleChart = ({ chartData }: LineChartProps) => {
     }
   }, [chartCreated, chartRef]);
 
+  useEffect(() => {
+    setValue(formattedCandleData[formattedCandleData.length - 1].open);
+  }, [formattedCandleData]);
+
   // add event listener for resize
   const isClient = typeof window === 'object';
   useEffect(() => {
@@ -133,7 +137,7 @@ const CandleChart = ({ chartData }: LineChartProps) => {
             (param && param.point && param.point.y > DEFAULT_HEIGHT))
         ) {
           // reset values
-          setValue && setValue(undefined);
+          setValue && setValue(formattedCandleData[formattedCandleData.length - 1].close);
           setLabel && setLabel(undefined);
         } else if (series && param) {
           const timestamp = param.time as number;
@@ -147,7 +151,7 @@ const CandleChart = ({ chartData }: LineChartProps) => {
   }, [chartCreated, formattedCandleData]);
 
   return (
-    <div style={{ minHeight: DEFAULT_HEIGHT }}>
+    <div>
       {label ? (
         <p className="text-small">{dayjs(label).format('MMM D, YYYY')}</p>
       ) : (
