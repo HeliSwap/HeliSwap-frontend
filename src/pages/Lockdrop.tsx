@@ -34,9 +34,7 @@ const Lockdrop = () => {
           <span className="text-numeric">{numeral(lockDropData.heliAmount).format('0,0.00')}</span>{' '}
           HELI
         </h3>
-        <p className="text-micro text-secondary mt-2">
-          Total HELI amount that is going to given to Lockdrop.
-        </p>
+        <p className="text-micro text-secondary mt-2">Total HELI amount distributed in Lockdrop</p>
       </div>
 
       {currentState > LOCKDROP_STATE.NOT_STARTED ? (

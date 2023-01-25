@@ -88,6 +88,11 @@ const LockdropForm = ({ currentState, lockDropData }: ILockdropFormProps) => {
     <div className="d-flex flex-column align-items-center py-20 container-lockdrop">
       <h2 className="text-subheader text-bold text-center my-7 mt-lg-10">Deposit HBAR</h2>
       <div className="container-action">
+        <p className="text-small mb-5">
+          This is where you will be able to deposit and withdraw your HBAR. Simply pick between
+          “deposit” and “withdraw” and choose how many HBAR. The bottom shows you the estimated
+          amount of LP tokens you would receive if the lockdrop ended in that moment.
+        </p>
         <div className="container-dark">
           {currentState < LOCKDROP_STATE.FINISHED ? (
             <>

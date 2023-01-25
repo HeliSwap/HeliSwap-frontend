@@ -37,10 +37,10 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
         HELI
       </h3>
       <div className="d-flex align-items-center">
-        <p className="text-micro text-secondary mt-2">
-          Total HELI amount that is going to given to Lockdrop.
-        </p>
-        <Tippy content={``}>
+        <p className="text-micro text-secondary mt-2">Total HELI amount distributed in Lockdrop</p>
+        <Tippy
+          content={`This is the amount that will be distributed to anyone who locks up HBAR in the lockdrop pool. We match your HBAR with HELI following your share of total contribution to create LP tokens.`}
+        >
           <span className="ms-2">
             <Icon size="small" color="gray" name="hint" />
           </span>
@@ -83,8 +83,12 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
               HBAR
             </h3>
             <div className="d-flex align-items-center">
-              <p className="text-micro text-secondary mt-2">Total liquidity added to Lockdrop.</p>
-              <Tippy content={``}>
+              <p className="text-micro text-secondary mt-2">
+                Total HBAR deposited to the Lockdrop Pool
+              </p>
+              <Tippy
+                content={`This is the amount of HBAR that the community currently has locked into the HELI Lockdrop pool. Please be aware, that this number is not final as more users may deposit, or users may deposit more or withdraw their HBAR again. Please read below to understand the mechanism.`}
+              >
                 <span className="ms-2">
                   <Icon size="small" color="gray" name="hint" />
                 </span>
@@ -149,7 +153,9 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
                     : '-'}
                 </span>
               </h3>
-              <Tippy content={``}>
+              <Tippy
+                content={`After 7 days, the lockdrop closes and the LP tokens are created to build the initial liquidity. This is the HELI price in the moment of launch. It depends on the ratio of HBAR committed to Total HELI in the lock drop at the end of day 7.`}
+              >
                 <span className="ms-2">
                   <Icon size="small" color="gray" name="hint" />
                 </span>
@@ -169,7 +175,9 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
             </h3>
             <div className="d-flex justify-content-end align-items-center">
               <p className="text-micro text-secondary mt-2">My liquidity added to Lockdrop</p>
-              <Tippy content={``}>
+              <Tippy
+                content={`This is how many HBAR you have deposited into the pool in total. You may deposit more or withdraw a portion of it. Only commit an amount that you are comfortable with. For more information read below.`}
+              >
                 <span className="ms-2">
                   <Icon size="small" color="gray" name="hint" />
                 </span>
@@ -180,13 +188,13 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
 
           <div className="text-end mt-5 mt-lg-15">
             <h3 className="text-subheader text-bold">
-              <span className="text-numeric">0.00%</span> LP TOKENS
+              <span className="text-numeric">0.00</span> LP TOKENS
             </h3>
             <div className="d-flex justify-content-end align-items-center">
-              <p className="text-micro text-secondary mt-2">
-                My estimated LP Tokens reward following current investment.
-              </p>
-              <Tippy content={``}>
+              <p className="text-micro text-secondary mt-2">My estimated LP Token allocation</p>
+              <Tippy
+                content={`This is an estimate based on your current deposit compared to the total HBAR that was deposited into the pool. It may change depending on either of these metrics increasing or decreasing.`}
+              >
                 <span className="ms-2">
                   <Icon size="small" color="gray" name="hint" />
                 </span>
