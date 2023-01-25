@@ -171,7 +171,7 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
 
           <div className="text-end mt-5 mt-lg-15">
             <h3 className="text-subheader text-bold">
-              <span className="text-numeric">0.00</span> LP TOKENS
+              <span className="text-numeric">{LPEstimatedTokens}</span> LP TOKENS
             </h3>
             <div className="d-flex justify-content-end align-items-center">
               <p className="text-micro text-secondary mt-2">My estimated LP Token allocation</p>
