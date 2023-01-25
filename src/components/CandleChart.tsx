@@ -21,6 +21,7 @@ const CandleChart = ({ chartData }: LineChartProps) => {
   const [chartCreated, setChart] = useState<IChartApi | undefined>();
   const [value, setValue] = useState<number | undefined>();
   const [label, setLabel] = useState<string | undefined>();
+  const [initialLoad, setInitialLoad] = useState(true);
 
   const formattedCandleData = useMemo(() => {
     return getTransformedCandleData(chartData);
@@ -46,7 +47,11 @@ const CandleChart = ({ chartData }: LineChartProps) => {
 
   // if chart not instantiated in canvas, create it
   useEffect(() => {
-    if (!chartRef.current || chartCreated) return;
+    if (initialLoad) {
+      setInitialLoad(false);
+      return;
+    }
+    if (!chartRef.current || chartCreated || initialLoad) return;
     if (!chartCreated && chartData && !!chartRef?.current?.parentElement) {
       const chart = createChart(chartRef.current, {
         height: DEFAULT_HEIGHT,
@@ -101,7 +106,7 @@ const CandleChart = ({ chartData }: LineChartProps) => {
       chart.timeScale().fitContent();
       setChart(chart);
     }
-  }, [chartCreated, chartData]);
+  }, [chartCreated, chartData, initialLoad]);
 
   useEffect(() => {
     if (chartCreated && formattedCandleData) {
