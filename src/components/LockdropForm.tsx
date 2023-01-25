@@ -25,16 +25,10 @@ enum ActionTab {
 interface ILockdropFormProps {
   currentState: LOCKDROP_STATE;
   lockDropData: ILockdropData;
-  countdownEnd: number;
   getContractData: () => void;
 }
 
-const LockdropForm = ({
-  currentState,
-  lockDropData,
-  countdownEnd,
-  getContractData,
-}: ILockdropFormProps) => {
+const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdropFormProps) => {
   const lockDropContractAddress = process.env.REACT_APP_LOCKDROP_ADDRESS;
   const contextValue = useContext(GlobalContext);
   const { connection } = contextValue;
@@ -44,7 +38,7 @@ const LockdropForm = ({
   const initialBallanceData = useMemo(() => '0', []);
 
   const [actionTab, setActionTab] = useState(ActionTab.Deposit);
-  const [hbarBalance, setHbarBalance] = useState(initialBallanceData);
+  const [hbarBalance, setHbarBalance] = useState('initialBallanceData');
   const [depositValue, setDepositValue] = useState('0');
   const [withdrawValue, setWithdrawValue] = useState('0');
   const [claimValue, setClaimValue] = useState('0');
