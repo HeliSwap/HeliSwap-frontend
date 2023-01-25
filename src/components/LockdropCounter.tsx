@@ -6,6 +6,7 @@ import { GlobalContext } from '../providers/Global';
 
 import { LOCKDROP_STATE, ILockdropData } from '../interfaces/common';
 import { calculateLPTokens, formatStringETHtoPriceFormatted } from '../utils/numberUtils';
+import { getCountdownReturnValues, formatTimeNumber } from '../utils/timeUtils';
 import Icon from './Icon';
 
 interface ILockdropCounterProps {
@@ -20,15 +21,6 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
 
   const [isEnded, setIsEnded] = useState(false);
   const [countDown, setCountDown] = useState(countdownEnd - new Date().getTime());
-
-  const getCountdownReturnValues = (countDown: number) => {
-    const days = Math.floor(countDown / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((countDown % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((countDown % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((countDown % (1000 * 60)) / 1000);
-
-    return { days, hours, minutes, seconds };
-  };
 
   const renderHELIDistribution = () => (
     <div>
@@ -106,25 +98,19 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
                 <div className="mt-3 d-flex justify-content-center">
                   <div className="mx-3">
                     <p className="text-numeric text-huge text-bold">
-                      {getCountdownReturnValues(countDown).days < 10
-                        ? `0${getCountdownReturnValues(countDown).days}`
-                        : getCountdownReturnValues(countDown).days}
+                      {formatTimeNumber(getCountdownReturnValues(countDown).days)}
                     </p>
                     <p className="text-micro text-secondary text-uppercase mt-2">days</p>
                   </div>
                   <div className="mx-3">
                     <p className="text-numeric text-huge text-bold">
-                      {getCountdownReturnValues(countDown).hours < 10
-                        ? `0${getCountdownReturnValues(countDown).hours}`
-                        : getCountdownReturnValues(countDown).hours}
+                      {formatTimeNumber(getCountdownReturnValues(countDown).hours)}
                     </p>
                     <p className="text-micro text-secondary text-uppercase mt-2">hours</p>
                   </div>
                   <div className="mx-3">
                     <p className="text-numeric text-huge text-bold">
-                      {getCountdownReturnValues(countDown).minutes < 10
-                        ? `0${getCountdownReturnValues(countDown).minutes}`
-                        : getCountdownReturnValues(countDown).minutes}
+                      {formatTimeNumber(getCountdownReturnValues(countDown).minutes)}
                     </p>
                     <p className="text-micro text-secondary text-uppercase mt-2">minutes</p>
                   </div>

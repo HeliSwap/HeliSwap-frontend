@@ -92,7 +92,11 @@ const Lockdrop = () => {
 
       {/* Deposit, Withdrtaw & Claim form */}
       {currentState >= LOCKDROP_STATE.NOT_STARTED && lockDropData ? (
-        <LockdropForm lockDropData={lockDropData} currentState={currentState} />
+        <LockdropForm
+          countdownEnd={countdownEnd}
+          lockDropData={lockDropData}
+          currentState={currentState}
+        />
       ) : null}
       {/* Deposit, Withdrtaw & Claim form */}
 
