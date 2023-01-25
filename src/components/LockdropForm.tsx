@@ -85,7 +85,8 @@ const LockdropForm = ({ currentState, lockDropData }: ILockdropFormProps) => {
   }, [userId, initialBallanceData]);
 
   return (
-    <div className="d-flex justify-content-center my-5 py-20 container-lockdrop">
+    <div className="d-flex flex-column align-items-center py-20 container-lockdrop">
+      <h2 className="text-subheader text-bold text-center my-7 mt-lg-10">Deposit HBAR</h2>
       <div className="container-action">
         <div className="container-dark">
           {currentState < LOCKDROP_STATE.FINISHED ? (

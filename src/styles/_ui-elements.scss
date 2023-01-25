@@ -405,13 +405,13 @@
 
 .container-days {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(8, 1fr);
   column-gap: 4px;
 }
 
 .container-days-labels {
   display: grid;
-  grid-template-columns: 5fr 2fr;
+  grid-template-columns: 5fr 2fr 1fr;
   column-gap: 4px;
 }
 

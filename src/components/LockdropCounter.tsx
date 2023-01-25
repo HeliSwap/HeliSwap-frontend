@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import numeral from 'numeral';
+import Tippy from '@tippyjs/react';
 
 import { GlobalContext } from '../providers/Global';
 
 import { LOCKDROP_STATE, ILockdropData } from '../interfaces/common';
 import { calculateLPTokens, formatStringETHtoPriceFormatted } from '../utils/numberUtils';
+import Icon from './Icon';
 
 interface ILockdropCounterProps {
   countdownEnd: number;
@@ -34,9 +36,16 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
         <span className="text-numeric">{numeral(lockDropData.heliAmount).format('0,0.00')}</span>{' '}
         HELI
       </h3>
-      <p className="text-micro text-secondary mt-2">
-        Total HELI amount that is going to given to Lockdrop.
-      </p>
+      <div className="d-flex align-items-center">
+        <p className="text-micro text-secondary mt-2">
+          Total HELI amount that is going to given to Lockdrop.
+        </p>
+        <Tippy content={``}>
+          <span className="ms-2">
+            <Icon size="small" color="gray" name="hint" />
+          </span>
+        </Tippy>
+      </div>
       <hr />
     </div>
   );
@@ -58,8 +67,6 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
     (Number(lockDropData.heliAmount) / Number(lockDropData.hbarAmount)) * hbarPrice;
   const LPEstimatedTokens = calculateLPTokens(lockDropData.heliAmount, lockDropData.hbarAmount);
 
-  console.log('LPEstimatedTokens', LPEstimatedTokens);
-
   return (
     <div>
       <h2 className="text-subheader text-center mt-7 mt-lg-20">
@@ -75,7 +82,14 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
               </span>{' '}
               HBAR
             </h3>
-            <p className="text-micro text-secondary mt-2">Total liquidity added to Lockdrop.</p>
+            <div className="d-flex align-items-center">
+              <p className="text-micro text-secondary mt-2">Total liquidity added to Lockdrop.</p>
+              <Tippy content={``}>
+                <span className="ms-2">
+                  <Icon size="small" color="gray" name="hint" />
+                </span>
+              </Tippy>
+            </div>
             <hr />
           </div>
         </div>
@@ -125,15 +139,22 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
 
           <div className="text-center mt-6 mt-lg-10">
             <p className="text-micro text-secondary mb-2">Estimated HELI Price After Launch</p>
-            <h3 className="text-subheader text-bold">
-              $
-              <span className="text-numeric">
-                {' '}
-                {Number(lockDropData.hbarAmount) > 0
-                  ? formatStringETHtoPriceFormatted(heliEstimatedPrice.toString(), 3)
-                  : '-'}
-              </span>
-            </h3>
+            <div className="d-flex justify-content-center align-items-center">
+              <h3 className="text-subheader text-bold">
+                $
+                <span className="text-numeric">
+                  {' '}
+                  {Number(lockDropData.hbarAmount) > 0
+                    ? formatStringETHtoPriceFormatted(heliEstimatedPrice.toString(), 3)
+                    : '-'}
+                </span>
+              </h3>
+              <Tippy content={``}>
+                <span className="ms-2">
+                  <Icon size="small" color="gray" name="hint" />
+                </span>
+              </Tippy>
+            </div>
             <hr />
           </div>
         </div>
@@ -146,17 +167,31 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
               </span>{' '}
               HBAR
             </h3>
-            <p className="text-micro text-secondary mt-2">My liquidity added to Lockdrop</p>
+            <div className="d-flex justify-content-end align-items-center">
+              <p className="text-micro text-secondary mt-2">My liquidity added to Lockdrop</p>
+              <Tippy content={``}>
+                <span className="ms-2">
+                  <Icon size="small" color="gray" name="hint" />
+                </span>
+              </Tippy>
+            </div>
             <hr />
           </div>
 
           <div className="text-end mt-5 mt-lg-15">
             <h3 className="text-subheader text-bold">
-              <span className="text-numeric">0.05%</span> LP TOKENS
+              <span className="text-numeric">0.00%</span> LP TOKENS
             </h3>
-            <p className="text-micro text-secondary mt-2">
-              My estimated LP Tokens reward following current investment.
-            </p>
+            <div className="d-flex justify-content-end align-items-center">
+              <p className="text-micro text-secondary mt-2">
+                My estimated LP Tokens reward following current investment.
+              </p>
+              <Tippy content={``}>
+                <span className="ms-2">
+                  <Icon size="small" color="gray" name="hint" />
+                </span>
+              </Tippy>
+            </div>
             <hr />
           </div>
         </div>

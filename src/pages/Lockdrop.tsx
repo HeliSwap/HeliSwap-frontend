@@ -1,3 +1,4 @@
+import numeral from 'numeral';
 import React, { useState, useEffect } from 'react';
 
 import ExpandContent from '../components/ExpandContent';
@@ -27,6 +28,16 @@ const Lockdrop = () => {
   return (
     <div className="container py-4 py-lg-7">
       <h1 className="text-display text-bold text-center">HELI LockDrop</h1>
+
+      <div className="text-center mt-5">
+        <h3 className="text-large text-bold">
+          <span className="text-numeric">{numeral(lockDropData.heliAmount).format('0,0.00')}</span>{' '}
+          HELI
+        </h3>
+        <p className="text-micro text-secondary mt-2">
+          Total HELI amount that is going to given to Lockdrop.
+        </p>
+      </div>
 
       {currentState > LOCKDROP_STATE.NOT_STARTED ? (
         currentState < LOCKDROP_STATE.FINISHED ? (
@@ -91,8 +102,31 @@ const Lockdrop = () => {
       <h2 id="how-it-works" className="text-subheader text-bold text-center mt-7 mt-lg-20">
         How the LockDrop Works?
       </h2>
+
       <div className="row mt-6">
         <div className="col-lg-10 offset-lg-1">
+          <h2 className="text-main text-bold mt-6">Step 1: The Lockdrop Pool</h2>
+          <ul className="list-default mt-4">
+            <li className="text-small">
+              XXX,XXX,XXXX HELI tokens will be allocated to a so called "lockdrop pool".
+            </li>
+            <li className="text-small">
+              Participants (you) may then decide to lock up their HBAR while the lockdrop-deposit
+              window is open.
+            </li>
+            <li className="text-small">
+              The entire lockdrop process lasts for 7 days. During the first 5 days, anyone may
+              deposit or withdraw their HBAR at will and as many times as desired.
+            </li>
+            <li className="text-small">
+              On days 6 & 7, no more deposits will be accepted. You may withdraw up to 50% of your
+              investment on day 6 and a linearly decreasing amount on day 7 (50%-0%).
+            </li>
+            <li className="text-small">
+              Each participant can only withdraw once after day 5 has ended.
+            </li>
+          </ul>
+
           <div className="mt-6">
             <div className="container-days-labels">
               <p className="text-micro text-center">Day 1-5</p>
@@ -106,6 +140,7 @@ const Lockdrop = () => {
               <div className="container-day">5</div>
               <div className="container-day is-day-6">6</div>
               <div className="container-day is-day-7">7</div>
+              <div className="container-day">🚀</div>
             </div>
             <div className="container-days-labels mt-4">
               <p className="text-micro text-center">
@@ -127,6 +162,40 @@ const Lockdrop = () => {
               </div>
             </div>
           </div>
+
+          <h2 className="text-main text-bold mt-6">Step 2: Allocation and LP token creation</h2>
+          <ul className="list-default mt-4">
+            <li className="text-small">
+              Depending on your share of the overall HBAR contribution, we allocate a proprotional
+              amount of the XXX,XXX,XXX HELI to your position. You can see the overall amount on the
+              vesting page throughout the entire week.
+            </li>
+            <li className="text-small">
+              We then take the HBAR and HELI and turn them into an LP token that will be used on the
+              HBAR/HELI pool to bootstrap liquidity.
+            </li>
+            <li className="text-small">
+              Over the next 3 months, your LP tokens will vest linearly and you can retrieve them on
+              the same page as you originally deposited your Hbar. The amount of LP tokens you will
+              receive will be directly proportional to the amount of HBAR you have contributed in
+              relation to the total amount of HBAR contributed.
+            </li>
+          </ul>
+
+          <h2 className="text-main text-bold mt-6">Step 3: Claiming your vested LP Tokens</h2>
+          <ul className="list-default mt-4">
+            <li className="text-small">
+              During the 3 month linear vesting period, you may decide to vest and redeem portions
+              of your allocated LP tokens.
+            </li>
+            <li className="text-small">
+              Those redeemed LP tokens are yours and you have full ownership of them.
+            </li>
+            <li className="text-small">
+              To make it easy for you, you can also directly stake your claimed LP tokens into our
+              Yield Farm and benefit of the HBAR/HELI APRs (no financial advice).
+            </li>
+          </ul>
         </div>
       </div>
       {/* How it works */}
