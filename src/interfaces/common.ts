@@ -66,4 +66,8 @@ export interface ILockdropData {
   hbarAmountRaw: string;
   lockedHbarAmount: string;
   endTimestamp: number;
+  totalLP: string;
+  vestingTimeEnd: number;
+  claimedOf: string;
+  lastTwoDaysWithdrawals: boolean;
 }

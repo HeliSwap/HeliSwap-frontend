@@ -37,7 +37,11 @@ const Lockdrop = () => {
     hbarAmount: '0',
     hbarAmountRaw: '0',
     lockedHbarAmount: '0',
+    totalLP: '0',
+    claimedOf: '0',
     endTimestamp: 0,
+    vestingTimeEnd: 0,
+    lastTwoDaysWithdrawals: false,
   };
 
   const [lockDropData, setLockDropData] = useState<ILockdropData>(lockDropInitialData);
@@ -51,25 +55,21 @@ const Lockdrop = () => {
       lockDropContract.totalHbars(),
       lockDropContract.totalLp(),
       lockDropContract.totalHeliTokens(),
-      lockDropContract.providers(idToAddress(userId)),
     ];
 
     try {
-      const [
-        durationBN,
-        vestingEndTimeBN,
-        totalHbarsBN,
-        totalLpBN,
-        totalHeliTokensBN,
-        stakedTokensBN,
-      ] = await Promise.all(promisesArray);
+      const [durationBN, vestingEndTimeBN, totalHbarsBN, totalLpBN, totalHeliTokensBN] =
+        await Promise.all(promisesArray);
 
-      console.log('duration', durationBN.toString());
-      console.log('vestingEndTime', vestingEndTimeBN.toString());
-      console.log('totalHbars', totalHbarsBN.toString());
-      console.log('totalLp', totalLpBN.toString());
-      console.log('totalHeliTokens', totalHeliTokensBN.toString());
-      console.log('stakedTokensBN', stakedTokensBN.toString());
+      let stakedTokensBN = ethers.BigNumber.from(0);
+      let claimedOfBN = ethers.BigNumber.from(0);
+      let lastTwoDaysWithdrawals = false;
+
+      if (userId) {
+        stakedTokensBN = await lockDropContract.providers(idToAddress(userId));
+        claimedOfBN = await lockDropContract.claimedOf(idToAddress(userId));
+        lastTwoDaysWithdrawals = await lockDropContract.lastTwoDaysWithdrawals(idToAddress(userId));
+      }
 
       setLockDropData({
         heliAmountRaw: totalHeliTokensBN.toString(),
@@ -78,9 +78,14 @@ const Lockdrop = () => {
         hbarAmount: ethers.utils.formatUnits(totalHbarsBN, 8),
         lockedHbarAmount: ethers.utils.formatUnits(stakedTokensBN, 8),
         endTimestamp: Number(durationBN.toString()),
+        totalLP: ethers.utils.formatUnits(totalLpBN, 18),
+        vestingTimeEnd: Number(vestingEndTimeBN.toString()),
+        claimedOf: ethers.utils.formatUnits(claimedOfBN, 8),
+        lastTwoDaysWithdrawals,
       });
       setCountDownEnd(Number(durationBN.toString()) * 1000);
     } catch (e) {
+      console.error('Error on fetching contract data:', e);
     } finally {
       setLoadingContractData(false);
     }
@@ -92,8 +97,8 @@ const Lockdrop = () => {
   }, [lockDropInitialData]);
 
   useEffect(() => {
-    userId && lockDropContract && getContractData();
-  }, [lockDropContract, getContractData, userId]);
+    lockDropContract && getContractData();
+  }, [lockDropContract, getContractData]);
 
   return (
     <div className="container py-4 py-lg-7">

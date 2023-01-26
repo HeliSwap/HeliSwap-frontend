@@ -17,7 +17,7 @@
   },
   {
     "inputs": [],
-    "name": "LockDrop__DepositDurationExpired",
+    "name": "LockDrop__DurationExpired",
     "type": "error"
   },
   {
@@ -27,13 +27,39 @@
   },
   {
     "inputs": [],
-    "name": "LockDrop__MsgSenderNotABeneficiary",
+    "name": "LockDrop__MsgSenderNotADepositor",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "LockDrop__OnlyUpTo50PercentWithdrawalAllowed",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "LockDrop__TooHighPercentageToWithdraw",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "LockDrop__UserAlreadyWithdrawnInLastTwoDays",
     "type": "error"
   },
   {
     "inputs": [],
     "name": "LockDrop__ZeroMessageValue",
     "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "LockDrop__ZeroTokenValue",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [],
+    "name": "HbarHeliPoolCreated",
+    "type": "event"
   },
   {
     "anonymous": false,
@@ -249,6 +275,25 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "lastTwoDaysWithdrawals",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "owner",
     "outputs": [
@@ -392,10 +437,16 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
     "name": "withdraw",
     "outputs": [],
-    "stateMutability": "payable",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

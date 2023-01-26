@@ -180,5 +180,5 @@ export const calculateLPTokens = (
 
   const amountLP = token0AmountBN.times(token1AmountBN).sqrt().toString();
 
-  return amountLP;
+  return formatStringWeiToStringEther(amountLP);
 };
