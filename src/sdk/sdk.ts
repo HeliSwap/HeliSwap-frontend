@@ -497,6 +497,7 @@ class SDK {
     HBARAmount: string,
   ) {
     const maxGas = TRANSACTION_MAX_FEES.STAKE_LP_TOKEN;
+    const HBARAmountBN = formatStringToBigNumberWei(HBARAmount, 8);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
@@ -504,9 +505,8 @@ class SDK {
       //Set the gas for the contract call
       .setGas(maxGas)
       //Amount of HBAR we want to provide
-      .setPayableAmount(HBARAmount)
       //Set the contract function to call
-      .setFunction('withdraw', new ContractFunctionParameters());
+      .setFunction('withdraw', new ContractFunctionParameters().addUint256(HBARAmountBN));
 
     return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }

@@ -42,7 +42,10 @@ const LockdropStats = ({ lockDropData, currentState, countdownEnd }: ILockdropSt
 
   const heliEstimatedPrice =
     (Number(lockDropData.hbarAmount) / Number(lockDropData.heliAmount)) * hbarPrice;
-  const LPEstimatedTokens = calculateLPTokens(lockDropData.heliAmount, lockDropData.hbarAmount);
+  const LPEstimatedTokens = calculateLPTokens(
+    lockDropData.heliAmount,
+    lockDropData.lockedHbarAmount,
+  );
 
   return (
     <div>
