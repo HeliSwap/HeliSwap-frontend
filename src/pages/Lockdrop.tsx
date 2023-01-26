@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 
 import { GlobalContext } from '../providers/Global';
 
-import LockdropCounter from '../components/LockdropCounter';
+import LockdropStats from '../components/LockdropStats';
 import LockdropFAQ from '../components/LockdropFAQ';
 import LockdropForm from '../components/LockdropForm';
 import LockdropHowItWorks from '../components/LockdropHowItWorks';
@@ -162,7 +162,7 @@ const Lockdrop = () => {
 
           {/* Lockdrop stats */}
           {lockDropData ? (
-            <LockdropCounter
+            <LockdropStats
               lockDropData={lockDropData}
               currentState={currentState}
               countdownEnd={countdownEnd}
