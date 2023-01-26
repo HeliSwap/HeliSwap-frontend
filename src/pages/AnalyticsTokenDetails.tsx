@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import { AnalyticsViews } from '../interfaces/common';
 
@@ -18,20 +18,20 @@ import useHistoricalTokenData from '../hooks/useHistoricalTokenData';
 
 import { analyticsPageInitialCurrentView, useQueryOptions } from '../constants';
 
+enum ChartToShowEnum {
+  tvl,
+  volume,
+  price,
+}
+
 const AnalyticsTokenDetials = () => {
   const { tokenAddress } = useParams();
+  const navigate = useNavigate();
 
   const [currentView, setCurrentView] = useState<AnalyticsViews>(analyticsPageInitialCurrentView);
   const [currentPrice, setCurrentPrice] = useState('');
-
-  enum ChartToShowEnum {
-    tvl,
-    volume,
-    price,
-  }
   const [chartToShow, setChartToShow] = useState<ChartToShowEnum>(ChartToShowEnum.price);
 
-  const navigate = useNavigate();
   const { tokenData, loadingTokenData } = useHistoricalTokenData(
     tokenAddress || '',
     useQueryOptions,
@@ -52,6 +52,7 @@ const AnalyticsTokenDetials = () => {
   const determineColorClass = (value: number) => {
     return value >= 0 ? 'text-success' : 'text-danger';
   };
+
   const renderChart = () => {
     if (currentPrice) {
       if (chartToShow === ChartToShowEnum.tvl) {
