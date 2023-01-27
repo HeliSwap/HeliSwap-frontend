@@ -48,7 +48,7 @@ const usePoolsByUser = (
     if (data) {
       const { getPoolsByUser } = data;
 
-      if (getPoolsByUser.length > 0) {
+      if (getPoolsByUser && getPoolsByUser.length > 0) {
         const poolsFormatted = getPoolsByUser.map((pool: IPoolData) => {
           const {
             token0Amount,
