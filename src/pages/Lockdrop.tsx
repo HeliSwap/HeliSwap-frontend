@@ -93,8 +93,7 @@ const Lockdrop = () => {
 
   useEffect(() => {
     setCurrentState(LOCKDROP_STATE.NOT_STARTED);
-    setLockDropData(lockDropInitialData);
-  }, [lockDropInitialData]);
+  }, []);
 
   useEffect(() => {
     lockDropContract && getContractData();
