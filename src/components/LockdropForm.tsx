@@ -31,7 +31,8 @@ interface ILockdropFormProps {
 const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdropFormProps) => {
   const lockDropContractAddress = process.env.REACT_APP_LOCKDROP_ADDRESS;
   const contextValue = useContext(GlobalContext);
-  const { connection } = contextValue;
+  const { connection, sdk } = contextValue;
+  const { hashconnectConnectorInstance } = connection;
   const { userId, connected, setShowConnectModal, isHashpackLoading } = connection;
 
   // State for token balances
