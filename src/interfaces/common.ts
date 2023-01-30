@@ -50,3 +50,17 @@ export interface IHistoricalData {
   time: string;
   volume: string;
 }
+
+export enum LOCKDROP_STATE {
+  NOT_STARTED,
+  DAY_1_5,
+  DAY_6,
+  DAY_7,
+  FINISHED,
+}
+
+export interface ILockdropData {
+  heliAmount: string;
+  hbarAmount: string;
+  lockedHbarAmount: string;
+}

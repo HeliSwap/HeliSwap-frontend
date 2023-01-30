@@ -25,5 +25,14 @@ export const timestampToDate = (UNIX_timestamp: number) => {
   return date;
 };
 
-const formatTimeNumber = (numberToFormat: number) =>
+export const formatTimeNumber = (numberToFormat: number) =>
   numberToFormat > 9 ? numberToFormat : `0${numberToFormat}`;
+
+export const getCountdownReturnValues = (countDown: number) => {
+  const days = Math.floor(countDown / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((countDown % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((countDown % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((countDown % (1000 * 60)) / 1000);
+
+  return { days, hours, minutes, seconds };
+};
