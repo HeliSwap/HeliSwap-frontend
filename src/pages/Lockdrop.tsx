@@ -14,7 +14,7 @@ const Lockdrop = () => {
 
   const lockDropInitialData = {
     heliAmountRaw: '100000000000',
-    heliAmount: '1000000',
+    heliAmount: '20000000',
     hbarAmount: '0',
     hbarAmountRaw: '0',
     lockedHbarAmount: '0',
@@ -30,13 +30,13 @@ const Lockdrop = () => {
     <div className="container py-4 py-lg-7">
       <h1 className="text-display text-bold text-center">HELI LockDrop</h1>
 
-      <div className="text-center mt-5">
+      {/* <div className="text-center mt-5">
         <h3 className="text-large text-bold">
           <span className="text-numeric">{numeral(lockDropData.heliAmount).format('0,0.00')}</span>{' '}
           HELI
         </h3>
         <p className="text-micro text-secondary mt-2">Total HELI amount distributed in Lockdrop</p>
-      </div>
+      </div> */}
 
       {currentState > LOCKDROP_STATE.NOT_STARTED ? (
         currentState < LOCKDROP_STATE.FINISHED ? (
@@ -65,10 +65,10 @@ const Lockdrop = () => {
         <div className="col-lg-6 offset-lg-3">
           <p className="text-small">
             A large amount of HELI is distributed to anyone who deposits their HBAR on the lock drop
-            page. We then merge the pre-announced amount of HELI (XXX,XXX,XXX) with the received
-            HBAR to create an HBAR/HELI Liquidity Pool. ALL LP tokens that are generated throughout
-            this process will be redistributed to participants and vest linearly over a 3 months
-            period. <br />
+            page. We then merge the pre-announced amount of HELI (20,000,000) with the received HBAR
+            to create an HBAR/HELI Liquidity Pool. ALL LP tokens that are generated throughout this
+            process will be redistributed to participants and vest linearly over a 3 months period.{' '}
+            <br />
             This mechanism helps HeliSwap to create a large initial HBAR/HELI pool with deep
             liquidity and allows for a community driven natural price discovery process. In a
             further step your already vested LP tokens can then be used to earn additional token
