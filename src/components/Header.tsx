@@ -1,4 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { hethers } from '@hashgraph/hethers';
 import { GlobalContext } from '../providers/Global';
 import { Md5 } from 'ts-md5/dist/md5';
@@ -67,40 +68,24 @@ const Header = () => {
     <div className="container-header with-message p-3 p-md-5">
       <div className="d-flex justify-content-end">
         <div className="d-flex align-items-center">
+          <div className="d-none d-md-block">
+            <Link className="d-flex align-items-center link" to="lockdrop">
+              <Icon name="heli" />
+              <span className="ms-3 text-small">Lockdrop</span>
+            </Link>
+          </div>
+          <span className="separator-header d-none d-md-block"></span>
+          <div className="me-5 d-none d-md-block">
+            <span className="text-small">
+              HBAR Price:{' '}
+              <span className="text-numeric">
+                ${formatStringETHtoPriceFormatted(hbarPrice.toString(), 5)}
+              </span>
+            </span>
+          </div>
+
           {connected && userId ? (
             <>
-              <div className="d-none d-md-block">
-                <a
-                  className="d-flex align-items-center link"
-                  target="_blank"
-                  rel="noreferrer"
-                  href="https://forms.gle/2pM7wEGKWAVy6qwP7"
-                >
-                  <Icon name="heli" />
-                  <span className="ms-3 text-small">Token Sale</span>
-                </a>
-              </div>
-              <span className="separator-header d-none d-md-block"></span>
-              <div className="d-none d-md-block">
-                <a
-                  className="d-flex align-items-center link"
-                  target="_blank"
-                  rel="noreferrer"
-                  href="https://app.hashport.network/"
-                >
-                  <Icon name="hashport" />
-                  <span className="ms-3 text-small">Hashport Bridge</span>
-                </a>
-              </div>
-              <span className="separator-header d-none d-md-block"></span>
-              <div className="me-5 d-none d-md-block">
-                <span className="text-small">
-                  HBAR Price:{' '}
-                  <span className="text-numeric">
-                    ${formatStringETHtoPriceFormatted(hbarPrice.toString(), 3)}
-                  </span>
-                </span>
-              </div>
               <div className="container-connected">
                 <div className="text-small">
                   <span className="text-numeric">{formatHBARStringToPrice(userBalance)}</span> HBAR

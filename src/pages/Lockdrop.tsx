@@ -49,21 +49,26 @@ const Lockdrop = () => {
         )
       ) : null}
 
+      {/* Lockdrop stats */}
+      {lockDropData ? (
+        <LockdropCounter
+          lockDropData={lockDropData}
+          currentState={currentState}
+          countdownEnd={countdownEnd}
+        />
+      ) : null}
+      {/* Lockdrop stats */}
+
       {/* About the lockdrop */}
       <h2 className="text-subheader text-bold text-center mt-7 mt-lg-10">About the LockDrop</h2>
       <div className="row mt-5">
-        <div className="col-lg-5 offset-lg-1">
+        <div className="col-lg-6 offset-lg-3">
           <p className="text-small">
             A large amount of HELI is distributed to anyone who deposits their HBAR on the lock drop
             page. We then merge the pre-announced amount of HELI (XXX,XXX,XXX) with the received
             HBAR to create an HBAR/HELI Liquidity Pool. ALL LP tokens that are generated throughout
             this process will be redistributed to participants and vest linearly over a 3 months
-            period.
-          </p>
-        </div>
-
-        <div className="col-lg-5 mt-4 mt-lg-0">
-          <p className="text-small">
+            period. <br />
             This mechanism helps HeliSwap to create a large initial HBAR/HELI pool with deep
             liquidity and allows for a community driven natural price discovery process. In a
             further step your already vested LP tokens can then be used to earn additional token
@@ -80,16 +85,6 @@ const Lockdrop = () => {
           How it works
         </a>
       </p>
-
-      {/* Lockdrop stats */}
-      {lockDropData ? (
-        <LockdropCounter
-          lockDropData={lockDropData}
-          currentState={currentState}
-          countdownEnd={countdownEnd}
-        />
-      ) : null}
-      {/* Lockdrop stats */}
 
       {/* Deposit, Withdrtaw & Claim form */}
       {currentState >= LOCKDROP_STATE.NOT_STARTED && lockDropData ? (

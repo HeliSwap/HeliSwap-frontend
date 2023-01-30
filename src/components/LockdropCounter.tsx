@@ -61,13 +61,10 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
 
   return (
     <div>
-      <h2 className="text-subheader text-center mt-7 mt-lg-20">
-        <span className="text-bold">HELI</span> Liquidity Bootstrap LockDrop
-      </h2>
       <div className="row mt-6 mt-lg-8">
         <div className="col-lg-3 offset-md-1 mt-lg-7">
-          {renderHELIDistribution()}
-          <div className="mt-5 mt-lg-15">
+          {/* {renderHELIDistribution()} */}
+          {/* <div className="mt-5 mt-lg-15">
             <h3 className="text-subheader text-bold">
               <span className="text-numeric">
                 {numeral(lockDropData.hbarAmount).format('0,0.00')}
@@ -87,7 +84,7 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
               </Tippy>
             </div>
             <hr />
-          </div>
+          </div> */}
         </div>
 
         <div className="col-lg-4 d-flex flex-column align-items-center">
@@ -152,7 +149,7 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
         </div>
 
         <div className="col-lg-3 mt-lg-7">
-          <div className="text-end">
+          {/* <div className="text-end">
             <h3 className="text-subheader text-bold">
               <span className="text-numeric">
                 {numeral(lockDropData.lockedHbarAmount).format('0,0.00')}
@@ -187,7 +184,7 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
               </Tippy>
             </div>
             <hr />
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
