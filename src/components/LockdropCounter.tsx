@@ -5,7 +5,7 @@ import Tippy from '@tippyjs/react';
 import { GlobalContext } from '../providers/Global';
 
 import { LOCKDROP_STATE, ILockdropData } from '../interfaces/common';
-import { calculateLPTokens, formatStringETHtoPriceFormatted } from '../utils/numberUtils';
+import { formatStringETHtoPriceFormatted } from '../utils/numberUtils';
 import { getCountdownReturnValues, formatTimeNumber } from '../utils/timeUtils';
 import Icon from './Icon';
 
@@ -57,7 +57,7 @@ const LockdropCounter = ({ countdownEnd, currentState, lockDropData }: ILockdrop
   const notStarted = currentState === LOCKDROP_STATE.NOT_STARTED;
   const heliEstimatedPrice =
     (Number(lockDropData.heliAmount) / Number(lockDropData.hbarAmount)) * hbarPrice;
-  const LPEstimatedTokens = calculateLPTokens(lockDropData.heliAmount, lockDropData.hbarAmount);
+  // const LPEstimatedTokens = calculateLPTokens(lockDropData.heliAmount, lockDropData.hbarAmount);
 
   return (
     <div>

@@ -1,5 +1,4 @@
-import numeral from 'numeral';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import LockdropCounter from '../components/LockdropCounter';
 import LockdropFAQ from '../components/LockdropFAQ';
@@ -12,19 +11,23 @@ const Lockdrop = () => {
   const countdownEnd = 1676548800000; //Thursday, 16 February 2023 12:00:00
   const [currentState, setCurrentState] = useState(LOCKDROP_STATE.NOT_STARTED);
 
-  const lockDropInitialData = {
-    heliAmountRaw: '100000000000',
-    heliAmount: '20000000',
-    hbarAmount: '0',
-    hbarAmountRaw: '0',
-    lockedHbarAmount: '0',
-  };
+  const lockDropInitialData = useMemo(
+    () => ({
+      heliAmountRaw: '100000000000',
+      heliAmount: '20000000',
+      hbarAmount: '0',
+      hbarAmountRaw: '0',
+      lockedHbarAmount: '0',
+    }),
+    [],
+  );
 
   const [lockDropData, setLockDropData] = useState<ILockdropData>(lockDropInitialData);
 
   useEffect(() => {
     setCurrentState(LOCKDROP_STATE.NOT_STARTED);
-  }, []);
+    setLockDropData(lockDropInitialData);
+  }, [lockDropInitialData]);
 
   return (
     <div className="container py-4 py-lg-7">

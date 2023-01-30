@@ -31,14 +31,8 @@ interface ILockdropFormProps {
 
 const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFormProps) => {
   const contextValue = useContext(GlobalContext);
-  const { connection, sdk } = contextValue;
-  const {
-    userId,
-    hashconnectConnectorInstance,
-    connected,
-    setShowConnectModal,
-    isHashpackLoading,
-  } = connection;
+  const { connection } = contextValue;
+  const { userId, connected, setShowConnectModal, isHashpackLoading } = connection;
 
   // State for token balances
   const initialBallanceData = useMemo(() => '0', []);
@@ -86,11 +80,11 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
     getHbarBalance();
   }, [userId, initialBallanceData]);
 
-  const renderHELIHBARRatio = () => (
-    <p className="text-numeric text-small mt-6">
-      1 HELI = {Number(lockDropData.hbarAmount) / Number(lockDropData.heliAmount)} HBAR
-    </p>
-  );
+  // const renderHELIHBARRatio = () => (
+  //   <p className="text-numeric text-small mt-6">
+  //     1 HELI = {Number(lockDropData.hbarAmount) / Number(lockDropData.heliAmount)} HBAR
+  //   </p>
+  // );
 
   const timeLeft = countdownEnd - new Date().getTime();
   const formDisabled = timeLeft > 0;
