@@ -28,7 +28,7 @@ const Lockdrop = () => {
 
   return (
     <div className="container py-4 py-lg-7">
-      <h1 className="text-display text-bold text-center">HELI LockDrop</h1>
+      <h1 className="text-display text-bold text-center">HELI Community Lockdrop</h1>
 
       {/* <div className="text-center mt-5">
         <h3 className="text-large text-bold">
