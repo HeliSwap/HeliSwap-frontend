@@ -12,7 +12,7 @@ const LockdropHowItWorks = () => {
           <h2 className="text-main text-bold mt-6">Step 1: The Lockdrop Pool</h2>
           <ul className="list-default mt-4">
             <li className="text-small">
-              XXX,XXX,XXXX HELI tokens will be allocated to a so called "lockdrop pool".
+              20,000,000 HELI tokens will be allocated to a so called "lockdrop pool".
             </li>
             <li className="text-small">
               Participants (you) may then decide to lock up their HBAR while the lockdrop-deposit
@@ -71,17 +71,17 @@ const LockdropHowItWorks = () => {
           <h2 className="text-main text-bold mt-6">Step 2: Allocation and LP token creation</h2>
           <ul className="list-default mt-4">
             <li className="text-small">
-              Depending on your share of the overall HBAR contribution, we allocate a proprotional
-              amount of the XXX,XXX,XXX HELI to your position. You can see the overall amount on the
+              Depending on your share of the overall HBAR contribution, we allocate a proportional
+              amount of the 20,000,000 HELI to your position. You can see the overall amount on the
               vesting page throughout the entire week.
             </li>
             <li className="text-small">
               We then take the HBAR and HELI and turn them into an LP token that will be used on the
-              HBAR/HELI pool to bootstrap liquidity.
+              HBAR/ HELI pool to bootstrap liquidity.
             </li>
             <li className="text-small">
               Over the next 3 months, your LP tokens will vest linearly and you can retrieve them on
-              the same page as you originally deposited your Hbar. The amount of LP tokens you will
+              the same page as you originally deposited your HBAR. The amount of LP tokens you will
               receive will be directly proportional to the amount of HBAR you have contributed in
               relation to the total amount of HBAR contributed.
             </li>
