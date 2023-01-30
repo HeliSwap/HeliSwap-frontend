@@ -161,9 +161,7 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
                     }
                   />
 
-                  {renderHELIHBARRatio()}
-
-                  <div className="mt-6 rounded border border-secondary justify-content-between">
+                  {/* <div className="mt-6 rounded border border-secondary justify-content-between">
                     <p className="text-small text-bold m-4">Estimate reward after the LockDrop:</p>
                     <div className="d-flex justify-content-between align-items-center m-4">
                       <p className="text-small">LP Tokens</p>
@@ -172,7 +170,7 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
                         <IconToken symbol="LP" />
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                 </>
               ) : (
                 <>
@@ -206,8 +204,6 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
                       ) : null
                     }
                   />
-
-                  {renderHELIHBARRatio()}
                 </>
               )}
 
