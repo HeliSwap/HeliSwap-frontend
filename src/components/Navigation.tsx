@@ -62,6 +62,17 @@ const Navigation = () => {
           </NavLink>
         );
       })}
+      <a
+        className="link-menu mt-md-4"
+        target="_blank"
+        rel="noreferrer"
+        href="https://app.hashport.network/"
+      >
+        <span className="icon-menu">
+          <Icon color="gray" name="hashport" />
+        </span>
+        <span className="ms-4 d-none d-xxxl-inline-block">Hashport Bridge</span>
+      </a>
     </div>
   );
 };
