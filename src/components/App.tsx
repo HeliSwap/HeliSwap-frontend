@@ -15,6 +15,7 @@ import FarmDetails from '../pages/FarmDetails';
 import Analytics from '../pages/Analytics';
 import AnalyticsPoolDetials from '../pages/AnalyticsPoolDetials';
 import Lockdrop from '../pages/Lockdrop';
+import Claimdrop from '../pages/Claimdrop';
 
 import Header from './Header';
 import Footer from './Footer';
@@ -51,6 +52,7 @@ function App() {
                         path="analytics/pool/:poolAddress"
                         element={<AnalyticsPoolDetials />}
                       />
+                      <Route path="claimdrop" element={<Claimdrop />} />
                       <Route path="styleguide" element={<Styleguide />} />
                     </Routes>
                   </div>
