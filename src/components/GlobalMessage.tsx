@@ -1,19 +1,15 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const GlobalMessage = () => {
   return (
     <div className="container-global-message">
       <p className="text-main text-center">
-        $HELI Token is launching soon. Be an Early Participant and secure your own $HELI at a great
-        discount!{' '}
-        <a
-          className="link-white"
-          href="https://forms.gle/2pM7wEGKWAVy6qwP7"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <span className="text-bold">Sign Up NOW!</span>
-        </a>
+        We are launching the $HELI token through a community focused LockDrop approach that rewards
+        our early supporters. Read More{' '}
+        <Link className="link-white" to="lockdrop">
+          <span className="text-bold">Read More</span>
+        </Link>
       </p>
     </div>
   );

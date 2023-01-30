@@ -3,6 +3,12 @@ import Icon from './Icon';
 
 const navigation = [
   {
+    link: '/lockdrop',
+    name: 'heli',
+    color: 'gray',
+    text: 'Lockdrop',
+  },
+  {
     link: '/',
     name: 'swap',
     color: 'gray',
