@@ -36,3 +36,35 @@ export const getCountdownReturnValues = (countDown: number) => {
 
   return { days, hours, minutes, seconds };
 };
+
+export const getMonthsFromDurationSeconds = (duration: number) => {
+  const returnObject = {
+    valueNumeric: 0,
+    valueString: '0 Months',
+  };
+
+  if (duration > 0) {
+    const months = Math.floor(duration / 30 / 24 / 3600);
+
+    returnObject.valueNumeric = months;
+    returnObject.valueString = `${months === 1 ? `${months} Month` : `${months} Months`}`;
+  }
+
+  return returnObject;
+};
+
+export const getDaysFromDurationMilliseconds = (duration: number) => {
+  const returnObject = {
+    valueNumeric: 0,
+    valueString: '0 Months',
+  };
+
+  if (duration > 0) {
+    const days = Math.floor(duration / 24 / 3600000);
+
+    returnObject.valueNumeric = days;
+    returnObject.valueString = `${days === 1 ? `${days} Day` : `${days} Days`}`;
+  }
+
+  return returnObject;
+};
