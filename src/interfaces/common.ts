@@ -97,8 +97,15 @@ export interface IDaysMapping {
 }
 
 export interface IClaimdropData {
-  startDate: string;
-  vestingDuration: string;
+  claimdropStart: {
+    date: string;
+    timestamp: number;
+  };
+  vestingDuration: {
+    valueNumericDays: number;
+    valueNumericMilliseconds: number;
+    valueString: string;
+  };
   claimPeriod: string;
   totalTokensAllocated: string;
   totalTokensClaimed: string;
