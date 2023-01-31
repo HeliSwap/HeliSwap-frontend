@@ -4,14 +4,16 @@ import { ethers } from 'ethers';
 
 import { GlobalContext } from '../providers/Global';
 
+import { ILockdropData, LOCKDROP_STATE } from '../interfaces/common';
+
 import LockdropStats from '../components/LockdropStats';
 import LockdropFAQ from '../components/LockdropFAQ';
 import LockdropForm from '../components/LockdropForm';
 import LockdropHowItWorks from '../components/LockdropHowItWorks';
 import Loader from '../components/Loader';
 
-import { ILockdropData, LOCKDROP_STATE } from '../interfaces/common';
 import { getProvider, idToAddress } from '../utils/tokenUtils';
+import { formatBigNumberToMilliseconds } from '../utils/numberUtils';
 
 const LockDropABI = require('../abi/LockDrop.json');
 
@@ -28,14 +30,12 @@ const Lockdrop = () => {
   }, []);
 
   const [countdownEnd, setCountDownEnd] = useState(0);
-  const [currentState, setCurrentState] = useState(LOCKDROP_STATE.NOT_STARTED);
+  const [currentState, setCurrentState] = useState(LOCKDROP_STATE.DAY_1_5);
   const [loadingContractData, setLoadingContractData] = useState(true);
 
-  const lockDropInitialData = {
-    heliAmountRaw: '0',
+  const lockDropInitialData: ILockdropData = {
     heliAmount: '0',
     hbarAmount: '0',
-    hbarAmountRaw: '0',
     lockedHbarAmount: '0',
     totalLP: '0',
     claimedOf: '0',
@@ -71,19 +71,40 @@ const Lockdrop = () => {
         lastTwoDaysWithdrawals = await lockDropContract.lastTwoDaysWithdrawals(idToAddress(userId));
       }
 
+      // Format data
+      const heliAmount = formatBNTokenToString(totalHeliTokensBN);
+      const hbarAmount = formatBNTokenToString(totalHbarsBN);
+      const lockedHbarAmount = formatBNTokenToString(stakedTokensBN);
+      const endTimestamp = formatBigNumberToMilliseconds(durationBN);
+      const totalLP = formatBNTokenToString(totalLpBN, 18);
+      const vestingTimeEnd = formatBigNumberToMilliseconds(vestingEndTimeBN);
+      const claimedOf = formatBNTokenToString(claimedOfBN);
+
+      // Determine state
+      const nowTimeStamp = Date.now();
+      const vesting = nowTimeStamp > endTimestamp && vestingTimeEnd === 0;
+      const end = vestingTimeEnd !== 0 ? nowTimeStamp > vestingTimeEnd : false;
+
+      if (vesting) {
+        setCurrentState(LOCKDROP_STATE.VESTING);
+      }
+
+      if (end) {
+        setCurrentState(LOCKDROP_STATE.END);
+      }
+
       setLockDropData({
-        heliAmountRaw: totalHeliTokensBN.toString(),
-        hbarAmountRaw: totalHbarsBN.toString(),
-        heliAmount: ethers.utils.formatUnits(totalHeliTokensBN, 8),
-        hbarAmount: ethers.utils.formatUnits(totalHbarsBN, 8),
-        lockedHbarAmount: ethers.utils.formatUnits(stakedTokensBN, 8),
-        endTimestamp: Number(durationBN.toString()),
-        totalLP: ethers.utils.formatUnits(totalLpBN, 18),
-        vestingTimeEnd: Number(vestingEndTimeBN.toString()),
-        claimedOf: ethers.utils.formatUnits(claimedOfBN, 8),
+        heliAmount,
+        hbarAmount,
+        lockedHbarAmount,
+        endTimestamp,
+        totalLP,
+        vestingTimeEnd,
+        claimedOf,
         lastTwoDaysWithdrawals,
       });
-      setCountDownEnd(Number(durationBN.toString()) * 1000);
+
+      setCountDownEnd(endTimestamp);
     } catch (e) {
       console.error('Error on fetching contract data:', e);
     } finally {
@@ -92,12 +113,11 @@ const Lockdrop = () => {
   }, [lockDropContract, userId]);
 
   useEffect(() => {
-    setCurrentState(LOCKDROP_STATE.NOT_STARTED);
-  }, []);
-
-  useEffect(() => {
     lockDropContract && getContractData();
   }, [lockDropContract, getContractData]);
+
+  const formatBNTokenToString = (numberToFormat: ethers.BigNumber, decimals = 8) =>
+    ethers.utils.formatUnits(numberToFormat, decimals);
 
   return (
     <div className="container py-4 py-lg-7">
@@ -121,16 +141,14 @@ const Lockdrop = () => {
             </p>
           </div>
 
-          {currentState > LOCKDROP_STATE.NOT_STARTED ? (
-            currentState < LOCKDROP_STATE.FINISHED ? (
-              <p className="text-main text-center mt-4">
-                Select how much <span className="text-bold">HBAR</span> you want to deposit in the
-                LockDrop Pool.
-              </p>
-            ) : (
-              <p className="text-main text-center mt-4">Locking period has ended.</p>
-            )
-          ) : null}
+          {currentState < LOCKDROP_STATE.VESTING ? (
+            <p className="text-main text-center mt-4">
+              Select how much <span className="text-bold">HBAR</span> you want to deposit in the
+              LockDrop Pool.
+            </p>
+          ) : (
+            <p className="text-main text-center mt-4">Locking period has ended.</p>
+          )}
 
           {/* About the lockdrop */}
           <h2 className="text-subheader text-bold text-center mt-7 mt-lg-10">About the LockDrop</h2>
@@ -170,7 +188,7 @@ const Lockdrop = () => {
           {/* Lockdrop stats */}
 
           {/* Deposit, Withdrtaw & Claim form */}
-          {currentState >= LOCKDROP_STATE.NOT_STARTED && lockDropData ? (
+          {lockDropData ? (
             <LockdropForm
               getContractData={getContractData}
               lockDropData={lockDropData}

@@ -8,7 +8,7 @@ interface ILockdropCounterProps {
   currentState: LOCKDROP_STATE;
 }
 
-const LockdropCounter = ({ countdownEnd, currentState }: ILockdropCounterProps) => {
+const LockdropCounter = ({ countdownEnd }: ILockdropCounterProps) => {
   const [isEnded, setIsEnded] = useState(false);
   const [countDown, setCountDown] = useState(countdownEnd - new Date().getTime());
 
@@ -24,13 +24,11 @@ const LockdropCounter = ({ countdownEnd, currentState }: ILockdropCounterProps) 
     countDown <= 0 && setIsEnded(true);
   }, [countDown]);
 
-  const notStarted = currentState === LOCKDROP_STATE.NOT_STARTED;
-
   return (
     <div className="container-lockdrop-progress">
       {!isEnded ? (
         <div className="text-center">
-          <p className="text-micro text-bold">{notStarted ? 'STARTS IN' : 'ENDS IN'}</p>
+          <p className="text-micro text-bold">ENDS IN</p>
           <div className="mt-3 d-flex justify-content-center">
             <div className="mx-3">
               <p className="text-numeric text-huge text-bold">

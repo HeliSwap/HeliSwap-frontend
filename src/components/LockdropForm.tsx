@@ -119,11 +119,11 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
     getHbarBalance();
   }, [userId, initialBallanceData]);
 
-  // const renderHELIHBARRatio = () => (
-  //   <p className="text-numeric text-small mt-6">
-  //     1 HELI = {Number(lockDropData.hbarAmount) / Number(lockDropData.heliAmount)} HBAR
-  //   </p>
-  // );
+  const renderHELIHBARRatio = () => (
+    <p className="text-numeric text-small mt-6">
+      1 HELI = {Number(lockDropData.hbarAmount) / Number(lockDropData.heliAmount)} HBAR
+    </p>
+  );
 
   return (
     <div className="d-flex flex-column align-items-center py-20 container-lockdrop">
@@ -135,7 +135,7 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
           amount of LP tokens you would receive if the lockdrop ended in that moment.
         </p>
         <div className="container-dark">
-          {currentState < LOCKDROP_STATE.FINISHED ? (
+          {currentState >= LOCKDROP_STATE.DAY_1_5 && currentState < LOCKDROP_STATE.VESTING ? (
             <>
               <div className="d-flex mb-5">
                 <span
@@ -188,7 +188,7 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
                     }
                   />
 
-                  {/* <div className="mt-6 rounded border border-secondary justify-content-between">
+                  <div className="mt-6 rounded border border-secondary justify-content-between">
                     <p className="text-small text-bold m-4">Estimate reward after the LockDrop:</p>
                     <div className="d-flex justify-content-between align-items-center m-4">
                       <p className="text-small">LP Tokens</p>
@@ -197,7 +197,7 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
                         <IconToken symbol="LP" />
                       </div>
                     </div>
-                  </div> */}
+                  </div>
                 </>
               ) : (
                 <>
@@ -234,6 +234,8 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
                 </>
               )}
 
+              {renderHELIHBARRatio()}
+
               {connected && !isHashpackLoading ? (
                 <div className="d-grid mt-5">
                   {actionTab === ActionTab.Deposit ? (
@@ -254,7 +256,9 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
                 </div>
               )}
             </>
-          ) : (
+          ) : null}
+
+          {currentState >= LOCKDROP_STATE.VESTING && currentState < LOCKDROP_STATE.END ? (
             <>
               <p className="text-small text-bold mb-3">Liquidity provied to Lockdrop</p>
 
@@ -359,7 +363,7 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
                 </div>
               )}
             </>
-          )}
+          ) : null}
         </div>
       </div>
     </div>

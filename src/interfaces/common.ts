@@ -52,18 +52,16 @@ export interface IHistoricalData {
 }
 
 export enum LOCKDROP_STATE {
-  NOT_STARTED,
   DAY_1_5,
   DAY_6,
   DAY_7,
-  FINISHED,
+  VESTING,
+  END,
 }
 
 export interface ILockdropData {
-  heliAmountRaw: string;
   heliAmount: string;
   hbarAmount: string;
-  hbarAmountRaw: string;
   lockedHbarAmount: string;
   endTimestamp: number;
   totalLP: string;
