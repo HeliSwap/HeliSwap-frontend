@@ -1,6 +1,7 @@
 import { useMemo, useEffect, useContext, useCallback, useState } from 'react';
 import Tippy from '@tippyjs/react';
 import { ethers } from 'ethers';
+import numeral from 'numeral';
 
 import { GlobalContext } from '../providers/Global';
 
@@ -15,6 +16,11 @@ import { IClaimdropData } from '../interfaces/common';
 
 // TODO: needs to be changed with the claim drop ABI
 import ClaimDropABI from '../abi/LockDrop.json';
+import {
+  getDaysFromDurationSeconds,
+  getMonthsFromDurationSeconds,
+  timestampToDate,
+} from '../utils/timeUtils';
 
 const ClaimDrop = () => {
   const contextValue = useContext(GlobalContext);
@@ -38,18 +44,45 @@ const ClaimDrop = () => {
 
   const [loadingContractData, setLoadingContractData] = useState(true);
   const [claimdropData, setClaimdropData] = useState<IClaimdropData>(initialClaimdropData);
+  const [loadingClaim, setLoadingClaim] = useState(false);
+
+  const handleButtonClaimClick = () => {
+    setLoadingClaim(true);
+    setLoadingClaim(false);
+    getContractData();
+  };
 
   const getContractData = useCallback(async () => {
     setLoadingContractData(true);
     console.log('userId', userId);
 
+    const startDateBN = ethers.BigNumber.from(1677832528);
+    const startDate = timestampToDate(Number(startDateBN.toString()) * 1000);
+
+    const vestingDurationBN = ethers.BigNumber.from(2592000);
+    const vestingDuration = getMonthsFromDurationSeconds(Number(vestingDurationBN.toString()));
+
+    const claimPeriodBN = ethers.BigNumber.from(2592000 * 2);
+    const claimPeriod = getDaysFromDurationSeconds(Number(claimPeriodBN.toString()));
+
+    const totalTokensAllocatedBN = ethers.BigNumber.from(3_000_000_000_000_00);
+    const totalTokensAllocated = numeral(
+      ethers.utils.formatUnits(totalTokensAllocatedBN, 8),
+    ).format();
+
+    const totalTokensClaimedBN = ethers.BigNumber.from(3_000_000_000_000_00);
+    const totalTokensClaimed = numeral(ethers.utils.formatUnits(totalTokensClaimedBN, 8)).format();
+
+    const availableToClaimBN = ethers.BigNumber.from(1_000_000_000_000_00);
+    const availableToClaim = numeral(ethers.utils.formatUnits(availableToClaimBN, 8)).format();
+
     setClaimdropData({
-      startDate: '12 Dec 2022',
-      vestingDuration: '12 Months',
-      claimPeriod: '30 Days',
-      totalTokensAllocated: '2,000,000',
-      totalTokensClaimed: '2,000,000',
-      availableToClaim: '2,000,000.00',
+      startDate,
+      vestingDuration,
+      claimPeriod,
+      totalTokensAllocated,
+      totalTokensClaimed,
+      availableToClaim,
     });
 
     try {
@@ -195,7 +228,12 @@ const ClaimDrop = () => {
                       </div>
                     </div>
 
-                    <Button size="small" className="mt-5 mt-lg-0">
+                    <Button
+                      loading={loadingClaim}
+                      onClick={handleButtonClaimClick}
+                      size="small"
+                      className="mt-5 mt-lg-0"
+                    >
                       CLAIM
                     </Button>
                   </div>
