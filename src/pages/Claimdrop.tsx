@@ -6,6 +6,7 @@ import { GlobalContext } from '../providers/Global';
 
 import Button from '../components/Button';
 import Icon from '../components/Icon';
+import IconToken from '../components/IconToken';
 import Loader from '../components/Loader';
 
 import { getProvider } from '../utils/tokenUtils';
@@ -52,7 +53,7 @@ const ClaimDrop = () => {
         ) : (
           <>
             <div className="row">
-              <div className="col-md-8">
+              <div className="col-lg-7 offset-lg-1">
                 <h1 className="text-display text-bold mb-5">
                   Claim Drop - <span className="text-bold">OM Holders</span>
                 </h1>
@@ -63,134 +64,117 @@ const ClaimDrop = () => {
                 </p>
               </div>
 
-              <div className="col-md-4"></div>
+              <div className="col-lg-4"></div>
             </div>
 
             <div className="row mt-6">
-              <div className="col-md-8">
-                <div className="container-blue-neutral-800 d-flex justify-content-between rounded">
-                  <div className="p-5">
-                    <p className="text-small text-gray text-uppercase text-bold mb-3">
-                      total tokens allocated{' '}
-                      <Tippy content={`some text.`}>
-                        <span className="ms-2">
-                          <Icon name="hint" size="small" color="gray" />
-                        </span>
-                      </Tippy>
-                    </p>
-                    <div className="text-subheader text-bold d-flex">
-                      <div className="w-28 h-28">
-                        <Icon name="heli" size="small" color="white" />
+              <div className="col-lg-7 offset-lg-1">
+                <div className="container-blue-neutral-900 p-5 rounded">
+                  <div className="container-border-rounded-bn-500">
+                    <div className="row align-items-center">
+                      <div className="col-lg-5">
+                        <p className="text-small text-secondary">Start date</p>
                       </div>
-                      <div>2,000,000</div>
-                    </div>
-                  </div>
-                  <div className="p-5">
-                    <p className="text-small text-gray text-uppercase text-bold mb-3">
-                      total claimed{' '}
-                      <Tippy content={`some text.`}>
-                        <span className="ms-2">
-                          <Icon name="hint" size="small" color="gray" />
-                        </span>
-                      </Tippy>
-                    </p>
-                    <div className="text-subheader text-bold d-flex">
-                      <div className="w-28 h-28">
-                        <Icon name="heli" size="small" color="white" />
-                      </div>
-                      <div>346,154.3383</div>
-                    </div>
-                  </div>
-                  <div className="p-5">
-                    <p className="text-small text-gray text-uppercase text-bold mb-3">
-                      left to claim{' '}
-                      <Tippy content={`some text.`}>
-                        <span className="ms-2">
-                          <Icon name="hint" size="small" color="gray" />
-                        </span>
-                      </Tippy>
-                    </p>
-                    <div className="text-subheader text-bold d-flex">
-                      <div className="w-28 h-28">
-                        <Icon name="heli" size="small" color="white" />
-                      </div>
-                      <div>42,645.6617</div>
-                    </div>
-                  </div>
-                </div>
 
-                <div className="container-blue-neutral-800 rounded mt-5">
-                  <div className="p-5">
-                    <p className="text-small text-gray text-uppercase text-bold mb-3">
-                      your total airdrop amount{' '}
-                      <Tippy content={`some text.`}>
-                        <span className="ms-2">
-                          <Icon name="hint" size="small" color="gray" />
-                        </span>
-                      </Tippy>
-                    </p>
-                    <div className="text-headline text-bold">2,000,000</div>
+                      <div className="col-lg-7 mt-2 mt-lg-0">
+                        <p className="text-subheader text-bold">12 Dec 2022</p>
+                      </div>
+                    </div>
+
+                    <div className="row align-items-center mt-4">
+                      <div className="col-lg-5">
+                        <p className="text-small text-secondary">Vesting Duration</p>
+                      </div>
+
+                      <div className="col-lg-7 mt-2 mt-lg-0">
+                        <p className="text-subheader text-bold">12 Months</p>
+                      </div>
+                    </div>
+
+                    <div className="row align-items-center mt-4">
+                      <div className="col-lg-5">
+                        <div className="d-flex align-items-center">
+                          <p className="text-small text-secondary">Claim Period</p>
+                          <Tippy content={`some text.`}>
+                            <span className="ms-2">
+                              <Icon name="hint" size="small" color="gray" />
+                            </span>
+                          </Tippy>
+                        </div>
+                      </div>
+
+                      <div className="col-lg-7 mt-2 mt-lg-0">
+                        <p className="text-subheader text-bold">30 Days</p>
+                      </div>
+                    </div>
+
+                    <hr />
+
+                    <div className="row align-items-center mt-4">
+                      <div className="col-lg-5">
+                        <div className="d-flex align-items-center">
+                          <p className="text-small text-secondary">Total Tokens Allocated</p>
+                          <Tippy content={`some text.`}>
+                            <span className="ms-2">
+                              <Icon name="hint" size="small" color="gray" />
+                            </span>
+                          </Tippy>
+                        </div>
+                      </div>
+
+                      <div className="col-lg-7 mt-2 mt-lg-0">
+                        <div className="d-flex align-items-center">
+                          <IconToken symbol="HELI" />
+                          <p className="text-subheader text-bold ms-3">2,000,000</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="row align-items-center mt-4">
+                      <div className="col-lg-5">
+                        <div className="d-flex align-items-center">
+                          <p className="text-small text-secondary">Total Tokens Claimed</p>
+                          <Tippy content={`some text.`}>
+                            <span className="ms-2">
+                              <Icon name="hint" size="small" color="gray" />
+                            </span>
+                          </Tippy>
+                        </div>
+                      </div>
+
+                      <div className="col-lg-7 mt-2 mt-lg-0">
+                        <div className="d-flex align-items-center">
+                          <IconToken symbol="HELI" />
+                          <p className="text-subheader text-bold ms-3">2,000,000</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="p-5">
-                    <p className="text-small text-gray text-uppercase text-bold mb-3">
-                      total airdropped{' '}
-                      <Tippy content={`some text.`}>
-                        <span className="ms-2">
-                          <Icon name="hint" size="small" color="gray" />
-                        </span>
-                      </Tippy>
-                    </p>
-                    <div className="text-subheader text-bold">2,000,000</div>
-                  </div>
-                  <div className="p-5">
-                    <p className="text-small text-gray text-uppercase text-bold mb-3">
-                      your bonus amount{' '}
-                      <Tippy content={`some text.`}>
-                        <span className="ms-2">
-                          <Icon name="hint" size="small" color="gray" />
-                        </span>
-                      </Tippy>
-                    </p>
-                    <div className="text-subheader text-bold">2,000,000</div>
+
+                  <div className="d-lg-flex justify-content-between align-items-center mt-7">
+                    <div>
+                      <div className="d-flex align-items-center">
+                        <p className="text-small text-secondary">Available to Claim</p>
+                        <Tippy content={`some text.`}>
+                          <span className="ms-2">
+                            <Icon name="hint" size="small" color="gray" />
+                          </span>
+                        </Tippy>
+                      </div>
+
+                      <div className="d-flex align-items-center mt-3">
+                        <IconToken symbol="HELI" />
+                        <p className="text-headline text-secondary-300 text-bold ms-3">2,000,000</p>
+                      </div>
+                    </div>
+
+                    <Button className="mt-5 mt-lg-0">Claim</Button>
                   </div>
                 </div>
               </div>
 
-              <div className="col-md-4">
-                <div className="container-blue-neutral-800 p-5 text-center">
-                  <p className="text-small text-gray text-uppercase text-bold mb-3">
-                    heli price per unit{' '}
-                    <Tippy content={`some text.`}>
-                      <span className="ms-2">
-                        <Icon name="hint" size="small" color="gray" />
-                      </span>
-                    </Tippy>
-                  </p>
-                  <div className="text-subheader text-bold">$0.25</div>
-                </div>
-
-                <div className="container-blue-neutral-800 p-5 text-center mt-5">
-                  <p className="text-small text-gray text-uppercase text-bold mb-3">week 26/26</p>
-                  <p className="text-small text-gray text-uppercase text-bold mb-3">
-                    available to claim now:
-                  </p>
-                  <div className="text-subheader text-bold d-flex">
-                    <div className="w-28 h-28">
-                      <Icon name="heli" size="small" color="white" />
-                    </div>
-                    <div>2,000,000</div>
-                  </div>
-                  <p className="text-small text-gray text-uppercase text-bold mb-3">your profit:</p>
-                  <div className="text-subheader text-bold d-flex">
-                    <div className="w-28 h-28">
-                      <Icon name="heli" size="small" color="white" />
-                    </div>
-                    <div>0</div>
-                  </div>
-                  <Button type="primary" size="default" className="mx-2" onClick={() => {}}>
-                    Claim
-                  </Button>
-                </div>
+              <div className="col-lg-4 mt-5 mt-lg-0">
+                <div className="container-blue-neutral-900 p-5 rounded height-100"></div>
               </div>
             </div>
           </>
