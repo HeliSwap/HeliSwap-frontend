@@ -37,14 +37,14 @@ export const getCountdownReturnValues = (countDown: number) => {
   return { days, hours, minutes, seconds };
 };
 
-export const getMonthsFromDurationSeconds = (duration: number) => {
+export const getMonthsFromDurationMilliseconds = (duration: number) => {
   const returnObject = {
     valueNumeric: 0,
     valueString: '0 Months',
   };
 
   if (duration > 0) {
-    const months = Math.floor(duration / 30 / 24 / 3600);
+    const months = Math.floor(duration / 30 / 24 / 3600000);
 
     returnObject.valueNumeric = months;
     returnObject.valueString = `${months === 1 ? `${months} Month` : `${months} Months`}`;
