@@ -11,6 +11,8 @@ import Loader from '../components/Loader';
 
 import { getProvider } from '../utils/tokenUtils';
 
+import { IClaimdropData } from '../interfaces/common';
+
 // TODO: needs to be changed with the claim drop ABI
 import ClaimDropABI from '../abi/LockDrop.json';
 
@@ -25,11 +27,30 @@ const ClaimDrop = () => {
     return new ethers.Contract(claimDropContractAddress as string, ClaimDropABI, provider);
   }, []);
 
+  const initialClaimdropData = {
+    startDate: '',
+    vestingDuration: '',
+    claimPeriod: '',
+    totalTokensAllocated: '',
+    totalTokensClaimed: '',
+    availableToClaim: '',
+  };
+
   const [loadingContractData, setLoadingContractData] = useState(true);
+  const [claimdropData, setClaimdropData] = useState<IClaimdropData>(initialClaimdropData);
 
   const getContractData = useCallback(async () => {
     setLoadingContractData(true);
     console.log('userId', userId);
+
+    setClaimdropData({
+      startDate: '12 Dec 2022',
+      vestingDuration: '12 Months',
+      claimPeriod: '30 Days',
+      totalTokensAllocated: '2,000,000',
+      totalTokensClaimed: '2,000,000',
+      availableToClaim: '2,000,000.00',
+    });
 
     try {
     } catch (e) {
@@ -54,7 +75,7 @@ const ClaimDrop = () => {
           <>
             <div className="row">
               <div className="col-lg-7 offset-lg-1">
-                <h1 className="text-display text-bold mb-5">
+                <h1 className="text-subheader mb-5">
                   Claim Drop - <span className="text-bold">OM Holders</span>
                 </h1>
                 <p className="text-main text-gray mt-5">
@@ -77,7 +98,7 @@ const ClaimDrop = () => {
                       </div>
 
                       <div className="col-lg-7 mt-2 mt-lg-0">
-                        <p className="text-subheader text-bold">12 Dec 2022</p>
+                        <p className="text-subheader text-bold">{claimdropData.startDate}</p>
                       </div>
                     </div>
 
@@ -87,7 +108,7 @@ const ClaimDrop = () => {
                       </div>
 
                       <div className="col-lg-7 mt-2 mt-lg-0">
-                        <p className="text-subheader text-bold">12 Months</p>
+                        <p className="text-subheader text-bold">{claimdropData.vestingDuration}</p>
                       </div>
                     </div>
 
@@ -104,7 +125,7 @@ const ClaimDrop = () => {
                       </div>
 
                       <div className="col-lg-7 mt-2 mt-lg-0">
-                        <p className="text-subheader text-bold">30 Days</p>
+                        <p className="text-subheader text-bold">{claimdropData.claimPeriod}</p>
                       </div>
                     </div>
 
@@ -125,7 +146,9 @@ const ClaimDrop = () => {
                       <div className="col-lg-7 mt-2 mt-lg-0">
                         <div className="d-flex align-items-center">
                           <IconToken symbol="HELI" />
-                          <p className="text-subheader text-bold ms-3">2,000,000</p>
+                          <p className="text-subheader text-bold ms-3">
+                            {claimdropData.totalTokensAllocated}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -145,7 +168,9 @@ const ClaimDrop = () => {
                       <div className="col-lg-7 mt-2 mt-lg-0">
                         <div className="d-flex align-items-center">
                           <IconToken symbol="HELI" />
-                          <p className="text-subheader text-bold ms-3">2,000,000</p>
+                          <p className="text-subheader text-bold ms-3">
+                            {claimdropData.totalTokensClaimed}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -164,11 +189,15 @@ const ClaimDrop = () => {
 
                       <div className="d-flex align-items-center mt-3">
                         <IconToken symbol="HELI" />
-                        <p className="text-headline text-secondary-300 text-bold ms-3">2,000,000</p>
+                        <p className="text-headline text-secondary-300 text-bold ms-3">
+                          {claimdropData.availableToClaim}
+                        </p>
                       </div>
                     </div>
 
-                    <Button className="mt-5 mt-lg-0">Claim</Button>
+                    <Button size="small" className="mt-5 mt-lg-0">
+                      CLAIM
+                    </Button>
                   </div>
                 </div>
               </div>

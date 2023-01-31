@@ -95,3 +95,12 @@ export interface IDaysMapping {
     [key: string]: string;
   };
 }
+
+export interface IClaimdropData {
+  startDate: string;
+  vestingDuration: string;
+  claimPeriod: string;
+  totalTokensAllocated: string;
+  totalTokensClaimed: string;
+  availableToClaim: string;
+}
