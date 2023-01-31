@@ -71,3 +71,12 @@ export interface ILockdropData {
   claimedOf: string;
   lastTwoDaysWithdrawals: boolean;
 }
+
+export interface IClaimdropData {
+  startDate: string;
+  vestingDuration: string;
+  claimPeriod: string;
+  totalTokensAllocated: string;
+  totalTokensClaimed: string;
+  availableToClaim: string;
+}
