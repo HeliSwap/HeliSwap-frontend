@@ -1,9 +1,13 @@
 import { useMemo, useEffect, useContext, useCallback, useState } from 'react';
+
 import Tippy from '@tippyjs/react';
-import { ethers } from 'ethers';
 import numeral from 'numeral';
 
+import { ethers } from 'ethers';
+
 import { GlobalContext } from '../providers/Global';
+
+import { IClaimdropData } from '../interfaces/common';
 
 import Button from '../components/Button';
 import Icon from '../components/Icon';
@@ -11,13 +15,18 @@ import IconToken from '../components/IconToken';
 import Loader from '../components/Loader';
 
 import { getProvider } from '../utils/tokenUtils';
-
-import { IClaimdropData } from '../interfaces/common';
+import { getDaysFromDurationMilliseconds, timestampToDate } from '../utils/timeUtils';
+import { formatBigNumberToMilliseconds } from '../utils/numberUtils';
 
 // TODO: needs to be changed with the claim drop ABI
 import ClaimDropABI from '../abi/LockDrop.json';
-import { getDaysFromDurationMilliseconds, timestampToDate } from '../utils/timeUtils';
-import { formatBigNumberToMilliseconds } from '../utils/numberUtils';
+
+enum CLAIMDROP_STATE {
+  NOT_STARTED,
+  VESTING,
+  POST_VESTING,
+  ENDED,
+}
 
 const ClaimDrop = () => {
   const contextValue = useContext(GlobalContext);
@@ -35,12 +44,16 @@ const ClaimDrop = () => {
       date: '',
       timestamp: 0,
     },
-    vestingDuration: {
+    vestingPeriod: {
       valueNumericDays: 0,
       valueNumericMilliseconds: 0,
       valueString: '',
     },
-    claimPeriod: '',
+    claimPeriod: {
+      valueNumericDays: 0,
+      valueNumericMilliseconds: 0,
+      valueString: '',
+    },
     totalTokensAllocated: '',
     totalTokensClaimed: '',
     availableToClaim: '',
@@ -48,6 +61,7 @@ const ClaimDrop = () => {
 
   const [loadingContractData, setLoadingContractData] = useState(true);
   const [claimdropData, setClaimdropData] = useState<IClaimdropData>(initialClaimdropData);
+  const [claimdropState, setClaimdropState] = useState(CLAIMDROP_STATE.NOT_STARTED);
   const [loadingClaim, setLoadingClaim] = useState(false);
 
   const handleButtonClaimClick = () => {
@@ -62,11 +76,11 @@ const ClaimDrop = () => {
 
     // Contract data
     const startDateBN = ethers.BigNumber.from(1673697600);
-    const vestingDurationBN = ethers.BigNumber.from(2592000); // 30 Days
+    const vestingPeriodBN = ethers.BigNumber.from(2592000); // 30 Days
     const claimPeriodBN = ethers.BigNumber.from(2592000 * 2);
     const totalTokensAllocatedBN = ethers.BigNumber.from(3_000_000_000_000_00);
     const totalTokensClaimedBN = ethers.BigNumber.from(2_000_000_000_000_00);
-    const availableToClaimBN = ethers.BigNumber.from(1_000_000_000_000_00);
+    const availableToClaimBN = ethers.BigNumber.from(0);
 
     // Prepare contract data
     const startTimestamp = formatBigNumberToMilliseconds(startDateBN);
@@ -75,18 +89,24 @@ const ClaimDrop = () => {
       timestamp: startTimestamp,
     };
 
-    const valueNumericMilliseconds = formatBigNumberToMilliseconds(vestingDurationBN);
-    const { valueString, valueNumeric: valueNumericDays } =
-      getDaysFromDurationMilliseconds(valueNumericMilliseconds);
-    const vestingDuration = {
-      valueString,
-      valueNumericDays,
-      valueNumericMilliseconds,
+    const vestingPeriodMilliseconds = formatBigNumberToMilliseconds(vestingPeriodBN);
+    const { valueString: vestingPeriodString, valueNumeric: vestingPeriodDays } =
+      getDaysFromDurationMilliseconds(vestingPeriodMilliseconds);
+
+    const vestingPeriod = {
+      valueString: vestingPeriodString,
+      valueNumericDays: vestingPeriodDays,
+      valueNumericMilliseconds: vestingPeriodMilliseconds,
     };
 
-    const claimPeriod = getDaysFromDurationMilliseconds(
-      formatBigNumberToMilliseconds(claimPeriodBN),
-    ).valueString;
+    const claimPeriodMilliseconds = formatBigNumberToMilliseconds(claimPeriodBN);
+    const { valueString: claimPeriodString, valueNumeric: claimPeriodDays } =
+      getDaysFromDurationMilliseconds(formatBigNumberToMilliseconds(claimPeriodBN));
+    const claimPeriod = {
+      valueString: claimPeriodString,
+      valueNumericDays: claimPeriodDays,
+      valueNumericMilliseconds: claimPeriodMilliseconds,
+    };
 
     const totalTokensAllocated = formatBNTokenToString(totalTokensAllocatedBN);
     const totalTokensClaimed = formatBNTokenToString(totalTokensClaimedBN);
@@ -94,12 +114,38 @@ const ClaimDrop = () => {
 
     setClaimdropData({
       claimdropStart,
-      vestingDuration,
+      vestingPeriod,
       claimPeriod,
       totalTokensAllocated,
       totalTokensClaimed,
       availableToClaim,
     });
+
+    // Determine state
+    const nowTimeStamp = Date.now();
+    const vestingEndTimeStamp = claimdropStart.timestamp + vestingPeriod.valueNumericMilliseconds;
+    const claimingEndTimeStamp = vestingEndTimeStamp + claimPeriod.valueNumericMilliseconds;
+
+    const notStarted = nowTimeStamp < claimdropStart.timestamp;
+    const vesting = nowTimeStamp >= claimdropStart.timestamp && nowTimeStamp < vestingEndTimeStamp;
+    const postVesting = nowTimeStamp >= vestingEndTimeStamp && nowTimeStamp < claimingEndTimeStamp;
+    const ended = nowTimeStamp > claimingEndTimeStamp;
+
+    if (notStarted) {
+      setClaimdropState(CLAIMDROP_STATE.NOT_STARTED);
+    }
+
+    if (vesting) {
+      setClaimdropState(CLAIMDROP_STATE.VESTING);
+    }
+
+    if (postVesting) {
+      setClaimdropState(CLAIMDROP_STATE.POST_VESTING);
+    }
+
+    if (ended) {
+      setClaimdropState(CLAIMDROP_STATE.ENDED);
+    }
 
     try {
     } catch (e) {
@@ -113,22 +159,34 @@ const ClaimDrop = () => {
     numeral(ethers.utils.formatUnits(numberToFormat, 8)).format();
 
   const renderClaimdropStatus = () => {
-    const { claimdropStart, vestingDuration } = claimdropData;
-    const now = Date.now();
-    const notStarted = now < claimdropStart.timestamp;
-    const ended = now > claimdropStart.timestamp + vestingDuration.valueNumericMilliseconds;
+    const { claimdropStart, vestingPeriod } = claimdropData;
 
-    if (notStarted) return <p className="text-small text-bold text-uppercase">Not started</p>;
+    if (claimdropState === CLAIMDROP_STATE.NOT_STARTED)
+      return <p className="text-small text-bold text-uppercase">Not started</p>;
 
-    if (ended) return <p className="text-small text-bold text-uppercase">Ended</p>;
+    if (claimdropState === CLAIMDROP_STATE.ENDED)
+      return <p className="text-small text-bold text-uppercase">Ended</p>;
 
-    const millisecondsPast = now - claimdropStart.timestamp;
+    const millisecondsPast = Date.now() - claimdropStart.timestamp;
     const daysPast = Math.ceil(millisecondsPast / 1000 / 3600 / 24);
 
     return (
       <p className="text-small text-bold text-uppercase">
-        Day {daysPast}/{vestingDuration.valueNumericDays}
+        Day {daysPast}/{vestingPeriod.valueNumericDays}
       </p>
+    );
+  };
+
+  const renderClaimButton = () => {
+    return (
+      <Button
+        loading={loadingClaim}
+        onClick={handleButtonClaimClick}
+        size="small"
+        className="mt-5 mt-lg-0"
+      >
+        CLAIM
+      </Button>
     );
   };
 
@@ -183,7 +241,7 @@ const ClaimDrop = () => {
 
                       <div className="col-lg-7 mt-2 mt-lg-0">
                         <p className="text-subheader text-bold">
-                          {claimdropData.vestingDuration.valueString}
+                          {claimdropData.vestingPeriod.valueString}
                         </p>
                       </div>
                     </div>
@@ -201,7 +259,9 @@ const ClaimDrop = () => {
                       </div>
 
                       <div className="col-lg-7 mt-2 mt-lg-0">
-                        <p className="text-subheader text-bold">{claimdropData.claimPeriod}</p>
+                        <p className="text-subheader text-bold">
+                          {claimdropData.claimPeriod.valueString}
+                        </p>
                       </div>
                     </div>
 
@@ -271,14 +331,7 @@ const ClaimDrop = () => {
                       </div>
                     </div>
 
-                    <Button
-                      loading={loadingClaim}
-                      onClick={handleButtonClaimClick}
-                      size="small"
-                      className="mt-5 mt-lg-0"
-                    >
-                      CLAIM
-                    </Button>
+                    {renderClaimButton()}
                   </div>
                 </div>
               </div>

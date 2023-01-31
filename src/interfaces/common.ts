@@ -101,12 +101,16 @@ export interface IClaimdropData {
     date: string;
     timestamp: number;
   };
-  vestingDuration: {
+  vestingPeriod: {
     valueNumericDays: number;
     valueNumericMilliseconds: number;
     valueString: string;
   };
-  claimPeriod: string;
+  claimPeriod: {
+    valueNumericDays: number;
+    valueNumericMilliseconds: number;
+    valueString: string;
+  };
   totalTokensAllocated: string;
   totalTokensClaimed: string;
   availableToClaim: string;
