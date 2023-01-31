@@ -17,6 +17,7 @@ import { IClaimdropData } from '../interfaces/common';
 // TODO: needs to be changed with the claim drop ABI
 import ClaimDropABI from '../abi/LockDrop.json';
 import { getDaysFromDurationMilliseconds, timestampToDate } from '../utils/timeUtils';
+import { formatBigNumberToMilliseconds } from '../utils/numberUtils';
 
 const ClaimDrop = () => {
   const contextValue = useContext(GlobalContext);
@@ -59,16 +60,22 @@ const ClaimDrop = () => {
     setLoadingContractData(true);
     console.log('userId', userId);
 
+    // Contract data
     const startDateBN = ethers.BigNumber.from(1673697600);
-    const startTimestamp = Number(startDateBN.toString()) * 1000;
-    const startDate = timestampToDate(startTimestamp);
+    const vestingDurationBN = ethers.BigNumber.from(2592000); // 30 Days
+    const claimPeriodBN = ethers.BigNumber.from(2592000 * 2);
+    const totalTokensAllocatedBN = ethers.BigNumber.from(3_000_000_000_000_00);
+    const totalTokensClaimedBN = ethers.BigNumber.from(2_000_000_000_000_00);
+    const availableToClaimBN = ethers.BigNumber.from(1_000_000_000_000_00);
+
+    // Prepare contract data
+    const startTimestamp = formatBigNumberToMilliseconds(startDateBN);
     const claimdropStart = {
-      date: startDate,
+      date: timestampToDate(startTimestamp),
       timestamp: startTimestamp,
     };
 
-    const vestingDurationBN = ethers.BigNumber.from(2592000); // 30 Days
-    const valueNumericMilliseconds = Number(vestingDurationBN.toString()) * 1000;
+    const valueNumericMilliseconds = formatBigNumberToMilliseconds(vestingDurationBN);
     const { valueString, valueNumeric: valueNumericDays } =
       getDaysFromDurationMilliseconds(valueNumericMilliseconds);
     const vestingDuration = {
@@ -77,21 +84,13 @@ const ClaimDrop = () => {
       valueNumericMilliseconds,
     };
 
-    const claimPeriodBN = ethers.BigNumber.from(2592000 * 2);
     const claimPeriod = getDaysFromDurationMilliseconds(
-      Number(claimPeriodBN.toString()),
+      formatBigNumberToMilliseconds(claimPeriodBN),
     ).valueString;
 
-    const totalTokensAllocatedBN = ethers.BigNumber.from(3_000_000_000_000_00);
-    const totalTokensAllocated = numeral(
-      ethers.utils.formatUnits(totalTokensAllocatedBN, 8),
-    ).format();
-
-    const totalTokensClaimedBN = ethers.BigNumber.from(2_000_000_000_000_00);
-    const totalTokensClaimed = numeral(ethers.utils.formatUnits(totalTokensClaimedBN, 8)).format();
-
-    const availableToClaimBN = ethers.BigNumber.from(1_000_000_000_000_00);
-    const availableToClaim = numeral(ethers.utils.formatUnits(availableToClaimBN, 8)).format();
+    const totalTokensAllocated = formatBNTokenToString(totalTokensAllocatedBN);
+    const totalTokensClaimed = formatBNTokenToString(totalTokensClaimedBN);
+    const availableToClaim = formatBNTokenToString(availableToClaimBN);
 
     setClaimdropData({
       claimdropStart,
@@ -110,24 +109,25 @@ const ClaimDrop = () => {
     }
   }, [userId]);
 
+  const formatBNTokenToString = (numberToFormat: ethers.BigNumber) =>
+    numeral(ethers.utils.formatUnits(numberToFormat, 8)).format();
+
   const renderClaimdropStatus = () => {
+    const { claimdropStart, vestingDuration } = claimdropData;
     const now = Date.now();
-    const notStarted = now < claimdropData.claimdropStart.timestamp;
-    const ended =
-      now >
-      claimdropData.claimdropStart.timestamp +
-        claimdropData.vestingDuration.valueNumericMilliseconds;
+    const notStarted = now < claimdropStart.timestamp;
+    const ended = now > claimdropStart.timestamp + vestingDuration.valueNumericMilliseconds;
 
     if (notStarted) return <p className="text-small text-bold text-uppercase">Not started</p>;
 
     if (ended) return <p className="text-small text-bold text-uppercase">Ended</p>;
 
-    const millisecondsPast = now - claimdropData.claimdropStart.timestamp;
+    const millisecondsPast = now - claimdropStart.timestamp;
     const daysPast = Math.ceil(millisecondsPast / 1000 / 3600 / 24);
 
     return (
       <p className="text-small text-bold text-uppercase">
-        Day {daysPast}/{claimdropData.vestingDuration.valueNumericDays}
+        Day {daysPast}/{vestingDuration.valueNumericDays}
       </p>
     );
   };
