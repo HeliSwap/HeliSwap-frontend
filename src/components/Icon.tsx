@@ -33,6 +33,7 @@ import { ReactComponent as Analytics } from '../icons/system/analytics.svg';
 import { ReactComponent as Heli } from '../icons/system/heli.svg';
 import { ReactComponent as Plus } from '../icons/system/plus.svg';
 import { ReactComponent as Minus } from '../icons/system/minus.svg';
+import { ReactComponent as Claim } from '../icons/system/claim.svg';
 import { ReactComponent as C14 } from '../icons/system/c14.svg';
 
 interface IIconProps {
@@ -93,6 +94,7 @@ const icons: IIconMapping = {
   heli: Heli,
   plus: Plus,
   minus: Minus,
+  claim: Claim,
   c14: C14,
 };
 

@@ -16,6 +16,7 @@ import Analytics from '../pages/Analytics';
 import AnalyticsPoolDetials from '../pages/AnalyticsPoolDetials';
 import Lockdrop from '../pages/Lockdrop';
 import Claimdrop from '../pages/Claimdrop';
+import ClaimdropDetails from '../pages/ClaimdropDetails';
 import C14 from '../pages/C14';
 
 import Header from './Header';
@@ -52,7 +53,7 @@ function App() {
                         element={<AnalyticsPoolDetials />}
                       />
                       <Route path="claimdrop" element={<Claimdrop />} />
-                      <Route path="claimdrop/:token" element={<Claimdrop />} />
+                      <Route path="claimdrop/:token" element={<ClaimdropDetails />} />
                       <Route path="buy-crypto" element={<C14 />} />
                       <Route path="styleguide" element={<Styleguide />} />
                     </Routes>
