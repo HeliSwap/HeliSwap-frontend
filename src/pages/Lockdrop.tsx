@@ -13,7 +13,7 @@ import LockdropHowItWorks from '../components/LockdropHowItWorks';
 import Loader from '../components/Loader';
 
 import { getProvider, idToAddress } from '../utils/tokenUtils';
-import { formatBigNumberToMilliseconds } from '../utils/numberUtils';
+import { calculateLPTokens, formatBigNumberToMilliseconds } from '../utils/numberUtils';
 
 const LockDropABI = require('../abi/LockDrop.json');
 
@@ -42,6 +42,7 @@ const Lockdrop = () => {
     endTimestamp: 0,
     vestingTimeEnd: 0,
     lastTwoDaysWithdrawals: false,
+    estimatedLPTokens: '0',
   };
 
   const [lockDropData, setLockDropData] = useState<ILockdropData>(lockDropInitialData);
@@ -79,6 +80,7 @@ const Lockdrop = () => {
       const totalLP = formatBNTokenToString(totalLpBN, 18);
       const vestingTimeEnd = formatBigNumberToMilliseconds(vestingEndTimeBN);
       const claimedOf = formatBNTokenToString(claimedOfBN);
+      const estimatedLPTokens = calculateLPTokens(heliAmount, lockedHbarAmount);
 
       // Determine state
       const nowTimeStamp = Date.now();
@@ -102,6 +104,7 @@ const Lockdrop = () => {
         vestingTimeEnd,
         claimedOf,
         lastTwoDaysWithdrawals,
+        estimatedLPTokens,
       });
 
       setCountDownEnd(endTimestamp);
@@ -141,41 +144,15 @@ const Lockdrop = () => {
             </p>
           </div>
 
-          {currentState < LOCKDROP_STATE.VESTING ? (
-            <p className="text-main text-center mt-4">
-              Select how much <span className="text-bold">HBAR</span> you want to deposit in the
-              LockDrop Pool.
-            </p>
-          ) : (
-            <p className="text-main text-center mt-4">Locking period has ended.</p>
-          )}
-
-          {/* About the lockdrop */}
-          <h2 className="text-subheader text-bold text-center mt-7 mt-lg-10">About the LockDrop</h2>
-          <div className="row mt-5">
-            <div className="col-lg-6 offset-lg-3">
-              <p className="text-small">
-                A large amount of HELI is distributed to anyone who deposits their HBAR on the lock
-                drop page. We then merge the pre-announced amount of HELI (20,000,000) with the
-                received HBAR to create an HBAR/HELI Liquidity Pool. ALL LP tokens that are
-                generated throughout this process will be redistributed to participants and vest
-                linearly over a 3 months period. <br />
-                This mechanism helps HeliSwap to create a large initial HBAR/HELI pool with deep
-                liquidity and allows for a community driven natural price discovery process. In a
-                further step your already vested LP tokens can then be used to earn additional token
-                rewards by staking them into the HELI/HBAR yield farming campaign. This is only a
-                suggestion and not financial advice, as already vested LP tokens can be used in any
-                way you like.
-              </p>
-            </div>
-          </div>
-          {/* About the lockdrop */}
-
-          <p className="mt-6 text-center">
-            <a className="link-primary text-bold" href="#how-it-works">
-              How it works
-            </a>
-          </p>
+          {/* Deposit, Withdrtaw & Claim form */}
+          {lockDropData ? (
+            <LockdropForm
+              getContractData={getContractData}
+              lockDropData={lockDropData}
+              currentState={currentState}
+            />
+          ) : null}
+          {/* Deposit, Withdrtaw & Claim form */}
 
           {/* Lockdrop stats */}
           {lockDropData ? (
@@ -186,18 +163,35 @@ const Lockdrop = () => {
             />
           ) : null}
           {/* Lockdrop stats */}
-
-          {/* Deposit, Withdrtaw & Claim form */}
-          {lockDropData ? (
-            <LockdropForm
-              getContractData={getContractData}
-              lockDropData={lockDropData}
-              currentState={currentState}
-            />
-          ) : null}
-          {/* Deposit, Withdrtaw & Claim form */}
         </>
       )}
+
+      {/* About the lockdrop */}
+      <h2 className="text-subheader text-bold text-center mt-7 mt-lg-10">About the LockDrop</h2>
+      <div className="row mt-5">
+        <div className="col-lg-6 offset-lg-3">
+          <p className="text-small">
+            A large amount of HELI is distributed to anyone who deposits their HBAR on the lock drop
+            page. We then merge the pre-announced amount of HELI (20,000,000) with the received HBAR
+            to create an HBAR/HELI Liquidity Pool. ALL LP tokens that are generated throughout this
+            process will be redistributed to participants and vest linearly over a 3 months period.{' '}
+            <br />
+            This mechanism helps HeliSwap to create a large initial HBAR/HELI pool with deep
+            liquidity and allows for a community driven natural price discovery process. In a
+            further step your already vested LP tokens can then be used to earn additional token
+            rewards by staking them into the HELI/HBAR yield farming campaign. This is only a
+            suggestion and not financial advice, as already vested LP tokens can be used in any way
+            you like.
+          </p>
+        </div>
+      </div>
+      {/* About the lockdrop */}
+
+      {/* <p className="mt-6 text-center">
+        <a className="link-primary text-bold" href="#how-it-works">
+          How it works
+        </a>
+      </p> */}
 
       {/* How it works */}
       <LockdropHowItWorks />

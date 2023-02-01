@@ -8,7 +8,7 @@ import Icon from './Icon';
 import LockdropCounter from './LockdropCounter';
 
 import { LOCKDROP_STATE, ILockdropData } from '../interfaces/common';
-import { calculateLPTokens } from '../utils/numberUtils';
+import { formatStringETHtoPriceFormatted } from '../utils/numberUtils';
 
 interface ILockdropStats {
   countdownEnd: number;
@@ -42,14 +42,10 @@ const LockdropStats = ({ lockDropData, currentState, countdownEnd }: ILockdropSt
 
   const heliEstimatedPrice =
     (Number(lockDropData.hbarAmount) / Number(lockDropData.heliAmount)) * hbarPrice;
-  const LPEstimatedTokens = calculateLPTokens(
-    lockDropData.heliAmount,
-    lockDropData.lockedHbarAmount,
-  );
 
   return (
     <div>
-      <h2 className="text-subheader text-center mt-7 mt-lg-20">
+      <h2 className="text-subheader text-center mt-7 mt-lg-10">
         <span className="text-bold">HELI</span> Liquidity Bootstrap LockDrop
       </h2>
       <div className="row mt-6 mt-lg-8">
@@ -126,7 +122,10 @@ const LockdropStats = ({ lockDropData, currentState, countdownEnd }: ILockdropSt
 
           <div className="text-end mt-5 mt-lg-15">
             <h3 className="text-subheader text-bold">
-              <span className="text-numeric">{LPEstimatedTokens}</span> LP TOKENS
+              <span className="text-numeric">
+                {formatStringETHtoPriceFormatted(lockDropData.estimatedLPTokens)}
+              </span>{' '}
+              LP TOKENS
             </h3>
             <div className="d-flex justify-content-end align-items-center">
               <p className="text-micro text-secondary mt-2">My estimated LP Token allocation</p>

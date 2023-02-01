@@ -68,4 +68,5 @@ export interface ILockdropData {
   vestingTimeEnd: number;
   claimedOf: string;
   lastTwoDaysWithdrawals: boolean;
+  estimatedLPTokens: string;
 }

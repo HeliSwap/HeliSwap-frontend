@@ -17,7 +17,7 @@ import Button from '../components/Button';
 import Icon from '../components/Icon';
 import ToasterWrapper from '../components/ToasterWrapper';
 
-import { stripStringToFixedDecimals } from '../utils/numberUtils';
+import { formatStringETHtoPriceFormatted, stripStringToFixedDecimals } from '../utils/numberUtils';
 import {
   addressToId,
   getTokenBalance,
@@ -178,9 +178,17 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
   );
 
   return (
-    <div className="d-flex flex-column align-items-center py-20 container-lockdrop">
-      <h2 className="text-subheader text-bold text-center my-7 mt-lg-10">Deposit HBAR</h2>
+    <div className="d-flex flex-column align-items-center py-15 container-lockdrop">
       <div className="container-action">
+        {currentState < LOCKDROP_STATE.VESTING ? (
+          <p className="text-subheader text-center mb-6">
+            Select how much <span className="text-bold">HBAR</span> you want to deposit in the
+            LockDrop Pool.
+          </p>
+        ) : (
+          <p className="text-subheader text-center mb-6">Locking period has ended.</p>
+        )}
+
         <p className="text-small mb-5">
           This is where you will be able to deposit and withdraw your HBAR. Simply pick between
           “deposit” and “withdraw” and choose how many HBAR. The bottom shows you the estimated
@@ -245,7 +253,9 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
                     <div className="d-flex justify-content-between align-items-center m-4">
                       <p className="text-small">LP Tokens</p>
                       <div className="d-flex align-items-center">
-                        <p className="text-numeric text-small me-3">0</p>
+                        <p className="text-numeric text-small me-3">
+                          {formatStringETHtoPriceFormatted(lockDropData.estimatedLPTokens)}
+                        </p>
                         <IconToken symbol="LP" />
                       </div>
                     </div>
