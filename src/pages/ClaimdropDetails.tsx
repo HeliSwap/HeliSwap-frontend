@@ -1,9 +1,9 @@
 import { useMemo, useEffect, useContext, useCallback, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import Tippy from '@tippyjs/react';
 import numeral from 'numeral';
-
 import { ethers } from 'ethers';
 
 import { GlobalContext } from '../providers/Global';
@@ -15,10 +15,18 @@ import Button from '../components/Button';
 import Icon from '../components/Icon';
 import IconToken from '../components/IconToken';
 import Loader from '../components/Loader';
+import ToasterWrapper from '../components/ToasterWrapper';
 
-import { addressToId, getHTSTokenInfo, getProvider } from '../utils/tokenUtils';
+import {
+  addressToId,
+  getHTSTokenInfo,
+  getProvider,
+  getUserAssociatedTokens,
+} from '../utils/tokenUtils';
 import { getDaysFromDurationMilliseconds, timestampToDate } from '../utils/timeUtils';
 import { formatBigNumberToMilliseconds } from '../utils/numberUtils';
+
+import getErrorMessage from '../content/errors';
 
 // TODO: needs to be changed with the claim drop ABI
 import ClaimDropABI from '../abi/LockDrop.json';
@@ -32,8 +40,9 @@ enum CLAIMDROP_STATE {
 
 const ClaimdropDetails = () => {
   const contextValue = useContext(GlobalContext);
-  const { connection } = contextValue;
-  const { userId } = connection;
+  const { connection, sdk } = contextValue;
+  const { userId, hashconnectConnectorInstance, setShowConnectModal, isHashpackLoading } =
+    connection;
 
   const { token } = useParams();
   const navigate = useNavigate();
@@ -71,16 +80,8 @@ const ClaimdropDetails = () => {
   const [claimdropData, setClaimdropData] = useState<IClaimdropData>(initialClaimdropData);
   const [claimdropState, setClaimdropState] = useState(CLAIMDROP_STATE.NOT_STARTED);
   const [loadingClaim, setLoadingClaim] = useState(false);
-
-  const handleButtonClaimClick = () => {
-    setLoadingClaim(true);
-    setLoadingClaim(false);
-    getContractData();
-  };
-
-  const handleBackClick = () => {
-    navigate('/claimdrop');
-  };
+  const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
+  const [loadingAssociate, setLoadingAssociate] = useState(false);
 
   const getContractData = useCallback(async () => {
     const formatBNTokenToString = (numberToFormat: ethers.BigNumber) =>
@@ -95,7 +96,7 @@ const ClaimdropDetails = () => {
     const claimPeriodBN = ethers.BigNumber.from(2592000 * 2);
     const totalTokensAllocatedBN = ethers.BigNumber.from(3_000_000_000_000_00);
     const totalTokensClaimedBN = ethers.BigNumber.from(2_000_000_000_000_00);
-    const availableToClaimBN = ethers.BigNumber.from(0);
+    const availableToClaimBN = ethers.BigNumber.from(10_000_000_00);
 
     // Prepare contract data
     const startTimestamp = formatBigNumberToMilliseconds(startDateBN);
@@ -170,29 +171,50 @@ const ClaimdropDetails = () => {
     }
   }, [userId, tokenData.decimals]);
 
-  const renderClaimdropStatus = () => {
-    const { claimdropStart, vestingPeriod } = claimdropData;
-
-    if (claimdropState === CLAIMDROP_STATE.NOT_STARTED)
-      return <p className="text-small text-bold text-uppercase">Not started</p>;
-
-    if (claimdropState === CLAIMDROP_STATE.ENDED)
-      return <p className="text-small text-bold text-uppercase">Ended</p>;
-
-    const millisecondsPast = Date.now() - claimdropStart.timestamp;
-    const daysPast = Math.ceil(millisecondsPast / 1000 / 3600 / 24);
-
-    return (
-      <p className="text-small text-bold text-uppercase">
-        Day {daysPast}/{vestingPeriod.valueNumericDays}
-      </p>
-    );
+  const checkTokenAssociation = async (userId: string) => {
+    const tokens = await getUserAssociatedTokens(userId);
+    setUserAssociatedTokens(tokens);
   };
 
-  const canClaim =
-    claimdropState > CLAIMDROP_STATE.NOT_STARTED && claimdropState < CLAIMDROP_STATE.ENDED;
-  const claimButtonDisabled = Number(claimdropData.availableToClaim) === 0;
+  // Handlers
+  const handleButtonClaimClick = () => {
+    setLoadingClaim(true);
+    setLoadingClaim(false);
+    getContractData();
+  };
 
+  const handleBackClick = () => {
+    navigate('/claimdrop');
+  };
+
+  const handleAssociateClick = async () => {
+    setLoadingAssociate(true);
+
+    try {
+      const receipt = await sdk.associateToken(
+        hashconnectConnectorInstance,
+        userId,
+        addressToId(tokenData.address),
+      );
+
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (!success) {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      }
+
+      await checkTokenAssociation(userId);
+    } catch (err) {
+      console.error(err);
+      toast('Error on associate');
+    } finally {
+      setLoadingAssociate(false);
+    }
+  };
+
+  // Get token info
   useEffect(() => {
     const getTokenData = async () => {
       try {
@@ -213,9 +235,44 @@ const ClaimdropDetails = () => {
     token && getTokenData();
   }, [token]);
 
+  // Get contract data
   useEffect(() => {
     claimDropContract && getContractData();
   }, [claimDropContract, getContractData]);
+
+  // Check for associations
+  useEffect(() => {
+    userId && checkTokenAssociation(userId);
+  }, [userId]);
+
+  // Helpers
+  const getTokenIsAssociated = () => userAssociatedTokens?.includes(addressToId(tokenData.address));
+
+  // Renders
+  const renderClaimdropStatus = () => {
+    const { claimdropStart, vestingPeriod } = claimdropData;
+
+    if (claimdropState === CLAIMDROP_STATE.NOT_STARTED)
+      return <p className="text-small text-bold text-uppercase">Not started</p>;
+
+    if (claimdropState === CLAIMDROP_STATE.ENDED)
+      return <p className="text-small text-bold text-uppercase">Ended</p>;
+
+    const millisecondsPast = Date.now() - claimdropStart.timestamp;
+    const daysPast = Math.ceil(millisecondsPast / 1000 / 3600 / 24);
+
+    return (
+      <p className="text-small text-bold text-uppercase">
+        Day {daysPast}/{vestingPeriod.valueNumericDays}
+      </p>
+    );
+  };
+
+  // Checks
+  const canClaim =
+    claimdropState > CLAIMDROP_STATE.NOT_STARTED && claimdropState < CLAIMDROP_STATE.ENDED;
+  const haveTokensToClaim = Number(claimdropData.availableToClaim) > 0;
+  const claimButtonDisabled = !haveTokensToClaim;
 
   return (
     <div className="d-flex justify-content-center">
@@ -248,140 +305,168 @@ const ClaimdropDetails = () => {
                 <div className="col-lg-4"></div>
               </div>
 
-              <div className="row mt-6">
-                <div className="col-lg-7 offset-lg-1">
-                  <div className="container-blue-neutral-900 p-5 rounded">
-                    <div className="container-border-rounded-bn-500">
-                      <div className="row align-items-center">
-                        <div className="col-lg-5">
-                          <p className="text-small text-secondary">Start date</p>
-                        </div>
-
-                        <div className="col-lg-7 mt-2 mt-lg-0">
-                          <p className="text-subheader text-bold">
-                            {claimdropData.claimdropStart.date}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="row align-items-center mt-4">
-                        <div className="col-lg-5">
-                          <p className="text-small text-secondary">Vesting Duration</p>
-                        </div>
-
-                        <div className="col-lg-7 mt-2 mt-lg-0">
-                          <p className="text-subheader text-bold">
-                            {claimdropData.vestingPeriod.valueString}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="row align-items-center mt-4">
-                        <div className="col-lg-5">
-                          <div className="d-flex align-items-center">
-                            <p className="text-small text-secondary">Claim Period</p>
-                            <Tippy content={`some text.`}>
-                              <span className="ms-2">
-                                <Icon name="hint" size="small" color="gray" />
-                              </span>
-                            </Tippy>
+              {userId && !isHashpackLoading ? (
+                <div className="row mt-6">
+                  <div className="col-lg-7 offset-lg-1">
+                    <div className="container-blue-neutral-900 p-5 rounded">
+                      <div className="container-border-rounded-bn-500">
+                        <div className="row align-items-center">
+                          <div className="col-lg-5">
+                            <p className="text-small text-secondary">Start date</p>
                           </div>
-                        </div>
 
-                        <div className="col-lg-7 mt-2 mt-lg-0">
-                          <p className="text-subheader text-bold">
-                            {claimdropData.claimPeriod.valueString}
-                          </p>
-                        </div>
-                      </div>
-
-                      <hr />
-
-                      <div className="row align-items-center mt-4">
-                        <div className="col-lg-5">
-                          <div className="d-flex align-items-center">
-                            <p className="text-small text-secondary">Total Tokens Allocated</p>
-                            <Tippy content={`some text.`}>
-                              <span className="ms-2">
-                                <Icon name="hint" size="small" color="gray" />
-                              </span>
-                            </Tippy>
-                          </div>
-                        </div>
-
-                        <div className="col-lg-7 mt-2 mt-lg-0">
-                          <div className="d-flex align-items-center">
-                            <IconToken symbol={tokenData.symbol} />
-                            <p className="text-subheader text-bold ms-3">
-                              {claimdropData.totalTokensAllocated}
+                          <div className="col-lg-7 mt-2 mt-lg-0">
+                            <p className="text-subheader text-bold">
+                              {claimdropData.claimdropStart.date}
                             </p>
                           </div>
                         </div>
-                      </div>
 
-                      <div className="row align-items-center mt-4">
-                        <div className="col-lg-5">
-                          <div className="d-flex align-items-center">
-                            <p className="text-small text-secondary">Total Tokens Claimed</p>
-                            <Tippy content={`some text.`}>
-                              <span className="ms-2">
-                                <Icon name="hint" size="small" color="gray" />
-                              </span>
-                            </Tippy>
+                        <div className="row align-items-center mt-4">
+                          <div className="col-lg-5">
+                            <p className="text-small text-secondary">Vesting Duration</p>
                           </div>
-                        </div>
 
-                        <div className="col-lg-7 mt-2 mt-lg-0">
-                          <div className="d-flex align-items-center">
-                            <IconToken symbol={tokenData.symbol} />
-                            <p className="text-subheader text-bold ms-3">
-                              {claimdropData.totalTokensClaimed}
+                          <div className="col-lg-7 mt-2 mt-lg-0">
+                            <p className="text-subheader text-bold">
+                              {claimdropData.vestingPeriod.valueString}
                             </p>
                           </div>
                         </div>
+
+                        <div className="row align-items-center mt-4">
+                          <div className="col-lg-5">
+                            <div className="d-flex align-items-center">
+                              <p className="text-small text-secondary">Claim Period</p>
+                              <Tippy content={`some text.`}>
+                                <span className="ms-2">
+                                  <Icon name="hint" size="small" color="gray" />
+                                </span>
+                              </Tippy>
+                            </div>
+                          </div>
+
+                          <div className="col-lg-7 mt-2 mt-lg-0">
+                            <p className="text-subheader text-bold">
+                              {claimdropData.claimPeriod.valueString}
+                            </p>
+                          </div>
+                        </div>
+
+                        <hr />
+
+                        <div className="row align-items-center mt-4">
+                          <div className="col-lg-5">
+                            <div className="d-flex align-items-center">
+                              <p className="text-small text-secondary">Total Tokens Allocated</p>
+                              <Tippy content={`some text.`}>
+                                <span className="ms-2">
+                                  <Icon name="hint" size="small" color="gray" />
+                                </span>
+                              </Tippy>
+                            </div>
+                          </div>
+
+                          <div className="col-lg-7 mt-2 mt-lg-0">
+                            <div className="d-flex align-items-center">
+                              <IconToken symbol={tokenData.symbol} />
+                              <p className="text-subheader text-bold ms-3">
+                                {claimdropData.totalTokensAllocated}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="row align-items-center mt-4">
+                          <div className="col-lg-5">
+                            <div className="d-flex align-items-center">
+                              <p className="text-small text-secondary">Total Tokens Claimed</p>
+                              <Tippy content={`some text.`}>
+                                <span className="ms-2">
+                                  <Icon name="hint" size="small" color="gray" />
+                                </span>
+                              </Tippy>
+                            </div>
+                          </div>
+
+                          <div className="col-lg-7 mt-2 mt-lg-0">
+                            <div className="d-flex align-items-center">
+                              <IconToken symbol={tokenData.symbol} />
+                              <p className="text-subheader text-bold ms-3">
+                                {claimdropData.totalTokensClaimed}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
+
+                      {canClaim ? (
+                        <div className="d-lg-flex justify-content-between align-items-end mt-7">
+                          <div>
+                            <div className="d-flex align-items-center">
+                              <p className="text-small text-secondary">Available to Claim</p>
+                              <Tippy content={`some text.`}>
+                                <span className="ms-2">
+                                  <Icon name="hint" size="small" color="gray" />
+                                </span>
+                              </Tippy>
+                            </div>
+
+                            <div className="d-flex align-items-center mt-3">
+                              <IconToken symbol={tokenData.symbol} />
+                              <p className="text-headline text-secondary-300 text-bold ms-3">
+                                {claimdropData.availableToClaim}
+                              </p>
+                            </div>
+                          </div>
+
+                          {}
+
+                          {getTokenIsAssociated() ? (
+                            <Button
+                              disabled={claimButtonDisabled}
+                              loading={loadingClaim}
+                              onClick={handleButtonClaimClick}
+                              size="small"
+                              className="mt-5 mt-lg-0"
+                            >
+                              CLAIM
+                            </Button>
+                          ) : (
+                            <Button
+                              size="small"
+                              className="mt-5 mt-lg-0"
+                              loading={loadingAssociate}
+                              onClick={handleAssociateClick}
+                            >
+                              {`Associate ${tokenData.symbol}`}
+                            </Button>
+                          )}
+                        </div>
+                      ) : null}
                     </div>
+                  </div>
 
-                    {canClaim ? (
-                      <div className="d-lg-flex justify-content-between align-items-end mt-7">
-                        <div>
-                          <div className="d-flex align-items-center">
-                            <p className="text-small text-secondary">Available to Claim</p>
-                            <Tippy content={`some text.`}>
-                              <span className="ms-2">
-                                <Icon name="hint" size="small" color="gray" />
-                              </span>
-                            </Tippy>
-                          </div>
-
-                          <div className="d-flex align-items-center mt-3">
-                            <IconToken symbol={tokenData.symbol} />
-                            <p className="text-headline text-secondary-300 text-bold ms-3">
-                              {claimdropData.availableToClaim}
-                            </p>
-                          </div>
-                        </div>
-
-                        <Button
-                          disabled={claimButtonDisabled}
-                          loading={loadingClaim}
-                          onClick={handleButtonClaimClick}
-                          size="small"
-                          className="mt-5 mt-lg-0"
-                        >
-                          CLAIM
-                        </Button>
-                      </div>
-                    ) : null}
+                  <div className="col-lg-4 mt-5 mt-lg-0 ">
+                    <div className="container-blue-neutral-900 p-5 rounded height-100 d-flex justify-content-center align-items-center">
+                      <div className="container-claim-progress">{renderClaimdropStatus()}</div>
+                    </div>
                   </div>
                 </div>
-
-                <div className="col-lg-4 mt-5 mt-lg-0 ">
-                  <div className="container-blue-neutral-900 p-5 rounded height-100 d-flex justify-content-center align-items-center">
-                    <div className="container-claim-progress">{renderClaimdropStatus()}</div>
+              ) : (
+                <div className="row mt-5">
+                  <div className="col-lg-3 offset-lg-3">
+                    <div className="d-grid mt-4">
+                      <Button
+                        disabled={isHashpackLoading}
+                        onClick={() => setShowConnectModal(true)}
+                      >
+                        Connect wallet
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </>
           )
         ) : (
@@ -393,6 +478,7 @@ const ClaimdropDetails = () => {
           </div>
         )}
       </div>
+      <ToasterWrapper />
     </div>
   );
 };

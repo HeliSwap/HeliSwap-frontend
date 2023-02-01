@@ -5,6 +5,10 @@ const claimdrops = [
     tokenAddress: '0x00000000000000000000000000000000002fA295',
     title: 'OM',
   },
+  {
+    tokenAddress: '0x0000000000000000000000000000000000002023',
+    title: 'HELI',
+  },
 ];
 
 const Claimdrop = () => {
