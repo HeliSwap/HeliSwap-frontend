@@ -88,7 +88,6 @@ const ClaimdropDetails = () => {
       numeral(ethers.utils.formatUnits(numberToFormat, tokenData.decimals)).format();
 
     setLoadingContractData(true);
-    console.log('userId', userId);
 
     // Contract data
     const startDateBN = ethers.BigNumber.from(1673697600);
