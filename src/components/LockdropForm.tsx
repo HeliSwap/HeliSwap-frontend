@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
-import toast from 'react-hot-toast';
+// import toast from 'react-hot-toast';
 import Tippy from '@tippyjs/react';
 
 import BigNumber from 'bignumber.js';
@@ -18,14 +18,7 @@ import Icon from '../components/Icon';
 import ToasterWrapper from '../components/ToasterWrapper';
 
 import { formatStringETHtoPriceFormatted, stripStringToFixedDecimals } from '../utils/numberUtils';
-import {
-  addressToId,
-  getTokenBalance,
-  getUserAssociatedTokens,
-  NATIVE_TOKEN,
-} from '../utils/tokenUtils';
-
-import getErrorMessage from '../content/errors';
+import { getTokenBalance, NATIVE_TOKEN } from '../utils/tokenUtils';
 
 enum ActionTab {
   'Deposit',
@@ -40,7 +33,6 @@ interface ILockdropFormProps {
 
 const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdropFormProps) => {
   const lockDropContractAddress = process.env.REACT_APP_LOCKDROP_ADDRESS;
-  const heliTokenAddress = process.env.REACT_APP_HELI_TOKEN_ADDRESS;
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
   const { hashconnectConnectorInstance } = connection;
@@ -53,9 +45,7 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
   const [hbarBalance, setHbarBalance] = useState('initialBallanceData');
   const [depositValue, setDepositValue] = useState('0');
   const [withdrawValue, setWithdrawValue] = useState('0');
-  const [claimValue, setClaimValue] = useState('0');
-  const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
-  const [loadingAssociate, setLoadingAssociate] = useState(false);
+  const [claimValue, setClaimValue] = useState(lockDropData.estimatedLPTokens);
 
   const [loadingButton, setLoadingButton] = useState(false);
 
@@ -113,28 +103,25 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
     }
   };
 
-  const handleAssociateClick = async () => {
-    setLoadingAssociate(true);
+  const handleClaimButtonClick = async () => {
+    setLoadingButton(true);
 
     try {
-      const receipt = await sdk.associateToken(
-        hashconnectConnectorInstance,
-        userId,
-        addressToId(heliTokenAddress as string),
-      );
-
-      const {
-        response: { success, error },
-      } = receipt;
-
-      if (!success) {
-        toast.error(getErrorMessage(error.status ? error.status : error));
-      }
-    } catch (err) {
-      console.error(err);
-      toast('Error on associate');
+    } catch (e) {
+      console.log('e', e);
     } finally {
-      setLoadingAssociate(false);
+      setLoadingButton(true);
+    }
+  };
+
+  const handleClaimAndStakeButtonClick = async () => {
+    setLoadingButton(true);
+
+    try {
+    } catch (e) {
+      console.log('e', e);
+    } finally {
+      setLoadingButton(true);
     }
   };
 
@@ -156,20 +143,6 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
 
     getHbarBalance();
   }, [userId, initialBallanceData]);
-
-  // Check for associations
-  useEffect(() => {
-    const checkTokenAssociation = async (userId: string) => {
-      const tokens = await getUserAssociatedTokens(userId);
-      setUserAssociatedTokens(tokens);
-    };
-
-    userId && checkTokenAssociation(userId);
-  }, [userId]);
-
-  const getTokenIsAssociated = () => {
-    return userAssociatedTokens?.includes(addressToId(heliTokenAddress as string));
-  };
 
   const renderHELIHBARRatio = () => (
     <p className="text-numeric text-small mt-6">
@@ -331,7 +304,17 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
                     <span className="text-main ms-3">HBAR</span>
                   </div>
                   <div className="d-flex align-items-center">
-                    <p className="text-numeric text-small me-3">1000</p>
+                    <p className="text-numeric text-small me-3">{lockDropData.lockedHbarAmount}</p>
+                  </div>
+                </div>
+
+                <div className="d-flex justify-content-between align-items-center m-4">
+                  <div className="d-flex align-items-center">
+                    <IconToken symbol="HELI" />
+                    <span className="text-main ms-3">HELI</span>
+                  </div>
+                  <div className="d-flex align-items-center">
+                    <p className="text-numeric text-small me-3">{lockDropData.heliAmount}</p>
                   </div>
                 </div>
               </div>
@@ -393,38 +376,25 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
                 buttonSelectorComponent={
                   <ButtonSelector disabled selectedToken={'LP'} selectorText="Select token" />
                 }
-                walletBalanceComponent={
-                  connected && !isHashpackLoading ? (
-                    <WalletBalance
-                      insufficientBallance={getInsufficientToken() as boolean}
-                      walletBalance={hbarBalance}
-                      onMaxButtonClick={(maxValue: string) => {
-                        handleClaimInputChange(maxValue);
-                      }}
-                    />
-                  ) : null
-                }
               />
 
-              {connected && !isHashpackLoading ? (
-                getTokenIsAssociated() ? (
-                  <>
-                    <div className="d-grid mt-5">
-                      <Button onClick={handleDepositButtonClick}>CLAIM</Button>
-                    </div>
-                    <div className="d-grid mt-4">
-                      <Button type="secondary" onClick={handleDepositButtonClick}>
-                        CLAIM AND STAKE
-                      </Button>
-                    </div>
-                  </>
-                ) : (
-                  <div className="d-grid mt-4">
-                    <Button loading={loadingAssociate} onClick={handleAssociateClick}>
-                      Associate HELI
+              {userId && !isHashpackLoading ? (
+                <>
+                  <div className="d-grid mt-5">
+                    <Button loading={loadingButton} onClick={handleClaimButtonClick}>
+                      CLAIM
                     </Button>
                   </div>
-                )
+                  <div className="d-grid mt-4">
+                    <Button
+                      loading={loadingButton}
+                      type="secondary"
+                      onClick={handleClaimAndStakeButtonClick}
+                    >
+                      CLAIM AND STAKE
+                    </Button>
+                  </div>
+                </>
               ) : (
                 <div className="d-grid mt-4">
                   <Button disabled={isHashpackLoading} onClick={() => setShowConnectModal(true)}>
