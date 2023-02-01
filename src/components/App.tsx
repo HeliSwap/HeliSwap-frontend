@@ -52,6 +52,7 @@ function App() {
                         element={<AnalyticsPoolDetials />}
                       />
                       <Route path="claimdrop" element={<Claimdrop />} />
+                      <Route path="claimdrop/:token" element={<Claimdrop />} />
                       <Route path="buy-crypto" element={<C14 />} />
                       <Route path="styleguide" element={<Styleguide />} />
                     </Routes>
