@@ -171,7 +171,7 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
           amount of LP tokens you would receive if the lockdrop ended in that moment.
         </p>
         <div className="container-dark">
-          {currentState >= LOCKDROP_STATE.DAY_1_5 && currentState < LOCKDROP_STATE.VESTING ? (
+          {currentState >= LOCKDROP_STATE.DEPOSIT && currentState < LOCKDROP_STATE.VESTING ? (
             <>
               <div className="d-flex mb-5">
                 <span

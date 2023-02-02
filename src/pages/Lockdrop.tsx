@@ -34,10 +34,11 @@ const Lockdrop = () => {
   }, []);
 
   const [countdownEnd, setCountDownEnd] = useState(0);
-  const [currentState, setCurrentState] = useState(LOCKDROP_STATE.DAY_1_5);
+  const [currentState, setCurrentState] = useState(LOCKDROP_STATE.DEPOSIT);
   const [loadingContractData, setLoadingContractData] = useState(true);
 
   const lockDropInitialData: ILockdropData = {
+    lockDropDuration: 0,
     lockdropEnd: 0,
     lockDropDespositEnd: 0,
     vestingEndTime: 0,
@@ -84,6 +85,7 @@ const Lockdrop = () => {
     setLoadingContractData(true);
 
     const promisesArray = [
+      lockDropContract.LOCK_DROP_DURATION(),
       lockDropContract.lockDropEnd(),
       lockDropContract.lockDropDespositEnd(),
       lockDropContract.vestingEndTime(),
@@ -95,6 +97,7 @@ const Lockdrop = () => {
 
     try {
       const [
+        lockDropDurationBN,
         lockDropEndBN,
         lockDropDespositEndBN,
         vestingEndTimeBN,
@@ -115,6 +118,7 @@ const Lockdrop = () => {
       }
 
       // Format data
+      const lockDropDuration = formatBigNumberToMilliseconds(lockDropDurationBN);
       const lockdropEnd = formatBigNumberToMilliseconds(lockDropEndBN);
       const lockDropDespositEnd = formatBigNumberToMilliseconds(lockDropDespositEndBN);
       const vestingEndTime = formatBigNumberToMilliseconds(vestingEndTimeBN);
@@ -156,8 +160,8 @@ const Lockdrop = () => {
       };
 
       const estimatedLPTokensBN = calculateLPTokens(
-        totalTokens.valueStringWei,
-        lockedHbars.valueStringWei,
+        totalTokens.valueStringETH,
+        lockedHbars.valueStringETH,
         8,
         8,
       );
@@ -167,19 +171,25 @@ const Lockdrop = () => {
       };
 
       // Determine state
-      // const nowTimeStamp = Date.now();
-      // const vesting = nowTimeStamp > endTimestamp && vestingTimeEnd === 0;
-      // const end = vestingTimeEnd !== 0 ? nowTimeStamp > vestingTimeEnd : false;
+      const nowTimeStamp = Date.now();
+      const withdrawOnly = nowTimeStamp > lockDropDespositEnd && nowTimeStamp <= lockdropEnd;
+      const vesting = nowTimeStamp > lockdropEnd;
+      const end = vestingEndTime !== 0 ? nowTimeStamp > vestingEndTime : false;
 
-      // if (vesting) {
-      //   setCurrentState(LOCKDROP_STATE.VESTING);
-      // }
+      if (withdrawOnly) {
+        setCurrentState(LOCKDROP_STATE.WITHDRAW);
+      }
 
-      // if (end) {
-      //   setCurrentState(LOCKDROP_STATE.END);
-      // }
+      if (vesting) {
+        setCurrentState(LOCKDROP_STATE.VESTING);
+      }
+
+      if (end) {
+        setCurrentState(LOCKDROP_STATE.END);
+      }
 
       setLockDropData({
+        lockDropDuration,
         lockdropEnd,
         lockDropDespositEnd,
         vestingEndTime,

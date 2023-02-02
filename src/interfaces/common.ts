@@ -54,48 +54,30 @@ export interface IHistoricalData {
 }
 
 export enum LOCKDROP_STATE {
-  DAY_1_5,
-  DAY_6,
-  DAY_7,
+  DEPOSIT,
+  WITHDRAW,
   VESTING,
   END,
 }
 
+export interface IContractTokenValue {
+  valueBN: ethers.BigNumber;
+  valueStringWei: string;
+  valueStringETH: string;
+}
+
 export interface ILockdropData {
+  lockDropDuration: number;
   lockdropEnd: number;
   lockDropDespositEnd: number;
   vestingEndTime: number;
   tokenAddress: string;
-  totalLP: {
-    valueBN: ethers.BigNumber;
-    valueStringWei: string;
-    valueStringETH: string;
-  };
-  totalHbars: {
-    valueBN: ethers.BigNumber;
-    valueStringWei: string;
-    valueStringETH: string;
-  };
-  totalTokens: {
-    valueBN: ethers.BigNumber;
-    valueStringWei: string;
-    valueStringETH: string;
-  };
-  lockedHbars: {
-    valueBN: ethers.BigNumber;
-    valueStringWei: string;
-    valueStringETH: string;
-  };
-  claimed: {
-    valueBN: ethers.BigNumber;
-    valueStringWei: string;
-    valueStringETH: string;
-  };
-  lastUserWithdrawal: {
-    valueBN: ethers.BigNumber;
-    valueStringWei: string;
-    valueStringETH: string;
-  };
+  totalLP: IContractTokenValue;
+  totalHbars: IContractTokenValue;
+  totalTokens: IContractTokenValue;
+  lockedHbars: IContractTokenValue;
+  claimed: IContractTokenValue;
+  lastUserWithdrawal: IContractTokenValue;
   estimatedLPTokens: {
     valueStringWei: string;
     valueStringETH: string;
