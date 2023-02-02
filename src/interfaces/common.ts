@@ -1,3 +1,5 @@
+import { ethers } from 'ethers';
+
 export interface IStringToString {
   [key: string]: string;
 }
@@ -60,13 +62,42 @@ export enum LOCKDROP_STATE {
 }
 
 export interface ILockdropData {
-  heliAmount: string;
-  hbarAmount: string;
-  lockedHbarAmount: string;
-  endTimestamp: number;
-  totalLP: string;
-  vestingTimeEnd: number;
-  claimedOf: string;
-  lastTwoDaysWithdrawals: boolean;
-  estimatedLPTokens: string;
+  lockdropEnd: number;
+  lockDropDespositEnd: number;
+  vestingEndTime: number;
+  tokenAddress: string;
+  totalLP: {
+    valueBN: ethers.BigNumber;
+    valueStringWei: string;
+    valueStringETH: string;
+  };
+  totalHbars: {
+    valueBN: ethers.BigNumber;
+    valueStringWei: string;
+    valueStringETH: string;
+  };
+  totalTokens: {
+    valueBN: ethers.BigNumber;
+    valueStringWei: string;
+    valueStringETH: string;
+  };
+  lockedHbars: {
+    valueBN: ethers.BigNumber;
+    valueStringWei: string;
+    valueStringETH: string;
+  };
+  claimed: {
+    valueBN: ethers.BigNumber;
+    valueStringWei: string;
+    valueStringETH: string;
+  };
+  lastUserWithdrawal: {
+    valueBN: ethers.BigNumber;
+    valueStringWei: string;
+    valueStringETH: string;
+  };
+  estimatedLPTokens: {
+    valueStringWei: string;
+    valueStringETH: string;
+  };
 }

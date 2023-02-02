@@ -17,6 +17,16 @@
   },
   {
     "inputs": [],
+    "name": "LockDrop__ClaimForbidden",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "LockDrop__DepositDurationExpired",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "LockDrop__DurationExpired",
     "type": "error"
   },
@@ -27,7 +37,12 @@
   },
   {
     "inputs": [],
-    "name": "LockDrop__MsgSenderNotADepositor",
+    "name": "LockDrop__LockDropStillNotEnded",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "LockDrop__OnlyOnce",
     "type": "error"
   },
   {
@@ -42,24 +57,8 @@
   },
   {
     "inputs": [],
-    "name": "LockDrop__UserAlreadyWithdrawnInLastTwoDays",
+    "name": "LockDrop__UserCanWithdrawOnlyOnceADay",
     "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "LockDrop__ZeroMessageValue",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "LockDrop__ZeroTokenValue",
-    "type": "error"
-  },
-  {
-    "anonymous": false,
-    "inputs": [],
-    "name": "HbarHeliPoolCreated",
-    "type": "event"
   },
   {
     "anonymous": false,
@@ -103,25 +102,6 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "LPTokensClaimed",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
         "indexed": true,
         "internalType": "address",
         "name": "previousOwner",
@@ -142,13 +122,77 @@
     "inputs": [
       {
         "indexed": false,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": false,
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
       }
     ],
-    "name": "TokensTransferred",
+    "name": "TokensClaimed",
     "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "TokensFunded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "totalLP",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "vestingEndData",
+        "type": "uint256"
+      }
+    ],
+    "name": "VestingRun",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "LOCK_DROP_DURATION",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "LPToken",
+    "outputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [],
@@ -161,7 +205,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "depositor",
+        "name": "user",
         "type": "address"
       }
     ],
@@ -169,7 +213,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "userLpToClaim",
+        "name": "availableToClaim",
         "type": "uint256"
       }
     ],
@@ -196,39 +240,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "amountTokenDesired",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amountTokenMin",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amountHBARMin",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "deadline",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_vestingEndTime",
-        "type": "uint256"
-      }
-    ],
-    "name": "createHbarHeliPool",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "deposit",
     "outputs": [],
@@ -236,29 +247,16 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "duration",
-    "outputs": [
+    "inputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "amount",
         "type": "uint256"
       }
     ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getRouterAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
+    "name": "fund",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -266,7 +264,7 @@
     "name": "heliSwapRouter",
     "outputs": [
       {
-        "internalType": "contract IUniswapV2Router02",
+        "internalType": "contract IHeliSwapRouter02",
         "name": "",
         "type": "address"
       }
@@ -282,12 +280,38 @@
         "type": "address"
       }
     ],
-    "name": "lastTwoDaysWithdrawals",
+    "name": "lastUserWithdrawal",
     "outputs": [
       {
-        "internalType": "bool",
+        "internalType": "uint256",
         "name": "",
-        "type": "bool"
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "lockDropDespositEnd",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "lockDropEnd",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -333,6 +357,19 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "vestingDuration",
+        "type": "uint256"
+      }
+    ],
+    "name": "runVesting",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "tokenAddress",
     "outputs": [
@@ -340,6 +377,25 @@
         "internalType": "address",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      }
+    ],
+    "name": "totalClaimable",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "userTotalLP",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -360,7 +416,7 @@
   },
   {
     "inputs": [],
-    "name": "totalHeliTokens",
+    "name": "totalLP",
     "outputs": [
       {
         "internalType": "uint256",
@@ -373,20 +429,7 @@
   },
   {
     "inputs": [],
-    "name": "totalLp",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "totalTokenBalance",
+    "name": "totalTokens",
     "outputs": [
       {
         "internalType": "uint256",
@@ -411,19 +454,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "transferTokens",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "vestingEndTime",
     "outputs": [
@@ -440,7 +470,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "value",
+        "name": "amount",
         "type": "uint256"
       }
     ],
@@ -448,9 +478,5 @@
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
-  },
-  {
-    "stateMutability": "payable",
-    "type": "receive"
   }
 ]

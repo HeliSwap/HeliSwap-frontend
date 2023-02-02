@@ -23,7 +23,9 @@ const LockdropStats = ({ lockDropData, currentState, countdownEnd }: ILockdropSt
   const renderHELIDistribution = () => (
     <div>
       <h3 className="text-subheader text-bold">
-        <span className="text-numeric">{numeral(lockDropData.heliAmount).format('0,0.00')}</span>{' '}
+        <span className="text-numeric">
+          {numeral(lockDropData.totalTokens.valueStringETH).format('0,0.00')}
+        </span>{' '}
         HELI
       </h3>
       <div className="d-flex align-items-center">
@@ -41,7 +43,9 @@ const LockdropStats = ({ lockDropData, currentState, countdownEnd }: ILockdropSt
   );
 
   const heliEstimatedPrice =
-    (Number(lockDropData.hbarAmount) / Number(lockDropData.heliAmount)) * hbarPrice;
+    (Number(lockDropData.totalHbars.valueStringETH) /
+      Number(lockDropData.totalTokens.valueStringETH)) *
+    hbarPrice;
 
   return (
     <div>
@@ -54,7 +58,7 @@ const LockdropStats = ({ lockDropData, currentState, countdownEnd }: ILockdropSt
           <div className="mt-5 mt-lg-15">
             <h3 className="text-subheader text-bold">
               <span className="text-numeric">
-                {numeral(lockDropData.hbarAmount).format('0,0.00')}
+                {numeral(lockDropData.totalHbars.valueStringETH).format('0,0.00')}
               </span>{' '}
               HBAR
             </h3>
@@ -84,7 +88,9 @@ const LockdropStats = ({ lockDropData, currentState, countdownEnd }: ILockdropSt
                 $
                 <span className="text-numeric">
                   {' '}
-                  {Number(lockDropData.hbarAmount) > 0 ? heliEstimatedPrice.toFixed(10) : '-'}
+                  {Number(lockDropData.totalHbars.valueStringETH) > 0
+                    ? heliEstimatedPrice.toFixed(10)
+                    : '-'}
                 </span>
               </h3>
               <Tippy
@@ -103,7 +109,7 @@ const LockdropStats = ({ lockDropData, currentState, countdownEnd }: ILockdropSt
           <div className="text-end">
             <h3 className="text-subheader text-bold">
               <span className="text-numeric">
-                {numeral(lockDropData.lockedHbarAmount).format('0,0.00')}
+                {numeral(lockDropData.lockedHbars.valueStringETH).format('0,0.00')}
               </span>{' '}
               HBAR
             </h3>
@@ -123,7 +129,7 @@ const LockdropStats = ({ lockDropData, currentState, countdownEnd }: ILockdropSt
           <div className="text-end mt-5 mt-lg-15">
             <h3 className="text-subheader text-bold">
               <span className="text-numeric">
-                {formatStringETHtoPriceFormatted(lockDropData.estimatedLPTokens)}
+                {formatStringETHtoPriceFormatted(lockDropData.estimatedLPTokens.valueStringETH)}
               </span>{' '}
               LP TOKENS
             </h3>

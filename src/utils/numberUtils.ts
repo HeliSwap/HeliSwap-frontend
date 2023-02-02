@@ -175,10 +175,12 @@ export const calculateLPTokens = (
   token0Decimals: number = 8,
   token1Decimals: number = 8,
 ): string => {
+  if (Number(token0Amount) === 0 || Number(token1Amount) === 0) return '0';
+
   const token0AmountBN = formatStringToBigNumberWei(token0Amount, token0Decimals);
   const token1AmountBN = formatStringToBigNumberWei(token1Amount, token1Decimals);
 
   const amountLP = token0AmountBN.times(token1AmountBN).sqrt().toString();
 
-  return formatStringWeiToStringEther(amountLP);
+  return amountLP;
 };

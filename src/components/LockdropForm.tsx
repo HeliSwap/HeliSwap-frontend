@@ -45,7 +45,7 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
   const [hbarBalance, setHbarBalance] = useState('initialBallanceData');
   const [depositValue, setDepositValue] = useState('0');
   const [withdrawValue, setWithdrawValue] = useState('0');
-  const [claimValue, setClaimValue] = useState(lockDropData.estimatedLPTokens);
+  const [claimValue, setClaimValue] = useState(lockDropData.estimatedLPTokens.valueStringETH);
 
   const [loadingButton, setLoadingButton] = useState(false);
 
@@ -146,7 +146,10 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
 
   const renderHELIHBARRatio = () => (
     <p className="text-numeric text-small mt-6">
-      1 HELI = {Number(lockDropData.hbarAmount) / Number(lockDropData.heliAmount)} HBAR
+      1 HELI ={' '}
+      {Number(lockDropData.totalHbars.valueStringETH) /
+        Number(lockDropData.totalTokens.valueStringETH)}{' '}
+      HBAR
     </p>
   );
 
@@ -227,7 +230,9 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
                       <p className="text-small">LP Tokens</p>
                       <div className="d-flex align-items-center">
                         <p className="text-numeric text-small me-3">
-                          {formatStringETHtoPriceFormatted(lockDropData.estimatedLPTokens)}
+                          {formatStringETHtoPriceFormatted(
+                            lockDropData.estimatedLPTokens.valueStringETH,
+                          )}
                         </p>
                         <IconToken symbol="LP" />
                       </div>
@@ -258,7 +263,7 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
                       connected && !isHashpackLoading ? (
                         <WalletBalance
                           insufficientBallance={getInsufficientToken() as boolean}
-                          walletBalance={lockDropData.lockedHbarAmount}
+                          walletBalance={lockDropData.lockedHbars.valueStringETH}
                           onMaxButtonClick={(maxValue: string) => {
                             handleWithdrawInputChange(maxValue);
                           }}
@@ -304,7 +309,9 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
                     <span className="text-main ms-3">HBAR</span>
                   </div>
                   <div className="d-flex align-items-center">
-                    <p className="text-numeric text-small me-3">{lockDropData.lockedHbarAmount}</p>
+                    <p className="text-numeric text-small me-3">
+                      {lockDropData.lockedHbars.valueStringETH}
+                    </p>
                   </div>
                 </div>
 
@@ -314,7 +321,9 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
                     <span className="text-main ms-3">HELI</span>
                   </div>
                   <div className="d-flex align-items-center">
-                    <p className="text-numeric text-small me-3">{lockDropData.heliAmount}</p>
+                    <p className="text-numeric text-small me-3">
+                      {lockDropData.totalTokens.valueStringETH}
+                    </p>
                   </div>
                 </div>
               </div>
