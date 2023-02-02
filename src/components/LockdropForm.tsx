@@ -41,7 +41,9 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
   // State for token balances
   const initialBallanceData = useMemo(() => '0', []);
 
-  const [actionTab, setActionTab] = useState(ActionTab.Deposit);
+  const [actionTab, setActionTab] = useState(
+    currentState === LOCKDROP_STATE.DEPOSIT ? ActionTab.Deposit : ActionTab.Withdraw,
+  );
   const [hbarBalance, setHbarBalance] = useState('initialBallanceData');
   const [depositValue, setDepositValue] = useState('0');
   const [withdrawValue, setWithdrawValue] = useState('0');
@@ -156,7 +158,7 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
   return (
     <div className="d-flex flex-column align-items-center py-15 container-lockdrop">
       <div className="container-action">
-        {currentState < LOCKDROP_STATE.VESTING ? (
+        {currentState < LOCKDROP_STATE.WITHDRAW ? (
           <p className="text-subheader text-center mb-6">
             Select how much <span className="text-bold">HBAR</span> you want to deposit in the
             LockDrop Pool.
@@ -174,19 +176,22 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
           {currentState >= LOCKDROP_STATE.DEPOSIT && currentState < LOCKDROP_STATE.VESTING ? (
             <>
               <div className="d-flex mb-5">
-                <span
-                  onClick={() => handleTabClick(ActionTab.Deposit)}
-                  className={`text-small text-bold text-uppercase cursor-pointer ${
-                    actionTab === ActionTab.Deposit ? '' : 'text-secondary'
-                  }`}
-                >
-                  Deposit
-                </span>
+                {currentState === LOCKDROP_STATE.DEPOSIT ? (
+                  <span
+                    onClick={() => handleTabClick(ActionTab.Deposit)}
+                    className={`text-small text-bold text-uppercase cursor-pointer ${
+                      actionTab === ActionTab.Deposit ? '' : 'text-secondary'
+                    } me-4`}
+                  >
+                    Deposit
+                  </span>
+                ) : null}
+
                 <span
                   onClick={() => handleTabClick(ActionTab.Withdraw)}
                   className={`text-small text-bold text-uppercase cursor-pointer ${
                     actionTab === ActionTab.Withdraw ? '' : 'text-secondary'
-                  } ms-4`}
+                  }`}
                 >
                   Withdraw
                 </span>

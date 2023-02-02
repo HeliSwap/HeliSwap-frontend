@@ -203,7 +203,7 @@ const Lockdrop = () => {
         estimatedLPTokens,
       });
 
-      setCountDownEnd(lockDropDespositEnd);
+      setCountDownEnd(lockdropEnd);
     } catch (e) {
       console.error('Error on fetching contract data:', e);
     } finally {
