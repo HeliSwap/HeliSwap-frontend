@@ -33,6 +33,7 @@ interface ILockdropFormProps {
 
 const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdropFormProps) => {
   const lockDropContractAddress = process.env.REACT_APP_LOCKDROP_ADDRESS;
+  const heliTokenAddress = process.env.REACT_APP_HELI_TOKEN_ADDRESS;
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
   const { hashconnectConnectorInstance } = connection;
@@ -110,6 +111,18 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
     setLoadingButton(true);
 
     try {
+      // await sdk.removeNativeLiquidity(
+      //   hashconnectConnectorInstance,
+      //   userId,
+      //   heliTokenAddress as string,
+      //   claimValue,
+      //   tokenAmount,
+      // WHBARAmount,
+      // tokenDecimals,
+      // WHBARDecimals,
+      // removeSlippage,
+      // transactionExpiration,
+      // );
     } catch (e) {
       console.log('e', e);
     } finally {
