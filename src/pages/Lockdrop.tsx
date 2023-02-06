@@ -68,6 +68,16 @@ const Lockdrop = () => {
       valueStringWei: '',
       valueStringETH: '',
     },
+    claimable: {
+      valueBN: ethers.BigNumber.from(0),
+      valueStringWei: '',
+      valueStringETH: '',
+    },
+    totalClaimable: {
+      valueBN: ethers.BigNumber.from(0),
+      valueStringWei: '',
+      valueStringETH: '',
+    },
     lastUserWithdrawal: {
       valueBN: ethers.BigNumber.from(0),
       valueStringWei: '',
@@ -109,12 +119,16 @@ const Lockdrop = () => {
 
       let stakedTokensBN = ethers.BigNumber.from(0);
       let claimedOfBN = ethers.BigNumber.from(0);
+      let totalClaimableBN = ethers.BigNumber.from(0);
+      let claimableBN = ethers.BigNumber.from(0);
       let lastUserWithdrawalBN = ethers.BigNumber.from(0);
 
       if (userId) {
         stakedTokensBN = await lockDropContract.providers(idToAddress(userId));
         claimedOfBN = await lockDropContract.claimedOf(idToAddress(userId));
         lastUserWithdrawalBN = await lockDropContract.lastUserWithdrawal(idToAddress(userId));
+        claimableBN = await lockDropContract.claimable(idToAddress(userId));
+        totalClaimableBN = await lockDropContract.totalClaimable(idToAddress(userId));
       }
 
       // Format data
@@ -150,7 +164,19 @@ const Lockdrop = () => {
       const claimed = {
         valueBN: claimedOfBN,
         valueStringWei: claimedOfBN.toString(),
-        valueStringETH: formatBNTokenToString(claimedOfBN),
+        valueStringETH: formatBNTokenToString(claimedOfBN, 18),
+      };
+
+      const claimable = {
+        valueBN: claimableBN,
+        valueStringWei: claimableBN.toString(),
+        valueStringETH: formatBNTokenToString(claimableBN, 18),
+      };
+
+      const totalClaimable = {
+        valueBN: totalClaimableBN,
+        valueStringWei: totalClaimableBN.toString(),
+        valueStringETH: formatBNTokenToString(totalClaimableBN, 18),
       };
 
       const lastUserWithdrawal = {
@@ -198,6 +224,8 @@ const Lockdrop = () => {
         totalTokens,
         lockedHbars,
         claimed,
+        claimable,
+        totalClaimable,
         lastUserWithdrawal,
         tokenAddress,
         estimatedLPTokens,

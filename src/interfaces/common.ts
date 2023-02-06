@@ -77,6 +77,8 @@ export interface ILockdropData {
   totalTokens: IContractTokenValue;
   lockedHbars: IContractTokenValue;
   claimed: IContractTokenValue;
+  claimable: IContractTokenValue;
+  totalClaimable: IContractTokenValue;
   lastUserWithdrawal: IContractTokenValue;
   estimatedLPTokens: {
     valueStringWei: string;

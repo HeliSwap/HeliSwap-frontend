@@ -33,12 +33,19 @@ interface ILockdropFormProps {
 
 const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdropFormProps) => {
   const lockDropContractAddress = process.env.REACT_APP_LOCKDROP_ADDRESS;
-  const heliTokenAddress = process.env.REACT_APP_HELI_TOKEN_ADDRESS;
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
   const { hashconnectConnectorInstance } = connection;
   const { userId, connected, setShowConnectModal, isHashpackLoading } = connection;
-  const { totalHbars, totalTokens, estimatedLPTokens, lockedHbars } = lockDropData;
+  const {
+    totalHbars,
+    totalTokens,
+    estimatedLPTokens,
+    lockedHbars,
+    claimed,
+    claimable,
+    totalClaimable,
+  } = lockDropData;
 
   // State for token balances
   const initialBallanceData = useMemo(() => '0', []);
@@ -49,7 +56,6 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
   const [hbarBalance, setHbarBalance] = useState('initialBallanceData');
   const [depositValue, setDepositValue] = useState('0');
   const [withdrawValue, setWithdrawValue] = useState('0');
-  const [claimValue, setClaimValue] = useState(estimatedLPTokens.valueStringETH);
 
   const [loadingButton, setLoadingButton] = useState(false);
 
@@ -59,10 +65,6 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
 
   const handleWithdrawInputChange = (rawValue: string) => {
     setWithdrawValue(rawValue);
-  };
-
-  const handleClaimInputChange = (rawValue: string) => {
-    setClaimValue(rawValue);
   };
 
   const handleTabClick = (target: ActionTab) => {
@@ -111,22 +113,13 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
     setLoadingButton(true);
 
     try {
-      // await sdk.removeNativeLiquidity(
-      //   hashconnectConnectorInstance,
-      //   userId,
-      //   heliTokenAddress as string,
-      //   claimValue,
-      //   tokenAmount,
-      // WHBARAmount,
-      // tokenDecimals,
-      // WHBARDecimals,
-      // removeSlippage,
-      // transactionExpiration,
-      // );
+      await sdk.claimLP(hashconnectConnectorInstance, lockDropContractAddress as string, userId);
+
+      await getContractData();
     } catch (e) {
       console.log('e', e);
     } finally {
-      setLoadingButton(true);
+      setLoadingButton(false);
     }
   };
 
@@ -137,7 +130,7 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
     } catch (e) {
       console.log('e', e);
     } finally {
-      setLoadingButton(true);
+      setLoadingButton(false);
     }
   };
 
@@ -312,7 +305,7 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
             </>
           ) : null}
 
-          {currentState >= LOCKDROP_STATE.VESTING && currentState < LOCKDROP_STATE.END ? (
+          {currentState >= LOCKDROP_STATE.VESTING ? (
             <>
               <p className="text-small text-bold mb-3">Liquidity provied to Lockdrop</p>
 
@@ -340,7 +333,9 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
 
               <div className="mt-5 d-flex justify-content-around align-items-center">
                 <div className="text-center">
-                  <p className="text-numeric text-small">1,000</p>
+                  <p className="text-numeric text-small">
+                    {formatStringETHtoPriceFormatted(totalClaimable.valueStringETH)}
+                  </p>
                   <div className="d-flex align-items-center">
                     <p className="text-micro">Total to claim</p>
                     <Tippy content={``}>
@@ -352,7 +347,9 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
                 </div>
 
                 <div className="text-center">
-                  <p className="text-numeric text-small">1,000</p>
+                  <p className="text-numeric text-small">
+                    {formatStringETHtoPriceFormatted(claimable.valueStringETH)}
+                  </p>
                   <div className="d-flex align-items-center">
                     <p className="text-micro">Available to claim</p>
                     <Tippy content={``}>
@@ -364,7 +361,9 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
                 </div>
 
                 <div className="text-center">
-                  <p className="text-numeric text-small">1,000</p>
+                  <p className="text-numeric text-small">
+                    {formatStringETHtoPriceFormatted(claimed.valueStringETH)}
+                  </p>
                   <div className="d-flex align-items-center">
                     <p className="text-micro">Claimed so far</p>
                     <Tippy content={``}>
@@ -382,16 +381,7 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
 
               <InputTokenSelector
                 isInvalid={getInsufficientToken() as boolean}
-                inputTokenComponent={
-                  <InputToken
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      const { value } = e.target;
-                      const strippedValue = stripStringToFixedDecimals(value, 6);
-                      handleClaimInputChange(strippedValue);
-                    }}
-                    value={claimValue}
-                  />
-                }
+                inputTokenComponent={<InputToken disabled value={claimable.valueStringETH} />}
                 buttonSelectorComponent={
                   <ButtonSelector disabled selectedToken={'LP'} selectorText="Select token" />
                 }
