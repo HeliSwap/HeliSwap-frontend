@@ -34,6 +34,7 @@ interface ILockdropFormProps {
   lockDropData: ILockdropData;
   getContractData: () => void;
   toast: any;
+  farmAddress: string;
 }
 
 const LockdropForm = ({
@@ -41,6 +42,7 @@ const LockdropForm = ({
   lockDropData,
   getContractData,
   toast,
+  farmAddress,
 }: ILockdropFormProps) => {
   const lockDropContractAddress = process.env.REACT_APP_LOCKDROP_ADDRESS;
   const contextValue = useContext(GlobalContext);

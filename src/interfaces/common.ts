@@ -85,4 +85,5 @@ export interface ILockdropData {
     valueStringWei: string;
     valueStringETH: string;
   };
+  lpTokenAddress: string;
 }

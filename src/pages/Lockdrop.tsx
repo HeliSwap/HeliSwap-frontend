@@ -5,6 +5,8 @@ import { ethers } from 'ethers';
 
 import { GlobalContext } from '../providers/Global';
 
+import useFarmAddress from '../hooks/useFarmAddress';
+
 import { ILockdropData, LOCKDROP_STATE } from '../interfaces/common';
 
 import LockdropStats from '../components/LockdropStats';
@@ -21,6 +23,8 @@ import {
   formatStringWeiToStringEther,
   getUserHELIReserves,
 } from '../utils/numberUtils';
+
+import { useQueryOptionsPoolsFarms } from '../constants';
 
 const LockDropABI = require('../abi/LockDrop.json');
 
@@ -46,6 +50,7 @@ const Lockdrop = () => {
     lockDropDespositEnd: 0,
     vestingEndTime: 0,
     tokenAddress: '',
+    lpTokenAddress: '',
     totalLP: {
       valueBN: ethers.BigNumber.from(0),
       valueStringWei: '',
@@ -94,6 +99,8 @@ const Lockdrop = () => {
 
   const [lockDropData, setLockDropData] = useState<ILockdropData>(lockDropInitialData);
 
+  const { farmAddress } = useFarmAddress(useQueryOptionsPoolsFarms, lockDropData.lpTokenAddress);
+
   const getContractData = useCallback(async () => {
     setLoadingContractData(true);
 
@@ -106,6 +113,7 @@ const Lockdrop = () => {
       lockDropContract.totalHbars(),
       lockDropContract.totalTokens(),
       lockDropContract.tokenAddress(),
+      lockDropContract.LPToken(),
     ];
 
     try {
@@ -118,6 +126,7 @@ const Lockdrop = () => {
         totalHbarsBN,
         totalTokensBN,
         tokenAddress,
+        lpTokenAddress,
       ] = await Promise.all(promisesArray);
 
       let stakedTokensBN = ethers.BigNumber.from(0);
@@ -243,6 +252,7 @@ const Lockdrop = () => {
         lastUserWithdrawal,
         tokenAddress,
         estimatedLPTokens,
+        lpTokenAddress,
       });
 
       setCountDownEnd(vesting ? vestingEndTime : lockdropEnd);
@@ -289,6 +299,7 @@ const Lockdrop = () => {
               getContractData={getContractData}
               lockDropData={lockDropData}
               currentState={currentState}
+              farmAddress={farmAddress}
             />
           ) : null}
           {/* Deposit, Withdrtaw & Claim form */}
