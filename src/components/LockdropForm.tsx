@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
-// import toast from 'react-hot-toast';
 import Tippy from '@tippyjs/react';
 
 import BigNumber from 'bignumber.js';
@@ -15,14 +14,15 @@ import WalletBalance from '../components/WalletBalance';
 import IconToken from '../components/IconToken';
 import Button from '../components/Button';
 import Icon from '../components/Icon';
-import ToasterWrapper from '../components/ToasterWrapper';
 
 import {
   formatStringETHtoPriceFormatted,
+  formatStringWeiToStringEther,
   getUserHELIReserves,
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
 import { getTokenBalance, NATIVE_TOKEN } from '../utils/tokenUtils';
+import getErrorMessage from '../content/errors';
 
 enum ActionTab {
   'Deposit',
@@ -33,9 +33,15 @@ interface ILockdropFormProps {
   currentState: LOCKDROP_STATE;
   lockDropData: ILockdropData;
   getContractData: () => void;
+  toast: any;
 }
 
-const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdropFormProps) => {
+const LockdropForm = ({
+  currentState,
+  lockDropData,
+  getContractData,
+  toast,
+}: ILockdropFormProps) => {
   const lockDropContractAddress = process.env.REACT_APP_LOCKDROP_ADDRESS;
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
@@ -79,12 +85,22 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
     setLoadingButton(true);
 
     try {
-      await sdk.depositHBAR(
+      const receipt = await sdk.depositHBAR(
         hashconnectConnectorInstance,
         lockDropContractAddress as string,
         userId,
         depositValue,
       );
+
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (success) {
+        toast.success('Success! Tokens were deposited.');
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      }
 
       await getContractData();
     } catch (e) {
@@ -98,12 +114,22 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
     setLoadingButton(true);
 
     try {
-      await sdk.withdrawHBAR(
+      const receipt = await sdk.withdrawHBAR(
         hashconnectConnectorInstance,
         lockDropContractAddress as string,
         userId,
         withdrawValue,
       );
+
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (success) {
+        toast.success('Success! Tokens were withdrawn.');
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      }
 
       await getContractData();
     } catch (e) {
@@ -117,7 +143,21 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
     setLoadingButton(true);
 
     try {
-      await sdk.claimLP(hashconnectConnectorInstance, lockDropContractAddress as string, userId);
+      const receipt = await sdk.claimLP(
+        hashconnectConnectorInstance,
+        lockDropContractAddress as string,
+        userId,
+      );
+
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (success) {
+        toast.success('Success! Tokens were claimed.');
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      }
 
       await getContractData();
     } catch (e) {
@@ -130,7 +170,30 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
   const handleClaimAndStakeButtonClick = async () => {
     setLoadingButton(true);
 
+    const farmAddress = '';
+    const tokensToStake = formatStringWeiToStringEther(claimable.valueStringETH);
+
     try {
+      await sdk.claimLP(hashconnectConnectorInstance, lockDropContractAddress as string, userId);
+
+      const receipt = await sdk.stakeLP(
+        hashconnectConnectorInstance,
+        tokensToStake,
+        farmAddress,
+        userId,
+      );
+
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (success) {
+        toast.success('Success! Tokens were staked.');
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      }
+
+      await getContractData();
     } catch (e) {
       console.log('e', e);
     } finally {
@@ -434,7 +497,6 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
           ) : null}
         </div>
       </div>
-      <ToasterWrapper />
     </div>
   );
 };

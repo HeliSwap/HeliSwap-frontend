@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useContext } from 'react';
 import numeral from 'numeral';
+import toast from 'react-hot-toast';
 import { ethers } from 'ethers';
 
 import { GlobalContext } from '../providers/Global';
@@ -11,6 +12,7 @@ import LockdropFAQ from '../components/LockdropFAQ';
 import LockdropForm from '../components/LockdropForm';
 import LockdropHowItWorks from '../components/LockdropHowItWorks';
 import Loader from '../components/Loader';
+import ToasterWrapper from '../components/ToasterWrapper';
 
 import { getProvider, idToAddress } from '../utils/tokenUtils';
 import {
@@ -283,6 +285,7 @@ const Lockdrop = () => {
           {/* Deposit, Withdrtaw & Claim form */}
           {lockDropData ? (
             <LockdropForm
+              toast={toast}
               getContractData={getContractData}
               lockDropData={lockDropData}
               currentState={currentState}
@@ -347,6 +350,7 @@ const Lockdrop = () => {
           <img className="ms-4" src="/button-gitbook.svg" alt="" />
         </a>
       </div>
+      <ToasterWrapper />
     </div>
   );
 };
