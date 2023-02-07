@@ -199,11 +199,16 @@ const Lockdrop = () => {
       // Determine state
       const nowTimeStamp = Date.now();
       const withdrawOnly = nowTimeStamp > lockDropDespositEnd && nowTimeStamp <= lockdropEnd;
-      const vesting = nowTimeStamp > lockdropEnd;
+      const preVesting = nowTimeStamp > lockdropEnd && vestingEndTime === 0;
+      const vesting = nowTimeStamp > lockdropEnd && vestingEndTime !== 0;
       const end = vestingEndTime !== 0 ? nowTimeStamp > vestingEndTime : false;
 
       if (withdrawOnly) {
         setCurrentState(LOCKDROP_STATE.WITHDRAW);
+      }
+
+      if (preVesting) {
+        setCurrentState(LOCKDROP_STATE.PRE_VESTING);
       }
 
       if (vesting) {
@@ -231,7 +236,7 @@ const Lockdrop = () => {
         estimatedLPTokens,
       });
 
-      setCountDownEnd(lockdropEnd);
+      setCountDownEnd(vesting ? vestingEndTime : lockdropEnd);
     } catch (e) {
       console.error('Error on fetching contract data:', e);
     } finally {

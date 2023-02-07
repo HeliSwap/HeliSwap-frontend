@@ -177,7 +177,7 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
           amount of LP tokens you would receive if the lockdrop ended in that moment.
         </p>
         <div className="container-dark">
-          {currentState >= LOCKDROP_STATE.DEPOSIT && currentState < LOCKDROP_STATE.VESTING ? (
+          {currentState >= LOCKDROP_STATE.DEPOSIT && currentState < LOCKDROP_STATE.PRE_VESTING ? (
             <>
               <div className="d-flex mb-5">
                 {currentState === LOCKDROP_STATE.DEPOSIT ? (
@@ -305,7 +305,7 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
             </>
           ) : null}
 
-          {currentState >= LOCKDROP_STATE.VESTING ? (
+          {currentState >= LOCKDROP_STATE.PRE_VESTING ? (
             <>
               <p className="text-small text-bold mb-3">Liquidity provied to Lockdrop</p>
 
@@ -390,12 +390,17 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
               {userId && !isHashpackLoading ? (
                 <>
                   <div className="d-grid mt-5">
-                    <Button loading={loadingButton} onClick={handleClaimButtonClick}>
+                    <Button
+                      disabled={currentState === LOCKDROP_STATE.PRE_VESTING}
+                      loading={loadingButton}
+                      onClick={handleClaimButtonClick}
+                    >
                       CLAIM
                     </Button>
                   </div>
                   <div className="d-grid mt-4">
                     <Button
+                      disabled={currentState === LOCKDROP_STATE.PRE_VESTING}
                       loading={loadingButton}
                       type="secondary"
                       onClick={handleClaimAndStakeButtonClick}

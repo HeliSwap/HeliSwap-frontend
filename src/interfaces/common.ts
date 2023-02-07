@@ -56,6 +56,7 @@ export interface IHistoricalData {
 export enum LOCKDROP_STATE {
   DEPOSIT,
   WITHDRAW,
+  PRE_VESTING,
   VESTING,
   END,
 }

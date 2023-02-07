@@ -8,7 +8,7 @@ interface ILockdropCounterProps {
   currentState: LOCKDROP_STATE;
 }
 
-const LockdropCounter = ({ countdownEnd }: ILockdropCounterProps) => {
+const LockdropCounter = ({ countdownEnd, currentState }: ILockdropCounterProps) => {
   const [isEnded, setIsEnded] = useState(false);
   const [countDown, setCountDown] = useState(countdownEnd - new Date().getTime());
 
@@ -26,7 +26,9 @@ const LockdropCounter = ({ countdownEnd }: ILockdropCounterProps) => {
 
   return (
     <div className="container-lockdrop-progress">
-      {!isEnded ? (
+      {currentState === LOCKDROP_STATE.PRE_VESTING ? (
+        <p className="text-display text-bold text-center">DEPLOYING POOL...</p>
+      ) : !isEnded ? (
         <div className="text-center">
           <p className="text-micro text-bold">ENDS IN</p>
           <div className="mt-3 d-flex justify-content-center">
