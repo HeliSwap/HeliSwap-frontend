@@ -91,6 +91,11 @@ export const formatStringETHtoPriceFormatted = (
   if (splitted.length > 1) {
     const lengthAfterDecimals = splitted[1].length;
 
+    // Check for 1 zero after the decimal
+    if (lengthAfterDecimals === 1 && splitted[1] === '0') {
+      return stringToFormat;
+    }
+
     // If the number contains zeros in the decimals, leaves the zeros and shows to more symbols, despite the how many symbols are indicated in the second argument
     let zerosBeforeSymbol = 0;
 
