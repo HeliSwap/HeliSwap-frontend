@@ -196,6 +196,8 @@ export const getUserHELIReserves = (
   lockedHbars: ethers.BigNumber,
   totalHbars: ethers.BigNumber,
 ) => {
+  if (Number(totalHbars.toString()) === 0 || Number(totalTokens.toString()) === 0) return '0.0';
+
   const myHELIBN = totalTokens.mul(lockedHbars).div(totalHbars);
   const myHELIFormatted = ethers.utils.formatUnits(myHELIBN, 8);
 
