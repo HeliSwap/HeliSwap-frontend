@@ -478,7 +478,7 @@ const LockdropForm = ({
                   </div>
                   <div className="d-grid mt-4">
                     <Button
-                      disabled={currentState === LOCKDROP_STATE.PRE_VESTING}
+                      disabled={currentState === LOCKDROP_STATE.PRE_VESTING || !farmAddress}
                       loading={loadingButton}
                       type="secondary"
                       onClick={handleClaimAndStakeButtonClick}
