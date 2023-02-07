@@ -172,7 +172,6 @@ const LockdropForm = ({
   const handleClaimAndStakeButtonClick = async () => {
     setLoadingButton(true);
 
-    const farmAddress = '';
     const tokensToStake = formatStringWeiToStringEther(claimable.valueStringETH);
 
     try {
