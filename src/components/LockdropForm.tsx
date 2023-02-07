@@ -17,7 +17,11 @@ import Button from '../components/Button';
 import Icon from '../components/Icon';
 import ToasterWrapper from '../components/ToasterWrapper';
 
-import { formatStringETHtoPriceFormatted, stripStringToFixedDecimals } from '../utils/numberUtils';
+import {
+  formatStringETHtoPriceFormatted,
+  getUserHELIReserves,
+  stripStringToFixedDecimals,
+} from '../utils/numberUtils';
 import { getTokenBalance, NATIVE_TOKEN } from '../utils/tokenUtils';
 
 enum ActionTab {
@@ -316,7 +320,9 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
                     <span className="text-main ms-3">HBAR</span>
                   </div>
                   <div className="d-flex align-items-center">
-                    <p className="text-numeric text-small me-3">{lockedHbars.valueStringETH}</p>
+                    <p className="text-numeric text-small me-3">
+                      {formatStringETHtoPriceFormatted(lockedHbars.valueStringETH)}
+                    </p>
                   </div>
                 </div>
 
@@ -326,7 +332,15 @@ const LockdropForm = ({ currentState, lockDropData, getContractData }: ILockdrop
                     <span className="text-main ms-3">HELI</span>
                   </div>
                   <div className="d-flex align-items-center">
-                    <p className="text-numeric text-small me-3">{totalTokens.valueStringETH}</p>
+                    <p className="text-numeric text-small me-3">
+                      {formatStringETHtoPriceFormatted(
+                        getUserHELIReserves(
+                          totalTokens.valueBN,
+                          lockedHbars.valueBN,
+                          totalHbars.valueBN,
+                        ),
+                      )}
+                    </p>
                   </div>
                 </div>
               </div>

@@ -17,6 +17,7 @@ import {
   calculateLPTokens,
   formatBigNumberToMilliseconds,
   formatStringWeiToStringEther,
+  getUserHELIReserves,
 } from '../utils/numberUtils';
 
 const LockDropABI = require('../abi/LockDrop.json');
@@ -185,8 +186,14 @@ const Lockdrop = () => {
         valueStringETH: formatBNTokenToString(lastUserWithdrawalBN, 18),
       };
 
+      const myHELIFormatted = getUserHELIReserves(
+        totalTokens.valueBN,
+        lockedHbars.valueBN,
+        totalHbars.valueBN,
+      );
+
       const estimatedLPTokensBN = calculateLPTokens(
-        totalTokens.valueStringETH,
+        myHELIFormatted,
         lockedHbars.valueStringETH,
         8,
         8,

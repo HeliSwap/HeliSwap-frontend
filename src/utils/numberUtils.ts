@@ -1,6 +1,7 @@
 import numeral from 'numeral';
 import BigNumber from 'bignumber.js';
 import { hethers } from '@hashgraph/hethers';
+import { ethers } from 'ethers';
 
 export const formatStringToPrice = (stringToFormat: string, floor: boolean = false) => {
   return floor && Number(stringToFormat) < 1000
@@ -183,4 +184,15 @@ export const calculateLPTokens = (
   const amountLP = token0AmountBN.times(token1AmountBN).sqrt().toString();
 
   return amountLP;
+};
+
+export const getUserHELIReserves = (
+  totalTokens: ethers.BigNumber,
+  lockedHbars: ethers.BigNumber,
+  totalHbars: ethers.BigNumber,
+) => {
+  const myHELIBN = totalTokens.mul(lockedHbars).div(totalHbars);
+  const myHELIFormatted = ethers.utils.formatUnits(myHELIBN, 8);
+
+  return myHELIFormatted;
 };
