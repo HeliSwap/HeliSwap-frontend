@@ -37,7 +37,12 @@
   },
   {
     "inputs": [],
-    "name": "LockDrop__LockDropStillNotEnded",
+    "name": "LockDrop__InvalidLiquiditySide",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "LockDrop__LockDropStillInProgress",
     "type": "error"
   },
   {
@@ -57,7 +62,12 @@
   },
   {
     "inputs": [],
-    "name": "LockDrop__UserCanWithdrawOnlyOnceADay",
+    "name": "LockDrop__UserCanWithdrawOnlyOnce",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "LockDrop__WaitToBeFunded",
     "type": "error"
   },
   {
@@ -293,7 +303,7 @@
   },
   {
     "inputs": [],
-    "name": "lockDropDespositEnd",
+    "name": "lockDropDepositEnd",
     "outputs": [
       {
         "internalType": "uint256",
@@ -456,6 +466,19 @@
   {
     "inputs": [],
     "name": "vestingEndTime",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "vestingStartTime",
     "outputs": [
       {
         "internalType": "uint256",

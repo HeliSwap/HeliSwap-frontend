@@ -47,7 +47,7 @@ const Lockdrop = () => {
   const lockDropInitialData: ILockdropData = {
     lockDropDuration: 0,
     lockdropEnd: 0,
-    lockDropDespositEnd: 0,
+    lockDropDepositEnd: 0,
     vestingEndTime: 0,
     tokenAddress: '',
     lpTokenAddress: '',
@@ -107,7 +107,7 @@ const Lockdrop = () => {
     const promisesArray = [
       lockDropContract.LOCK_DROP_DURATION(),
       lockDropContract.lockDropEnd(),
-      lockDropContract.lockDropDespositEnd(),
+      lockDropContract.lockDropDepositEnd(),
       lockDropContract.vestingEndTime(),
       lockDropContract.totalLP(),
       lockDropContract.totalHbars(),
@@ -120,7 +120,7 @@ const Lockdrop = () => {
       const [
         lockDropDurationBN,
         lockDropEndBN,
-        lockDropDespositEndBN,
+        lockDropDepositEndBN,
         vestingEndTimeBN,
         totalLPBN,
         totalHbarsBN,
@@ -146,7 +146,7 @@ const Lockdrop = () => {
       // Format data
       const lockDropDuration = formatBigNumberToMilliseconds(lockDropDurationBN);
       const lockdropEnd = formatBigNumberToMilliseconds(lockDropEndBN);
-      const lockDropDespositEnd = formatBigNumberToMilliseconds(lockDropDespositEndBN);
+      const lockDropDepositEnd = formatBigNumberToMilliseconds(lockDropDepositEndBN);
       const vestingEndTime = formatBigNumberToMilliseconds(vestingEndTimeBN);
 
       const totalLP = {
@@ -216,7 +216,7 @@ const Lockdrop = () => {
 
       // Determine state
       const nowTimeStamp = Date.now();
-      const withdrawOnly = nowTimeStamp > lockDropDespositEnd && nowTimeStamp <= lockdropEnd;
+      const withdrawOnly = nowTimeStamp > lockDropDepositEnd && nowTimeStamp <= lockdropEnd;
       const preVesting = nowTimeStamp > lockdropEnd && vestingEndTime === 0;
       const vesting = nowTimeStamp > lockdropEnd && vestingEndTime !== 0;
       const end = vestingEndTime !== 0 ? nowTimeStamp > vestingEndTime : false;
@@ -240,7 +240,7 @@ const Lockdrop = () => {
       setLockDropData({
         lockDropDuration,
         lockdropEnd,
-        lockDropDespositEnd,
+        lockDropDepositEnd,
         vestingEndTime,
         totalLP,
         totalHbars,

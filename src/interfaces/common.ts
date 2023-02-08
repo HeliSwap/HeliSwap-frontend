@@ -70,7 +70,7 @@ export interface IContractTokenValue {
 export interface ILockdropData {
   lockDropDuration: number;
   lockdropEnd: number;
-  lockDropDespositEnd: number;
+  lockDropDepositEnd: number;
   vestingEndTime: number;
   tokenAddress: string;
   totalLP: IContractTokenValue;
