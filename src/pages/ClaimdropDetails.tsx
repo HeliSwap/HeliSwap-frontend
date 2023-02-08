@@ -22,14 +22,14 @@ import {
   getHTSTokenInfo,
   getProvider,
   getUserAssociatedTokens,
+  idToAddress,
 } from '../utils/tokenUtils';
 import { getDaysFromDurationMilliseconds, timestampToDate } from '../utils/timeUtils';
 import { formatBigNumberToMilliseconds } from '../utils/numberUtils';
 
 import getErrorMessage from '../content/errors';
 
-// TODO: needs to be changed with the claim drop ABI
-import ClaimDropABI from '../abi/LockDrop.json';
+import ClaimDropABI from '../abi/ClaimDrop.json';
 
 enum CLAIMDROP_STATE {
   NOT_STARTED,
@@ -58,6 +58,10 @@ const ClaimdropDetails = () => {
       date: '',
       timestamp: 0,
     },
+    claimdropEnd: {
+      date: '',
+      timestamp: 0,
+    },
     vestingPeriod: {
       valueNumericDays: 0,
       valueNumericMilliseconds: 0,
@@ -68,9 +72,36 @@ const ClaimdropDetails = () => {
       valueNumericMilliseconds: 0,
       valueString: '',
     },
-    totalTokensAllocated: '',
-    totalTokensClaimed: '',
-    availableToClaim: '',
+    totalAllocated: {
+      valueBN: ethers.BigNumber.from(0),
+      valueStringWei: '',
+      valueStringETH: '',
+    },
+    claimedOf: {
+      valueBN: ethers.BigNumber.from(0),
+      valueStringWei: '',
+      valueStringETH: '',
+    },
+    vestedTokensOf: {
+      valueBN: ethers.BigNumber.from(0),
+      valueStringWei: '',
+      valueStringETH: '',
+    },
+    claimable: {
+      valueBN: ethers.BigNumber.from(0),
+      valueStringWei: '',
+      valueStringETH: '',
+    },
+    extraTokensOf: {
+      valueBN: ethers.BigNumber.from(0),
+      valueStringWei: '',
+      valueStringETH: '',
+    },
+    totalAllocatedOf: {
+      valueBN: ethers.BigNumber.from(0),
+      valueStringWei: '',
+      valueStringETH: '',
+    },
   };
 
   const [tokenData, setTokenData] = useState({} as ITokenData);
@@ -84,91 +115,170 @@ const ClaimdropDetails = () => {
   const [loadingAssociate, setLoadingAssociate] = useState(false);
 
   const getContractData = useCallback(async () => {
-    const formatBNTokenToString = (numberToFormat: ethers.BigNumber) =>
-      numeral(ethers.utils.formatUnits(numberToFormat, tokenData.decimals)).format();
+    const formatBNTokenToString = (numberToFormat: ethers.BigNumber, decimals = 8) =>
+      ethers.utils.formatUnits(numberToFormat, decimals);
 
     setLoadingContractData(true);
 
-    // Contract data
-    const startDateBN = ethers.BigNumber.from(1673697600);
-    const vestingPeriodBN = ethers.BigNumber.from(2592000); // 30 Days
-    const claimPeriodBN = ethers.BigNumber.from(2592000 * 2);
-    const totalTokensAllocatedBN = ethers.BigNumber.from(3_000_000_000_000_00);
-    const totalTokensClaimedBN = ethers.BigNumber.from(2_000_000_000_000_00);
-    const availableToClaimBN = ethers.BigNumber.from(10_000_000_00);
-
-    // Prepare contract data
-    const startTimestamp = formatBigNumberToMilliseconds(startDateBN);
-    const claimdropStart = {
-      date: timestampToDate(startTimestamp),
-      timestamp: startTimestamp,
-    };
-
-    const vestingPeriodMilliseconds = formatBigNumberToMilliseconds(vestingPeriodBN);
-    const { valueString: vestingPeriodString, valueNumeric: vestingPeriodDays } =
-      getDaysFromDurationMilliseconds(vestingPeriodMilliseconds);
-
-    const vestingPeriod = {
-      valueString: vestingPeriodString,
-      valueNumericDays: vestingPeriodDays,
-      valueNumericMilliseconds: vestingPeriodMilliseconds,
-    };
-
-    const claimPeriodMilliseconds = formatBigNumberToMilliseconds(claimPeriodBN);
-    const { valueString: claimPeriodString, valueNumeric: claimPeriodDays } =
-      getDaysFromDurationMilliseconds(formatBigNumberToMilliseconds(claimPeriodBN));
-    const claimPeriod = {
-      valueString: claimPeriodString,
-      valueNumericDays: claimPeriodDays,
-      valueNumericMilliseconds: claimPeriodMilliseconds,
-    };
-
-    const totalTokensAllocated = formatBNTokenToString(totalTokensAllocatedBN);
-    const totalTokensClaimed = formatBNTokenToString(totalTokensClaimedBN);
-    const availableToClaim = formatBNTokenToString(availableToClaimBN);
-
-    setClaimdropData({
-      claimdropStart,
-      vestingPeriod,
-      claimPeriod,
-      totalTokensAllocated,
-      totalTokensClaimed,
-      availableToClaim,
-    });
-
-    // Determine state
-    const nowTimeStamp = Date.now();
-    const vestingEndTimeStamp = claimdropStart.timestamp + vestingPeriod.valueNumericMilliseconds;
-    const claimingEndTimeStamp = vestingEndTimeStamp + claimPeriod.valueNumericMilliseconds;
-
-    const notStarted = nowTimeStamp < claimdropStart.timestamp;
-    const vesting = nowTimeStamp >= claimdropStart.timestamp && nowTimeStamp < vestingEndTimeStamp;
-    const postVesting = nowTimeStamp >= vestingEndTimeStamp && nowTimeStamp < claimingEndTimeStamp;
-    const ended = nowTimeStamp > claimingEndTimeStamp;
-
-    if (notStarted) {
-      setClaimdropState(CLAIMDROP_STATE.NOT_STARTED);
-    }
-
-    if (vesting) {
-      setClaimdropState(CLAIMDROP_STATE.VESTING);
-    }
-
-    if (postVesting) {
-      setClaimdropState(CLAIMDROP_STATE.POST_VESTING);
-    }
-
-    if (ended) {
-      setClaimdropState(CLAIMDROP_STATE.ENDED);
-    }
-
     try {
+      const promisesArray = [
+        claimDropContract.start(),
+        claimDropContract.end(),
+        // claimDropContract.cliffEnd(),
+        claimDropContract.claimExtraTime(),
+        // claimDropContract.tokensNotVestedPercentage(),
+        // claimDropContract.failMode(),
+        // claimDropContract.index(),
+        claimDropContract.totalAllocated(),
+      ];
+
+      const [
+        startBN,
+        endBN,
+        // cliffEndBN,
+        claimExtraTimeBN,
+        // tokensNotVestedPercentageBN,
+        // failMode,
+        // indexBN,
+        totalAllocatedBN,
+      ] = await Promise.all(promisesArray);
+
+      let claimedOfBN = ethers.BigNumber.from(0);
+      let vestedTokensOfBN = ethers.BigNumber.from(0);
+      let claimableBN = ethers.BigNumber.from(0);
+      let extraTokensOfBN = ethers.BigNumber.from(0);
+      let totalAllocatedOfBN = ethers.BigNumber.from(0);
+
+      if (userId) {
+        const userAddress = idToAddress(userId);
+
+        const userPromisesArray = [
+          claimDropContract.claimedOf(userAddress),
+          claimDropContract.vestedTokensOf(userAddress),
+          claimDropContract.claimable(userAddress),
+          claimDropContract.extraTokensOf(userAddress),
+          claimDropContract.totalAllocatedOf(userAddress),
+        ];
+
+        [claimedOfBN, vestedTokensOfBN, claimableBN, extraTokensOfBN, totalAllocatedOfBN] =
+          await Promise.all(userPromisesArray);
+      }
+
+      // Prepare contract data
+      const startTimestamp = formatBigNumberToMilliseconds(startBN);
+      const claimdropStart = {
+        date: timestampToDate(startTimestamp),
+        timestamp: startTimestamp,
+      };
+
+      const endTimestamp = formatBigNumberToMilliseconds(endBN);
+      const claimdropEnd = {
+        date: timestampToDate(endTimestamp),
+        timestamp: endTimestamp,
+      };
+
+      const vestingPeriodMilliseconds = endTimestamp - startTimestamp;
+      const { valueString: vestingPeriodString, valueNumeric: vestingPeriodDays } =
+        getDaysFromDurationMilliseconds(vestingPeriodMilliseconds);
+
+      const vestingPeriod = {
+        valueString: vestingPeriodString,
+        valueNumericDays: vestingPeriodDays,
+        valueNumericMilliseconds: vestingPeriodMilliseconds,
+      };
+
+      const claimPeriodMilliseconds = formatBigNumberToMilliseconds(claimExtraTimeBN);
+      const { valueString: claimPeriodString, valueNumeric: claimPeriodDays } =
+        getDaysFromDurationMilliseconds(formatBigNumberToMilliseconds(claimExtraTimeBN));
+      const claimPeriod = {
+        valueString: claimPeriodString,
+        valueNumericDays: claimPeriodDays,
+        valueNumericMilliseconds: claimPeriodMilliseconds,
+      };
+
+      // Format token data
+      const totalAllocated = {
+        valueBN: totalAllocatedBN,
+        valueStringWei: totalAllocatedBN.toString(),
+        valueStringETH: formatBNTokenToString(totalAllocatedBN, tokenData.decimals),
+      };
+
+      const claimedOf = {
+        valueBN: claimedOfBN,
+        valueStringWei: claimedOfBN.toString(),
+        valueStringETH: formatBNTokenToString(claimedOfBN, tokenData.decimals),
+      };
+
+      const vestedTokensOf = {
+        valueBN: vestedTokensOfBN,
+        valueStringWei: vestedTokensOfBN.toString(),
+        valueStringETH: formatBNTokenToString(vestedTokensOfBN, tokenData.decimals),
+      };
+
+      const claimable = {
+        valueBN: claimableBN,
+        valueStringWei: claimableBN.toString(),
+        valueStringETH: formatBNTokenToString(claimableBN, tokenData.decimals),
+      };
+
+      const extraTokensOf = {
+        valueBN: extraTokensOfBN,
+        valueStringWei: extraTokensOfBN.toString(),
+        valueStringETH: formatBNTokenToString(extraTokensOfBN, tokenData.decimals),
+      };
+
+      const totalAllocatedOf = {
+        valueBN: totalAllocatedOfBN,
+        valueStringWei: totalAllocatedOfBN.toString(),
+        valueStringETH: formatBNTokenToString(totalAllocatedOfBN, tokenData.decimals),
+      };
+
+      setClaimdropData({
+        claimdropStart,
+        claimdropEnd,
+        vestingPeriod,
+        claimPeriod,
+        totalAllocated,
+        claimedOf,
+        vestedTokensOf,
+        claimable,
+        extraTokensOf,
+        totalAllocatedOf,
+      });
+
+      // Determine state
+      const nowTimeStamp = Date.now();
+      const vestingEndTimeStamp = claimdropStart.timestamp + vestingPeriod.valueNumericMilliseconds;
+      const claimingEndTimeStamp = vestingEndTimeStamp + claimPeriod.valueNumericMilliseconds;
+
+      const notStarted = nowTimeStamp < claimdropStart.timestamp;
+      const vesting =
+        nowTimeStamp >= claimdropStart.timestamp && nowTimeStamp < vestingEndTimeStamp;
+      const postVesting =
+        nowTimeStamp >= vestingEndTimeStamp && nowTimeStamp < claimingEndTimeStamp;
+      const ended = nowTimeStamp > claimingEndTimeStamp;
+
+      if (notStarted) {
+        setClaimdropState(CLAIMDROP_STATE.NOT_STARTED);
+      }
+
+      if (vesting) {
+        setClaimdropState(CLAIMDROP_STATE.VESTING);
+      }
+
+      if (postVesting) {
+        setClaimdropState(CLAIMDROP_STATE.POST_VESTING);
+      }
+
+      if (ended) {
+        setClaimdropState(CLAIMDROP_STATE.ENDED);
+      }
     } catch (e) {
       console.error('Error on fetching contract data:', e);
     } finally {
       setLoadingContractData(false);
     }
-  }, [userId, tokenData.decimals]);
+  }, [userId, tokenData.decimals, claimDropContract]);
 
   const checkTokenAssociation = async (userId: string) => {
     const tokens = await getUserAssociatedTokens(userId);
@@ -267,11 +377,16 @@ const ClaimdropDetails = () => {
     );
   };
 
+  const { claimdropStart, vestingPeriod, claimPeriod, totalAllocated, claimedOf, claimable } =
+    claimdropData;
+
   // Checks
   const canClaim =
     claimdropState > CLAIMDROP_STATE.NOT_STARTED && claimdropState < CLAIMDROP_STATE.ENDED;
-  const haveTokensToClaim = Number(claimdropData.availableToClaim) > 0;
+  const haveTokensToClaim = Number(claimable.valueBN.toString()) > 0;
   const claimButtonDisabled = !haveTokensToClaim;
+
+  console.log(claimdropData);
 
   return (
     <div className="d-flex justify-content-center">
@@ -315,9 +430,7 @@ const ClaimdropDetails = () => {
                           </div>
 
                           <div className="col-lg-7 mt-2 mt-lg-0">
-                            <p className="text-subheader text-bold">
-                              {claimdropData.claimdropStart.date}
-                            </p>
+                            <p className="text-subheader text-bold">{claimdropStart.date}</p>
                           </div>
                         </div>
 
@@ -327,9 +440,7 @@ const ClaimdropDetails = () => {
                           </div>
 
                           <div className="col-lg-7 mt-2 mt-lg-0">
-                            <p className="text-subheader text-bold">
-                              {claimdropData.vestingPeriod.valueString}
-                            </p>
+                            <p className="text-subheader text-bold">{vestingPeriod.valueString}</p>
                           </div>
                         </div>
 
@@ -346,9 +457,7 @@ const ClaimdropDetails = () => {
                           </div>
 
                           <div className="col-lg-7 mt-2 mt-lg-0">
-                            <p className="text-subheader text-bold">
-                              {claimdropData.claimPeriod.valueString}
-                            </p>
+                            <p className="text-subheader text-bold">{claimPeriod.valueString}</p>
                           </div>
                         </div>
 
@@ -370,7 +479,7 @@ const ClaimdropDetails = () => {
                             <div className="d-flex align-items-center">
                               <IconToken symbol={tokenData.symbol} />
                               <p className="text-subheader text-bold ms-3">
-                                {claimdropData.totalTokensAllocated}
+                                {numeral(totalAllocated.valueStringETH).format('0,0.00')}
                               </p>
                             </div>
                           </div>
@@ -392,7 +501,7 @@ const ClaimdropDetails = () => {
                             <div className="d-flex align-items-center">
                               <IconToken symbol={tokenData.symbol} />
                               <p className="text-subheader text-bold ms-3">
-                                {claimdropData.totalTokensClaimed}
+                                {numeral(claimedOf.valueStringETH).format('0,0.00')}
                               </p>
                             </div>
                           </div>
@@ -414,7 +523,7 @@ const ClaimdropDetails = () => {
                             <div className="d-flex align-items-center mt-3">
                               <IconToken symbol={tokenData.symbol} />
                               <p className="text-headline text-secondary-300 text-bold ms-3">
-                                {claimdropData.availableToClaim}
+                                {claimable.valueStringETH}
                               </p>
                             </div>
                           </div>
