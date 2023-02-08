@@ -24,13 +24,22 @@ const LockdropCounter = ({ countdownEnd, currentState }: ILockdropCounterProps) 
     countDown <= 0 && setIsEnded(true);
   }, [countDown]);
 
+  const stateMapping: any = {
+    [LOCKDROP_STATE.DEPOSIT]: 'Lockrop',
+    [LOCKDROP_STATE.WITHDRAW]: 'Lockrop',
+    [LOCKDROP_STATE.VESTING]: 'Vesting',
+    [LOCKDROP_STATE.END]: 'Vesting',
+  };
+
   return (
     <div className="container-lockdrop-progress">
       {currentState === LOCKDROP_STATE.PRE_VESTING ? (
         <p className="text-display text-bold text-center">DEPLOYING POOL...</p>
       ) : !isEnded ? (
         <div className="text-center">
-          <p className="text-micro text-bold">ENDS IN</p>
+          <p className="text-micro text-uppercase text-bold">
+            {stateMapping[currentState]} ENDS IN
+          </p>
           <div className="mt-3 d-flex justify-content-center">
             <div className="mx-3">
               <p className="text-numeric text-huge text-bold">
@@ -59,7 +68,9 @@ const LockdropCounter = ({ countdownEnd, currentState }: ILockdropCounterProps) 
           </div>
         </div>
       ) : (
-        <p className="text-huge text-bold">ENDED</p>
+        <p className="text-display text-bold text-uppercase text-center px-3">
+          {stateMapping[currentState]} ENDED
+        </p>
       )}
     </div>
   );

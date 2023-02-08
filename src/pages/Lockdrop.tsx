@@ -136,11 +136,18 @@ const Lockdrop = () => {
       let lastUserWithdrawalBN = ethers.BigNumber.from(0);
 
       if (userId) {
-        stakedTokensBN = await lockDropContract.providers(idToAddress(userId));
-        claimedOfBN = await lockDropContract.claimedOf(idToAddress(userId));
-        lastUserWithdrawalBN = await lockDropContract.lastUserWithdrawal(idToAddress(userId));
-        claimableBN = await lockDropContract.claimable(idToAddress(userId));
-        totalClaimableBN = await lockDropContract.totalClaimable(idToAddress(userId));
+        const userAddress = idToAddress(userId);
+
+        const userPromisesArray = [
+          lockDropContract.providers(userAddress),
+          lockDropContract.claimedOf(userAddress),
+          lockDropContract.lastUserWithdrawal(userAddress),
+          lockDropContract.claimable(userAddress),
+          lockDropContract.totalClaimable(userAddress),
+        ];
+
+        [stakedTokensBN, claimedOfBN, lastUserWithdrawalBN, claimableBN, totalClaimableBN] =
+          await Promise.all(userPromisesArray);
       }
 
       // Format data
