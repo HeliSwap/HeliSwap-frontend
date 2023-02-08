@@ -47,11 +47,13 @@ const ClaimdropDetails = () => {
   const { token } = useParams();
   const navigate = useNavigate();
 
+  const claimDropContractAddress = process.env.REACT_APP_CLAIMDROP_ADDRESS;
+
   const claimDropContract = useMemo(() => {
     const provider = getProvider();
-    const claimDropContractAddress = process.env.REACT_APP_CLAIMDROP_ADDRESS;
+
     return new ethers.Contract(claimDropContractAddress as string, ClaimDropABI, provider);
-  }, []);
+  }, [claimDropContractAddress]);
 
   const initialClaimdropData: IClaimdropData = {
     claimdropStart: {
@@ -126,9 +128,6 @@ const ClaimdropDetails = () => {
         claimDropContract.end(),
         // claimDropContract.cliffEnd(),
         claimDropContract.claimExtraTime(),
-        // claimDropContract.tokensNotVestedPercentage(),
-        // claimDropContract.failMode(),
-        // claimDropContract.index(),
         claimDropContract.totalAllocated(),
       ];
 
@@ -137,9 +136,6 @@ const ClaimdropDetails = () => {
         endBN,
         // cliffEndBN,
         claimExtraTimeBN,
-        // tokensNotVestedPercentageBN,
-        // failMode,
-        // indexBN,
         totalAllocatedBN,
       ] = await Promise.all(promisesArray);
 
@@ -286,10 +282,32 @@ const ClaimdropDetails = () => {
   };
 
   // Handlers
-  const handleButtonClaimClick = () => {
+  const handleButtonClaimClick = async () => {
     setLoadingClaim(true);
-    setLoadingClaim(false);
-    getContractData();
+
+    try {
+      const receipt = await sdk.claimLP(
+        hashconnectConnectorInstance,
+        claimDropContractAddress as string,
+        userId,
+      );
+
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (success) {
+        toast.success('Success! Tokens were claimed.');
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      }
+
+      await getContractData();
+    } catch (e) {
+      console.log('e', e);
+    } finally {
+      setLoadingClaim(false);
+    }
   };
 
   const handleBackClick = () => {
@@ -377,7 +395,7 @@ const ClaimdropDetails = () => {
     );
   };
 
-  const { claimdropStart, vestingPeriod, claimPeriod, totalAllocated, claimedOf, claimable } =
+  const { claimdropStart, vestingPeriod, claimPeriod, totalAllocatedOf, claimedOf, claimable } =
     claimdropData;
 
   // Checks
@@ -447,7 +465,7 @@ const ClaimdropDetails = () => {
                         <div className="row align-items-center mt-4">
                           <div className="col-lg-5">
                             <div className="d-flex align-items-center">
-                              <p className="text-small text-secondary">Claim Period</p>
+                              <p className="text-small text-secondary">Extra Claim Period</p>
                               <Tippy content={`some text.`}>
                                 <span className="ms-2">
                                   <Icon name="hint" size="small" color="gray" />
@@ -479,7 +497,7 @@ const ClaimdropDetails = () => {
                             <div className="d-flex align-items-center">
                               <IconToken symbol={tokenData.symbol} />
                               <p className="text-subheader text-bold ms-3">
-                                {numeral(totalAllocated.valueStringETH).format('0,0.00')}
+                                {numeral(totalAllocatedOf.valueStringETH).format('0,0.00')}
                               </p>
                             </div>
                           </div>

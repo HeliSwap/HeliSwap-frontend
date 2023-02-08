@@ -2,11 +2,11 @@ import { useNavigate } from 'react-router-dom';
 
 const claimdrops = [
   {
-    tokenAddress: '0x00000000000000000000000000000000002fA295',
+    tokenAddress: '0x0000000000000000000000000000000000340a6a',
     title: 'OM',
   },
   {
-    tokenAddress: '0x0000000000000000000000000000000000002023',
+    tokenAddress: '0x000000000000000000000000000000000033dac0',
     title: 'HELI',
   },
 ];

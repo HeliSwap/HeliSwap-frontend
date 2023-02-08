@@ -530,6 +530,25 @@ class SDK {
     return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
+  async claimTokensFromClaimDrop(
+    hashconnectConnectorInstance: Hashconnect,
+    claimdropAddress: string,
+    userId: string,
+  ) {
+    const maxGas = TRANSACTION_MAX_FEES.STAKE_LP_TOKEN;
+
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(claimdropAddress))
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Amount of HBAR we want to provide
+      //Set the contract function to call
+      .setFunction('claim', new ContractFunctionParameters());
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
   sendTransactionAndGetResponse = async (
     hashconnectConnectorInstance: Hashconnect,
     transaction: Transaction,
