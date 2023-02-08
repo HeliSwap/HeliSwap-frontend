@@ -227,6 +227,8 @@ const LockdropForm = ({
     </p>
   );
 
+  const canClaim = Number(claimable.valueBN.toString()) > 0;
+
   return (
     <div className="d-flex flex-column align-items-center py-15 container-lockdrop">
       <div className="container-action">
@@ -469,7 +471,7 @@ const LockdropForm = ({
                 <>
                   <div className="d-grid mt-5">
                     <Button
-                      disabled={currentState === LOCKDROP_STATE.PRE_VESTING}
+                      disabled={currentState === LOCKDROP_STATE.PRE_VESTING || !canClaim}
                       loading={loadingButton}
                       onClick={handleClaimButtonClick}
                     >
