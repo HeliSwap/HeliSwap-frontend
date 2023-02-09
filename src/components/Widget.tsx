@@ -1,14 +1,24 @@
 interface IWidgetrops {
-  width: number;
-  height: number;
   resource: string;
   title: string;
 }
 
-const Widget = ({ width, height, resource, title }: IWidgetrops) => {
+const Widget = ({ resource, title }: IWidgetrops) => {
   return (
-    <div>
-      <iframe title={title} src={resource} width={width} height={height}></iframe>
+    <div className="d-flex justify-content-center">
+      <div className="container-max-with-1042">
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <div className="d-flex">
+            <h2 className="text-subheader">{title}</h2>
+          </div>
+        </div>
+
+        <hr className="my-5" />
+
+        <div className="ratio ratio-4x3">
+          <iframe title={title} src={resource}></iframe>
+        </div>
+      </div>
     </div>
   );
 };
