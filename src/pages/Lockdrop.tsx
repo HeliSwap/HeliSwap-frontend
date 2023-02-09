@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo, useContext } from 're
 import numeral from 'numeral';
 import toast from 'react-hot-toast';
 import { ethers } from 'ethers';
+import dayjs from 'dayjs';
 
 import { GlobalContext } from '../providers/Global';
 
@@ -25,6 +26,7 @@ import {
 } from '../utils/numberUtils';
 
 import { useQueryOptionsPoolsFarms } from '../constants';
+import { BigNumber, hethers } from '@hashgraph/hethers';
 
 const LockDropABI = require('../abi/LockDrop.json');
 
@@ -43,6 +45,7 @@ const Lockdrop = () => {
   const [countdownEnd, setCountDownEnd] = useState(0);
   const [currentState, setCurrentState] = useState(LOCKDROP_STATE.DEPOSIT);
   const [loadingContractData, setLoadingContractData] = useState(true);
+  const [maxWithdrawValue, setMaxWithdrawValue] = useState<string>('0');
 
   const lockDropInitialData: ILockdropData = {
     lockDropDuration: 0,
@@ -262,9 +265,62 @@ const Lockdrop = () => {
     }
   }, [lockDropContract, userId]);
 
+  const getMaxWithdrawAmount = useCallback(() => {
+    const { lockdropEnd, lockedHbars } = lockDropData;
+    let maxWithdrawValue = '0';
+    const timeLockDropEnd = dayjs(lockdropEnd);
+    const timeLockDropStart = dayjs(lockdropEnd).subtract(7, 'days');
+    const timeNow = dayjs();
+
+    const timeMinusTwoDays = dayjs(lockdropEnd).subtract(2, 'days');
+    const timeMinusOneDay = dayjs(lockdropEnd).subtract(1, 'days');
+    if (
+      lockedHbars.valueBN.gt(BigNumber.from('0')) &&
+      (timeNow.isAfter(timeLockDropStart) || timeNow.isBefore(timeLockDropEnd))
+    ) {
+      if (timeNow.isBefore(timeMinusTwoDays)) {
+        maxWithdrawValue = lockedHbars.valueStringETH;
+      } else if (timeNow.isAfter(timeMinusTwoDays) && timeNow.isBefore(timeMinusOneDay)) {
+        maxWithdrawValue = hethers.utils.formatHbar(lockedHbars.valueBN.div(BigNumber.from('2')));
+      } else if (timeNow.isAfter(timeMinusTwoDays) && timeNow.isBefore(timeLockDropEnd)) {
+        //Show the amount in future moment, so the user is able to execute the transaction and withraw the amount shown
+        const timeNowDelayed = timeNow.add(30, 'seconds');
+
+        const maxAvailableToWithdraw = lockedHbars.valueBN.div(BigNumber.from('2'));
+        const timeFromStartOfDay = timeNowDelayed.valueOf() - timeMinusOneDay.valueOf();
+        const timeToLockdropEnd = timeLockDropEnd.valueOf() - timeMinusOneDay.valueOf();
+
+        const timeRatio = BigNumber.from(timeFromStartOfDay.toString())
+          .mul(BigNumber.from(hethers.constants.WeiPerEther))
+          .div(BigNumber.from(timeToLockdropEnd.toString()));
+
+        const maxWithdrawValueBN = maxAvailableToWithdraw.sub(
+          maxAvailableToWithdraw
+            .mul(timeRatio)
+            .div(BigNumber.from(hethers.constants.WeiPerEther))
+            .toString(),
+        );
+
+        maxWithdrawValue = maxWithdrawValueBN.lte(BigNumber.from('0'))
+          ? '0'
+          : hethers.utils.formatHbar(maxWithdrawValueBN);
+      }
+    }
+    setMaxWithdrawValue(maxWithdrawValue);
+  }, [lockDropData]);
+
   useEffect(() => {
     lockDropContract && getContractData();
   }, [lockDropContract, getContractData]);
+
+  useEffect(() => {
+    const fetchInterval = setInterval(() => {
+      getMaxWithdrawAmount();
+    }, 5000);
+    return () => {
+      clearInterval(fetchInterval);
+    };
+  }, [getMaxWithdrawAmount]);
 
   const formatBNTokenToString = (numberToFormat: ethers.BigNumber, decimals = 8) =>
     ethers.utils.formatUnits(numberToFormat, decimals);
