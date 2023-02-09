@@ -86,11 +86,7 @@ const Lockdrop = () => {
       valueStringWei: '',
       valueStringETH: '',
     },
-    lastUserWithdrawal: {
-      valueBN: ethers.BigNumber.from(0),
-      valueStringWei: '',
-      valueStringETH: '',
-    },
+    lastUserWithdrawal: 0,
     estimatedLPTokens: {
       valueStringWei: '',
       valueStringETH: '',
@@ -198,11 +194,7 @@ const Lockdrop = () => {
         valueStringETH: formatBNTokenToString(totalClaimableBN, 18),
       };
 
-      const lastUserWithdrawal = {
-        valueBN: lastUserWithdrawalBN,
-        valueStringWei: lastUserWithdrawalBN.toString(),
-        valueStringETH: formatBNTokenToString(lastUserWithdrawalBN, 18),
-      };
+      const lastUserWithdrawal = formatBigNumberToMilliseconds(lastUserWithdrawalBN);
 
       const myHELIFormatted = getUserHELIReserves(
         totalTokens.valueBN,

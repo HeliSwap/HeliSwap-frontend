@@ -80,7 +80,7 @@ export interface ILockdropData {
   claimed: IContractTokenValue;
   claimable: IContractTokenValue;
   totalClaimable: IContractTokenValue;
-  lastUserWithdrawal: IContractTokenValue;
+  lastUserWithdrawal: number;
   estimatedLPTokens: {
     valueStringWei: string;
     valueStringETH: string;

@@ -57,6 +57,8 @@ const LockdropForm = ({
     claimed,
     claimable,
     totalClaimable,
+    lastUserWithdrawal,
+    lockDropDepositEnd,
   } = lockDropData;
 
   // State for token balances
@@ -228,6 +230,7 @@ const LockdropForm = ({
   );
 
   const canClaim = Number(claimable.valueBN.toString()) > 0;
+  const canWithdraw = lastUserWithdrawal < lockDropDepositEnd;
 
   return (
     <div className="d-flex flex-column align-items-center py-15 container-lockdrop">
@@ -324,6 +327,7 @@ const LockdropForm = ({
                     isInvalid={getInsufficientToken() as boolean}
                     inputTokenComponent={
                       <InputToken
+                        disabled={!canWithdraw}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           const { value } = e.target;
                           const strippedValue = stripStringToFixedDecimals(value, 8);
@@ -340,7 +344,7 @@ const LockdropForm = ({
                       connected && !isHashpackLoading ? (
                         <WalletBalance
                           insufficientBallance={getInsufficientToken() as boolean}
-                          walletBalance={lockedHbars.valueStringETH}
+                          walletBalance={canWithdraw ? lockedHbars.valueStringETH : '0'}
                           onMaxButtonClick={(maxValue: string) => {
                             handleWithdrawInputChange(maxValue);
                           }}
@@ -360,7 +364,11 @@ const LockdropForm = ({
                       DEPOSIT HBAR
                     </Button>
                   ) : (
-                    <Button loading={loadingButton} onClick={handleWithdrawButtonClick}>
+                    <Button
+                      disabled={!canWithdraw}
+                      loading={loadingButton}
+                      onClick={handleWithdrawButtonClick}
+                    >
                       WITHDRAW HBAR
                     </Button>
                   )}
