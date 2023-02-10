@@ -214,6 +214,10 @@ const LockdropForm = ({
     </p>
   );
 
+  const isInputValueInvalid = (value: string) => {
+    return !value || isNaN(Number(value)) || Number(value) <= 0;
+  };
+
   const canClaim = Number(claimable.valueBN.toString()) > 0;
   const canWithdraw = lastUserWithdrawal < lockDropDepositEnd;
   const canStake = Number(lpBalance) > 0 && currentState >= LOCKDROP_STATE.VESTING && farmAddress;
@@ -271,7 +275,9 @@ const LockdropForm = ({
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           const { value } = e.target;
                           const strippedValue = stripStringToFixedDecimals(value, 8);
-                          handleDepositInputChange(strippedValue);
+                          handleDepositInputChange(
+                            isNaN(Number(strippedValue)) ? '0' : strippedValue,
+                          );
                         }}
                         value={depositValue}
                       />
@@ -317,7 +323,10 @@ const LockdropForm = ({
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           const { value } = e.target;
                           const strippedValue = stripStringToFixedDecimals(value, 8);
-                          handleWithdrawInputChange(strippedValue);
+
+                          handleWithdrawInputChange(
+                            isNaN(Number(strippedValue)) ? '0' : strippedValue,
+                          );
                         }}
                         value={withdrawValue}
                         name="amountOut"
@@ -334,6 +343,7 @@ const LockdropForm = ({
                           onMaxButtonClick={(maxValue: string) => {
                             handleWithdrawInputChange(maxValue);
                           }}
+                          label="Available to withdraw"
                         />
                       ) : null
                     }
@@ -346,12 +356,16 @@ const LockdropForm = ({
               {connected && !isHashpackLoading ? (
                 <div className="d-grid mt-5">
                   {actionTab === ActionTab.Deposit ? (
-                    <Button loading={loadingButton} onClick={handleDepositButtonClick}>
+                    <Button
+                      loading={loadingButton}
+                      disabled={isInputValueInvalid(depositValue)}
+                      onClick={handleDepositButtonClick}
+                    >
                       DEPOSIT HBAR
                     </Button>
                   ) : (
                     <Button
-                      disabled={!canWithdraw}
+                      disabled={!canWithdraw || isInputValueInvalid(withdrawValue)}
                       loading={loadingButton}
                       onClick={handleWithdrawButtonClick}
                     >
