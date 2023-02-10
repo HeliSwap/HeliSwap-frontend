@@ -17,11 +17,6 @@
   },
   {
     "inputs": [],
-    "name": "LockDrop__ClaimForbidden",
-    "type": "error"
-  },
-  {
-    "inputs": [],
     "name": "LockDrop__DepositDurationExpired",
     "type": "error"
   },
@@ -223,7 +218,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "availableToClaim",
+        "name": "",
         "type": "uint256"
       }
     ],
@@ -277,6 +272,19 @@
         "internalType": "contract IHeliSwapRouter02",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "lastLockDropDay",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -404,7 +412,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "userTotalLP",
+        "name": "",
         "type": "uint256"
       }
     ],
