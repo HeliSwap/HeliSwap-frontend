@@ -26,7 +26,6 @@ import {
 } from '../utils/numberUtils';
 
 import { useQueryOptionsPoolsFarms } from '../constants';
-import { BigNumber, hethers } from '@hashgraph/hethers';
 
 const LockDropABI = require('../abi/LockDrop.json');
 
@@ -274,40 +273,46 @@ const Lockdrop = () => {
 
     const timeMinusTwoDays = dayjs(lockdropEnd).subtract(2, 'days');
     const timeMinusOneDay = dayjs(lockdropEnd).subtract(1, 'days');
+
+    const zeroBN = ethers.BigNumber.from('0');
+    const twoBN = zeroBN;
+
     if (
-      lockedHbars.valueBN.gt(BigNumber.from('0')) &&
+      lockedHbars.valueBN.gt(zeroBN) &&
       (timeNow.isAfter(timeLockDropStart) || timeNow.isBefore(timeLockDropEnd))
     ) {
       if (timeNow.isBefore(timeMinusTwoDays)) {
         maxWithdrawValue = lockedHbars.valueStringETH;
       } else if (timeNow.isAfter(timeMinusTwoDays) && timeNow.isBefore(timeMinusOneDay)) {
-        maxWithdrawValue = hethers.utils.formatHbar(lockedHbars.valueBN.div(BigNumber.from('2')));
+        maxWithdrawValue = ethers.utils.formatUnits(lockedHbars.valueBN.div(twoBN), 8);
       } else if (timeNow.isAfter(timeMinusTwoDays) && timeNow.isBefore(timeLockDropEnd)) {
         //Show the amount in future moment, so the user is able to execute the transaction and withraw the amount shown
         const timeNowDelayed = timeNow.add(30, 'seconds');
 
-        const maxAvailableToWithdraw = lockedHbars.valueBN.div(BigNumber.from('2'));
+        const maxAvailableToWithdraw = lockedHbars.valueBN.div(twoBN);
         const timeFromStartOfDay = timeNowDelayed.valueOf() - timeMinusOneDay.valueOf();
         const timeToLockdropEnd = timeLockDropEnd.valueOf() - timeMinusOneDay.valueOf();
 
-        const timeRatio = BigNumber.from(timeFromStartOfDay.toString())
-          .mul(BigNumber.from(hethers.constants.WeiPerEther))
-          .div(BigNumber.from(timeToLockdropEnd.toString()));
+        const timeRatio = ethers.BigNumber.from(timeFromStartOfDay.toString())
+          .mul(ethers.BigNumber.from(ethers.constants.WeiPerEther))
+          .div(ethers.BigNumber.from(timeToLockdropEnd.toString()));
 
         const maxWithdrawValueBN = maxAvailableToWithdraw.sub(
           maxAvailableToWithdraw
             .mul(timeRatio)
-            .div(BigNumber.from(hethers.constants.WeiPerEther))
+            .div(ethers.BigNumber.from(ethers.constants.WeiPerEther))
             .toString(),
         );
 
-        maxWithdrawValue = maxWithdrawValueBN.lte(BigNumber.from('0'))
+        maxWithdrawValue = maxWithdrawValueBN.lte(zeroBN)
           ? '0'
-          : hethers.utils.formatHbar(maxWithdrawValueBN);
+          : ethers.utils.formatUnits(maxWithdrawValueBN, 8);
       }
     }
     setMaxWithdrawValue(maxWithdrawValue);
   }, [lockDropData]);
+
+  console.log('maxWithdrawValue', maxWithdrawValue);
 
   useEffect(() => {
     lockDropContract && getContractData();
