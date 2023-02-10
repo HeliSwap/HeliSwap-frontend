@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useMemo, useContext } from 're
 import numeral from 'numeral';
 import toast from 'react-hot-toast';
 import { ethers } from 'ethers';
-import dayjs from 'dayjs';
 
 import { GlobalContext } from '../providers/Global';
 
@@ -270,35 +269,32 @@ const Lockdrop = () => {
   }, [lockDropContract, userId]);
 
   const getMaxWithdrawAmount = useCallback(() => {
-    const { lockdropEnd, lockedHbars } = lockDropData;
+    const { lockdropEnd, lockedHbars, lockDropDuration, lockDropDepositEnd, lastLockDropDay } =
+      lockDropData;
+    const timeLockDropStart = lockdropEnd - lockDropDuration;
+    const timeNow = Date.now();
+    const offset = 30000;
 
     let maxWithdrawValue = '0';
 
-    const timeLockDropEnd = dayjs(lockdropEnd);
-    const timeLockDropStart = dayjs(lockdropEnd).subtract(10, 'minutes');
-    const timeNow = dayjs();
-
-    const timeMinusTwoDays = dayjs(lockdropEnd).subtract(5, 'minutes');
-    const timeMinusOneDay = dayjs(lockdropEnd).subtract(4, 'minutes');
-
-    const zeroBN = ethers.BigNumber.from('0');
-    const twoBN = ethers.BigNumber.from('2');
-
     if (
-      lockedHbars.valueBN.gt(zeroBN) &&
-      (timeNow.isAfter(timeLockDropStart) || timeNow.isBefore(timeLockDropEnd))
+      lockedHbars.valueBN.gt(ethers.constants.Zero) &&
+      (timeNow > timeLockDropStart || timeNow < lockdropEnd)
     ) {
-      if (timeNow.isBefore(timeMinusTwoDays)) {
+      if (timeNow < lockDropDepositEnd) {
         maxWithdrawValue = lockedHbars.valueStringETH;
-      } else if (timeNow.isAfter(timeMinusTwoDays) && timeNow.isBefore(timeMinusOneDay)) {
-        maxWithdrawValue = ethers.utils.formatUnits(lockedHbars.valueBN.div(twoBN), 8);
-      } else if (timeNow.isAfter(timeMinusTwoDays) && timeNow.isBefore(timeLockDropEnd)) {
+      } else if (timeNow > lockDropDepositEnd && timeNow < lastLockDropDay) {
+        maxWithdrawValue = ethers.utils.formatUnits(
+          lockedHbars.valueBN.div(ethers.constants.Two),
+          8,
+        );
+      } else if (timeNow > lockDropDepositEnd && timeNow < lockdropEnd) {
         //Show the amount in future moment, so the user is able to execute the transaction and withraw the amount shown
-        const timeNowDelayed = timeNow.add(30, 'seconds');
+        const timeNowDelayed = timeNow + offset;
 
-        const maxAvailableToWithdraw = lockedHbars.valueBN.div(twoBN);
-        const timeFromStartOfDay = timeNowDelayed.valueOf() - timeMinusOneDay.valueOf();
-        const timeToLockdropEnd = timeLockDropEnd.valueOf() - timeMinusOneDay.valueOf();
+        const maxAvailableToWithdraw = lockedHbars.valueBN.div(ethers.constants.Two);
+        const timeFromStartOfDay = timeNowDelayed.valueOf() - lastLockDropDay.valueOf();
+        const timeToLockdropEnd = lockdropEnd.valueOf() - lastLockDropDay.valueOf();
 
         const timeRatio = ethers.BigNumber.from(timeFromStartOfDay.toString())
           .mul(ethers.BigNumber.from(ethers.constants.WeiPerEther))
@@ -311,13 +307,15 @@ const Lockdrop = () => {
             .toString(),
         );
 
-        maxWithdrawValue = maxWithdrawValueBN.lte(zeroBN)
+        maxWithdrawValue = maxWithdrawValueBN.lte(ethers.constants.Zero)
           ? '0'
           : ethers.utils.formatUnits(maxWithdrawValueBN, 8);
       }
     }
     setMaxWithdrawValue(maxWithdrawValue);
   }, [lockDropData]);
+
+  // console.log('maxWithdrawValue', maxWithdrawValue);
 
   useEffect(() => {
     lockDropContract && getContractData();
@@ -381,7 +379,6 @@ const Lockdrop = () => {
           {/* Lockdrop stats */}
         </>
       )}
-
       {/* About the lockdrop */}
       <h2 className="text-subheader text-bold text-center mt-7 mt-lg-10">About the LockDrop</h2>
       <div className="row mt-5">
