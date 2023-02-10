@@ -329,6 +329,10 @@ const Lockdrop = () => {
     };
   }, [getMaxWithdrawAmount]);
 
+  useEffect(() => {
+    getMaxWithdrawAmount();
+  }, [lockDropData, getMaxWithdrawAmount]);
+
   const formatBNTokenToString = (numberToFormat: ethers.BigNumber, decimals = 8) =>
     ethers.utils.formatUnits(numberToFormat, decimals);
 
