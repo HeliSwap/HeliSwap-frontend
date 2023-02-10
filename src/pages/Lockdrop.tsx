@@ -48,6 +48,7 @@ const Lockdrop = () => {
 
   const lockDropInitialData: ILockdropData = {
     lockDropDuration: 0,
+    lastLockDropDay: 0,
     lockdropEnd: 0,
     lockDropDepositEnd: 0,
     vestingEndTime: 0,
@@ -105,6 +106,7 @@ const Lockdrop = () => {
     const promisesArray = [
       lockDropContract.LOCK_DROP_DURATION(),
       lockDropContract.lockDropEnd(),
+      lockDropContract.lastLockDropDay(),
       lockDropContract.lockDropDepositEnd(),
       lockDropContract.vestingEndTime(),
       lockDropContract.totalLP(),
@@ -118,6 +120,7 @@ const Lockdrop = () => {
       const [
         lockDropDurationBN,
         lockDropEndBN,
+        lastLockDropDayBN,
         lockDropDepositEndBN,
         vestingEndTimeBN,
         totalLPBN,
@@ -152,6 +155,7 @@ const Lockdrop = () => {
       const lockDropDuration = formatBigNumberToMilliseconds(lockDropDurationBN);
       const lockdropEnd = formatBigNumberToMilliseconds(lockDropEndBN);
       const lockDropDepositEnd = formatBigNumberToMilliseconds(lockDropDepositEndBN);
+      const lastLockDropDay = formatBigNumberToMilliseconds(lastLockDropDayBN);
       const vestingEndTime = formatBigNumberToMilliseconds(vestingEndTimeBN);
 
       const totalLP = {
@@ -241,6 +245,7 @@ const Lockdrop = () => {
       setLockDropData({
         lockDropDuration,
         lockdropEnd,
+        lastLockDropDay,
         lockDropDepositEnd,
         vestingEndTime,
         totalLP,
@@ -266,7 +271,9 @@ const Lockdrop = () => {
 
   const getMaxWithdrawAmount = useCallback(() => {
     const { lockdropEnd, lockedHbars } = lockDropData;
+
     let maxWithdrawValue = '0';
+
     const timeLockDropEnd = dayjs(lockdropEnd);
     const timeLockDropStart = dayjs(lockdropEnd).subtract(7, 'days');
     const timeNow = dayjs();
@@ -275,7 +282,7 @@ const Lockdrop = () => {
     const timeMinusOneDay = dayjs(lockdropEnd).subtract(1, 'days');
 
     const zeroBN = ethers.BigNumber.from('0');
-    const twoBN = zeroBN;
+    const twoBN = ethers.BigNumber.from('2');
 
     if (
       lockedHbars.valueBN.gt(zeroBN) &&
@@ -322,6 +329,7 @@ const Lockdrop = () => {
     const fetchInterval = setInterval(() => {
       getMaxWithdrawAmount();
     }, 5000);
+
     return () => {
       clearInterval(fetchInterval);
     };

@@ -71,6 +71,7 @@ export interface ILockdropData {
   lockDropDuration: number;
   lockdropEnd: number;
   lockDropDepositEnd: number;
+  lastLockDropDay: number;
   vestingEndTime: number;
   tokenAddress: string;
   totalLP: IContractTokenValue;
