@@ -35,6 +35,7 @@ interface ILockdropFormProps {
   getContractData: () => void;
   toast: any;
   farmAddress: string;
+  maxWithdrawValue: string;
 }
 
 const LockdropForm = ({
@@ -43,6 +44,7 @@ const LockdropForm = ({
   getContractData,
   toast,
   farmAddress,
+  maxWithdrawValue,
 }: ILockdropFormProps) => {
   const lockDropContractAddress = process.env.REACT_APP_LOCKDROP_ADDRESS;
   const contextValue = useContext(GlobalContext);
@@ -328,7 +330,7 @@ const LockdropForm = ({
                       connected && !isHashpackLoading ? (
                         <WalletBalance
                           insufficientBallance={getInsufficientToken() as boolean}
-                          walletBalance={canWithdraw ? lockedHbars.valueStringETH : '0'}
+                          walletBalance={canWithdraw ? maxWithdrawValue : '0'}
                           onMaxButtonClick={(maxValue: string) => {
                             handleWithdrawInputChange(maxValue);
                           }}

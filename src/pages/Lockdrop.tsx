@@ -315,8 +315,6 @@ const Lockdrop = () => {
     setMaxWithdrawValue(maxWithdrawValue);
   }, [lockDropData]);
 
-  // console.log('maxWithdrawValue', maxWithdrawValue);
-
   useEffect(() => {
     lockDropContract && getContractData();
   }, [lockDropContract, getContractData]);
@@ -364,6 +362,7 @@ const Lockdrop = () => {
               lockDropData={lockDropData}
               currentState={currentState}
               farmAddress={farmAddress}
+              maxWithdrawValue={maxWithdrawValue}
             />
           ) : null}
           {/* Deposit, Withdrtaw & Claim form */}
