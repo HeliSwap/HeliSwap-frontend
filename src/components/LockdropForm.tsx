@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Tippy from '@tippyjs/react';
 
 import BigNumber from 'bignumber.js';
@@ -17,11 +18,10 @@ import Icon from '../components/Icon';
 
 import {
   formatStringETHtoPriceFormatted,
-  formatStringWeiToStringEther,
   getUserHELIReserves,
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
-import { getTokenBalance, NATIVE_TOKEN } from '../utils/tokenUtils';
+import { getTokenBalance, getTokenBalanceERC20, NATIVE_TOKEN } from '../utils/tokenUtils';
 import getErrorMessage from '../content/errors';
 
 enum ActionTab {
@@ -49,6 +49,7 @@ const LockdropForm = ({
   const { connection, sdk } = contextValue;
   const { hashconnectConnectorInstance } = connection;
   const { userId, connected, setShowConnectModal, isHashpackLoading } = connection;
+  const navigate = useNavigate();
   const {
     totalHbars,
     totalTokens,
@@ -59,6 +60,7 @@ const LockdropForm = ({
     totalClaimable,
     lastUserWithdrawal,
     lockDropDepositEnd,
+    lpTokenAddress,
   } = lockDropData;
 
   // State for token balances
@@ -70,6 +72,7 @@ const LockdropForm = ({
   const [hbarBalance, setHbarBalance] = useState('initialBallanceData');
   const [depositValue, setDepositValue] = useState('0');
   const [withdrawValue, setWithdrawValue] = useState('0');
+  const [lpBalance, setLpBalance] = useState('0');
 
   const [loadingButton, setLoadingButton] = useState(false);
 
@@ -171,37 +174,8 @@ const LockdropForm = ({
     }
   };
 
-  const handleClaimAndStakeButtonClick = async () => {
-    setLoadingButton(true);
-
-    const tokensToStake = formatStringWeiToStringEther(claimable.valueStringETH);
-
-    try {
-      await sdk.claimLP(hashconnectConnectorInstance, lockDropContractAddress as string, userId);
-
-      const receipt = await sdk.stakeLP(
-        hashconnectConnectorInstance,
-        tokensToStake,
-        farmAddress,
-        userId,
-      );
-
-      const {
-        response: { success, error },
-      } = receipt;
-
-      if (success) {
-        toast.success('Success! Tokens were staked.');
-      } else {
-        toast.error(getErrorMessage(error.status ? error.status : error));
-      }
-
-      await getContractData();
-    } catch (e) {
-      console.log('e', e);
-    } finally {
-      setLoadingButton(false);
-    }
+  const handleStakeButtonClick = async () => {
+    navigate(`/farms/${farmAddress}`);
   };
 
   const getInsufficientToken = useCallback(() => {
@@ -223,6 +197,15 @@ const LockdropForm = ({
     getHbarBalance();
   }, [userId, initialBallanceData]);
 
+  useEffect(() => {
+    const getLPBalance = async () => {
+      const userBalance = await getTokenBalanceERC20(lpTokenAddress, userId);
+      setLpBalance(userBalance);
+    };
+
+    userId && lpTokenAddress && currentState >= LOCKDROP_STATE.VESTING && getLPBalance();
+  }, [userId, lpTokenAddress, currentState]);
+
   const renderHELIHBARRatio = () => (
     <p className="text-numeric text-small mt-6">
       1 HELI = {Number(totalHbars.valueStringETH) / Number(totalTokens.valueStringETH)} HBAR
@@ -231,6 +214,7 @@ const LockdropForm = ({
 
   const canClaim = Number(claimable.valueBN.toString()) > 0;
   const canWithdraw = lastUserWithdrawal < lockDropDepositEnd;
+  const canStake = Number(lpBalance) > 0 && currentState >= LOCKDROP_STATE.VESTING && farmAddress;
 
   return (
     <div className="d-flex flex-column align-items-center py-15 container-lockdrop">
@@ -488,12 +472,12 @@ const LockdropForm = ({
                   </div>
                   <div className="d-grid mt-4">
                     <Button
-                      disabled={currentState === LOCKDROP_STATE.PRE_VESTING || !farmAddress}
+                      disabled={!canStake}
                       loading={loadingButton}
-                      type="secondary"
-                      onClick={handleClaimAndStakeButtonClick}
+                      type="primary"
+                      onClick={handleStakeButtonClick}
                     >
-                      CLAIM AND STAKE
+                      STAKE
                     </Button>
                   </div>
                 </>

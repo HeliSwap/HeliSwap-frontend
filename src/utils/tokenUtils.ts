@@ -150,6 +150,15 @@ export const checkAllowanceERC20 = async (
   return canSpend;
 };
 
+export const getTokenBalanceERC20 = async (tokenAddress: string, userId: string) => {
+  const provider = getProvider();
+  const tokenContract = new ethers.Contract(tokenAddress, ERC20.abi, provider);
+
+  const balanceBN = await tokenContract.balanceOf(idToAddress(userId));
+
+  return balanceBN.toString();
+};
+
 export const checkAllowanceHTS = async (
   userId: string,
   token: ITokenData,

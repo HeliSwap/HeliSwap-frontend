@@ -275,11 +275,11 @@ const Lockdrop = () => {
     let maxWithdrawValue = '0';
 
     const timeLockDropEnd = dayjs(lockdropEnd);
-    const timeLockDropStart = dayjs(lockdropEnd).subtract(7, 'days');
+    const timeLockDropStart = dayjs(lockdropEnd).subtract(10, 'minutes');
     const timeNow = dayjs();
 
-    const timeMinusTwoDays = dayjs(lockdropEnd).subtract(2, 'days');
-    const timeMinusOneDay = dayjs(lockdropEnd).subtract(1, 'days');
+    const timeMinusTwoDays = dayjs(lockdropEnd).subtract(5, 'minutes');
+    const timeMinusOneDay = dayjs(lockdropEnd).subtract(4, 'minutes');
 
     const zeroBN = ethers.BigNumber.from('0');
     const twoBN = ethers.BigNumber.from('2');
@@ -318,8 +318,6 @@ const Lockdrop = () => {
     }
     setMaxWithdrawValue(maxWithdrawValue);
   }, [lockDropData]);
-
-  console.log('maxWithdrawValue', maxWithdrawValue);
 
   useEffect(() => {
     lockDropContract && getContractData();
