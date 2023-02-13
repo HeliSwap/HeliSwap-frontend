@@ -23,6 +23,7 @@ jobs:
         run: |
           echo "REACT_APP_ROUTER_ADDRESS=0x000000000000000000000000000000000013422e" >> $GITHUB_ENV
           echo "REACT_APP_WHBAR_ADDRESS=0x00000000000000000000000000000000000F7e89" >> $GITHUB_ENV
+          echo "REACT_APP_LOCKDROP_ADDRESS=" >> $GITHUB_ENV
       - name: Build
         run: yarn install --frozen-lockfile && yarn run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
