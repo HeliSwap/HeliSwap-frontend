@@ -44,6 +44,7 @@ const Lockdrop = () => {
   const [currentState, setCurrentState] = useState(LOCKDROP_STATE.DEPOSIT);
   const [loadingContractData, setLoadingContractData] = useState(true);
   const [maxWithdrawValue, setMaxWithdrawValue] = useState<string>('0');
+  const [contractLoadingError, setContractLoadingError] = useState(false);
 
   const lockDropInitialData: ILockdropData = {
     lockDropDuration: 0,
@@ -100,6 +101,7 @@ const Lockdrop = () => {
   const { farmAddress } = useFarmAddress(useQueryOptionsPoolsFarms, lockDropData.lpTokenAddress);
 
   const getContractData = useCallback(async () => {
+    setContractLoadingError(false);
     setLoadingContractData(true);
 
     const promisesArray = [
@@ -263,6 +265,7 @@ const Lockdrop = () => {
       setCountDownEnd(vesting ? vestingEndTime : lockdropEnd);
     } catch (e) {
       console.error('Error on fetching contract data:', e);
+      setContractLoadingError(true);
     } finally {
       setLoadingContractData(false);
     }
@@ -336,6 +339,12 @@ const Lockdrop = () => {
   const formatBNTokenToString = (numberToFormat: ethers.BigNumber, decimals = 8) =>
     ethers.utils.formatUnits(numberToFormat, decimals);
 
+  const getErrorMessage = () => (
+    <div className="alert alert-warning text-center">
+      Network is busy, please try again later...
+    </div>
+  );
+
   return (
     <div className="container py-4 py-lg-7">
       <h1 className="text-display text-bold text-center">HELI Community Lockdrop</h1>
@@ -343,6 +352,10 @@ const Lockdrop = () => {
       {loadingContractData ? (
         <div className="d-flex justify-content-center my-6">
           <Loader />
+        </div>
+      ) : contractLoadingError ? (
+        <div className="row my-6">
+          <div className="col-lg-6 offset-lg-3">{getErrorMessage()}</div>
         </div>
       ) : (
         <>
@@ -382,6 +395,7 @@ const Lockdrop = () => {
           {/* Lockdrop stats */}
         </>
       )}
+
       {/* About the lockdrop */}
       <h2 className="text-subheader text-bold text-center mt-7 mt-lg-10">About the LockDrop</h2>
       <div className="row mt-5">
