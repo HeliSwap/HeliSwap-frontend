@@ -67,7 +67,7 @@ const LockdropStats = ({ lockDropData, currentState, countdownEnd }: ILockdropSt
                 Total HBAR deposited to the Lockdrop Pool
               </p>
               <Tippy
-                content={`This is the amount of HBAR that the community currently has locked into the HELI Lockdrop pool. Please be aware, that this number is not final as more users may deposit, or users may deposit more or withdraw their HBAR again. Please read below to understand the mechanism.`}
+                content={`This is the amount of HBAR that the community has contributed towards the HELI Lockdrop Pool.`}
               >
                 <span className="ms-2">
                   <Icon size="small" color="gray" name="hint" />
@@ -82,7 +82,9 @@ const LockdropStats = ({ lockDropData, currentState, countdownEnd }: ILockdropSt
           <LockdropCounter currentState={currentState} countdownEnd={countdownEnd} />
 
           <div className="text-center mt-6 mt-lg-10">
-            <p className="text-micro text-secondary mb-2">Estimated HELI Price After Launch</p>
+            <p className="text-micro text-secondary mb-2">
+              Estimated HELI Price After the Lockdrop
+            </p>
             <div className="d-flex justify-content-center align-items-center">
               <h3 className="text-subheader text-bold">
                 $
@@ -94,7 +96,7 @@ const LockdropStats = ({ lockDropData, currentState, countdownEnd }: ILockdropSt
                 </span>
               </h3>
               <Tippy
-                content={`After 7 days, the lockdrop closes and the LP tokens are created to build the initial liquidity. This is the HELI price in the moment of launch. It depends on the ratio of HBAR committed to Total HELI in the lock drop at the end of day 7.`}
+                content={`The price of the HELI token determined by the community through their HBAR contributions `}
               >
                 <span className="ms-2">
                   <Icon size="small" color="gray" name="hint" />
@@ -115,9 +117,7 @@ const LockdropStats = ({ lockDropData, currentState, countdownEnd }: ILockdropSt
             </h3>
             <div className="d-flex justify-content-end align-items-center">
               <p className="text-micro text-secondary mt-2">My liquidity added to Lockdrop</p>
-              <Tippy
-                content={`This is how many HBAR you have deposited into the pool in total. You may deposit more or withdraw a portion of it. Only commit an amount that you are comfortable with. For more information read below.`}
-              >
+              <Tippy content={`How many HBAR you have contributed to the HELI Lockdrop Pool. `}>
                 <span className="ms-2">
                   <Icon size="small" color="gray" name="hint" />
                 </span>
@@ -136,7 +136,7 @@ const LockdropStats = ({ lockDropData, currentState, countdownEnd }: ILockdropSt
             <div className="d-flex justify-content-end align-items-center">
               <p className="text-micro text-secondary mt-2">My estimated LP Token allocation</p>
               <Tippy
-                content={`This is an estimate based on your current deposit compared to the total HBAR that was deposited into the pool. It may change depending on either of these metrics increasing or decreasing.`}
+                content={`The amount of LP tokens that you got allocated during the lockdrop period.`}
               >
                 <span className="ms-2">
                   <Icon size="small" color="gray" name="hint" />

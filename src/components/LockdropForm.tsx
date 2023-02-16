@@ -426,7 +426,9 @@ const LockdropForm = ({
                   </p>
                   <div className="d-flex align-items-center">
                     <p className="text-micro">Total to claim</p>
-                    <Tippy content={``}>
+                    <Tippy
+                      content={`The total amount of LP tokens that you were allocated during the lockdrop period (your HBAR contribution divided by the total HBAR contribution).`}
+                    >
                       <span className="ms-2">
                         <Icon size="small" color="gray" name="hint" />
                       </span>
@@ -440,7 +442,9 @@ const LockdropForm = ({
                   </p>
                   <div className="d-flex align-items-center">
                     <p className="text-micro">Available to claim</p>
-                    <Tippy content={``}>
+                    <Tippy
+                      content={`The amount of LP tokens that have vested (unlocked) and can be claimed by you.`}
+                    >
                       <span className="ms-2">
                         <Icon size="small" color="gray" name="hint" />
                       </span>
@@ -454,7 +458,7 @@ const LockdropForm = ({
                   </p>
                   <div className="d-flex align-items-center">
                     <p className="text-micro">Claimed so far</p>
-                    <Tippy content={``}>
+                    <Tippy content={`The amount of LP tokens that you have claimed already.`}>
                       <span className="ms-2">
                         <Icon size="small" color="gray" name="hint" />
                       </span>
