@@ -31,8 +31,40 @@ export const formatTimeNumber = (numberToFormat: number) =>
 export const getCountdownReturnValues = (countDown: number) => {
   const days = Math.floor(countDown / (1000 * 60 * 60 * 24));
   const hours = Math.floor((countDown % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const minutes = Math.floor((countDown % (1000 * 60 * 60)) / (1000 * 60));
+  const minutes = Math.ceil((countDown % (1000 * 60 * 60)) / (1000 * 60));
   const seconds = Math.floor((countDown % (1000 * 60)) / 1000);
 
   return { days, hours, minutes, seconds };
+};
+
+export const getMonthsFromDurationMilliseconds = (duration: number) => {
+  const returnObject = {
+    valueNumeric: 0,
+    valueString: '0 Months',
+  };
+
+  if (duration > 0) {
+    const months = Math.floor(duration / 30 / 24 / 3600000);
+
+    returnObject.valueNumeric = months;
+    returnObject.valueString = `${months === 1 ? `${months} Month` : `${months} Months`}`;
+  }
+
+  return returnObject;
+};
+
+export const getDaysFromDurationMilliseconds = (duration: number) => {
+  const returnObject = {
+    valueNumeric: 0,
+    valueString: '0 Months',
+  };
+
+  if (duration > 0) {
+    const days = Math.floor(duration / 24 / 3600000);
+
+    returnObject.valueNumeric = days;
+    returnObject.valueString = `${days === 1 ? `${days} Day` : `${days} Days`}`;
+  }
+
+  return returnObject;
 };

@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
-import BigNumber from 'bignumber.js';
+import { useNavigate } from 'react-router-dom';
 import Tippy from '@tippyjs/react';
 
+import BigNumber from 'bignumber.js';
+
 import { GlobalContext } from '../providers/Global';
+
+import { LOCKDROP_STATE, ILockdropData } from '../interfaces/common';
 
 import ButtonSelector from '../components/ButtonSelector';
 import InputToken from '../components/InputToken';
@@ -12,11 +16,13 @@ import IconToken from '../components/IconToken';
 import Button from '../components/Button';
 import Icon from '../components/Icon';
 
-import { LOCKDROP_STATE, ILockdropData } from '../interfaces/common';
-
-import { stripStringToFixedDecimals } from '../utils/numberUtils';
-import { getTokenBalance, NATIVE_TOKEN } from '../utils/tokenUtils';
-import { getCountdownReturnValues } from '../utils/timeUtils';
+import {
+  formatStringETHtoPriceFormatted,
+  getUserHELIReserves,
+  stripStringToFixedDecimals,
+} from '../utils/numberUtils';
+import { getTokenBalance, getTokenBalanceERC20, NATIVE_TOKEN } from '../utils/tokenUtils';
+import getErrorMessage from '../content/errors';
 
 enum ActionTab {
   'Deposit',
@@ -26,22 +32,51 @@ enum ActionTab {
 interface ILockdropFormProps {
   currentState: LOCKDROP_STATE;
   lockDropData: ILockdropData;
-  countdownEnd: number;
+  getContractData: () => void;
+  toast: any;
+  farmAddress: string;
+  maxWithdrawValue: string;
 }
 
-const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFormProps) => {
+const LockdropForm = ({
+  currentState,
+  lockDropData,
+  getContractData,
+  toast,
+  farmAddress,
+  maxWithdrawValue,
+}: ILockdropFormProps) => {
+  const lockDropContractAddress = process.env.REACT_APP_LOCKDROP_ADDRESS;
   const contextValue = useContext(GlobalContext);
-  const { connection } = contextValue;
+  const { connection, sdk } = contextValue;
+  const { hashconnectConnectorInstance } = connection;
   const { userId, connected, setShowConnectModal, isHashpackLoading } = connection;
+  const navigate = useNavigate();
+  const {
+    totalHbars,
+    totalTokens,
+    estimatedLPTokens,
+    lockedHbars,
+    claimed,
+    claimable,
+    totalClaimable,
+    lastUserWithdrawal,
+    lockDropDepositEnd,
+    lpTokenAddress,
+  } = lockDropData;
 
   // State for token balances
   const initialBallanceData = useMemo(() => '0', []);
 
-  const [actionTab, setActionTab] = useState(ActionTab.Deposit);
-  const [hbarBalance, setHbarBalance] = useState(initialBallanceData);
+  const [actionTab, setActionTab] = useState(
+    currentState === LOCKDROP_STATE.DEPOSIT ? ActionTab.Deposit : ActionTab.Withdraw,
+  );
+  const [hbarBalance, setHbarBalance] = useState('initialBallanceData');
   const [depositValue, setDepositValue] = useState('0');
   const [withdrawValue, setWithdrawValue] = useState('0');
-  const [claimValue, setClaimValue] = useState('0');
+  const [lpBalance, setLpBalance] = useState('0');
+
+  const [loadingButton, setLoadingButton] = useState(false);
 
   const handleDepositInputChange = (rawValue: string) => {
     setDepositValue(rawValue);
@@ -51,15 +86,99 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
     setWithdrawValue(rawValue);
   };
 
-  const handleClaimInputChange = (rawValue: string) => {
-    setClaimValue(rawValue);
-  };
-
   const handleTabClick = (target: ActionTab) => {
     setActionTab(target);
   };
 
-  const handleDepositButtonClick = () => {};
+  const handleDepositButtonClick = async () => {
+    setLoadingButton(true);
+
+    try {
+      const receipt = await sdk.depositHBAR(
+        hashconnectConnectorInstance,
+        lockDropContractAddress as string,
+        userId,
+        depositValue,
+      );
+
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (success) {
+        toast.success('Success! Tokens were deposited.');
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      }
+
+      await getContractData();
+    } catch (e) {
+      console.log('e', e);
+    } finally {
+      setLoadingButton(false);
+    }
+  };
+
+  const handleWithdrawButtonClick = async () => {
+    setLoadingButton(true);
+
+    try {
+      const receipt = await sdk.withdrawHBAR(
+        hashconnectConnectorInstance,
+        lockDropContractAddress as string,
+        userId,
+        withdrawValue,
+      );
+
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (success) {
+        toast.success('Success! Tokens were withdrawn.');
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      }
+
+      await getContractData();
+    } catch (e) {
+      console.log('e', e);
+    } finally {
+      setLoadingButton(false);
+    }
+  };
+
+  const handleClaimButtonClick = async () => {
+    setLoadingButton(true);
+
+    try {
+      const receipt = await sdk.claimLP(
+        hashconnectConnectorInstance,
+        lockDropContractAddress as string,
+        userId,
+      );
+
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (success) {
+        toast.success('Success! Tokens were claimed.');
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      }
+
+      await getContractData();
+    } catch (e) {
+      console.log('e', e);
+    } finally {
+      setLoadingButton(false);
+    }
+  };
+
+  const handleStakeButtonClick = async () => {
+    navigate(`/farms/${farmAddress}`);
+  };
 
   const getInsufficientToken = useCallback(() => {
     return (
@@ -80,42 +199,66 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
     getHbarBalance();
   }, [userId, initialBallanceData]);
 
-  // const renderHELIHBARRatio = () => (
-  //   <p className="text-numeric text-small mt-6">
-  //     1 HELI = {Number(lockDropData.hbarAmount) / Number(lockDropData.heliAmount)} HBAR
-  //   </p>
-  // );
+  useEffect(() => {
+    const getLPBalance = async () => {
+      const userBalance = await getTokenBalanceERC20(lpTokenAddress, userId);
+      setLpBalance(userBalance);
+    };
 
-  const timeLeft = countdownEnd - new Date().getTime();
-  const formDisabled = timeLeft > 0;
-  const disabledButtonText = `${getCountdownReturnValues(timeLeft).days.toString()} days left`;
+    userId && lpTokenAddress && currentState >= LOCKDROP_STATE.VESTING && getLPBalance();
+  }, [userId, lpTokenAddress, currentState]);
+
+  const renderHELIHBARRatio = () => (
+    <p className="text-numeric text-small mt-6">
+      1 HELI = {Number(totalHbars.valueStringETH) / Number(totalTokens.valueStringETH)} HBAR
+    </p>
+  );
+
+  const isInputValueInvalid = (value: string) => {
+    return !value || isNaN(Number(value)) || Number(value) <= 0;
+  };
+
+  const canClaim = Number(claimable.valueBN.toString()) > 0;
+  const canWithdraw = lastUserWithdrawal < lockDropDepositEnd;
+  const canStake = Number(lpBalance) > 0 && currentState >= LOCKDROP_STATE.VESTING && farmAddress;
 
   return (
-    <div className="d-flex flex-column align-items-center py-20 container-lockdrop">
-      <h2 className="text-subheader text-bold text-center my-7 mt-lg-10">Deposit HBAR</h2>
+    <div className="d-flex flex-column align-items-center py-15 container-lockdrop">
       <div className="container-action">
+        {currentState < LOCKDROP_STATE.WITHDRAW ? (
+          <p className="text-subheader text-center mb-6">
+            Select how much <span className="text-bold">HBAR</span> you want to deposit in the
+            LockDrop Pool.
+          </p>
+        ) : (
+          <p className="text-subheader text-center mb-6">Locking period has ended.</p>
+        )}
+
         <p className="text-small mb-5">
           This is where you will be able to deposit and withdraw your HBAR. Simply pick between
           “deposit” and “withdraw” and choose how many HBAR. The bottom shows you the estimated
           amount of LP tokens you would receive if the lockdrop ended in that moment.
         </p>
         <div className="container-dark">
-          {currentState < LOCKDROP_STATE.FINISHED ? (
+          {currentState >= LOCKDROP_STATE.DEPOSIT && currentState < LOCKDROP_STATE.PRE_VESTING ? (
             <>
               <div className="d-flex mb-5">
-                <span
-                  onClick={() => handleTabClick(ActionTab.Deposit)}
-                  className={`text-small text-bold text-uppercase cursor-pointer ${
-                    actionTab === ActionTab.Deposit ? '' : 'text-secondary'
-                  }`}
-                >
-                  Deposit
-                </span>
+                {currentState === LOCKDROP_STATE.DEPOSIT ? (
+                  <span
+                    onClick={() => handleTabClick(ActionTab.Deposit)}
+                    className={`text-small text-bold text-uppercase cursor-pointer ${
+                      actionTab === ActionTab.Deposit ? '' : 'text-secondary'
+                    } me-4`}
+                  >
+                    Deposit
+                  </span>
+                ) : null}
+
                 <span
                   onClick={() => handleTabClick(ActionTab.Withdraw)}
                   className={`text-small text-bold text-uppercase cursor-pointer ${
                     actionTab === ActionTab.Withdraw ? '' : 'text-secondary'
-                  } ms-4`}
+                  }`}
                 >
                   Withdraw
                 </span>
@@ -131,12 +274,12 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
                       <InputToken
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           const { value } = e.target;
-                          const strippedValue = stripStringToFixedDecimals(value, 6);
-                          handleDepositInputChange(strippedValue);
+                          const strippedValue = stripStringToFixedDecimals(value, 8);
+                          handleDepositInputChange(
+                            isNaN(Number(strippedValue)) ? '0' : strippedValue,
+                          );
                         }}
                         value={depositValue}
-                        disabled={formDisabled}
-                        name="amountOut"
                       />
                     }
                     buttonSelectorComponent={
@@ -147,24 +290,26 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
                         <WalletBalance
                           insufficientBallance={getInsufficientToken() as boolean}
                           walletBalance={hbarBalance}
-                          // onMaxButtonClick={(maxValue: string) => {
-                          //   handleDepositInputChange(maxValue);
-                          // }}
+                          onMaxButtonClick={(maxValue: string) => {
+                            handleDepositInputChange(maxValue);
+                          }}
                         />
                       ) : null
                     }
                   />
 
-                  {/* <div className="mt-6 rounded border border-secondary justify-content-between">
+                  <div className="mt-6 rounded border border-secondary justify-content-between">
                     <p className="text-small text-bold m-4">Estimate reward after the LockDrop:</p>
                     <div className="d-flex justify-content-between align-items-center m-4">
                       <p className="text-small">LP Tokens</p>
                       <div className="d-flex align-items-center">
-                        <p className="text-numeric text-small me-3">0</p>
+                        <p className="text-numeric text-small me-3">
+                          {formatStringETHtoPriceFormatted(estimatedLPTokens.valueStringETH)}
+                        </p>
                         <IconToken symbol="LP" />
                       </div>
                     </div>
-                  </div> */}
+                  </div>
                 </>
               ) : (
                 <>
@@ -174,10 +319,14 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
                     isInvalid={getInsufficientToken() as boolean}
                     inputTokenComponent={
                       <InputToken
+                        disabled={!canWithdraw}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           const { value } = e.target;
-                          const strippedValue = stripStringToFixedDecimals(value, 6);
-                          handleWithdrawInputChange(strippedValue);
+                          const strippedValue = stripStringToFixedDecimals(value, 8);
+
+                          handleWithdrawInputChange(
+                            isNaN(Number(strippedValue)) ? '0' : strippedValue,
+                          );
                         }}
                         value={withdrawValue}
                         name="amountOut"
@@ -190,10 +339,11 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
                       connected && !isHashpackLoading ? (
                         <WalletBalance
                           insufficientBallance={getInsufficientToken() as boolean}
-                          walletBalance={lockDropData.lockedHbarAmount}
+                          walletBalance={canWithdraw ? maxWithdrawValue : '0'}
                           onMaxButtonClick={(maxValue: string) => {
                             handleWithdrawInputChange(maxValue);
                           }}
+                          label="Available to withdraw"
                         />
                       ) : null
                     }
@@ -201,15 +351,25 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
                 </>
               )}
 
+              {renderHELIHBARRatio()}
+
               {connected && !isHashpackLoading ? (
                 <div className="d-grid mt-5">
                   {actionTab === ActionTab.Deposit ? (
-                    <Button disabled={formDisabled} onClick={handleDepositButtonClick}>
-                      {formDisabled ? disabledButtonText : 'DEPOSIT HBAR'}
+                    <Button
+                      loading={loadingButton}
+                      disabled={isInputValueInvalid(depositValue)}
+                      onClick={handleDepositButtonClick}
+                    >
+                      DEPOSIT HBAR
                     </Button>
                   ) : (
-                    <Button disabled={formDisabled} onClick={handleDepositButtonClick}>
-                      {formDisabled ? disabledButtonText : 'WITHDRAW HBAR'}
+                    <Button
+                      disabled={!canWithdraw || isInputValueInvalid(withdrawValue)}
+                      loading={loadingButton}
+                      onClick={handleWithdrawButtonClick}
+                    >
+                      WITHDRAW HBAR
                     </Button>
                   )}
                 </div>
@@ -221,7 +381,9 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
                 </div>
               )}
             </>
-          ) : (
+          ) : null}
+
+          {currentState >= LOCKDROP_STATE.PRE_VESTING ? (
             <>
               <p className="text-small text-bold mb-3">Liquidity provied to Lockdrop</p>
 
@@ -232,17 +394,41 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
                     <span className="text-main ms-3">HBAR</span>
                   </div>
                   <div className="d-flex align-items-center">
-                    <p className="text-numeric text-small me-3">1000</p>
+                    <p className="text-numeric text-small me-3">
+                      {formatStringETHtoPriceFormatted(lockedHbars.valueStringETH)}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="d-flex justify-content-between align-items-center m-4">
+                  <div className="d-flex align-items-center">
+                    <IconToken symbol="HELI" />
+                    <span className="text-main ms-3">HELI</span>
+                  </div>
+                  <div className="d-flex align-items-center">
+                    <p className="text-numeric text-small me-3">
+                      {formatStringETHtoPriceFormatted(
+                        getUserHELIReserves(
+                          totalTokens.valueBN,
+                          lockedHbars.valueBN,
+                          totalHbars.valueBN,
+                        ),
+                      )}
+                    </p>
                   </div>
                 </div>
               </div>
 
               <div className="mt-5 d-flex justify-content-around align-items-center">
                 <div className="text-center">
-                  <p className="text-numeric text-small">1,000</p>
+                  <p className="text-numeric text-small">
+                    {formatStringETHtoPriceFormatted(totalClaimable.valueStringETH)}
+                  </p>
                   <div className="d-flex align-items-center">
                     <p className="text-micro">Total to claim</p>
-                    <Tippy content={``}>
+                    <Tippy
+                      content={`The total amount of LP tokens that you were allocated during the lockdrop period (your HBAR contribution divided by the total HBAR contribution).`}
+                    >
                       <span className="ms-2">
                         <Icon size="small" color="gray" name="hint" />
                       </span>
@@ -251,10 +437,14 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
                 </div>
 
                 <div className="text-center">
-                  <p className="text-numeric text-small">1,000</p>
+                  <p className="text-numeric text-small">
+                    {formatStringETHtoPriceFormatted(claimable.valueStringETH)}
+                  </p>
                   <div className="d-flex align-items-center">
                     <p className="text-micro">Available to claim</p>
-                    <Tippy content={``}>
+                    <Tippy
+                      content={`The amount of LP tokens that have vested (unlocked) and can be claimed by you.`}
+                    >
                       <span className="ms-2">
                         <Icon size="small" color="gray" name="hint" />
                       </span>
@@ -263,10 +453,12 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
                 </div>
 
                 <div className="text-center">
-                  <p className="text-numeric text-small">1,000</p>
+                  <p className="text-numeric text-small">
+                    {formatStringETHtoPriceFormatted(claimed.valueStringETH)}
+                  </p>
                   <div className="d-flex align-items-center">
                     <p className="text-micro">Claimed so far</p>
-                    <Tippy content={``}>
+                    <Tippy content={`The amount of LP tokens that you have claimed already.`}>
                       <span className="ms-2">
                         <Icon size="small" color="gray" name="hint" />
                       </span>
@@ -281,41 +473,31 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
 
               <InputTokenSelector
                 isInvalid={getInsufficientToken() as boolean}
-                inputTokenComponent={
-                  <InputToken
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      const { value } = e.target;
-                      const strippedValue = stripStringToFixedDecimals(value, 6);
-                      handleClaimInputChange(strippedValue);
-                    }}
-                    value={claimValue}
-                    name="amountOut"
-                  />
-                }
+                inputTokenComponent={<InputToken disabled value={claimable.valueStringETH} />}
                 buttonSelectorComponent={
                   <ButtonSelector disabled selectedToken={'LP'} selectorText="Select token" />
                 }
-                walletBalanceComponent={
-                  connected && !isHashpackLoading ? (
-                    <WalletBalance
-                      insufficientBallance={getInsufficientToken() as boolean}
-                      walletBalance={hbarBalance}
-                      onMaxButtonClick={(maxValue: string) => {
-                        handleClaimInputChange(maxValue);
-                      }}
-                    />
-                  ) : null
-                }
               />
 
-              {connected && !isHashpackLoading ? (
+              {userId && !isHashpackLoading ? (
                 <>
                   <div className="d-grid mt-5">
-                    <Button onClick={handleDepositButtonClick}>CLAIM</Button>
+                    <Button
+                      disabled={currentState === LOCKDROP_STATE.PRE_VESTING || !canClaim}
+                      loading={loadingButton}
+                      onClick={handleClaimButtonClick}
+                    >
+                      CLAIM
+                    </Button>
                   </div>
                   <div className="d-grid mt-4">
-                    <Button type="secondary" onClick={handleDepositButtonClick}>
-                      CLAIM AND STAKE
+                    <Button
+                      disabled={!canStake}
+                      loading={loadingButton}
+                      type="primary"
+                      onClick={handleStakeButtonClick}
+                    >
+                      STAKE
                     </Button>
                   </div>
                 </>
@@ -327,7 +509,7 @@ const LockdropForm = ({ currentState, lockDropData, countdownEnd }: ILockdropFor
                 </div>
               )}
             </>
-          )}
+          ) : null}
         </div>
       </div>
     </div>

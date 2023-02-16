@@ -1,3 +1,5 @@
+import { ethers } from 'ethers';
+
 export interface IStringToString {
   [key: string]: string;
 }
@@ -52,15 +54,37 @@ export interface IHistoricalData {
 }
 
 export enum LOCKDROP_STATE {
-  NOT_STARTED,
-  DAY_1_5,
-  DAY_6,
-  DAY_7,
-  FINISHED,
+  DEPOSIT,
+  WITHDRAW,
+  PRE_VESTING,
+  VESTING,
+  END,
+}
+
+export interface IContractTokenValue {
+  valueBN: ethers.BigNumber;
+  valueStringWei: string;
+  valueStringETH: string;
 }
 
 export interface ILockdropData {
-  heliAmount: string;
-  hbarAmount: string;
-  lockedHbarAmount: string;
+  lockDropDuration: number;
+  lockdropEnd: number;
+  lockDropDepositEnd: number;
+  lastLockDropDay: number;
+  vestingEndTime: number;
+  tokenAddress: string;
+  totalLP: IContractTokenValue;
+  totalHbars: IContractTokenValue;
+  totalTokens: IContractTokenValue;
+  lockedHbars: IContractTokenValue;
+  claimed: IContractTokenValue;
+  claimable: IContractTokenValue;
+  totalClaimable: IContractTokenValue;
+  lastUserWithdrawal: number;
+  estimatedLPTokens: {
+    valueStringWei: string;
+    valueStringETH: string;
+  };
+  lpTokenAddress: string;
 }

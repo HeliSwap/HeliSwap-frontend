@@ -1,6 +1,7 @@
 import numeral from 'numeral';
 import BigNumber from 'bignumber.js';
 import { hethers } from '@hashgraph/hethers';
+import { ethers } from 'ethers';
 
 export const formatStringToPrice = (stringToFormat: string, floor: boolean = false) => {
   return floor && Number(stringToFormat) < 1000
@@ -90,6 +91,11 @@ export const formatStringETHtoPriceFormatted = (
   if (splitted.length > 1) {
     const lengthAfterDecimals = splitted[1].length;
 
+    // Check for 1 zero after the decimal
+    if (lengthAfterDecimals === 1 && splitted[1] === '0') {
+      return stringToFormat;
+    }
+
     // If the number contains zeros in the decimals, leaves the zeros and shows to more symbols, despite the how many symbols are indicated in the second argument
     let zerosBeforeSymbol = 0;
 
@@ -165,16 +171,35 @@ export const randomIntFromInterval = (min: number, max: number): number => {
   return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
+export const formatBigNumberToMilliseconds = (secondsBigNumber: hethers.BigNumber) => {
+  return Number(secondsBigNumber.toString()) * 1000;
+};
+
 export const calculateLPTokens = (
   token0Amount: string,
   token1Amount: string,
   token0Decimals: number = 8,
   token1Decimals: number = 8,
 ): string => {
+  if (Number(token0Amount) === 0 || Number(token1Amount) === 0) return '0';
+
   const token0AmountBN = formatStringToBigNumberWei(token0Amount, token0Decimals);
   const token1AmountBN = formatStringToBigNumberWei(token1Amount, token1Decimals);
 
   const amountLP = token0AmountBN.times(token1AmountBN).sqrt().toString();
 
   return amountLP;
+};
+
+export const getUserHELIReserves = (
+  totalTokens: ethers.BigNumber,
+  lockedHbars: ethers.BigNumber,
+  totalHbars: ethers.BigNumber,
+) => {
+  if (Number(totalHbars.toString()) === 0 || Number(totalTokens.toString()) === 0) return '0.0';
+
+  const myHELIBN = totalTokens.mul(lockedHbars).div(totalHbars);
+  const myHELIFormatted = ethers.utils.formatUnits(myHELIBN, 8);
+
+  return myHELIFormatted;
 };

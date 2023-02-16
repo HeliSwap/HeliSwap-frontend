@@ -7,7 +7,7 @@ import { hethers } from '@hashgraph/hethers';
 
 import { GlobalContext } from '../providers/Global';
 
-import { IPoolData } from '../interfaces/tokens';
+import { IPoolData, ITokenData, TokenType } from '../interfaces/tokens';
 
 import Button from './Button';
 import IconToken from './IconToken';
@@ -36,6 +36,7 @@ import {
   invalidInputTokensData,
   requestIdFromAddress,
   checkAllowanceERC20,
+  getUserAssociatedTokens,
 } from '../utils/tokenUtils';
 import {
   getTransactionSettings,
@@ -44,9 +45,11 @@ import {
 } from '../utils/transactionUtils';
 import { formatIcons } from '../utils/iconUtils';
 
+import useTokensByListIds from '../hooks/useTokensByListIds';
+
 import getErrorMessage from '../content/errors';
 
-import { MAX_UINT_ERC20, SLIDER_INITIAL_VALUE } from '../constants';
+import { MAX_UINT_ERC20, SLIDER_INITIAL_VALUE, useQueryOptions } from '../constants';
 
 interface IRemoveLiquidityProps {
   pairData: IPoolData;
@@ -65,6 +68,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
   const [lpApproved, setLpApproved] = useState(false);
   const [lpInputValue, setLpInputValue] = useState(maxLpInputValue);
   const [sliderValue, setSliderValue] = useState(SLIDER_INITIAL_VALUE);
+  const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
 
   const [removeLpData, setRemoveLpData] = useState({
     tokenInAddress: '',
@@ -84,6 +88,13 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
   const [loadingApprove, setLoadingApprove] = useState(false);
   const [loadingCheckApprove, setLoadingCheckApprove] = useState(true);
+  const [loadingAssociate, setLoadingAssociate] = useState(false);
+
+  // Get selected tokens to check for assosiations
+  const { tokens: tokenReserves } = useTokensByListIds(
+    [pairData.token0, pairData.token1],
+    useQueryOptions,
+  );
 
   // Handlers
   const handleLpInputChange = (value: string) => {
@@ -234,7 +245,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
     }
   };
 
-  const hanleApproveLPClick = async () => {
+  const handleApproveLPClick = async () => {
     const amount = MAX_UINT_ERC20.toString();
 
     setLoadingApprove(true);
@@ -264,6 +275,33 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
       toast.error('Approve Token transaction resulted in an error.');
     } finally {
       setLoadingApprove(false);
+    }
+  };
+
+  const handleAssociateClick = async (token: ITokenData) => {
+    setLoadingAssociate(true);
+
+    try {
+      const receipt = await sdk.associateToken(
+        hashconnectConnectorInstance,
+        userId,
+        token.hederaId,
+      );
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (!success) {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      } else {
+        const tokens = await getUserAssociatedTokens(userId);
+        setUserAssociatedTokens(tokens);
+      }
+    } catch (err) {
+      console.error(err);
+      toast('Error on associate');
+    } finally {
+      setLoadingAssociate(false);
     }
   };
 
@@ -338,7 +376,30 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
     };
   }, [pairData, userId]);
 
-  const canRemove = lpApproved && removeLpData.tokenInAddress !== '';
+  // Check for associations
+  useEffect(() => {
+    const checkTokenAssociation = async (userId: string) => {
+      const tokens = await getUserAssociatedTokens(userId);
+      setUserAssociatedTokens(tokens);
+    };
+
+    userId && checkTokenAssociation(userId);
+  }, [userId]);
+
+  const getTokenIsAssociated = (token: ITokenData) => {
+    const notHTS =
+      Object.keys(token).length === 0 ||
+      token.type === TokenType.HBAR ||
+      token.type === TokenType.ERC20;
+    return notHTS || userAssociatedTokens?.includes(token.hederaId);
+  };
+
+  const canRemove =
+    lpApproved &&
+    removeLpData.tokenInAddress !== '' &&
+    tokenReserves &&
+    getTokenIsAssociated(tokenReserves[1]) &&
+    getTokenIsAssociated(tokenReserves[2]);
 
   const confirmationText = `Removing ${formatStringETHtoPriceFormatted(
     removeLpData.tokensLpAmount,
@@ -446,7 +507,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
               <Button
                 className="d-flex justify-content-center align-items-center mb-3"
                 loading={loadingApprove || loadingCheckApprove}
-                onClick={hanleApproveLPClick}
+                onClick={handleApproveLPClick}
               >
                 <span>Approve LP</span>
                 <Tippy
@@ -457,7 +518,31 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
                   </span>
                 </Tippy>
               </Button>
-            ) : null}
+            ) : (
+              <>
+                {tokenReserves && !getTokenIsAssociated(tokenReserves[1]) ? (
+                  <div className="d-grid mb-3">
+                    <Button
+                      loading={loadingAssociate}
+                      onClick={() => handleAssociateClick(tokenReserves[1])}
+                    >
+                      {`Associate ${pairData.token0Symbol}`}
+                    </Button>
+                  </div>
+                ) : null}
+
+                {tokenReserves && !getTokenIsAssociated(tokenReserves[2]) ? (
+                  <div className="d-grid mb-3">
+                    <Button
+                      loading={loadingAssociate}
+                      onClick={() => handleAssociateClick(tokenReserves[2])}
+                    >
+                      {`Associate ${pairData.token1Symbol}`}
+                    </Button>
+                  </div>
+                ) : null}
+              </>
+            )}
 
             <Button
               loading={loadingRemove}
