@@ -177,6 +177,14 @@
       "symbol": "SOF",
       "decimals": 7,
       "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/SOF.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x00000000000000000000000000000000001d90C9",
+      "name": "HeliSwap",
+      "symbol": "HELI",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/HELI.png"
     }
   ]
 }
