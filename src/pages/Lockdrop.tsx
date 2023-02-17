@@ -78,6 +78,7 @@ const Lockdrop = () => {
   const [loadingContractData, setLoadingContractData] = useState(true);
   const [maxWithdrawValue, setMaxWithdrawValue] = useState<string>('0');
   const [contractLoadingError, setContractLoadingError] = useState(false);
+  const [daysSinceStart, setDaysSinceStart] = useState(0);
 
   const [lockDropData, setLockDropData] = useState<ILockdropData>(lockDropInitialData);
 
@@ -207,7 +208,13 @@ const Lockdrop = () => {
         };
 
         // Determine state
+        const lockdropStartTime =
+          lockDropInitialData.lockdropEnd - lockDropInitialData.lockDropDuration;
         const nowTimeStamp = Date.now();
+        const timeSinceStart = nowTimeStamp - lockdropStartTime;
+        const daysSinceStart = Math.floor(timeSinceStart / 1000 / 3600 / 24);
+        setDaysSinceStart(daysSinceStart);
+
         const withdrawOnly =
           nowTimeStamp > lockDropInitialData.lockDropDepositEnd &&
           nowTimeStamp <= lockDropInitialData.lockdropEnd;
@@ -423,14 +430,8 @@ const Lockdrop = () => {
       </div>
       {/* About the lockdrop */}
 
-      {/* <p className="mt-6 text-center">
-        <a className="link-primary text-bold" href="#how-it-works">
-          How it works
-        </a>
-      </p> */}
-
       {/* How it works */}
-      <LockdropHowItWorks />
+      <LockdropHowItWorks daysSinceStart={daysSinceStart} />
       {/* How it works */}
 
       {/* FAQ */}

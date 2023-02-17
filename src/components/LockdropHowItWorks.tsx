@@ -1,6 +1,41 @@
 import React from 'react';
 
-const LockdropHowItWorks = () => {
+interface ILockdropHowItWorks {
+  daysSinceStart: number;
+}
+
+interface IDaysMapping {
+  [key: string]: {
+    [key: string]: string;
+  };
+}
+
+const daysMapping: IDaysMapping = {
+  '1': {
+    className: 'container-day',
+  },
+  '2': {
+    className: 'container-day',
+  },
+  '3': {
+    className: 'container-day',
+  },
+  '4': {
+    className: 'container-day',
+  },
+  '5': {
+    className: 'container-day',
+  },
+  '6': {
+    className: 'container-day is-day-6',
+  },
+  '7': {
+    className: 'container-day is-day-7',
+  },
+};
+
+const LockdropHowItWorks = ({ daysSinceStart }: ILockdropHowItWorks) => {
+  console.log('daysSinceStart', daysSinceStart);
   return (
     <>
       <h2 id="how-it-works" className="text-subheader text-bold text-center mt-7 mt-lg-20">
@@ -37,13 +72,23 @@ const LockdropHowItWorks = () => {
               <p className="text-micro text-center">Day 6-7</p>
             </div>
             <div className="container-days mt-4">
-              <div className="container-day">1</div>
+              {Object.keys(daysMapping).map(key => (
+                <div
+                  key={key}
+                  className={`${daysMapping[key].className} ${
+                    Number(key) === daysSinceStart ? 'is-active' : ''
+                  }`}
+                >
+                  {key}
+                </div>
+              ))}
+              {/* <div className="container-day">1</div>
               <div className="container-day">2</div>
               <div className="container-day">3</div>
               <div className="container-day">4</div>
               <div className="container-day">5</div>
               <div className="container-day is-day-6">6</div>
-              <div className="container-day is-day-7">7</div>
+              <div className="container-day is-day-7">7</div> */}
               <div className="container-day">🚀</div>
             </div>
             <div className="container-days-labels mt-4">
