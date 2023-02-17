@@ -19,7 +19,7 @@ import ToasterWrapper from '../components/ToasterWrapper';
 import { getProvider, idToAddress } from '../utils/tokenUtils';
 import {
   calculateLPTokens,
-  formatBigNumberToMilliseconds,
+  // formatBigNumberToMilliseconds,
   formatStringWeiToStringEther,
   getUserHELIReserves,
 } from '../utils/numberUtils';
@@ -28,47 +28,29 @@ import { useQueryOptionsPoolsFarms } from '../constants';
 
 const LockDropABI = require('../abi/LockDrop.json');
 
+const defaultBNValue = {
+  valueBN: ethers.BigNumber.from('0'),
+  valueStringWei: '0',
+  valueStringETH: '0.0',
+};
+
 const lockDropInitialData: ILockdropData = {
   lockDropDuration: 604800000,
   lockdropEnd: 1677153552000,
   lastLockDropDay: 1677067152000,
   lockDropDepositEnd: 1676980752000,
   vestingEndTime: 0,
-  totalLP: {
-    valueBN: ethers.BigNumber.from('0'),
-    valueStringWei: '0',
-    valueStringETH: '0.0',
-  },
-  totalHbars: {
-    valueBN: ethers.BigNumber.from('0'),
-    valueStringWei: '0',
-    valueStringETH: '0.0',
-  },
+  totalLP: defaultBNValue,
+  totalHbars: defaultBNValue,
   totalTokens: {
     valueBN: ethers.BigNumber.from('2000000000000000'),
     valueStringWei: '2000000000000000',
     valueStringETH: '20000000.0',
   },
-  lockedHbars: {
-    valueBN: ethers.BigNumber.from('0'),
-    valueStringWei: '0',
-    valueStringETH: '0.0',
-  },
-  claimed: {
-    valueBN: ethers.BigNumber.from('0'),
-    valueStringWei: '0',
-    valueStringETH: '0.0',
-  },
-  claimable: {
-    valueBN: ethers.BigNumber.from('0'),
-    valueStringWei: '0',
-    valueStringETH: '0.0',
-  },
-  totalClaimable: {
-    valueBN: ethers.BigNumber.from('0'),
-    valueStringWei: '0',
-    valueStringETH: '0.0',
-  },
+  lockedHbars: defaultBNValue,
+  claimed: defaultBNValue,
+  claimable: defaultBNValue,
+  totalClaimable: defaultBNValue,
   lastUserWithdrawal: 0,
   tokenAddress: '0x00000000000000000000000000000000001d90C9',
   estimatedLPTokens: {
@@ -132,10 +114,10 @@ const Lockdrop = () => {
       ] = await Promise.all(promisesArray);
 
       let stakedTokensBN = ethers.BigNumber.from(0);
-      let claimedOfBN = ethers.BigNumber.from(0);
-      let totalClaimableBN = ethers.BigNumber.from(0);
-      let claimableBN = ethers.BigNumber.from(0);
-      let lastUserWithdrawalBN = ethers.BigNumber.from(0);
+      // let claimedOfBN = ethers.BigNumber.from(0);
+      // let totalClaimableBN = ethers.BigNumber.from(0);
+      // let claimableBN = ethers.BigNumber.from(0);
+      // let lastUserWithdrawalBN = ethers.BigNumber.from(0);
 
       if (userId) {
         const userAddress = idToAddress(userId);
@@ -363,8 +345,6 @@ const Lockdrop = () => {
       Network is busy, please try again later...
     </div>
   );
-
-  console.log('lockDropData', lockDropData);
 
   return (
     <div className="container py-4 py-lg-7">
