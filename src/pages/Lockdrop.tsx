@@ -80,7 +80,8 @@ const daysMapping: IDaysMapping = {
   },
   '5': {
     className: 'container-day',
-    message: 'Unlimited deposits and withdrawals during this time.',
+    message:
+      'Unlimited deposits and withdrawals during this time. This is the last day you can deposit and withdraw all your tokens!',
   },
   '6': {
     className: 'container-day is-day-6',

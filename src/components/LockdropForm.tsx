@@ -226,10 +226,18 @@ const LockdropForm = ({
     for (const [key, value] of Object.entries(daysMapping)) {
       if (Number(key) === daysSinceStart) {
         return (
-          <div className="alert alert-warning my-5 text-center">
-            <p className="text-subheader text-bold">It&rsquo;s day {key} from the Lockdrop.</p>
-            <p className="text-main mt-3">{value.message}</p>
-          </div>
+          <>
+            <div className="alert alert-warning my-5 text-center">
+              <p className="text-subheader text-bold">It&rsquo;s day {key} from the Lockdrop.</p>
+              <p className="text-main mt-3">{value.message}</p>
+            </div>
+            <div className="alert alert-warning my-5 text-center">
+              <p className="text-subheader text-bold">Network issues are possible!</p>
+              <p className="text-main mt-3">
+                Please do not wait till the last moment to update your position!
+              </p>
+            </div>
+          </>
         );
       }
     }
