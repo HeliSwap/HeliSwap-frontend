@@ -136,7 +136,7 @@ const LockdropStats = ({ lockDropData, currentState, countdownEnd }: ILockdropSt
             <div className="d-flex justify-content-end align-items-center">
               <p className="text-micro text-secondary mt-2">My estimated LP Token allocation</p>
               <Tippy
-                content={`The percentage of your LP tokens that you got allocated during the lockdrop period.`}
+                content={`The percentage of total LP token allocation your current position represents.`}
               >
                 <span className="ms-2">
                   <Icon size="small" color="gray" name="hint" />
