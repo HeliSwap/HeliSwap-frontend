@@ -19,7 +19,7 @@ import ToasterWrapper from '../components/ToasterWrapper';
 import { idToAddress } from '../utils/tokenUtils';
 import {
   calculateLPTokens,
-  // formatBigNumberToMilliseconds,
+  formatBigNumberToMilliseconds,
   formatStringWeiToStringEther,
   getUserHELIReserves,
 } from '../utils/numberUtils';
@@ -155,22 +155,23 @@ const Lockdrop = () => {
         // let claimedOfBN = ethers.BigNumber.from(0);
         // let totalClaimableBN = ethers.BigNumber.from(0);
         // let claimableBN = ethers.BigNumber.from(0);
-        // let lastUserWithdrawalBN = ethers.BigNumber.from(0);
+        let lastUserWithdrawalBN = ethers.BigNumber.from(0);
 
         if (userId) {
           const userAddress = idToAddress(userId);
 
           const userPromisesArray = [
             lockDropContract.providers(userAddress),
+            lockDropContract.lastUserWithdrawal(userAddress),
             // lockDropContract.claimedOf(userAddress),
-            // lockDropContract.lastUserWithdrawal(userAddress),
             // lockDropContract.claimable(userAddress),
             // lockDropContract.totalClaimable(userAddress),
           ];
 
           [
             stakedTokensBN,
-            // claimedOfBN, lastUserWithdrawalBN, claimableBN, totalClaimableBN
+            lastUserWithdrawalBN,
+            // claimedOfBN, claimableBN, totalClaimableBN
           ] = await Promise.all(userPromisesArray);
         }
 
@@ -223,7 +224,7 @@ const Lockdrop = () => {
         //   valueStringETH: formatBNTokenToString(totalClaimableBN, 18),
         // };
 
-        // const lastUserWithdrawal = formatBigNumberToMilliseconds(lastUserWithdrawalBN);
+        const lastUserWithdrawal = formatBigNumberToMilliseconds(lastUserWithdrawalBN);
 
         const myHELIFormatted = getUserHELIReserves(
           lockDropInitialData.totalTokens.valueBN,
@@ -328,6 +329,7 @@ const Lockdrop = () => {
           estimatedLPTokens,
           lockedHbars,
           estimatedLPPercentage,
+          lastUserWithdrawal,
         });
 
         setCountDownEnd(
