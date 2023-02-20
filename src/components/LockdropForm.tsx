@@ -22,6 +22,8 @@ import {
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
 import { getTokenBalance, getTokenBalanceERC20, NATIVE_TOKEN } from '../utils/tokenUtils';
+import { formatTimeNumber, getCountdownReturnValues } from '../utils/timeUtils';
+
 import getErrorMessage from '../content/errors';
 
 enum ActionTab {
@@ -227,15 +229,24 @@ const LockdropForm = ({
       if (Number(key) === daysSinceStart) {
         return (
           <>
-            <div className="alert alert-warning my-5 text-center">
-              <p className="text-subheader text-bold">It&rsquo;s day {key} from the Lockdrop.</p>
-              <p className="text-main mt-3">{value.message}</p>
-            </div>
-            <div className="alert alert-warning my-5 text-center">
-              <p className="text-subheader text-bold">Network issues are possible!</p>
-              <p className="text-main mt-3">
-                Please do not wait till the last moment to update your position!
+            <div className="my-5 text-center">
+              <p className="text-title text-white">
+                It&rsquo;s day <span className="text-bold text-headline">{key}</span> from the
+                Lockdrop.
               </p>
+              <p className="text-main text-white mt-3">{value.message}</p>
+              {timeTillDepositEnd > 0 ? (
+                <>
+                  <hr />
+                  <p className="text-title text-white text-secondary mt-5">
+                    <span className="text-bold">{formatTimeNumber(countDownData.days)}</span> Days{' '}
+                    <span className="text-bold">{formatTimeNumber(countDownData.hours)}</span> Hours{' '}
+                    <span className="text-bold">{formatTimeNumber(countDownData.minutes)}</span>{' '}
+                    Minutes
+                  </p>
+                  <p className="text-white text-uppercase text-bold mt-3">before deposit ends</p>
+                </>
+              ) : null}
             </div>
           </>
         );
@@ -247,15 +258,20 @@ const LockdropForm = ({
   const canWithdraw = lastUserWithdrawal < lockDropDepositEnd;
   const canStake = Number(lpBalance) > 0 && currentState >= LOCKDROP_STATE.VESTING && farmAddress;
 
+  const timeNow = Date.now();
+  const timeTillDepositEnd = lockDropData.lockDropDepositEnd - timeNow;
+  const countDownData = getCountdownReturnValues(timeTillDepositEnd);
+
   return (
     <div className="d-flex flex-column align-items-center py-15 container-lockdrop">
       <div className="container-action">
         {currentState < LOCKDROP_STATE.WITHDRAW ? (
-          <p className="text-subheader text-center mb-6">
-            Select how much <span className="text-bold">HBAR</span> you want to deposit in the
-            LockDrop Pool.
-          </p>
+          <></>
         ) : (
+          // <p className="text-subheader text-center mb-6">
+          //   Select how much <span className="text-bold">HBAR</span> you want to deposit in the
+          //   LockDrop Pool.
+          // </p>
           <p className="text-subheader text-center mb-6">Locking period has ended.</p>
         )}
 
@@ -266,6 +282,7 @@ const LockdropForm = ({
           “deposit” and “withdraw” and choose how many HBAR. The bottom shows you the estimated
           amount of LP tokens you would receive if the lockdrop ended in that moment.
         </p>
+
         <div className="container-dark">
           {currentState >= LOCKDROP_STATE.DEPOSIT && currentState < LOCKDROP_STATE.PRE_VESTING ? (
             <>
@@ -289,6 +306,13 @@ const LockdropForm = ({
                 >
                   Withdraw
                 </span>
+              </div>
+
+              <div className="alert alert-warning my-5 text-center">
+                <p className="text-subheader">Network issues are possible!</p>
+                <p className="text-small mt-3">
+                  Please do not wait till the last moment to update your position!
+                </p>
               </div>
 
               {actionTab === ActionTab.Deposit ? (
