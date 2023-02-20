@@ -7,7 +7,7 @@ import { GlobalContext } from '../providers/Global';
 
 import useFarmAddress from '../hooks/useFarmAddress';
 
-import { ILockdropData, LOCKDROP_STATE } from '../interfaces/common';
+import { IDaysMapping, ILockdropData, LOCKDROP_STATE } from '../interfaces/common';
 
 import LockdropStats from '../components/LockdropStats';
 import LockdropFAQ from '../components/LockdropFAQ';
@@ -58,6 +58,40 @@ const lockDropInitialData: ILockdropData = {
     valueStringETH: '0',
   },
   lpTokenAddress: '0x0000000000000000000000000000000000000000',
+  estimatedLPPercentage: '0',
+};
+
+const daysMapping: IDaysMapping = {
+  '1': {
+    className: 'container-day',
+    message: 'Unlimited deposits and withdrawals during this time.',
+  },
+  '2': {
+    className: 'container-day',
+    message: 'Unlimited deposits and withdrawals during this time.',
+  },
+  '3': {
+    className: 'container-day',
+    message: 'Unlimited deposits and withdrawals during this time.',
+  },
+  '4': {
+    className: 'container-day',
+    message: 'Unlimited deposits and withdrawals during this time.',
+  },
+  '5': {
+    className: 'container-day',
+    message: 'Unlimited deposits and withdrawals during this time.',
+  },
+  '6': {
+    className: 'container-day is-day-6',
+    message:
+      'Only 1 withdrawal possible over day 6 & 7 combined. Up to 50% of position can be withdrawn on day 6.',
+  },
+  '7': {
+    className: 'container-day is-day-7',
+    message:
+      'Only 1 withdrawal possible over day 6 & 7 combined. Max. withdrawal gradually decreasing from 50% to 0%.',
+  },
 };
 
 const Lockdrop = () => {
@@ -207,12 +241,34 @@ const Lockdrop = () => {
           valueStringETH: formatStringWeiToStringEther(estimatedLPTokensBN),
         };
 
+        // Calculate total estimates LP tokens before pool is created; this amount shoub be == to `totalLPtokens` after pool is created
+        const estimatedTotalLPTokensBN = calculateLPTokens(
+          lockDropInitialData.totalTokens.valueStringETH,
+          totalHbars.valueStringETH,
+          8,
+          8,
+        );
+        const estimatedTotalLPTokens = {
+          valueStringWei: estimatedTotalLPTokensBN.toString(),
+          valueStringETH: formatStringWeiToStringEther(estimatedTotalLPTokensBN),
+        };
+
+        const estimatedLPPercentage =
+          Number(estimatedLPTokens.valueStringWei) === 0 ||
+          Number(estimatedTotalLPTokens.valueStringWei) === 0
+            ? '0'
+            : (
+                (Number(estimatedLPTokens.valueStringWei) /
+                  Number(estimatedTotalLPTokens.valueStringWei)) *
+                100
+              ).toString();
+
         // Determine state
         const lockdropStartTime =
           lockDropInitialData.lockdropEnd - lockDropInitialData.lockDropDuration;
         const nowTimeStamp = Date.now();
         const timeSinceStart = nowTimeStamp - lockdropStartTime;
-        const daysSinceStart = Math.floor(timeSinceStart / 1000 / 3600 / 24);
+        const daysSinceStart = Math.ceil(timeSinceStart / 1000 / 3600 / 24);
         setDaysSinceStart(daysSinceStart);
 
         const withdrawOnly =
@@ -270,6 +326,7 @@ const Lockdrop = () => {
           totalHbars,
           estimatedLPTokens,
           lockedHbars,
+          estimatedLPPercentage,
         });
 
         setCountDownEnd(
@@ -387,6 +444,8 @@ const Lockdrop = () => {
           {/* Deposit, Withdrtaw & Claim form */}
           {lockDropData ? (
             <LockdropForm
+              daysSinceStart={daysSinceStart}
+              daysMapping={daysMapping}
               toast={toast}
               getContractData={getContractData}
               lockDropData={lockDropData}
@@ -431,7 +490,7 @@ const Lockdrop = () => {
       {/* About the lockdrop */}
 
       {/* How it works */}
-      <LockdropHowItWorks daysSinceStart={daysSinceStart} />
+      <LockdropHowItWorks daysMapping={daysMapping} daysSinceStart={daysSinceStart} />
       {/* How it works */}
 
       {/* FAQ */}

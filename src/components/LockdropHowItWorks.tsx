@@ -1,41 +1,13 @@
 import React from 'react';
 
+import { IDaysMapping } from '../interfaces/common';
+
 interface ILockdropHowItWorks {
   daysSinceStart: number;
+  daysMapping: IDaysMapping;
 }
 
-interface IDaysMapping {
-  [key: string]: {
-    [key: string]: string;
-  };
-}
-
-const daysMapping: IDaysMapping = {
-  '1': {
-    className: 'container-day',
-  },
-  '2': {
-    className: 'container-day',
-  },
-  '3': {
-    className: 'container-day',
-  },
-  '4': {
-    className: 'container-day',
-  },
-  '5': {
-    className: 'container-day',
-  },
-  '6': {
-    className: 'container-day is-day-6',
-  },
-  '7': {
-    className: 'container-day is-day-7',
-  },
-};
-
-const LockdropHowItWorks = ({ daysSinceStart }: ILockdropHowItWorks) => {
-  console.log('daysSinceStart', daysSinceStart);
+const LockdropHowItWorks = ({ daysSinceStart, daysMapping }: ILockdropHowItWorks) => {
   return (
     <>
       <h2 id="how-it-works" className="text-subheader text-bold text-center mt-7 mt-lg-20">

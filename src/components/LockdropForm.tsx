@@ -6,7 +6,7 @@ import BigNumber from 'bignumber.js';
 
 import { GlobalContext } from '../providers/Global';
 
-import { LOCKDROP_STATE, ILockdropData } from '../interfaces/common';
+import { LOCKDROP_STATE, ILockdropData, IDaysMapping } from '../interfaces/common';
 
 import ButtonSelector from '../components/ButtonSelector';
 import InputToken from '../components/InputToken';
@@ -36,6 +36,8 @@ interface ILockdropFormProps {
   toast: any;
   farmAddress: string;
   maxWithdrawValue: string;
+  daysMapping: IDaysMapping;
+  daysSinceStart: number;
 }
 
 const LockdropForm = ({
@@ -45,6 +47,8 @@ const LockdropForm = ({
   toast,
   farmAddress,
   maxWithdrawValue,
+  daysMapping,
+  daysSinceStart,
 }: ILockdropFormProps) => {
   const lockDropContractAddress = process.env.REACT_APP_LOCKDROP_ADDRESS;
   const contextValue = useContext(GlobalContext);
@@ -218,6 +222,19 @@ const LockdropForm = ({
     return !value || isNaN(Number(value)) || Number(value) <= 0;
   };
 
+  const renderDayMessage = () => {
+    for (const [key, value] of Object.entries(daysMapping)) {
+      if (Number(key) === daysSinceStart) {
+        return (
+          <div className="alert alert-warning my-5 text-center">
+            <p className="text-subheader text-bold">It&rsquo;s day {key} from the Lockdrop.</p>
+            <p className="text-main mt-3">{value.message}</p>
+          </div>
+        );
+      }
+    }
+  };
+
   const canClaim = Number(claimable.valueBN.toString()) > 0;
   const canWithdraw = lastUserWithdrawal < lockDropDepositEnd;
   const canStake = Number(lpBalance) > 0 && currentState >= LOCKDROP_STATE.VESTING && farmAddress;
@@ -233,6 +250,8 @@ const LockdropForm = ({
         ) : (
           <p className="text-subheader text-center mb-6">Locking period has ended.</p>
         )}
+
+        {renderDayMessage()}
 
         <p className="text-small mb-5">
           This is where you will be able to deposit and withdraw your HBAR. Simply pick between
