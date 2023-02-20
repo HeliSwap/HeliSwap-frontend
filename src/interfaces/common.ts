@@ -86,5 +86,12 @@ export interface ILockdropData {
     valueStringWei: string;
     valueStringETH: string;
   };
+  estimatedLPPercentage: string;
   lpTokenAddress: string;
+}
+
+export interface IDaysMapping {
+  [key: string]: {
+    [key: string]: string;
+  };
 }
