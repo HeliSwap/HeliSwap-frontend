@@ -129,14 +129,14 @@ const LockdropStats = ({ lockDropData, currentState, countdownEnd }: ILockdropSt
           <div className="text-end mt-5 mt-lg-15">
             <h3 className="text-subheader text-bold">
               <span className="text-numeric">
-                {formatStringETHtoPriceFormatted(lockDropData.estimatedLPTokens.valueStringETH)}
+                {formatStringETHtoPriceFormatted(lockDropData.estimatedLPPercentage)}
               </span>{' '}
-              LP TOKENS
+              % of all LP TOKENS
             </h3>
             <div className="d-flex justify-content-end align-items-center">
               <p className="text-micro text-secondary mt-2">My estimated LP Token allocation</p>
               <Tippy
-                content={`The amount of LP tokens that you got allocated during the lockdrop period.`}
+                content={`The percentage of total LP token allocation your current position represents.`}
               >
                 <span className="ms-2">
                   <Icon size="small" color="gray" name="hint" />

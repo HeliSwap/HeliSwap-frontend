@@ -7,7 +7,7 @@ import { GlobalContext } from '../providers/Global';
 
 import useFarmAddress from '../hooks/useFarmAddress';
 
-import { ILockdropData, LOCKDROP_STATE } from '../interfaces/common';
+import { IDaysMapping, ILockdropData, LOCKDROP_STATE } from '../interfaces/common';
 
 import LockdropStats from '../components/LockdropStats';
 import LockdropFAQ from '../components/LockdropFAQ';
@@ -19,7 +19,7 @@ import ToasterWrapper from '../components/ToasterWrapper';
 import { idToAddress } from '../utils/tokenUtils';
 import {
   calculateLPTokens,
-  // formatBigNumberToMilliseconds,
+  formatBigNumberToMilliseconds,
   formatStringWeiToStringEther,
   getUserHELIReserves,
 } from '../utils/numberUtils';
@@ -58,6 +58,41 @@ const lockDropInitialData: ILockdropData = {
     valueStringETH: '0',
   },
   lpTokenAddress: '0x0000000000000000000000000000000000000000',
+  estimatedLPPercentage: '0',
+};
+
+const daysMapping: IDaysMapping = {
+  '1': {
+    className: 'container-day',
+    message: 'Unlimited deposits and withdrawals during this time.',
+  },
+  '2': {
+    className: 'container-day',
+    message: 'Unlimited deposits and withdrawals during this time.',
+  },
+  '3': {
+    className: 'container-day',
+    message: 'Unlimited deposits and withdrawals during this time.',
+  },
+  '4': {
+    className: 'container-day',
+    message: 'Unlimited deposits and withdrawals during this time.',
+  },
+  '5': {
+    className: 'container-day',
+    message:
+      'Unlimited deposits and withdrawals during this time. This is the last day you can deposit and withdraw all your tokens!',
+  },
+  '6': {
+    className: 'container-day is-day-6',
+    message:
+      'Only 1 withdrawal possible over day 6 & 7 combined. Up to 50% of position can be withdrawn on day 6.',
+  },
+  '7': {
+    className: 'container-day is-day-7',
+    message:
+      'Only 1 withdrawal possible over day 6 & 7 combined. Max. withdrawal gradually decreasing from 50% to 0%.',
+  },
 };
 
 const Lockdrop = () => {
@@ -78,6 +113,7 @@ const Lockdrop = () => {
   const [loadingContractData, setLoadingContractData] = useState(true);
   const [maxWithdrawValue, setMaxWithdrawValue] = useState<string>('0');
   const [contractLoadingError, setContractLoadingError] = useState(false);
+  const [daysSinceStart, setDaysSinceStart] = useState(0);
 
   const [lockDropData, setLockDropData] = useState<ILockdropData>(lockDropInitialData);
 
@@ -119,22 +155,23 @@ const Lockdrop = () => {
         // let claimedOfBN = ethers.BigNumber.from(0);
         // let totalClaimableBN = ethers.BigNumber.from(0);
         // let claimableBN = ethers.BigNumber.from(0);
-        // let lastUserWithdrawalBN = ethers.BigNumber.from(0);
+        let lastUserWithdrawalBN = ethers.BigNumber.from(0);
 
         if (userId) {
           const userAddress = idToAddress(userId);
 
           const userPromisesArray = [
             lockDropContract.providers(userAddress),
+            lockDropContract.lastUserWithdrawal(userAddress),
             // lockDropContract.claimedOf(userAddress),
-            // lockDropContract.lastUserWithdrawal(userAddress),
             // lockDropContract.claimable(userAddress),
             // lockDropContract.totalClaimable(userAddress),
           ];
 
           [
             stakedTokensBN,
-            // claimedOfBN, lastUserWithdrawalBN, claimableBN, totalClaimableBN
+            lastUserWithdrawalBN,
+            // claimedOfBN, claimableBN, totalClaimableBN
           ] = await Promise.all(userPromisesArray);
         }
 
@@ -187,7 +224,7 @@ const Lockdrop = () => {
         //   valueStringETH: formatBNTokenToString(totalClaimableBN, 18),
         // };
 
-        // const lastUserWithdrawal = formatBigNumberToMilliseconds(lastUserWithdrawalBN);
+        const lastUserWithdrawal = formatBigNumberToMilliseconds(lastUserWithdrawalBN);
 
         const myHELIFormatted = getUserHELIReserves(
           lockDropInitialData.totalTokens.valueBN,
@@ -206,8 +243,36 @@ const Lockdrop = () => {
           valueStringETH: formatStringWeiToStringEther(estimatedLPTokensBN),
         };
 
+        // Calculate total estimates LP tokens before pool is created; this amount shoub be == to `totalLPtokens` after pool is created
+        const estimatedTotalLPTokensBN = calculateLPTokens(
+          lockDropInitialData.totalTokens.valueStringETH,
+          totalHbars.valueStringETH,
+          8,
+          8,
+        );
+        const estimatedTotalLPTokens = {
+          valueStringWei: estimatedTotalLPTokensBN.toString(),
+          valueStringETH: formatStringWeiToStringEther(estimatedTotalLPTokensBN),
+        };
+
+        const estimatedLPPercentage =
+          Number(estimatedLPTokens.valueStringWei) === 0 ||
+          Number(estimatedTotalLPTokens.valueStringWei) === 0
+            ? '0'
+            : (
+                (Number(estimatedLPTokens.valueStringWei) /
+                  Number(estimatedTotalLPTokens.valueStringWei)) *
+                100
+              ).toString();
+
         // Determine state
+        const lockdropStartTime =
+          lockDropInitialData.lockdropEnd - lockDropInitialData.lockDropDuration;
         const nowTimeStamp = Date.now();
+        const timeSinceStart = nowTimeStamp - lockdropStartTime;
+        const daysSinceStart = Math.ceil(timeSinceStart / 1000 / 3600 / 24);
+        setDaysSinceStart(daysSinceStart);
+
         const withdrawOnly =
           nowTimeStamp > lockDropInitialData.lockDropDepositEnd &&
           nowTimeStamp <= lockDropInitialData.lockdropEnd;
@@ -263,6 +328,8 @@ const Lockdrop = () => {
           totalHbars,
           estimatedLPTokens,
           lockedHbars,
+          estimatedLPPercentage,
+          lastUserWithdrawal,
         });
 
         setCountDownEnd(
@@ -380,6 +447,8 @@ const Lockdrop = () => {
           {/* Deposit, Withdrtaw & Claim form */}
           {lockDropData ? (
             <LockdropForm
+              daysSinceStart={daysSinceStart}
+              daysMapping={daysMapping}
               toast={toast}
               getContractData={getContractData}
               lockDropData={lockDropData}
@@ -423,14 +492,8 @@ const Lockdrop = () => {
       </div>
       {/* About the lockdrop */}
 
-      {/* <p className="mt-6 text-center">
-        <a className="link-primary text-bold" href="#how-it-works">
-          How it works
-        </a>
-      </p> */}
-
       {/* How it works */}
-      <LockdropHowItWorks />
+      <LockdropHowItWorks daysMapping={daysMapping} daysSinceStart={daysSinceStart} />
       {/* How it works */}
 
       {/* FAQ */}
