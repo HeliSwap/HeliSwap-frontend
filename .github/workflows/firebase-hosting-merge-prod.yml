@@ -9,7 +9,7 @@ env:
   REACT_APP_TOKEN_LIST_URL: https://heliswap.infura-ipfs.io/ipfs/QmTURxXyLpACyvyPHkDmK7Ahg1MzTxcvK3LYSFN8ffcHqp
   REACT_APP_NETWORK_TYPE: mainnet
   REACT_APP_GRAPHQL_URI: https://heliswap-prod-362307.oa.r.appspot.com/query
-  REACT_APP_POOL_MIN_LIQUIDITY: 2500
+  REACT_APP_POOL_MIN_LIQUIDITY: 1500
 'on':
   push:
     branches:
