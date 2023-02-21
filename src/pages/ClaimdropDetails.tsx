@@ -30,6 +30,7 @@ import { formatBigNumberToMilliseconds } from '../utils/numberUtils';
 import getErrorMessage from '../content/errors';
 
 import ClaimDropABI from '../abi/ClaimDrop.json';
+import claimdrops from '../claimdrops/testnet';
 
 enum CLAIMDROP_STATE {
   NOT_STARTED,
@@ -47,13 +48,23 @@ const ClaimdropDetails = () => {
   const { token } = useParams();
   const navigate = useNavigate();
 
-  const claimDropContractAddress = process.env.REACT_APP_CLAIMDROP_ADDRESS;
+  const foundLockdropData: IClaimdropData = useMemo(
+    () => claimdrops.find(item => item.token === token) || ({} as IClaimdropData),
+    [token],
+  );
+  const claimDropContractAddress = claimdrops.find(item => item.token === token)?.claimdropAddress;
 
   const claimDropContract = useMemo(() => {
     const provider = getProvider();
 
     return new ethers.Contract(claimDropContractAddress as string, ClaimDropABI, provider);
   }, [claimDropContractAddress]);
+
+  const defaultBNValue = {
+    valueBN: ethers.BigNumber.from('0'),
+    valueStringWei: '0',
+    valueStringETH: '0.0',
+  };
 
   const initialClaimdropData: IClaimdropData = {
     claimdropStart: {
@@ -74,36 +85,12 @@ const ClaimdropDetails = () => {
       valueNumericMilliseconds: 0,
       valueString: '',
     },
-    totalAllocated: {
-      valueBN: ethers.BigNumber.from(0),
-      valueStringWei: '',
-      valueStringETH: '',
-    },
-    claimedOf: {
-      valueBN: ethers.BigNumber.from(0),
-      valueStringWei: '',
-      valueStringETH: '',
-    },
-    vestedTokensOf: {
-      valueBN: ethers.BigNumber.from(0),
-      valueStringWei: '',
-      valueStringETH: '',
-    },
-    claimable: {
-      valueBN: ethers.BigNumber.from(0),
-      valueStringWei: '',
-      valueStringETH: '',
-    },
-    extraTokensOf: {
-      valueBN: ethers.BigNumber.from(0),
-      valueStringWei: '',
-      valueStringETH: '',
-    },
-    totalAllocatedOf: {
-      valueBN: ethers.BigNumber.from(0),
-      valueStringWei: '',
-      valueStringETH: '',
-    },
+    totalAllocated: defaultBNValue,
+    claimedOf: defaultBNValue,
+    vestedTokensOf: defaultBNValue,
+    claimable: defaultBNValue,
+    extraTokensOf: defaultBNValue,
+    totalAllocatedOf: defaultBNValue,
   };
 
   const [tokenData, setTokenData] = useState({} as ITokenData);
@@ -126,18 +113,11 @@ const ClaimdropDetails = () => {
       const promisesArray = [
         claimDropContract.start(),
         claimDropContract.end(),
-        // claimDropContract.cliffEnd(),
         claimDropContract.claimExtraTime(),
         claimDropContract.totalAllocated(),
       ];
 
-      const [
-        startBN,
-        endBN,
-        // cliffEndBN,
-        claimExtraTimeBN,
-        totalAllocatedBN,
-      ] = await Promise.all(promisesArray);
+      const [startBN, endBN, claimExtraTimeBN, totalAllocatedBN] = await Promise.all(promisesArray);
 
       let claimedOfBN = ethers.BigNumber.from(0);
       let vestedTokensOfBN = ethers.BigNumber.from(0);
@@ -276,6 +256,111 @@ const ClaimdropDetails = () => {
     }
   }, [userId, tokenData.decimals, claimDropContract]);
 
+  const getContractDataFound = useCallback(async () => {
+    const formatBNTokenToString = (numberToFormat: ethers.BigNumber, decimals = 8) =>
+      ethers.utils.formatUnits(numberToFormat, decimals);
+
+    setLoadingContractData(true);
+
+    try {
+      let claimedOfBN = ethers.BigNumber.from(0);
+      let vestedTokensOfBN = ethers.BigNumber.from(0);
+      let claimableBN = ethers.BigNumber.from(0);
+      let extraTokensOfBN = ethers.BigNumber.from(0);
+      let totalAllocatedOfBN = ethers.BigNumber.from(0);
+
+      if (userId) {
+        const userAddress = idToAddress(userId);
+
+        const userPromisesArray = [
+          claimDropContract.claimedOf(userAddress),
+          claimDropContract.vestedTokensOf(userAddress),
+          claimDropContract.claimable(userAddress),
+          claimDropContract.extraTokensOf(userAddress),
+          claimDropContract.totalAllocatedOf(userAddress),
+        ];
+
+        [claimedOfBN, vestedTokensOfBN, claimableBN, extraTokensOfBN, totalAllocatedOfBN] =
+          await Promise.all(userPromisesArray);
+      }
+
+      const claimedOf = {
+        valueBN: claimedOfBN,
+        valueStringWei: claimedOfBN.toString(),
+        valueStringETH: formatBNTokenToString(claimedOfBN, tokenData.decimals),
+      };
+
+      const vestedTokensOf = {
+        valueBN: vestedTokensOfBN,
+        valueStringWei: vestedTokensOfBN.toString(),
+        valueStringETH: formatBNTokenToString(vestedTokensOfBN, tokenData.decimals),
+      };
+
+      const claimable = {
+        valueBN: claimableBN,
+        valueStringWei: claimableBN.toString(),
+        valueStringETH: formatBNTokenToString(claimableBN, tokenData.decimals),
+      };
+
+      const extraTokensOf = {
+        valueBN: extraTokensOfBN,
+        valueStringWei: extraTokensOfBN.toString(),
+        valueStringETH: formatBNTokenToString(extraTokensOfBN, tokenData.decimals),
+      };
+
+      const totalAllocatedOf = {
+        valueBN: totalAllocatedOfBN,
+        valueStringWei: totalAllocatedOfBN.toString(),
+        valueStringETH: formatBNTokenToString(totalAllocatedOfBN, tokenData.decimals),
+      };
+
+      setClaimdropData({
+        ...foundLockdropData,
+        claimedOf,
+        vestedTokensOf,
+        claimable,
+        extraTokensOf,
+        totalAllocatedOf,
+      });
+
+      // Determine state
+      const nowTimeStamp = Date.now();
+      const vestingEndTimeStamp =
+        foundLockdropData.claimdropStart.timestamp +
+        foundLockdropData.vestingPeriod.valueNumericMilliseconds;
+      const claimingEndTimeStamp =
+        vestingEndTimeStamp + foundLockdropData.claimPeriod.valueNumericMilliseconds;
+
+      const notStarted = nowTimeStamp < foundLockdropData.claimdropStart.timestamp;
+      const vesting =
+        nowTimeStamp >= foundLockdropData.claimdropStart.timestamp &&
+        nowTimeStamp < vestingEndTimeStamp;
+      const postVesting =
+        nowTimeStamp >= vestingEndTimeStamp && nowTimeStamp < claimingEndTimeStamp;
+      const ended = nowTimeStamp > claimingEndTimeStamp;
+
+      if (notStarted) {
+        setClaimdropState(CLAIMDROP_STATE.NOT_STARTED);
+      }
+
+      if (vesting) {
+        setClaimdropState(CLAIMDROP_STATE.VESTING);
+      }
+
+      if (postVesting) {
+        setClaimdropState(CLAIMDROP_STATE.POST_VESTING);
+      }
+
+      if (ended) {
+        setClaimdropState(CLAIMDROP_STATE.ENDED);
+      }
+    } catch (e) {
+      console.error('Error on fetching contract data:', e);
+    } finally {
+      setLoadingContractData(false);
+    }
+  }, [userId, tokenData.decimals, claimDropContract, foundLockdropData]);
+
   const checkTokenAssociation = async (userId: string) => {
     const tokens = await getUserAssociatedTokens(userId);
     setUserAssociatedTokens(tokens);
@@ -302,7 +387,7 @@ const ClaimdropDetails = () => {
         toast.error(getErrorMessage(error.status ? error.status : error));
       }
 
-      await getContractData();
+      await getContractDataFound();
     } catch (e) {
       console.log('e', e);
     } finally {
@@ -364,8 +449,8 @@ const ClaimdropDetails = () => {
 
   // Get contract data
   useEffect(() => {
-    claimDropContract && getContractData();
-  }, [claimDropContract, getContractData]);
+    claimDropContract && getContractDataFound();
+  }, [claimDropContract, getContractDataFound]);
 
   // Check for associations
   useEffect(() => {
@@ -403,8 +488,6 @@ const ClaimdropDetails = () => {
     claimdropState > CLAIMDROP_STATE.NOT_STARTED && claimdropState < CLAIMDROP_STATE.ENDED;
   const haveTokensToClaim = Number(claimable.valueBN.toString()) > 0;
   const claimButtonDisabled = !haveTokensToClaim;
-
-  console.log(claimdropData);
 
   return (
     <div className="d-flex justify-content-center">

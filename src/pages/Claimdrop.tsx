@@ -1,15 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-
-const claimdrops = [
-  {
-    tokenAddress: '0x0000000000000000000000000000000000340a6a',
-    title: 'OM',
-  },
-  {
-    tokenAddress: '0x000000000000000000000000000000000033dac0',
-    title: 'HELI',
-  },
-];
+import claimdrops from '../claimdrops/testnet';
 
 const Claimdrop = () => {
   const navigate = useNavigate();
@@ -38,7 +28,7 @@ const Claimdrop = () => {
           {claimdrops.map((item, index) => (
             <div
               key={index}
-              onClick={() => handleViewDetailsRowClick(item.tokenAddress)}
+              onClick={() => handleViewDetailsRowClick(item.token)}
               className="table-pools-row"
             >
               <div className="table-pools-cell">
