@@ -16,7 +16,7 @@ import LockdropHowItWorks from '../components/LockdropHowItWorks';
 import Loader from '../components/Loader';
 import ToasterWrapper from '../components/ToasterWrapper';
 
-import { idToAddress } from '../utils/tokenUtils';
+import { addressToId, idToAddress } from '../utils/tokenUtils';
 import {
   calculateLPTokens,
   formatBigNumberToMilliseconds,
@@ -24,7 +24,8 @@ import {
   getUserHELIReserves,
 } from '../utils/numberUtils';
 
-import { useQueryOptionsPoolsFarms } from '../constants';
+import { HASHSCAN_ROOT_DOMAIN, useQueryOptionsPoolsFarms } from '../constants';
+import LockdropEmergencyForm from '../components/LockdropEmergencyForm';
 
 const LockDropABI = require('../abi/LockDrop.json');
 
@@ -118,6 +119,8 @@ const Lockdrop = () => {
   const [lockDropData, setLockDropData] = useState<ILockdropData>(lockDropInitialData);
 
   const { farmAddress } = useFarmAddress(useQueryOptionsPoolsFarms, lockDropData.lpTokenAddress);
+
+  const hashscanLink = `${HASHSCAN_ROOT_DOMAIN}/${process.env.REACT_APP_NETWORK_TYPE}/account/${userId}`;
 
   const getContractData = useCallback(async () => {
     if (lockDropContract) {
@@ -414,7 +417,16 @@ const Lockdrop = () => {
 
   const getErrorMessage = () => (
     <div className="alert alert-warning text-center">
-      Network is busy, please try again later...
+      Network is busy, please try refreshing the page.
+      <br />
+      <br />
+      If the issue persists, you can also withdraw your HBAR by getting the data for your latest
+      deposits - search for all your transactions to Lockdrop contract with id{' '}
+      <code>{addressToId(process.env.REACT_APP_LOCKDROP_ADDRESS as string)}</code>
+      <a rel="noreferrer" target="_blank" href={hashscanLink} className="link">
+        <span className="text-small ms-2">here</span>
+      </a>
+      .
     </div>
   );
 
@@ -427,9 +439,12 @@ const Lockdrop = () => {
           <Loader />
         </div>
       ) : contractLoadingError ? (
-        <div className="row my-6">
-          <div className="col-lg-6 offset-lg-3">{getErrorMessage()}</div>
-        </div>
+        <>
+          <div className="row my-6">
+            <div className="col-lg-6 offset-lg-3">{getErrorMessage()}</div>
+          </div>
+          <LockdropEmergencyForm toast={toast} getContractData={getContractData} />
+        </>
       ) : (
         <>
           <div className="text-center mt-5">
