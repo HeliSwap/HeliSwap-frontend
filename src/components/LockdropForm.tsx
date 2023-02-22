@@ -235,7 +235,7 @@ const LockdropForm = ({
                 Lockdrop.
               </p>
               <p className="text-main text-white mt-3">{value.message}</p>
-              {timeTillDepositEnd > 0 ? (
+              {timeTillLastDay > 0 ? (
                 <>
                   <hr />
                   <p className="text-title text-white text-secondary mt-5">
@@ -244,7 +244,9 @@ const LockdropForm = ({
                     <span className="text-bold">{formatTimeNumber(countDownData.minutes)}</span>{' '}
                     Minutes
                   </p>
-                  <p className="text-white text-uppercase text-bold mt-3">before deposit ends</p>
+                  <p className="text-white text-uppercase text-bold mt-3">
+                    before last lockdrop day
+                  </p>
                 </>
               ) : null}
             </div>
@@ -259,8 +261,8 @@ const LockdropForm = ({
   const canStake = Number(lpBalance) > 0 && currentState >= LOCKDROP_STATE.VESTING && farmAddress;
 
   const timeNow = Date.now();
-  const timeTillDepositEnd = lockDropData.lockDropDepositEnd - timeNow;
-  const countDownData = getCountdownReturnValues(timeTillDepositEnd);
+  const timeTillLastDay = lockDropData.lastLockDropDay - timeNow;
+  const countDownData = getCountdownReturnValues(timeTillLastDay);
 
   return (
     <div className="d-flex flex-column align-items-center py-15 container-lockdrop">
