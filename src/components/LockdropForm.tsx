@@ -265,16 +265,6 @@ const LockdropForm = ({
   return (
     <div className="d-flex flex-column align-items-center py-15 container-lockdrop">
       <div className="container-action">
-        {currentState < LOCKDROP_STATE.WITHDRAW ? (
-          <></>
-        ) : (
-          // <p className="text-subheader text-center mb-6">
-          //   Select how much <span className="text-bold">HBAR</span> you want to deposit in the
-          //   LockDrop Pool.
-          // </p>
-          <p className="text-subheader text-center mb-6">Locking period has ended.</p>
-        )}
-
         {renderDayMessage()}
 
         <p className="text-small mb-5">
