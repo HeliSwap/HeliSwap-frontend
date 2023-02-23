@@ -1,11 +1,17 @@
-import React, { ReactNode, useContext, useMemo, useState } from 'react';
+import React, { ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import Tippy from '@tippyjs/react';
 import toast from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { GlobalContext } from '../providers/Global';
 
-import { IReward, IRewardsAccumulated, IUserStakingData } from '../interfaces/tokens';
+import {
+  IReward,
+  IRewardsAccumulated,
+  ITokenData,
+  IUserStakingData,
+  TokenType,
+} from '../interfaces/tokens';
 
 import Icon from '../components/Icon';
 import IconToken from '../components/IconToken';
@@ -16,6 +22,7 @@ import FarmActions from '../components/FarmActions';
 import Modal from '../components/Modal';
 import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
 import Confirmation from '../components/Confirmation';
+import Loader from '../components/Loader';
 
 import { formatIcons } from '../utils/iconUtils';
 import {
@@ -25,14 +32,17 @@ import {
   formatStringWeiToStringEther,
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
+import { renderCampaignEndDate } from '../utils/farmUtils';
+
+import { getUserAssociatedTokens, NATIVE_TOKEN } from '../utils/tokenUtils';
+
+import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
+import useTokensByListIds from '../hooks/useTokensByListIds';
+import useFarmByAddress from '../hooks/useFarmByAddress';
 
 import getErrorMessage from '../content/errors';
-import { NATIVE_TOKEN } from '../utils/tokenUtils';
-import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
-import useFarmByAddress from '../hooks/useFarmByAddress';
-import { useQueryOptionsPoolsFarms } from '../constants';
-import Loader from '../components/Loader';
-import { renderCampaignEndDate } from '../utils/farmUtils';
+
+import { useQueryOptions, useQueryOptionsPoolsFarms } from '../constants';
 
 const FarmDetails = () => {
   const contextValue = useContext(GlobalContext);
@@ -64,6 +74,9 @@ const FarmDetails = () => {
 
   const [loadingHarvest, setLoadingHarvest] = useState(false);
   const [showHarvestModal, setShowHarvestModal] = useState(false);
+
+  const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
+  const [loadingAssociate, setLoadingAssociate] = useState(false);
 
   const userRewardsUSD = useMemo(() => {
     if (Object.keys(farmData).length !== 0) {
@@ -112,6 +125,60 @@ const FarmDetails = () => {
     }
   };
 
+  const handleAssociateClick = async (token: ITokenData) => {
+    setLoadingAssociate(true);
+
+    try {
+      const receipt = await sdk.associateToken(
+        hashconnectConnectorInstance,
+        userId,
+        token.hederaId,
+      );
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (!success) {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      } else {
+        const tokens = await getUserAssociatedTokens(userId);
+        setUserAssociatedTokens(tokens);
+      }
+    } catch (err) {
+      console.error(err);
+      toast('Error on associate');
+    } finally {
+      setLoadingAssociate(false);
+    }
+  };
+
+  // Check for associations
+  useEffect(() => {
+    const checkTokenAssociation = async (userId: string) => {
+      const tokens = await getUserAssociatedTokens(userId);
+      setUserAssociatedTokens(tokens);
+    };
+
+    userId && checkTokenAssociation(userId);
+  }, [userId]);
+
+  const getTokenIsAssociated = (token: ITokenData) => {
+    const notHTS =
+      Object.keys(token).length === 0 ||
+      token.type === TokenType.HBAR ||
+      token.type === TokenType.ERC20;
+    return notHTS || userAssociatedTokens?.includes(token.hederaId);
+  };
+
+  const userRewardsAddresses =
+    farmData.userStakingData?.rewardsAccumulated &&
+    farmData.userStakingData?.rewardsAccumulated?.length > 0
+      ? farmData.userStakingData?.rewardsAccumulated.map(reward => reward.address)
+      : [];
+
+  // Get selected tokens to check for assosiations
+  const { tokens: userRewardsData } = useTokensByListIds(userRewardsAddresses, useQueryOptions);
+
   const hasUserStaked = farmData.userStakingData?.stakedAmount !== '0';
   const hasUserProvided = farmData.poolData?.lpShares !== '0';
   const campaignEnded = farmData.campaignEndDate < Date.now();
@@ -121,6 +188,8 @@ const FarmDetails = () => {
     ? Object.keys(farmData.rewardsData.find(reward => reward.rewardEnd > Date.now()) || {}).length >
       0
     : false;
+
+  const tokensToAssociate = userRewardsData?.filter(token => !getTokenIsAssociated(token));
 
   return isHashpackLoading ? (
     <Loader />
@@ -309,15 +378,30 @@ const FarmDetails = () => {
                               </span>
                             </Tippy>
                           </div>
+
                           <div className="d-flex justify-content-end">
-                            <Button
-                              loading={loadingHarvest}
-                              onClick={() => setShowHarvestModal(true)}
-                              size="small"
-                              type="primary"
-                            >
-                              Harvest
-                            </Button>
+                            {tokensToAssociate && tokensToAssociate?.length > 0 ? (
+                              tokensToAssociate.map((token, index) => (
+                                <Button
+                                  key={index}
+                                  loading={loadingAssociate}
+                                  onClick={() => handleAssociateClick(token)}
+                                  size="small"
+                                  type="primary"
+                                >
+                                  {`Associate ${token.symbol}`}
+                                </Button>
+                              ))
+                            ) : (
+                              <Button
+                                loading={loadingHarvest}
+                                onClick={() => setShowHarvestModal(true)}
+                                size="small"
+                                type="primary"
+                              >
+                                Harvest
+                              </Button>
+                            )}
                           </div>
                         </div>
 
@@ -451,6 +535,9 @@ const FarmDetails = () => {
               hasUserStaked={hasUserStaked}
               hasUserProvided={hasUserProvided}
               farmData={farmData}
+              loadingAssociate={loadingAssociate}
+              tokensToAssociate={tokensToAssociate || []}
+              handleAssociateClick={handleAssociateClick}
             />
           </div>
         ) : (
