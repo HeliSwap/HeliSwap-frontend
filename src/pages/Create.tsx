@@ -439,14 +439,20 @@ const Create = () => {
       const key = `${index}Amount`;
       const amountToSpend = createPairData[key as keyof ICreatePairData] as string;
       const spenderAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
-      const canSpend = await checkAllowanceERC20(
-        tokenA.address,
-        userId,
-        spenderAddress,
-        amountToSpend,
-      );
-      setApproved(prev => ({ ...prev, [index]: canSpend }));
-      setLoadingCheckApprove(false);
+
+      try {
+        const canSpend = await checkAllowanceERC20(
+          tokenA.address,
+          userId,
+          spenderAddress,
+          amountToSpend,
+        );
+        setApproved(prev => ({ ...prev, [index]: canSpend }));
+      } catch {
+        setApproved(prev => ({ ...prev, [index]: false }));
+      } finally {
+        setLoadingCheckApprove(false);
+      }
     };
 
     const { tokenA, tokenB } = tokensData;
