@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js';
 
 import { GlobalContext } from '../providers/Global';
 
-import { IFarmData } from '../interfaces/tokens';
+import { IFarmData, ITokenData } from '../interfaces/tokens';
 
 import Button from './Button';
 import ButtonSelector from './ButtonSelector';
@@ -40,6 +40,9 @@ interface IFarmActionsProps {
   hasUserStaked: boolean;
   campaignEnded: boolean;
   hasUserProvided: boolean;
+  tokensToAssociate: ITokenData[];
+  loadingAssociate: boolean;
+  handleAssociateClick: (token: ITokenData) => void;
 }
 
 enum TabStates {
@@ -52,6 +55,9 @@ const FarmActions = ({
   hasUserStaked,
   campaignEnded,
   hasUserProvided,
+  tokensToAssociate,
+  loadingAssociate,
+  handleAssociateClick,
 }: IFarmActionsProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
@@ -370,9 +376,23 @@ const FarmActions = ({
               </div>
 
               <div className="d-grid mt-4">
-                <Button loading={loadingExit} onClick={() => setShowExitModal(true)}>
-                  Unstake
-                </Button>
+                {tokensToAssociate && tokensToAssociate?.length > 0 ? (
+                  tokensToAssociate.map((token, index) => (
+                    <Button
+                      key={index}
+                      loading={loadingAssociate}
+                      onClick={() => handleAssociateClick(token)}
+                      size="small"
+                      type="primary"
+                    >
+                      {`Associate ${token.symbol}`}
+                    </Button>
+                  ))
+                ) : (
+                  <Button loading={loadingExit} onClick={() => setShowExitModal(true)}>
+                    Unstake
+                  </Button>
+                )}
               </div>
             </>
           )}
