@@ -587,14 +587,19 @@ const Swap = () => {
 
     const getAllowanceERC20 = async (userId: string) => {
       const spenderAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
-      const canSpend = await checkAllowanceERC20(
-        address,
-        userId,
-        spenderAddress,
-        swapData.amountIn,
-      );
-      setApproved(canSpend);
-      setLoadingCheckApprove(false);
+      try {
+        const canSpend = await checkAllowanceERC20(
+          address,
+          userId,
+          spenderAddress,
+          swapData.amountIn,
+        );
+        setApproved(canSpend);
+      } catch (e) {
+        setApproved(false);
+      } finally {
+        setLoadingCheckApprove(false);
+      }
     };
 
     const {
