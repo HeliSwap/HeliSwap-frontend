@@ -155,9 +155,9 @@ const Lockdrop = () => {
         ] = await Promise.all(promisesArray);
 
         let stakedTokensBN = ethers.BigNumber.from(0);
-        // let claimedOfBN = ethers.BigNumber.from(0);
-        // let totalClaimableBN = ethers.BigNumber.from(0);
-        // let claimableBN = ethers.BigNumber.from(0);
+        let claimedOfBN = ethers.BigNumber.from(0);
+        let totalClaimableBN = ethers.BigNumber.from(0);
+        let claimableBN = ethers.BigNumber.from(0);
         let lastUserWithdrawalBN = ethers.BigNumber.from(0);
 
         if (userId) {
@@ -166,16 +166,13 @@ const Lockdrop = () => {
           const userPromisesArray = [
             lockDropContract.providers(userAddress),
             lockDropContract.lastUserWithdrawal(userAddress),
-            // lockDropContract.claimedOf(userAddress),
-            // lockDropContract.claimable(userAddress),
-            // lockDropContract.totalClaimable(userAddress),
+            lockDropContract.claimedOf(userAddress),
+            lockDropContract.claimable(userAddress),
+            lockDropContract.totalClaimable(userAddress),
           ];
 
-          [
-            stakedTokensBN,
-            lastUserWithdrawalBN,
-            // claimedOfBN, claimableBN, totalClaimableBN
-          ] = await Promise.all(userPromisesArray);
+          [stakedTokensBN, lastUserWithdrawalBN, claimedOfBN, claimableBN, totalClaimableBN] =
+            await Promise.all(userPromisesArray);
         }
 
         // Format data
@@ -209,23 +206,23 @@ const Lockdrop = () => {
           valueStringETH: formatBNTokenToString(stakedTokensBN),
         };
 
-        // const claimed = {
-        //   valueBN: claimedOfBN,
-        //   valueStringWei: claimedOfBN.toString(),
-        //   valueStringETH: formatBNTokenToString(claimedOfBN, 18),
-        // };
+        const claimed = {
+          valueBN: claimedOfBN,
+          valueStringWei: claimedOfBN.toString(),
+          valueStringETH: formatBNTokenToString(claimedOfBN, 18),
+        };
 
-        // const claimable = {
-        //   valueBN: claimableBN,
-        //   valueStringWei: claimableBN.toString(),
-        //   valueStringETH: formatBNTokenToString(claimableBN, 18),
-        // };
+        const claimable = {
+          valueBN: claimableBN,
+          valueStringWei: claimableBN.toString(),
+          valueStringETH: formatBNTokenToString(claimableBN, 18),
+        };
 
-        // const totalClaimable = {
-        //   valueBN: totalClaimableBN,
-        //   valueStringWei: totalClaimableBN.toString(),
-        //   valueStringETH: formatBNTokenToString(totalClaimableBN, 18),
-        // };
+        const totalClaimable = {
+          valueBN: totalClaimableBN,
+          valueStringWei: totalClaimableBN.toString(),
+          valueStringETH: formatBNTokenToString(totalClaimableBN, 18),
+        };
 
         const lastUserWithdrawal = formatBigNumberToMilliseconds(lastUserWithdrawalBN);
 
@@ -333,6 +330,9 @@ const Lockdrop = () => {
           lockedHbars,
           estimatedLPPercentage,
           lastUserWithdrawal,
+          claimed,
+          claimable,
+          totalClaimable,
         });
 
         setCountDownEnd(
