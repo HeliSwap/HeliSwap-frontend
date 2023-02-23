@@ -426,7 +426,7 @@ const LockdropForm = ({
 
           {currentState >= LOCKDROP_STATE.PRE_VESTING ? (
             <>
-              <p className="text-small text-bold mb-3">Liquidity provied to Lockdrop</p>
+              <p className="text-small text-bold mb-3">Liquidity provided to Lockdrop</p>
 
               <div className="mt-6 rounded border border-secondary justify-content-between">
                 <div className="d-flex justify-content-between align-items-center m-4">
