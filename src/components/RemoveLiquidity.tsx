@@ -317,14 +317,19 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
   useEffect(() => {
     const getLPAllowanceData = async (amountToSpend: string) => {
       const spenderAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
-      const canSpend = await checkAllowanceERC20(
-        pairData.pairAddress,
-        userId,
-        spenderAddress,
-        amountToSpend,
-      );
-      setLpApproved(canSpend);
-      setLoadingCheckApprove(false);
+      try {
+        const canSpend = await checkAllowanceERC20(
+          pairData.pairAddress,
+          userId,
+          spenderAddress,
+          amountToSpend,
+        );
+        setLpApproved(canSpend);
+      } catch (e) {
+        setLpApproved(false);
+      } finally {
+        setLoadingCheckApprove(false);
+      }
     };
 
     const {
