@@ -211,14 +211,19 @@ const FarmActions = ({
 
   useEffect(() => {
     const getLPAllowanceData = async () => {
-      const canSpend = await checkAllowanceERC20(
-        farmData.stakingTokenAddress,
-        userId,
-        farmData.address,
-        lpInputValue,
-      );
-      setLpApproved(canSpend);
-      setLoadingApprove(false);
+      try {
+        const canSpend = await checkAllowanceERC20(
+          farmData.stakingTokenAddress,
+          userId,
+          farmData.address,
+          lpInputValue,
+        );
+        setLpApproved(canSpend);
+      } catch (e) {
+        setLpApproved(false);
+      } finally {
+        setLoadingApprove(false);
+      }
     };
 
     getLPAllowanceData();
