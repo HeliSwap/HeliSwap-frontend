@@ -16,16 +16,14 @@ import LockdropHowItWorks from '../components/LockdropHowItWorks';
 import Loader from '../components/Loader';
 import ToasterWrapper from '../components/ToasterWrapper';
 
-import { addressToId, idToAddress } from '../utils/tokenUtils';
+import { idToAddress } from '../utils/tokenUtils';
 import {
   calculateLPTokens,
-  formatBigNumberToMilliseconds,
   formatStringWeiToStringEther,
   getUserHELIReserves,
 } from '../utils/numberUtils';
 
-import { HASHSCAN_ROOT_DOMAIN, useQueryOptionsPoolsFarms } from '../constants';
-import LockdropEmergencyForm from '../components/LockdropEmergencyForm';
+import { useQueryOptionsPoolsFarms } from '../constants';
 
 const LockDropABI = require('../abi/LockDrop.json');
 
@@ -40,7 +38,7 @@ const lockDropInitialData: ILockdropData = {
   lockdropEnd: 1677153552000,
   lastLockDropDay: 1677067152000,
   lockDropDepositEnd: 1676980752000,
-  vestingEndTime: 0,
+  vestingEndTime: 1685039134000,
   totalLP: defaultBNValue,
   totalHbars: defaultBNValue,
   totalTokens: {
@@ -58,7 +56,7 @@ const lockDropInitialData: ILockdropData = {
     valueStringWei: '0',
     valueStringETH: '0',
   },
-  lpTokenAddress: '0x0000000000000000000000000000000000000000',
+  lpTokenAddress: '0x3904ad0E5c86c9C3Ac452cD61afE1776BF92Cecd',
   estimatedLPPercentage: '0',
 };
 
@@ -120,8 +118,6 @@ const Lockdrop = () => {
 
   const { farmAddress } = useFarmAddress(useQueryOptionsPoolsFarms, lockDropData.lpTokenAddress);
 
-  const hashscanLink = `${HASHSCAN_ROOT_DOMAIN}/${process.env.REACT_APP_NETWORK_TYPE}/account/${userId}`;
-
   const getContractData = useCallback(async () => {
     if (lockDropContract) {
       setContractLoadingError(false);
@@ -158,21 +154,26 @@ const Lockdrop = () => {
         let claimedOfBN = ethers.BigNumber.from(0);
         let totalClaimableBN = ethers.BigNumber.from(0);
         let claimableBN = ethers.BigNumber.from(0);
-        let lastUserWithdrawalBN = ethers.BigNumber.from(0);
+        // let lastUserWithdrawalBN = ethers.BigNumber.from(0);
 
         if (userId) {
           const userAddress = idToAddress(userId);
 
           const userPromisesArray = [
             lockDropContract.providers(userAddress),
-            lockDropContract.lastUserWithdrawal(userAddress),
             lockDropContract.claimedOf(userAddress),
             lockDropContract.claimable(userAddress),
             lockDropContract.totalClaimable(userAddress),
+            // lockDropContract.lastUserWithdrawal(userAddress),
           ];
 
-          [stakedTokensBN, lastUserWithdrawalBN, claimedOfBN, claimableBN, totalClaimableBN] =
-            await Promise.all(userPromisesArray);
+          [
+            stakedTokensBN,
+            claimedOfBN,
+            claimableBN,
+            totalClaimableBN,
+            //lastUserWithdrawalBN
+          ] = await Promise.all(userPromisesArray);
         }
 
         // Format data
@@ -224,7 +225,7 @@ const Lockdrop = () => {
           valueStringETH: formatBNTokenToString(totalClaimableBN, 18),
         };
 
-        const lastUserWithdrawal = formatBigNumberToMilliseconds(lastUserWithdrawalBN);
+        // const lastUserWithdrawal = formatBigNumberToMilliseconds(lastUserWithdrawalBN);
 
         const myHELIFormatted = getUserHELIReserves(
           lockDropInitialData.totalTokens.valueBN,
@@ -329,7 +330,6 @@ const Lockdrop = () => {
           estimatedLPTokens,
           lockedHbars,
           estimatedLPPercentage,
-          lastUserWithdrawal,
           claimed,
           claimable,
           totalClaimable,
@@ -418,15 +418,6 @@ const Lockdrop = () => {
   const getErrorMessage = () => (
     <div className="alert alert-warning text-center">
       Network is busy, please try refreshing the page.
-      <br />
-      <br />
-      If the issue persists, you can also withdraw your HBAR by getting the data for your latest
-      deposits - search for all your transactions to Lockdrop contract with id{' '}
-      <code>{addressToId(process.env.REACT_APP_LOCKDROP_ADDRESS as string)}</code>
-      <a rel="noreferrer" target="_blank" href={hashscanLink} className="link">
-        <span className="text-small ms-2">here</span>
-      </a>
-      .
     </div>
   );
 
@@ -443,7 +434,6 @@ const Lockdrop = () => {
           <div className="row my-6">
             <div className="col-lg-6 offset-lg-3">{getErrorMessage()}</div>
           </div>
-          <LockdropEmergencyForm toast={toast} getContractData={getContractData} />
         </>
       ) : (
         <>
