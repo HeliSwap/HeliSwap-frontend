@@ -184,20 +184,27 @@
   background-color: $blue-neutral-700;
   box-shadow: 0px 2px 16px rgba(0, 0, 0, 0.05);
   border-radius: $border-radius;
-  padding: 3px 3px 3px 12px;
-  display: flex;
-  align-items: center;
+  padding: 4px;
+
+  @include media-breakpoint-up(sm) {
+    padding: 3px 3px 3px 12px;
+    display: flex;
+    align-items: center;
+  }
 }
 
 .container-address {
   background-color: $blue-neutral-500;
   border-radius: 2px;
   padding: 4px 8px;
-  margin-left: 12px;
   cursor: pointer;
   transition: background-color 0.15s linear;
   display: flex;
   align-items: center;
+
+  @include media-breakpoint-up(sm) {
+    margin-left: 12px;
+  }
 
   &:hover {
     background-color: $blue-neutral-600;
@@ -683,7 +690,12 @@
   height: 36px;
   background-color: $blue-neutral-400;
   opacity: 0.5;
-  margin: 0 24px;
+
+  margin: 0 12px;
+
+  @include media-breakpoint-up(md) {
+    margin: 0 24px;
+  }
 }
 
 .separator-expand {
