@@ -80,78 +80,82 @@ const Header = () => {
 
   return (
     <div className="container-header p-3 p-md-5">
-      <div className="d-flex justify-content-end">
-        <div className="d-flex align-items-center">
-          <div className="me-2 d-none d-md-block">
-            <span className="text-small">
-              HELI Price:{' '}
-              {loadingPools ? (
-                <span>Loading...</span>
-              ) : (
-                <span className="text-numeric">
-                  ${formatStringETHtoPriceFormatted(heliPrice.toString(), 5)}
-                </span>
-              )}
-            </span>
-          </div>
-          <span className="separator-header d-none d-md-block"></span>
-          <div className="me-5 d-none d-md-block">
-            <span className="text-small">
-              HBAR Price:{' '}
+      <div className="d-flex justify-content-between justify-content-md-end align-items-center">
+        <div className="d-sm-flex align-items-center">
+          <p className="text-small">
+            HELI Price:{' '}
+            {loadingPools ? (
+              <span>Loading...</span>
+            ) : (
               <span className="text-numeric">
-                ${formatStringETHtoPriceFormatted(hbarPrice.toString(), 5)}
+                ${formatStringETHtoPriceFormatted(heliPrice.toString(), 5)}
               </span>
+            )}
+          </p>
+          <span className="separator-header d-none d-sm-block"></span>
+          <p className="text-small mt-2 mt-sm-0 me-md-5">
+            HBAR Price:{' '}
+            <span className="text-numeric">
+              ${formatStringETHtoPriceFormatted(hbarPrice.toString(), 5)}
             </span>
-          </div>
-
-          {connected && userId ? (
-            <>
-              <div className="container-connected">
-                <div className="text-small">
-                  <span className="text-numeric">{formatHBARStringToPrice(userBalance)}</span> HBAR
-                </div>
-                <div className="container-address" onClick={() => setShowUserAccountModal(true)}>
-                  <div className="text-small">{userId}</div>
-                  <img
-                    className="img-profile ms-3"
-                    src={`https://www.gravatar.com/avatar/${Md5.hashStr(userId)}/?d=identicon`}
-                    alt=""
-                  />
-                </div>
-              </div>
-            </>
-          ) : (
-            <Button
-              onClick={() => handleConnectButtonClick()}
-              type="primary"
-              size="small"
-              className="mx-2"
-            >
-              Connect wallet
-            </Button>
-          )}
-          {showConnectModal ? (
-            <Modal show={showConnectModal} closeModal={() => setShowConnectModal(false)}>
-              <ConnectModalContent
-                modalTitle="Connect wallet"
-                closeModal={() => setShowConnectModal(false)}
-                connectWallet={connectWallet}
-                isLoading={isHashpackLoading}
-                extensionFound={extensionFound}
-              />
-            </Modal>
-          ) : null}
-          {showUserAccountModal ? (
-            <Modal show={showUserAccountModal} closeModal={() => setShowUserAccountModal(false)}>
-              <UserAccountModalContent
-                modalTitle="Account"
-                closeModal={() => setShowUserAccountModal(false)}
-                disconnectWallet={disconnectWallet}
-                userId={userId}
-              />
-            </Modal>
-          ) : null}
+          </p>
         </div>
+
+        {connected && userId ? (
+          <>
+            <div className="container-connected">
+              <div className="text-center">
+                <span className="text-small text-numeric">
+                  {formatHBARStringToPrice(userBalance)}
+                </span>{' '}
+                HBAR
+              </div>
+              <div
+                className="container-address mt-2 mt-sm-0"
+                onClick={() => setShowUserAccountModal(true)}
+              >
+                <div className="text-small">{userId}</div>
+                <img
+                  className="img-profile ms-3"
+                  src={`https://www.gravatar.com/avatar/${Md5.hashStr(userId)}/?d=identicon`}
+                  alt=""
+                />
+              </div>
+            </div>
+          </>
+        ) : (
+          <Button
+            onClick={() => handleConnectButtonClick()}
+            type="primary"
+            size="small"
+            className="mx-2"
+          >
+            Connect wallet
+          </Button>
+        )}
+
+        {showConnectModal ? (
+          <Modal show={showConnectModal} closeModal={() => setShowConnectModal(false)}>
+            <ConnectModalContent
+              modalTitle="Connect wallet"
+              closeModal={() => setShowConnectModal(false)}
+              connectWallet={connectWallet}
+              isLoading={isHashpackLoading}
+              extensionFound={extensionFound}
+            />
+          </Modal>
+        ) : null}
+
+        {showUserAccountModal ? (
+          <Modal show={showUserAccountModal} closeModal={() => setShowUserAccountModal(false)}>
+            <UserAccountModalContent
+              modalTitle="Account"
+              closeModal={() => setShowUserAccountModal(false)}
+              disconnectWallet={disconnectWallet}
+              userId={userId}
+            />
+          </Modal>
+        ) : null}
       </div>
     </div>
   );
