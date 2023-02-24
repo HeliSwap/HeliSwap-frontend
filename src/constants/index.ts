@@ -127,3 +127,5 @@ export enum INITIAL_CHART_LABELS {
   TVL_LINE_CHART = 'TVL',
   VOLUME_BAR_CHART = 'Volume 24H',
 }
+
+export const C14URL = 'https://pay.c14.money/';
