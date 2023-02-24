@@ -32,6 +32,12 @@ const navigation = [
     color: 'gray',
     text: 'Analytics',
   },
+  {
+    link: '/buy-crypto',
+    name: 'c14',
+    color: 'gray',
+    text: 'Buy crypto',
+  },
 ];
 
 const Navigation = () => {
