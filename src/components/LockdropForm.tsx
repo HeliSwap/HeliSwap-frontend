@@ -268,9 +268,8 @@ const LockdropForm = ({
         {renderDayMessage()}
 
         <p className="text-small mb-5">
-          This is where you will be able to deposit and withdraw your HBAR. Simply pick between
-          “deposit” and “withdraw” and choose how many HBAR. The bottom shows you the estimated
-          amount of LP tokens you would receive if the lockdrop ended in that moment.
+          This is where you can claim your LP tokens and stake them. Claim period is 3 months and
+          the vesting is linear.
         </p>
 
         <div className="container-dark">

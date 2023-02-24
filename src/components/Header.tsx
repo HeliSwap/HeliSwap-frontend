@@ -1,22 +1,22 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { hethers } from '@hashgraph/hethers';
 import { GlobalContext } from '../providers/Global';
 import { Md5 } from 'ts-md5/dist/md5';
 
 import Button from './Button';
 import Modal from './Modal';
-import Icon from './Icon';
 import ConnectModalContent from './Modals/ConnectModalContent';
 import UserAccountModalContent from './Modals/UserAccountModalContent';
 
 import { formatHBARStringToPrice, formatStringETHtoPriceFormatted } from '../utils/numberUtils';
 
-import { BALLANCE_FETCH_INTERVAL } from '../constants';
+import { BALLANCE_FETCH_INTERVAL, useQueryOptionsProvideSwapRemove } from '../constants';
+import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
+import { getTokenPrice } from '../utils/tokenUtils';
 
 const Header = () => {
   const contextValue = useContext(GlobalContext);
-  const { hbarPrice } = contextValue;
+  const { hbarPrice, tokensWhitelisted } = contextValue;
 
   const {
     connected,
@@ -28,6 +28,20 @@ const Header = () => {
     showConnectModal,
     setShowConnectModal,
   } = contextValue.connection;
+
+  const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
+
+  const { poolsByTokenList: pools, processingPools: loadingPools } = usePoolsByTokensList(
+    useQueryOptionsProvideSwapRemove,
+    true,
+    tokensWhitelistedAddresses,
+  );
+
+  const heliPrice = getTokenPrice(
+    pools,
+    process.env.REACT_APP_HELI_TOKEN_ADDRESS as string,
+    hbarPrice,
+  );
 
   const [showUserAccountModal, setShowUserAccountModal] = useState(false);
   const [userBalance, setUserBalance] = useState('0.0');
@@ -65,14 +79,20 @@ const Header = () => {
   }, [getUserTokensData]);
 
   return (
-    <div className="container-header with-message p-3 p-md-5">
+    <div className="container-header p-3 p-md-5">
       <div className="d-flex justify-content-end">
         <div className="d-flex align-items-center">
-          <div className="d-none d-md-block">
-            <Link className="d-flex align-items-center link" to="lockdrop">
-              <Icon name="heli" />
-              <span className="ms-3 text-small">Lockdrop</span>
-            </Link>
+          <div className="me-2 d-none d-md-block">
+            <span className="text-small">
+              HELI Price:{' '}
+              {loadingPools ? (
+                <span>Loading...</span>
+              ) : (
+                <span className="text-numeric">
+                  ${formatStringETHtoPriceFormatted(heliPrice.toString(), 5)}
+                </span>
+              )}
+            </span>
           </div>
           <span className="separator-header d-none d-md-block"></span>
           <div className="me-5 d-none d-md-block">

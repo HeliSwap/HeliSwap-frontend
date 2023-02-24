@@ -19,7 +19,6 @@ import Lockdrop from '../pages/Lockdrop';
 import Header from './Header';
 import Footer from './Footer';
 import Sidebar from './Sidebar';
-import GlobalMessage from './GlobalMessage';
 
 function App() {
   const apolloClient = getApolloClient();
@@ -33,7 +32,6 @@ function App() {
             <div className="wrapper flex-1">
               <div className="main">
                 <div className="flex-1">
-                  <GlobalMessage />
                   <Header />
                   <div className="container py-4 py-lg-7">
                     <Routes>
