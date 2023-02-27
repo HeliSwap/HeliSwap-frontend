@@ -30,7 +30,9 @@ import { formatBigNumberToMilliseconds } from '../utils/numberUtils';
 import getErrorMessage from '../content/errors';
 
 import ClaimDropABI from '../abi/ClaimDrop.json';
-import claimdrops from '../claimdrops/testnet';
+
+import claimdropsTestnet from '../claimdrops/testnet';
+import claimdropsMainet from '../claimdrops/mainnet';
 
 enum CLAIMDROP_STATE {
   NOT_STARTED,
@@ -48,11 +50,21 @@ const ClaimdropDetails = () => {
   const { token } = useParams();
   const navigate = useNavigate();
 
+  const claimdrops: { [key: string]: any } = {
+    testnet: claimdropsTestnet,
+    mainnet: claimdropsMainet,
+  };
+
+  const networkType = process.env.REACT_APP_NETWORK_TYPE as string;
+  const claimdropsByNetwork = claimdrops[networkType];
+
   const foundLockdropData: IClaimdropData = useMemo(
-    () => claimdrops.find(item => item.token === token) || ({} as IClaimdropData),
-    [token],
+    () => claimdropsByNetwork.find((item: any) => item.token === token) || ({} as IClaimdropData),
+    [token, claimdropsByNetwork],
   );
-  const claimDropContractAddress = claimdrops.find(item => item.token === token)?.claimdropAddress;
+  const claimDropContractAddress = claimdropsByNetwork.find(
+    (item: any) => item.token === token,
+  )?.claimdropAddress;
 
   const claimDropContract = useMemo(() => {
     const provider = getProvider();
@@ -96,6 +108,7 @@ const ClaimdropDetails = () => {
   const [tokenData, setTokenData] = useState({} as ITokenData);
   const [tokenError, setTokenError] = useState(false);
   const [loadingTokenData, setLoadingTokenData] = useState(true);
+  const [contractDataError, setContractDataError] = useState(false);
   const [loadingContractData, setLoadingContractData] = useState(true);
   const [claimdropData, setClaimdropData] = useState<IClaimdropData>(initialClaimdropData);
   const [claimdropState, setClaimdropState] = useState(CLAIMDROP_STATE.NOT_STARTED);
@@ -251,6 +264,7 @@ const ClaimdropDetails = () => {
       }
     } catch (e) {
       console.error('Error on fetching contract data:', e);
+      setContractDataError(true);
     } finally {
       setLoadingContractData(false);
     }
@@ -356,6 +370,7 @@ const ClaimdropDetails = () => {
       }
     } catch (e) {
       console.error('Error on fetching contract data:', e);
+      setContractDataError(true);
     } finally {
       setLoadingContractData(false);
     }
@@ -387,7 +402,7 @@ const ClaimdropDetails = () => {
         toast.error(getErrorMessage(error.status ? error.status : error));
       }
 
-      await getContractDataFound();
+      await getContractData();
     } catch (e) {
       console.log('e', e);
     } finally {
@@ -449,7 +464,7 @@ const ClaimdropDetails = () => {
 
   // Get contract data
   useEffect(() => {
-    claimDropContract && getContractDataFound();
+    claimDropContract && getContractData();
   }, [claimDropContract, getContractDataFound]);
 
   // Check for associations
@@ -520,7 +535,15 @@ const ClaimdropDetails = () => {
                 <div className="col-lg-4"></div>
               </div>
 
-              {userId && !isHashpackLoading ? (
+              {contractDataError ? (
+                <div className="row mt-6">
+                  <div className="col-6 offset-3">
+                    <div className="alert alert-warning my-5">
+                      Network is busy, please try again later...
+                    </div>
+                  </div>
+                </div>
+              ) : userId && !isHashpackLoading ? (
                 <div className="row mt-6">
                   <div className="col-lg-7 offset-lg-1">
                     <div className="container-blue-neutral-900 p-5 rounded">

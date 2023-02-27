@@ -50,8 +50,8 @@ const data = [
       valueStringWei: '0',
       valueStringETH: '0.0',
     },
-    token: '0x0000000000000000000000000000000000002023',
-    claimdropAddress: '0x0000000000000000000000000000000000369fd1',
+    token: '0x00000000000000000000000000000000003523E4',
+    claimdropAddress: '0x0000000000000000000000000000000000357016',
     title: 'HELI',
   },
 ];
