@@ -1,8 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import numeral from 'numeral';
 import Tippy from '@tippyjs/react';
-
-import { GlobalContext } from '../providers/Global';
 
 import Icon from './Icon';
 import LockdropCounter from './LockdropCounter';
@@ -17,9 +15,6 @@ interface ILockdropStats {
 }
 
 const LockdropStats = ({ lockDropData, currentState, countdownEnd }: ILockdropStats) => {
-  const contextValue = useContext(GlobalContext);
-  const { hbarPrice } = contextValue;
-
   const renderHELIDistribution = () => (
     <div>
       <h3 className="text-subheader text-bold">
@@ -42,10 +37,7 @@ const LockdropStats = ({ lockDropData, currentState, countdownEnd }: ILockdropSt
     </div>
   );
 
-  const heliEstimatedPrice =
-    (Number(lockDropData.totalHbars.valueStringETH) /
-      Number(lockDropData.totalTokens.valueStringETH)) *
-    hbarPrice;
+  const heliEstimatedPrice = 0.063115689;
 
   return (
     <div>
@@ -82,18 +74,10 @@ const LockdropStats = ({ lockDropData, currentState, countdownEnd }: ILockdropSt
           <LockdropCounter currentState={currentState} countdownEnd={countdownEnd} />
 
           <div className="text-center mt-6 mt-lg-10">
-            <p className="text-micro text-secondary mb-2">
-              Estimated HELI Price After the Lockdrop
-            </p>
+            <p className="text-micro text-secondary mb-2">Initial HELI Price After the Lockdrop</p>
             <div className="d-flex justify-content-center align-items-center">
               <h3 className="text-subheader text-bold">
-                $
-                <span className="text-numeric">
-                  {' '}
-                  {Number(lockDropData.totalHbars.valueStringETH) > 0
-                    ? heliEstimatedPrice.toFixed(10)
-                    : '-'}
-                </span>
+                $<span className="text-numeric">{heliEstimatedPrice}</span>
               </h3>
               <Tippy
                 content={`The price of the HELI token determined by the community through their HBAR contributions `}
