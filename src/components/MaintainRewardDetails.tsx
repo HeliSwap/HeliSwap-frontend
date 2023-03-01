@@ -9,6 +9,7 @@ import { IReward } from '../interfaces/tokens';
 
 import IconToken from '../components/IconToken';
 import Button from '../components/Button';
+import { ethers } from 'ethers';
 
 interface IRewardDetailsProps {
   reward: IReward;
@@ -63,7 +64,8 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
     setLoadingApproveReward(true);
     try {
       await farmsSDK.wrapHBAR(rewardAmount);
-      await farmsSDK.approveToken(rewardAddress, farmAddress, approveRewardAmount.toString());
+      const formattedAmount = ethers.utils.parseUnits(rewardAmount, 8);
+      await farmsSDK.approveToken(rewardAddress, farmAddress, formattedAmount.toString());
       toast.success('Success! Token was approved.');
       setApproveRewardAmount(0);
     } catch (error) {

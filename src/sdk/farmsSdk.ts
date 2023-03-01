@@ -106,7 +106,6 @@ class FarmsSDK {
   }
 
   async wrapHBAR(hbarAmount: string) {
-    const hbarAmountETH = formatStringWeiToStringEther(hbarAmount, 8);
     const WHBAR = new hethers.Contract(
       process.env.REACT_APP_WHBAR_ADDRESS as string,
       WHBARABI,
@@ -114,7 +113,7 @@ class FarmsSDK {
     );
 
     const depositTx = await WHBAR.deposit({
-      value: hbarAmountETH,
+      value: hbarAmount,
       gasLimit: 150_000,
     });
 
