@@ -1,5 +1,4 @@
 import { hethers } from '@hashgraph/hethers';
-import { formatStringWeiToStringEther } from '../utils/numberUtils';
 import { addressToId } from '../utils/tokenUtils';
 import FactoryContractABI from './abis/FactoryABI.json';
 import MultirewardsContractABI from './abis/MultirewardsABI.json';
@@ -22,8 +21,7 @@ class FarmsSDK {
   network: networkType;
 
   constructor() {
-    this.network = 'testnet';
-    // this.network = process.env.REACT_APP_NETWORK_TYPE as networkType;
+    this.network = process.env.REACT_APP_NETWORK_TYPE as networkType;
     this.factoryAddress = process.env.REACT_APP_CAMPAIGN_FACTORY_ADDRESS as string;
     this.walletAddress = process.env.REACT_APP_DEPLOYER_ADDRESS as string;
 
