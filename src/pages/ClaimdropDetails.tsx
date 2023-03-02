@@ -465,7 +465,7 @@ const ClaimdropDetails = () => {
   // Get contract data
   useEffect(() => {
     claimDropContract && getContractData();
-  }, [claimDropContract, getContractDataFound]);
+  }, [claimDropContract, getContractData]);
 
   // Check for associations
   useEffect(() => {

@@ -51,7 +51,7 @@ const data = [
       valueStringETH: '0.0',
     },
     token: '0x0000000000000000000000000000000000002023',
-    claimdropAddress: '0x0000000000000000000000000000000000369fd1',
+    claimdropAddress: '0x0000000000000000000000000000000000372c6e',
     title: 'HELI',
   },
 ];
