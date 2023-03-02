@@ -47,7 +47,7 @@ const ClaimdropDetails = () => {
   const { userId, hashconnectConnectorInstance, setShowConnectModal, isHashpackLoading } =
     connection;
 
-  const { token } = useParams();
+  const { campaign } = useParams();
   const navigate = useNavigate();
 
   const claimdrops: { [key: string]: any } = {
@@ -59,17 +59,25 @@ const ClaimdropDetails = () => {
   const claimdropsByNetwork = claimdrops[networkType];
 
   const foundLockdropData: IClaimdropData = useMemo(
-    () => claimdropsByNetwork.find((item: any) => item.token === token) || ({} as IClaimdropData),
-    [token, claimdropsByNetwork],
+    () =>
+      claimdropsByNetwork.find((item: any) => item.claimdropAddress === campaign) ||
+      ({} as IClaimdropData),
+    [campaign, claimdropsByNetwork],
   );
-  const claimDropContractAddress = claimdropsByNetwork.find(
-    (item: any) => item.token === token,
-  )?.claimdropAddress;
+
+  let claimDropContractAddress = '';
+  let claimDropTokenAddress = '';
+
+  const foundCampaign = claimdropsByNetwork.find((item: any) => item.claimdropAddress === campaign);
+  if (foundCampaign) {
+    claimDropContractAddress = foundCampaign.claimdropAddress;
+    claimDropTokenAddress = foundCampaign.token;
+  }
 
   const claimDropContract = useMemo(() => {
     const provider = getProvider();
 
-    return new ethers.Contract(claimDropContractAddress as string, ClaimDropABI, provider);
+    return new ethers.Contract(claimDropContractAddress, ClaimDropABI, provider);
   }, [claimDropContractAddress]);
 
   const defaultBNValue = {
@@ -106,7 +114,7 @@ const ClaimdropDetails = () => {
   };
 
   const [tokenData, setTokenData] = useState({} as ITokenData);
-  const [tokenError, setTokenError] = useState(false);
+  const [campaignError, setCampaignError] = useState(false);
   const [loadingTokenData, setLoadingTokenData] = useState(true);
   const [contractDataError, setContractDataError] = useState(false);
   const [loadingContractData, setLoadingContractData] = useState(true);
@@ -441,31 +449,37 @@ const ClaimdropDetails = () => {
     }
   };
 
-  // Get token info
+  useEffect(() => {
+    if (claimDropTokenAddress === '' || claimDropTokenAddress === '') {
+      setLoadingContractData(true);
+      setCampaignError(true);
+    }
+  }, [claimDropTokenAddress, claimDropTokenAddress]);
+
   useEffect(() => {
     const getTokenData = async () => {
       try {
-        const result = await getHTSTokenInfo(addressToId(token as string));
+        const result = await getHTSTokenInfo(addressToId(claimDropTokenAddress as string));
         if (Object.keys(result).length > 0) {
           setTokenData(result);
         } else {
-          setTokenError(true);
+          setCampaignError(true);
         }
       } catch (e) {
         console.log('e', e);
-        setTokenError(true);
+        setCampaignError(true);
       } finally {
         setLoadingTokenData(false);
       }
     };
 
-    token && getTokenData();
-  }, [token]);
+    claimDropTokenAddress !== '' && getTokenData();
+  }, [claimDropTokenAddress]);
 
   // Get contract data
   useEffect(() => {
-    claimDropContract && getContractData();
-  }, [claimDropContract, getContractData]);
+    claimDropTokenAddress !== '' && claimDropContract && getContractData();
+  }, [claimDropTokenAddress, claimDropContract, getContractData]);
 
   // Check for associations
   useEffect(() => {
@@ -507,7 +521,7 @@ const ClaimdropDetails = () => {
   return (
     <div className="d-flex justify-content-center">
       <div className="container-max-with-1042">
-        {!tokenError ? (
+        {!campaignError ? (
           loadingContractData || loadingTokenData ? (
             <div className="d-flex justify-content-center my-6">
               <Loader />
@@ -705,7 +719,7 @@ const ClaimdropDetails = () => {
           <div className="d-flex justify-content-center my-6">
             <div className="alert alert-danger d-inline-flex align-items-center mt-5" role="alert">
               <Icon className="me-3 alert-icon" name="warning" color="danger" />
-              <p className="alert-message">Something went wrong! Cannot get token...</p>
+              <p className="alert-message">Something went wrong! Cannot get claimdrop...</p>
             </div>
           </div>
         )}

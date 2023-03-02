@@ -38,7 +38,7 @@ const Claimdrop = () => {
             {claimdrops[networkType].map((item: any, index: number) => (
               <div
                 key={index}
-                onClick={() => handleViewDetailsRowClick(item.token)}
+                onClick={() => handleViewDetailsRowClick(item.claimdropAddress)}
                 className="table-pools-row"
               >
                 <div className="table-pools-cell">
