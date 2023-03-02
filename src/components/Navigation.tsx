@@ -32,6 +32,12 @@ const navigation = [
     color: 'gray',
     text: 'Analytics',
   },
+  {
+    link: '/claimdrop',
+    name: 'claim',
+    color: 'gray',
+    text: 'Claimdrops',
+  },
   // {
   //   link: '/buy-crypto',
   //   name: 'c14',

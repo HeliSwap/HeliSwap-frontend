@@ -207,7 +207,7 @@ const AnalyticsPoolDetials = () => {
 
             <div className="row mt-4 mt-md-5">
               <div className="col-md-3">
-                <div className="container-blue-neutral-800 heigth-100 rounded d-flex flex-column justify-content-between p-3 p-md-4">
+                <div className="container-blue-neutral-800 height-100 rounded d-flex flex-column justify-content-between p-3 p-md-4">
                   <div className="container-blue-neutral rounded p-3 p-md-4">
                     <p className="text-small">Total Tokens Locked</p>
                     <div className="mt-4 d-flex justify-content-between align-items-center">

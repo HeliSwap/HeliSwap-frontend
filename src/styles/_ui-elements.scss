@@ -458,6 +458,16 @@
   align-items: center;
 }
 
+.container-claim-progress {
+  width: 256px;
+  height: 256px;
+  border: 1px solid $blue-neutral-600;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /* Tables */
 .table-pools {
   border-radius: 4px 4px 0px 0px;
