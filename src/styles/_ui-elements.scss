@@ -497,6 +497,10 @@
       border-bottom: none;
     }
 
+    &.with-3-columns {
+      grid-template-columns: 4fr 1fr 1fr;
+    }
+
     &.with-4-columns {
       grid-template-columns: 20px 3fr 1fr 1fr;
     }

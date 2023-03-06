@@ -3,17 +3,17 @@ import { ethers } from 'ethers';
 const data = [
   {
     claimdropStart: {
-      date: '17 February 2023',
-      timestamp: 1676626712000,
+      date: '06 March 2023',
+      timestamp: 1678101242000,
     },
     claimdropEnd: {
-      date: '18 May 2023',
-      timestamp: 1684402712000,
+      date: '09 March 2023',
+      timestamp: 1678360442000,
     },
     vestingPeriod: {
-      valueString: '90 Days',
-      valueNumericDays: 90,
-      valueNumericMilliseconds: 7776000000,
+      valueString: '3 Days',
+      valueNumericDays: 3,
+      valueNumericMilliseconds: 259200000,
     },
     claimPeriod: {
       valueString: '7 Days',
@@ -21,9 +21,9 @@ const data = [
       valueNumericMilliseconds: 604800000,
     },
     totalAllocated: {
-      valueBN: ethers.BigNumber.from('1000000000000'),
-      valueStringWei: '1000000000000',
-      valueStringETH: '10000.0',
+      valueBN: ethers.BigNumber.from('100000000000000'),
+      valueStringWei: '100000000000000',
+      valueStringETH: '1000000.0',
     },
     claimedOf: {
       valueBN: ethers.BigNumber.from('0'),
@@ -51,8 +51,10 @@ const data = [
       valueStringETH: '0.0',
     },
     token: '0x0000000000000000000000000000000000002023',
-    claimdropAddress: '0x0000000000000000000000000000000000372c6e',
+    claimdropAddress: '0x000000000000000000000000000000000037bb12',
     title: 'HELI',
+    claimdropDescription:
+      'You may have received claimable token rewards from the HeliSwap Airdrop. Claiming your airdrop will forfeit a portion of your balance. Your total claimable amount will rise whenever someone forfeits a portion of their reward.',
   },
 ];
 
