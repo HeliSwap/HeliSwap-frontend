@@ -25,7 +25,10 @@ import {
   idToAddress,
 } from '../utils/tokenUtils';
 import { getDaysFromDurationMilliseconds, timestampToDate } from '../utils/timeUtils';
-import { formatBigNumberToMilliseconds } from '../utils/numberUtils';
+import {
+  formatBigNumberToMilliseconds,
+  formatStringETHtoPriceFormatted,
+} from '../utils/numberUtils';
 
 import getErrorMessage from '../content/errors';
 
@@ -410,7 +413,7 @@ const ClaimdropDetails = () => {
         toast.error(getErrorMessage(error.status ? error.status : error));
       }
 
-      await getContractData();
+      await getContractDataFound();
     } catch (e) {
       console.log('e', e);
     } finally {
@@ -450,11 +453,11 @@ const ClaimdropDetails = () => {
   };
 
   useEffect(() => {
-    if (claimDropTokenAddress === '' || claimDropTokenAddress === '') {
+    if (claimDropTokenAddress === '' || claimDropContractAddress === '') {
       setLoadingContractData(true);
       setCampaignError(true);
     }
-  }, [claimDropTokenAddress, claimDropTokenAddress]);
+  }, [claimDropTokenAddress, claimDropContractAddress]);
 
   useEffect(() => {
     const getTokenData = async () => {
@@ -478,8 +481,8 @@ const ClaimdropDetails = () => {
 
   // Get contract data
   useEffect(() => {
-    claimDropTokenAddress !== '' && claimDropContract && getContractData();
-  }, [claimDropTokenAddress, claimDropContract, getContractData]);
+    claimDropTokenAddress !== '' && claimDropContract && getContractDataFound();
+  }, [claimDropTokenAddress, claimDropContract, getContractDataFound]);
 
   // Check for associations
   useEffect(() => {
@@ -496,21 +499,26 @@ const ClaimdropDetails = () => {
     if (claimdropState === CLAIMDROP_STATE.NOT_STARTED)
       return <p className="text-small text-bold text-uppercase">Not started</p>;
 
-    if (claimdropState === CLAIMDROP_STATE.ENDED)
+    if (claimdropState === CLAIMDROP_STATE.POST_VESTING)
       return <p className="text-small text-bold text-uppercase">Ended</p>;
 
     const millisecondsPast = Date.now() - claimdropStart.timestamp;
-    const daysPast = Math.ceil(millisecondsPast / 1000 / 3600 / 24);
 
-    return (
-      <p className="text-small text-bold text-uppercase">
-        Day {daysPast}/{vestingPeriod.valueNumericDays}
-      </p>
-    );
+    const totalMillisecondsPeriod = vestingPeriod.valueNumericMilliseconds;
+    const percentagePast = (millisecondsPast / totalMillisecondsPeriod) * 100;
+
+    return <p className="text-title text-bold text-uppercase">{percentagePast.toFixed(2)}%</p>;
   };
 
-  const { claimdropStart, vestingPeriod, claimPeriod, totalAllocatedOf, claimedOf, claimable } =
-    claimdropData;
+  const {
+    claimdropStart,
+    vestingPeriod,
+    claimPeriod,
+    totalAllocatedOf,
+    claimedOf,
+    claimable,
+    claimdropDescription,
+  } = claimdropData;
 
   // Checks
   const canClaim =
@@ -539,11 +547,7 @@ const ClaimdropDetails = () => {
                     </h1>
                   </div>
 
-                  <p className="text-main text-gray mt-5">
-                    You may have received claimable token rewards from the HeliSwap Airdrop.
-                    Claiming your airdrop will forfeit a portion of your balance. Your total
-                    claimable amount will rise whenever someone forfeits a portion of their reward.
-                  </p>
+                  <p className="text-main text-gray mt-5">{claimdropDescription}</p>
                 </div>
 
                 <div className="col-lg-4"></div>
@@ -564,7 +568,16 @@ const ClaimdropDetails = () => {
                       <div className="container-border-rounded-bn-500">
                         <div className="row align-items-center">
                           <div className="col-lg-5">
-                            <p className="text-small text-secondary">Start date</p>
+                            <div className="d-flex align-items-center">
+                              <p className="text-small text-secondary">Start date</p>
+                              <Tippy
+                                content={`This is when the vesting period starts. If the date lies in the future, this specific claim drop is still within the cliff period.`}
+                              >
+                                <span className="ms-2">
+                                  <Icon name="hint" size="small" color="gray" />
+                                </span>
+                              </Tippy>
+                            </div>
                           </div>
 
                           <div className="col-lg-7 mt-2 mt-lg-0">
@@ -574,7 +587,16 @@ const ClaimdropDetails = () => {
 
                         <div className="row align-items-center mt-4">
                           <div className="col-lg-5">
-                            <p className="text-small text-secondary">Vesting Duration</p>
+                            <div className="d-flex align-items-center">
+                              <p className="text-small text-secondary">Vesting Duration</p>
+                              <Tippy
+                                content={`This is the period over which the allocated tokens vest linearly.`}
+                              >
+                                <span className="ms-2">
+                                  <Icon name="hint" size="small" color="gray" />
+                                </span>
+                              </Tippy>
+                            </div>
                           </div>
 
                           <div className="col-lg-7 mt-2 mt-lg-0">
@@ -586,7 +608,9 @@ const ClaimdropDetails = () => {
                           <div className="col-lg-5">
                             <div className="d-flex align-items-center">
                               <p className="text-small text-secondary">Extra Claim Period</p>
-                              <Tippy content={`some text.`}>
+                              <Tippy
+                                content={`After the vesting period expired, and all 100% of tokens are available to claim, we give another courtesy period to claim expired tokens. When this date is reached, the right for unclaimed tokens is forfeited.`}
+                              >
                                 <span className="ms-2">
                                   <Icon name="hint" size="small" color="gray" />
                                 </span>
@@ -605,7 +629,9 @@ const ClaimdropDetails = () => {
                           <div className="col-lg-5">
                             <div className="d-flex align-items-center">
                               <p className="text-small text-secondary">Total Tokens Allocated</p>
-                              <Tippy content={`some text.`}>
+                              <Tippy
+                                content={`The Amount of tokens that have been allocated to you for this claimdrop.`}
+                              >
                                 <span className="ms-2">
                                   <Icon name="hint" size="small" color="gray" />
                                 </span>
@@ -627,7 +653,9 @@ const ClaimdropDetails = () => {
                           <div className="col-lg-5">
                             <div className="d-flex align-items-center">
                               <p className="text-small text-secondary">Total Tokens Claimed</p>
-                              <Tippy content={`some text.`}>
+                              <Tippy
+                                content={`The amount of tokens that you have already claimed from the claimdrop.`}
+                              >
                                 <span className="ms-2">
                                   <Icon name="hint" size="small" color="gray" />
                                 </span>
@@ -651,7 +679,9 @@ const ClaimdropDetails = () => {
                           <div>
                             <div className="d-flex align-items-center">
                               <p className="text-small text-secondary">Available to Claim</p>
-                              <Tippy content={`some text.`}>
+                              <Tippy
+                                content={`The tokens that have vested since you last claimed and are currently available for claiming. You can repeat the claiming until 100% of your allocation has vested and been claimed.`}
+                              >
                                 <span className="ms-2">
                                   <Icon name="hint" size="small" color="gray" />
                                 </span>
@@ -661,7 +691,7 @@ const ClaimdropDetails = () => {
                             <div className="d-flex align-items-center mt-3">
                               <IconToken symbol={tokenData.symbol} />
                               <p className="text-headline text-secondary-300 text-bold ms-3">
-                                {claimable.valueStringETH}
+                                {formatStringETHtoPriceFormatted(claimable.valueStringETH, 2)}
                               </p>
                             </div>
                           </div>
