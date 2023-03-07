@@ -76,7 +76,7 @@ const Claimdrop = () => {
                   <span className="text-small">{item.claimdropStart.date}</span>
                 </div>
                 <div className="table-pools-cell">
-                  <span className="text-small">{item.claimdropEnd.date}</span>
+                  <span className="text-small">{item.expiryEnd.date}</span>
                 </div>
               </div>
             ))}

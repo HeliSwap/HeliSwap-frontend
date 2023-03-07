@@ -105,6 +105,10 @@ export interface IClaimdropData {
     date: string;
     timestamp: number;
   };
+  expiryEnd: {
+    date: string;
+    timestamp: number;
+  };
   vestingPeriod: {
     valueNumericDays: number;
     valueNumericMilliseconds: number;

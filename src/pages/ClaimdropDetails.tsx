@@ -98,6 +98,10 @@ const ClaimdropDetails = () => {
       date: '',
       timestamp: 0,
     },
+    expiryEnd: {
+      date: '',
+      timestamp: 0,
+    },
     vestingPeriod: {
       valueNumericDays: 0,
       valueNumericMilliseconds: 0,
@@ -196,6 +200,12 @@ const ClaimdropDetails = () => {
         valueNumericMilliseconds: claimPeriodMilliseconds,
       };
 
+      const expiryTimestamp = endTimestamp + claimPeriodMilliseconds;
+      const expiryEnd = {
+        date: timestampToDate(expiryTimestamp),
+        timestamp: expiryTimestamp,
+      };
+
       // Format token data
       const totalAllocated = {
         valueBN: totalAllocatedBN,
@@ -236,6 +246,7 @@ const ClaimdropDetails = () => {
       setClaimdropData({
         claimdropStart,
         claimdropEnd,
+        expiryEnd,
         vestingPeriod,
         claimPeriod,
         totalAllocated,
@@ -492,6 +503,15 @@ const ClaimdropDetails = () => {
   // Helpers
   const getTokenIsAssociated = () => userAssociatedTokens?.includes(addressToId(tokenData.address));
 
+  const getClaimedPercentage = () => {
+    return Number(claimedOf.valueStringETH) > 0
+      ? (
+          (Number(claimedOf.valueStringETH) / Number(totalAllocatedOf.valueStringETH)) *
+          100
+        ).toFixed(2)
+      : '0';
+  };
+
   // Renders
   const renderClaimdropStatus = () => {
     const { claimdropStart, vestingPeriod } = claimdropData;
@@ -507,11 +527,25 @@ const ClaimdropDetails = () => {
     const totalMillisecondsPeriod = vestingPeriod.valueNumericMilliseconds;
     const percentagePast = (millisecondsPast / totalMillisecondsPeriod) * 100;
 
-    return <p className="text-title text-bold text-uppercase">{percentagePast.toFixed(2)}%</p>;
+    return (
+      <>
+        <p className="text-secondary text-uppercase text-main">Vested Tokens (in%)</p>
+        <p className="text-title text-bold text-uppercase">{percentagePast.toFixed(2)}%</p>
+        <div className="progress mt-3">
+          <div
+            className="progress-bar bg-claimdrop"
+            role="progressbar"
+            aria-label="Success example"
+            style={{ width: `${percentagePast.toFixed(2)}%` }}
+          ></div>
+        </div>
+      </>
+    );
   };
 
   const {
     claimdropStart,
+    expiryEnd,
     vestingPeriod,
     claimPeriod,
     totalAllocatedOf,
@@ -582,6 +616,25 @@ const ClaimdropDetails = () => {
 
                           <div className="col-lg-7 mt-2 mt-lg-0">
                             <p className="text-subheader text-bold">{claimdropStart.date}</p>
+                          </div>
+                        </div>
+
+                        <div className="row align-items-center mt-4">
+                          <div className="col-lg-5">
+                            <div className="d-flex align-items-center">
+                              <p className="text-small text-secondary">Expiry date</p>
+                              <Tippy
+                                content={`IMPORTANT: After the Claimdrop has fully vested, there is a limited time where tokens can be claimed. When this day expires, you forfeit all unclaimed tokens of this claimdrop.`}
+                              >
+                                <span className="ms-2">
+                                  <Icon name="hint" size="small" color="gray" />
+                                </span>
+                              </Tippy>
+                            </div>
+                          </div>
+
+                          <div className="col-lg-7 mt-2 mt-lg-0">
+                            <p className="text-subheader text-bold">{expiryEnd.date}</p>
                           </div>
                         </div>
 
@@ -672,6 +725,18 @@ const ClaimdropDetails = () => {
                             </div>
                           </div>
                         </div>
+
+                        <div className="row align-items-center mt-4">
+                          <div className="col-lg-5">
+                            <div className="d-flex align-items-center">
+                              <p className="text-small text-secondary">Claimed percentage</p>
+                            </div>
+                          </div>
+
+                          <div className="col-lg-7 mt-2 mt-lg-0">
+                            <p className="text-subheader text-bold">{getClaimedPercentage()}%</p>
+                          </div>
+                        </div>
                       </div>
 
                       {canClaim ? (
@@ -725,7 +790,7 @@ const ClaimdropDetails = () => {
 
                   <div className="col-lg-4 mt-5 mt-lg-0 ">
                     <div className="container-blue-neutral-900 p-5 rounded height-100 d-flex justify-content-center align-items-center">
-                      <div className="container-claim-progress">{renderClaimdropStatus()}</div>
+                      <div className="w-100 text-center">{renderClaimdropStatus()}</div>
                     </div>
                   </div>
                 </div>
