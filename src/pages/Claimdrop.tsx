@@ -19,7 +19,12 @@ const Claimdrop = () => {
   };
 
   const networkType = process.env.REACT_APP_NETWORK_TYPE as string;
-  const haveClaimdrops = claimdrops[networkType].length > 0;
+  const filteredClaimdrops =
+    claimdrops[networkType].length > 0
+      ? claimdrops[networkType].filter((item: any) => item.expiryEnd.timestamp > Date.now())
+      : [];
+
+  const haveClaimdrops = filteredClaimdrops.length > 0;
 
   return (
     <div className="d-flex justify-content-center">
@@ -63,7 +68,7 @@ const Claimdrop = () => {
                 </div>
               </div>
             </div>
-            {claimdrops[networkType].map((item: any, index: number) => (
+            {filteredClaimdrops.map((item: any, index: number) => (
               <div
                 key={index}
                 onClick={() => handleViewDetailsRowClick(item.claimdropAddress)}
