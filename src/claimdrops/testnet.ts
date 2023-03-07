@@ -10,6 +10,10 @@ const data = [
       date: '09 March 2023',
       timestamp: 1678360442000,
     },
+    expiryEnd: {
+      date: '16 March 2023',
+      timestamp: 1678965242000,
+    },
     vestingPeriod: {
       valueString: '3 Days',
       valueNumericDays: 3,

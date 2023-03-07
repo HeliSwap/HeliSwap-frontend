@@ -98,6 +98,10 @@ const ClaimdropDetails = () => {
       date: '',
       timestamp: 0,
     },
+    expiryEnd: {
+      date: '',
+      timestamp: 0,
+    },
     vestingPeriod: {
       valueNumericDays: 0,
       valueNumericMilliseconds: 0,
@@ -196,6 +200,12 @@ const ClaimdropDetails = () => {
         valueNumericMilliseconds: claimPeriodMilliseconds,
       };
 
+      const expiryTimestamp = endTimestamp + claimPeriodMilliseconds;
+      const expiryEnd = {
+        date: timestampToDate(expiryTimestamp),
+        timestamp: expiryTimestamp,
+      };
+
       // Format token data
       const totalAllocated = {
         valueBN: totalAllocatedBN,
@@ -236,6 +246,7 @@ const ClaimdropDetails = () => {
       setClaimdropData({
         claimdropStart,
         claimdropEnd,
+        expiryEnd,
         vestingPeriod,
         claimPeriod,
         totalAllocated,
@@ -492,6 +503,15 @@ const ClaimdropDetails = () => {
   // Helpers
   const getTokenIsAssociated = () => userAssociatedTokens?.includes(addressToId(tokenData.address));
 
+  const getClaimedPercentage = () => {
+    return Number(claimedOf.valueStringETH) > 0
+      ? (
+          (Number(claimedOf.valueStringETH) / Number(totalAllocatedOf.valueStringETH)) *
+          100
+        ).toFixed(2)
+      : '0';
+  };
+
   // Renders
   const renderClaimdropStatus = () => {
     const { claimdropStart, vestingPeriod } = claimdropData;
@@ -507,11 +527,25 @@ const ClaimdropDetails = () => {
     const totalMillisecondsPeriod = vestingPeriod.valueNumericMilliseconds;
     const percentagePast = (millisecondsPast / totalMillisecondsPeriod) * 100;
 
-    return <p className="text-title text-bold text-uppercase">{percentagePast.toFixed(2)}%</p>;
+    return (
+      <>
+        <p className="text-secondary text-uppercase text-main">Vested Tokens (in%)</p>
+        <p className="text-title text-bold text-uppercase">{percentagePast.toFixed(2)}%</p>
+        <div className="progress mt-3">
+          <div
+            className="progress-bar bg-claimdrop"
+            role="progressbar"
+            aria-label="Success example"
+            style={{ width: `${percentagePast.toFixed(2)}%` }}
+          ></div>
+        </div>
+      </>
+    );
   };
 
   const {
     claimdropStart,
+    expiryEnd,
     vestingPeriod,
     claimPeriod,
     totalAllocatedOf,
@@ -523,7 +557,8 @@ const ClaimdropDetails = () => {
   // Checks
   const canClaim =
     claimdropState > CLAIMDROP_STATE.NOT_STARTED && claimdropState < CLAIMDROP_STATE.ENDED;
-  const haveTokensToClaim = Number(claimable.valueBN.toString()) > 0;
+  const haveTokensAllocated = Number(totalAllocatedOf.valueStringETH) > 0;
+  const haveTokensToClaim = Number(claimable.valueStringETH) > 0;
   const claimButtonDisabled = !haveTokensToClaim;
 
   return (
@@ -562,173 +597,216 @@ const ClaimdropDetails = () => {
                   </div>
                 </div>
               ) : userId && !isHashpackLoading ? (
-                <div className="row mt-6">
-                  <div className="col-lg-7 offset-lg-1">
-                    <div className="container-blue-neutral-900 p-5 rounded">
-                      <div className="container-border-rounded-bn-500">
-                        <div className="row align-items-center">
-                          <div className="col-lg-5">
-                            <div className="d-flex align-items-center">
-                              <p className="text-small text-secondary">Start date</p>
-                              <Tippy
-                                content={`This is when the vesting period starts. If the date lies in the future, this specific claim drop is still within the cliff period.`}
-                              >
-                                <span className="ms-2">
-                                  <Icon name="hint" size="small" color="gray" />
-                                </span>
-                              </Tippy>
+                haveTokensAllocated ? (
+                  <div className="row mt-6">
+                    <div className="col-lg-7 offset-lg-1">
+                      <div className="container-blue-neutral-900 p-5 rounded">
+                        <div className="container-border-rounded-bn-500">
+                          <div className="row align-items-center">
+                            <div className="col-lg-5">
+                              <div className="d-flex align-items-center">
+                                <p className="text-small text-secondary">Start date</p>
+                                <Tippy
+                                  content={`This is when the vesting period starts. If the date lies in the future, this specific claim drop is still within the cliff period.`}
+                                >
+                                  <span className="ms-2">
+                                    <Icon name="hint" size="small" color="gray" />
+                                  </span>
+                                </Tippy>
+                              </div>
+                            </div>
+
+                            <div className="col-lg-7 mt-2 mt-lg-0">
+                              <p className="text-subheader text-bold">{claimdropStart.date}</p>
                             </div>
                           </div>
 
-                          <div className="col-lg-7 mt-2 mt-lg-0">
-                            <p className="text-subheader text-bold">{claimdropStart.date}</p>
-                          </div>
-                        </div>
+                          <div className="row align-items-center mt-4">
+                            <div className="col-lg-5">
+                              <div className="d-flex align-items-center">
+                                <p className="text-small text-secondary">Expiry date</p>
+                                <Tippy
+                                  content={`IMPORTANT: After the Claimdrop has fully vested, there is a limited time where tokens can be claimed. When this day expires, you forfeit all unclaimed tokens of this claimdrop.`}
+                                >
+                                  <span className="ms-2">
+                                    <Icon name="hint" size="small" color="gray" />
+                                  </span>
+                                </Tippy>
+                              </div>
+                            </div>
 
-                        <div className="row align-items-center mt-4">
-                          <div className="col-lg-5">
-                            <div className="d-flex align-items-center">
-                              <p className="text-small text-secondary">Vesting Duration</p>
-                              <Tippy
-                                content={`This is the period over which the allocated tokens vest linearly.`}
-                              >
-                                <span className="ms-2">
-                                  <Icon name="hint" size="small" color="gray" />
-                                </span>
-                              </Tippy>
+                            <div className="col-lg-7 mt-2 mt-lg-0">
+                              <p className="text-subheader text-bold">{expiryEnd.date}</p>
                             </div>
                           </div>
 
-                          <div className="col-lg-7 mt-2 mt-lg-0">
-                            <p className="text-subheader text-bold">{vestingPeriod.valueString}</p>
-                          </div>
-                        </div>
-
-                        <div className="row align-items-center mt-4">
-                          <div className="col-lg-5">
-                            <div className="d-flex align-items-center">
-                              <p className="text-small text-secondary">Extra Claim Period</p>
-                              <Tippy
-                                content={`After the vesting period expired, and all 100% of tokens are available to claim, we give another courtesy period to claim expired tokens. When this date is reached, the right for unclaimed tokens is forfeited.`}
-                              >
-                                <span className="ms-2">
-                                  <Icon name="hint" size="small" color="gray" />
-                                </span>
-                              </Tippy>
+                          <div className="row align-items-center mt-4">
+                            <div className="col-lg-5">
+                              <div className="d-flex align-items-center">
+                                <p className="text-small text-secondary">Vesting Duration</p>
+                                <Tippy
+                                  content={`This is the period over which the allocated tokens vest linearly.`}
+                                >
+                                  <span className="ms-2">
+                                    <Icon name="hint" size="small" color="gray" />
+                                  </span>
+                                </Tippy>
+                              </div>
                             </div>
-                          </div>
 
-                          <div className="col-lg-7 mt-2 mt-lg-0">
-                            <p className="text-subheader text-bold">{claimPeriod.valueString}</p>
-                          </div>
-                        </div>
-
-                        <hr />
-
-                        <div className="row align-items-center mt-4">
-                          <div className="col-lg-5">
-                            <div className="d-flex align-items-center">
-                              <p className="text-small text-secondary">Total Tokens Allocated</p>
-                              <Tippy
-                                content={`The Amount of tokens that have been allocated to you for this claimdrop.`}
-                              >
-                                <span className="ms-2">
-                                  <Icon name="hint" size="small" color="gray" />
-                                </span>
-                              </Tippy>
-                            </div>
-                          </div>
-
-                          <div className="col-lg-7 mt-2 mt-lg-0">
-                            <div className="d-flex align-items-center">
-                              <IconToken symbol={tokenData.symbol} />
-                              <p className="text-subheader text-bold ms-3">
-                                {numeral(totalAllocatedOf.valueStringETH).format('0,0.00')}
+                            <div className="col-lg-7 mt-2 mt-lg-0">
+                              <p className="text-subheader text-bold">
+                                {vestingPeriod.valueString}
                               </p>
                             </div>
                           </div>
+
+                          <div className="row align-items-center mt-4">
+                            <div className="col-lg-5">
+                              <div className="d-flex align-items-center">
+                                <p className="text-small text-secondary">Extra Claim Period</p>
+                                <Tippy
+                                  content={`After the vesting period expired, and all 100% of tokens are available to claim, we give another courtesy period to claim expired tokens. When this date is reached, the right for unclaimed tokens is forfeited.`}
+                                >
+                                  <span className="ms-2">
+                                    <Icon name="hint" size="small" color="gray" />
+                                  </span>
+                                </Tippy>
+                              </div>
+                            </div>
+
+                            <div className="col-lg-7 mt-2 mt-lg-0">
+                              <p className="text-subheader text-bold">{claimPeriod.valueString}</p>
+                            </div>
+                          </div>
+
+                          <hr />
+
+                          <div className="row align-items-center mt-4">
+                            <div className="col-lg-5">
+                              <div className="d-flex align-items-center">
+                                <p className="text-small text-secondary">Total Tokens Allocated</p>
+                                <Tippy
+                                  content={`The Amount of tokens that have been allocated to you for this claimdrop.`}
+                                >
+                                  <span className="ms-2">
+                                    <Icon name="hint" size="small" color="gray" />
+                                  </span>
+                                </Tippy>
+                              </div>
+                            </div>
+
+                            <div className="col-lg-7 mt-2 mt-lg-0">
+                              <div className="d-flex align-items-center">
+                                <IconToken symbol={tokenData.symbol} />
+                                <p className="text-subheader text-bold ms-3">
+                                  {numeral(totalAllocatedOf.valueStringETH).format('0,0.00')}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="row align-items-center mt-4">
+                            <div className="col-lg-5">
+                              <div className="d-flex align-items-center">
+                                <p className="text-small text-secondary">Total Tokens Claimed</p>
+                                <Tippy
+                                  content={`The amount of tokens that you have already claimed from the claimdrop.`}
+                                >
+                                  <span className="ms-2">
+                                    <Icon name="hint" size="small" color="gray" />
+                                  </span>
+                                </Tippy>
+                              </div>
+                            </div>
+
+                            <div className="col-lg-7 mt-2 mt-lg-0">
+                              <div className="d-flex align-items-center">
+                                <IconToken symbol={tokenData.symbol} />
+                                <p className="text-subheader text-bold ms-3">
+                                  {numeral(claimedOf.valueStringETH).format('0,0.00')}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="row align-items-center mt-4">
+                            <div className="col-lg-5">
+                              <div className="d-flex align-items-center">
+                                <p className="text-small text-secondary">Claimed percentage</p>
+                              </div>
+                            </div>
+
+                            <div className="col-lg-7 mt-2 mt-lg-0">
+                              <p className="text-subheader text-bold">{getClaimedPercentage()}%</p>
+                            </div>
+                          </div>
                         </div>
 
-                        <div className="row align-items-center mt-4">
-                          <div className="col-lg-5">
-                            <div className="d-flex align-items-center">
-                              <p className="text-small text-secondary">Total Tokens Claimed</p>
-                              <Tippy
-                                content={`The amount of tokens that you have already claimed from the claimdrop.`}
+                        {canClaim ? (
+                          <div className="d-lg-flex justify-content-between align-items-end mt-7">
+                            <div>
+                              <div className="d-flex align-items-center">
+                                <p className="text-small text-secondary">Available to Claim</p>
+                                <Tippy
+                                  content={`The tokens that have vested since you last claimed and are currently available for claiming. You can repeat the claiming until 100% of your allocation has vested and been claimed.`}
+                                >
+                                  <span className="ms-2">
+                                    <Icon name="hint" size="small" color="gray" />
+                                  </span>
+                                </Tippy>
+                              </div>
+
+                              <div className="d-flex align-items-center mt-3">
+                                <IconToken symbol={tokenData.symbol} />
+                                <p className="text-headline text-secondary-300 text-bold ms-3">
+                                  {formatStringETHtoPriceFormatted(claimable.valueStringETH, 2)}
+                                </p>
+                              </div>
+                            </div>
+
+                            {}
+
+                            {getTokenIsAssociated() ? (
+                              <Button
+                                disabled={claimButtonDisabled}
+                                loading={loadingClaim}
+                                onClick={handleButtonClaimClick}
+                                size="small"
+                                className="mt-5 mt-lg-0"
                               >
-                                <span className="ms-2">
-                                  <Icon name="hint" size="small" color="gray" />
-                                </span>
-                              </Tippy>
-                            </div>
+                                CLAIM
+                              </Button>
+                            ) : (
+                              <Button
+                                size="small"
+                                className="mt-5 mt-lg-0"
+                                loading={loadingAssociate}
+                                onClick={handleAssociateClick}
+                              >
+                                {`Associate ${tokenData.symbol}`}
+                              </Button>
+                            )}
                           </div>
-
-                          <div className="col-lg-7 mt-2 mt-lg-0">
-                            <div className="d-flex align-items-center">
-                              <IconToken symbol={tokenData.symbol} />
-                              <p className="text-subheader text-bold ms-3">
-                                {numeral(claimedOf.valueStringETH).format('0,0.00')}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
+                        ) : null}
                       </div>
+                    </div>
 
-                      {canClaim ? (
-                        <div className="d-lg-flex justify-content-between align-items-end mt-7">
-                          <div>
-                            <div className="d-flex align-items-center">
-                              <p className="text-small text-secondary">Available to Claim</p>
-                              <Tippy
-                                content={`The tokens that have vested since you last claimed and are currently available for claiming. You can repeat the claiming until 100% of your allocation has vested and been claimed.`}
-                              >
-                                <span className="ms-2">
-                                  <Icon name="hint" size="small" color="gray" />
-                                </span>
-                              </Tippy>
-                            </div>
-
-                            <div className="d-flex align-items-center mt-3">
-                              <IconToken symbol={tokenData.symbol} />
-                              <p className="text-headline text-secondary-300 text-bold ms-3">
-                                {formatStringETHtoPriceFormatted(claimable.valueStringETH, 2)}
-                              </p>
-                            </div>
-                          </div>
-
-                          {}
-
-                          {getTokenIsAssociated() ? (
-                            <Button
-                              disabled={claimButtonDisabled}
-                              loading={loadingClaim}
-                              onClick={handleButtonClaimClick}
-                              size="small"
-                              className="mt-5 mt-lg-0"
-                            >
-                              CLAIM
-                            </Button>
-                          ) : (
-                            <Button
-                              size="small"
-                              className="mt-5 mt-lg-0"
-                              loading={loadingAssociate}
-                              onClick={handleAssociateClick}
-                            >
-                              {`Associate ${tokenData.symbol}`}
-                            </Button>
-                          )}
-                        </div>
-                      ) : null}
+                    <div className="col-lg-4 mt-5 mt-lg-0 ">
+                      <div className="container-blue-neutral-900 p-5 rounded height-100 d-flex justify-content-center align-items-center">
+                        <div className="w-100 text-center">{renderClaimdropStatus()}</div>
+                      </div>
                     </div>
                   </div>
-
-                  <div className="col-lg-4 mt-5 mt-lg-0 ">
-                    <div className="container-blue-neutral-900 p-5 rounded height-100 d-flex justify-content-center align-items-center">
-                      <div className="container-claim-progress">{renderClaimdropStatus()}</div>
+                ) : (
+                  <div className="row mt-6">
+                    <div className="col-6 offset-3">
+                      <div className="alert alert-warning text-center">
+                        You are not eligible for this claimdrop.
+                      </div>
                     </div>
                   </div>
-                </div>
+                )
               ) : (
                 <div className="row mt-5">
                   <div className="col-lg-3 offset-lg-3">

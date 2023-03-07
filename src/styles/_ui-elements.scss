@@ -717,3 +717,10 @@
   height: 1px;
   background-color: $blue-neutral-500;
 }
+
+// Progress
+.progress {
+  .bg-claimdrop {
+    background: linear-gradient(90deg, #f32fd7 0%, #3845fb 100%);
+  }
+}
