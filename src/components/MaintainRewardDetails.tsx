@@ -10,6 +10,7 @@ import { IReward } from '../interfaces/tokens';
 import IconToken from '../components/IconToken';
 import Button from '../components/Button';
 import { ethers } from 'ethers';
+import { formatStringWeiToStringEther } from '../utils/numberUtils';
 
 interface IRewardDetailsProps {
   reward: IReward;
@@ -114,7 +115,10 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
           </p>
         </div>
         <div className="col-6 col-md-4">
-          <p className="text-main text-numeric">{reward.totalAmount}</p>
+          <p className="text-main text-numeric">
+            {formatStringWeiToStringEther(reward.totalAmount, reward.decimals)} (
+            {reward.totalAmount})
+          </p>
         </div>
       </div>
 
