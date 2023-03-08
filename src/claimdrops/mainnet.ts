@@ -4,30 +4,30 @@ const data = [
   {
     claimdropStart: {
       date: '08 March 2023',
-      timestamp: 1678261314000,
+      timestamp: 1678276556000,
     },
     claimdropEnd: {
-      date: '11 March 2023',
-      timestamp: 1678520514000,
+      date: '08 April 2023',
+      timestamp: 1680904556000,
     },
     expiryEnd: {
-      date: '18 March 2023',
-      timestamp: 1679125314000,
+      date: '07 June 2023',
+      timestamp: 1686160556000,
     },
     vestingPeriod: {
-      valueString: '3 Days',
-      valueNumericDays: 3,
-      valueNumericMilliseconds: 259200000,
+      valueString: '30 Days',
+      valueNumericDays: 30,
+      valueNumericMilliseconds: 2628000000,
     },
     claimPeriod: {
-      valueString: '7 Days',
-      valueNumericDays: 7,
-      valueNumericMilliseconds: 604800000,
+      valueString: '60 Days',
+      valueNumericDays: 60,
+      valueNumericMilliseconds: 5256000000,
     },
     totalAllocated: {
-      valueBN: ethers.BigNumber.from('100000000000000'),
-      valueStringWei: '100000000000000',
-      valueStringETH: '1000000.0',
+      valueBN: ethers.BigNumber.from('89660000000000'),
+      valueStringWei: '89660000000000',
+      valueStringETH: '896600.0',
     },
     claimedOf: {
       valueBN: ethers.BigNumber.from('0'),
@@ -55,7 +55,7 @@ const data = [
       valueStringETH: '0.0',
     },
     token: '0x00000000000000000000000000000000001d90C9',
-    claimdropAddress: '',
+    claimdropAddress: '0x00000000000000000000000000000000001ec642',
     title: 'HELI',
     claimdropTitle: 'Lockdrop Claimdrop',
     claimdropDescription:
