@@ -125,5 +125,6 @@ export interface IClaimdropData {
   claimable: IContractTokenValue;
   extraTokensOf: IContractTokenValue;
   totalAllocatedOf: IContractTokenValue;
+  claimdropTitle?: string;
   claimdropDescription?: string;
 }
