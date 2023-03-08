@@ -57,8 +57,9 @@ const data = [
     token: '0x0000000000000000000000000000000000002023',
     claimdropAddress: '0x000000000000000000000000000000000037bb12',
     title: 'HELI',
+    claimdropTitle: 'Lockdrop Claimdrop',
     claimdropDescription:
-      'You may have received claimable token rewards from the HeliSwap Airdrop. Claiming your airdrop will forfeit a portion of your balance. Your total claimable amount will rise whenever someone forfeits a portion of their reward.',
+      'If you participated in the Community Lockdrop, the HeliSwap Team would like to thank you for your trust and commitment to the platform. This is why we decided to give you extra HELI tokens that symbolize the importance of the community to us. Welcome to HELI ! Enjoy the ride!',
   },
   {
     claimdropStart: {
@@ -116,8 +117,9 @@ const data = [
     token: '0x0000000000000000000000000000000000002023',
     claimdropAddress: '0x000000000000000000000000000000000038111f',
     title: 'HELI',
+    claimdropTitle: 'Lockdrop Claimdrop',
     claimdropDescription:
-      'You may have received claimable token rewards from the HeliSwap Airdrop. Claiming your airdrop will forfeit a portion of your balance. Your total claimable amount will rise whenever someone forfeits a portion of their reward.',
+      'If you participated in the Community Lockdrop, the HeliSwap Team would like to thank you for your trust and commitment to the platform. This is why we decided to give you extra HELI tokens that symbolize the importance of the community to us. Welcome to HELI ! Enjoy the ride!',
   },
 ];
 

@@ -551,6 +551,7 @@ const ClaimdropDetails = () => {
     totalAllocatedOf,
     claimedOf,
     claimable,
+    claimdropTitle,
     claimdropDescription,
   } = claimdropData;
 
@@ -577,9 +578,7 @@ const ClaimdropDetails = () => {
                     <span className="cursor-pointer me-3" onClick={handleBackClick}>
                       <Icon name="arrow-left" />
                     </span>
-                    <h1 className="text-subheader">
-                      Claim Drop - <span className="text-bold">{tokenData.symbol} Holders</span>
-                    </h1>
+                    <h1 className="text-subheader">{claimdropTitle}</h1>
                   </div>
 
                   <p className="text-main text-gray mt-5">{claimdropDescription}</p>
