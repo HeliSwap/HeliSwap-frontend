@@ -300,9 +300,7 @@ const ClaimdropDetails = () => {
 
     try {
       let claimedOfBN = ethers.BigNumber.from(0);
-      let vestedTokensOfBN = ethers.BigNumber.from(0);
       let claimableBN = ethers.BigNumber.from(0);
-      let extraTokensOfBN = ethers.BigNumber.from(0);
       let totalAllocatedOfBN = ethers.BigNumber.from(0);
 
       if (userId) {
@@ -310,14 +308,11 @@ const ClaimdropDetails = () => {
 
         const userPromisesArray = [
           claimDropContract.claimedOf(userAddress),
-          claimDropContract.vestedTokensOf(userAddress),
           claimDropContract.claimable(userAddress),
-          claimDropContract.extraTokensOf(userAddress),
           claimDropContract.totalAllocatedOf(userAddress),
         ];
 
-        [claimedOfBN, vestedTokensOfBN, claimableBN, extraTokensOfBN, totalAllocatedOfBN] =
-          await Promise.all(userPromisesArray);
+        [claimedOfBN, claimableBN, totalAllocatedOfBN] = await Promise.all(userPromisesArray);
       }
 
       const claimedOf = {
@@ -326,22 +321,10 @@ const ClaimdropDetails = () => {
         valueStringETH: formatBNTokenToString(claimedOfBN, tokenData.decimals),
       };
 
-      const vestedTokensOf = {
-        valueBN: vestedTokensOfBN,
-        valueStringWei: vestedTokensOfBN.toString(),
-        valueStringETH: formatBNTokenToString(vestedTokensOfBN, tokenData.decimals),
-      };
-
       const claimable = {
         valueBN: claimableBN,
         valueStringWei: claimableBN.toString(),
         valueStringETH: formatBNTokenToString(claimableBN, tokenData.decimals),
-      };
-
-      const extraTokensOf = {
-        valueBN: extraTokensOfBN,
-        valueStringWei: extraTokensOfBN.toString(),
-        valueStringETH: formatBNTokenToString(extraTokensOfBN, tokenData.decimals),
       };
 
       const totalAllocatedOf = {
@@ -353,9 +336,7 @@ const ClaimdropDetails = () => {
       setClaimdropData({
         ...foundLockdropData,
         claimedOf,
-        vestedTokensOf,
         claimable,
-        extraTokensOf,
         totalAllocatedOf,
       });
 
