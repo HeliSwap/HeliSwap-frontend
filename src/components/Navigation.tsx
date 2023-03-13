@@ -9,6 +9,12 @@ const navigation = [
     text: 'Lockdrop',
   },
   {
+    link: '/claimdrop',
+    name: 'claim',
+    color: 'gray',
+    text: 'Claimdrops',
+  },
+  {
     link: '/',
     name: 'swap',
     color: 'gray',
@@ -31,12 +37,6 @@ const navigation = [
     name: 'analytics',
     color: 'gray',
     text: 'Analytics',
-  },
-  {
-    link: '/claimdrop',
-    name: 'claim',
-    color: 'gray',
-    text: 'Claimdrops',
   },
   // {
   //   link: '/buy-crypto',
