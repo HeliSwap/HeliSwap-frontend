@@ -15,6 +15,8 @@ import FarmDetails from '../pages/FarmDetails';
 import Analytics from '../pages/Analytics';
 import AnalyticsPoolDetials from '../pages/AnalyticsPoolDetials';
 import Lockdrop from '../pages/Lockdrop';
+import Claimdrop from '../pages/Claimdrop';
+import ClaimdropDetails from '../pages/ClaimdropDetails';
 import C14 from '../pages/C14';
 
 import Header from './Header';
@@ -50,7 +52,9 @@ function App() {
                         path="analytics/pool/:poolAddress"
                         element={<AnalyticsPoolDetials />}
                       />
-                      <Route path="/buy-crypto" element={<C14 />} />
+                      <Route path="claimdrop" element={<Claimdrop />} />
+                      <Route path="claimdrop/:campaign" element={<ClaimdropDetails />} />
+                      <Route path="buy-crypto" element={<C14 />} />
                       <Route path="styleguide" element={<Styleguide />} />
                     </Routes>
                   </div>

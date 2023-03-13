@@ -458,6 +458,16 @@
   align-items: center;
 }
 
+.container-claim-progress {
+  width: 256px;
+  height: 256px;
+  border: 1px solid $blue-neutral-600;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /* Tables */
 .table-pools {
   border-radius: 4px 4px 0px 0px;
@@ -485,6 +495,10 @@
 
     &:last-child {
       border-bottom: none;
+    }
+
+    &.with-3-columns {
+      grid-template-columns: 4fr 1fr 1fr;
     }
 
     &.with-4-columns {
@@ -702,4 +716,11 @@
   border: 0;
   height: 1px;
   background-color: $blue-neutral-500;
+}
+
+// Progress
+.progress {
+  .bg-claimdrop {
+    background: linear-gradient(90deg, #f32fd7 0%, #3845fb 100%);
+  }
 }

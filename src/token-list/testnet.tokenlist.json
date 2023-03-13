@@ -41,6 +41,14 @@
       "symbol": "WBTC",
       "decimals": 8,
       "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/WBTC.png"
+    },
+    {
+      "chainId": 290,
+      "address": "0x0000000000000000000000000000000000002023",
+      "name": "HeliSwap",
+      "symbol": "HELI",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/HELI.png"
     }
   ]
 }
