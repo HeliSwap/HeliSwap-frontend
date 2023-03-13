@@ -18,6 +18,7 @@ import useFarms from '../hooks/useFarms';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 
 import {
+  farmsToExclude,
   SORT_DIRECTION,
   SORT_OPTIONS,
   SORT_OPTIONS_ENUM,
@@ -50,7 +51,14 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
     tokensWhitelistedAddresses,
   );
 
-  const { farms, processingFarms } = useFarms(useQueryOptionsPoolsFarms, userId, pools);
+  const { farms: farmsUnfiltered, processingFarms } = useFarms(
+    useQueryOptionsPoolsFarms,
+    userId,
+    pools,
+  );
+
+  // Exclude duplicated or expired farms
+  const farms = farmsUnfiltered.filter(farm => !farmsToExclude.includes(farm.address));
 
   const sortFarms = useMemo(
     () => (farmA: IFarmData, farmB: IFarmData, direction: SORT_DIRECTION) => {

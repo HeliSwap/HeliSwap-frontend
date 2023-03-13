@@ -24,9 +24,9 @@ import {
   getUserAssociatedTokens,
   idToAddress,
 } from '../utils/tokenUtils';
-import { getDaysFromDurationMilliseconds, timestampToDate } from '../utils/timeUtils';
+// import { getDaysFromDurationMilliseconds, timestampToDate } from '../utils/timeUtils';
 import {
-  formatBigNumberToMilliseconds,
+  // formatBigNumberToMilliseconds,
   formatStringETHtoPriceFormatted,
 } from '../utils/numberUtils';
 
@@ -131,166 +131,166 @@ const ClaimdropDetails = () => {
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
   const [loadingAssociate, setLoadingAssociate] = useState(false);
 
-  const getContractData = useCallback(async () => {
-    const formatBNTokenToString = (numberToFormat: ethers.BigNumber, decimals = 8) =>
-      ethers.utils.formatUnits(numberToFormat, decimals);
+  // const getContractData = useCallback(async () => {
+  //   const formatBNTokenToString = (numberToFormat: ethers.BigNumber, decimals = 8) =>
+  //     ethers.utils.formatUnits(numberToFormat, decimals);
 
-    setLoadingContractData(true);
+  //   setLoadingContractData(true);
 
-    try {
-      const promisesArray = [
-        claimDropContract.start(),
-        claimDropContract.end(),
-        claimDropContract.claimExtraTime(),
-        claimDropContract.totalAllocated(),
-      ];
+  //   try {
+  //     const promisesArray = [
+  //       claimDropContract.start(),
+  //       claimDropContract.end(),
+  //       claimDropContract.claimExtraTime(),
+  //       claimDropContract.totalAllocated(),
+  //     ];
 
-      const [startBN, endBN, claimExtraTimeBN, totalAllocatedBN] = await Promise.all(promisesArray);
+  //     const [startBN, endBN, claimExtraTimeBN, totalAllocatedBN] = await Promise.all(promisesArray);
 
-      let claimedOfBN = ethers.BigNumber.from(0);
-      let vestedTokensOfBN = ethers.BigNumber.from(0);
-      let claimableBN = ethers.BigNumber.from(0);
-      let extraTokensOfBN = ethers.BigNumber.from(0);
-      let totalAllocatedOfBN = ethers.BigNumber.from(0);
+  //     let claimedOfBN = ethers.BigNumber.from(0);
+  //     let vestedTokensOfBN = ethers.BigNumber.from(0);
+  //     let claimableBN = ethers.BigNumber.from(0);
+  //     let extraTokensOfBN = ethers.BigNumber.from(0);
+  //     let totalAllocatedOfBN = ethers.BigNumber.from(0);
 
-      if (userId) {
-        const userAddress = idToAddress(userId);
+  //     if (userId) {
+  //       const userAddress = idToAddress(userId);
 
-        const userPromisesArray = [
-          claimDropContract.claimedOf(userAddress),
-          claimDropContract.vestedTokensOf(userAddress),
-          claimDropContract.claimable(userAddress),
-          claimDropContract.extraTokensOf(userAddress),
-          claimDropContract.totalAllocatedOf(userAddress),
-        ];
+  //       const userPromisesArray = [
+  //         claimDropContract.claimedOf(userAddress),
+  //         claimDropContract.vestedTokensOf(userAddress),
+  //         claimDropContract.claimable(userAddress),
+  //         claimDropContract.extraTokensOf(userAddress),
+  //         claimDropContract.totalAllocatedOf(userAddress),
+  //       ];
 
-        [claimedOfBN, vestedTokensOfBN, claimableBN, extraTokensOfBN, totalAllocatedOfBN] =
-          await Promise.all(userPromisesArray);
-      }
+  //       [claimedOfBN, vestedTokensOfBN, claimableBN, extraTokensOfBN, totalAllocatedOfBN] =
+  //         await Promise.all(userPromisesArray);
+  //     }
 
-      // Prepare contract data
-      const startTimestamp = formatBigNumberToMilliseconds(startBN);
-      const claimdropStart = {
-        date: timestampToDate(startTimestamp),
-        timestamp: startTimestamp,
-      };
+  //     // Prepare contract data
+  //     const startTimestamp = formatBigNumberToMilliseconds(startBN);
+  //     const claimdropStart = {
+  //       date: timestampToDate(startTimestamp),
+  //       timestamp: startTimestamp,
+  //     };
 
-      const endTimestamp = formatBigNumberToMilliseconds(endBN);
-      const claimdropEnd = {
-        date: timestampToDate(endTimestamp),
-        timestamp: endTimestamp,
-      };
+  //     const endTimestamp = formatBigNumberToMilliseconds(endBN);
+  //     const claimdropEnd = {
+  //       date: timestampToDate(endTimestamp),
+  //       timestamp: endTimestamp,
+  //     };
 
-      const vestingPeriodMilliseconds = endTimestamp - startTimestamp;
-      const { valueString: vestingPeriodString, valueNumeric: vestingPeriodDays } =
-        getDaysFromDurationMilliseconds(vestingPeriodMilliseconds);
+  //     const vestingPeriodMilliseconds = endTimestamp - startTimestamp;
+  //     const { valueString: vestingPeriodString, valueNumeric: vestingPeriodDays } =
+  //       getDaysFromDurationMilliseconds(vestingPeriodMilliseconds);
 
-      const vestingPeriod = {
-        valueString: vestingPeriodString,
-        valueNumericDays: vestingPeriodDays,
-        valueNumericMilliseconds: vestingPeriodMilliseconds,
-      };
+  //     const vestingPeriod = {
+  //       valueString: vestingPeriodString,
+  //       valueNumericDays: vestingPeriodDays,
+  //       valueNumericMilliseconds: vestingPeriodMilliseconds,
+  //     };
 
-      const claimPeriodMilliseconds = formatBigNumberToMilliseconds(claimExtraTimeBN);
-      const { valueString: claimPeriodString, valueNumeric: claimPeriodDays } =
-        getDaysFromDurationMilliseconds(formatBigNumberToMilliseconds(claimExtraTimeBN));
-      const claimPeriod = {
-        valueString: claimPeriodString,
-        valueNumericDays: claimPeriodDays,
-        valueNumericMilliseconds: claimPeriodMilliseconds,
-      };
+  //     const claimPeriodMilliseconds = formatBigNumberToMilliseconds(claimExtraTimeBN);
+  //     const { valueString: claimPeriodString, valueNumeric: claimPeriodDays } =
+  //       getDaysFromDurationMilliseconds(formatBigNumberToMilliseconds(claimExtraTimeBN));
+  //     const claimPeriod = {
+  //       valueString: claimPeriodString,
+  //       valueNumericDays: claimPeriodDays,
+  //       valueNumericMilliseconds: claimPeriodMilliseconds,
+  //     };
 
-      const expiryTimestamp = endTimestamp + claimPeriodMilliseconds;
-      const expiryEnd = {
-        date: timestampToDate(expiryTimestamp),
-        timestamp: expiryTimestamp,
-      };
+  //     const expiryTimestamp = endTimestamp + claimPeriodMilliseconds;
+  //     const expiryEnd = {
+  //       date: timestampToDate(expiryTimestamp),
+  //       timestamp: expiryTimestamp,
+  //     };
 
-      // Format token data
-      const totalAllocated = {
-        valueBN: totalAllocatedBN,
-        valueStringWei: totalAllocatedBN.toString(),
-        valueStringETH: formatBNTokenToString(totalAllocatedBN, tokenData.decimals),
-      };
+  //     // Format token data
+  //     const totalAllocated = {
+  //       valueBN: totalAllocatedBN,
+  //       valueStringWei: totalAllocatedBN.toString(),
+  //       valueStringETH: formatBNTokenToString(totalAllocatedBN, tokenData.decimals),
+  //     };
 
-      const claimedOf = {
-        valueBN: claimedOfBN,
-        valueStringWei: claimedOfBN.toString(),
-        valueStringETH: formatBNTokenToString(claimedOfBN, tokenData.decimals),
-      };
+  //     const claimedOf = {
+  //       valueBN: claimedOfBN,
+  //       valueStringWei: claimedOfBN.toString(),
+  //       valueStringETH: formatBNTokenToString(claimedOfBN, tokenData.decimals),
+  //     };
 
-      const vestedTokensOf = {
-        valueBN: vestedTokensOfBN,
-        valueStringWei: vestedTokensOfBN.toString(),
-        valueStringETH: formatBNTokenToString(vestedTokensOfBN, tokenData.decimals),
-      };
+  //     const vestedTokensOf = {
+  //       valueBN: vestedTokensOfBN,
+  //       valueStringWei: vestedTokensOfBN.toString(),
+  //       valueStringETH: formatBNTokenToString(vestedTokensOfBN, tokenData.decimals),
+  //     };
 
-      const claimable = {
-        valueBN: claimableBN,
-        valueStringWei: claimableBN.toString(),
-        valueStringETH: formatBNTokenToString(claimableBN, tokenData.decimals),
-      };
+  //     const claimable = {
+  //       valueBN: claimableBN,
+  //       valueStringWei: claimableBN.toString(),
+  //       valueStringETH: formatBNTokenToString(claimableBN, tokenData.decimals),
+  //     };
 
-      const extraTokensOf = {
-        valueBN: extraTokensOfBN,
-        valueStringWei: extraTokensOfBN.toString(),
-        valueStringETH: formatBNTokenToString(extraTokensOfBN, tokenData.decimals),
-      };
+  //     const extraTokensOf = {
+  //       valueBN: extraTokensOfBN,
+  //       valueStringWei: extraTokensOfBN.toString(),
+  //       valueStringETH: formatBNTokenToString(extraTokensOfBN, tokenData.decimals),
+  //     };
 
-      const totalAllocatedOf = {
-        valueBN: totalAllocatedOfBN,
-        valueStringWei: totalAllocatedOfBN.toString(),
-        valueStringETH: formatBNTokenToString(totalAllocatedOfBN, tokenData.decimals),
-      };
+  //     const totalAllocatedOf = {
+  //       valueBN: totalAllocatedOfBN,
+  //       valueStringWei: totalAllocatedOfBN.toString(),
+  //       valueStringETH: formatBNTokenToString(totalAllocatedOfBN, tokenData.decimals),
+  //     };
 
-      setClaimdropData({
-        claimdropStart,
-        claimdropEnd,
-        expiryEnd,
-        vestingPeriod,
-        claimPeriod,
-        totalAllocated,
-        claimedOf,
-        vestedTokensOf,
-        claimable,
-        extraTokensOf,
-        totalAllocatedOf,
-      });
+  //     setClaimdropData({
+  //       claimdropStart,
+  //       claimdropEnd,
+  //       expiryEnd,
+  //       vestingPeriod,
+  //       claimPeriod,
+  //       totalAllocated,
+  //       claimedOf,
+  //       vestedTokensOf,
+  //       claimable,
+  //       extraTokensOf,
+  //       totalAllocatedOf,
+  //     });
 
-      // Determine state
-      const nowTimeStamp = Date.now();
-      const vestingEndTimeStamp = claimdropStart.timestamp + vestingPeriod.valueNumericMilliseconds;
-      const claimingEndTimeStamp = vestingEndTimeStamp + claimPeriod.valueNumericMilliseconds;
+  //     // Determine state
+  //     const nowTimeStamp = Date.now();
+  //     const vestingEndTimeStamp = claimdropStart.timestamp + vestingPeriod.valueNumericMilliseconds;
+  //     const claimingEndTimeStamp = vestingEndTimeStamp + claimPeriod.valueNumericMilliseconds;
 
-      const notStarted = nowTimeStamp < claimdropStart.timestamp;
-      const vesting =
-        nowTimeStamp >= claimdropStart.timestamp && nowTimeStamp < vestingEndTimeStamp;
-      const postVesting =
-        nowTimeStamp >= vestingEndTimeStamp && nowTimeStamp < claimingEndTimeStamp;
-      const ended = nowTimeStamp > claimingEndTimeStamp;
+  //     const notStarted = nowTimeStamp < claimdropStart.timestamp;
+  //     const vesting =
+  //       nowTimeStamp >= claimdropStart.timestamp && nowTimeStamp < vestingEndTimeStamp;
+  //     const postVesting =
+  //       nowTimeStamp >= vestingEndTimeStamp && nowTimeStamp < claimingEndTimeStamp;
+  //     const ended = nowTimeStamp > claimingEndTimeStamp;
 
-      if (notStarted) {
-        setClaimdropState(CLAIMDROP_STATE.NOT_STARTED);
-      }
+  //     if (notStarted) {
+  //       setClaimdropState(CLAIMDROP_STATE.NOT_STARTED);
+  //     }
 
-      if (vesting) {
-        setClaimdropState(CLAIMDROP_STATE.VESTING);
-      }
+  //     if (vesting) {
+  //       setClaimdropState(CLAIMDROP_STATE.VESTING);
+  //     }
 
-      if (postVesting) {
-        setClaimdropState(CLAIMDROP_STATE.POST_VESTING);
-      }
+  //     if (postVesting) {
+  //       setClaimdropState(CLAIMDROP_STATE.POST_VESTING);
+  //     }
 
-      if (ended) {
-        setClaimdropState(CLAIMDROP_STATE.ENDED);
-      }
-    } catch (e) {
-      console.error('Error on fetching contract data:', e);
-      setContractDataError(true);
-    } finally {
-      setLoadingContractData(false);
-    }
-  }, [userId, tokenData.decimals, claimDropContract]);
+  //     if (ended) {
+  //       setClaimdropState(CLAIMDROP_STATE.ENDED);
+  //     }
+  //   } catch (e) {
+  //     console.error('Error on fetching contract data:', e);
+  //     setContractDataError(true);
+  //   } finally {
+  //     setLoadingContractData(false);
+  //   }
+  // }, [userId, tokenData.decimals, claimDropContract]);
 
   const getContractDataFound = useCallback(async () => {
     const formatBNTokenToString = (numberToFormat: ethers.BigNumber, decimals = 8) =>
