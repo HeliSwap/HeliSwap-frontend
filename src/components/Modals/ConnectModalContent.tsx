@@ -6,7 +6,8 @@ import Icon from '../Icon';
 
 interface IConnectModalContentProps {
   closeModal: () => void;
-  connectWallet: () => void;
+  connectHashpackWallet: () => void;
+  connectBladeWallet: () => void;
   modalTitle: string;
   isLoading: boolean;
   extensionFound: boolean;
@@ -14,7 +15,8 @@ interface IConnectModalContentProps {
 
 const ConnectModalContent = ({
   closeModal,
-  connectWallet,
+  connectHashpackWallet,
+  connectBladeWallet,
   modalTitle,
   isLoading,
   extensionFound,
@@ -23,9 +25,18 @@ const ConnectModalContent = ({
   const { connection } = contextValue;
   const { hashconnectConnectorInstance } = connection;
 
-  const handleConnectButtonClick = () => {
+  const handleHashpackConnectButtonClick = () => {
     if (extensionFound) {
-      connectWallet();
+      connectHashpackWallet();
+    } else {
+      const newWindow = window.open('https://www.hashpack.app/', '_blank', 'noopener,noreferrer');
+      if (newWindow) newWindow.opener = null;
+    }
+  };
+
+  const handleBladeConnectButtonClick = () => {
+    if (extensionFound) {
+      connectBladeWallet();
     } else {
       const newWindow = window.open('https://www.hashpack.app/', '_blank', 'noopener,noreferrer');
       if (newWindow) newWindow.opener = null;
@@ -33,7 +44,6 @@ const ConnectModalContent = ({
   };
 
   const handleCopyButtonClick = () => {
-    console.log('hashconnectConnectorInstance', hashconnectConnectorInstance);
     navigator.clipboard.writeText(hashconnectConnectorInstance.pairingString);
   };
 
@@ -66,8 +76,8 @@ const ConnectModalContent = ({
           </>
         ) : (
           <>
-            <p className="text-small text-bold mt-4 mb-4">Connect With Hashpack Extension</p>
-            <div onClick={handleConnectButtonClick} className="btn-connect-wallet">
+            <p className="text-small text-bold mt-4 mb-4">Connect with:</p>
+            <div onClick={handleHashpackConnectButtonClick} className="btn-connect-wallet">
               <div>
                 <p className="text-main">Hashpack</p>
                 {!extensionFound ? (
@@ -76,6 +86,14 @@ const ConnectModalContent = ({
               </div>
               <span className="icon-hashpack"></span>
             </div>
+
+            <div onClick={handleBladeConnectButtonClick} className="btn-connect-wallet mt-3">
+              <div>
+                <p className="text-main">Blade wallet</p>
+              </div>
+              <span className="icon-hashpack"></span>
+            </div>
+
             {hashconnectConnectorInstance && hashconnectConnectorInstance ? (
               <>
                 <p className="text-small text-bold mt-4 mb-4">Connect With Code</p>

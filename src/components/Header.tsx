@@ -19,7 +19,8 @@ const Header = () => {
 
   const {
     connected,
-    connectWallet,
+    connectHashpackWallet,
+    connectBladeWallet,
     disconnectWallet,
     extensionFound,
     isHashpackLoading,
@@ -178,7 +179,8 @@ const Header = () => {
             <ConnectModalContent
               modalTitle="Connect wallet"
               closeModal={() => setShowConnectModal(false)}
-              connectWallet={connectWallet}
+              connectHashpackWallet={connectHashpackWallet}
+              connectBladeWallet={connectBladeWallet}
               isLoading={isHashpackLoading}
               extensionFound={extensionFound}
             />
