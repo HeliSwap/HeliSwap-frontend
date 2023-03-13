@@ -129,3 +129,8 @@ export enum INITIAL_CHART_LABELS {
 }
 
 export const C14URL = 'https://pay.c14.money/';
+
+export const farmsToExclude = [
+  '0x00000000000000000000000000000000001eDB9E',
+  '0x000000000000000000000000000000000014371C',
+];
