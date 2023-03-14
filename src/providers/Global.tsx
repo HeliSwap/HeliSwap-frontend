@@ -76,11 +76,11 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
   };
 
   const connectBladeWallet = async () => {
-    const signer = await bladeConnectorInstance?.initBlade();
-    console.log('signer', signer);
+    await bladeConnectorInstance?.connect();
   };
 
   const disconnectWallet = () => {
+    bladeConnectorInstance?.signer.killSession();
     hashconnectConnectorInstance?.clearPairings();
     setUserId('');
   };
@@ -124,7 +124,13 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
 
     const initBladeConnector = async () => {
       const bladeConnectorInstance = new BladeConnect(setConnected, setUserId);
-      await bladeConnectorInstance.initBlade();
+      const sessionFromLS = localStorage.getItem('wc@2:client:0.3//session');
+
+      if (sessionFromLS && JSON.parse(sessionFromLS).length > 0) {
+        const session = JSON.parse(sessionFromLS);
+        await bladeConnectorInstance.connect();
+      }
+
       setBladeConnectorInstance(bladeConnectorInstance);
     };
 

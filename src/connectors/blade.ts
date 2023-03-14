@@ -8,14 +8,14 @@ class BladeConnect {
   setUserId: (userId: string) => void;
 
   constructor(setConnected: (loading: boolean) => void, setUserId: (userId: string) => void) {
-    this.signer = {} as BladeSigner;
+    const bladeSigner = new BladeSigner();
+
+    this.signer = bladeSigner;
     this.setConnected = setConnected;
     this.setUserId = setUserId;
   }
 
-  async initBlade() {
-    const bladeSigner = new BladeSigner();
-
+  async connect() {
     const params = {
       network: process.env.REACT_APP_NETWORK_TYPE as HederaNetwork,
       // dAppCode - optional while testing, request specific one by contacting us.
@@ -23,11 +23,9 @@ class BladeConnect {
     };
 
     // create session with optional parameters.
-    await bladeSigner.createSession(params);
-
-    this.signer = bladeSigner;
+    await this.signer.createSession(params);
     this.setConnected(true);
-    this.setUserId(bladeSigner.getAccountId().toString());
+    this.setUserId(this.signer.getAccountId().toString());
   }
 
   async sendTransaction(transaction: Transaction) {
