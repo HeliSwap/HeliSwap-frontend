@@ -134,3 +134,12 @@ export const farmsToExclude = [
   '0x00000000000000000000000000000000001eDB9E',
   '0x000000000000000000000000000000000014371C',
 ];
+
+export const tokenWeights: { [key: string]: number } = {
+  HBAR: 1000,
+  HELI: 100,
+  'OM[hts]': 99,
+  HBARX: 98,
+  USDC: 97,
+  'USDC[hts]': 96,
+};

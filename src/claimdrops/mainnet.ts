@@ -56,7 +56,7 @@ const data = [
     },
     token: '0x00000000000000000000000000000000001d90C9',
     claimdropAddress: '0x00000000000000000000000000000000001ec642',
-    title: 'HELI',
+    title: 'Lockdrop',
     claimdropTitle: 'Lockdrop Claimdrop',
     claimdropDescription:
       'If you participated in the Community Lockdrop, the HeliSwap Team would like to thank you for your trust and commitment to the platform. This is why we decided to give you extra HELI tokens that symbolize the importance of the community to us. Welcome to HELI ! Enjoy the ride!',
