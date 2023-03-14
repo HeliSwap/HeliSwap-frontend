@@ -12,7 +12,7 @@ import {
   requestIdFromAddress,
 } from '../../utils/tokenUtils';
 
-import { ASYNC_SEARCH_THRESHOLD, HASHSCAN_ROOT_DOMAIN } from '../../constants';
+import { ASYNC_SEARCH_THRESHOLD, HASHSCAN_ROOT_DOMAIN, tokenWeights } from '../../constants';
 
 import IconToken from '../IconToken';
 import Button from '../Button';
@@ -191,7 +191,18 @@ const ModalSearchContent = ({
     }
 
     if (searchInputValue === '' && tokenDataList) {
-      setTokenList(tokenDataList);
+      // Using wights in order to have some custom token sorting
+      const weightedTokenData = tokenDataList.map(token => {
+        const weight = tokenWeights[token.symbol] ? tokenWeights[token.symbol] : 0;
+
+        return {
+          ...token,
+          weight,
+        };
+      });
+
+      const sortedTokenData = weightedTokenData.sort((a, b) => b.weight - a.weight);
+      setTokenList(sortedTokenData);
     }
 
     const searchAddressExluded = isAddress && searchInputValue.trim() === itemToExlude?.address;

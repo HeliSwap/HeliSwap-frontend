@@ -11,6 +11,7 @@ export interface ITokenData {
   hasFees?: boolean;
   isHTS?: boolean;
   maxSupply?: string;
+  weight?: number;
 }
 
 export interface ITokenDataAnalytics extends ITokenData {
