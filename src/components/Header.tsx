@@ -12,11 +12,10 @@ import { formatHBARStringToPrice, formatStringETHtoPriceFormatted } from '../uti
 
 import { BALLANCE_FETCH_INTERVAL, useQueryOptionsProvideSwapRemove } from '../constants';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
-import { getTokenPrice } from '../utils/tokenUtils';
 
 const Header = () => {
   const contextValue = useContext(GlobalContext);
-  const { hbarPrice, tokensWhitelisted } = contextValue;
+  const { hbarPrice } = contextValue;
 
   const {
     connected,
@@ -29,19 +28,24 @@ const Header = () => {
     setShowConnectModal,
   } = contextValue.connection;
 
-  const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
+  const poolTokens = [
+    process.env.REACT_APP_HELI_TOKEN_ADDRESS as string,
+    process.env.REACT_APP_WHBAR_ADDRESS as string,
+  ];
 
   const { poolsByTokenList: pools, processingPools: loadingPools } = usePoolsByTokensList(
     useQueryOptionsProvideSwapRemove,
     true,
-    tokensWhitelistedAddresses,
+    poolTokens,
   );
 
-  const heliPrice = getTokenPrice(
-    pools,
-    process.env.REACT_APP_HELI_TOKEN_ADDRESS as string,
-    hbarPrice,
-  );
+  let heliPrice = 0;
+
+  if (pools && pools.length > 0) {
+    const { token0AmountFormatted, token1AmountFormatted } = pools[0];
+    const heliForHbar = Number(token1AmountFormatted) / Number(token0AmountFormatted);
+    heliPrice = heliForHbar * hbarPrice;
+  }
 
   const [showUserAccountModal, setShowUserAccountModal] = useState(false);
   const [userBalance, setUserBalance] = useState('0.0');
