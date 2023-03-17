@@ -9,13 +9,18 @@ const useHeliPrice = () => {
   const getHeliPrice = useCallback(async () => {
     setLoading(true);
 
-    const url = 'https://heliswap-api.ey.r.appspot.com/tokens/heli/';
+    const url = 'https://heliswap-api.ey.r.appspot.com/tokens/heli';
 
     try {
       const response = await axios.get(url);
-      console.log('response', response);
+      const { status, data } = response;
 
-      setHeliPrice(0);
+      if (status === 200) {
+        const { price } = data;
+        setHeliPrice(price);
+      } else {
+        setHeliPrice(0);
+      }
     } catch (e) {
       console.error(e);
       setHeliPrice(0);
