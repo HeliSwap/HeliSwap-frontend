@@ -9,7 +9,7 @@ import { ITokenListData } from '../interfaces/tokens';
 import useHealthCheck from '../hooks/useHealthCheck';
 import useTokensWhitelisted from '../hooks/useTokensWhitelisted';
 import useHbarPrice from '../hooks/useHbarPrice';
-
+import useHeliPrice from '../hooks/useHeliPrice';
 import SDK from '../sdk/sdk';
 
 import { HEALTH_CHECK_INTERVAL } from '../constants';
@@ -34,6 +34,7 @@ const contextInitialValue = {
   isRunning: false,
   lastUpdated: '',
   hbarPrice: 0,
+  heliPrice: 0,
 };
 
 export const GlobalContext = React.createContext(contextInitialValue);
@@ -63,6 +64,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
   const { tokens: tokensWhitelisted } = useTokensWhitelisted();
 
   const { hbarPrice } = useHbarPrice();
+  const { heliPrice } = useHeliPrice();
 
   const lastUpdated = new Date(Number(timestamp) * 1000).toString();
 
@@ -111,6 +113,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
     lastUpdated,
     tokensWhitelisted,
     hbarPrice,
+    heliPrice,
     provider,
   };
 

@@ -10,12 +10,11 @@ import UserAccountModalContent from './Modals/UserAccountModalContent';
 
 import { formatHBARStringToPrice, formatStringETHtoPriceFormatted } from '../utils/numberUtils';
 
-import { BALLANCE_FETCH_INTERVAL, useQueryOptionsProvideSwapRemove } from '../constants';
-import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
+import { BALLANCE_FETCH_INTERVAL } from '../constants';
 
 const Header = () => {
   const contextValue = useContext(GlobalContext);
-  const { hbarPrice } = contextValue;
+  const { hbarPrice, heliPrice } = contextValue;
 
   const {
     connected,
@@ -28,33 +27,6 @@ const Header = () => {
     showConnectModal,
     setShowConnectModal,
   } = contextValue.connection;
-
-  const poolTokens = [
-    process.env.REACT_APP_HELI_TOKEN_ADDRESS as string,
-    process.env.REACT_APP_WHBAR_ADDRESS as string,
-  ];
-
-  const { poolsByTokenList: pools, processingPools: loadingPools } = usePoolsByTokensList(
-    useQueryOptionsProvideSwapRemove,
-    true,
-    poolTokens,
-  );
-
-  let heliPrice = 0;
-
-  if (pools && pools.length > 0) {
-    const { token0AmountFormatted, token1AmountFormatted, token0 } = pools[0];
-    const hbarTokenAmount =
-      token0 === process.env.REACT_APP_WHBAR_ADDRESS
-        ? token0AmountFormatted
-        : token1AmountFormatted;
-    const heliTokenAmount =
-      token0 === process.env.REACT_APP_HELI_TOKEN_ADDRESS
-        ? token0AmountFormatted
-        : token1AmountFormatted;
-    const heliForHbar = Number(heliTokenAmount) / Number(hbarTokenAmount);
-    heliPrice = hbarPrice / heliForHbar;
-  }
 
   const [showUserAccountModal, setShowUserAccountModal] = useState(false);
   const [userBalance, setUserBalance] = useState('0.0');
@@ -132,13 +104,9 @@ const Header = () => {
           </div>
           <p className="text-small">
             HELI Price:{' '}
-            {loadingPools ? (
-              <span>Loading...</span>
-            ) : (
-              <span className="text-numeric">
-                ${formatStringETHtoPriceFormatted(heliPrice.toString(), 5)}
-              </span>
-            )}
+            <span className="text-numeric">
+              ${formatStringETHtoPriceFormatted(heliPrice.toString(), 5)}
+            </span>
           </p>
           <span className="separator-header d-none d-sm-block"></span>
           <p className="text-small mt-2 mt-sm-0 me-md-5">
