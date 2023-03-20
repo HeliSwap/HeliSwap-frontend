@@ -176,8 +176,8 @@ const data = [
     },
     token: '0x00000000000000000000000000000000001d90C9',
     claimdropAddress: '0x00000000000000000000000000000000001f0ea2',
-    title: 'OM on HeliSwap Claimdrop',
-    claimdropTitle: 'OM on HeliSwap Claimdrop',
+    title: 'MANTRA appreciation Claimdrop #1',
+    claimdropTitle: 'MANTRA appreciation Claimdrop #1 - OM on HeliSwap',
     claimdropDescription:
       'Dear community, the long awaited Claimdrop for everyone that provided OM on HeliSwap is now live! To show a token of appreciation to the MANTRA community, we are rewarding you if you have provided OM in the OM <> USDC and OM <> HBAR pools.',
   },
