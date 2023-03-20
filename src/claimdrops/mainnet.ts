@@ -121,6 +121,66 @@ const data = [
     claimdropDescription:
       'If you are one of our early supporters, we definitely want to say a big thank you! Without you, there would not be deep liquidity for the various pools and other community members would not be able to swap their favourite tokens. This is why (apart from providing you with amazing APRs on our Yield Farming Campaigns) we also want to give you a Claimdrop that is dedicated to all early supporters. We have taken several snapshots throughout the early stages of the DEX, so if you provided liquidity when we took the snapshots, you are eligible for this Claimdrop. Thank you for your continuous support! The HeliSwap Team',
   },
+  {
+    claimdropStart: {
+      date: '20 March 2023',
+      timestamp: 1679301816000,
+    },
+    claimdropEnd: {
+      date: '20 July 2023',
+      timestamp: 1689811816000,
+    },
+    expiryEnd: {
+      date: '18 September 2023',
+      timestamp: 1695067816000,
+    },
+    vestingPeriod: {
+      valueString: '121 Days',
+      valueNumericDays: 121,
+      valueNumericMilliseconds: 10510000000,
+    },
+    claimPeriod: {
+      valueString: '60 Days',
+      valueNumericDays: 60,
+      valueNumericMilliseconds: 5256000000,
+    },
+    totalAllocated: {
+      valueBN: ethers.BigNumber.from('39919200000000'),
+      valueStringWei: '39919200000000',
+      valueStringETH: '399192.0',
+    },
+    claimedOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    vestedTokensOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    claimable: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    extraTokensOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    totalAllocatedOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    token: '0x00000000000000000000000000000000001d90C9',
+    claimdropAddress: '0x00000000000000000000000000000000001f0ea2',
+    title: 'OM on HeliSwap Claimdrop',
+    claimdropTitle: 'OM on HeliSwap Claimdrop',
+    claimdropDescription:
+      'Dear community, the long awaited Claimdrop for everyone that provided OM on HeliSwap is now live! To show a token of appreciation to the MANTRA community, we are rewarding you if you have provided OM in the OM <> USDC and OM <> HBAR pools.',
+  },
 ];
 
 export default data;
