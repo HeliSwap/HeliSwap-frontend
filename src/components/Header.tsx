@@ -86,6 +86,41 @@ const Header = () => {
     <div className="container-header p-3 p-md-5">
       <div className="d-flex justify-content-between justify-content-md-end align-items-center">
         <div className="d-sm-flex align-items-center">
+          <div className="d-none d-xl-flex align-items-center">
+            <a
+              className="link mx-4"
+              href="https://www.heliswap.io/ecosystem"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Our Ecosystem
+            </a>
+            <a
+              className="link mx-4"
+              href="https://www.heliswap.io/community"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Community
+            </a>
+            <a
+              className="link mx-4"
+              href="https://www.heliswap.io/academy"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Academy
+            </a>
+            <a
+              className="link ms-4"
+              href="https://www.heliswap.io/news"
+              target="_blank"
+              rel="noreferrer"
+            >
+              News
+            </a>
+            <span className="separator-header d-none d-sm-block"></span>
+          </div>
           <p className="text-small">
             HELI Price:{' '}
             {loadingPools ? (
