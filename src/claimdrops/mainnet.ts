@@ -179,7 +179,67 @@ const data = [
     title: 'MANTRA appreciation Claimdrop #1',
     claimdropTitle: 'MANTRA appreciation Claimdrop #1 - OM on HeliSwap',
     claimdropDescription:
-      'Dear community, the long awaited Claimdrop for everyone that provided OM on HeliSwap is now live! To show a token of appreciation to the MANTRA community, we are rewarding you if you have provided OM in the OM <> USDC and OM <> HBAR pools.',
+      'Dear community, the long awaited Claimdrop for everyone that provided more than 50 USD worth of OM on average on HeliSwap is now live! To show a token of appreciation to the MANTRA community, we are rewarding you if you have provided OM in the OM <> USDC and OM <> HBAR pools.',
+  },
+  {
+    claimdropStart: {
+      date: '22 March 2023',
+      timestamp: 1679476306000,
+    },
+    claimdropEnd: {
+      date: '22 July 2023',
+      timestamp: 1689986306000,
+    },
+    expiryEnd: {
+      date: '20 September 2023',
+      timestamp: 1695242306000,
+    },
+    vestingPeriod: {
+      valueString: '121 Days',
+      valueNumericDays: 121,
+      valueNumericMilliseconds: 10510000000,
+    },
+    claimPeriod: {
+      valueString: '60 Days',
+      valueNumericDays: 60,
+      valueNumericMilliseconds: 5256000000,
+    },
+    totalAllocated: {
+      valueBN: ethers.BigNumber.from('89213300802755'),
+      valueStringWei: '89213300802755',
+      valueStringETH: '892133.00802755',
+    },
+    claimedOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    vestedTokensOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    claimable: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    extraTokensOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    totalAllocatedOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    token: '0x00000000000000000000000000000000001d90C9',
+    claimdropAddress: '0x00000000000000000000000000000000001fbf9e',
+    title: 'Heli Dazzle Duck NFT Claimdrop',
+    claimdropTitle: 'Heli Dazzle Duck NFT Claimdrop',
+    claimdropDescription:
+      'Dear HeliSwap and NFT community, as part of our Launch Claimdrop series we are giving out a Claimdrop to all Heli Dazzle Duck holders that held this cute duck in their wallet on 20 March 2023. This is to show some love towards the NFT community on Hedera and a thank you to all our early supporters that actively follow our announcements and claimed these ducks.',
   },
 ];
 
