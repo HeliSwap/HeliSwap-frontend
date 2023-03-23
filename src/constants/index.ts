@@ -128,8 +128,18 @@ export enum INITIAL_CHART_LABELS {
   VOLUME_BAR_CHART = 'Volume 24H',
 }
 
-export const C14URL =
-  'https://pay.c14.money/?targetAssetId=d9b45743-e712-4088-8a31-65ee6f371022&targetAssetIdLock=true';
+export const C14BaseURL = 'https://pay.c14.money/?targetAssetIdLock=true&targetAssetId=';
+
+interface IC14AssetIds {
+  [key: string]: string;
+}
+
+export const C14AssetIds: IC14AssetIds = {
+  HBAR: 'd9b45743-e712-4088-8a31-65ee6f371022',
+  USDC: 'b0694345-1eb4-4bc4-b340-f389a58ee4f3',
+};
+
+export const C14BaseDefaultAsset = 'HBAR';
 
 export const farmsToExclude = [
   '0x00000000000000000000000000000000001eDB9E',
