@@ -128,7 +128,8 @@ export enum INITIAL_CHART_LABELS {
   VOLUME_BAR_CHART = 'Volume 24H',
 }
 
-export const C14URL = 'https://pay.c14.money/';
+export const C14URL =
+  'https://pay.c14.money/?targetAssetId=d9b45743-e712-4088-8a31-65ee6f371022&targetAssetIdLock=true';
 
 export const farmsToExclude = [
   '0x00000000000000000000000000000000001eDB9E',
