@@ -38,12 +38,12 @@ const navigation = [
     color: 'gray',
     text: 'Analytics',
   },
-  // {
-  //   link: '/buy-crypto',
-  //   name: 'c14',
-  //   color: 'gray',
-  //   text: 'Buy crypto',
-  // },
+  {
+    link: '/buy-crypto',
+    name: 'c14',
+    color: 'gray',
+    text: 'Buy crypto with Fiat',
+  },
 ];
 
 const Navigation = () => {
