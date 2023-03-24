@@ -33,17 +33,17 @@ const navigation = [
     text: 'Farms',
   },
   {
+    link: '/buy-crypto',
+    name: 'c14',
+    color: 'gray',
+    text: 'Buy crypto with Fiat',
+  },
+  {
     link: '/analytics',
     name: 'analytics',
     color: 'gray',
     text: 'Analytics',
   },
-  // {
-  //   link: '/buy-crypto',
-  //   name: 'c14',
-  //   color: 'gray',
-  //   text: 'Buy crypto',
-  // },
 ];
 
 const Navigation = () => {
