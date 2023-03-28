@@ -61,7 +61,7 @@ const FarmActions = ({
 }: IFarmActionsProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
-  const { userId, hashconnectConnectorInstance } = connection;
+  const { userId, connectorInstance } = connection;
 
   const maxLpInputValue = formatStringWeiToStringEther(farmData.poolData?.lpShares as string);
 
@@ -111,7 +111,7 @@ const FarmActions = ({
     setLoadingStake(true);
     try {
       const receipt = await sdk.stakeLP(
-        hashconnectConnectorInstance,
+        connectorInstance,
         lpInputValue as string,
         farmData.address,
         userId,
@@ -139,7 +139,7 @@ const FarmActions = ({
     setLoadingExit(true);
 
     try {
-      const receipt = await sdk.exit(hashconnectConnectorInstance, farmData.address, userId);
+      const receipt = await sdk.exit(connectorInstance, farmData.address, userId);
       const {
         response: { success, error },
       } = receipt;
@@ -166,7 +166,7 @@ const FarmActions = ({
 
     try {
       const receipt = await sdk.approveToken(
-        hashconnectConnectorInstance,
+        connectorInstance,
         amount,
         userId,
         lpTokenId,

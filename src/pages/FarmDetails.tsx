@@ -47,13 +47,8 @@ import { useQueryOptions, useQueryOptionsPoolsFarms } from '../constants';
 const FarmDetails = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk, tokensWhitelisted } = contextValue;
-  const {
-    userId,
-    hashconnectConnectorInstance,
-    isHashpackLoading,
-    setShowConnectModal,
-    connected,
-  } = connection;
+  const { userId, connectorInstance, isHashpackLoading, setShowConnectModal, connected } =
+    connection;
 
   const navigate = useNavigate();
   const { campaignAddress } = useParams();
@@ -102,11 +97,7 @@ const FarmDetails = () => {
   const handleHarvestConfirm = async () => {
     setLoadingHarvest(true);
     try {
-      const receipt = await sdk.collectRewards(
-        hashconnectConnectorInstance,
-        farmData.address,
-        userId,
-      );
+      const receipt = await sdk.collectRewards(connectorInstance, farmData.address, userId);
       const {
         response: { success, error },
       } = receipt;
@@ -129,11 +120,7 @@ const FarmDetails = () => {
     setLoadingAssociate(true);
 
     try {
-      const receipt = await sdk.associateToken(
-        hashconnectConnectorInstance,
-        userId,
-        token.hederaId,
-      );
+      const receipt = await sdk.associateToken(connectorInstance, userId, token.hederaId);
       const {
         response: { success, error },
       } = receipt;

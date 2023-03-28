@@ -25,7 +25,7 @@ const contextInitialValue = {
     connectHashpackWallet: () => {},
     connectBladeWallet: () => {},
     disconnectWallet: () => {},
-    hashconnectConnectorInstance: {} as Hashconnect,
+    connectorInstance: {} as any,
     showConnectModal: false,
     setShowConnectModal: (show: boolean) => {},
   },
@@ -49,6 +49,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
   const [extensionFound, setExtensionFound] = useState(false);
   const [hashconnectConnectorInstance, setHashconnectConnectorInstance] = useState<Hashconnect>();
   const [bladeConnectorInstance, setBladeConnectorInstance] = useState<BladeConnect>();
+  const [connectorInstance, setConnectorInstance] = useState<BladeConnect | Hashconnect>();
   const [userId, setUserId] = useState('');
   const [showConnectModal, setShowConnectModal] = useState(false);
 
@@ -93,7 +94,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
     connectHashpackWallet,
     connectBladeWallet,
     disconnectWallet,
-    hashconnectConnectorInstance: hashconnectConnectorInstance || ({} as Hashconnect),
+    connectorInstance,
     showConnectModal,
     setShowConnectModal,
   };
@@ -120,6 +121,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
 
       await hashconnectConnector.initHashconnect();
       setHashconnectConnectorInstance(hashconnectConnector);
+      setConnectorInstance(hashconnectConnector);
     };
 
     const initBladeConnector = async () => {
@@ -127,11 +129,12 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
       const sessionFromLS = localStorage.getItem('wc@2:client:0.3//session');
 
       if (sessionFromLS && JSON.parse(sessionFromLS).length > 0) {
-        const session = JSON.parse(sessionFromLS);
+        // const session = JSON.parse(sessionFromLS);
         await bladeConnectorInstance.connect();
       }
 
       setBladeConnectorInstance(bladeConnectorInstance);
+      setConnectorInstance(bladeConnectorInstance);
     };
 
     initHashconnectConnector();

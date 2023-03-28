@@ -23,7 +23,7 @@ const ConnectModalContent = ({
 }: IConnectModalContentProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection } = contextValue;
-  const { hashconnectConnectorInstance } = connection;
+  const { connectorInstance } = connection;
 
   const handleHashpackConnectButtonClick = () => {
     if (extensionFound) {
@@ -44,7 +44,7 @@ const ConnectModalContent = ({
   };
 
   const handleCopyButtonClick = () => {
-    navigator.clipboard.writeText(hashconnectConnectorInstance.pairingString);
+    // navigator.clipboard.writeText(connectorInstance.pairingString);
   };
 
   return (
@@ -94,7 +94,7 @@ const ConnectModalContent = ({
               <span className="icon-hashpack"></span>
             </div>
 
-            {hashconnectConnectorInstance && hashconnectConnectorInstance ? (
+            {connectorInstance && connectorInstance ? (
               <>
                 <p className="text-small text-bold mt-4 mb-4">Connect With Code</p>
                 <div className="d-flex align-items-center" onClick={() => handleCopyButtonClick()}>
@@ -105,11 +105,7 @@ const ConnectModalContent = ({
                 </div>
                 <p className="text-small text-bold mt-4 mb-4">Connect With Code</p>
                 <div className="d-flex justify-content-center">
-                  <QRCodeSVG
-                    size={200}
-                    value={hashconnectConnectorInstance.pairingString}
-                    includeMargin={true}
-                  />
+                  <QRCodeSVG size={200} value={''} includeMargin={true} />
                 </div>
               </>
             ) : null}

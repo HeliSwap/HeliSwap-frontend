@@ -59,7 +59,7 @@ interface IRemoveLiquidityProps {
 const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
-  const { userId, hashconnectConnectorInstance } = connection;
+  const { userId, connectorInstance } = connection;
 
   const maxLpInputValue: string = formatStringWeiToStringEther(pairData?.lpShares as string);
 
@@ -192,7 +192,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
           : removeLpData.tokenInAddress;
 
         responseData = await sdk.removeNativeLiquidity(
-          hashconnectConnectorInstance,
+          connectorInstance,
           userId,
           tokenAddress,
           removeLpData.tokensLpAmount,
@@ -205,7 +205,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
         );
       } else {
         responseData = await sdk.removeLiquidity(
-          hashconnectConnectorInstance,
+          connectorInstance,
           userId,
           removeLpData.tokenInAddress,
           removeLpData.tokenOutAddress,
@@ -253,13 +253,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
     try {
       const lpTokenId = await requestIdFromAddress(pairData.pairAddress);
 
-      const receipt = await sdk.approveToken(
-        hashconnectConnectorInstance,
-        amount,
-        userId,
-        lpTokenId,
-        false,
-      );
+      const receipt = await sdk.approveToken(connectorInstance, amount, userId, lpTokenId, false);
 
       const {
         response: { success, error },
@@ -282,11 +276,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
     setLoadingAssociate(true);
 
     try {
-      const receipt = await sdk.associateToken(
-        hashconnectConnectorInstance,
-        userId,
-        token.hederaId,
-      );
+      const receipt = await sdk.associateToken(connectorInstance, userId, token.hederaId);
       const {
         response: { success, error },
       } = receipt;

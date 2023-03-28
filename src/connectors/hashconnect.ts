@@ -1,4 +1,4 @@
-import { AccountId, Transaction, TransactionId } from '@hashgraph/sdk';
+import { AccountId, Transaction, TransactionId, TransactionReceipt } from '@hashgraph/sdk';
 import { HashConnect, HashConnectTypes, MessageTypes } from 'hashconnect';
 import { randomIntFromInterval } from '../utils/numberUtils';
 
@@ -103,24 +103,32 @@ class Hashconnect {
     this.hashconnect.connectToLocalWallet();
   }
 
-  async sendTransaction(
-    trans: Uint8Array,
-    acctToSign: string,
-    return_trans: boolean = false,
-    hideNfts: boolean = false,
-  ) {
-    const transaction: MessageTypes.Transaction = {
+  async sendTransaction(transaction: Transaction, userId: string) {
+    const transactionBytes = await this.makeBytes(transaction, userId);
+
+    const transactionObj: MessageTypes.Transaction = {
       topic: this.topic,
-      byteArray: trans,
+      byteArray: transactionBytes,
 
       metadata: {
-        accountToSign: acctToSign,
-        returnTransaction: return_trans,
-        hideNft: hideNfts,
+        accountToSign: userId,
+        returnTransaction: false,
+        hideNft: true,
       },
     };
 
-    return await this.hashconnect.sendTransaction(this.topic, transaction);
+    const response = await this.hashconnect.sendTransaction(this.topic, transactionObj);
+
+    let responseData: any = {
+      response,
+      receipt: null,
+    };
+
+    if (response?.success) {
+      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
+    }
+
+    return responseData;
   }
 
   async requestAccountInfo() {

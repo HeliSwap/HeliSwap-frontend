@@ -1,4 +1,10 @@
-import { AccountId, Transaction, TransactionId } from '@hashgraph/sdk';
+import {
+  AccountId,
+  Client,
+  Transaction,
+  TransactionId,
+  TransactionReceiptQuery,
+} from '@hashgraph/sdk';
 import { BladeSigner, HederaNetwork } from '@bladelabs/blade-web3.js';
 import { randomIntFromInterval } from '../utils/numberUtils';
 
@@ -28,8 +34,37 @@ class BladeConnect {
     this.setUserId(this.signer.getAccountId().toString());
   }
 
-  async sendTransaction(transaction: Transaction) {
-    return await this.signer.call(transaction);
+  async sendTransaction(transaction: Transaction, userId: string) {
+    const transactionBytes = await this.freezeTransaction(transaction, userId);
+
+    const response = await this.signer.call(transactionBytes);
+    const { transactionId } = response;
+
+    try {
+      // const receipt = await this.signer.call(new TransactionReceiptQuery({ transactionId }));
+      const client = Client.forTestnet();
+      const receipt = await new TransactionReceiptQuery({
+        transactionId,
+      }).execute(client);
+
+      return {
+        response: {
+          ...response,
+          success: receipt.status.toString() === 'SUCCESS',
+          error: '',
+        },
+        receipt,
+      };
+    } catch (error) {
+      return {
+        response: {
+          ...response,
+          success: false,
+          error,
+        },
+        receipt: null,
+      };
+    }
   }
 
   async freezeTransaction(trans: Transaction, userId: string) {

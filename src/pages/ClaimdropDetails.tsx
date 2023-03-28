@@ -47,8 +47,7 @@ enum CLAIMDROP_STATE {
 const ClaimdropDetails = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
-  const { userId, hashconnectConnectorInstance, setShowConnectModal, isHashpackLoading } =
-    connection;
+  const { userId, connectorInstance, setShowConnectModal, isHashpackLoading } = connection;
 
   const { campaign } = useParams();
   const navigate = useNavigate();
@@ -390,7 +389,7 @@ const ClaimdropDetails = () => {
 
     try {
       const receipt = await sdk.claimLP(
-        hashconnectConnectorInstance,
+        connectorInstance,
         claimDropContractAddress as string,
         userId,
       );
@@ -422,7 +421,7 @@ const ClaimdropDetails = () => {
 
     try {
       const receipt = await sdk.associateToken(
-        hashconnectConnectorInstance,
+        connectorInstance,
         userId,
         addressToId(tokenData.address),
       );
