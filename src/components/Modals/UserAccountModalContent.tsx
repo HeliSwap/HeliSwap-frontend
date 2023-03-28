@@ -47,7 +47,7 @@ const UserAccoutnModalContent = ({
         <div className="border border-secondary rounded p-4">
           <div className="d-flex justify-content-between align-items-start">
             <div>
-              <p className="text-small text-bold">Connected with Hashpack</p>
+              <p className="text-small text-bold">Connected with wallet</p>
               {userId ? (
                 <div className="d-flex align-items-center mt-5">
                   <img

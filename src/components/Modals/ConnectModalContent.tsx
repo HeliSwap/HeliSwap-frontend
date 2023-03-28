@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { GlobalContext } from '../../providers/Global';
 import Loader from '../Loader';
-import Icon from '../Icon';
+// import Icon from '../Icon';
 
 interface IConnectModalContentProps {
   closeModal: () => void;
@@ -43,9 +43,9 @@ const ConnectModalContent = ({
     }
   };
 
-  const handleCopyButtonClick = () => {
-    // navigator.clipboard.writeText(connectorInstance.pairingString);
-  };
+  // const handleCopyButtonClick = () => {
+  //   navigator.clipboard.writeText(connectorInstance.pairingString);
+  // };
 
   return (
     <>
@@ -96,13 +96,13 @@ const ConnectModalContent = ({
 
             {connectorInstance && connectorInstance ? (
               <>
-                <p className="text-small text-bold mt-4 mb-4">Connect With Code</p>
+                {/* <p className="text-small text-bold mt-4 mb-4">Connect With Code</p>
                 <div className="d-flex align-items-center" onClick={() => handleCopyButtonClick()}>
                   <span className="link cursor-pointer">
                     <Icon name="copy" />
                     <span className="text-small ms-2">Copy Pairing Code</span>
                   </span>
-                </div>
+                </div> */}
                 <p className="text-small text-bold mt-4 mb-4">Connect With Code</p>
                 <div className="d-flex justify-content-center">
                   <QRCodeSVG size={200} value={''} includeMargin={true} />
