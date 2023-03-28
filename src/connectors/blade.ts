@@ -42,7 +42,8 @@ class BladeConnect {
 
     try {
       // const receipt = await this.signer.call(new TransactionReceiptQuery({ transactionId }));
-      const client = Client.forTestnet();
+      const networkType = process.env.REACT_APP_NETWORK_TYPE as string;
+      const client = networkType === 'testnet' ? Client.forTestnet() : Client.forMainnet();
       const receipt = await new TransactionReceiptQuery({
         transactionId,
       }).execute(client);
