@@ -38,7 +38,7 @@ const ConnectModalContent = ({
     if (extensionFound) {
       connectBladeWallet();
     } else {
-      const newWindow = window.open('https://www.hashpack.app/', '_blank', 'noopener,noreferrer');
+      const newWindow = window.open('https://www.bladewallet.io/', '_blank', 'noopener,noreferrer');
       if (newWindow) newWindow.opener = null;
     }
   };
@@ -91,7 +91,7 @@ const ConnectModalContent = ({
               <div>
                 <p className="text-main">Blade wallet</p>
               </div>
-              <span className="icon-hashpack"></span>
+              <span className="icon-blade"></span>
             </div>
 
             {connectorInstance && connectorInstance ? (
