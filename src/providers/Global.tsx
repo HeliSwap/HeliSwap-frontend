@@ -151,7 +151,5 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
     setProvider(provider);
   }, []);
 
-  console.log('connectorInstance', connectorInstance);
-
   return <GlobalContext.Provider value={contextValue}>{children}</GlobalContext.Provider>;
 };
