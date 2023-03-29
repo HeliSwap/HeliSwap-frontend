@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import Hashconnect from '../connectors/hashconnect';
 import { ethers } from 'ethers';
-import { HEALTH_CHECK_INTERVAL } from '../constants';
+
+import Hashconnect from '../connectors/hashconnect';
+import BladeConnect from '../connectors/blade';
+
+import { ITokenListData } from '../interfaces/tokens';
+
 import useHealthCheck from '../hooks/useHealthCheck';
 import useTokensWhitelisted from '../hooks/useTokensWhitelisted';
 import useHbarPrice from '../hooks/useHbarPrice';
-import { ITokenListData } from '../interfaces/tokens';
+
 import SDK from '../sdk/sdk';
+
+import { HEALTH_CHECK_INTERVAL } from '../constants';
 
 const contextInitialValue = {
   sdk: {} as SDK,
@@ -16,9 +22,10 @@ const contextInitialValue = {
     connected: false,
     isHashpackLoading: false,
     extensionFound: false,
-    connectWallet: () => {},
+    connectHashpackWallet: () => {},
+    connectBladeWallet: () => {},
     disconnectWallet: () => {},
-    hashconnectConnectorInstance: {} as Hashconnect,
+    connectorInstance: {} as any,
     showConnectModal: false,
     setShowConnectModal: (show: boolean) => {},
   },
@@ -41,6 +48,8 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
   const [isHashpackLoading, setIsHashpackLoading] = useState(false);
   const [extensionFound, setExtensionFound] = useState(false);
   const [hashconnectConnectorInstance, setHashconnectConnectorInstance] = useState<Hashconnect>();
+  const [bladeConnectorInstance, setBladeConnectorInstance] = useState<BladeConnect>();
+  const [connectorInstance, setConnectorInstance] = useState<BladeConnect | Hashconnect>();
   const [userId, setUserId] = useState('');
   const [showConnectModal, setShowConnectModal] = useState(false);
 
@@ -62,14 +71,21 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
       : false
     : false;
 
-  const connectWallet = () => {
+  const connectHashpackWallet = () => {
     hashconnectConnectorInstance?.connectToExtension();
     setIsHashpackLoading(true);
   };
 
+  const connectBladeWallet = async () => {
+    await bladeConnectorInstance?.connect();
+  };
+
   const disconnectWallet = () => {
+    bladeConnectorInstance?.signer.killSession();
     hashconnectConnectorInstance?.clearPairings();
+    localStorage.clear();
     setUserId('');
+    setConnectorInstance(undefined);
   };
 
   const connection = {
@@ -77,12 +93,14 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
     userId,
     isHashpackLoading,
     extensionFound,
-    connectWallet,
+    connectHashpackWallet,
+    connectBladeWallet,
     disconnectWallet,
-    hashconnectConnectorInstance: hashconnectConnectorInstance || ({} as Hashconnect),
+    connectorInstance,
     showConnectModal,
     setShowConnectModal,
   };
+
   const contextValue = {
     sdk,
     connection,
@@ -101,13 +119,31 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
         setUserId,
         setIsHashpackLoading,
         setShowConnectModal,
+        setConnectorInstance,
       );
 
       await hashconnectConnector.initHashconnect();
       setHashconnectConnectorInstance(hashconnectConnector);
     };
 
+    const initBladeConnector = async () => {
+      const bladeConnectorInstance = new BladeConnect(
+        setConnected,
+        setUserId,
+        setConnectorInstance,
+      );
+      const sessionFromLS = localStorage.getItem('wc@2:client:0.3//session');
+
+      if (sessionFromLS && JSON.parse(sessionFromLS).length > 0) {
+        // const session = JSON.parse(sessionFromLS);
+        await bladeConnectorInstance.connect();
+      }
+
+      setBladeConnectorInstance(bladeConnectorInstance);
+    };
+
     initHashconnectConnector();
+    initBladeConnector();
 
     const sdk = new SDK();
     const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER_URL);

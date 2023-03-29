@@ -80,13 +80,8 @@ enum ADD_LIQUIDITY_TITLES {
 const Create = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk, tokensWhitelisted } = contextValue;
-  const {
-    userId,
-    hashconnectConnectorInstance,
-    connected,
-    setShowConnectModal,
-    isHashpackLoading,
-  } = connection;
+  const { userId, connectorInstance, connected, setShowConnectModal, isHashpackLoading } =
+    connection;
 
   const { token0, token1 } = useParams();
   const navigate = useNavigate();
@@ -296,11 +291,7 @@ const Create = () => {
     setLoadingAssociate(true);
 
     try {
-      const receipt = await sdk.associateToken(
-        hashconnectConnectorInstance,
-        userId,
-        token.hederaId,
-      );
+      const receipt = await sdk.associateToken(connectorInstance, userId, token.hederaId);
       const {
         response: { success, error },
       } = receipt;
@@ -335,7 +326,7 @@ const Create = () => {
 
     try {
       const receipt = await sdk.approveToken(
-        hashconnectConnectorInstance,
+        connectorInstance,
         amount,
         userId,
         hederaId,
@@ -374,7 +365,7 @@ const Create = () => {
     try {
       const receipt = provideNative
         ? await sdk.addNativeLiquidity(
-            hashconnectConnectorInstance,
+            connectorInstance,
             userId,
             createPairData,
             provideSlippage,
@@ -383,7 +374,7 @@ const Create = () => {
             typeA === TokenType.HBAR ? typeB : typeA,
           )
         : await sdk.addLiquidity(
-            hashconnectConnectorInstance,
+            connectorInstance,
             userId,
             createPairData,
             provideSlippage,

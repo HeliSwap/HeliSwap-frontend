@@ -53,7 +53,7 @@ const PoolInfo = ({
 }: IPoolInfoProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
-  const { userId, hashconnectConnectorInstance } = connection;
+  const { userId, connectorInstance } = connection;
   const navigate = useNavigate();
 
   const maxLpInputValue: string = formatStringWeiToStringEther(poolData?.lpShares as string);
@@ -112,7 +112,7 @@ const PoolInfo = ({
 
     try {
       const receipt = await sdk.transferERC20(
-        hashconnectConnectorInstance,
+        connectorInstance,
         userId,
         tokenAddress,
         amount,

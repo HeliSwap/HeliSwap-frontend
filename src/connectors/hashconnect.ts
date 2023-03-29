@@ -1,4 +1,4 @@
-import { AccountId, Transaction, TransactionId } from '@hashgraph/sdk';
+import { AccountId, Transaction, TransactionId, TransactionReceipt } from '@hashgraph/sdk';
 import { HashConnect, HashConnectTypes, MessageTypes } from 'hashconnect';
 import { randomIntFromInterval } from '../utils/numberUtils';
 
@@ -22,6 +22,7 @@ class Hashconnect {
   setIsHashpackLoading: (loading: boolean) => void;
   setConnected: (loading: boolean) => void;
   setShowConnectModal: (show: boolean) => void;
+  setConnectorInstance: (instance: Hashconnect) => void;
   transactionResponseReceived: Event;
 
   availableExtensions: HashConnectTypes.WalletMetadata[] = [];
@@ -34,6 +35,7 @@ class Hashconnect {
     setUserId: (userId: string) => void,
     setIsHashpackLoading: (loading: boolean) => void,
     setShowConnectModal: (show: boolean) => void,
+    setConnectorInstance: (instance: Hashconnect) => void,
   ) {
     this.hashconnect = new HashConnect();
     this.setExtensionFound = setExtensionFound;
@@ -42,6 +44,7 @@ class Hashconnect {
     this.setIsHashpackLoading = setIsHashpackLoading;
     this.setShowConnectModal = setShowConnectModal;
     this.transactionResponseReceived = new CustomEvent('transaction-response-received');
+    this.setConnectorInstance = setConnectorInstance;
   }
 
   async initHashconnect() {
@@ -67,6 +70,7 @@ class Hashconnect {
     if (this.pairingData && this.pairingData.accountIds[0]) {
       this.setUserId(this.pairingData.accountIds[0]);
       this.setConnected(true);
+      this.setConnectorInstance(this);
     }
   }
 
@@ -101,26 +105,35 @@ class Hashconnect {
   async connectToExtension() {
     //this will automatically pop up a pairing request in the HashPack extension
     this.hashconnect.connectToLocalWallet();
+    this.setConnectorInstance(this);
   }
 
-  async sendTransaction(
-    trans: Uint8Array,
-    acctToSign: string,
-    return_trans: boolean = false,
-    hideNfts: boolean = false,
-  ) {
-    const transaction: MessageTypes.Transaction = {
+  async sendTransaction(transaction: Transaction, userId: string) {
+    const transactionBytes = await this.makeBytes(transaction, userId);
+
+    const transactionObj: MessageTypes.Transaction = {
       topic: this.topic,
-      byteArray: trans,
+      byteArray: transactionBytes,
 
       metadata: {
-        accountToSign: acctToSign,
-        returnTransaction: return_trans,
-        hideNft: hideNfts,
+        accountToSign: userId,
+        returnTransaction: false,
+        hideNft: true,
       },
     };
 
-    return await this.hashconnect.sendTransaction(this.topic, transaction);
+    const response = await this.hashconnect.sendTransaction(this.topic, transactionObj);
+
+    let responseData: any = {
+      response,
+      receipt: null,
+    };
+
+    if (response?.success) {
+      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
+    }
+
+    return responseData;
   }
 
   async requestAccountInfo() {

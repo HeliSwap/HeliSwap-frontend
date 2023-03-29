@@ -75,13 +75,8 @@ import {
 const Swap = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk, tokensWhitelisted } = contextValue;
-  const {
-    userId,
-    hashconnectConnectorInstance,
-    connected,
-    setShowConnectModal,
-    isHashpackLoading,
-  } = connection;
+  const { userId, connectorInstance, connected, setShowConnectModal, isHashpackLoading } =
+    connection;
 
   const { token0, token1 } = useParams();
 
@@ -409,11 +404,7 @@ const Swap = () => {
     setLoadingAssociate(true);
 
     try {
-      const receipt = await sdk.associateToken(
-        hashconnectConnectorInstance,
-        userId,
-        token.hederaId,
-      );
+      const receipt = await sdk.associateToken(connectorInstance, userId, token.hederaId);
       const {
         response: { success, error },
       } = receipt;
@@ -449,7 +440,7 @@ const Swap = () => {
 
     try {
       const receipt = await sdk.approveToken(
-        hashconnectConnectorInstance,
+        connectorInstance,
         amount,
         userId,
         tokenA.hederaId,
@@ -492,12 +483,12 @@ const Swap = () => {
       let receipt;
 
       if (willWrapTokens) {
-        receipt = await sdk.wrapHBAR(hashconnectConnectorInstance, userId, amountIn);
+        receipt = await sdk.wrapHBAR(connectorInstance, userId, amountIn);
       } else if (willUnwrapTokens) {
-        receipt = await sdk.unwrapHBAR(hashconnectConnectorInstance, userId, amountIn);
+        receipt = await sdk.unwrapHBAR(connectorInstance, userId, amountIn);
       } else {
         receipt = await sdk.swap(
-          hashconnectConnectorInstance,
+          connectorInstance,
           userId,
           amountIn,
           amountOut,
