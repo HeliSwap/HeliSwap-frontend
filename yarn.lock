@@ -2027,24 +2027,6 @@
     protobufjs "^6.11.2"
     utf8 "^3.0.0"
 
-"@hashgraph/sdk@^2.14.2":
-  version "2.16.2"
-  resolved "https://registry.yarnpkg.com/@hashgraph/sdk/-/sdk-2.16.2.tgz#f90e9b24ee214e13c3b73af5a64e28b0a5e744b4"
-  integrity sha512-WCJ46Z2E+8h/3LbBVsiWtgi92+aquCIUJsS+DbNzvHTRtO7vcLiRMA0xLDa2qgcl3rQh1H1pCV80bAW8bn3kVQ==
-  dependencies:
-    "@ethersproject/rlp" "^5.6.0"
-    "@grpc/grpc-js" "^1.6.7"
-    "@hashgraph/cryptography" "^1.3.0"
-    "@hashgraph/proto" "2.5.0"
-    axios "^0.27.2"
-    bignumber.js "^9.0.2"
-    crypto-js "^4.1.1"
-    js-base64 "^3.7.2"
-    js-logger "^1.6.1"
-    long "^4.0.0"
-    protobufjs "^6.11.2"
-    utf8 "^3.0.0"
-
 "@hashgraph/sdk@^2.16.6":
   version "2.16.6"
   resolved "https://registry.yarnpkg.com/@hashgraph/sdk/-/sdk-2.16.6.tgz#379e4ef540a03bab5decf328dd4475b7d93adf1f"
@@ -2067,6 +2049,24 @@
   version "2.22.0"
   resolved "https://registry.yarnpkg.com/@hashgraph/sdk/-/sdk-2.22.0.tgz#48486f81ae7f50b6b3d019e0a7b82910b1965c69"
   integrity sha512-7/uDS7n1W3PPz/dBtGzXjMGHr4NMYvc8M/DiL2JROj3ULU6GI/hhslkcztZ2SB6dgcdS88lu8An2gLWjiJrGHQ==
+  dependencies:
+    "@ethersproject/rlp" "^5.7.0"
+    "@grpc/grpc-js" "^1.7.3"
+    "@hashgraph/cryptography" "^1.4.3"
+    "@hashgraph/proto" "2.12.0"
+    axios "^1.3.1"
+    bignumber.js "^9.1.1"
+    crypto-js "^4.1.1"
+    js-base64 "^3.7.4"
+    js-logger "^1.6.1"
+    long "^4.0.0"
+    protobufjs "^7.1.2"
+    utf8 "^3.0.0"
+
+"@hashgraph/sdk@^2.19.2":
+  version "2.23.0"
+  resolved "https://registry.yarnpkg.com/@hashgraph/sdk/-/sdk-2.23.0.tgz#fa020d275bf061e554fd5b7adb9a1cc44cfa8b46"
+  integrity sha512-P/hv/mz1vmNLvQxtSzE6ptHaqmtDJtmM69FhJPEYf8fBklSPPWnBrA/jYEHm2lNSZwM1HyODEWcNfV+h44iA6w==
   dependencies:
     "@ethersproject/rlp" "^5.7.0"
     "@grpc/grpc-js" "^1.7.3"
@@ -6780,12 +6780,12 @@ hash.js@1.1.7, hash.js@^1.0.0, hash.js@^1.0.3:
     inherits "^2.0.3"
     minimalistic-assert "^1.0.1"
 
-hashconnect@^0.2.3:
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/hashconnect/-/hashconnect-0.2.3.tgz#5cd52f000a6c96481b524e87f65e0449847bbb33"
-  integrity sha512-E3MrJi50GPZYpc9FBtXaPC/4B7azhRTt49JCFK2IUIeqhWf91yr2tkSlNkOI9yeeGdo4uziD1WZ4dz8yZ+XLeA==
+hashconnect@^0.2.4:
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/hashconnect/-/hashconnect-0.2.4.tgz#b15d2c8d2808a6770dd00dd372ac43faa6d4e089"
+  integrity sha512-LPz+gu/8rQT/OEn1Gdcrqb0Mgbbw6cKjRH12Q0AkjJPAE8ks0pTpOi6Rdp6TZ6gzO7xgm8POSAABa13ITD9bLw==
   dependencies:
-    "@hashgraph/sdk" "^2.14.2"
+    "@hashgraph/sdk" "^2.19.2"
     buffer "^6.0.3"
     crypto-es "^1.2.7"
     crypto-js "^4.1.1"

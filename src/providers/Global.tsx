@@ -83,7 +83,9 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
   const disconnectWallet = () => {
     bladeConnectorInstance?.signer.killSession();
     hashconnectConnectorInstance?.clearPairings();
+    localStorage.clear();
     setUserId('');
+    setConnectorInstance(undefined);
   };
 
   const connection = {
@@ -117,15 +119,19 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
         setUserId,
         setIsHashpackLoading,
         setShowConnectModal,
+        setConnectorInstance,
       );
 
       await hashconnectConnector.initHashconnect();
       setHashconnectConnectorInstance(hashconnectConnector);
-      setConnectorInstance(hashconnectConnector);
     };
 
     const initBladeConnector = async () => {
-      const bladeConnectorInstance = new BladeConnect(setConnected, setUserId);
+      const bladeConnectorInstance = new BladeConnect(
+        setConnected,
+        setUserId,
+        setConnectorInstance,
+      );
       const sessionFromLS = localStorage.getItem('wc@2:client:0.3//session');
 
       if (sessionFromLS && JSON.parse(sessionFromLS).length > 0) {
@@ -134,7 +140,6 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
       }
 
       setBladeConnectorInstance(bladeConnectorInstance);
-      setConnectorInstance(bladeConnectorInstance);
     };
 
     initHashconnectConnector();
@@ -145,6 +150,8 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
     setSdk(sdk);
     setProvider(provider);
   }, []);
+
+  console.log('connectorInstance', connectorInstance);
 
   return <GlobalContext.Provider value={contextValue}>{children}</GlobalContext.Provider>;
 };

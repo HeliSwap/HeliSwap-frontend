@@ -12,13 +12,19 @@ class BladeConnect {
   signer: BladeSigner;
   setConnected: (loading: boolean) => void;
   setUserId: (userId: string) => void;
+  setConnectorInstance: (instance: BladeConnect) => void;
 
-  constructor(setConnected: (loading: boolean) => void, setUserId: (userId: string) => void) {
+  constructor(
+    setConnected: (loading: boolean) => void,
+    setUserId: (userId: string) => void,
+    setConnectorInstance: (instance: BladeConnect) => void,
+  ) {
     const bladeSigner = new BladeSigner();
 
     this.signer = bladeSigner;
     this.setConnected = setConnected;
     this.setUserId = setUserId;
+    this.setConnectorInstance = setConnectorInstance;
   }
 
   async connect() {
@@ -32,6 +38,7 @@ class BladeConnect {
     await this.signer.createSession(params);
     this.setConnected(true);
     this.setUserId(this.signer.getAccountId().toString());
+    this.setConnectorInstance(this);
   }
 
   async sendTransaction(transaction: Transaction, userId: string) {
