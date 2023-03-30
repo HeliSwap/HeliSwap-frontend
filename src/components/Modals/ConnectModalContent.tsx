@@ -35,12 +35,12 @@ const ConnectModalContent = ({
   };
 
   const handleBladeConnectButtonClick = () => {
-    if (extensionFound) {
-      connectBladeWallet();
-    } else {
-      const newWindow = window.open('https://www.bladewallet.io/', '_blank', 'noopener,noreferrer');
-      if (newWindow) newWindow.opener = null;
-    }
+    // if (extensionFound) {
+    connectBladeWallet();
+    // } else {
+    //   const newWindow = window.open('https://www.bladewallet.io/', '_blank', 'noopener,noreferrer');
+    //   if (newWindow) newWindow.opener = null;
+    // }
   };
 
   // const handleCopyButtonClick = () => {
