@@ -55,7 +55,7 @@ const LockdropForm = ({
   const lockDropContractAddress = process.env.REACT_APP_LOCKDROP_ADDRESS;
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
-  const { hashconnectConnectorInstance } = connection;
+  const { connectorInstance } = connection;
   const { userId, connected, setShowConnectModal, isHashpackLoading } = connection;
   const navigate = useNavigate();
   const {
@@ -101,7 +101,7 @@ const LockdropForm = ({
 
     try {
       const receipt = await sdk.depositHBAR(
-        hashconnectConnectorInstance,
+        connectorInstance,
         lockDropContractAddress as string,
         userId,
         depositValue,
@@ -130,7 +130,7 @@ const LockdropForm = ({
 
     try {
       const receipt = await sdk.withdrawHBAR(
-        hashconnectConnectorInstance,
+        connectorInstance,
         lockDropContractAddress as string,
         userId,
         withdrawValue,
@@ -159,7 +159,7 @@ const LockdropForm = ({
 
     try {
       const receipt = await sdk.claimLP(
-        hashconnectConnectorInstance,
+        connectorInstance,
         lockDropContractAddress as string,
         userId,
       );

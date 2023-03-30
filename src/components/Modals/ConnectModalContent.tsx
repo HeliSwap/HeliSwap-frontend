@@ -2,11 +2,12 @@ import React, { useContext } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { GlobalContext } from '../../providers/Global';
 import Loader from '../Loader';
-import Icon from '../Icon';
+// import Icon from '../Icon';
 
 interface IConnectModalContentProps {
   closeModal: () => void;
-  connectWallet: () => void;
+  connectHashpackWallet: () => void;
+  connectBladeWallet: () => void;
   modalTitle: string;
   isLoading: boolean;
   extensionFound: boolean;
@@ -14,28 +15,37 @@ interface IConnectModalContentProps {
 
 const ConnectModalContent = ({
   closeModal,
-  connectWallet,
+  connectHashpackWallet,
+  connectBladeWallet,
   modalTitle,
   isLoading,
   extensionFound,
 }: IConnectModalContentProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection } = contextValue;
-  const { hashconnectConnectorInstance } = connection;
+  const { connectorInstance } = connection;
 
-  const handleConnectButtonClick = () => {
+  const handleHashpackConnectButtonClick = () => {
     if (extensionFound) {
-      connectWallet();
+      connectHashpackWallet();
     } else {
       const newWindow = window.open('https://www.hashpack.app/', '_blank', 'noopener,noreferrer');
       if (newWindow) newWindow.opener = null;
     }
   };
 
-  const handleCopyButtonClick = () => {
-    console.log('hashconnectConnectorInstance', hashconnectConnectorInstance);
-    navigator.clipboard.writeText(hashconnectConnectorInstance.pairingString);
+  const handleBladeConnectButtonClick = () => {
+    if (extensionFound) {
+      connectBladeWallet();
+    } else {
+      const newWindow = window.open('https://www.bladewallet.io/', '_blank', 'noopener,noreferrer');
+      if (newWindow) newWindow.opener = null;
+    }
   };
+
+  // const handleCopyButtonClick = () => {
+  //   navigator.clipboard.writeText(connectorInstance.pairingString);
+  // };
 
   return (
     <>
@@ -66,8 +76,8 @@ const ConnectModalContent = ({
           </>
         ) : (
           <>
-            <p className="text-small text-bold mt-4 mb-4">Connect With Hashpack Extension</p>
-            <div onClick={handleConnectButtonClick} className="btn-connect-wallet">
+            <p className="text-small text-bold mt-4 mb-4">Connect with:</p>
+            <div onClick={handleHashpackConnectButtonClick} className="btn-connect-wallet">
               <div>
                 <p className="text-main">Hashpack</p>
                 {!extensionFound ? (
@@ -76,22 +86,26 @@ const ConnectModalContent = ({
               </div>
               <span className="icon-hashpack"></span>
             </div>
-            {hashconnectConnectorInstance && hashconnectConnectorInstance ? (
+
+            <div onClick={handleBladeConnectButtonClick} className="btn-connect-wallet mt-3">
+              <div>
+                <p className="text-main">Blade wallet</p>
+              </div>
+              <span className="icon-blade"></span>
+            </div>
+
+            {connectorInstance && connectorInstance ? (
               <>
-                <p className="text-small text-bold mt-4 mb-4">Connect With Code</p>
+                {/* <p className="text-small text-bold mt-4 mb-4">Connect With Code</p>
                 <div className="d-flex align-items-center" onClick={() => handleCopyButtonClick()}>
                   <span className="link cursor-pointer">
                     <Icon name="copy" />
                     <span className="text-small ms-2">Copy Pairing Code</span>
                   </span>
-                </div>
+                </div> */}
                 <p className="text-small text-bold mt-4 mb-4">Connect With Code</p>
                 <div className="d-flex justify-content-center">
-                  <QRCodeSVG
-                    size={200}
-                    value={hashconnectConnectorInstance.pairingString}
-                    includeMargin={true}
-                  />
+                  <QRCodeSVG size={200} value={''} includeMargin={true} />
                 </div>
               </>
             ) : null}

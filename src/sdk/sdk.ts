@@ -2,11 +2,11 @@ import {
   ContractExecuteTransaction,
   ContractFunctionParameters,
   ContractId,
-  TransactionReceipt,
   TokenAssociateTransaction,
   Transaction,
 } from '@hashgraph/sdk';
 import Hashconnect from '../connectors/hashconnect';
+import BladeConnect from '../connectors/blade';
 import { ICreatePairData, TokenType } from '../interfaces/tokens';
 import {
   addressToId,
@@ -24,7 +24,7 @@ import { TRANSACTION_MAX_FEES } from '../constants';
 
 class SDK {
   async associateToken(
-    hashconnectConnectorInstance: Hashconnect,
+    connectorInstance: BladeConnect | Hashconnect,
     userId: string,
     tokenId: string | ContractId,
   ) {
@@ -33,11 +33,11 @@ class SDK {
     trans.setTokenIds([tokenId]);
     trans.setAccountId(userId);
 
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+    return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
   }
 
   async approveToken(
-    hashconnectConnectorInstance: Hashconnect,
+    connectorInstance: BladeConnect | Hashconnect,
     amount: string,
     userId: string,
     tokenId: string | ContractId,
@@ -60,11 +60,11 @@ class SDK {
         new ContractFunctionParameters().addAddress(spenderAddress).addUint256(amountToApproveBN),
       );
 
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+    return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
   }
 
   async addNativeLiquidity(
-    hashconnectConnectorInstance: Hashconnect,
+    connectorInstance: BladeConnect | Hashconnect,
     userId: string,
     createPairData: ICreatePairData,
     slippage: number,
@@ -115,11 +115,11 @@ class SDK {
           .addUint256(getExpirationTime(expiresAfter)),
       );
 
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+    return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
   }
 
   async addLiquidity(
-    hashconnectConnectorInstance: Hashconnect,
+    connectorInstance: BladeConnect | Hashconnect,
     userId: string,
     createPairData: ICreatePairData,
     slippage: number,
@@ -181,11 +181,11 @@ class SDK {
           .addUint256(getExpirationTime(expiresAfter)),
       );
 
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+    return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
   }
 
   async removeNativeLiquidity(
-    hashconnectConnectorInstance: Hashconnect,
+    connectorInstance: BladeConnect | Hashconnect,
     userId: string,
     tokenAddress: string,
     tokensLpAmount: string,
@@ -221,11 +221,11 @@ class SDK {
           .addUint256(getExpirationTime(expiresAfter)),
       );
 
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+    return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
   }
 
   async removeLiquidity(
-    hashconnectConnectorInstance: Hashconnect,
+    connectorInstance: BladeConnect | Hashconnect,
     userId: string,
     tokenInAddress: string,
     tokenOutAddress: string,
@@ -263,11 +263,11 @@ class SDK {
           .addUint256(getExpirationTime(expiresAfter)),
       );
 
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+    return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
   }
 
   async swap(
-    hashconnectConnectorInstance: Hashconnect,
+    connectorInstance: BladeConnect | Hashconnect,
     userId: string,
     amountIn: string,
     amountOut: string,
@@ -355,10 +355,10 @@ class SDK {
       );
     }
 
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+    return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
   }
 
-  async wrapHBAR(hashconnectConnectorInstance: Hashconnect, userId: string, HBARIn: string) {
+  async wrapHBAR(connectorInstance: BladeConnect | Hashconnect, userId: string, HBARIn: string) {
     const WHBARAddress = process.env.REACT_APP_WHBAR_ADDRESS as string;
     const maxGas = TRANSACTION_MAX_FEES.WRAP_HBAR;
     const trans = new ContractExecuteTransaction()
@@ -371,11 +371,11 @@ class SDK {
       //Set the contract function to call
       .setFunction('deposit', new ContractFunctionParameters());
 
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+    return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
   }
 
   async unwrapHBAR(
-    hashconnectConnectorInstance: Hashconnect,
+    connectorInstance: BladeConnect | Hashconnect,
     userId: string,
     tokenAmountIn: string,
   ) {
@@ -390,11 +390,11 @@ class SDK {
       //Set the contract function to call
       .setFunction('withdraw', new ContractFunctionParameters().addUint256(tokenAmountInNum));
 
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+    return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
   }
 
   async transferERC20(
-    hashconnectConnectorInstance: Hashconnect,
+    connectorInstance: BladeConnect | Hashconnect,
     userId: string,
     tokenAddress: string,
     amount: string,
@@ -415,11 +415,11 @@ class SDK {
         new ContractFunctionParameters().addAddress(to).addUint256(tokenAAmount),
       );
 
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+    return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
   }
 
   async stakeLP(
-    hashconnectConnectorInstance: Hashconnect,
+    connectorInstance: BladeConnect | Hashconnect,
     stakeAmount: string,
     campaignAddress: string,
     userId: string,
@@ -434,11 +434,11 @@ class SDK {
       //Set the contract function to call
       .setFunction('stake', new ContractFunctionParameters().addUint256(tokensLpAmountBN));
 
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+    return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
   }
 
   async collectRewards(
-    hashconnectConnectorInstance: Hashconnect,
+    connectorInstance: BladeConnect | Hashconnect,
     campaignAddress: string,
     userId: string,
   ) {
@@ -452,10 +452,14 @@ class SDK {
       //Set the contract function to call
       .setFunction('getReward', new ContractFunctionParameters());
 
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+    return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
   }
 
-  async exit(hashconnectConnectorInstance: Hashconnect, campaignAddress: string, userId: string) {
+  async exit(
+    connectorInstance: BladeConnect | Hashconnect,
+    campaignAddress: string,
+    userId: string,
+  ) {
     const maxGas = TRANSACTION_MAX_FEES.EXIT_CAMPAIGN;
 
     const trans = new ContractExecuteTransaction()
@@ -466,11 +470,11 @@ class SDK {
       //Set the contract function to call
       .setFunction('exit', new ContractFunctionParameters());
 
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+    return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
   }
 
   async depositHBAR(
-    hashconnectConnectorInstance: Hashconnect,
+    connectorInstance: BladeConnect | Hashconnect,
     lockdropAddress: string,
     userId: string,
     HBARAmount: string,
@@ -487,11 +491,11 @@ class SDK {
       //Set the contract function to call
       .setFunction('deposit', new ContractFunctionParameters());
 
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+    return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
   }
 
   async withdrawHBAR(
-    hashconnectConnectorInstance: Hashconnect,
+    connectorInstance: BladeConnect | Hashconnect,
     lockdropAddress: string,
     userId: string,
     HBARAmount: string,
@@ -508,11 +512,11 @@ class SDK {
       //Set the contract function to call
       .setFunction('withdraw', new ContractFunctionParameters().addUint256(HBARAmountBN));
 
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+    return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
   }
 
   async claimLP(
-    hashconnectConnectorInstance: Hashconnect,
+    connectorInstance: BladeConnect | Hashconnect,
     lockdropAddress: string,
     userId: string,
   ) {
@@ -527,11 +531,11 @@ class SDK {
       //Set the contract function to call
       .setFunction('claim', new ContractFunctionParameters());
 
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+    return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
   }
 
   async claimTokensFromClaimDrop(
-    hashconnectConnectorInstance: Hashconnect,
+    connectorInstance: BladeConnect | Hashconnect,
     claimdropAddress: string,
     userId: string,
   ) {
@@ -546,33 +550,22 @@ class SDK {
       //Set the contract function to call
       .setFunction('claim', new ContractFunctionParameters());
 
-    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+    return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
   }
 
   sendTransactionAndGetResponse = async (
-    hashconnectConnectorInstance: Hashconnect,
+    connectorInstance: BladeConnect | Hashconnect,
     transaction: Transaction,
     userId: string,
   ) => {
-    const transactionBytes: Uint8Array = await hashconnectConnectorInstance?.makeBytes(
-      transaction,
-      userId,
-    );
-
-    const response = await hashconnectConnectorInstance?.sendTransaction(
-      transactionBytes as Uint8Array,
-      userId,
-      false,
-    );
+    const result = await connectorInstance?.sendTransaction(transaction, userId);
+    const { response, receipt } = result;
 
     const responseData: any = {
       response,
-      receipt: null,
+      receipt,
     };
 
-    if (response?.success) {
-      responseData.receipt = TransactionReceipt.fromBytes(response.receipt as Uint8Array);
-    }
     return responseData;
   };
 }

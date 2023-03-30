@@ -20,7 +20,7 @@ const LockdropEmergencyForm = ({ getContractData, toast }: ILockdropEmergencyFor
   const lockDropContractAddress = process.env.REACT_APP_LOCKDROP_ADDRESS;
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
-  const { hashconnectConnectorInstance } = connection;
+  const { connectorInstance } = connection;
   const { userId, connected, setShowConnectModal, isHashpackLoading } = connection;
 
   const [withdrawValue, setWithdrawValue] = useState('0');
@@ -36,7 +36,7 @@ const LockdropEmergencyForm = ({ getContractData, toast }: ILockdropEmergencyFor
 
     try {
       const receipt = await sdk.withdrawHBAR(
-        hashconnectConnectorInstance,
+        connectorInstance,
         lockDropContractAddress as string,
         userId,
         withdrawValue,
