@@ -98,6 +98,7 @@ export interface IPoolExtendedData extends IPoolData {
   tokensPriceEvaluated?: boolean;
   [key: string]: any;
   farmAddress?: string;
+  forMigration?: boolean;
 }
 
 export interface IPoolsAnalytics {

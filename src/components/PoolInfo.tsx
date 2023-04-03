@@ -485,10 +485,15 @@ const PoolInfo = ({
           >
             <span className="text-micro text-numeric badge bg-secondary-800 ms-3">{POOLS_FEE}</span>
           </Tippy>
+
           {poolData.hasCampaign ? (
             <span className="text-micro text-uppercase badge bg-success-600 ms-3">
               Yield farming
             </span>
+          ) : null}
+
+          {poolData.forMigration ? (
+            <span className="text-micro text-uppercase badge bg-warning ms-3">Migration</span>
           ) : null}
 
           {poolData.hasProblematicToken ? (

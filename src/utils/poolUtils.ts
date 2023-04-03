@@ -67,6 +67,16 @@ export const getProcessedPools = (
           (!isNaN(Number(token0Price)) && Number(token0Price) !== 0) ||
           (!isNaN(Number(token1Price)) && Number(token1Price) !== 0);
 
+        // Check if pool is for migration
+        let forMigration = false;
+        const containsOldWHBARToken =
+          token0 === process.env.REACT_APP_WHBAR_ADDRESS_OLD ||
+          token1 === process.env.REACT_APP_WHBAR_ADDRESS_OLD;
+
+        if (containsOldWHBARToken) {
+          forMigration = true;
+        }
+
         const poolData: IPoolExtendedData = {
           ...pool,
           token0Symbol: mapHBARTokenSymbol(pool.token0Symbol),
@@ -83,6 +93,7 @@ export const getProcessedPools = (
           tvlUsd,
           volume24hUsd,
           volume7dUsd,
+          forMigration,
         };
 
         return poolData;

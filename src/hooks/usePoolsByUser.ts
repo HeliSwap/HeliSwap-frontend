@@ -144,6 +144,16 @@ const usePoolsByUser = (
             totalUserShare.toString(),
           );
 
+          // Check if pool is for migration
+          let forMigration = false;
+          const containsOldWHBARToken =
+            token0 === process.env.REACT_APP_WHBAR_ADDRESS_OLD ||
+            token1 === process.env.REACT_APP_WHBAR_ADDRESS_OLD;
+
+          if (containsOldWHBARToken) {
+            forMigration = true;
+          }
+
           const poolData: IPoolExtendedData = {
             ...pool,
             token0AmountFormatted: reserve0ShareStr,
@@ -162,6 +172,7 @@ const usePoolsByUser = (
             fee1AmountFormatted: fee1Formatted,
             token0Symbol: mapHBARTokenSymbol(pool.token0Symbol),
             token1Symbol: mapHBARTokenSymbol(pool.token1Symbol),
+            forMigration,
           };
 
           return poolData;
