@@ -9,7 +9,7 @@ import {
   formatStringToPrice,
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
-import { NATIVE_TOKEN } from '../utils/tokenUtils';
+import { mapWHBARAddress } from '../utils/tokenUtils';
 import { renderCampaignEndDate } from '../utils/farmUtils';
 
 interface IFarmRowProps {
@@ -48,10 +48,7 @@ const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
             haveRewardSendToCampaign && (rewardActive || !campaignHasActiveRewards);
 
           if (showReward) {
-            const rewardSymbol =
-              reward.address === process.env.REACT_APP_WHBAR_ADDRESS
-                ? NATIVE_TOKEN.symbol
-                : reward.symbol;
+            const rewardSymbol = mapWHBARAddress(reward);
 
             acc.push(rewardSymbol);
           }

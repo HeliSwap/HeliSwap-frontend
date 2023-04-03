@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 import { Client, AccountBalanceQuery } from '@hashgraph/sdk';
 import BigNumber from 'bignumber.js';
 
-import { IAllowanceData, IPoolData, ITokenData, TokenType } from '../interfaces/tokens';
+import { IAllowanceData, IPoolData, IReward, ITokenData, TokenType } from '../interfaces/tokens';
 
 import {
   formatNumberToBigNumber,
@@ -481,5 +481,9 @@ export const getProcessedTokens = (tokensData: ITokenData[]): ITokenData[] => {
 };
 
 export const mapHBARTokenSymbol = (tokenSymbol: string) => {
-  return tokenSymbol === 'WHBAR' ? 'HBAR' : tokenSymbol;
+  return tokenSymbol === 'WHBAR' ? NATIVE_TOKEN.symbol : tokenSymbol;
+};
+
+export const mapWHBARAddress = (token: ITokenData | IReward) => {
+  return token.address === process.env.REACT_APP_WHBAR_ADDRESS ? NATIVE_TOKEN.symbol : token.symbol;
 };

@@ -15,7 +15,7 @@ import TopTokens from './TopTokens';
 import Loader from '../../Loader';
 import PoolsAnalytics from '../PoolsAnalytics';
 
-import { getTokenPrice, NATIVE_TOKEN } from '../../../utils/tokenUtils';
+import { getTokenPrice, mapWHBARAddress, NATIVE_TOKEN } from '../../../utils/tokenUtils';
 
 import usePoolsByTokensList from '../../../hooks/usePoolsByTokensList';
 import useTokensByListIds from '../../../hooks/useTokensByListIds';
@@ -86,10 +86,7 @@ const Overview = () => {
         const tokenPrice = getTokenPrice(pools, token.address, hbarPrice);
         const tokenName =
           token.address === process.env.REACT_APP_WHBAR_ADDRESS ? NATIVE_TOKEN.name : token.name;
-        const tokenSymbol =
-          token.address === process.env.REACT_APP_WHBAR_ADDRESS
-            ? NATIVE_TOKEN.symbol
-            : token.symbol;
+        const tokenSymbol = mapWHBARAddress(token);
 
         let tvl;
 
