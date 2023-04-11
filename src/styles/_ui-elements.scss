@@ -730,3 +730,12 @@
     background: linear-gradient(90deg, #f32fd7 0%, #3845fb 100%);
   }
 }
+
+// Ratios
+.ratio-widget {
+  --bs-aspect-ratio: 140%;
+
+  @include media-breakpoint-up(md) {
+    --bs-aspect-ratio: 75%;
+  }
+}

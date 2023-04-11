@@ -31,7 +31,7 @@ const Widget = ({ resource, title, setCurrentAsset }: IWidgetrops) => {
           </Button>
         </div>
 
-        <div className="ratio ratio-4x3 mt-4">
+        <div className="ratio ratio-widget mt-4">
           <iframe title={title} src={resource}></iframe>
         </div>
 

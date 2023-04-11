@@ -34,7 +34,7 @@ import {
 } from '../utils/numberUtils';
 import { renderCampaignEndDate } from '../utils/farmUtils';
 
-import { getUserAssociatedTokens, NATIVE_TOKEN } from '../utils/tokenUtils';
+import { getUserAssociatedTokens, mapWHBARAddress } from '../utils/tokenUtils';
 
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import useTokensByListIds from '../hooks/useTokensByListIds';
@@ -271,10 +271,7 @@ const FarmDetails = () => {
                             haveRewardSendToCampaign && (rewardActive || !campaignHasActiveRewards);
 
                           if (showReward) {
-                            const rewardSymbol =
-                              reward.address === process.env.REACT_APP_WHBAR_ADDRESS
-                                ? NATIVE_TOKEN.symbol
-                                : reward.symbol;
+                            const rewardSymbol = mapWHBARAddress(reward);
 
                             acc.push(
                               <div
@@ -412,12 +409,8 @@ const FarmDetails = () => {
                                 const userRewardAccumulated = userRewardData.totalAccumulated > 0;
 
                                 if (userRewardAccumulated) {
-                                  const rewardAddress = reward.address;
                                   const rewardDecimals = reward.decimals;
-                                  const rewardSymbol =
-                                    rewardAddress === process.env.REACT_APP_WHBAR_ADDRESS
-                                      ? NATIVE_TOKEN.symbol
-                                      : reward.symbol;
+                                  const rewardSymbol = mapWHBARAddress(reward);
 
                                   acc.push(
                                     <p
