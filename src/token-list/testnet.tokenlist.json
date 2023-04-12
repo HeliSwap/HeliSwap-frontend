@@ -20,6 +20,14 @@
     },
     {
       "chainId": 290,
+      "address": "0x00000000000000000000000000000000003c08e3",
+      "name": "Wrapped HBAR",
+      "symbol": "WHBAR",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmSmHsoeapmRKpz7bgeYto4EgQmuZZMkuZc5ViWqLptQjJ/WHBAR.png"
+    },
+    {
+      "chainId": 290,
       "address": "0x0000000000000000000000000000000000001fFF",
       "name": "USD Coin",
       "symbol": "USDC",
