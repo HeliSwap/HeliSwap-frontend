@@ -16,6 +16,7 @@ import {
   calculateReserves,
   calculatePercentageByShare,
   mapHBARTokenSymbol,
+  isPoolDepricated,
 } from '../utils/tokenUtils';
 import { formatStringWeiToStringEther } from '../utils/numberUtils';
 
@@ -146,11 +147,8 @@ const usePoolsByUser = (
 
           // Check if pool is for migration
           let forMigration = false;
-          const containsOldWHBARToken =
-            token0 === process.env.REACT_APP_WHBAR_ADDRESS_OLD ||
-            token1 === process.env.REACT_APP_WHBAR_ADDRESS_OLD;
 
-          if (containsOldWHBARToken) {
+          if (isPoolDepricated(token0, token1)) {
             forMigration = true;
           }
 
