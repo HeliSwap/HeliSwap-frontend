@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { GlobalContext } from '../../providers/Global';
 import Loader from '../Loader';
-// import Icon from '../Icon';
+import Icon from '../Icon';
 
 interface IConnectModalContentProps {
   closeModal: () => void;
@@ -23,7 +23,7 @@ const ConnectModalContent = ({
 }: IConnectModalContentProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection } = contextValue;
-  const { connectorInstance } = connection;
+  const { pairingString } = connection;
 
   const handleHashpackConnectButtonClick = () => {
     if (extensionFound) {
@@ -43,9 +43,9 @@ const ConnectModalContent = ({
     // }
   };
 
-  // const handleCopyButtonClick = () => {
-  //   navigator.clipboard.writeText(connectorInstance.pairingString);
-  // };
+  const handleCopyButtonClick = () => {
+    navigator.clipboard.writeText(pairingString);
+  };
 
   return (
     <>
@@ -93,23 +93,21 @@ const ConnectModalContent = ({
               </div>
               <span className="icon-blade"></span>
             </div>
-
-            {connectorInstance && connectorInstance ? (
+            {pairingString !== '' ? (
               <>
-                {/* <p className="text-small text-bold mt-4 mb-4">Connect With Code</p>
+                <p className="text-small text-bold mt-4 mb-4">Connect With Code</p>
                 <div className="d-flex align-items-center" onClick={() => handleCopyButtonClick()}>
                   <span className="link cursor-pointer">
                     <Icon name="copy" />
                     <span className="text-small ms-2">Copy Pairing Code</span>
                   </span>
-                </div> */}
+                </div>
                 <p className="text-small text-bold mt-4 mb-4">Connect With Code</p>
                 <div className="d-flex justify-content-center">
-                  <QRCodeSVG size={200} value={''} includeMargin={true} />
+                  <QRCodeSVG size={200} value={pairingString} includeMargin={true} />
                 </div>
               </>
             ) : null}
-            <div></div>
             <p className="text-micro text-gray mt-4">
               By connecting a wallet, you agree to HeliSwap Terms of Service and acknowledge that
               you have read and understand the Heliswap Protocol Disclaimer.
