@@ -28,6 +28,7 @@ const contextInitialValue = {
     connectorInstance: {} as any,
     showConnectModal: false,
     setShowConnectModal: (show: boolean) => {},
+    pairingString: '',
   },
   tokensWhitelisted: [] as ITokenListData[],
   isRunning: false,
@@ -45,6 +46,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
   const [sdk, setSdk] = useState({} as SDK);
   const [provider, setProvider] = useState({} as ethers.providers.JsonRpcProvider);
   const [connected, setConnected] = useState(false);
+  const [pairingString, setPairingString] = useState('');
   const [isHashpackLoading, setIsHashpackLoading] = useState(false);
   const [extensionFound, setExtensionFound] = useState(false);
   const [hashconnectConnectorInstance, setHashconnectConnectorInstance] = useState<Hashconnect>();
@@ -99,6 +101,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
     connectorInstance,
     showConnectModal,
     setShowConnectModal,
+    pairingString,
   };
 
   const contextValue = {
@@ -124,6 +127,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
 
       await hashconnectConnector.initHashconnect();
       setHashconnectConnectorInstance(hashconnectConnector);
+      setPairingString(hashconnectConnector.pairingString);
     };
 
     const initBladeConnector = async () => {
