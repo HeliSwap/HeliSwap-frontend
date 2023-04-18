@@ -7,7 +7,7 @@ import BigNumber from 'bignumber.js';
 
 import { GlobalContext } from '../providers/Global';
 
-import { IFarmData, ITokenData } from '../interfaces/tokens';
+import { ISSSData, ITokenData } from '../interfaces/tokens';
 
 import Button from './Button';
 import ButtonSelector from './ButtonSelector';
@@ -35,7 +35,7 @@ import {
 } from '../utils/tokenUtils';
 
 interface IFarmActionsProps {
-  farmData: IFarmData;
+  sssData: ISSSData;
   hasUserStaked: boolean;
   campaignEnded: boolean;
   hasUserProvided: boolean;
@@ -51,7 +51,7 @@ enum TabStates {
 }
 
 const FarmActions = ({
-  farmData,
+  sssData,
   hasUserStaked,
   campaignEnded,
   hasUserProvided,
@@ -110,7 +110,7 @@ const FarmActions = ({
       const receipt = await sdk.stakeLP(
         connectorInstance,
         lpInputValue as string,
-        farmData.address,
+        sssData.address,
         userId,
       );
       const {
@@ -136,7 +136,7 @@ const FarmActions = ({
     setLoadingExit(true);
 
     try {
-      const receipt = await sdk.exit(connectorInstance, farmData.address, userId);
+      const receipt = await sdk.exit(connectorInstance, sssData.address, userId);
       const {
         response: { success, error },
       } = receipt;
@@ -204,15 +204,15 @@ const FarmActions = ({
 
   useEffect(() => {
     setLpInputValue(maxHELIInputValue);
-  }, [farmData.poolData?.lpShares, maxHELIInputValue]);
+  }, [sssData.poolData?.lpShares, maxHELIInputValue]);
 
   useEffect(() => {
     const getLPAllowanceData = async () => {
       try {
         const canSpend = await checkAllowanceERC20(
-          farmData.stakingTokenAddress,
+          sssData.stakingTokenAddress,
           userId,
-          farmData.address,
+          sssData.address,
           lpInputValue,
         );
         setLpApproved(canSpend);
@@ -228,7 +228,7 @@ const FarmActions = ({
     return () => {
       setLpApproved(false);
     };
-  }, [farmData.stakingTokenAddress, farmData.address, userId, lpInputValue]);
+  }, [sssData.stakingTokenAddress, sssData.address, userId, lpInputValue]);
 
   // Helper methods
   const getStakeButtonLabel = () => {
@@ -317,7 +317,7 @@ const FarmActions = ({
                         className="mb-3"
                         loading={loadingApprove}
                         onClick={() =>
-                          handleApproveButtonClick(farmData.address, farmData.poolData?.pairAddress)
+                          handleApproveButtonClick(sssData.address, sssData.poolData?.pairAddress)
                         }
                       >
                         <>
@@ -353,7 +353,7 @@ const FarmActions = ({
                   inputTokenComponent={
                     <InputToken
                       value={formatStringWeiToStringEther(
-                        farmData.userStakingData?.stakedAmount as string,
+                        sssData.userStakingData?.stakedAmount as string,
                         8,
                       )}
                       disabled={true}
@@ -430,7 +430,7 @@ const FarmActions = ({
                 {loadingExit ? (
                   <Confirmation
                     confirmationText={`Unstaking ${formatStringWeiToStringEther(
-                      farmData.userStakingData?.stakedAmount as string,
+                      sssData.userStakingData?.stakedAmount as string,
                       8,
                     )} HELI tokens`}
                   />
@@ -447,7 +447,7 @@ const FarmActions = ({
 
                       <div className="text-main text-numeric">
                         {formatStringWeiToStringEther(
-                          farmData.userStakingData?.stakedAmount as string,
+                          sssData.userStakingData?.stakedAmount as string,
                           8,
                         )}
                       </div>

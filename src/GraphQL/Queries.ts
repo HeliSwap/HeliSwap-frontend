@@ -325,6 +325,31 @@ export const GET_FARM_BY_ADDRESS = gql`
   }
 `;
 
+export const GET_SSS_BY_ADDRESS = gql`
+  query getFarmDetails($farmAddress: String!, $userAddress: String!) {
+    getFarmDetails(farmAddress: $farmAddress, userAddress: $userAddress) {
+      address
+      totalStaked
+      stakingTokenAddress
+      rewardsData {
+        address
+        symbol
+        decimals
+        rewardEnd
+        totalAmount
+        duration
+      }
+      userStakingData {
+        stakedAmount
+        rewardsAccumulated {
+          address
+          totalAccumulated
+        }
+      }
+    }
+  }
+`;
+
 export const GET_SWAP_RATE = gql`
   query {
     getSwapRate {

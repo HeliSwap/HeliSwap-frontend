@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { GlobalContext } from '../providers/Global';
 
 import {
+  IPoolExtendedData,
   IReward,
   IRewardsAccumulated,
   ITokenData,
@@ -23,7 +24,6 @@ import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransact
 import Confirmation from '../components/Confirmation';
 import Loader from '../components/Loader';
 
-import { formatIcons } from '../utils/iconUtils';
 import {
   formatStringETHtoPriceFormatted,
   formatStringToPercentage,
@@ -42,7 +42,7 @@ import {
 
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import useTokensByListIds from '../hooks/useTokensByListIds';
-import useFarmByAddress from '../hooks/useFarmByAddress';
+import useSSSByAddress from '../hooks/useSSSByAddress';
 
 import getErrorMessage from '../content/errors';
 
@@ -50,7 +50,7 @@ import { useQueryOptions, useQueryOptionsPoolsFarms } from '../constants';
 
 const SingleSidedStaking = () => {
   const contextValue = useContext(GlobalContext);
-  const { connection, sdk, tokensWhitelisted } = contextValue;
+  const { connection, sdk, tokensWhitelisted, hbarPrice } = contextValue;
   const { userId, connectorInstance, isHashpackLoading, setShowConnectModal, connected } =
     connection;
 
@@ -58,16 +58,34 @@ const SingleSidedStaking = () => {
   const stakingTokenId = addressToId(process.env.REACT_APP_HELI_TOKEN_ADDRESS as string);
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
 
+  const heliPoolTokens = [
+    process.env.REACT_APP_HELI_TOKEN_ADDRESS as string,
+    process.env.REACT_APP_WHBAR_ADDRESS as string,
+  ];
+
   const { poolsByTokenList: pools } = usePoolsByTokensList(
     useQueryOptionsPoolsFarms,
     true,
     tokensWhitelistedAddresses,
   );
 
-  const { farm: farmData, processingFarms } = useFarmByAddress(
+  const heliPool =
+    pools.find(
+      pool => heliPoolTokens.includes(pool.token0) && heliPoolTokens.includes(pool.token1),
+    ) || ({} as IPoolExtendedData);
+
+  let heliPrice = 0;
+
+  if (pools && pools.length > 0) {
+    const { token0AmountFormatted, token1AmountFormatted } = heliPool;
+    const heliForHbar = Number(token1AmountFormatted) / Number(token0AmountFormatted);
+    heliPrice = hbarPrice / heliForHbar;
+  }
+
+  const { sss: sssData, processingSss } = useSSSByAddress(
     useQueryOptionsPoolsFarms,
     userId,
-    pools,
+    heliPrice,
     campaignAddress || '',
   );
 
@@ -79,8 +97,8 @@ const SingleSidedStaking = () => {
   const [stakingTokenBalance, setStakingTokenBalance] = useState(0);
 
   const userRewardsUSD = useMemo(() => {
-    if (Object.keys(farmData).length !== 0) {
-      const { userStakingData } = farmData;
+    if (Object.keys(sssData).length !== 0) {
+      const { userStakingData } = sssData;
 
       if (!userStakingData?.rewardsAccumulated) return '0';
 
@@ -88,21 +106,21 @@ const SingleSidedStaking = () => {
         return (Number(acc) + Number(currentValue.totalAccumulatedUSD)).toString();
       }, '0');
     }
-  }, [farmData]);
+  }, [sssData]);
 
   const userShare = useMemo(() => {
-    const { totalStaked, userStakingData } = farmData;
+    const { totalStaked, userStakingData } = sssData;
 
     if (!userStakingData?.stakedAmount || !totalStaked || Number(totalStaked) === 0) return '0';
 
     return ((Number(userStakingData?.stakedAmount) / Number(totalStaked)) * 100).toString();
-  }, [farmData]);
+  }, [sssData]);
 
   // Handlers
   const handleHarvestConfirm = async () => {
     setLoadingHarvest(true);
     try {
-      const receipt = await sdk.collectRewards(connectorInstance, farmData.address, userId);
+      const receipt = await sdk.collectRewards(connectorInstance, sssData.address, userId);
       const {
         response: { success, error },
       } = receipt;
@@ -172,21 +190,21 @@ const SingleSidedStaking = () => {
   }, [userId, stakingTokenId]);
 
   const userRewardsAddresses =
-    farmData.userStakingData?.rewardsAccumulated &&
-    farmData.userStakingData?.rewardsAccumulated?.length > 0
-      ? farmData.userStakingData?.rewardsAccumulated.map(reward => reward.address)
+    sssData.userStakingData?.rewardsAccumulated &&
+    sssData.userStakingData?.rewardsAccumulated?.length > 0
+      ? sssData.userStakingData?.rewardsAccumulated.map(reward => reward.address)
       : [];
 
   // Get selected tokens to check for assosiations
   const { tokens: userRewardsData } = useTokensByListIds(userRewardsAddresses, useQueryOptions);
 
-  const hasUserStaked = farmData.userStakingData?.stakedAmount !== '0';
+  const hasUserStaked = sssData.userStakingData?.stakedAmount !== '0';
   const hasUserProvided = stakingTokenBalance !== 0;
-  const campaignEnded = farmData.campaignEndDate < Date.now();
-  const haveFarm = Object.keys(farmData).length !== 0;
-  const campaignHasRewards = farmData.rewardsData?.length > 0;
+  const campaignEnded = sssData.campaignEndDate < Date.now();
+  const haveFarm = Object.keys(sssData).length !== 0;
+  const campaignHasRewards = sssData.rewardsData?.length > 0;
   const campaignHasActiveRewards = campaignHasRewards
-    ? Object.keys(farmData.rewardsData.find(reward => reward.rewardEnd > Date.now()) || {}).length >
+    ? Object.keys(sssData.rewardsData.find(reward => reward.rewardEnd > Date.now()) || {}).length >
       0
     : false;
 
@@ -194,7 +212,7 @@ const SingleSidedStaking = () => {
 
   return isHashpackLoading ? (
     <Loader />
-  ) : processingFarms ? (
+  ) : processingSss ? (
     <Loader />
   ) : (
     <div className="d-flex justify-content-center">
@@ -206,17 +224,12 @@ const SingleSidedStaking = () => {
               <div className="container-blue-neutral-800 rounded p-4 p-lg-5">
                 <div className="d-md-flex justify-content-between align-items-start">
                   <div className="d-flex align-items-center">
-                    {formatIcons(
-                      [farmData.poolData?.token0Symbol, farmData.poolData?.token1Symbol],
-                      'large',
-                    )}
-                    <p className="text-subheader text-light ms-4">
-                      {farmData.poolData?.token0Symbol} / {farmData.poolData?.token1Symbol}
-                    </p>
+                    <IconToken size={'large'} symbol={'HELI'} />
+                    <p className="text-subheader text-light ms-3">HELI</p>
                   </div>
 
                   <div className="container-campaign-status mt-4 mt-md-0 d-flex align-items-center">
-                    {renderCampaignEndDate(farmData.campaignEndDate)}
+                    {renderCampaignEndDate(sssData.campaignEndDate)}
                   </div>
                 </div>
 
@@ -234,7 +247,7 @@ const SingleSidedStaking = () => {
                     </div>
                     <div className="col-6 col-md-4">
                       <p className="text-subheader text-numeric">
-                        {formatStringToPercentage(stripStringToFixedDecimals(farmData.APR, 2))}
+                        {formatStringToPercentage(stripStringToFixedDecimals(sssData.APR, 2))}
                       </p>
                     </div>
                   </div>
@@ -252,9 +265,7 @@ const SingleSidedStaking = () => {
                     </div>
                     <div className="col-6 col-md-4">
                       <p className="text-main text-numeric">
-                        {formatStringToPrice(
-                          stripStringToFixedDecimals(farmData.totalStakedUSD, 2),
-                        )}
+                        {formatStringToPrice(stripStringToFixedDecimals(sssData.totalStakedUSD, 2))}
                       </p>
                     </div>
                   </div>
@@ -274,7 +285,7 @@ const SingleSidedStaking = () => {
                     </div>
                     <div className="col-6 col-md-4 d-md-flex align-items-center">
                       {campaignHasRewards &&
-                        farmData.rewardsData?.reduce((acc: ReactNode[], reward: IReward, index) => {
+                        sssData.rewardsData?.reduce((acc: ReactNode[], reward: IReward, index) => {
                           // When reward is enabled, but not sent -> do not show
                           const haveRewardSendToCampaign =
                             reward.totalAmount && Number(reward.totalAmount || reward) !== 0;
@@ -339,7 +350,7 @@ const SingleSidedStaking = () => {
                           <p className="text-subheader text-numeric">
                             {formatStringToPrice(
                               stripStringToFixedDecimals(
-                                farmData.userStakingData?.stakedAmountUSD as string,
+                                sssData.userStakingData?.stakedAmountUSD as string,
                                 2,
                               ),
                             )}
@@ -348,7 +359,7 @@ const SingleSidedStaking = () => {
                             <span className="text-secondary text-main">
                               {formatStringETHtoPriceFormatted(
                                 formatStringWeiToStringEther(
-                                  farmData.userStakingData?.stakedAmount || '0',
+                                  sssData.userStakingData?.stakedAmount || '0',
                                 ),
                               )}
                             </span>
@@ -412,9 +423,9 @@ const SingleSidedStaking = () => {
 
                           <div className="mt-4">
                             {campaignHasRewards &&
-                              farmData.rewardsData?.reduce((acc: ReactNode[], reward: IReward) => {
+                              sssData.rewardsData?.reduce((acc: ReactNode[], reward: IReward) => {
                                 const userRewardData =
-                                  farmData.userStakingData?.rewardsAccumulated?.find(
+                                  sssData.userStakingData?.rewardsAccumulated?.find(
                                     (rewardSingle: IUserStakingData) => {
                                       return rewardSingle.address === reward.address;
                                     },
@@ -466,9 +477,9 @@ const SingleSidedStaking = () => {
                               ) : (
                                 <>
                                   <div className="text-small">Estimated pending rewards:</div>
-                                  {farmData.rewardsData?.map((reward: IReward) => {
+                                  {sssData.rewardsData?.map((reward: IReward) => {
                                     const userReward =
-                                      farmData.userStakingData?.rewardsAccumulated?.find(
+                                      sssData.userStakingData?.rewardsAccumulated?.find(
                                         (currReward: IRewardsAccumulated) =>
                                           currReward.address === reward.address,
                                       );
@@ -529,7 +540,7 @@ const SingleSidedStaking = () => {
               hasUserStaked={hasUserStaked}
               hasUserProvided={hasUserProvided}
               stakingTokenBalance={stakingTokenBalance}
-              farmData={farmData}
+              sssData={sssData}
               loadingAssociate={loadingAssociate}
               tokensToAssociate={tokensToAssociate || []}
               handleAssociateClick={handleAssociateClick}
