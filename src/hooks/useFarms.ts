@@ -9,7 +9,7 @@ import { IFarmData, IPoolData } from '../interfaces/tokens';
 import { getProcessedFarms } from '../utils/farmUtils';
 import { idToAddress } from '../utils/tokenUtils';
 
-import { REFRESH_TIME } from '../constants';
+import { REFRESH_TIME, farmsToExclude } from '../constants';
 
 const useFarms = (useQueryOptions: QueryHookOptions = {}, userId: string, pools: IPoolData[]) => {
   const contextValue = useContext(GlobalContext);
@@ -32,7 +32,10 @@ const useFarms = (useQueryOptions: QueryHookOptions = {}, userId: string, pools:
       if (getFarmsOverview && getFarmsOverview.length > 0 && pools.length && hbarPrice !== 0) {
         try {
           const processedFarms = getProcessedFarms(getFarmsOverview, pools, hbarPrice);
-          setFarms(processedFarms);
+
+          // Exclude duplicated or expired farms
+          const farms = processedFarms.filter(farm => !farmsToExclude.includes(farm.address));
+          setFarms(farms);
         } catch (e) {
           console.error('Error while processing campaigns data');
         } finally {
