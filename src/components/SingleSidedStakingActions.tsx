@@ -64,7 +64,7 @@ const FarmActions = ({
   const { connection, sdk } = contextValue;
   const { userId, connectorInstance } = connection;
 
-  const maxHELIInputValue = formatStringWeiToStringEther(stakingTokenBalance.toString());
+  const maxHELIInputValue = formatStringWeiToStringEther(stakingTokenBalance.toString(), 8);
 
   const [lpInputValue, setLpInputValue] = useState(maxHELIInputValue);
   const [sliderValue, setSliderValue] = useState(SLIDER_INITIAL_VALUE);
@@ -81,14 +81,10 @@ const FarmActions = ({
   const [showExitModal, setShowExitModal] = useState(false);
 
   const getInsufficientTokenBalance = useCallback(() => {
-    const {
-      poolData: { lpShares },
-    } = farmData;
-
     return new BigNumber(lpInputValue as string).gt(
-      new BigNumber(formatStringWeiToStringEther(lpShares || '0')),
+      new BigNumber(formatStringWeiToStringEther(stakingTokenBalance.toString() || '0', 8)),
     );
-  }, [farmData, lpInputValue]);
+  }, [stakingTokenBalance, lpInputValue]);
 
   // Handlers
   const handleTabButtonClick = (value: TabStates) => {
@@ -97,7 +93,7 @@ const FarmActions = ({
 
   const handleLpInputChange = (value: string) => {
     if (invalidInputTokensData(value, maxHELIInputValue, 18)) {
-      setLpInputValue(formatStringWeiToStringEther(farmData.poolData?.lpShares as string));
+      setLpInputValue(formatStringWeiToStringEther(stakingTokenBalance.toString(), 8));
       setSliderValue(SLIDER_INITIAL_VALUE);
       return;
     }
@@ -301,7 +297,8 @@ const FarmActions = ({
                       <WalletBalance
                         insufficientBallance={getInsufficientTokenBalance()}
                         walletBalance={formatStringWeiToStringEther(
-                          farmData.poolData?.lpShares || '0',
+                          stakingTokenBalance.toString() || '0',
+                          8,
                         )}
                         onMaxButtonClick={(maxValue: string) => {
                           handleLpInputChange(maxValue);
@@ -357,6 +354,7 @@ const FarmActions = ({
                     <InputToken
                       value={formatStringWeiToStringEther(
                         farmData.userStakingData?.stakedAmount as string,
+                        8,
                       )}
                       disabled={true}
                       isCompact={true}
@@ -433,11 +431,12 @@ const FarmActions = ({
                   <Confirmation
                     confirmationText={`Unstaking ${formatStringWeiToStringEther(
                       farmData.userStakingData?.stakedAmount as string,
-                    )} LP tokens`}
+                      8,
+                    )} HELI tokens`}
                   />
                 ) : (
                   <>
-                    <div className="text-small">LP token count</div>
+                    <div className="text-small">HELI token count</div>
 
                     <div className="d-flex justify-content-between align-items-center mt-4">
                       <div className="d-flex align-items-center">
@@ -449,6 +448,7 @@ const FarmActions = ({
                       <div className="text-main text-numeric">
                         {formatStringWeiToStringEther(
                           farmData.userStakingData?.stakedAmount as string,
+                          8,
                         )}
                       </div>
                     </div>
