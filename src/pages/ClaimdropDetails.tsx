@@ -499,7 +499,7 @@ const ClaimdropDetails = () => {
     if (claimdropState === CLAIMDROP_STATE.NOT_STARTED)
       return <p className="text-small text-bold text-uppercase">Not started</p>;
 
-    if (claimdropState === CLAIMDROP_STATE.POST_VESTING)
+    if (claimdropState === CLAIMDROP_STATE.ENDED)
       return <p className="text-small text-bold text-uppercase">Ended</p>;
 
     const millisecondsPast = Date.now() - claimdropStart.timestamp;
@@ -510,7 +510,9 @@ const ClaimdropDetails = () => {
     return (
       <>
         <p className="text-secondary text-uppercase text-main">Vested Tokens (in%)</p>
-        <p className="text-title text-bold text-uppercase">{percentagePast.toFixed(2)}%</p>
+        <p className="text-title text-bold text-uppercase">
+          {percentagePast >= 100 ? 100 : percentagePast.toFixed(2)}%
+        </p>
         <div className="progress mt-3">
           <div
             className="progress-bar bg-claimdrop"
