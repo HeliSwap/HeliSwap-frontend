@@ -360,6 +360,7 @@ const SingleSidedStaking = () => {
                               {formatStringETHtoPriceFormatted(
                                 formatStringWeiToStringEther(
                                   sssData.userStakingData?.stakedAmount || '0',
+                                  8,
                                 ),
                               )}
                             </span>

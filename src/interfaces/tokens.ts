@@ -108,7 +108,6 @@ export interface IPoolsAnalytics {
 
 export interface ISSSDataRaw {
   address: string;
-  stakingTokenData?: ITokenData;
   totalStaked: string;
   rewardsData: IRewardRaw[];
   stakingTokenAddress: string;

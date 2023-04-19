@@ -326,8 +326,8 @@ export const GET_FARM_BY_ADDRESS = gql`
 `;
 
 export const GET_SSS_BY_ADDRESS = gql`
-  query getFarmDetails($farmAddress: String!, $userAddress: String!) {
-    getFarmDetails(farmAddress: $farmAddress, userAddress: $userAddress) {
+  query getSSSDetails($userAddress: String!, $farmAddress: String!) {
+    getSSSDetails(userAddress: $userAddress, farmAddress: $farmAddress) {
       address
       totalStaked
       stakingTokenAddress

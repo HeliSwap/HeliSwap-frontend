@@ -25,13 +25,13 @@ import { formatStringWeiToStringEther, stripStringToFixedDecimals } from '../uti
 
 import getErrorMessage from '../content/errors';
 
-import { MAX_UINT_ERC20, SLIDER_INITIAL_VALUE } from '../constants';
+import { MAX_UINT_HTS, SLIDER_INITIAL_VALUE } from '../constants';
 import {
+  addressToId,
   calculatePercentageByShare,
   calculateShareByPercentage,
   checkAllowanceERC20,
   invalidInputTokensData,
-  requestIdFromAddress,
 } from '../utils/tokenUtils';
 
 interface IFarmActionsProps {
@@ -112,6 +112,7 @@ const FarmActions = ({
         lpInputValue as string,
         sssData.address,
         userId,
+        8,
       );
       const {
         response: { success, error },
@@ -156,18 +157,18 @@ const FarmActions = ({
     }
   };
 
-  const handleApproveButtonClick = async (campaignAddress: string, poolAddress: string) => {
+  const handleApproveButtonClick = async (campaignAddress: string, tokenAddress: string) => {
     setLoadingApprove(true);
-    const amount = MAX_UINT_ERC20.toString();
-    const lpTokenId = await requestIdFromAddress(poolAddress);
+    const amount = MAX_UINT_HTS.toString();
+    const tokenId = await addressToId(tokenAddress);
 
     try {
       const receipt = await sdk.approveToken(
         connectorInstance,
         amount,
         userId,
-        lpTokenId,
-        false,
+        tokenId,
+        true,
         campaignAddress,
       );
       const {
@@ -317,13 +318,13 @@ const FarmActions = ({
                         className="mb-3"
                         loading={loadingApprove}
                         onClick={() =>
-                          handleApproveButtonClick(sssData.address, sssData.poolData?.pairAddress)
+                          handleApproveButtonClick(sssData.address, sssData.stakingTokenAddress)
                         }
                       >
                         <>
-                          Approve LP
+                          Approve HELI
                           <Tippy
-                            content={`You must give the HeliSwap smart contracts permission to use your LP tokens.`}
+                            content={`You must give the HeliSwap smart contracts permission to use your HELI tokens.`}
                           >
                             <span className="ms-2">
                               <Icon name="hint" />
@@ -391,14 +392,14 @@ const FarmActions = ({
           {showStakeModal ? (
             <Modal show={showStakeModal} closeModal={() => setShowStakeModal(false)}>
               <ConfirmTransactionModalContent
-                modalTitle="Stake Your LP Tokens"
+                modalTitle="Stake Your HELI Tokens"
                 closeModal={() => setShowStakeModal(false)}
                 confirmTansaction={handleStakeConfirm}
                 confirmButtonLabel="Confirm"
                 isLoading={loadingStake}
               >
                 {loadingStake ? (
-                  <Confirmation confirmationText={`Staking ${lpInputValue || '0'} LP tokens`} />
+                  <Confirmation confirmationText={`Staking ${lpInputValue || '0'} HELI tokens`} />
                 ) : (
                   <>
                     <div className="text-small">HELI token count</div>

@@ -273,7 +273,10 @@ export const getProcessedSSS = (
         rewardsAccumulated: [],
       };
     } else {
-      const userStakedFormatted = formatStringWeiToStringEther(userStakingData.stakedAmount || '0');
+      const userStakedFormatted = formatStringWeiToStringEther(
+        userStakingData.stakedAmount || '0',
+        8,
+      );
 
       const rewardsProcessed =
         userStakingData?.rewardsAccumulated && userStakingData?.rewardsAccumulated!.length > 0
@@ -361,7 +364,7 @@ export const getProcessedSSS = (
   const currentFarmProcessed = { ...rawSSS, rewardsData: rewardsDataProcessed };
 
   const { totalStaked } = currentFarmProcessed;
-  const totalStakedFormatted = formatStringWeiToStringEther(totalStaked || '0');
+  const totalStakedFormatted = formatStringWeiToStringEther(totalStaked || '0', 8);
   const totalStakedUSD = (heliPrice * Number(totalStakedFormatted)).toString();
   const rewardsData = getRewardsProcessed(currentFarmProcessed, heliPrice);
   const totalRewardsUSD = getTotalRewardsUSD(rewardsData);

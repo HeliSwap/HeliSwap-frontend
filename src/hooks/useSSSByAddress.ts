@@ -26,17 +26,17 @@ const useSSSByAddress = (
   const userAddress = userId ? idToAddress(userId) : '';
 
   const { loading, data, error, startPolling, stopPolling } = useQuery(GET_SSS_BY_ADDRESS, {
-    variables: { farmAddress: sssAddress, userAddress },
+    variables: { userAddress, farmAddress: sssAddress },
     ...useQueryOptions,
     skip: !sssAddress,
   });
 
   useEffect(() => {
-    const getFarmData = () => {
-      const { getFarmDetails } = data;
-      if (getFarmDetails && Object.keys(getFarmDetails).length > 0 && hbarPrice !== 0) {
+    const getSSSData = () => {
+      const { getSSSDetails } = data;
+      if (getSSSDetails && Object.keys(getSSSDetails).length > 0 && hbarPrice !== 0) {
         try {
-          const processedSSS = getProcessedSSS(getFarmDetails, heliPrice, hbarPrice);
+          const processedSSS = getProcessedSSS(getSSSDetails, heliPrice, hbarPrice);
           setSss(processedSSS);
           setProcessingSss(false);
         } catch (error) {
@@ -47,7 +47,7 @@ const useSSSByAddress = (
       }
     };
 
-    data && getFarmData();
+    data && getSSSData();
   }, [data, sssAddress, heliPrice, hbarPrice]);
 
   useEffect(() => {
