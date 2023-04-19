@@ -423,8 +423,9 @@ class SDK {
     stakeAmount: string,
     campaignAddress: string,
     userId: string,
+    decimals: number = 18,
   ) {
-    const tokensLpAmountBN = formatStringToBigNumberWei(stakeAmount, 18);
+    const tokensLpAmountBN = formatStringToBigNumberWei(stakeAmount, decimals);
     const maxGas = TRANSACTION_MAX_FEES.STAKE_LP_TOKEN;
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract

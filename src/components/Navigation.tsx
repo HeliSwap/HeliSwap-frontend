@@ -15,6 +15,12 @@ const navigation = [
     text: 'Claimdrops',
   },
   {
+    link: '/single-sided-staking',
+    name: 'sss',
+    color: 'gray',
+    text: 'Single Sided Staking',
+  },
+  {
     link: '/',
     name: 'swap',
     color: 'gray',
