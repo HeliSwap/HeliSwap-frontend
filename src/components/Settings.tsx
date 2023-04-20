@@ -43,7 +43,7 @@ const Settings = ({ slippage }: ISettingsProps) => {
   return (
     <>
       <div
-        className="d-none d-md-flex justify-content-end align-items-center cursor-pointer"
+        className="d-flex justify-content-end align-items-center cursor-pointer"
         onClick={() => setShowModalTransactionSettings(true)}
       >
         <span className="text-small me-2">Settings</span>
