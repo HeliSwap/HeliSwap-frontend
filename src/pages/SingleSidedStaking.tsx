@@ -35,7 +35,7 @@ import { renderCampaignEndDate } from '../utils/farmUtils';
 
 import {
   addressToId,
-  getHTSTokenWalletBalance,
+  getTokenBalance,
   getUserAssociatedTokens,
   mapWHBARAddress,
 } from '../utils/tokenUtils';
@@ -94,7 +94,7 @@ const SingleSidedStaking = () => {
 
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
   const [loadingAssociate, setLoadingAssociate] = useState(false);
-  const [stakingTokenBalance, setStakingTokenBalance] = useState(0);
+  const [stakingTokenBalance, setStakingTokenBalance] = useState('0');
 
   const userRewardsUSD = useMemo(() => {
     if (Object.keys(sssData).length !== 0) {
@@ -182,9 +182,21 @@ const SingleSidedStaking = () => {
 
   useEffect(() => {
     const getStakingTokenBalance = async (userId: string, stakingTokenId: string) => {
-      const stakingToken = await getHTSTokenWalletBalance(userId, stakingTokenId);
-      setStakingTokenBalance(stakingToken);
+      const stakingTokenBalance =
+        (await getTokenBalance(userId, {
+          decimals: 8,
+          hederaId: stakingTokenId,
+          symbol: 'HELI',
+          type: TokenType.HTS,
+          name: '',
+          address: '',
+        })) || '0';
+      setStakingTokenBalance(stakingTokenBalance);
     };
+
+    if (!userId) {
+      setStakingTokenBalance('0');
+    }
 
     userId && stakingTokenId && getStakingTokenBalance(userId, stakingTokenId);
   }, [userId, stakingTokenId]);
@@ -199,7 +211,7 @@ const SingleSidedStaking = () => {
   const { tokens: userRewardsData } = useTokensByListIds(userRewardsAddresses, useQueryOptions);
 
   const hasUserStaked = sssData.userStakingData?.stakedAmount !== '0';
-  const hasUserProvided = stakingTokenBalance !== 0;
+  const hasUserProvided = Number(stakingTokenBalance) !== 0;
   const campaignEnded = sssData.campaignEndDate < Date.now();
   const haveFarm = Object.keys(sssData).length !== 0;
   const campaignHasRewards = sssData.rewardsData?.length > 0;
