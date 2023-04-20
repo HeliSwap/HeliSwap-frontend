@@ -15,7 +15,6 @@ import {
 
 import Icon from '../components/Icon';
 import IconToken from '../components/IconToken';
-import PageHeader from '../components/PageHeader';
 import Button from '../components/Button';
 import ToasterWrapper from '../components/ToasterWrapper';
 import SingleSidedStakingActions from '../components/SingleSidedStakingActions';
@@ -23,6 +22,7 @@ import Modal from '../components/Modal';
 import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
 import Confirmation from '../components/Confirmation';
 import Loader from '../components/Loader';
+import SSSFAQ from '../components/SSSFAQ';
 
 import {
   formatStringETHtoPriceFormatted,
@@ -35,7 +35,7 @@ import { renderCampaignEndDate } from '../utils/farmUtils';
 
 import {
   addressToId,
-  getHTSTokenWalletBalance,
+  getTokenBalance,
   getUserAssociatedTokens,
   mapWHBARAddress,
 } from '../utils/tokenUtils';
@@ -94,7 +94,7 @@ const SingleSidedStaking = () => {
 
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
   const [loadingAssociate, setLoadingAssociate] = useState(false);
-  const [stakingTokenBalance, setStakingTokenBalance] = useState(0);
+  const [stakingTokenBalance, setStakingTokenBalance] = useState('0');
 
   const userRewardsUSD = useMemo(() => {
     if (Object.keys(sssData).length !== 0) {
@@ -180,11 +180,23 @@ const SingleSidedStaking = () => {
     return notHTS || userAssociatedTokens?.includes(token.hederaId);
   };
 
+  const getStakingTokenBalance = async (userId: string, stakingTokenId: string) => {
+    const stakingTokenBalance =
+      (await getTokenBalance(userId, {
+        decimals: 8,
+        hederaId: stakingTokenId,
+        symbol: 'HELI',
+        type: TokenType.HTS,
+        name: '',
+        address: '',
+      })) || '0';
+    setStakingTokenBalance(stakingTokenBalance);
+  };
+
   useEffect(() => {
-    const getStakingTokenBalance = async (userId: string, stakingTokenId: string) => {
-      const stakingToken = await getHTSTokenWalletBalance(userId, stakingTokenId);
-      setStakingTokenBalance(stakingToken);
-    };
+    if (!userId) {
+      setStakingTokenBalance('0');
+    }
 
     userId && stakingTokenId && getStakingTokenBalance(userId, stakingTokenId);
   }, [userId, stakingTokenId]);
@@ -199,7 +211,7 @@ const SingleSidedStaking = () => {
   const { tokens: userRewardsData } = useTokensByListIds(userRewardsAddresses, useQueryOptions);
 
   const hasUserStaked = sssData.userStakingData?.stakedAmount !== '0';
-  const hasUserProvided = stakingTokenBalance !== 0;
+  const hasUserProvided = Number(stakingTokenBalance) !== 0;
   const campaignEnded = sssData.campaignEndDate < Date.now();
   const haveFarm = Object.keys(sssData).length !== 0;
   const campaignHasRewards = sssData.rewardsData?.length > 0;
@@ -217,7 +229,16 @@ const SingleSidedStaking = () => {
   ) : (
     <div className="d-flex justify-content-center">
       <div className="container-max-with-1042">
-        <PageHeader title="Single Sided Staking" />
+        <h1 className="text-headline text-light mb-4">Single Sided Staking - Phase 1</h1>
+
+        <p className="text-small mb-4 mb-lg-6">
+          Phase 1 is a standard Single Sided Staking pool. Phase 2 will involve the same mechanism,
+          but with advanced features like lockup periods. In Phase 2, staked tokens will also earn
+          voting power for the HeliSwap DAO. Phase 2 will follow a few weeks after Phase 1 and we
+          will update the community well in advance to make sure everyone can migrate their
+          liquidity on time.
+        </p>
+
         {haveFarm ? (
           <div className="row">
             <div className="col-md-7">
@@ -256,7 +277,7 @@ const SingleSidedStaking = () => {
                     <div className="col-6 col-md-4 d-flex align-items-center">
                       <p className="d-flex align-items-center">
                         <span className="text-secondary text-small">Total Staked</span>
-                        <Tippy content="The total amount of staked tokens in this farm pool, denominated in $USD.">
+                        <Tippy content="The total amount of staked tokens in this single sided staking pool, denominated in $USD.">
                           <span className="ms-2">
                             <Icon name="hint" color="gray" size="small" />
                           </span>
@@ -321,7 +342,7 @@ const SingleSidedStaking = () => {
                         <div className="col-6 col-md-4 d-flex align-items-center">
                           <p className="d-flex align-items-center">
                             <span className="text-secondary text-small">Your share</span>
-                            <Tippy content="Your staked amount in this farm pool, expressed as a percentage.">
+                            <Tippy content="Your staked amount in this single sided staking pool, expressed as a percentage.">
                               <span className="ms-2">
                                 <Icon name="hint" color="gray" size="small" />
                               </span>
@@ -545,6 +566,7 @@ const SingleSidedStaking = () => {
               loadingAssociate={loadingAssociate}
               tokensToAssociate={tokensToAssociate || []}
               handleAssociateClick={handleAssociateClick}
+              getStakingTokenBalance={getStakingTokenBalance}
             />
           </div>
         ) : (
@@ -557,6 +579,8 @@ const SingleSidedStaking = () => {
             </div>
           </div>
         )}
+
+        <SSSFAQ />
       </div>
       <ToasterWrapper />
     </div>
