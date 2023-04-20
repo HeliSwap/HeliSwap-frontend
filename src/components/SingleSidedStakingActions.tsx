@@ -42,6 +42,7 @@ interface IFarmActionsProps {
   stakingTokenBalance: string;
   tokensToAssociate: ITokenData[];
   loadingAssociate: boolean;
+  getStakingTokenBalance: (userId: string, tokenId: string) => void;
   handleAssociateClick: (token: ITokenData) => void;
 }
 
@@ -58,6 +59,7 @@ const FarmActions = ({
   stakingTokenBalance,
   tokensToAssociate,
   loadingAssociate,
+  getStakingTokenBalance,
   handleAssociateClick,
 }: IFarmActionsProps) => {
   const contextValue = useContext(GlobalContext);
@@ -125,6 +127,7 @@ const FarmActions = ({
       console.error(err);
       toast.error('Error on stake');
     } finally {
+      await getStakingTokenBalance(userId, addressToId(sssData.stakingTokenAddress));
       setLoadingStake(false);
       setShowStakeModal(false);
       setSliderValue(SLIDER_INITIAL_VALUE);

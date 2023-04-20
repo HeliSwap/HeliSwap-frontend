@@ -180,20 +180,20 @@ const SingleSidedStaking = () => {
     return notHTS || userAssociatedTokens?.includes(token.hederaId);
   };
 
-  useEffect(() => {
-    const getStakingTokenBalance = async (userId: string, stakingTokenId: string) => {
-      const stakingTokenBalance =
-        (await getTokenBalance(userId, {
-          decimals: 8,
-          hederaId: stakingTokenId,
-          symbol: 'HELI',
-          type: TokenType.HTS,
-          name: '',
-          address: '',
-        })) || '0';
-      setStakingTokenBalance(stakingTokenBalance);
-    };
+  const getStakingTokenBalance = async (userId: string, stakingTokenId: string) => {
+    const stakingTokenBalance =
+      (await getTokenBalance(userId, {
+        decimals: 8,
+        hederaId: stakingTokenId,
+        symbol: 'HELI',
+        type: TokenType.HTS,
+        name: '',
+        address: '',
+      })) || '0';
+    setStakingTokenBalance(stakingTokenBalance);
+  };
 
+  useEffect(() => {
     if (!userId) {
       setStakingTokenBalance('0');
     }
@@ -566,6 +566,7 @@ const SingleSidedStaking = () => {
               loadingAssociate={loadingAssociate}
               tokensToAssociate={tokensToAssociate || []}
               handleAssociateClick={handleAssociateClick}
+              getStakingTokenBalance={getStakingTokenBalance}
             />
           </div>
         ) : (
