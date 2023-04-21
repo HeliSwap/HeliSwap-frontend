@@ -57,7 +57,9 @@ class SDK {
       //Set the contract function to call
       .setFunction(
         'approve',
-        new ContractFunctionParameters().addAddress(spenderAddress).addUint256(amountToApproveBN),
+        new ContractFunctionParameters()
+          .addAddress(spenderAddress)
+          .addUint256(amountToApproveBN.toNumber()),
       );
 
     return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
@@ -103,14 +105,14 @@ class SDK {
       //Set the gas for the contract call
       .setGas(maxGas)
       //Amount of HBAR we want to provide
-      .setPayableAmount(HBARAmount)
+      .setPayableAmount(HBARAmount.toString())
       .setFunction(
         'addLiquidityHBAR',
         new ContractFunctionParameters()
           .addAddress(tokenAddress)
-          .addUint256(tokenAmount)
-          .addUint256(tokenAmountMin)
-          .addUint256(HBARAmountMin)
+          .addUint256(tokenAmount.toNumber())
+          .addUint256(tokenAmountMin.toNumber())
+          .addUint256(HBARAmountMin.toNumber())
           .addAddress(userAddress)
           .addUint256(getExpirationTime(expiresAfter)),
       );
@@ -173,10 +175,10 @@ class SDK {
         new ContractFunctionParameters()
           .addAddress(tokenAAddress)
           .addAddress(tokenBAddress)
-          .addUint256(tokenAAmount)
-          .addUint256(tokenBAmount)
-          .addUint256(tokenAAmountMin)
-          .addUint256(tokenBAmountMin)
+          .addUint256(tokenAAmount.toNumber())
+          .addUint256(tokenBAmount.toNumber())
+          .addUint256(tokenAAmountMin.toNumber())
+          .addUint256(tokenBAmountMin.toNumber())
           .addAddress(userAddress)
           .addUint256(getExpirationTime(expiresAfter)),
       );
@@ -214,9 +216,9 @@ class SDK {
         'removeLiquidityHBAR',
         new ContractFunctionParameters()
           .addAddress(tokenAddress)
-          .addUint256(tokensLpAmountBN)
-          .addUint256(tokenAmountMin)
-          .addUint256(HBARAmountMin)
+          .addUint256(tokensLpAmountBN.toNumber())
+          .addUint256(tokenAmountMin.toNumber())
+          .addUint256(HBARAmountMin.toNumber())
           .addAddress(userAddress)
           .addUint256(getExpirationTime(expiresAfter)),
       );
@@ -256,9 +258,9 @@ class SDK {
         new ContractFunctionParameters()
           .addAddress(tokenInAddress)
           .addAddress(tokenOutAddress)
-          .addUint256(tokensLpAmountBN)
-          .addUint256(tokens0AmountMin)
-          .addUint256(tokens1AmountMin)
+          .addUint256(tokensLpAmountBN.toNumber())
+          .addUint256(tokens0AmountMin.toNumber())
+          .addUint256(tokens1AmountMin.toNumber())
           .addAddress(userAddress)
           .addUint256(getExpirationTime(expiresAfter)),
       );
@@ -334,11 +336,11 @@ class SDK {
         ? formatStringToBigNumberWei(amountIn, 0)
         : getAmountWithSlippage(amountIn, 0, slippage, false, true);
       trans //Amount of HBAR we want to provide
-        .setPayableAmount(HBARAmount)
+        .setPayableAmount(HBARAmount.toString())
         .setFunction(
           getTransactionName(),
           new ContractFunctionParameters()
-            .addUint256(tokenOutAmount)
+            .addUint256(tokenOutAmount.toNumber())
             .addAddressArray(path)
             .addAddress(userAddress)
             .addUint256(getExpirationTime(expiresAfter)),
@@ -347,8 +349,8 @@ class SDK {
       trans.setFunction(
         getTransactionName(),
         new ContractFunctionParameters()
-          .addUint256(exactAmountIn ? tokenInAmount : tokenOutAmount)
-          .addUint256(exactAmountIn ? tokenOutAmount : tokenInAmount)
+          .addUint256(exactAmountIn ? tokenInAmount.toNumber() : tokenOutAmount.toNumber())
+          .addUint256(exactAmountIn ? tokenOutAmount.toNumber() : tokenInAmount.toNumber())
           .addAddressArray(path)
           .addAddress(userAddress)
           .addUint256(getExpirationTime(expiresAfter)),
@@ -388,7 +390,10 @@ class SDK {
       //Set the gas for the contract call
       .setGas(maxGas)
       //Set the contract function to call
-      .setFunction('withdraw', new ContractFunctionParameters().addUint256(tokenAmountInNum));
+      .setFunction(
+        'withdraw',
+        new ContractFunctionParameters().addUint256(tokenAmountInNum.toNumber()),
+      );
 
     return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
   }
@@ -412,7 +417,7 @@ class SDK {
       //Set the contract function to call
       .setFunction(
         'transfer',
-        new ContractFunctionParameters().addAddress(to).addUint256(tokenAAmount),
+        new ContractFunctionParameters().addAddress(to).addUint256(tokenAAmount.toNumber()),
       );
 
     return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
@@ -433,7 +438,10 @@ class SDK {
       //Set the gas for the contract call
       .setGas(maxGas)
       //Set the contract function to call
-      .setFunction('stake', new ContractFunctionParameters().addUint256(tokensLpAmountBN));
+      .setFunction(
+        'stake',
+        new ContractFunctionParameters().addUint256(tokensLpAmountBN.toNumber()),
+      );
 
     return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
   }
@@ -511,7 +519,10 @@ class SDK {
       .setGas(maxGas)
       //Amount of HBAR we want to provide
       //Set the contract function to call
-      .setFunction('withdraw', new ContractFunctionParameters().addUint256(HBARAmountBN));
+      .setFunction(
+        'withdraw',
+        new ContractFunctionParameters().addUint256(HBARAmountBN.toNumber()),
+      );
 
     return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
   }
