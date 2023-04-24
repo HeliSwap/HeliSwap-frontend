@@ -7,7 +7,7 @@ import BigNumber from 'bignumber.js';
 
 import { GlobalContext } from '../providers/Global';
 
-import { ISSSData, ITokenData } from '../interfaces/tokens';
+import { ISSSData, ITokenData, TokenType } from '../interfaces/tokens';
 
 import Button from './Button';
 import ButtonSelector from './ButtonSelector';
@@ -30,7 +30,7 @@ import {
   addressToId,
   calculatePercentageByShare,
   calculateShareByPercentage,
-  checkAllowanceERC20,
+  checkAllowanceHTS,
   invalidInputTokensData,
 } from '../utils/tokenUtils';
 
@@ -211,11 +211,18 @@ const FarmActions = ({
   useEffect(() => {
     const getLPAllowanceData = async () => {
       try {
-        const canSpend = await checkAllowanceERC20(
-          sssData.stakingTokenAddress,
+        const canSpend = await checkAllowanceHTS(
           userId,
-          sssData.address,
+          {
+            decimals: 8,
+            hederaId: addressToId(sssData.stakingTokenAddress),
+            symbol: 'HELI',
+            type: TokenType.HTS,
+            name: '',
+            address: sssData.stakingTokenAddress,
+          },
           lpInputValue,
+          sssData.address,
         );
         setLpApproved(canSpend);
       } catch (e) {
