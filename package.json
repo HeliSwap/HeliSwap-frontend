@@ -19,7 +19,7 @@
     "@types/react-dom": "^18.0.5",
     "@types/react-gtm-module": "^2.0.1",
     "axios": "^0.27.2",
-    "bignumber.js": "^9.0.2",
+    "bignumber.js": "^9.1.1",
     "bootstrap": "^5.2.2",
     "dayjs": "^1.11.5",
     "ethers": "^5.7.2",
