@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom';
+import Tippy from '@tippyjs/react';
 import Icon from './Icon';
 
 const navigation = [
@@ -73,9 +74,11 @@ const Navigation = () => {
             to={item.link}
             className={({ isActive }) => getClasses(isActive, index).join(' ')}
           >
-            <span className="icon-menu">
-              <Icon color={item.color} name={item.name} />
-            </span>
+            <Tippy placement="right" className="d-xxxl-none" content={item.text}>
+              <span className="icon-menu">
+                <Icon color={item.color} name={item.name} />
+              </span>
+            </Tippy>
             <span className="ms-4 d-none d-xxxl-inline-block">{item.text}</span>
           </NavLink>
         );
@@ -86,9 +89,11 @@ const Navigation = () => {
         rel="noreferrer"
         href="https://app.hashport.network/"
       >
-        <span className="icon-menu">
-          <Icon color="gray" name="hashport" />
-        </span>
+        <Tippy placement="right" className="d-xxxl-none" content="Hashport Bridge">
+          <span className="icon-menu">
+            <Icon color="gray" name="hashport" />
+          </span>
+        </Tippy>
         <span className="ms-4 d-none d-xxxl-inline-block">Hashport Bridge</span>
       </a>
     </div>
