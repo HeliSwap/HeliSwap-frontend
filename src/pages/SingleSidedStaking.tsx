@@ -31,7 +31,7 @@ import {
   formatStringWeiToStringEther,
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
-import { renderCampaignEndDate } from '../utils/farmUtils';
+import { renderSSSEndDate } from '../utils/farmUtils';
 
 import {
   addressToId,
@@ -250,7 +250,7 @@ const SingleSidedStaking = () => {
                   </div>
 
                   <div className="container-campaign-status mt-4 mt-md-0 d-flex align-items-center">
-                    {renderCampaignEndDate(sssData.campaignEndDate)}
+                    {renderSSSEndDate(sssData.campaignEndDate)}
                   </div>
                 </div>
 

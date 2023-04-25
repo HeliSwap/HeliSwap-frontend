@@ -9,6 +9,7 @@ import {
   IUserStakingData,
 } from '../interfaces/tokens';
 import { formatStringWeiToStringEther } from './numberUtils';
+import { timestampToDate } from './timeUtils';
 import { getTokenPrice, mapHBARTokenSymbol } from './tokenUtils';
 
 export const getProcessedFarms = (
@@ -391,6 +392,35 @@ export const renderCampaignEndDate = (campaignEndDate: number) => {
   const campaignNotStarted = campaignEndDate === 0;
 
   const statusLabel = campaignNotStarted ? 'Not started' : campaignEnded ? 'Ended' : 'Active';
+
+  const dateContent = (
+    <>
+      <span
+        className={`icon-campaign-status ${
+          !campaignNotStarted ? (!campaignEnded ? 'is-active' : '') : 'not-started'
+        }`}
+      ></span>
+      <span className="text-micro ms-3">{statusLabel}</span>
+    </>
+  );
+
+  return <div className="d-flex align-items-center">{dateContent}</div>;
+};
+
+export const renderSSSEndDate = (campaignEndDate: number) => {
+  const campaignEnded = campaignEndDate < Date.now();
+  const campaignNotStarted = campaignEndDate === 0;
+
+  const statusLabel = campaignNotStarted ? (
+    'Campaign not started'
+  ) : campaignEnded ? (
+    'Campaign Ended'
+  ) : (
+    <>
+      Until <span className="text-bold">{timestampToDate(campaignEndDate)}</span>
+      <span className="ms-2">(Staking period might be extended)</span>
+    </>
+  );
 
   const dateContent = (
     <>
