@@ -163,8 +163,12 @@ export const checkAllowanceHTS = async (
   userId: string,
   token: ITokenData,
   amountToSpend: string,
+  spenderAddress?: string,
 ) => {
-  const spenderId = addressToId(process.env.REACT_APP_ROUTER_ADDRESS as string);
+  const spenderId =
+    spenderAddress && spenderAddress !== ''
+      ? addressToId(spenderAddress as string)
+      : addressToId(process.env.REACT_APP_ROUTER_ADDRESS as string);
   const allowances = await getTokenAllowance(userId, spenderId, token.hederaId);
 
   if (allowances.length > 0) {

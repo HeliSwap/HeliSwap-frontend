@@ -106,6 +106,24 @@ export interface IPoolsAnalytics {
   volume7d: number;
 }
 
+export interface ISSSDataRaw {
+  address: string;
+  totalStaked: string;
+  rewardsData: IRewardRaw[];
+  stakingTokenAddress: string;
+  userStakingData: IUserStakingDataRaw;
+}
+
+export interface ISSSData extends ISSSDataRaw {
+  totalStakedUSD: string;
+  rewardsData: IReward[];
+  userStakingData: IUserStakingData;
+  APR: string;
+  totalRewardsUSD: string;
+  campaignEndDate: number;
+  [key: string]: any;
+}
+
 export interface IFarmDataRaw {
   address: string;
   poolData: IPoolData;

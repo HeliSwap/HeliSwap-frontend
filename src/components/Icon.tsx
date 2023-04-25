@@ -35,6 +35,7 @@ import { ReactComponent as Plus } from '../icons/system/plus.svg';
 import { ReactComponent as Minus } from '../icons/system/minus.svg';
 import { ReactComponent as Claim } from '../icons/system/claim.svg';
 import { ReactComponent as C14 } from '../icons/system/c14.svg';
+import { ReactComponent as SSS } from '../icons/system/sss.svg';
 
 interface IIconProps {
   name: string;
@@ -96,6 +97,7 @@ const icons: IIconMapping = {
   minus: Minus,
   claim: Claim,
   c14: C14,
+  sss: SSS,
 };
 
 const colorMapping: IColorMapping = {

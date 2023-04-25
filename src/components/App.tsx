@@ -18,6 +18,7 @@ import Lockdrop from '../pages/Lockdrop';
 import Claimdrop from '../pages/Claimdrop';
 import ClaimdropDetails from '../pages/ClaimdropDetails';
 import C14 from '../pages/C14';
+import SingleSidedStaking from '../pages/SingleSidedStaking';
 
 import Header from './Header';
 import Footer from './Footer';
@@ -55,6 +56,7 @@ function App() {
                       <Route path="claimdrop" element={<Claimdrop />} />
                       <Route path="claimdrop/:campaign" element={<ClaimdropDetails />} />
                       <Route path="buy-crypto" element={<C14 />} />
+                      <Route path="single-sided-staking" element={<SingleSidedStaking />} />
                       <Route path="styleguide" element={<Styleguide />} />
                     </Routes>
                   </div>
