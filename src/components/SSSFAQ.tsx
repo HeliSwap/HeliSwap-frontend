@@ -64,7 +64,7 @@ const SSSFAQ = () => {
 
           <ExpandContent title="How long will Phase 1 go?">
             <p className="text-small">
-              Phase 1 is intended to last a few weeks from today (April 25th) until Phase 2 has been
+              Phase 1 is intended to last a few weeks from today (April 26th) until Phase 2 has been
               rolled out. Once we have more clarity on the launch date for Phase 2, we will update
               the entire community in advance.
             </p>
