@@ -43,7 +43,7 @@ const navigation = [
     link: '/buy-crypto',
     name: 'c14',
     color: 'gray',
-    text: 'Buy crypto with Fiat',
+    text: 'Buy Crypto with Fiat',
   },
   {
     link: '/analytics',
@@ -74,7 +74,7 @@ const Navigation = () => {
             to={item.link}
             className={({ isActive }) => getClasses(isActive, index).join(' ')}
           >
-            <Tippy placement="right" className="d-xxxl-none" content={item.text}>
+            <Tippy placement="right" className="d-none d-md-block d-xxxl-none" content={item.text}>
               <span className="icon-menu">
                 <Icon color={item.color} name={item.name} />
               </span>
@@ -89,7 +89,11 @@ const Navigation = () => {
         rel="noreferrer"
         href="https://app.hashport.network/"
       >
-        <Tippy placement="right" className="d-xxxl-none" content="Hashport Bridge">
+        <Tippy
+          placement="right"
+          className="d-none d-md-block d-xxxl-none"
+          content="Hashport Bridge"
+        >
           <span className="icon-menu">
             <Icon color="gray" name="hashport" />
           </span>
