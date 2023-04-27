@@ -7,7 +7,7 @@ import { hethers } from '@hashgraph/hethers';
 
 import { GlobalContext } from '../providers/Global';
 
-import { IPoolData, ITokenData, TokenType } from '../interfaces/tokens';
+import { IPoolExtendedData, ITokenData, TokenType } from '../interfaces/tokens';
 
 import Button from './Button';
 import IconToken from './IconToken';
@@ -52,7 +52,7 @@ import getErrorMessage from '../content/errors';
 import { MAX_UINT_ERC20, SLIDER_INITIAL_VALUE, useQueryOptions } from '../constants';
 
 interface IRemoveLiquidityProps {
-  pairData: IPoolData;
+  pairData: IPoolExtendedData;
   setShowRemoveContainer: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -169,7 +169,9 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
       const { removeSlippage, transactionExpiration } = getTransactionSettings();
 
       if (hasWrappedHBAR && removeNative) {
-        const isFirstTokenWHBAR = pairData.token0 === process.env.REACT_APP_WHBAR_ADDRESS;
+        const isFirstTokenWHBAR =
+          pairData.token0 === process.env.REACT_APP_WHBAR_ADDRESS ||
+          pairData.token0 === process.env.REACT_APP_WHBAR_ADDRESS_OLD;
 
         const WHBARAmount = isFirstTokenWHBAR
           ? removeLpData.tokens0Amount
@@ -202,6 +204,7 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
           WHBARDecimals,
           removeSlippage,
           transactionExpiration,
+          pairData.forMigration || false,
         );
       } else {
         responseData = await sdk.removeLiquidity(
@@ -299,7 +302,9 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
     if (pairData && pairData.pairAddress) {
       setHasWrappedHBAR(
         pairData.token0 === process.env.REACT_APP_WHBAR_ADDRESS ||
-          pairData.token1 === process.env.REACT_APP_WHBAR_ADDRESS,
+          pairData.token1 === process.env.REACT_APP_WHBAR_ADDRESS ||
+          pairData.token0 === process.env.REACT_APP_WHBAR_ADDRESS_OLD ||
+          pairData.token1 === process.env.REACT_APP_WHBAR_ADDRESS_OLD,
       );
     }
   }, [pairData, removeLpData, sdk, userId]);
