@@ -195,14 +195,16 @@ const PoolInfo = ({
             </Link>
           </div>
 
-          <div className="flex-1">
-            <Link
-              className="d-block btn btn-sm btn-primary ms-3"
-              to={`/create/${poolData.token0}/${poolData.token1}`}
-            >
-              Add Liquidity
-            </Link>
-          </div>
+          {!poolData.forMigration ? (
+            <div className="flex-1">
+              <Link
+                className="d-block btn btn-sm btn-primary ms-3"
+                to={`/create/${poolData.token0}/${poolData.token1}`}
+              >
+                Add Liquidity
+              </Link>
+            </div>
+          ) : null}
 
           <div className="flex-1">
             <Link
@@ -432,14 +434,16 @@ const PoolInfo = ({
         ) : null}
 
         <div className="col-md-4 mt-4 mt-md-0">
-          <div>
-            <Link
-              className="d-block btn btn-sm btn-primary"
-              to={`/create/${poolData.token0}/${poolData.token1}`}
-            >
-              Increase Liquidity
-            </Link>
-          </div>
+          {!poolData.forMigration ? (
+            <div>
+              <Link
+                className="d-block btn btn-sm btn-primary"
+                to={`/create/${poolData.token0}/${poolData.token1}`}
+              >
+                Increase Liquidity
+              </Link>
+            </div>
+          ) : null}
 
           <div className="d-grid mt-3">
             <Button
@@ -493,7 +497,7 @@ const PoolInfo = ({
           ) : null}
 
           {poolData.forMigration ? (
-            <span className="text-micro text-uppercase badge bg-warning ms-3">Migration</span>
+            <span className="text-micro text-uppercase badge bg-danger ms-3">Deprecated</span>
           ) : null}
 
           {poolData.hasProblematicToken ? (
