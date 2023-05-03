@@ -255,8 +255,18 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
     try {
       const lpTokenId = await requestIdFromAddress(pairData.pairAddress);
+      const spender = pairData.forMigration
+        ? (process.env.REACT_APP_ROUTER_ADDRESS_OLD as string)
+        : '';
 
-      const receipt = await sdk.approveToken(connectorInstance, amount, userId, lpTokenId, false);
+      const receipt = await sdk.approveToken(
+        connectorInstance,
+        amount,
+        userId,
+        lpTokenId,
+        false,
+        spender,
+      );
 
       const {
         response: { success, error },
@@ -311,7 +321,10 @@ const RemoveLiquidity = ({ pairData, setShowRemoveContainer }: IRemoveLiquidityP
 
   useEffect(() => {
     const getLPAllowanceData = async (amountToSpend: string) => {
-      const spenderAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
+      const forMigration = pairData.forMigration;
+      const spenderAddress = forMigration
+        ? (process.env.REACT_APP_ROUTER_ADDRESS_OLD as string)
+        : (process.env.REACT_APP_ROUTER_ADDRESS as string);
       try {
         const canSpend = await checkAllowanceERC20(
           pairData.pairAddress,
