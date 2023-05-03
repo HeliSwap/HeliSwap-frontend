@@ -492,7 +492,7 @@ export const mapWHBARAddress = (token: ITokenData | IReward) => {
   return token.address === process.env.REACT_APP_WHBAR_ADDRESS ? NATIVE_TOKEN.symbol : token.symbol;
 };
 
-export const isPoolDepricated = (token0: string, token1: string) => {
+export const isPoolDeprecated = (token0: string, token1: string) => {
   return (
     token0 === process.env.REACT_APP_WHBAR_ADDRESS_OLD ||
     token1 === process.env.REACT_APP_WHBAR_ADDRESS_OLD

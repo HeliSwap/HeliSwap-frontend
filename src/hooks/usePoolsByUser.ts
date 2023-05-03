@@ -16,7 +16,7 @@ import {
   calculateReserves,
   calculatePercentageByShare,
   mapHBARTokenSymbol,
-  isPoolDepricated,
+  isPoolDeprecated,
 } from '../utils/tokenUtils';
 import { formatStringWeiToStringEther } from '../utils/numberUtils';
 
@@ -148,7 +148,7 @@ const usePoolsByUser = (
           // Check if pool is for migration
           let forMigration = false;
 
-          if (isPoolDepricated(token0, token1)) {
+          if (isPoolDeprecated(token0, token1)) {
             forMigration = true;
           }
 
