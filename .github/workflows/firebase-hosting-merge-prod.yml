@@ -6,7 +6,7 @@ env:
   CI: false
   REACT_APP_PROVIDER_URL: https://mainnet.hashio.io/api
   REACT_APP_MIRROR_NODE_URL: https://mainnet-public.mirrornode.hedera.com
-  REACT_APP_TOKEN_LIST_URL: https://heliswap.infura-ipfs.io/ipfs/QmTURxXyLpACyvyPHkDmK7Ahg1MzTxcvK3LYSFN8ffcHqp
+  REACT_APP_TOKEN_LIST_URL: https://heliswap.infura-ipfs.io/ipfs/QmNYhwMJBYP84sT1RaxcSTW2U2FFk59BogD8CtVdU1a3Bx
   REACT_APP_NETWORK_TYPE: mainnet
   REACT_APP_GRAPHQL_URI: https://heliswap-prod-362307.oa.r.appspot.com/query
   REACT_APP_POOL_MIN_LIQUIDITY: 1500
