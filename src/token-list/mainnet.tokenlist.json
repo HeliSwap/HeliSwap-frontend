@@ -193,6 +193,14 @@
       "symbol": "$LAB",
       "decimals": 8,
       "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/LAB.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x000000000000000000000000000000000022D6de",
+      "name": "Karate",
+      "symbol": "KARATE",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/KARATE.png"
     }
   ]
 }
