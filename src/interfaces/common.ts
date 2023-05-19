@@ -67,6 +67,14 @@ export interface IContractTokenValue {
   valueStringETH: string;
 }
 
+export interface ILockdropDataRaw {
+  getLockDropUserInfo: {
+    totalAllocated: String;
+    claimable: String;
+    claimed: String;
+  };
+}
+
 export interface ILockdropData {
   lockDropDuration: number;
   lockdropEnd: number;

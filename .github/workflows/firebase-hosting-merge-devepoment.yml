@@ -9,6 +9,7 @@ env:
   REACT_APP_TOKEN_LIST_URL: https://heliswap.infura-ipfs.io/ipfs/Qme6rWvTbjUvykvFaawbK9Dh5ZSsj44mNhCiPfC1vk1fDc
   REACT_APP_NETWORK_TYPE: testnet
   REACT_APP_GRAPHQL_URI: https://api-dev.heliswap.io/query
+  REACT_APP_DROP_POLLER_URI: https://api-dev.heliswap.io/query
   REACT_APP_POOL_MIN_LIQUIDITY: 0
 'on':
   push:
