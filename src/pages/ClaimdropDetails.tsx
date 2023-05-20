@@ -5,10 +5,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Tippy from '@tippyjs/react';
 import numeral from 'numeral';
 import { ethers } from 'ethers';
+import { GraphQLClient } from 'graphql-request';
 
 import { GlobalContext } from '../providers/Global';
 
-import { IClaimdropData } from '../interfaces/common';
+import { IClaimdropData, IClaimdropDataRaw } from '../interfaces/common';
 import { ITokenData } from '../interfaces/tokens';
 
 import Button from '../components/Button';
@@ -36,6 +37,7 @@ import ClaimDropABI from '../abi/ClaimDrop.json';
 
 import claimdropsTestnet from '../claimdrops/testnet';
 import claimdropsMainet from '../claimdrops/mainnet';
+import { GET_CLAIMDROP_DATA } from '../GraphQL/Queries';
 
 enum CLAIMDROP_STATE {
   NOT_STARTED,
@@ -305,13 +307,21 @@ const ClaimdropDetails = () => {
       if (userId) {
         const userAddress = idToAddress(userId);
 
-        const userPromisesArray = [
-          claimDropContract.claimedOf(userAddress),
-          claimDropContract.claimable(userAddress),
-          claimDropContract.totalAllocatedOf(userAddress),
-        ];
+        const heliSwapAPIUrl = process.env.REACT_APP_DROP_POLLER_URI as string;
+        const variables = {
+          address: userAddress,
+          claimDropAddress: claimDropContractAddress,
+        };
 
-        [claimedOfBN, claimableBN, totalAllocatedOfBN] = await Promise.all(userPromisesArray);
+        const client = new GraphQLClient(heliSwapAPIUrl);
+        const response = await client.request<IClaimdropDataRaw>(GET_CLAIMDROP_DATA, variables);
+        const {
+          getClaimDropUserInfo: { claimable, claimed, totalAllocated },
+        } = response;
+
+        claimableBN = ethers.BigNumber.from(claimable);
+        claimedOfBN = ethers.BigNumber.from(claimed);
+        totalAllocatedOfBN = ethers.BigNumber.from(totalAllocated);
       }
 
       const claimedOf = {
@@ -376,7 +386,7 @@ const ClaimdropDetails = () => {
     } finally {
       setLoadingContractData(false);
     }
-  }, [userId, tokenData.decimals, claimDropContract, foundLockdropData]);
+  }, [userId, tokenData.decimals, foundLockdropData, claimDropContractAddress]);
 
   const checkTokenAssociation = async (userId: string) => {
     const tokens = await getUserAssociatedTokens(userId);

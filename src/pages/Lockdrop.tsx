@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useContext } from 'react';
-import numeral from 'numeral';
 import toast from 'react-hot-toast';
+
+import numeral from 'numeral';
 import { ethers } from 'ethers';
 import { GraphQLClient } from 'graphql-request';
 

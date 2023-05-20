@@ -104,6 +104,14 @@ export interface IDaysMapping {
   };
 }
 
+export interface IClaimdropDataRaw {
+  getClaimDropUserInfo: {
+    totalAllocated: String;
+    claimable: String;
+    claimed: String;
+  };
+}
+
 export interface IClaimdropData {
   claimdropStart: {
     date: string;
