@@ -157,10 +157,10 @@ const Lockdrop = () => {
             getLockDropUserInfo: { claimable, claimed, totalAllocated, deposited },
           } = response;
 
-          claimableBN = ethers.BigNumber.from(claimable);
-          claimedOfBN = ethers.BigNumber.from(claimed);
-          totalClaimableBN = ethers.BigNumber.from(totalAllocated);
-          stakedTokensBN = ethers.BigNumber.from(deposited);
+          claimableBN = ethers.BigNumber.from(claimable || 0);
+          claimedOfBN = ethers.BigNumber.from(claimed || 0);
+          totalClaimableBN = ethers.BigNumber.from(totalAllocated || 0);
+          stakedTokensBN = ethers.BigNumber.from(deposited || 0);
         }
 
         const totalLP = {
