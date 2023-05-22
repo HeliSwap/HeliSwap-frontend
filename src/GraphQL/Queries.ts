@@ -380,6 +380,7 @@ export const GET_LOCKDROP_DATA = gql`
       totalAllocated
       claimed
       claimable
+      deposited
     }
   }
 `;

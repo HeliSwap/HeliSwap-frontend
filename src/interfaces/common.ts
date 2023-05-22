@@ -72,6 +72,7 @@ export interface ILockdropDataRaw {
     totalAllocated: String;
     claimable: String;
     claimed: String;
+    deposited: String;
   };
 }
 

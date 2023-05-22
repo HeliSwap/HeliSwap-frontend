@@ -48,7 +48,11 @@ const lockDropInitialData: ILockdropData = {
   lockDropDepositEnd: 1676980752000,
   vestingEndTime: 1685039134000,
   totalLP: defaultBNValue,
-  totalHbars: defaultBNValue,
+  totalHbars: {
+    valueBN: ethers.BigNumber.from('1541129857313845'),
+    valueStringWei: '1541129857313845',
+    valueStringETH: '15411298.57313845',
+  },
   totalTokens: {
     valueBN: ethers.BigNumber.from('2000000000000000'),
     valueStringWei: '2000000000000000',
@@ -136,7 +140,6 @@ const Lockdrop = () => {
         let claimedOfBN = ethers.BigNumber.from(0);
         let totalClaimableBN = ethers.BigNumber.from(0);
         let totalLPBN = ethers.BigNumber.from(0);
-        let totalHbarsBN = ethers.BigNumber.from(0);
 
         let claimableBN = ethers.BigNumber.from(0);
 
@@ -151,12 +154,13 @@ const Lockdrop = () => {
           const client = new GraphQLClient(heliSwapAPIUrl);
           const response = await client.request<ILockdropDataRaw>(GET_LOCKDROP_DATA, variables);
           const {
-            getLockDropUserInfo: { claimable, claimed, totalAllocated },
+            getLockDropUserInfo: { claimable, claimed, totalAllocated, deposited },
           } = response;
 
           claimableBN = ethers.BigNumber.from(claimable);
           claimedOfBN = ethers.BigNumber.from(claimed);
           totalClaimableBN = ethers.BigNumber.from(totalAllocated);
+          stakedTokensBN = ethers.BigNumber.from(deposited);
         }
 
         const totalLP = {
@@ -164,16 +168,6 @@ const Lockdrop = () => {
           valueStringWei: totalLPBN.toString(),
           valueStringETH: formatBNTokenToString(totalLPBN, 18),
         };
-        const totalHbars = {
-          valueBN: totalHbarsBN,
-          valueStringWei: totalHbarsBN.toString(),
-          valueStringETH: formatBNTokenToString(totalHbarsBN),
-        };
-        // const totalTokens = {
-        //   valueBN: totalTokensBN,
-        //   valueStringWei: totalTokensBN.toString(),
-        //   valueStringETH: formatBNTokenToString(totalTokensBN),
-        // };
         const lockedHbars = {
           valueBN: stakedTokensBN,
           valueStringWei: stakedTokensBN.toString(),
@@ -198,7 +192,7 @@ const Lockdrop = () => {
         const myHELIFormatted = getUserHELIReserves(
           lockDropInitialData.totalTokens.valueBN,
           lockedHbars.valueBN,
-          totalHbars.valueBN,
+          lockDropInitialData.totalHbars.valueBN,
         );
         const estimatedLPTokensBN = calculateLPTokens(
           myHELIFormatted,
@@ -213,7 +207,7 @@ const Lockdrop = () => {
         // Calculate total estimates LP tokens before pool is created; this amount shoub be == to `totalLPtokens` after pool is created
         const estimatedTotalLPTokensBN = calculateLPTokens(
           lockDropInitialData.totalTokens.valueStringETH,
-          totalHbars.valueStringETH,
+          lockDropInitialData.totalHbars.valueStringETH,
           8,
           8,
         );
@@ -283,7 +277,6 @@ const Lockdrop = () => {
         setLockDropData({
           ...lockDropInitialData,
           totalLP,
-          totalHbars,
           estimatedLPTokens,
           lockedHbars,
           estimatedLPPercentage,
