@@ -1,13 +1,20 @@
-import React, { useState, useEffect, useCallback, useMemo, useContext } from 'react';
-import numeral from 'numeral';
+import { useState, useEffect, useCallback, useMemo, useContext } from 'react';
 import toast from 'react-hot-toast';
+
+import numeral from 'numeral';
 import { ethers } from 'ethers';
+import { GraphQLClient } from 'graphql-request';
 
 import { GlobalContext } from '../providers/Global';
 
 import useFarmAddress from '../hooks/useFarmAddress';
 
-import { IDaysMapping, ILockdropData, LOCKDROP_STATE } from '../interfaces/common';
+import {
+  IDaysMapping,
+  ILockdropData,
+  ILockdropDataRaw,
+  LOCKDROP_STATE,
+} from '../interfaces/common';
 
 import LockdropStats from '../components/LockdropStats';
 import LockdropFAQ from '../components/LockdropFAQ';
@@ -24,6 +31,7 @@ import {
 } from '../utils/numberUtils';
 
 import { useQueryOptionsPoolsFarms } from '../constants';
+import { GET_LOCKDROP_DATA } from '../GraphQL/Queries';
 
 const LockDropABI = require('../abi/LockDrop.json');
 
@@ -40,7 +48,11 @@ const lockDropInitialData: ILockdropData = {
   lockDropDepositEnd: 1676980752000,
   vestingEndTime: 1685039134000,
   totalLP: defaultBNValue,
-  totalHbars: defaultBNValue,
+  totalHbars: {
+    valueBN: ethers.BigNumber.from('1541129857313845'),
+    valueStringWei: '1541129857313845',
+    valueStringETH: '15411298.57313845',
+  },
   totalTokens: {
     valueBN: ethers.BigNumber.from('2000000000000000'),
     valueStringWei: '2000000000000000',
@@ -123,116 +135,65 @@ const Lockdrop = () => {
       setContractLoadingError(false);
       setLoadingContractData(true);
 
-      const promisesArray = [
-        // lockDropContract.LOCK_DROP_DURATION(),
-        // lockDropContract.lockDropEnd(),
-        // lockDropContract.lastLockDropDay(),
-        // lockDropContract.lockDropDepositEnd(),
-        // lockDropContract.vestingEndTime(),
-        lockDropContract.totalLP(),
-        lockDropContract.totalHbars(),
-        // lockDropContract.totalTokens(),
-        // lockDropContract.tokenAddress(),
-        // lockDropContract.LPToken(),
-      ];
-
       try {
-        const [
-          // lockDropDurationBN,
-          // lockDropEndBN,
-          // lastLockDropDayBN,
-          // lockDropDepositEndBN,
-          // vestingEndTimeBN,
-          totalLPBN,
-          totalHbarsBN,
-          // totalTokensBN,
-          // tokenAddress,
-          // lpTokenAddress,
-        ] = await Promise.all(promisesArray);
-
         let stakedTokensBN = ethers.BigNumber.from(0);
         let claimedOfBN = ethers.BigNumber.from(0);
         let totalClaimableBN = ethers.BigNumber.from(0);
+        let totalLPBN = ethers.BigNumber.from(0);
+
         let claimableBN = ethers.BigNumber.from(0);
-        // let lastUserWithdrawalBN = ethers.BigNumber.from(0);
 
         if (userId) {
           const userAddress = idToAddress(userId);
 
-          const userPromisesArray = [
-            lockDropContract.providers(userAddress),
-            lockDropContract.claimedOf(userAddress),
-            lockDropContract.claimable(userAddress),
-            lockDropContract.totalClaimable(userAddress),
-            // lockDropContract.lastUserWithdrawal(userAddress),
-          ];
+          const heliSwapAPIUrl = process.env.REACT_APP_DROP_POLLER_URI as string;
+          const variables = {
+            address: userAddress,
+          };
 
-          [
-            stakedTokensBN,
-            claimedOfBN,
-            claimableBN,
-            totalClaimableBN,
-            //lastUserWithdrawalBN
-          ] = await Promise.all(userPromisesArray);
+          const client = new GraphQLClient(heliSwapAPIUrl);
+          const response = await client.request<ILockdropDataRaw>(GET_LOCKDROP_DATA, variables);
+          const {
+            getLockDropUserInfo: { claimable, claimed, totalAllocated, deposited },
+          } = response;
+
+          claimableBN = ethers.BigNumber.from(claimable || 0);
+          claimedOfBN = ethers.BigNumber.from(claimed || 0);
+          totalClaimableBN = ethers.BigNumber.from(totalAllocated || 0);
+          stakedTokensBN = ethers.BigNumber.from(deposited || 0);
         }
-
-        // Format data
-        // const lockDropDuration = formatBigNumberToMilliseconds(lockDropDurationBN);
-        // const lockdropEnd = formatBigNumberToMilliseconds(lockDropEndBN);
-        // const lockDropDepositEnd = formatBigNumberToMilliseconds(lockDropDepositEndBN);
-        // const lastLockDropDay = formatBigNumberToMilliseconds(lastLockDropDayBN);
-        // const vestingEndTime = formatBigNumberToMilliseconds(vestingEndTimeBN);
 
         const totalLP = {
           valueBN: totalLPBN,
           valueStringWei: totalLPBN.toString(),
           valueStringETH: formatBNTokenToString(totalLPBN, 18),
         };
-
-        const totalHbars = {
-          valueBN: totalHbarsBN,
-          valueStringWei: totalHbarsBN.toString(),
-          valueStringETH: formatBNTokenToString(totalHbarsBN),
-        };
-
-        // const totalTokens = {
-        //   valueBN: totalTokensBN,
-        //   valueStringWei: totalTokensBN.toString(),
-        //   valueStringETH: formatBNTokenToString(totalTokensBN),
-        // };
-
         const lockedHbars = {
           valueBN: stakedTokensBN,
           valueStringWei: stakedTokensBN.toString(),
           valueStringETH: formatBNTokenToString(stakedTokensBN),
         };
-
         const claimed = {
           valueBN: claimedOfBN,
           valueStringWei: claimedOfBN.toString(),
           valueStringETH: formatBNTokenToString(claimedOfBN, 18),
         };
-
         const claimable = {
           valueBN: claimableBN,
           valueStringWei: claimableBN.toString(),
           valueStringETH: formatBNTokenToString(claimableBN, 18),
         };
-
         const totalClaimable = {
           valueBN: totalClaimableBN,
           valueStringWei: totalClaimableBN.toString(),
           valueStringETH: formatBNTokenToString(totalClaimableBN, 18),
         };
-
         // const lastUserWithdrawal = formatBigNumberToMilliseconds(lastUserWithdrawalBN);
-
         const myHELIFormatted = getUserHELIReserves(
           lockDropInitialData.totalTokens.valueBN,
           lockedHbars.valueBN,
-          totalHbars.valueBN,
+          lockDropInitialData.totalHbars.valueBN,
         );
-
         const estimatedLPTokensBN = calculateLPTokens(
           myHELIFormatted,
           lockedHbars.valueStringETH,
@@ -243,11 +204,10 @@ const Lockdrop = () => {
           valueStringWei: estimatedLPTokensBN.toString(),
           valueStringETH: formatStringWeiToStringEther(estimatedLPTokensBN),
         };
-
         // Calculate total estimates LP tokens before pool is created; this amount shoub be == to `totalLPtokens` after pool is created
         const estimatedTotalLPTokensBN = calculateLPTokens(
           lockDropInitialData.totalTokens.valueStringETH,
-          totalHbars.valueStringETH,
+          lockDropInitialData.totalHbars.valueStringETH,
           8,
           8,
         );
@@ -255,7 +215,6 @@ const Lockdrop = () => {
           valueStringWei: estimatedTotalLPTokensBN.toString(),
           valueStringETH: formatStringWeiToStringEther(estimatedTotalLPTokensBN),
         };
-
         const estimatedLPPercentage =
           Number(estimatedLPTokens.valueStringWei) === 0 ||
           Number(estimatedTotalLPTokens.valueStringWei) === 0
@@ -265,7 +224,6 @@ const Lockdrop = () => {
                   Number(estimatedTotalLPTokens.valueStringWei)) *
                 100
               ).toString();
-
         // Determine state
         const lockdropStartTime =
           lockDropInitialData.lockdropEnd - lockDropInitialData.lockDropDuration;
@@ -273,7 +231,6 @@ const Lockdrop = () => {
         const timeSinceStart = nowTimeStamp - lockdropStartTime;
         const daysSinceStart = Math.ceil(timeSinceStart / 1000 / 3600 / 24);
         setDaysSinceStart(daysSinceStart);
-
         const withdrawOnly =
           nowTimeStamp > lockDropInitialData.lockDropDepositEnd &&
           nowTimeStamp <= lockDropInitialData.lockdropEnd;
@@ -287,23 +244,18 @@ const Lockdrop = () => {
           lockDropInitialData.vestingEndTime !== 0
             ? nowTimeStamp > lockDropInitialData.vestingEndTime
             : false;
-
         if (withdrawOnly) {
           setCurrentState(LOCKDROP_STATE.WITHDRAW);
         }
-
         if (preVesting) {
           setCurrentState(LOCKDROP_STATE.PRE_VESTING);
         }
-
         if (vesting) {
           setCurrentState(LOCKDROP_STATE.VESTING);
         }
-
         if (end) {
           setCurrentState(LOCKDROP_STATE.END);
         }
-
         // setLockDropData({
         //   lockDropDuration,
         //   lockdropEnd,
@@ -322,11 +274,9 @@ const Lockdrop = () => {
         //   estimatedLPTokens,
         //   lpTokenAddress,
         // });
-
         setLockDropData({
           ...lockDropInitialData,
           totalLP,
-          totalHbars,
           estimatedLPTokens,
           lockedHbars,
           estimatedLPPercentage,
@@ -334,7 +284,6 @@ const Lockdrop = () => {
           claimable,
           totalClaimable,
         });
-
         setCountDownEnd(
           vesting ? lockDropInitialData.vestingEndTime : lockDropInitialData.lockdropEnd,
         );

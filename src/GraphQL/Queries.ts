@@ -373,3 +373,24 @@ export const GET_METRICS = gql`
     }
   }
 `;
+
+export const GET_LOCKDROP_DATA = gql`
+  query getLockDropUserInfo($address: String!) {
+    getLockDropUserInfo(eoaAddress: $address) {
+      totalAllocated
+      claimed
+      claimable
+      deposited
+    }
+  }
+`;
+
+export const GET_CLAIMDROP_DATA = gql`
+  query getLockDropUserInfo($address: String!, $claimDropAddress: String!) {
+    getClaimDropUserInfo(eoaAddress: $address, claimDropAddress: $claimDropAddress) {
+      totalAllocated
+      claimed
+      claimable
+    }
+  }
+`;
