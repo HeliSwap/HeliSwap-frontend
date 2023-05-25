@@ -12,7 +12,7 @@
   "tokens": [
     {
       "chainId": 290,
-      "address": "0x0000000000000000000000000000000000001c3D",
+      "address": "0x0000000000000000000000000000000000cdfa88",
       "name": "Wrapped HBAR",
       "symbol": "WHBAR",
       "decimals": 8,
