@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import { IPoolData, IPoolExtendedData } from '../interfaces/tokens';
 import { formatStringWeiToStringEther } from './numberUtils';
-import { getTokenPrice, mapHBARTokenSymbol } from './tokenUtils';
+import { getTokenPrice, isPoolDeprecated, mapHBARTokenSymbol } from './tokenUtils';
 
 export const getProcessedPools = (
   pools: IPoolExtendedData[],
@@ -67,6 +67,13 @@ export const getProcessedPools = (
           (!isNaN(Number(token0Price)) && Number(token0Price) !== 0) ||
           (!isNaN(Number(token1Price)) && Number(token1Price) !== 0);
 
+        // Check if pool is for migration
+        let forMigration = false;
+
+        if (isPoolDeprecated(token0, token1)) {
+          forMigration = true;
+        }
+
         const poolData: IPoolExtendedData = {
           ...pool,
           token0Symbol: mapHBARTokenSymbol(pool.token0Symbol),
@@ -83,6 +90,7 @@ export const getProcessedPools = (
           tvlUsd,
           volume24hUsd,
           volume7dUsd,
+          forMigration,
         };
 
         return poolData;

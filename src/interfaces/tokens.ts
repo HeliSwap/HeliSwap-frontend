@@ -98,6 +98,7 @@ export interface IPoolExtendedData extends IPoolData {
   tokensPriceEvaluated?: boolean;
   [key: string]: any;
   farmAddress?: string;
+  forMigration?: boolean;
 }
 
 export interface IPoolsAnalytics {
@@ -140,6 +141,7 @@ export interface IFarmData extends IFarmDataRaw {
   APR: string;
   totalRewardsUSD: string;
   campaignEndDate: number;
+  isFarmDeprecated: boolean;
   [key: string]: any;
 }
 
