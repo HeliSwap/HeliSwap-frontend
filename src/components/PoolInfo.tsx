@@ -497,7 +497,7 @@ const PoolInfo = ({
           ) : null}
 
           {poolData.forMigration ? (
-            <span className="text-micro text-uppercase badge bg-danger ms-3">Deprecated</span>
+            <span className="text-micro text-uppercase badge bg-warning ms-3">Deprecated</span>
           ) : null}
 
           {poolData.hasProblematicToken ? (
