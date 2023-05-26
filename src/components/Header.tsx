@@ -44,7 +44,7 @@ const Header = () => {
 
   if (pools && pools.length > 0) {
     const { token0AmountFormatted, token1AmountFormatted } = pools[0];
-    const heliForHbar = Number(token1AmountFormatted) / Number(token0AmountFormatted);
+    const heliForHbar = Number(token0AmountFormatted) / Number(token1AmountFormatted);
     heliPrice = hbarPrice / heliForHbar;
   }
 
