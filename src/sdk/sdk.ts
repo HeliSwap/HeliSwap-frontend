@@ -195,8 +195,11 @@ class SDK {
     WHBARDecimal: number,
     slippage: number,
     expiresAfter: number,
+    forMigration: boolean,
   ) {
-    const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
+    const routerContractAddress = forMigration
+      ? (process.env.REACT_APP_ROUTER_ADDRESS_OLD as string)
+      : (process.env.REACT_APP_ROUTER_ADDRESS as string);
     const userAddress = idToAddress(userId);
 
     const tokenAmountMin = getAmountWithSlippage(tokenAmount, tokenDecimals, slippage, true);

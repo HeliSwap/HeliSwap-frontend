@@ -16,6 +16,8 @@ import {
   calculateReserves,
   calculatePercentageByShare,
   mapHBARTokenSymbol,
+  isPoolDeprecated,
+  isPoolNew,
 } from '../utils/tokenUtils';
 import { formatStringWeiToStringEther } from '../utils/numberUtils';
 
@@ -144,6 +146,18 @@ const usePoolsByUser = (
             totalUserShare.toString(),
           );
 
+          // Check if pool is for migration
+          let forMigration = false;
+          let newPool = false;
+
+          if (isPoolDeprecated(token0, token1)) {
+            forMigration = true;
+          }
+
+          if (isPoolNew(token0, token1)) {
+            newPool = true;
+          }
+
           const poolData: IPoolExtendedData = {
             ...pool,
             token0AmountFormatted: reserve0ShareStr,
@@ -162,6 +176,8 @@ const usePoolsByUser = (
             fee1AmountFormatted: fee1Formatted,
             token0Symbol: mapHBARTokenSymbol(pool.token0Symbol),
             token1Symbol: mapHBARTokenSymbol(pool.token1Symbol),
+            forMigration,
+            newPool,
           };
 
           return poolData;

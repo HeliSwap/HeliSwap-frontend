@@ -195,14 +195,16 @@ const PoolInfo = ({
             </Link>
           </div>
 
-          <div className="flex-1">
-            <Link
-              className="d-block btn btn-sm btn-primary ms-3"
-              to={`/create/${poolData.token0}/${poolData.token1}`}
-            >
-              Add Liquidity
-            </Link>
-          </div>
+          {!poolData.forMigration ? (
+            <div className="flex-1">
+              <Link
+                className="d-block btn btn-sm btn-primary ms-3"
+                to={`/create/${poolData.token0}/${poolData.token1}`}
+              >
+                Add Liquidity
+              </Link>
+            </div>
+          ) : null}
 
           <div className="flex-1">
             <Link
@@ -432,14 +434,16 @@ const PoolInfo = ({
         ) : null}
 
         <div className="col-md-4 mt-4 mt-md-0">
-          <div>
-            <Link
-              className="d-block btn btn-sm btn-primary"
-              to={`/create/${poolData.token0}/${poolData.token1}`}
-            >
-              Increase Liquidity
-            </Link>
-          </div>
+          {!poolData.forMigration ? (
+            <div>
+              <Link
+                className="d-block btn btn-sm btn-primary"
+                to={`/create/${poolData.token0}/${poolData.token1}`}
+              >
+                Increase Liquidity
+              </Link>
+            </div>
+          ) : null}
 
           <div className="d-grid mt-3">
             <Button
@@ -485,10 +489,33 @@ const PoolInfo = ({
           >
             <span className="text-micro text-numeric badge bg-secondary-800 ms-3">{POOLS_FEE}</span>
           </Tippy>
-          {poolData.hasCampaign ? (
+
+          {poolData.hasCampaign && !poolData.forMigration ? (
             <span className="text-micro text-uppercase badge bg-success-600 ms-3">
               Yield farming
             </span>
+          ) : null}
+
+          {poolData.forMigration ? (
+            <>
+              <span className="text-micro text-uppercase badge bg-warning ms-3">Deprecated</span>
+              <Tippy content="This pool has been deprecated. If you see it in the UI, it means, that you have liquidity in the pool and need to actively migrate it to the new pool with the same name.">
+                <span className="ms-3">
+                  <Icon name="info" color="info" />
+                </span>
+              </Tippy>
+            </>
+          ) : null}
+
+          {poolData.newPool ? (
+            <>
+              <span className="text-micro text-uppercase badge bg-info ms-3">New pool</span>
+              <Tippy content="This is a new pool that was created following a small migration on May 29th concerning 7 pools. If the UI shows you the same pool with the word “DEPRECATED” behind it, you need to get active in moving your liquidity from the deprecated pool to this New one.">
+                <span className="ms-3">
+                  <Icon name="info" color="info" />
+                </span>
+              </Tippy>
+            </>
           ) : null}
 
           {poolData.hasProblematicToken ? (

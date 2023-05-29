@@ -7,6 +7,10 @@
   background-color: $positive-600;
 }
 
+.bg-info {
+  background-color: $primary-500 !important;
+}
+
 /* Buttons */
 .btn {
   text-transform: uppercase;
@@ -398,7 +402,7 @@
   }
 
   @include media-breakpoint-up(xxxl) {
-    margin-left: 252px;
+    margin-left: 277px;
   }
 }
 

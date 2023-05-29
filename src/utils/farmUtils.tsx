@@ -10,7 +10,7 @@ import {
 } from '../interfaces/tokens';
 import { formatStringWeiToStringEther } from './numberUtils';
 import { timestampToDate } from './timeUtils';
-import { getTokenPrice, mapHBARTokenSymbol } from './tokenUtils';
+import { getTokenPrice, isPoolDeprecated, isPoolNew, mapHBARTokenSymbol } from './tokenUtils';
 
 export const getProcessedFarms = (
   rawFarms: IFarmDataRaw[],
@@ -201,6 +201,12 @@ export const getProcessedFarms = (
     const campaignEndDate = getCampaignEndDate(currentFarmProcessed);
     const campaignEnded = getCampaignEndDate(currentFarmProcessed) < Date.now();
     const APR = campaignEnded ? '0' : getAPR(rewardsData, totalStakedUSD, totalRewardsUSD);
+    const isFarmDeprecated = isPoolDeprecated(
+      currentFarm.poolData.token0,
+      currentFarm.poolData.token1,
+    );
+
+    const isFarmNew = isPoolNew(currentFarm.poolData.token0, currentFarm.poolData.token1);
 
     const formatted = {
       ...currentFarmProcessed,
@@ -215,6 +221,8 @@ export const getProcessedFarms = (
         token0Symbol: mapHBARTokenSymbol(currentFarmProcessed.poolData.token0Symbol),
         token1Symbol: mapHBARTokenSymbol(currentFarmProcessed.poolData.token1Symbol),
       },
+      isFarmDeprecated,
+      isFarmNew,
     };
 
     return formatted;

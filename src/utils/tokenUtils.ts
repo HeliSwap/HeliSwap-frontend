@@ -489,5 +489,21 @@ export const mapHBARTokenSymbol = (tokenSymbol: string) => {
 };
 
 export const mapWHBARAddress = (token: ITokenData | IReward) => {
-  return token.address === process.env.REACT_APP_WHBAR_ADDRESS ? NATIVE_TOKEN.symbol : token.symbol;
+  return token.address === process.env.REACT_APP_WHBAR_ADDRESS ||
+    token.address === process.env.REACT_APP_WHBAR_ADDRESS_OLD
+    ? NATIVE_TOKEN.symbol
+    : token.symbol;
+};
+
+export const isPoolDeprecated = (token0: string, token1: string) => {
+  return (
+    token0 === process.env.REACT_APP_WHBAR_ADDRESS_OLD ||
+    token1 === process.env.REACT_APP_WHBAR_ADDRESS_OLD
+  );
+};
+
+export const isPoolNew = (token0: string, token1: string) => {
+  return (
+    token0 === process.env.REACT_APP_WHBAR_ADDRESS || token1 === process.env.REACT_APP_WHBAR_ADDRESS
+  );
 };

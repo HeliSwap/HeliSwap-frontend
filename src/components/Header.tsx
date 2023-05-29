@@ -43,8 +43,16 @@ const Header = () => {
   let heliPrice = 0;
 
   if (pools && pools.length > 0) {
-    const { token0AmountFormatted, token1AmountFormatted } = pools[0];
-    const heliForHbar = Number(token1AmountFormatted) / Number(token0AmountFormatted);
+    const { token0AmountFormatted, token1AmountFormatted, token0 } = pools[0];
+    const hbarTokenAmount =
+      token0 === process.env.REACT_APP_WHBAR_ADDRESS
+        ? token0AmountFormatted
+        : token1AmountFormatted;
+    const heliTokenAmount =
+      token0 === process.env.REACT_APP_HELI_TOKEN_ADDRESS
+        ? token0AmountFormatted
+        : token1AmountFormatted;
+    const heliForHbar = Number(heliTokenAmount) / Number(hbarTokenAmount);
     heliPrice = hbarPrice / heliForHbar;
   }
 
@@ -84,7 +92,7 @@ const Header = () => {
   }, [getUserTokensData]);
 
   return (
-    <div className="container-header p-3 p-md-5">
+    <div className="container-header with-message p-3 p-md-5">
       <div className="d-flex justify-content-between justify-content-md-end align-items-center">
         <div className="d-sm-flex align-items-center">
           <div className="d-none d-xl-flex align-items-center">
