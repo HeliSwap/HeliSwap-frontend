@@ -1,14 +1,17 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-
 const GlobalMessage = () => {
   return (
     <div className="container-global-message">
       <p className="text-main text-center">
-        POOL MIGRATION IN PROCESS: PLEASE READ{' '}
-        <Link className="link-white" to="lockdrop">
+        +++ ATTENTION: POOL MIGRATION in PROCESS: PLEASE READ THESE INSTRUCTIONS{' '}
+        <a
+          href="https://docs.google.com/document/d/1sAw-aEf2JiBxzE0WoOnfKrbgWPZbjNGw4YTCp-f99DE"
+          className="link-white"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <span className="text-bold">THESE INSTRUCTIONS</span>
-        </Link>
+        </a>{' '}
+        (Started on May 29th) +++
       </p>
     </div>
   );

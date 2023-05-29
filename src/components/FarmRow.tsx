@@ -75,6 +75,9 @@ const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
         {farmData.isFarmDeprecated ? (
           <span className="text-micro text-uppercase badge bg-warning ms-3">Deprecated</span>
         ) : null}
+        {farmData.isFarmNew ? (
+          <span className="text-micro text-uppercase badge bg-info ms-3">New</span>
+        ) : null}
       </div>
       <div className="table-pools-cell justify-content-between justify-content-md-end">
         <span className="d-md-none text-small">Total Staked</span>

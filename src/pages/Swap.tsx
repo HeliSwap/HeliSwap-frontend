@@ -85,6 +85,8 @@ const Swap = () => {
   const [showModalB, setShowModalB] = useState(false);
   const [showModalConfirmSwap, setShowModalConfirmSwap] = useState(false);
 
+  const [showWarningModal, setShowWarningModal] = useState(true);
+
   // State for token inputs
   const [tokensData, setTokensData] = useState<ITokensData>(initialTokensDataSwap);
   const [tokenInIsNative, setTokenInIsNative] = useState(false);
@@ -1127,8 +1129,91 @@ const Swap = () => {
     <div className="d-flex justify-content-center">
       <div className="container-action">
         <PageHeader slippage="swap" title="Swap" />
+        <div className="alert alert-warning">
+          <div className="d-flex align-items-center">
+            <Icon name="warning" color="warning" />
+            <p className="text-bold ms-3">Warning!</p>
+          </div>
+          <p className="mt-3">
+            MIGRATION MAY TEMPORARILY AFFECT SWAP FUNCTIONALITY. AS LIQUIDITY IS BEING MIGRATED TO
+            NEW POOLS, TVL USED FOR SWAPS MAY TEMPORARILY BE LOWER POTENTIALLY CAUSING INCREASED
+            SLIPPAGE
+          </p>
+        </div>
         {renderSwapSection()}
         <ToasterWrapper />
+
+        {showWarningModal ? (
+          <Modal show={showWarningModal} closeModal={() => setShowWarningModal(false)}>
+            <div className="modal-header">
+              <h5 className="modal-title text-small text-bold" id="exampleModalLabel">
+                ATTENTION HELISWAP USER
+              </h5>
+
+              <button
+                onClick={() => setShowWarningModal(false)}
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="modal-body">
+              <p className="text-small">
+                On May 29th, a few pools were deprecated and new pools with the same name were
+                started. Old pools are clearly labeled and indicated as “DEPRECATED”. New pools are
+                called “NEW POOLS”.
+              </p>
+
+              <p className="mt-3 text-small">The affected pools are:</p>
+              <ul className="list-default text-small">
+                <li>HBAR/HELI </li>
+                <li>HBAR/USDC</li>
+                <li>HBAR/OM[hts]</li>
+                <li>HBAR/HBARX</li>
+                <li>HBAR/HASHTREE</li>
+              </ul>
+
+              <p className="mt-5 text-small">
+                If you are a liquidity provider in one of these pools, you need to actively move
+                your liquidity into the new pools.
+                <br />
+                <br />
+                <a
+                  href="https://docs.google.com/document/d/1sAw-aEf2JiBxzE0WoOnfKrbgWPZbjNGw4YTCp-f99DE"
+                  className="link-white"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="text-bold">Here </span>{' '}
+                </a>
+                is a step-by-step guide on how to migrate your liquidity <br />
+                <br />
+                Here is a short video showing you how to migrate your liquidity <br />
+                <br />
+                <a
+                  href="https://docs.heliswap.io/may-29th-migrating-to-hbar-pools"
+                  className="link-white"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="text-bold">Here</span>{' '}
+                </a>
+                is more information on the May 29th migration in general.
+                <br />
+                <br />
+                For any further questions, please use our Discord or Telegram channel and the team
+                will be happy to help!
+              </p>
+
+              <div className="d-flex justify-content-end">
+                <Button onClick={() => setShowWarningModal(false)} size="small" className="mt-4">
+                  I understand
+                </Button>
+              </div>
+            </div>
+          </Modal>
+        ) : null}
       </div>
     </div>
   );

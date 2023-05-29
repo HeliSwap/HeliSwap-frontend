@@ -10,7 +10,7 @@ import {
 } from '../interfaces/tokens';
 import { formatStringWeiToStringEther } from './numberUtils';
 import { timestampToDate } from './timeUtils';
-import { getTokenPrice, isPoolDeprecated, mapHBARTokenSymbol } from './tokenUtils';
+import { getTokenPrice, isPoolDeprecated, isPoolNew, mapHBARTokenSymbol } from './tokenUtils';
 
 export const getProcessedFarms = (
   rawFarms: IFarmDataRaw[],
@@ -206,6 +206,8 @@ export const getProcessedFarms = (
       currentFarm.poolData.token1,
     );
 
+    const isFarmNew = isPoolNew(currentFarm.poolData.token0, currentFarm.poolData.token1);
+
     const formatted = {
       ...currentFarmProcessed,
       totalStakedUSD,
@@ -220,6 +222,7 @@ export const getProcessedFarms = (
         token1Symbol: mapHBARTokenSymbol(currentFarmProcessed.poolData.token1Symbol),
       },
       isFarmDeprecated,
+      isFarmNew,
     };
 
     return formatted;
