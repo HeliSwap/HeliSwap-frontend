@@ -2,7 +2,7 @@ const GlobalMessage = () => {
   return (
     <div className="container-global-message">
       <p className="text-main text-center">
-        +++ ATTENTION: POOL MIGRATION in PROCESS: PLEASE READ{' '}
+        +++ ATTENTION: POOL MIGRATION in PROGRESS: PLEASE READ{' '}
         <a
           href="https://docs.heliswap.io/hbar-pool-migration-on-may-29th/step-by-step-guide-to-migrate-liquidity"
           className="link-white"

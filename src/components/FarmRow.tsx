@@ -105,9 +105,7 @@ const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
       <div className="table-pools-cell justify-content-between justify-content-md-end">
         <span className="d-md-none text-small">Total APR</span>
         <span className="text-small text-numeric">
-          {restrictedFarms.includes(farmData.address)
-            ? '0%'
-            : formatStringToPercentage(stripStringToFixedDecimals(farmData.APR, 2))}
+          {formatStringToPercentage(stripStringToFixedDecimals(farmData.APR, 2))}
         </span>
       </div>
 

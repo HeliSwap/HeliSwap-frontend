@@ -491,16 +491,14 @@ const PoolInfo = ({
           </Tippy>
 
           {poolData.hasCampaign && !poolData.forMigration ? (
-            <span className="text-micro text-uppercase badge bg-success-600 ms-3">
-              Yield farming
-            </span>
+            <span className="text-micro text-uppercase badge bg-success-600 ms-3">YF</span>
           ) : null}
 
           {poolData.forMigration ? (
             <>
               <span className="text-micro text-uppercase badge bg-warning ms-3">Deprecated</span>
               <Tippy content="This pool has been deprecated. If you see it in the UI, it means, that you have liquidity in the pool and need to actively migrate it to the new pool with the same name.">
-                <span className="ms-3">
+                <span className="ms-2">
                   <Icon name="info" color="info" />
                 </span>
               </Tippy>
@@ -509,9 +507,9 @@ const PoolInfo = ({
 
           {poolData.newPool ? (
             <>
-              <span className="text-micro text-uppercase badge bg-info ms-3">New pool</span>
+              <span className="text-micro text-uppercase badge bg-info ms-3">New</span>
               <Tippy content="This is a new pool that was created following a small migration on May 29th concerning 7 pools. If the UI shows you the same pool with the word “DEPRECATED” behind it, you need to get active in moving your liquidity from the deprecated pool to this New one.">
-                <span className="ms-3">
+                <span className="ms-2">
                   <Icon name="info" color="info" />
                 </span>
               </Tippy>
@@ -520,7 +518,7 @@ const PoolInfo = ({
 
           {poolData.hasProblematicToken ? (
             <Tippy content={generalFeesAndKeysWarning}>
-              <span className="ms-3">
+              <span className="ms-1">
                 <Icon name="info" color="info" />
               </span>
             </Tippy>
