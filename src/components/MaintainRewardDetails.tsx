@@ -167,14 +167,16 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
           <div className="mt-4">
             <Button
               onClick={() =>
-                process.env.REACT_APP_WHBAR_ADDRESS === reward.address
+                process.env.REACT_APP_WHBAR_ADDRESS === reward.address ||
+                process.env.REACT_APP_WHBAR_ADDRESS_OLD === reward.address
                   ? handleWrapAndApproveToken(reward.address, approveRewardAmount.toString())
                   : handleApproveToken(reward.address)
               }
               loading={loadingApproveReward}
               size="small"
             >
-              {process.env.REACT_APP_WHBAR_ADDRESS === reward.address
+              {process.env.REACT_APP_WHBAR_ADDRESS === reward.address ||
+              process.env.REACT_APP_WHBAR_ADDRESS_OLD === reward.address
                 ? 'Wrap and Approve'
                 : 'Approve token'}
             </Button>
