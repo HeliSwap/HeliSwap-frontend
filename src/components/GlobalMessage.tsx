@@ -4,7 +4,7 @@ const GlobalMessage = () => {
       <p className="text-main text-center">
         +++ ATTENTION: POOL MIGRATION in PROCESS: PLEASE READ{' '}
         <a
-          href="https://docs.google.com/document/d/1sAw-aEf2JiBxzE0WoOnfKrbgWPZbjNGw4YTCp-f99DE"
+          href="https://docs.heliswap.io/hbar-pool-migration-on-may-29th/step-by-step-guide-to-migrate-liquidity"
           className="link-white"
           target="_blank"
           rel="noopener noreferrer"

@@ -1183,7 +1183,7 @@ const Swap = () => {
                 <br />
                 <br />
                 <a
-                  href="https://docs.google.com/document/d/1sAw-aEf2JiBxzE0WoOnfKrbgWPZbjNGw4YTCp-f99DE"
+                  href="https://docs.heliswap.io/hbar-pool-migration-on-may-29th/step-by-step-guide-to-migrate-liquidity"
                   className="link-white"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -1192,7 +1192,16 @@ const Swap = () => {
                 </a>
                 is a step-by-step guide on how to migrate your liquidity <br />
                 <br />
-                Here is a short video showing you how to migrate your liquidity <br />
+                Here is a{' '}
+                <a
+                  href="https://www.youtube.com/watch?v=cjk2_63Rshc"
+                  className="link-white"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="text-bold">short video</span>{' '}
+                </a>{' '}
+                showing you how to migrate your liquidity <br />
                 <br />
                 For any further questions, please use our Discord or Telegram channel and the team
                 will be happy to help!

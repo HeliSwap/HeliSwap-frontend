@@ -182,8 +182,8 @@ const LockdropForm = ({
     }
   };
 
-  const handleStakeButtonClick = async () => {
-    navigate(`/farms/${farmAddress}`);
+  const handleMigrateButtonClick = async () => {
+    navigate(`/pools/`);
   };
 
   const getInsufficientToken = useCallback(() => {
@@ -535,9 +535,9 @@ const LockdropForm = ({
                       disabled={!canStake}
                       loading={loadingButton}
                       type="primary"
-                      onClick={handleStakeButtonClick}
+                      onClick={handleMigrateButtonClick}
                     >
-                      STAKE
+                      MIGRATE
                     </Button>
                   </div>
                 </>
