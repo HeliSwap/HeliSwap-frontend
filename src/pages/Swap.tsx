@@ -1149,14 +1149,6 @@ const Swap = () => {
               <h5 className="modal-title text-small text-bold" id="exampleModalLabel">
                 ATTENTION HELISWAP USER
               </h5>
-
-              <button
-                onClick={() => setShowWarningModal(false)}
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
             </div>
             <div className="modal-body">
               <p className="text-small">
@@ -1180,6 +1172,17 @@ const Swap = () => {
                 <br />
                 <br />
                 <a
+                  href="https://docs.heliswap.io/may-29th-migrating-to-hbar-pools"
+                  className="link-white"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="text-bold">Here</span>{' '}
+                </a>
+                is more information on the May 29th migration in general.
+                <br />
+                <br />
+                <a
                   href="https://docs.google.com/document/d/1sAw-aEf2JiBxzE0WoOnfKrbgWPZbjNGw4YTCp-f99DE"
                   className="link-white"
                   target="_blank"
@@ -1190,17 +1193,6 @@ const Swap = () => {
                 is a step-by-step guide on how to migrate your liquidity <br />
                 <br />
                 Here is a short video showing you how to migrate your liquidity <br />
-                <br />
-                <a
-                  href="https://docs.heliswap.io/may-29th-migrating-to-hbar-pools"
-                  className="link-white"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <span className="text-bold">Here</span>{' '}
-                </a>
-                is more information on the May 29th migration in general.
-                <br />
                 <br />
                 For any further questions, please use our Discord or Telegram channel and the team
                 will be happy to help!
