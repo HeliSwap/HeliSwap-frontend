@@ -220,9 +220,7 @@ const FarmDetails = () => {
                     </div>
                     <div className="col-6 col-md-4">
                       <p className="text-subheader text-numeric">
-                        {!restrictedFarms.includes(farmData.address)
-                          ? formatStringToPercentage(stripStringToFixedDecimals(farmData.APR, 2))
-                          : '0%'}
+                        {formatStringToPercentage(stripStringToFixedDecimals(farmData.APR, 2))}
                       </p>
                     </div>
                   </div>

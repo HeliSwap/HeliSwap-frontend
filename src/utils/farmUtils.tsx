@@ -1,3 +1,4 @@
+import { restrictedFarms } from '../constants';
 import {
   IFarmData,
   IFarmDataRaw,
@@ -200,7 +201,10 @@ export const getProcessedFarms = (
     const userStakingData = getUserStakingDataProcessed(currentFarmProcessed, lPValue);
     const campaignEndDate = getCampaignEndDate(currentFarmProcessed);
     const campaignEnded = getCampaignEndDate(currentFarmProcessed) < Date.now();
-    const APR = campaignEnded ? '0' : getAPR(rewardsData, totalStakedUSD, totalRewardsUSD);
+    const APR =
+      campaignEnded || restrictedFarms.includes(currentFarm.address)
+        ? '0'
+        : getAPR(rewardsData, totalStakedUSD, totalRewardsUSD);
     const isFarmDeprecated = isPoolDeprecated(
       currentFarm.poolData.token0,
       currentFarm.poolData.token1,
