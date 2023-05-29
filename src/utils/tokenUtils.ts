@@ -501,3 +501,9 @@ export const isPoolDeprecated = (token0: string, token1: string) => {
     token1 === process.env.REACT_APP_WHBAR_ADDRESS_OLD
   );
 };
+
+export const isPoolNew = (token0: string, token1: string) => {
+  return (
+    token0 === process.env.REACT_APP_WHBAR_ADDRESS || token1 === process.env.REACT_APP_WHBAR_ADDRESS
+  );
+};

@@ -99,6 +99,7 @@ export interface IPoolExtendedData extends IPoolData {
   [key: string]: any;
   farmAddress?: string;
   forMigration?: boolean;
+  newPool?: boolean;
 }
 
 export interface IPoolsAnalytics {
