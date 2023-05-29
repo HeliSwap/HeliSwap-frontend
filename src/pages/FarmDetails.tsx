@@ -42,7 +42,7 @@ import useFarmByAddress from '../hooks/useFarmByAddress';
 
 import getErrorMessage from '../content/errors';
 
-import { useQueryOptions, useQueryOptionsPoolsFarms } from '../constants';
+import { restrictedFarms, useQueryOptions, useQueryOptionsPoolsFarms } from '../constants';
 
 const FarmDetails = () => {
   const contextValue = useContext(GlobalContext);
@@ -220,7 +220,9 @@ const FarmDetails = () => {
                     </div>
                     <div className="col-6 col-md-4">
                       <p className="text-subheader text-numeric">
-                        {formatStringToPercentage(stripStringToFixedDecimals(farmData.APR, 2))}
+                        {!restrictedFarms.includes(farmData.address)
+                          ? formatStringToPercentage(stripStringToFixedDecimals(farmData.APR, 2))
+                          : '0%'}
                       </p>
                     </div>
                   </div>
@@ -349,7 +351,7 @@ const FarmDetails = () => {
 
                 <div className="container-blue-neutral rounded p-4 p-lg-5 mt-4 mt-lg-5">
                   {connected && !isHashpackLoading ? (
-                    hasUserStaked ? (
+                    hasUserStaked && !restrictedFarms.includes(farmData.address) ? (
                       <>
                         <div className="d-flex justify-content-between align-items-start">
                           <div className="d-flex align-items-center">

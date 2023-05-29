@@ -13,6 +13,7 @@ import { mapWHBARAddress } from '../utils/tokenUtils';
 import { renderCampaignEndDate } from '../utils/farmUtils';
 import Tippy from '@tippyjs/react';
 import Icon from './Icon';
+import { restrictedFarms } from '../constants';
 
 interface IFarmRowProps {
   farmData: IFarmData;
@@ -74,7 +75,7 @@ const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
         <p className="text-small ms-3">
           {farmData.poolData.token0Symbol}/{farmData.poolData.token1Symbol}
         </p>
-        {farmData.isFarmDeprecated ? (
+        {farmData.isFarmDeprecated || restrictedFarms.includes(farmData.address) ? (
           <>
             <span className="text-micro text-uppercase badge bg-warning ms-3">Deprecated</span>
             <Tippy content="This farm has been deprecated. If you see it in the UI, it means, that you have liquidity in the pool and need to actively migrate it to the new pool with the same name.">
@@ -84,7 +85,7 @@ const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
             </Tippy>
           </>
         ) : null}
-        {farmData.isFarmNew ? (
+        {farmData.isFarmNew && !restrictedFarms.includes(farmData.address) ? (
           <>
             <span className="text-micro text-uppercase badge bg-info ms-3">New</span>
             <Tippy content="This is a new farm that was created following a small migration on May 29th concerning 7 pools. If the UI shows you the same pool with the word “DEPRECATED” behind it, you need to get active in moving your liquidity from the deprecated pool to this New one.">

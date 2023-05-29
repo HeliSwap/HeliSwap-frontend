@@ -26,7 +26,7 @@ import { formatStringWeiToStringEther, stripStringToFixedDecimals } from '../uti
 
 import getErrorMessage from '../content/errors';
 
-import { MAX_UINT_ERC20, SLIDER_INITIAL_VALUE } from '../constants';
+import { MAX_UINT_ERC20, SLIDER_INITIAL_VALUE, restrictedFarms } from '../constants';
 import {
   calculatePercentageByShare,
   calculateShareByPercentage,
@@ -243,14 +243,17 @@ const FarmActions = ({
     <div className="col-md-5 mt-4 mt-md-0">
       <div className="container-blue-neutral-900 rounded p-4 p-lg-5 height-100 d-flex flex-column">
         <div>
-          <span
-            onClick={() => handleTabButtonClick(TabStates.STAKE)}
-            className={`text-small text-bold text-uppercase link-tab me-5 ${
-              tabState === TabStates.STAKE ? 'is-active' : ''
-            }`}
-          >
-            Stake
-          </span>
+          {!restrictedFarms.includes(farmData.address) && (
+            <span
+              onClick={() => handleTabButtonClick(TabStates.STAKE)}
+              className={`text-small text-bold text-uppercase link-tab me-5 ${
+                tabState === TabStates.STAKE ? 'is-active' : ''
+              }`}
+            >
+              Stake
+            </span>
+          )}
+
           {hasUserStaked ? (
             <span
               onClick={() => handleTabButtonClick(TabStates.UNSTAKE)}
@@ -264,7 +267,7 @@ const FarmActions = ({
         </div>
 
         <div className="d-flex flex-column justify-content-between flex-1 mt-5">
-          {tabState === TabStates.STAKE ? (
+          {tabState === TabStates.STAKE && !restrictedFarms.includes(farmData.address) ? (
             <>
               <div>
                 {!campaignEnded && hasUserProvided ? (
