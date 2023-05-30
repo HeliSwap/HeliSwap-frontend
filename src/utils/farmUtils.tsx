@@ -11,7 +11,7 @@ import {
 } from '../interfaces/tokens';
 import { formatStringWeiToStringEther } from './numberUtils';
 import { timestampToDate } from './timeUtils';
-import { getTokenPrice, isPoolDeprecated, isPoolNew, mapHBARTokenSymbol } from './tokenUtils';
+import { getTokenPrice, mapHBARTokenSymbol } from './tokenUtils';
 
 export const getProcessedFarms = (
   rawFarms: IFarmDataRaw[],
@@ -183,6 +183,13 @@ export const getProcessedFarms = (
     return endTimestamp;
   };
 
+  const hasFarmDeprecatedRewards = (rewardsData: IReward[]): boolean => {
+    const found = rewardsData.find(
+      reward => reward.address === process.env.REACT_APP_WHBAR_ADDRESS_OLD,
+    );
+    return found ? true : false;
+  };
+
   const farms: IFarmData[] = rawFarms.map((currentFarm: IFarmDataRaw): IFarmData => {
     // This is needed, cause of discrepancies in the BE data regarding duration & rewardEnd, comming as strings in stead of numbers
     const rewardsDataProcessed = currentFarm.rewardsData.map((rewardsData: IRewardRaw) => ({
@@ -205,12 +212,7 @@ export const getProcessedFarms = (
       campaignEnded || restrictedFarms.includes(currentFarm.address)
         ? '0'
         : getAPR(rewardsData, totalStakedUSD, totalRewardsUSD);
-    const isFarmDeprecated = isPoolDeprecated(
-      currentFarm.poolData.token0,
-      currentFarm.poolData.token1,
-    );
-
-    const isFarmNew = isPoolNew(currentFarm.poolData.token0, currentFarm.poolData.token1);
+    const isFarmDeprecated = hasFarmDeprecatedRewards(rewardsData);
 
     const formatted = {
       ...currentFarmProcessed,
@@ -226,7 +228,6 @@ export const getProcessedFarms = (
         token1Symbol: mapHBARTokenSymbol(currentFarmProcessed.poolData.token1Symbol),
       },
       isFarmDeprecated,
-      isFarmNew,
     };
 
     return formatted;

@@ -143,7 +143,6 @@ export interface IFarmData extends IFarmDataRaw {
   totalRewardsUSD: string;
   campaignEndDate: number;
   isFarmDeprecated: boolean;
-  isFarmNew: boolean;
   [key: string]: any;
 }
 

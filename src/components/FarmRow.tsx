@@ -84,8 +84,7 @@ const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
               </span>
             </Tippy>
           </>
-        ) : null}
-        {farmData.isFarmNew && !restrictedFarms.includes(farmData.address) ? (
+        ) : (
           <>
             <span className="text-micro text-uppercase badge bg-info ms-3">New</span>
             <Tippy content="This is a new farm that was created following a small migration on May 29th concerning 7 pools. If the UI shows you the same pool with the word “DEPRECATED” behind it, you need to get active in moving your liquidity from the deprecated pool to this New one.">
@@ -94,7 +93,7 @@ const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
               </span>
             </Tippy>
           </>
-        ) : null}
+        )}
       </div>
       <div className="table-pools-cell justify-content-between justify-content-md-end">
         <span className="d-md-none text-small">Total Staked</span>
