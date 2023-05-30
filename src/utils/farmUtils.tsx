@@ -208,7 +208,6 @@ export const getProcessedFarms = (
     const userStakingData = getUserStakingDataProcessed(currentFarmProcessed, lPValue);
     const campaignEndDate = getCampaignEndDate(currentFarmProcessed);
     const campaignEnded = getCampaignEndDate(currentFarmProcessed) < Date.now();
-    console.log('rewardsData', rewardsData);
     const APR =
       campaignEnded || restrictedFarms.includes(currentFarm.address)
         ? '0'
