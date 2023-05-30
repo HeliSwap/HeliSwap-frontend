@@ -76,9 +76,17 @@ const SingleSidedStaking = () => {
 
   let heliPrice = 0;
 
-  if (pools && pools.length > 0) {
-    const { token0AmountFormatted, token1AmountFormatted } = heliPool;
-    const heliForHbar = Number(token1AmountFormatted) / Number(token0AmountFormatted);
+  if (heliPool) {
+    const { token0AmountFormatted, token1AmountFormatted, token0 } = heliPool;
+    const hbarTokenAmount =
+      token0 === process.env.REACT_APP_WHBAR_ADDRESS
+        ? token0AmountFormatted
+        : token1AmountFormatted;
+    const heliTokenAmount =
+      token0 === process.env.REACT_APP_HELI_TOKEN_ADDRESS
+        ? token0AmountFormatted
+        : token1AmountFormatted;
+    const heliForHbar = Number(heliTokenAmount) / Number(hbarTokenAmount);
     heliPrice = hbarPrice / heliForHbar;
   }
 
