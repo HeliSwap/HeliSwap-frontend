@@ -99,11 +99,14 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
           userCampaigns.push(farm);
         }
       });
+
       sortedFarms = [...userCampaigns].sort((a: IFarmData, b: IFarmData) =>
         sortFarms(a, b, sortDirection),
       );
     } else {
-      sortedFarms = [...farms].sort((a: IFarmData, b: IFarmData) => sortFarms(a, b, sortDirection));
+      sortedFarms = [...farms]
+        .filter(farm => !farm.isFarmDeprecated)
+        .sort((a: IFarmData, b: IFarmData) => sortFarms(a, b, sortDirection));
     }
 
     if (sortedFarms.length < itemOffset) {
