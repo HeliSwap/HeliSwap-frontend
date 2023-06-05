@@ -315,13 +315,16 @@ const ClaimdropDetails = () => {
 
         const client = new GraphQLClient(heliSwapAPIUrl);
         const response = await client.request<IClaimdropDataRaw>(GET_CLAIMDROP_DATA, variables);
+
         const {
           getClaimDropUserInfo: { claimable, claimed, totalAllocated },
         } = response;
 
-        claimableBN = ethers.BigNumber.from(claimable);
-        claimedOfBN = ethers.BigNumber.from(claimed);
-        totalAllocatedOfBN = ethers.BigNumber.from(totalAllocated);
+        if (claimable && claimed && totalAllocated) {
+          claimableBN = ethers.BigNumber.from(claimable);
+          claimedOfBN = ethers.BigNumber.from(claimed);
+          totalAllocatedOfBN = ethers.BigNumber.from(totalAllocated);
+        }
       }
 
       const claimedOf = {
