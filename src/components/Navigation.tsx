@@ -4,6 +4,12 @@ import Icon from './Icon';
 
 const navigation = [
   {
+    link: '/heliverse',
+    name: 'heli',
+    color: 'gray',
+    text: 'HeliVerse',
+  },
+  {
     link: '/lockdrop',
     name: 'heli',
     color: 'gray',
