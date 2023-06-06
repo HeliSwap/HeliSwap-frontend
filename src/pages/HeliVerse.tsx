@@ -1,4 +1,14 @@
+import { useEffect } from 'react';
+
 const HeliVerse = () => {
+  useEffect(() => {
+    document.body.classList.add('heliverse');
+
+    return () => {
+      document.body.classList.remove('heliverse');
+    };
+  }, []);
+
   return (
     <div className="d-flex justify-content-center">
       <div className="container-max-with-1042">
