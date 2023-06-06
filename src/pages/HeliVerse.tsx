@@ -12,7 +12,7 @@ const HeliVerse = () => {
   return (
     <div className="d-flex justify-content-center">
       <div className="container-max-with-1042">
-        <img className="img-fluid" src="/heliverse.jpg" alt="" />
+        <img className="img-fluid" src="/heliverse.png" alt="" />
         <h2 className="text-subheader text-bold mt-8">Meet the HeliVerse:</h2>
         <p className="text-main mt-4">
           One of our missions is to expand and increase the utility of the HELI token and to drive
