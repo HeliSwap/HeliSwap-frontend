@@ -4,22 +4,10 @@ import Icon from './Icon';
 
 const navigation = [
   {
-    link: '/lockdrop',
+    link: '/heliverse',
     name: 'heli',
     color: 'gray',
-    text: 'Lockdrop',
-  },
-  {
-    link: '/claimdrop',
-    name: 'claim',
-    color: 'gray',
-    text: 'Claimdrops',
-  },
-  {
-    link: '/single-sided-staking',
-    name: 'sss',
-    color: 'gray',
-    text: 'Single Sided Staking',
+    text: 'HeliVerse',
   },
   {
     link: '/',
@@ -40,10 +28,28 @@ const navigation = [
     text: 'Farms',
   },
   {
+    link: '/single-sided-staking',
+    name: 'sss',
+    color: 'gray',
+    text: 'Single Sided Staking',
+  },
+  {
+    link: '/claimdrop',
+    name: 'claim',
+    color: 'gray',
+    text: 'Claimdrops',
+  },
+  {
     link: '/buy-crypto',
     name: 'c14',
     color: 'gray',
     text: 'Buy Crypto with Fiat',
+  },
+  {
+    link: '/lockdrop',
+    name: 'heli',
+    color: 'gray',
+    text: 'Lockdrop',
   },
   {
     link: '/analytics',

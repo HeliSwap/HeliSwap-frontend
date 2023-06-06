@@ -14,6 +14,10 @@ body {
   background-image: url('../../public/body-bg-01.png'), url('../../public/body-bg-02.png');
   background-repeat: no-repeat, no-repeat;
   background-position: 0 0, 100% 100%;
+
+  &.heliverse {
+    background: #134875;
+  }
 }
 
 ul {
