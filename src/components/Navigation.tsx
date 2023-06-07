@@ -8,6 +8,7 @@ const navigation = [
     name: 'question',
     color: 'gray',
     text: 'HeliVerse',
+    commingSoon: true,
   },
   {
     link: '/',
@@ -86,6 +87,11 @@ const Navigation = () => {
               </span>
             </Tippy>
             <span className="ms-4 d-none d-xxxl-inline-block">{item.text}</span>
+            {item.commingSoon ? (
+              <span className="text-micro d-none d-xxxl-inline-block badge bg-primary ms-3">
+                Coming soon
+              </span>
+            ) : null}
           </NavLink>
         );
       })}

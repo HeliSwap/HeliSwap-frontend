@@ -38,11 +38,13 @@ const HeliVerse = () => {
           Only the future knows…
           <br />
           <br />
-          Users can use their HELI or HBAR tokens to choose one of the definitive outcomes. The
-          overall odds then depend on the volume participation in each outcome. If you predicted
-          correctly, you win the pool of wrong predictions (whether that is a Yes / No,
-          Win/Draw/Lose scenario or similar).
+          Users can use their HELI tokens to choose one of the definitive outcomes. The overall odds
+          then depend on the volume participation in each outcome. If you predicted correctly, you
+          win the pool of wrong predictions (whether that is a Yes / No, Win/Draw/Lose scenario or
+          similar).
         </p>
+        <img className="img-fluid mt-5" src="/leaderboard.jpg" alt="" />
+        <p className="text-micro mt-3">Final design may be slightly different</p>
         <h2 className="text-subheader text-bold mt-8">Leaderboards:</h2>
         <p className="text-main mt-4">
           The HeliVerse will show leaderboards and a fun level-up system with cool HeliVerse avatar
