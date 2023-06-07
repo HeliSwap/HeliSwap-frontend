@@ -24,6 +24,7 @@ import Header from './Header';
 import Footer from './Footer';
 import Sidebar from './Sidebar';
 import GlobalMessage from './GlobalMessage';
+import HeliVerse from '../pages/HeliVerse';
 
 function App() {
   const apolloClient = getApolloClient();
@@ -59,6 +60,7 @@ function App() {
                       <Route path="claimdrop/:campaign" element={<ClaimdropDetails />} />
                       <Route path="buy-crypto" element={<C14 />} />
                       <Route path="single-sided-staking" element={<SingleSidedStaking />} />
+                      <Route path="heliverse" element={<HeliVerse />} />
                       <Route path="styleguide" element={<Styleguide />} />
                     </Routes>
                   </div>
