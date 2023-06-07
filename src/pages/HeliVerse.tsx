@@ -27,14 +27,12 @@ const HeliVerse = () => {
         </p>
         <h2 className="text-subheader text-bold mt-8">HeliVerse Predictions:</h2>
         <p className="text-main mt-4">
-          The goal of the HeliVerse is to create and combine many different use cases for HELI. At
-          first, we are launching our flagship product: The HeliVerse Predictions. HeliVerse
-          Predictions: Join the HeliSwap and Hedera communities as they predict the outcome of the
-          future. Any event with a definite outcome can serve as an underlying prediction. How much
-          will HBAR be worth in 2 months at a given date and time? Will HEDERA reach 25B
-          transactions by the end of the year? Will Manchester City win the Champions League? Will
-          Donald Trump be allowed to run as a presidential candidate? How many people will be living
-          on earth by the end of this year according to the PRB?
+          Join the HeliSwap and Hedera communities as they predict the outcome of the future. Any
+          event with a definite outcome can serve as an underlying prediction. How much will HBAR be
+          worth in 2 months at a given date and time? Will HEDERA reach 25B transactions by the end
+          of the year? Will Manchester City win the Champions League? Will Donald Trump be allowed
+          to run as a presidential candidate? How many people will be living on earth by the end of
+          this year according to the PRB?
           <br />
           <br />
           Only the future knows…
@@ -48,8 +46,8 @@ const HeliVerse = () => {
         <h2 className="text-subheader text-bold mt-8">Leaderboards:</h2>
         <p className="text-main mt-4">
           The HeliVerse will show leaderboards and a fun level-up system with cool HeliVerse avatar
-          NFTs to unlock at each stage. First users to reach the last level will win extra prices -
-          so make sure to join early!
+          NFTs to unlock at each stage. The first users to reach the last level will win extra
+          prices - so make sure to join early!
         </p>
         <h2 className="text-subheader text-bold mt-8">Are you ready to predict the universe?</h2>
         <p className="text-main mt-4">

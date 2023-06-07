@@ -5,7 +5,7 @@ import Icon from './Icon';
 const navigation = [
   {
     link: '/heliverse',
-    name: 'heli',
+    name: 'question',
     color: 'gray',
     text: 'HeliVerse',
   },

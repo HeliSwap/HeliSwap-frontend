@@ -16,7 +16,8 @@ body {
   background-position: 0 0, 100% 100%;
 
   &.heliverse {
-    background: #134875;
+    background: rgb(9, 13, 41);
+    background: linear-gradient(234deg, rgba(9, 13, 41, 1) 0%, rgba(22, 45, 87, 1) 100%);
   }
 }
 
