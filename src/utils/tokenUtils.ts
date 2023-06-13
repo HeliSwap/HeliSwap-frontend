@@ -246,16 +246,20 @@ export const calculateReserves = (
  * @param {string} percentage - percentage
  * @return {string} - Share in ETH
  */
-export const calculateShareByPercentage = (totalAmount: string, percentage: string) => {
+export const calculateShareByPercentage = (
+  totalAmount: string,
+  percentage: string,
+  decimals: number = 18,
+) => {
   const percentageStr = (Number(percentage) / 100).toString();
   const percentageBN = formatStringToBigNumber(percentageStr);
-  const totalAmountBN = formatStringToBigNumberWei(totalAmount);
+  const totalAmountBN = formatStringToBigNumberWei(totalAmount, decimals);
 
   const shareBN = totalAmountBN.times(percentageBN);
 
   const shareFormatted = stripStringToFixedDecimals(
-    formatStringWeiToStringEther(shareBN.toFixed(), 18),
-    18,
+    formatStringWeiToStringEther(shareBN.toFixed(), decimals),
+    decimals,
   );
 
   return shareFormatted;

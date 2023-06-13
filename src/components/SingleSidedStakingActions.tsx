@@ -194,13 +194,13 @@ const FarmActions = ({
     const { value } = target;
 
     setSliderValue(value);
-    const calculatedShare = calculateShareByPercentage(maxHELIInputValue, value);
+    const calculatedShare = calculateShareByPercentage(maxHELIInputValue, value, 8);
     setLpInputValue(calculatedShare);
   };
 
   const handleButtonClick = (value: string) => {
     setSliderValue(value);
-    const calculatedShare = calculateShareByPercentage(maxHELIInputValue, value);
+    const calculatedShare = calculateShareByPercentage(maxHELIInputValue, value, 8);
     setLpInputValue(calculatedShare);
   };
 
