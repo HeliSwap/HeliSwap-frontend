@@ -28,6 +28,7 @@ import KHK from '../icons/tokens/KHK.png';
 import SOF from '../icons/tokens/SOF.png';
 import LAB from '../icons/tokens/LAB.png';
 import KARATE from '../icons/tokens/KARATE.png';
+import PEPE from '../icons/tokens/PEPE.png';
 
 interface IIconTokenProps {
   symbol: string;
@@ -75,6 +76,7 @@ const tokenMapping: ITokenMapping = {
   SOF: SOF,
   $LAB: LAB,
   KARATE: KARATE,
+  'PEPE[hts]': PEPE,
   LP: LP,
 };
 
