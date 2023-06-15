@@ -201,6 +201,14 @@
       "symbol": "KARATE",
       "decimals": 8,
       "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/KARATE.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x00000000000000000000000000000000002D4720",
+      "name": "Pepe",
+      "symbol": "PEPE[hts]",
+      "decimals": 8,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/PEPE.png"
     }
   ]
 }
