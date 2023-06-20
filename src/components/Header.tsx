@@ -92,7 +92,7 @@ const Header = () => {
   }, [getUserTokensData]);
 
   return (
-    <div className="container-header with-message p-3 p-md-5">
+    <div className="container-header p-3 p-md-5">
       <div className="d-flex justify-content-between justify-content-md-end align-items-center">
         <div className="d-sm-flex align-items-center">
           <div className="d-none d-xl-flex align-items-center">
