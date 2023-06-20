@@ -138,9 +138,10 @@ interface IC14AssetIds {
 export const C14AssetIds: IC14AssetIds = {
   HBAR: 'd9b45743-e712-4088-8a31-65ee6f371022',
   USDC: 'b0694345-1eb4-4bc4-b340-f389a58ee4f3',
+  HELI: '5258d266-b144-4826-8f86-07c7ca5984aa',
 };
 
-export const C14BaseDefaultAsset = 'HBAR';
+export const C14BaseDefaultAsset = 'HELI';
 
 export const farmsToExclude = [
   '0x00000000000000000000000000000000001eDB9E',

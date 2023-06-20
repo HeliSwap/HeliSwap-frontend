@@ -1,4 +1,5 @@
 import Button from './Button';
+import IconToken from './IconToken';
 
 interface IWidgetrops {
   resource: string;
@@ -23,11 +24,23 @@ const Widget = ({ resource, title, setCurrentAsset }: IWidgetrops) => {
         <hr className="my-5" />
 
         <div className="d-flex">
-          <Button size="small" onClick={() => handleAssetButtonClick('HBAR')}>
-            Buy HBAR
+          <Button size="small" onClick={() => handleAssetButtonClick('HELI')}>
+            <span className="d-flex align-items-center">
+              <IconToken symbol="HELI" className="me-3" />
+              Buy HELI
+            </span>
+          </Button>
+          <Button size="small" onClick={() => handleAssetButtonClick('HBAR')} className="ms-3">
+            <span className="d-flex align-items-center">
+              <IconToken symbol="HBAR" className="me-3" />
+              Buy HBAR
+            </span>
           </Button>
           <Button size="small" onClick={() => handleAssetButtonClick('USDC')} className="ms-3">
-            Buy USDC
+            <span className="d-flex align-items-center">
+              <IconToken symbol="USDC" className="me-3" />
+              Buy USDC
+            </span>
           </Button>
         </div>
 
