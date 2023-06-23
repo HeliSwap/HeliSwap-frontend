@@ -10,7 +10,7 @@ env:
   REACT_APP_NETWORK_TYPE: mainnet
   REACT_APP_GRAPHQL_URI: https://heliswap-prod-362307.oa.r.appspot.com/query
   REACT_APP_DROP_POLLER_URI: https://heliswap-drops-poller-53iakaarfq-ey.a.run.app/query
-  REACT_APP_POOL_MIN_LIQUIDITY: 1500
+  REACT_APP_POOL_MIN_LIQUIDITY: 250
 'on':
   push:
     branches:
