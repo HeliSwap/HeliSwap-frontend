@@ -52,6 +52,7 @@ function App() {
                       <Route path="farms" element={<Farms itemsPerPage={10} />} />
                       <Route path="farms/:campaignAddress" element={<FarmDetails />} />
                       <Route path="tokens" element={<Tokens />} />
+                      <Route path="lockdrop" element={<Lockdrop />} />
                       <Route path="analytics" element={<Analytics />} />
                       <Route
                         path="analytics/pool/:poolAddress"
