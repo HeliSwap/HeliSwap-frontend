@@ -5,50 +5,64 @@ import {
   TransactionId,
   TransactionReceiptQuery,
 } from '@hashgraph/sdk';
-import { BladeSigner, HederaNetwork } from '@bladelabs/blade-web3.js';
+import {
+  BladeConnector,
+  ConnectorStrategy,
+  BladeSigner,
+  HederaNetwork,
+} from '@bladelabs/blade-web3.js';
 import { randomIntFromInterval } from '../utils/numberUtils';
 
 class BladeConnect {
-  signer: BladeSigner;
+  connector: BladeConnector;
+  signer: BladeSigner | null = null;
   setConnected: (loading: boolean) => void;
   setUserId: (userId: string) => void;
+  setShowConnectModal: (show: boolean) => void;
   setConnectorInstance: (instance: BladeConnect) => void;
 
   constructor(
     setConnected: (loading: boolean) => void,
     setUserId: (userId: string) => void,
+    setShowConnectModal: (show: boolean) => void,
     setConnectorInstance: (instance: BladeConnect) => void,
   ) {
-    const bladeSigner = new BladeSigner();
+    const bladeConnector = new BladeConnector(ConnectorStrategy.EXTENSION, {
+      name: 'HeliSwap DEX',
+      description: 'DApp description',
+      url: 'https://app.heliswap.io/',
+      icons: ['logo.png'],
+    });
 
-    this.signer = bladeSigner;
+    this.connector = bladeConnector;
     this.setConnected = setConnected;
     this.setUserId = setUserId;
+    this.setShowConnectModal = setShowConnectModal;
     this.setConnectorInstance = setConnectorInstance;
   }
 
   async connect() {
     const params = {
       network: process.env.REACT_APP_NETWORK_TYPE as HederaNetwork,
-      // dAppCode - optional while testing, request specific one by contacting us.
-      dAppCode: 'HeliSwap DEX',
     };
 
     // create session with optional parameters.
-    await this.signer.createSession(params);
+    const accounts = await this.connector.createSession(params);
+
     this.setConnected(true);
-    this.setUserId(this.signer.getAccountId().toString());
+    this.setUserId(accounts[0]);
+    this.signer = await this.connector.getSigner();
+    this.setShowConnectModal(false);
     this.setConnectorInstance(this);
   }
 
   async sendTransaction(transaction: Transaction, userId: string) {
     const transactionBytes = await this.freezeTransaction(transaction, userId);
-
-    const response = await this.signer.call(transactionBytes);
+    const signer = (await this.connector.getSigner()) as BladeSigner;
+    const response = await signer.call(transactionBytes);
     const { transactionId } = response;
 
     try {
-      // const receipt = await this.signer.call(new TransactionReceiptQuery({ transactionId }));
       const networkType = process.env.REACT_APP_NETWORK_TYPE as string;
       const client = networkType === 'testnet' ? Client.forTestnet() : Client.forMainnet();
       const receipt = await new TransactionReceiptQuery({

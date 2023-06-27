@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.6.9",
-    "@bladelabs/blade-web3.js": "^0.10.1",
+    "@bladelabs/blade-web3.js": "^1.0.3",
     "@hashgraph/hethers": "^1.2.6",
     "@hashgraph/sdk": "^2.24.1",
     "@testing-library/jest-dom": "^5.16.4",

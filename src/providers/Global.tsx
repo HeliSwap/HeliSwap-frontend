@@ -83,7 +83,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
   };
 
   const disconnectWallet = () => {
-    bladeConnectorInstance?.signer.killSession();
+    bladeConnectorInstance?.connector.killSession();
     hashconnectConnectorInstance?.clearPairings();
     localStorage.clear();
     setUserId('');
@@ -134,6 +134,7 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
       const bladeConnectorInstance = new BladeConnect(
         setConnected,
         setUserId,
+        setShowConnectModal,
         setConnectorInstance,
       );
       const sessionFromLS = localStorage.getItem('wc@2:client:0.3//session');

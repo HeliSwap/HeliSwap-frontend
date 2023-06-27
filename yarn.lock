@@ -1094,10 +1094,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@bladelabs/blade-web3.js@^0.10.1":
-  version "0.10.1"
-  resolved "https://registry.yarnpkg.com/@bladelabs/blade-web3.js/-/blade-web3.js-0.10.1.tgz#17a04b1abbe03473a4bfa07a7d822f4b53e018d5"
-  integrity sha512-wG8pJ/9rEFyTXCL0+L8Ghjr+hH7OSXfOuZzzephXICPVgZrLEiIL4VhmpwozDMbSQGLvqzhBSms709r10qcaZw==
+"@bladelabs/blade-web3.js@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@bladelabs/blade-web3.js/-/blade-web3.js-1.0.3.tgz#b19a556124a08787f44255f3790222f2fa18bed9"
+  integrity sha512-FZf2Mr0bp8wwRygjpJ0gzwPMk872sAcq9nTI1ujgOpFYOJUvnbnACkMVRN9YctfnECUtfZhLBRDhmEp6pWs1og==
   dependencies:
     "@hashgraph/hedera-wallet-connect" "^0.1.0"
     rxjs "^7.8.0"
