@@ -21,7 +21,7 @@ import { formatIcons } from '../utils/iconUtils';
 
 import { generalFeesAndKeysWarning } from '../content/messages';
 
-import { POOLS_FEE } from '../constants';
+import { POOLS_FEE, boostedPools } from '../constants';
 import InputToken from './InputToken';
 import ButtonSelector from './ButtonSelector';
 import WalletBalance from './WalletBalance';
@@ -505,12 +505,12 @@ const PoolInfo = ({
             </>
           ) : null}
 
-          {poolData.newPool ? (
+          {boostedPools.includes(poolData.pairAddress) ? (
             <>
-              <span className="text-micro text-uppercase badge bg-info ms-3">New</span>
-              <Tippy content="This is a new pool that was created following a small migration on May 29th concerning 7 pools. If the UI shows you the same pool with the word “DEPRECATED” behind it, you need to get active in moving your liquidity from the deprecated pool to this New one.">
-                <span className="ms-2">
-                  <Icon name="info" color="info" />
+              <span className="text-micro text-uppercase badge bg-warning ms-3">HBAR Boost</span>
+              <Tippy content="This Pool’s Yield Farm has increased HBAR Rewards (almost 50% of reward tokens are HBAR)">
+                <span className="ms-3">
+                  <Icon name="info" color="warning" />
                 </span>
               </Tippy>
             </>

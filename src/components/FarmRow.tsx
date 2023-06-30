@@ -13,7 +13,7 @@ import { mapWHBARAddress } from '../utils/tokenUtils';
 import { renderCampaignEndDate } from '../utils/farmUtils';
 import Tippy from '@tippyjs/react';
 import Icon from './Icon';
-import { restrictedFarms } from '../constants';
+import { boostedPools, restrictedFarms } from '../constants';
 
 interface IFarmRowProps {
   farmData: IFarmData;
@@ -84,16 +84,17 @@ const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
               </span>
             </Tippy>
           </>
-        ) : (
+        ) : null}
+        {boostedPools.includes(farmData.poolData.pairAddress) ? (
           <>
-            <span className="text-micro text-uppercase badge bg-info ms-3">New</span>
-            <Tippy content="This is a new farm that was created following a small migration on May 29th concerning 7 pools. If the UI shows you the same pool with the word “DEPRECATED” behind it, you need to get active in moving your liquidity from the deprecated pool to this New one.">
+            <span className="text-micro text-uppercase badge bg-warning ms-3">HBAR Boost</span>
+            <Tippy content="This Yield Farm has increased HBAR Rewards (almost 50% of reward tokens are HBAR)">
               <span className="ms-3">
-                <Icon name="info" color="info" />
+                <Icon name="info" color="warning" />
               </span>
             </Tippy>
           </>
-        )}
+        ) : null}
       </div>
       <div className="table-pools-cell justify-content-between justify-content-md-end">
         <span className="d-md-none text-small">Total Staked</span>

@@ -154,6 +154,8 @@ export const restrictedFarms = [
   '0x00000000000000000000000000000000002CcA7D',
 ];
 
+export const boostedPools = ['0x5718F1127E025C6745835faCF551283481630423'];
+
 export const tokenWeights: { [key: string]: number } = {
   HBAR: 1000,
   HELI: 100,
