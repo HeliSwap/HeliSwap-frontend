@@ -347,41 +347,75 @@ export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbar
     return true;
   });
 
-  // Calculate the target token amount for 1 HBAR
-  let tradesIn = getPossibleTradesExactIn(
-    filteredPoolsData || [],
-    '1',
-    WHBARAddress || '',
-    tokenAddress,
-    false,
-  );
+  // Check for direct pool with HBAR
+  const directPool = filteredPoolsData.find(pool => {
+    const { token0, token1 } = pool;
 
-  let sortedTrades = tradesIn.sort(tradeComparator);
+    return (
+      (token0 === tokenAddress && token1 === WHBARAddress) ||
+      (token1 === tokenAddress && token0 === WHBARAddress)
+    );
+  });
 
-  if (sortedTrades.length === 0) return '0';
+  if (directPool) {
+    const { token0Amount, token1Amount, token0Decimals, token1Decimals, token0 } = directPool;
 
-  let bestTradeAmount = new BigNumber(sortedTrades[0].amountOut);
+    const hbarTokenAmount = token0 === WHBARAddress ? token0Amount : token1Amount;
+    const tokenAmount = token0 === tokenAddress ? token0Amount : token1Amount;
 
-  //Handle special case where for 1 token in you get 0 tokens out because of big difference of the amounts and decimals
-  if (Number(sortedTrades[0].amountOut) === 0) {
-    // Calculate the HBARs token amount for 1 target token
-    tradesIn = getPossibleTradesExactIn(
+    const hbarTokenDecimals = token0 === WHBARAddress ? token0Decimals : token1Decimals;
+    const tokenDecimals = token0 === tokenAddress ? token0Decimals : token1Decimals;
+
+    const hbarTokenAmountNumber = Number(
+      ethers.utils.formatUnits(BigInt(hbarTokenAmount), hbarTokenDecimals),
+    );
+    const tokenAmountNumber = Number(ethers.utils.formatUnits(BigInt(tokenAmount), tokenDecimals));
+
+    const tokenForHbar =
+      hbarTokenAmountNumber === 0 || tokenAmountNumber === 0
+        ? 0
+        : tokenAmountNumber / hbarTokenAmountNumber;
+
+    const tokenPrice = hbarPrice / tokenForHbar;
+
+    return tokenPrice.toString();
+  } else {
+    // Calculate the target token amount for 1 HBAR
+    let tradesIn = getPossibleTradesExactIn(
       filteredPoolsData || [],
       '1',
-      tokenAddress,
       WHBARAddress || '',
+      tokenAddress,
       false,
     );
 
-    sortedTrades = tradesIn.sort(tradeComparator);
+    let sortedTrades = tradesIn.sort(tradeComparator);
 
-    if (sortedTrades.length === 0 || Number(sortedTrades[0].amountOut) === 0) return '0';
+    if (sortedTrades.length === 0) return '0';
 
-    bestTradeAmount = new BigNumber(sortedTrades[0].amountOut);
+    let bestTradeAmount = new BigNumber(sortedTrades[0].amountOut);
 
-    return new BigNumber(hbarPrice).times(bestTradeAmount).toString();
-  } else {
-    return new BigNumber(hbarPrice).div(bestTradeAmount).toString();
+    //Handle special case where for 1 token in you get 0 tokens out because of big difference of the amounts and decimals
+    if (Number(sortedTrades[0].amountOut) === 0) {
+      // Calculate the HBARs token amount for 1 target token
+      tradesIn = getPossibleTradesExactIn(
+        filteredPoolsData || [],
+        '1',
+        tokenAddress,
+        WHBARAddress || '',
+        false,
+      );
+
+      sortedTrades = tradesIn.sort(tradeComparator);
+
+      if (sortedTrades.length === 0 || Number(sortedTrades[0].amountOut) === 0) return '0';
+
+      bestTradeAmount = new BigNumber(sortedTrades[0].amountOut);
+
+      return new BigNumber(hbarPrice).times(bestTradeAmount).toString();
+    } else {
+      return new BigNumber(hbarPrice).div(bestTradeAmount).toString();
+    }
   }
 };
 
