@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
-import { IPoolData, IPoolExtendedData } from '../interfaces/tokens';
+import { IPoolData, IPoolExtendedData, ITokenPriceMapping } from '../interfaces/tokens';
 import { formatStringWeiToStringEther } from './numberUtils';
 import { getTokenPrice, isPoolDeprecated, isPoolNew, mapHBARTokenSymbol } from './tokenUtils';
 
@@ -9,6 +9,7 @@ export const getProcessedPools = (
   getExtended: boolean,
   hbarPrice: number | undefined,
   restPools: IPoolExtendedData[] = [],
+  tokenPriceMapping?: ITokenPriceMapping,
 ) => {
   if (getExtended) {
     const mergedPools = _.unionBy(restPools, pools, 'id');
@@ -29,8 +30,14 @@ export const getProcessedPools = (
           volume7dUsd,
         } = pool;
 
-        const token0Price = getTokenPrice(mergedPools, token0, hbarPrice);
-        const token1Price = getTokenPrice(mergedPools, token1, hbarPrice);
+        const token0Price =
+          tokenPriceMapping && tokenPriceMapping[token0] !== '0'
+            ? tokenPriceMapping[token0]
+            : getTokenPrice(mergedPools, token0, hbarPrice);
+        const token1Price =
+          tokenPriceMapping && tokenPriceMapping[token1] !== '0'
+            ? tokenPriceMapping[token1]
+            : getTokenPrice(mergedPools, token1, hbarPrice);
         const token0AmountFormatted = formatStringWeiToStringEther(token0Amount, token0Decimals);
         const token1AmountFormatted = formatStringWeiToStringEther(token1Amount, token1Decimals);
         const token0Value = Number(token0AmountFormatted) * Number(token0Price);

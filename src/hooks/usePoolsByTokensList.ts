@@ -15,7 +15,7 @@ const usePoolsByTokensList = (
   tokensList: string[] = [],
 ) => {
   const contextValue = useContext(GlobalContext);
-  const { hbarPrice } = contextValue;
+  const { hbarPrice, tokenPriceMapping } = contextValue;
 
   const [pools, setPools] = useState<IPoolExtendedData[]>([]);
   const [processingPools, setProcessingPools] = useState<boolean>(true);
@@ -42,7 +42,13 @@ const usePoolsByTokensList = (
       const { poolsConsistingOf } = data;
       if (poolsConsistingOf && poolsConsistingOf.length > 0 && hbarPrice !== 0) {
         try {
-          const processedPools = getProcessedPools(poolsConsistingOf, getExtended, hbarPrice);
+          const processedPools = getProcessedPools(
+            poolsConsistingOf,
+            getExtended,
+            hbarPrice,
+            [],
+            tokenPriceMapping,
+          );
           if (processedPools) setPools(processedPools);
         } catch (error) {
           console.error('Error while fetching pools data.');
@@ -51,7 +57,7 @@ const usePoolsByTokensList = (
         }
       }
     }
-  }, [data, hbarPrice, getExtended]);
+  }, [data, hbarPrice, getExtended, tokenPriceMapping]);
 
   useEffect(() => {
     if (

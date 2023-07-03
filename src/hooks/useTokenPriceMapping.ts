@@ -1,16 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
+import { ITokenPriceMapping } from '../interfaces/tokens';
 import { BALLANCE_FETCH_INTERVAL } from '../constants';
 import { getTokenPriceByAddress } from '../utils/tokenUtils';
-
-interface ITokenPriceMapping {
-  [key: string]: string;
-}
 
 const useTokenPriceMapping = (tokenAddresses: string[]) => {
   const [tokenPriceMapping, setTokenPriceMapping] = useState({} as ITokenPriceMapping);
 
   const getTokenPriceMapping = useCallback(async () => {
     let tokenPriceMapping: ITokenPriceMapping = {};
+    console.log('first');
     if (tokenAddresses && tokenAddresses.length > 0) {
       for (let i = 0; i < tokenAddresses.length; i++) {
         tokenPriceMapping[tokenAddresses[i]] = await getTokenPriceByAddress(tokenAddresses[i]);

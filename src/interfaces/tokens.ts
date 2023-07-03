@@ -223,3 +223,7 @@ export interface IfaceInitialBalanceData {
   tokenA: string | undefined;
   tokenB: string | undefined;
 }
+
+export interface ITokenPriceMapping {
+  [key: string]: string;
+}

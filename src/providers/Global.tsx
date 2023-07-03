@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 import Hashconnect from '../connectors/hashconnect';
 import BladeConnect from '../connectors/blade';
 
-import { ITokenListData } from '../interfaces/tokens';
+import { ITokenListData, ITokenPriceMapping } from '../interfaces/tokens';
 
 import useHealthCheck from '../hooks/useHealthCheck';
 import useTokensWhitelisted from '../hooks/useTokensWhitelisted';
@@ -13,6 +13,7 @@ import useHeliPrice from '../hooks/useHeliPrice';
 import SDK from '../sdk/sdk';
 
 import { HEALTH_CHECK_INTERVAL } from '../constants';
+import useTokenPriceMapping from '../hooks/useTokenPriceMapping';
 
 const contextInitialValue = {
   sdk: {} as SDK,
@@ -31,6 +32,7 @@ const contextInitialValue = {
     pairingString: '',
   },
   tokensWhitelisted: [] as ITokenListData[],
+  tokenPriceMapping: {} as ITokenPriceMapping,
   isRunning: false,
   lastUpdated: '',
   hbarPrice: 0,
@@ -65,6 +67,8 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
 
   const { hbarPrice } = useHbarPrice();
   const { heliPrice } = useHeliPrice();
+  const tokenAddresses = tokensWhitelisted.map(token => token.address);
+  const tokenPriceMapping = useTokenPriceMapping(tokenAddresses);
 
   const lastUpdated = new Date(Number(timestamp) * 1000).toString();
 
@@ -115,7 +119,10 @@ export const GlobalProvider = ({ children }: IGlobalProps) => {
     hbarPrice,
     heliPrice,
     provider,
+    tokenPriceMapping,
   };
+
+  console.log('In global context');
 
   useEffect(() => {
     const initHashconnectConnector = async () => {

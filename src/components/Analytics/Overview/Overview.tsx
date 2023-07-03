@@ -20,7 +20,6 @@ import { getTokenPrice, mapWHBARAddress, NATIVE_TOKEN } from '../../../utils/tok
 import usePoolsByTokensList from '../../../hooks/usePoolsByTokensList';
 import useTokensByListIds from '../../../hooks/useTokensByListIds';
 import useHistoricalData from '../../../hooks/useHistoricalData';
-import useTokenPriceMapping from '../../../hooks/useTokenPriceMapping';
 
 import {
   useQueryOptions,
@@ -32,7 +31,7 @@ import { IHistoricalData } from '../../../interfaces/common';
 
 const Overview = () => {
   const contextValue = useContext(GlobalContext);
-  const { tokensWhitelisted, hbarPrice } = contextValue;
+  const { tokensWhitelisted, hbarPrice, tokenPriceMapping } = contextValue;
 
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
 
@@ -53,8 +52,6 @@ const Overview = () => {
     false,
   );
   const { historicalData } = useHistoricalData(useQueryOptions);
-
-  const tokenPriceMapping = useTokenPriceMapping(tokensWhitelistedAddresses);
 
   useEffect(() => {
     setLoadingTokens(true);
