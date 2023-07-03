@@ -20,6 +20,7 @@ import { getTokenPrice, mapWHBARAddress, NATIVE_TOKEN } from '../../../utils/tok
 import usePoolsByTokensList from '../../../hooks/usePoolsByTokensList';
 import useTokensByListIds from '../../../hooks/useTokensByListIds';
 import useHistoricalData from '../../../hooks/useHistoricalData';
+import useTokenPriceMapping from '../../../hooks/useTokenPriceMapping';
 
 import {
   useQueryOptions,
@@ -53,6 +54,8 @@ const Overview = () => {
   );
   const { historicalData } = useHistoricalData(useQueryOptions);
 
+  const tokenPriceMapping = useTokenPriceMapping(tokensWhitelistedAddresses);
+
   useEffect(() => {
     setLoadingTokens(true);
 
@@ -68,8 +71,14 @@ const Overview = () => {
           acc[token1] = 0;
         }
 
-        const token0Price = getTokenPrice(pools, token0, hbarPrice);
-        const token1Price = getTokenPrice(pools, token1, hbarPrice);
+        const token0Price =
+          tokenPriceMapping[token0] !== '0'
+            ? tokenPriceMapping[token0]
+            : getTokenPrice(pools, token0, hbarPrice);
+        const token1Price =
+          tokenPriceMapping[token1] !== '0'
+            ? tokenPriceMapping[token1]
+            : getTokenPrice(pools, token1, hbarPrice);
 
         const token0AmountFormatted = formatStringWeiToStringEther(token0Amount, token0Decimals);
         const token1AmountFormatted = formatStringWeiToStringEther(token1Amount, token1Decimals);
@@ -83,7 +92,10 @@ const Overview = () => {
       }, {});
 
       const tokensWithData = tokenDataList.map(token => {
-        const tokenPrice = getTokenPrice(pools, token.address, hbarPrice);
+        const tokenPrice =
+          tokenPriceMapping[token.address] !== '0'
+            ? tokenPriceMapping[token.address]
+            : getTokenPrice(pools, token.address, hbarPrice);
         const tokenName =
           token.address === process.env.REACT_APP_WHBAR_ADDRESS ? NATIVE_TOKEN.name : token.name;
         const tokenSymbol = mapWHBARAddress(token);
@@ -106,7 +118,7 @@ const Overview = () => {
       setLoadingTokens(false);
       setTokensToShow(tokensWithData);
     }
-  }, [tokensWhitelisted, pools, hbarPrice, tokenDataList]);
+  }, [tokensWhitelisted, pools, hbarPrice, tokenDataList, tokenPriceMapping]);
 
   useEffect(() => {
     const calculatePoolsTVL = (pools: IPoolExtendedData[]) => {

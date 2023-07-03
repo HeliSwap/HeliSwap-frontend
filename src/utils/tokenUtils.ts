@@ -419,6 +419,25 @@ export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbar
   }
 };
 
+export const getTokenPriceByAddress = async (tokenAddress: string) => {
+  const url = `https://heliswap-api.ey.r.appspot.com/tokens/${tokenAddress}`;
+
+  try {
+    const response = await axios.get(url);
+    const { status, data } = response;
+
+    if (status === 200) {
+      const { price } = data;
+      return price.toString();
+    } else {
+      return '0';
+    }
+  } catch (e) {
+    console.error(e);
+    return '0';
+  }
+};
+
 const getUserHTSData = async (userId: string) => {
   const networkType = process.env.REACT_APP_NETWORK_TYPE as string;
   const client = networkType === 'testnet' ? Client.forTestnet() : Client.forMainnet();
