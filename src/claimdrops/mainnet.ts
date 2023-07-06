@@ -241,6 +241,66 @@ const data = [
     claimdropDescription:
       'Dear HeliSwap and NFT community, as part of our Launch Claimdrop series we are giving out a Claimdrop to all Heli Dazzle Duck holders that held this cute duck in their wallet on 20 March 2023. This is to show some love towards the NFT community on Hedera and a thank you to all our early supporters that actively follow our announcements and claimed these ducks.',
   },
+  {
+    claimdropStart: {
+      date: '10 July 2023',
+      timestamp: 1688631250000,
+    },
+    claimdropEnd: {
+      date: '10 August 2023',
+      timestamp: 1691658000000,
+    },
+    expiryEnd: {
+      date: '10 October 2023',
+      timestamp: 1696928400000,
+    },
+    vestingPeriod: {
+      valueString: '30 Days',
+      valueNumericDays: 30,
+      valueNumericMilliseconds: 2592000000,
+    },
+    claimPeriod: {
+      valueString: '60 Days',
+      valueNumericDays: 60,
+      valueNumericMilliseconds: 5256000000,
+    },
+    totalAllocated: {
+      valueBN: ethers.BigNumber.from('89213300802755'),
+      valueStringWei: '89213300802755',
+      valueStringETH: '892133.00802755',
+    },
+    claimedOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    vestedTokensOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    claimable: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    extraTokensOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    totalAllocatedOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    token: '0x00000000000000000000000000000000001d90C9',
+    claimdropAddress: '0x00000000000000000000000000000000002f59ff',
+    title: 'BLADE WALLET LOYALTY CARD Appreciation Claimdrop #1',
+    claimdropTitle: 'BLADE WALLET LOYALTY CARD Appreciation Claimdrop #1',
+    claimdropDescription:
+      'As part of a series of Claimdrops to appreciate our collaboration with Blade Wallet, and to introduce the loyal Blade Wallet users to the DeFi space on Hedera, we have set up a first (of several) appreciation Claimdrops. The first 1,000 Blade Wallet Loyalty Card Holders are eligible for this Claimdrop. You can check your position under the "NFT" section of your Blade Wallet when you look at the Serial Number of your loyalty card (if you hold one).',
+  },
 ];
 
 export default data;
