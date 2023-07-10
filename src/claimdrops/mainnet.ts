@@ -244,15 +244,15 @@ const data = [
   {
     claimdropStart: {
       date: '10 July 2023',
-      timestamp: 1688631250000,
+      timestamp: 1688988804000,
     },
     claimdropEnd: {
-      date: '10 August 2023',
-      timestamp: 1691658000000,
+      date: '9 August 2023',
+      timestamp: 1691580804000,
     },
     expiryEnd: {
-      date: '10 October 2023',
-      timestamp: 1696928400000,
+      date: '8 October 2023',
+      timestamp: 1696764804000,
     },
     vestingPeriod: {
       valueString: '30 Days',
@@ -265,9 +265,9 @@ const data = [
       valueNumericMilliseconds: 5256000000,
     },
     totalAllocated: {
-      valueBN: ethers.BigNumber.from('89213300802755'),
-      valueStringWei: '89213300802755',
-      valueStringETH: '892133.00802755',
+      valueBN: ethers.BigNumber.from('50050000000000'),
+      valueStringWei: '50050000000000',
+      valueStringETH: '500500.00',
     },
     claimedOf: {
       valueBN: ethers.BigNumber.from('0'),
@@ -295,7 +295,7 @@ const data = [
       valueStringETH: '0.0',
     },
     token: '0x00000000000000000000000000000000001d90C9',
-    claimdropAddress: '0x00000000000000000000000000000000002f59ff',
+    claimdropAddress: '0x00000000000000000000000000000000002fe4bd',
     title: 'BLADE WALLET LOYALTY CARD Appreciation Claimdrop #1',
     claimdropTitle: 'BLADE WALLET LOYALTY CARD Appreciation Claimdrop #1',
     claimdropDescription:
