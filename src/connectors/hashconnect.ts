@@ -94,6 +94,7 @@ class Hashconnect {
       this.setConnected(true);
       this.setIsHashpackLoading(false);
       this.setShowConnectModal(false);
+      this.setConnectorInstance(this);
     });
 
     this.hashconnect.transactionEvent.on(data => {
