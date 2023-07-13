@@ -38,6 +38,7 @@ import ClaimDropABI from '../abi/ClaimDrop.json';
 import claimdropsTestnet from '../claimdrops/testnet';
 import claimdropsMainet from '../claimdrops/mainnet';
 import { GET_CLAIMDROP_DATA } from '../GraphQL/Queries';
+import { bladeClaimdropAddress } from '../constants';
 
 enum CLAIMDROP_STATE {
   NOT_STARTED,
@@ -815,6 +816,167 @@ const ClaimdropDetails = () => {
                   </div>
                 </div>
               )}
+
+              {bladeClaimdropAddress === claimDropContractAddress ? (
+                <div className="row">
+                  <div className="col-lg-10 offset-lg-1">
+                    <p className="text-title text-bold text-gray mt-6">
+                      A Warm Welcome to the HeliSwap Platform to all Blade Loyalty Card Holders!
+                    </p>
+
+                    <p className="text-main text-gray mt-5">
+                      <span className="text-bold">Join the HeliSwap community</span> for an easier
+                      and more engaging experience on our DeFi platform. Our team and community are
+                      ready to assist you in navigating the world of decentralized finance,
+                      providing support, and keeping you updated on the latest developments. Don't
+                      miss out on the opportunity to connect with like-minded individuals and embark
+                      on a journey of financial empowerment.
+                    </p>
+
+                    <div className="mt-5 d-flex align-items-center">
+                      <a
+                        className="text-main link d-flex align-items-center"
+                        target="_blank"
+                        rel="noreferrer"
+                        href="https://discord.gg/wVrkMwBKsm"
+                      >
+                        <Icon name="discord" />
+                        <span className="ms-3">Discord</span>
+                      </a>
+                      <a
+                        className="text-main link d-flex align-items-center ms-3"
+                        target="_blank"
+                        rel="noreferrer"
+                        href="https://t.me/heliswap"
+                      >
+                        <Icon name="telegram" />
+                        <span className="ms-3">Telegram</span>
+                      </a>
+                    </div>
+
+                    <p className="text-title text-bold text-gray mt-8">
+                      Now Let’s start with a small Intro to DeFi!
+                    </p>
+
+                    <p className="text-main text-gray mt-5">
+                      What can you do with your $HELI Tokens?
+                    </p>
+
+                    <p className="text-main text-gray mt-5">
+                      1. You can stake your tokens into a Farm on HeliSwap to earn rewards, which in
+                      DeFi are called “APR” and expressed as an annual reward rate. Watch the video
+                      below for a step by step guide on how to stake into the HeliSwap Liquidity
+                      Pools & Farms.
+                    </p>
+
+                    <div className="ratio ratio-16x9 mt-5">
+                      <iframe
+                        width="1280"
+                        height="800"
+                        src="https://www.youtube.com/embed/Nri2iAWyJtA"
+                        title="Step-by-Step Guide: Staking into Yield Farms on HeliSwap DEX"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      ></iframe>
+                    </div>
+
+                    <p className="text-main text-gray mt-5">
+                      2. If you only hold $HELI and don't have any other assets, you can consider
+                      staking it on HelISwap's "Single Sided Staking" or "Single Asset Staking"
+                      platform. Here's a step-by-step guide on how to do it:
+                    </p>
+
+                    <div className="ratio ratio-16x9 mt-5">
+                      <iframe
+                        width="1280"
+                        height="800"
+                        src="https://www.youtube.com/embed/y8P-wJQvLFQ"
+                        title="Step by Step Guide: How to use HELI Single Sided Staking"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      ></iframe>
+                    </div>
+
+                    <p className="text-main text-gray mt-5">
+                      3. You have the opportunity to swap $HELI for various other tokens and explore
+                      the functionalities of our platform.
+                    </p>
+
+                    <p className="text-main text-gray mt-5">
+                      Of course, when delving deeper into the world of DeFi, it's important to
+                      consider additional topics and risks. To expand your knowledge, we recommend
+                      exploring our academy, specifically focusing on the following articles:
+                    </p>
+
+                    <ul className="list-default text-main text-gray mt-5">
+                      <li>
+                        <a
+                          className="link"
+                          target="_blank"
+                          rel="noreferrer"
+                          href="https://www.heliswap.io/academy-articles/what-is-impermanent-loss"
+                        >
+                          Impermanent Loss
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          className="link"
+                          target="_blank"
+                          rel="noreferrer"
+                          href="https://www.heliswap.io/academy-articles/apr-vs-apy"
+                        >
+                          APR vs APY
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          className="link"
+                          target="_blank"
+                          rel="noreferrer"
+                          href="https://www.heliswap.io/academy-articles/what-is-slippage"
+                        >
+                          Slippage
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          className="link"
+                          target="_blank"
+                          rel="noreferrer"
+                          href="https://www.heliswap.io/academy-articles/what-are-lp-tokens"
+                        >
+                          LP tokens
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          className="link"
+                          target="_blank"
+                          rel="noreferrer"
+                          href="https://www.heliswap.io/academy-articles/what-are-liquidity-pools"
+                        >
+                          Liquidity Pools
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          className="link"
+                          target="_blank"
+                          rel="noreferrer"
+                          href="https://www.heliswap.io/academy-articles/what-is-single-sided-staking"
+                        >
+                          Single-Sided Staking
+                        </a>
+                      </li>
+                    </ul>
+
+                    <p className="text-main text-gray mt-5">
+                      Our academy articles will provide you with valuable insights and information
+                      to enhance your understanding of DeFi and enable you to make informed
+                      decisions in this dynamic ecosystem.
+                    </p>
+                  </div>
+                </div>
+              ) : null}
             </>
           )
         ) : (
