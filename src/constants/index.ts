@@ -158,7 +158,10 @@ export const bladeClaimdropAddress = '0x00000000000000000000000000000000002fe4bd
 
 export const boostedPools = ['0x5718F1127E025C6745835faCF551283481630423'];
 
-export const notVerifiedTokens = ['0x00000000000000000000000000000000002A30A8'];
+export const notVerifiedTokens = [
+  '0x00000000000000000000000000000000002A30A8',
+  '0x000000000000000000000000000000000021226e',
+];
 
 export const tokenWeights: { [key: string]: number } = {
   HBAR: 1000,

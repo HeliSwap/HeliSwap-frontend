@@ -12,7 +12,12 @@ import {
   requestIdFromAddress,
 } from '../../utils/tokenUtils';
 
-import { ASYNC_SEARCH_THRESHOLD, HASHSCAN_ROOT_DOMAIN, tokenWeights } from '../../constants';
+import {
+  ASYNC_SEARCH_THRESHOLD,
+  HASHSCAN_ROOT_DOMAIN,
+  notVerifiedTokens,
+  tokenWeights,
+} from '../../constants';
 
 import IconToken from '../IconToken';
 import Button from '../Button';
@@ -252,6 +257,34 @@ const ModalSearchContent = ({
     }
   };
 
+  const renderNotVerifiedTooltip = (token: ITokenData) => {
+    const isNotVerifiedTokens = notVerifiedTokens.includes(token.address);
+
+    return isNotVerifiedTokens ? (
+      <div className="d-flex aling-item-center">
+        <span className="text-micro text-uppercase badge bg-warning ms-3">Unverified</span>
+        <Tippy
+          content={
+            <div className="text-warning">
+              <div className="d-flex align-items-center">
+                <Icon name="info" color="warning" />
+                <p className="text-bold ms-3">Warning!</p>
+              </div>
+              <p className="mt-3">
+                This token has not beed verified by the HeliSwap DAO. HeliSwap is a permissionless
+                platform. Always do your own due diligence before engaging with a project or token.
+              </p>
+            </div>
+          }
+        >
+          <span className="ms-2">
+            <Icon color="warning" name="info" />
+          </span>
+        </Tippy>
+      </div>
+    ) : null;
+  };
+
   const hasTokenList = tokenList && tokenList.length > 0;
   const showImportButton = canImport && readyToImport;
   const showTokenList = canImport
@@ -388,6 +421,7 @@ const ModalSearchContent = ({
                             <div className="d-flex align-items-center">
                               <p className="text-main">{token.symbol}</p>
                               {renderWarningTooltip(token)}
+                              {renderNotVerifiedTooltip(token)}
                             </div>
                             <p className="text-small text-secondary">
                               {token.name}{' '}
