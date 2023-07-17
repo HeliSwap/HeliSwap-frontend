@@ -30,6 +30,7 @@ import LAB from '../icons/tokens/LAB.png';
 import KARATE from '../icons/tokens/KARATE.png';
 import PEPE from '../icons/tokens/PEPE.png';
 import SUS from '../icons/tokens/SUS.png';
+import GARY from '../icons/tokens/GARY.png';
 
 interface IIconTokenProps {
   symbol: string;
@@ -79,6 +80,7 @@ const tokenMapping: ITokenMapping = {
   KARATE: KARATE,
   'PEPE[hts]': PEPE,
   'SUS.h': SUS,
+  'GARY ': GARY,
   LP: LP,
 };
 

@@ -217,6 +217,14 @@
       "symbol": "SUS.h",
       "decimals": 6,
       "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/SUS.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x000000000000000000000000000000000021226e",
+      "name": "GASLESS GARY",
+      "symbol": "GARY",
+      "decimals": 0,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/GARY.png"
     }
   ]
 }
