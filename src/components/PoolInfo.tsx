@@ -21,7 +21,7 @@ import { formatIcons } from '../utils/iconUtils';
 
 import { generalFeesAndKeysWarning } from '../content/messages';
 
-import { POOLS_FEE, boostedPools } from '../constants';
+import { POOLS_FEE, boostedPools, notVerifiedTokens } from '../constants';
 import InputToken from './InputToken';
 import ButtonSelector from './ButtonSelector';
 import WalletBalance from './WalletBalance';
@@ -462,6 +462,8 @@ const PoolInfo = ({
 
   const canTransfer = inputIdValid && inputId !== '' && inputLPAmountValid;
   const haveStakedTokens = Number(poolData.stakedBalance) > 0;
+  const haveNotVerifiedTokens =
+    notVerifiedTokens.includes(poolData.token0) || notVerifiedTokens.includes(poolData.token1);
 
   return (
     <>
@@ -509,6 +511,17 @@ const PoolInfo = ({
             <>
               <span className="text-micro text-uppercase badge bg-warning ms-3">HBAR Boost</span>
               <Tippy content="This Pool’s Yield Farm has increased HBAR Rewards (almost 50% of USD Reward Value are HBAR)">
+                <span className="ms-3">
+                  <Icon name="info" color="warning" />
+                </span>
+              </Tippy>
+            </>
+          ) : null}
+
+          {haveNotVerifiedTokens ? (
+            <>
+              <span className="text-micro text-uppercase badge bg-warning ms-3">Unverified</span>
+              <Tippy content="One or both of the tokens in this liquidity pool have not been verified by the DAO. Be cautious when engaging with any tokens and please do your own due diligence">
                 <span className="ms-3">
                   <Icon name="info" color="warning" />
                 </span>

@@ -13,7 +13,7 @@ import { mapWHBARAddress } from '../utils/tokenUtils';
 import { renderCampaignEndDate } from '../utils/farmUtils';
 import Tippy from '@tippyjs/react';
 import Icon from './Icon';
-import { boostedPools, restrictedFarms } from '../constants';
+import { boostedPools, notVerifiedTokens, restrictedFarms } from '../constants';
 
 interface IFarmRowProps {
   farmData: IFarmData;
@@ -62,6 +62,10 @@ const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
     return formatIcons(rewardsSymbols);
   };
 
+  const haveNotVerifiedTokens =
+    notVerifiedTokens.includes(farmData.poolData.token0) ||
+    notVerifiedTokens.includes(farmData.poolData.token1);
+
   return (
     <div
       onClick={handleViewDetailsRowClick}
@@ -85,10 +89,22 @@ const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
             </Tippy>
           </>
         ) : null}
+
         {boostedPools.includes(farmData.poolData.pairAddress) ? (
           <>
             <span className="text-micro text-uppercase badge bg-warning ms-3">HBAR Boost</span>
             <Tippy content="This Yield Farm has increased HBAR Rewards (almost 50% of USD Reward Value are HBAR)">
+              <span className="ms-3">
+                <Icon name="info" color="warning" />
+              </span>
+            </Tippy>
+          </>
+        ) : null}
+
+        {haveNotVerifiedTokens ? (
+          <>
+            <span className="text-micro text-uppercase badge bg-warning ms-3">Unverified</span>
+            <Tippy content="One or both of the tokens in this liquidity pool have not been verified by the DAO. Be cautious when engaging with any tokens and please do your own due diligence">
               <span className="ms-3">
                 <Icon name="info" color="warning" />
               </span>
