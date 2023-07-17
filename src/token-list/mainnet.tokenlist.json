@@ -209,6 +209,14 @@
       "symbol": "PEPE[hts]",
       "decimals": 8,
       "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/PEPE.png"
+    },
+    {
+      "chainId": 295,
+      "address": "0x00000000000000000000000000000000002A30A8",
+      "name": "SUS Token",
+      "symbol": "SUS.h",
+      "decimals": 6,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/QmYTdakJSFDCAGDqLsKmW166h7G8EnwH16mq1C4Nii16ow/SUS.png"
     }
   ]
 }
