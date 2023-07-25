@@ -509,10 +509,10 @@ const PoolInfo = ({
 
           {boostedPools.includes(poolData.pairAddress) ? (
             <>
-              <span className="text-micro text-uppercase badge bg-warning ms-3">Super Farm</span>
+              <span className="text-micro text-uppercase badge bg-success ms-3">Super Farm</span>
               <Tippy content="This Pool’s Yield Farm has increased HBAR Rewards (almost 50% of USD Reward Value are HBAR)">
                 <span className="ms-3">
-                  <Icon name="info" color="warning" />
+                  <Icon name="info" color="success" />
                 </span>
               </Tippy>
             </>
