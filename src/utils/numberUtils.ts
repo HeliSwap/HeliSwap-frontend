@@ -38,6 +38,12 @@ export const formatStringToBigNumber = (numberToFormat: string) => {
   return numberToFormatBN;
 };
 
+export const formatBigNumberToStringETH = (numberToFormat: ethers.BigNumberish) => {
+  const numberToFormatETH = ethers.utils.formatUnits(numberToFormat, 8);
+
+  return numberToFormatETH;
+};
+
 // Used to format values (string | ETH) into BN / wei (used for native contract calls)
 export const formatStringToBigNumberWei = (numberToFormat: string, decimals: number = 18) => {
   const numberToFormatBN = new BigNumber(numberToFormat);

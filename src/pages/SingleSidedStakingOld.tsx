@@ -1,7 +1,6 @@
-import { ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import Tippy from '@tippyjs/react';
 import toast from 'react-hot-toast';
-import { ethers } from 'ethers';
 
 import { GlobalContext } from '../providers/Global';
 
@@ -26,7 +25,6 @@ import Loader from '../components/Loader';
 import SSSFAQ from '../components/SSSFAQ';
 
 import {
-  formatBigNumberToStringETH,
   formatStringETHtoPriceFormatted,
   formatStringToPercentage,
   formatStringToPrice,
@@ -39,17 +37,12 @@ import {
   addressToId,
   getTokenBalance,
   getUserAssociatedTokens,
-  idToAddress,
   mapWHBARAddress,
 } from '../utils/tokenUtils';
 
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import useTokensByListIds from '../hooks/useTokensByListIds';
 import useSSSByAddress from '../hooks/useSSSByAddress';
-
-import useHELITokenContract from '../hooks/useHELITokenContract';
-import useRewardsContract from '../hooks/useRewardsContract';
-import useKernelContract from '../hooks/useKernelContract';
 
 import getErrorMessage from '../content/errors';
 
@@ -110,18 +103,6 @@ const SingleSidedStaking = () => {
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
   const [loadingAssociate, setLoadingAssociate] = useState(false);
   const [stakingTokenBalance, setStakingTokenBalance] = useState('0');
-
-  const kernelContract = useKernelContract();
-  const tokenContract = useHELITokenContract();
-  const rewardsContract = useRewardsContract();
-
-  const [heliStaked, setHeliStaked] = useState('0');
-  const [heliBalance, setHeliBalance] = useState('0');
-  const [userRewardsBalance, setUserRewardsBalance] = useState('0');
-
-  const [loadingHeliStaked, setLoadingHeliStaked] = useState(true);
-  const [loadingRewards, setLoadingRewards] = useState(true);
-  const [loadingClaim, setLoadingClaim] = useState(false);
 
   const userRewardsUSD = useMemo(() => {
     if (Object.keys(sssData).length !== 0) {
@@ -220,44 +201,6 @@ const SingleSidedStaking = () => {
     setStakingTokenBalance(stakingTokenBalance);
   };
 
-  const getHeliStaked = useCallback(async () => {
-    try {
-      setLoadingHeliStaked(true);
-      const balanceBN = await kernelContract.balanceOf(idToAddress(userId));
-      console.log('balanceBN', balanceBN.toString());
-      setHeliStaked(formatBigNumberToStringETH(balanceBN));
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoadingHeliStaked(false);
-    }
-  }, [kernelContract, userId]);
-
-  const getUserRewardsBalance = useCallback(async () => {
-    setLoadingRewards(true);
-
-    try {
-      const balanceBN = await rewardsContract.owed(idToAddress(userId));
-      const decimals = await tokenContract.decimals();
-      const balance = ethers.utils.formatUnits(balanceBN, decimals);
-
-      setUserRewardsBalance(balance);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoadingRewards(false);
-    }
-  }, [rewardsContract, tokenContract, userId]);
-
-  const getHeliBalance = useCallback(async () => {
-    try {
-      const balanceBN = await tokenContract.balanceOf(idToAddress(userId));
-      setHeliBalance(formatBigNumberToStringETH(balanceBN));
-    } catch (error) {
-      console.error(error);
-    }
-  }, [tokenContract, userId]);
-
   useEffect(() => {
     if (!userId) {
       setStakingTokenBalance('0');
@@ -265,18 +208,6 @@ const SingleSidedStaking = () => {
 
     userId && stakingTokenId && getStakingTokenBalance(userId, stakingTokenId);
   }, [userId, stakingTokenId]);
-
-  useEffect(() => {
-    userId && Object.keys(kernelContract).length && getHeliStaked();
-  }, [kernelContract, userId, getHeliStaked]);
-
-  useEffect(() => {
-    tokenContract && Object.keys(rewardsContract).length && userId && getUserRewardsBalance();
-  }, [tokenContract, rewardsContract, userId, getUserRewardsBalance]);
-
-  useEffect(() => {
-    userId && Object.keys(tokenContract).length && getHeliBalance();
-  }, [tokenContract, userId, getHeliBalance]);
 
   const userRewardsAddresses =
     sssData.userStakingData?.rewardsAccumulated &&
