@@ -306,7 +306,7 @@ const SingleSidedStaking = () => {
   ) : (
     <div className="d-flex justify-content-center">
       <div className="container-max-with-1042">
-        <h1 className="text-headline text-light mb-4">Single Sided Staking - Phase 1</h1>
+        <h1 className="text-headline text-light mb-4">Single Sided Staking - Phase 2</h1>
 
         <p className="text-small mb-4 mb-lg-6">
           Phase 1 is a standard Single Sided Staking pool. Phase 2 will involve the same mechanism,
