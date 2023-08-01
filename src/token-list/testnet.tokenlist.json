@@ -12,7 +12,7 @@
   "tokens": [
     {
       "chainId": 290,
-      "address": "0x0000000000000000000000000000000000CFc209",
+      "address": "0x000000000000000000000000000000000006A6cB",
       "name": "Wrapped HBAR",
       "symbol": "WHBAR",
       "decimals": 8,
@@ -20,7 +20,7 @@
     },
     {
       "chainId": 290,
-      "address": "0x0000000000000000000000000000000000001fFF",
+      "address": "0x000000000000000000000000000000000006a5c5",
       "name": "USD Coin",
       "symbol": "USDC",
       "decimals": 6,
@@ -28,7 +28,7 @@
     },
     {
       "chainId": 290,
-      "address": "0x0000000000000000000000000000000000002020",
+      "address": "0x000000000000000000000000000000000006a5e2",
       "name": "Wrapped Ethereum",
       "symbol": "WETH",
       "decimals": 8,
@@ -36,7 +36,7 @@
     },
     {
       "chainId": 290,
-      "address": "0x0000000000000000000000000000000000002016",
+      "address": "0x000000000000000000000000000000000006a5F0",
       "name": "Wrapped Bitcoin",
       "symbol": "WBTC",
       "decimals": 8,
