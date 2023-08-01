@@ -209,3 +209,29 @@ export const getUserHELIReserves = (
 
   return myHELIFormatted;
 };
+
+export const formatContractAmount = (amount: hethers.BigNumberish, decimals = 8) => {
+  return {
+    inETH: ethers.utils.formatUnits(amount, decimals),
+    inWEI: amount.toString(),
+    inBG: amount,
+  };
+};
+
+export const formatContractDuration = (duration: hethers.BigNumberish) => {
+  return {
+    inMilliSeconds: Number(duration.toString()) * 1000,
+    inSeconds: Number(duration.toString()),
+    inMinutes: Number(duration.toString()) / 60,
+    inHours: Number(duration.toString()) / 3600,
+    inDays: Number(duration.toString()) / 86400,
+  };
+};
+
+export const formatContractTimestamp = (timestamp: hethers.BigNumberish) => {
+  return {
+    inMilliSeconds: Number(timestamp.toString()) * 1000,
+    inSeconds: Number(timestamp.toString()),
+    inDate: new Date(Number(timestamp.toString()) * 1000),
+  };
+};

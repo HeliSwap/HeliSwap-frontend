@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import Tippy from '@tippyjs/react';
 import toast from 'react-hot-toast';
 import { ethers } from 'ethers';
@@ -14,6 +14,8 @@ import {
   TokenType,
 } from '../interfaces/tokens';
 
+import { ISSSData } from '../interfaces/dao';
+
 import Icon from '../components/Icon';
 import IconToken from '../components/IconToken';
 import Button from '../components/Button';
@@ -27,6 +29,9 @@ import SSSFAQ from '../components/SSSFAQ';
 
 import {
   formatBigNumberToStringETH,
+  formatContractAmount,
+  formatContractDuration,
+  formatContractTimestamp,
   formatStringETHtoPriceFormatted,
   formatStringToPercentage,
   formatStringToPrice,
@@ -45,11 +50,11 @@ import {
 
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import useTokensByListIds from '../hooks/useTokensByListIds';
-import useSSSByAddress from '../hooks/useSSSByAddress';
 
 import useHELITokenContract from '../hooks/useHELITokenContract';
 import useRewardsContract from '../hooks/useRewardsContract';
 import useKernelContract from '../hooks/useKernelContract';
+import useSSSContract from '../hooks/useSSSContract';
 
 import getErrorMessage from '../content/errors';
 
@@ -97,13 +102,6 @@ const SingleSidedStaking = () => {
     heliPrice = hbarPrice / heliForHbar;
   }
 
-  const { sss: sssData, processingSss } = useSSSByAddress(
-    useQueryOptionsPoolsFarms,
-    userId,
-    heliPrice,
-    campaignAddress || '',
-  );
-
   const [loadingHarvest, setLoadingHarvest] = useState(false);
   const [showHarvestModal, setShowHarvestModal] = useState(false);
 
@@ -114,6 +112,7 @@ const SingleSidedStaking = () => {
   const kernelContract = useKernelContract();
   const tokenContract = useHELITokenContract();
   const rewardsContract = useRewardsContract();
+  const sssContract = useSSSContract();
 
   const [heliStaked, setHeliStaked] = useState('0');
   const [heliBalance, setHeliBalance] = useState('0');
@@ -123,48 +122,31 @@ const SingleSidedStaking = () => {
   const [loadingRewards, setLoadingRewards] = useState(true);
   const [loadingClaim, setLoadingClaim] = useState(false);
 
-  const userRewardsUSD = useMemo(() => {
-    if (Object.keys(sssData).length !== 0) {
-      const { userStakingData } = sssData;
+  const [sssData, setSssDdata] = useState({} as ISSSData);
+  const [loadingSSSData, setLoadingSSSData] = useState(false);
 
-      if (!userStakingData?.rewardsAccumulated) return '0';
+  // const userRewardsUSD = useMemo(() => {
+  //   if (Object.keys(sssData).length !== 0) {
+  //     const { userStakingData } = sssData;
 
-      return userStakingData?.rewardsAccumulated?.reduce((acc: string, currentValue) => {
-        return (Number(acc) + Number(currentValue.totalAccumulatedUSD)).toString();
-      }, '0');
-    }
-  }, [sssData]);
+  //     if (!userStakingData?.rewardsAccumulated) return '0';
 
-  const userShare = useMemo(() => {
-    const { totalStaked, userStakingData } = sssData;
+  //     return userStakingData?.rewardsAccumulated?.reduce((acc: string, currentValue) => {
+  //       return (Number(acc) + Number(currentValue.totalAccumulatedUSD)).toString();
+  //     }, '0');
+  //   }
+  // }, [sssData]);
 
-    if (!userStakingData?.stakedAmount || !totalStaked || Number(totalStaked) === 0) return '0';
+  // const userShare = useMemo(() => {
+  //   const { totalStaked, userStakingData } = sssData;
 
-    return ((Number(userStakingData?.stakedAmount) / Number(totalStaked)) * 100).toString();
-  }, [sssData]);
+  //   if (!userStakingData?.stakedAmount || !totalStaked || Number(totalStaked) === 0) return '0';
+
+  //   return ((Number(userStakingData?.stakedAmount) / Number(totalStaked)) * 100).toString();
+  // }, [sssData]);
 
   // Handlers
-  const handleHarvestConfirm = async () => {
-    setLoadingHarvest(true);
-    try {
-      const receipt = await sdk.collectRewards(connectorInstance, sssData.address, userId);
-      const {
-        response: { success, error },
-      } = receipt;
-
-      if (success) {
-        toast.success('Success! Rewards were harvested.');
-      } else {
-        toast.error(getErrorMessage(error.status ? error.status : error));
-      }
-    } catch (err) {
-      console.error(err);
-      toast('Error on harvest');
-    } finally {
-      setLoadingHarvest(false);
-      setShowHarvestModal(false);
-    }
-  };
+  const handleHarvestConfirm = async () => {};
 
   const handleAssociateClick = async (token: ITokenData) => {
     setLoadingAssociate(true);
@@ -258,6 +240,43 @@ const SingleSidedStaking = () => {
     }
   }, [tokenContract, userId]);
 
+  const getSSSData = useCallback(async () => {
+    setLoadingSSSData(true);
+    try {
+      const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS;
+
+      const totalDeposited = await sssContract.totalDeposited();
+      const treasury = await sssContract.treasury();
+      const positions = await sssContract.positions(kernelAddress, idToAddress(userId));
+      const claimable = await sssContract.claimable(kernelAddress, idToAddress(userId));
+      const totalRewards = await sssContract.totalRewards(kernelAddress, idToAddress(userId));
+
+      const { amount, duration, expiration, rewardsNotClaimed, rewardsPending } = positions;
+
+      const sssData = {
+        totalDeposited: formatContractAmount(totalDeposited),
+        totalRewards: formatContractAmount(totalRewards),
+        claimable: formatContractAmount(claimable),
+        treasury,
+        position: {
+          amount: formatContractAmount(amount),
+          duration: formatContractDuration(duration),
+          expiration: formatContractTimestamp(expiration),
+          rewardsNotClaimed: formatContractAmount(rewardsNotClaimed),
+          rewardsPending: formatContractAmount(rewardsPending),
+        },
+      };
+
+      console.log('sssData', sssData);
+
+      setSssDdata(sssData);
+    } catch (error) {
+      console.error(`Error getting SSS data: ${error}`);
+    } finally {
+      setLoadingSSSData(false);
+    }
+  }, [sssContract, userId]);
+
   useEffect(() => {
     if (!userId) {
       setStakingTokenBalance('0');
@@ -278,30 +297,28 @@ const SingleSidedStaking = () => {
     userId && Object.keys(tokenContract).length && getHeliBalance();
   }, [tokenContract, userId, getHeliBalance]);
 
-  const userRewardsAddresses =
-    sssData.userStakingData?.rewardsAccumulated &&
-    sssData.userStakingData?.rewardsAccumulated?.length > 0
-      ? sssData.userStakingData?.rewardsAccumulated.map(reward => reward.address)
-      : [];
+  useEffect(() => {
+    userId && Object.keys(sssContract).length && getSSSData();
+  }, [sssContract, userId, getSSSData]);
+
+  const userRewardsAddresses = [process.env.REACT_APP_HELI_TOKEN_ADDRESS as string];
 
   // Get selected tokens to check for assosiations
   const { tokens: userRewardsData } = useTokensByListIds(userRewardsAddresses, useQueryOptions);
 
-  const hasUserStaked = sssData.userStakingData?.stakedAmount !== '0';
+  const hasUserStaked = sssData && sssData.totalDeposited && sssData.totalDeposited.inETH !== '0';
   const hasUserProvided = Number(stakingTokenBalance) !== 0;
-  const campaignEnded = sssData.campaignEndDate < Date.now();
+  const campaignEnded =
+    sssData && sssData.position && sssData.position.expiration.inMilliSeconds < Date.now();
   const haveFarm = Object.keys(sssData).length !== 0;
-  const campaignHasRewards = sssData.rewardsData?.length > 0;
-  const campaignHasActiveRewards = campaignHasRewards
-    ? Object.keys(sssData.rewardsData.find(reward => reward.rewardEnd > Date.now()) || {}).length >
-      0
-    : false;
+  const campaignHasRewards = true;
+  const campaignHasActiveRewards = true;
 
   const tokensToAssociate = userRewardsData?.filter(token => !getTokenIsAssociated(token));
 
   return isHashpackLoading ? (
     <Loader />
-  ) : processingSss ? (
+  ) : loadingSSSData ? (
     <Loader />
   ) : (
     <div className="d-flex justify-content-center">
@@ -327,7 +344,7 @@ const SingleSidedStaking = () => {
                   </div>
 
                   <div className="container-campaign-status mt-4 mt-md-0 d-flex align-items-center">
-                    {renderSSSEndDate(sssData.campaignEndDate)}
+                    {/* {renderSSSEndDate(sssData.campaignEndDate)} */}
                   </div>
                 </div>
 
@@ -345,7 +362,7 @@ const SingleSidedStaking = () => {
                     </div>
                     <div className="col-6 col-md-4">
                       <p className="text-subheader text-numeric">
-                        {formatStringToPercentage(stripStringToFixedDecimals(sssData.APR, 2))}
+                        {/* {formatStringToPercentage(stripStringToFixedDecimals(sssData.APR, 2))} */}
                       </p>
                     </div>
                   </div>
@@ -363,7 +380,7 @@ const SingleSidedStaking = () => {
                     </div>
                     <div className="col-6 col-md-4">
                       <p className="text-main text-numeric">
-                        {formatStringToPrice(stripStringToFixedDecimals(sssData.totalStakedUSD, 2))}
+                        {/* {formatStringToPrice(stripStringToFixedDecimals(sssData.totalStakedUSD, 2))} */}
                       </p>
                     </div>
                   </div>
@@ -381,7 +398,7 @@ const SingleSidedStaking = () => {
                         </Tippy>
                       </p>
                     </div>
-                    <div className="col-6 col-md-4 d-md-flex align-items-center">
+                    {/* <div className="col-6 col-md-4 d-md-flex align-items-center">
                       {campaignHasRewards &&
                         sssData.rewardsData?.reduce((acc: ReactNode[], reward: IReward, index) => {
                           // When reward is enabled, but not sent -> do not show
@@ -408,7 +425,7 @@ const SingleSidedStaking = () => {
                           }
                           return acc;
                         }, [])}
-                    </div>
+                    </div> */}
                   </div>
 
                   {connected && !isHashpackLoading ? (
@@ -428,7 +445,7 @@ const SingleSidedStaking = () => {
                         </div>
                         <div className="col-6 col-md-4 d-flex align-items-center">
                           <p className="text-main">
-                            {stripStringToFixedDecimals(userShare || '0', 2)}%
+                            {/* {stripStringToFixedDecimals(userShare || '0', 2)}% */}
                           </p>
                         </div>
                       </div>
@@ -446,21 +463,21 @@ const SingleSidedStaking = () => {
                         </div>
                         <div className="col-6 col-md-8 d-md-flex align-items-center">
                           <p className="text-subheader text-numeric">
-                            {formatStringToPrice(
+                            {/* {formatStringToPrice(
                               stripStringToFixedDecimals(
                                 sssData.userStakingData?.stakedAmountUSD as string,
                                 2,
                               ),
-                            )}
+                            )} */}
                           </p>
                           <p className="d-flex align-items-center ms-md-3 mt-2">
                             <span className="text-secondary text-main">
-                              {formatStringETHtoPriceFormatted(
+                              {/* {formatStringETHtoPriceFormatted(
                                 formatStringWeiToStringEther(
                                   sssData.userStakingData?.stakedAmount || '0',
                                   8,
                                 ),
-                              )}
+                              )} */}
                             </span>
 
                             <IconToken className="ms-3" symbol="HELI" />
@@ -515,13 +532,13 @@ const SingleSidedStaking = () => {
 
                         <div className="mt-5">
                           <p className="text-title text-success text-numeric">
-                            {formatStringToPrice(userRewardsUSD as string, true)}
+                            {/* {formatStringToPrice(userRewardsUSD as string, true)} */}
                           </p>
 
                           <hr className="my-4" />
 
                           <div className="mt-4">
-                            {campaignHasRewards &&
+                            {/* {campaignHasRewards &&
                               sssData.rewardsData?.reduce((acc: ReactNode[], reward: IReward) => {
                                 const userRewardData =
                                   sssData.userStakingData?.rewardsAccumulated?.find(
@@ -555,7 +572,7 @@ const SingleSidedStaking = () => {
                                   );
                                 }
                                 return acc;
-                              }, [])}
+                              }, [])} */}
                           </div>
                         </div>
 
@@ -576,7 +593,7 @@ const SingleSidedStaking = () => {
                               ) : (
                                 <>
                                   <div className="text-small">Estimated pending rewards:</div>
-                                  {sssData.rewardsData?.map((reward: IReward) => {
+                                  {/* {sssData.rewardsData?.map((reward: IReward) => {
                                     const userReward =
                                       sssData.userStakingData?.rewardsAccumulated?.find(
                                         (currReward: IRewardsAccumulated) =>
@@ -600,7 +617,7 @@ const SingleSidedStaking = () => {
                                         </div>
                                       </div>
                                     );
-                                  })}
+                                  })} */}
                                 </>
                               )}
                             </ConfirmTransactionModalContent>
@@ -634,7 +651,7 @@ const SingleSidedStaking = () => {
                 </div>
               </div>
             </div>
-            <SingleSidedStakingActions
+            {/* <SingleSidedStakingActions
               campaignEnded={campaignEnded}
               hasUserStaked={hasUserStaked}
               hasUserProvided={hasUserProvided}
@@ -644,7 +661,7 @@ const SingleSidedStaking = () => {
               tokensToAssociate={tokensToAssociate || []}
               handleAssociateClick={handleAssociateClick}
               getStakingTokenBalance={getStakingTokenBalance}
-            />
+            /> */}
           </div>
         ) : (
           <div className="row">
