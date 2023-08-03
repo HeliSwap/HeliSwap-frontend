@@ -94,7 +94,7 @@ const SingleSidedStaking = () => {
   const [sssData, setSssDdata] = useState({} as ISSSData);
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
 
-  const [loadingHarvest, setLoadingHarvest] = useState(false);
+  const [loadingClaim, setLoadingClaim] = useState(false);
   const [loadingAssociate, setLoadingAssociate] = useState(false);
   const [userRewardsBalance, setUserRewardsBalance] = useState('0');
   const [loadingSSSData, setLoadingSSSData] = useState(true);
@@ -128,8 +128,6 @@ const SingleSidedStaking = () => {
   }, [rewardsContract, tokenContract, userId]);
 
   // Handlers
-  const handleHarvestConfirm = async () => {};
-
   const handleAssociateClick = async (token: ITokenData) => {
     setLoadingAssociate(true);
 
@@ -150,6 +148,21 @@ const SingleSidedStaking = () => {
       toast('Error on associate');
     } finally {
       setLoadingAssociate(false);
+    }
+  };
+
+  const handleClaimClick = async () => {
+    setLoadingClaim(true);
+    try {
+      const rewardsAddress = process.env.REACT_APP_REWARDS_ADDRESS as string;
+      const tx = await sdk.claim(connectorInstance, rewardsAddress, userId);
+      await tx.wait();
+    } catch (e) {
+      console.log('e', e);
+    } finally {
+      setLoadingClaim(false);
+      setShowHarvestModal(false);
+      setUserRewardsBalance('0');
     }
   };
 
@@ -423,7 +436,7 @@ const SingleSidedStaking = () => {
                               ))
                             ) : (
                               <Button
-                                loading={loadingHarvest}
+                                loading={loadingClaim}
                                 onClick={() => setShowHarvestModal(true)}
                                 size="small"
                                 type="primary"
@@ -436,47 +449,19 @@ const SingleSidedStaking = () => {
 
                         <div className="mt-5">
                           <p className="text-title text-success text-numeric">
-                            {/* {formatStringToPrice(userRewardsUSD as string, true)} */}
+                            {/* {userRewardsBalance} */}
                           </p>
 
                           <hr className="my-4" />
 
                           <div className="mt-4">
-                            {/* {campaignHasRewards &&
-                              sssData.rewardsData?.reduce((acc: ReactNode[], reward: IReward) => {
-                                const userRewardData =
-                                  sssData.userStakingData?.rewardsAccumulated?.find(
-                                    (rewardSingle: IUserStakingData) => {
-                                      return rewardSingle.address === reward.address;
-                                    },
-                                  ) || ({} as IUserStakingData);
-
-                                const userRewardAccumulated = userRewardData.totalAccumulated > 0;
-
-                                if (userRewardAccumulated) {
-                                  const rewardDecimals = reward.decimals;
-                                  const rewardSymbol = mapWHBARAddress(reward);
-
-                                  acc.push(
-                                    <p
-                                      key={rewardSymbol}
-                                      className="text-main d-flex justify-content-between align-items-center mt-4"
-                                    >
-                                      <span className="d-flex align-items-center text-secondary">
-                                        <IconToken symbol={rewardSymbol} />
-                                        <span className="ms-3">{rewardSymbol}</span>
-                                      </span>
-                                      <span className="text-numeric ms-3">
-                                        {formatStringWeiToStringEther(
-                                          userRewardData.totalAccumulated || '0',
-                                          rewardDecimals,
-                                        )}
-                                      </span>
-                                    </p>,
-                                  );
-                                }
-                                return acc;
-                              }, [])} */}
+                            <p className="text-main d-flex justify-content-between align-items-center mt-4">
+                              <span className="d-flex align-items-center text-secondary">
+                                <IconToken symbol={'HELI'} />
+                                <span className="ms-3">{'HELI'}</span>
+                              </span>
+                              <span className="text-numeric ms-3">{userRewardsBalance}</span>
+                            </p>
                           </div>
                         </div>
 
@@ -488,15 +473,25 @@ const SingleSidedStaking = () => {
                             <ConfirmTransactionModalContent
                               modalTitle="Harvest Pending Rewards"
                               closeModal={() => setShowHarvestModal(false)}
-                              confirmTansaction={handleHarvestConfirm}
+                              confirmTansaction={handleClaimClick}
                               confirmButtonLabel="Confirm"
-                              isLoading={loadingHarvest}
+                              isLoading={loadingClaim}
                             >
-                              {loadingHarvest ? (
+                              {loadingClaim ? (
                                 <Confirmation confirmationText={'Harvesting reward tokens'} />
                               ) : (
                                 <>
                                   <div className="text-small">Estimated pending rewards:</div>
+                                  <div className="d-flex justify-content-between align-items-center mt-4">
+                                    <div className="d-flex align-items-center">
+                                      <IconToken symbol={'HELI'} />
+                                      <span className="text-main ms-3">{'HELI'}</span>
+                                    </div>
+
+                                    <div className="text-main text-numeric">
+                                      {userRewardsBalance}
+                                    </div>
+                                  </div>
                                   {/* {sssData.rewardsData?.map((reward: IReward) => {
                                     const userReward =
                                       sssData.userStakingData?.rewardsAccumulated?.find(
