@@ -58,9 +58,9 @@ export interface ITimestampData {
 
 export interface ISSSData {
   totalDeposited: IAmountData;
+  rewardsPercentage: number;
   totalRewards: IAmountData;
   claimable: IAmountData;
-  treasury: string;
   position: {
     amount: IAmountData;
     duration: IDurationData;

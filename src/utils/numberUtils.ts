@@ -235,3 +235,7 @@ export const formatContractTimestamp = (timestamp: hethers.BigNumberish) => {
     inDate: new Date(Number(timestamp.toString()) * 1000),
   };
 };
+
+export const formatContractNumberPercentage = (number: hethers.BigNumberish) => {
+  return Number(ethers.utils.formatUnits(number, 18)) * 100;
+};

@@ -23,6 +23,7 @@ import {
   formatBigNumberToStringETH,
   formatContractAmount,
   formatContractDuration,
+  formatContractNumberPercentage,
   formatContractTimestamp,
 } from '../utils/numberUtils';
 import {
@@ -210,22 +211,28 @@ const SingleSidedStaking = () => {
   useEffect(() => {
     const getSSSData = async () => {
       setLoadingSSSData(true);
+
       try {
         const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS;
 
-        const totalDeposited = await sssContract.totalDeposited();
-        const treasury = await sssContract.treasury();
-        const positions = await sssContract.positions(kernelAddress, idToAddress(userId));
-        const claimable = await sssContract.claimable(kernelAddress, idToAddress(userId));
-        const totalRewards = await sssContract.totalRewards(kernelAddress, idToAddress(userId));
+        const promisesArray = [
+          sssContract.totalDeposited(),
+          sssContract.rewardsPercentage(),
+          sssContract.positions(kernelAddress, idToAddress(userId)),
+          sssContract.claimable(kernelAddress, idToAddress(userId)),
+          sssContract.totalRewards(kernelAddress, idToAddress(userId)),
+        ];
+
+        const [totalDeposited, rewardsPercentage, positions, claimable, totalRewards] =
+          await Promise.all(promisesArray);
 
         const { amount, duration, expiration, rewardsNotClaimed, rewardsPending } = positions;
 
         const sssData = {
+          rewardsPercentage: formatContractNumberPercentage(rewardsPercentage),
           totalDeposited: formatContractAmount(totalDeposited),
           totalRewards: formatContractAmount(totalRewards),
           claimable: formatContractAmount(claimable),
-          treasury,
           position: {
             amount: formatContractAmount(amount),
             duration: formatContractDuration(duration),
@@ -252,6 +259,8 @@ const SingleSidedStaking = () => {
   const haveFarm = Object.keys(sssData).length !== 0;
 
   const tokensToAssociate = userRewardsData?.filter(token => !getTokenIsAssociated(token));
+
+  console.log('sssData', sssData);
 
   return isHashpackLoading ? (
     <Loader />
@@ -289,7 +298,7 @@ const SingleSidedStaking = () => {
                   <div className="row">
                     <div className="col-6 col-md-4 d-flex align-items-center">
                       <p className="d-flex align-items-center">
-                        <span className="text-secondary text-small">Total APR</span>
+                        <span className="text-secondary text-small">APR from locking</span>
                         <Tippy content="Your annual rate of return, expressed as a percentage. Interest paid in previous periods is not accounted for.">
                           <span className="ms-2">
                             <Icon name="hint" color="gray" size="small" />
@@ -298,9 +307,7 @@ const SingleSidedStaking = () => {
                       </p>
                     </div>
                     <div className="col-6 col-md-4">
-                      <p className="text-subheader text-numeric">
-                        {/* {formatStringToPercentage(stripStringToFixedDecimals(sssData.APR, 2))} */}
-                      </p>
+                      <p className="text-subheader text-numeric">{sssData.rewardsPercentage}%</p>
                     </div>
                   </div>
 
@@ -320,70 +327,9 @@ const SingleSidedStaking = () => {
                     </div>
                   </div>
 
-                  <hr className="my-5" />
-
-                  <div className="row mt-4">
-                    <div className="col-6 col-md-4 d-flex align-items-center">
-                      <p className="d-flex align-items-center">
-                        <span className="text-secondary text-small">Rewards</span>
-                        <Tippy content="The tokens you will be rewarded with upon harvest.">
-                          <span className="ms-2">
-                            <Icon name="hint" color="gray" size="small" />
-                          </span>
-                        </Tippy>
-                      </p>
-                    </div>
-                    {/* <div className="col-6 col-md-4 d-md-flex align-items-center">
-                      {campaignHasRewards &&
-                        sssData.rewardsData?.reduce((acc: ReactNode[], reward: IReward, index) => {
-                          // When reward is enabled, but not sent -> do not show
-                          const haveRewardSendToCampaign =
-                            reward.totalAmount && Number(reward.totalAmount || reward) !== 0;
-
-                          const rewardActive = reward.rewardEnd > Date.now();
-                          // When all rewards are inactive -> show all, when at least one is active -> show only active
-                          const showReward =
-                            haveRewardSendToCampaign && (rewardActive || !campaignHasActiveRewards);
-
-                          if (showReward) {
-                            const rewardSymbol = mapWHBARAddress(reward);
-
-                            acc.push(
-                              <div
-                                key={index}
-                                className="d-flex align-items-center mt-3 mt-lg-0 me-4"
-                              >
-                                <IconToken symbol={reward.symbol} />{' '}
-                                <span className="text-main ms-3">{rewardSymbol}</span>
-                              </div>,
-                            );
-                          }
-                          return acc;
-                        }, [])}
-                    </div> */}
-                  </div>
-
                   {connected && !isHashpackLoading ? (
                     <>
                       <hr className="my-5" />
-
-                      <div className="row mt-4">
-                        <div className="col-6 col-md-4 d-flex align-items-center">
-                          <p className="d-flex align-items-center">
-                            <span className="text-secondary text-small">Your share</span>
-                            <Tippy content="Your staked amount in this single sided staking pool, expressed as a percentage.">
-                              <span className="ms-2">
-                                <Icon name="hint" color="gray" size="small" />
-                              </span>
-                            </Tippy>
-                          </p>
-                        </div>
-                        <div className="col-6 col-md-4 d-flex align-items-center">
-                          <p className="text-main">
-                            {/* {stripStringToFixedDecimals(userShare || '0', 2)}% */}
-                          </p>
-                        </div>
-                      </div>
 
                       <div className="row mt-4">
                         <div className="col-6 col-md-4 d-flex align-items-center">
@@ -398,6 +344,36 @@ const SingleSidedStaking = () => {
                         </div>
                         <div className="col-6 col-md-8 d-md-flex align-items-center">
                           <p className="text-subheader text-numeric">{heliStaked}</p>
+                          <p className="d-flex align-items-center ms-md-3 mt-2">
+                            <span className="text-secondary text-main">
+                              {/* {formatStringETHtoPriceFormatted(
+                                formatStringWeiToStringEther(
+                                  sssData.userStakingData?.stakedAmount || '0',
+                                  8,
+                                ),
+                              )} */}
+                            </span>
+
+                            <IconToken className="ms-3" symbol="HELI" />
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="row mt-4">
+                        <div className="col-6 col-md-4 d-flex align-items-center">
+                          <p className="d-flex align-items-center">
+                            <span className="text-secondary text-small">Locked HELI Tokens</span>
+                            <Tippy content="The amount of your staked tokens in $USD, as well as staked tokens count.">
+                              <span className="ms-2">
+                                <Icon name="hint" color="gray" size="small" />
+                              </span>
+                            </Tippy>
+                          </p>
+                        </div>
+                        <div className="col-6 col-md-8 d-md-flex align-items-center">
+                          <p className="text-subheader text-numeric">
+                            {sssData.position.amount.inETH}
+                          </p>
                           <p className="d-flex align-items-center ms-md-3 mt-2">
                             <span className="text-secondary text-main">
                               {/* {formatStringETHtoPriceFormatted(

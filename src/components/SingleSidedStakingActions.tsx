@@ -51,6 +51,7 @@ interface IFarmActionsProps {
 
 enum TabStates {
   STAKE,
+  LOCK,
   UNSTAKE,
 }
 
@@ -79,10 +80,15 @@ const FarmActions = ({
   const [loadingStake, setLoadingStake] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(true);
   const [loadingExit, setLoadingExit] = useState(false);
+  const [loadingLock, setLoadingLock] = useState(false);
 
   const [tabState, setTabState] = useState(TabStates.STAKE);
   const [lpApproved, setLpApproved] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
+
+  const [selectedButton, setSelectedButton] = useState(0);
+  const [lockTimestampValue, setLockTimestampValue] = useState(0);
+  const [availableToLock, setAvailableToLock] = useState('0');
 
   // Handlers
   const handleTabButtonClick = (value: TabStates) => {
@@ -181,6 +187,27 @@ const FarmActions = ({
     setLpInputValue(calculatedShare);
   };
 
+  const handleLockClick = async () => {
+    setLoadingLock(true);
+    try {
+      const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
+      await sdk.lock(connectorInstance, lockTimestampValue, kernelAddress, userId);
+
+      setLockTimestampValue(0);
+    } catch (e) {
+      console.log('e', e);
+    } finally {
+      setLoadingLock(false);
+      setSelectedButton(0);
+    }
+  };
+
+  const handleLockDurationButtonClick = (seconds: number) => {
+    setSelectedButton(seconds);
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    setLockTimestampValue(nowSeconds + seconds);
+  };
+
   const handleButtonClick = (value: string) => {
     setSliderValue(value);
     const calculatedShare = calculateShareByPercentage(maxHELIInputValue, value, 8);
@@ -219,6 +246,29 @@ const FarmActions = ({
     return 'Stake';
   };
 
+  const buttons = [
+    {
+      seconds: 60,
+      label: '1 Minute',
+    },
+    {
+      seconds: 3600,
+      label: '1 Hour',
+    },
+    {
+      seconds: 3600 * 24,
+      label: '1 Day',
+    },
+    {
+      seconds: 15770000,
+      label: '6 Months',
+    },
+    {
+      seconds: 31540000,
+      label: '12 Months',
+    },
+  ];
+
   return (
     <div className="col-md-5 mt-4 mt-md-0">
       <div className="container-blue-neutral-900 rounded p-4 p-lg-5 height-100 d-flex flex-column">
@@ -231,6 +281,17 @@ const FarmActions = ({
           >
             Stake
           </span>
+          {hasUserStaked ? (
+            <span
+              onClick={() => handleTabButtonClick(TabStates.LOCK)}
+              className={`text-small text-bold text-uppercase link-tab me-5 ${
+                tabState === TabStates.LOCK ? 'is-active' : ''
+              }`}
+            >
+              Lock
+            </span>
+          ) : null}
+
           {hasUserStaked ? (
             <span
               onClick={() => handleTabButtonClick(TabStates.UNSTAKE)}
@@ -312,7 +373,59 @@ const FarmActions = ({
                 </div>
               ) : null}
             </>
-          ) : (
+          ) : null}
+
+          {tabState === TabStates.LOCK ? (
+            <>
+              <div>
+                <p className="text-small text-bold">HELI Token Amount to lock</p>
+                <InputTokenSelector
+                  className="mt-4"
+                  readonly={true}
+                  inputTokenComponent={
+                    <InputToken
+                      value={heliStaked}
+                      disabled={true}
+                      isCompact={true}
+                      name="amountIn"
+                    />
+                  }
+                  buttonSelectorComponent={
+                    <ButtonSelector disabled selectedToken="HELI" selectorText="Select a token" />
+                  }
+                />
+
+                <p className="text-secondary text-small text-bold mt-5">Lock for:</p>
+
+                <div className="d-flex flex-wrap align-items-center mt-2">
+                  {buttons.map((item, index) => (
+                    <Button
+                      key={index}
+                      onClick={() => handleLockDurationButtonClick(item.seconds)}
+                      className={`${selectedButton === item.seconds ? 'active' : ''} ${
+                        index !== 0 ? 'ms-3' : ''
+                      } mb-3`}
+                      size="small"
+                    >
+                      {item.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="d-grid mt-4">
+                <Button
+                  disabled={lockTimestampValue === 0}
+                  loading={loadingLock}
+                  onClick={handleLockClick}
+                >
+                  Lock
+                </Button>
+              </div>
+            </>
+          ) : null}
+
+          {tabState === TabStates.UNSTAKE ? (
             <>
               <div>
                 <p className="text-small text-bold">HELI Token Amount to unstake</p>
@@ -353,7 +466,7 @@ const FarmActions = ({
                 )}
               </div>
             </>
-          )}
+          ) : null}
 
           {showExitModal ? (
             <Modal show={showExitModal} closeModal={() => setShowExitModal(false)}>
