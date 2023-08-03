@@ -91,6 +91,8 @@ const SingleSidedStaking = () => {
 
   const [heliBalance, setHeliBalance] = useState('0');
   const [heliStaked, setHeliStaked] = useState('0');
+  const [heliLocked, setHeliLocked] = useState('0');
+  const [amountToLock, setAmountToLock] = useState('0');
   const [sssData, setSssDdata] = useState({} as ISSSData);
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
 
@@ -199,6 +201,18 @@ const SingleSidedStaking = () => {
     });
   };
 
+  const updateLockedHeli = (locked: string, action: string) => {
+    setHeliLocked(prev => {
+      let newLocked;
+      if (action === 'add') {
+        newLocked = ethers.utils.parseUnits(prev, 8).add(ethers.utils.parseUnits(locked, 8));
+      } else {
+        newLocked = ethers.utils.parseUnits(prev, 8).sub(ethers.utils.parseUnits(locked, 8));
+      }
+      return formatBigNumberToStringETH(newLocked);
+    });
+  };
+
   // Check for associations
   useEffect(() => {
     const checkTokenAssociation = async (userId: string) => {
@@ -258,6 +272,7 @@ const SingleSidedStaking = () => {
         // console.log('sssData', sssData);
 
         setSssDdata(sssData);
+        setHeliLocked(sssData.position.amount.inETH);
       } catch (error) {
         console.error(`Error getting SSS data: ${error}`);
       } finally {
@@ -268,12 +283,14 @@ const SingleSidedStaking = () => {
     userId && Object.keys(sssContract).length && getSSSData();
   }, [sssContract, userId]);
 
+  useEffect(() => {
+    setAmountToLock((Number(heliStaked) - Number(heliLocked)).toString());
+  }, [heliLocked, heliStaked]);
+
   const hasUserStaked = sssData && sssData.totalDeposited && sssData.totalDeposited.inETH !== '0';
   const haveFarm = Object.keys(sssData).length !== 0;
 
   const tokensToAssociate = userRewardsData?.filter(token => !getTokenIsAssociated(token));
-
-  console.log('sssData', sssData);
 
   return isHashpackLoading ? (
     <Loader />
@@ -384,9 +401,7 @@ const SingleSidedStaking = () => {
                           </p>
                         </div>
                         <div className="col-6 col-md-8 d-md-flex align-items-center">
-                          <p className="text-subheader text-numeric">
-                            {sssData.position.amount.inETH}
-                          </p>
+                          <p className="text-subheader text-numeric">{heliLocked}</p>
                           <p className="d-flex align-items-center ms-md-3 mt-2">
                             <span className="text-secondary text-main">
                               {/* {formatStringETHtoPriceFormatted(
@@ -548,12 +563,14 @@ const SingleSidedStaking = () => {
               hasUserStaked={hasUserStaked}
               stakingTokenBalance={heliBalance}
               heliStaked={heliStaked}
+              amountToLock={amountToLock}
               sssData={sssData}
               loadingAssociate={loadingAssociate}
               tokensToAssociate={tokensToAssociate || []}
               handleAssociateClick={handleAssociateClick}
               getStakingTokenBalance={getStakingTokenBalance}
               updateStakedHeli={updateStakedHeli}
+              updateLockedHeli={updateLockedHeli}
             />
           </div>
         ) : (

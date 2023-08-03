@@ -42,11 +42,13 @@ interface IFarmActionsProps {
   hasUserStaked: boolean;
   stakingTokenBalance: string;
   heliStaked: string;
+  amountToLock: string;
   tokensToAssociate: ITokenData[];
   loadingAssociate: boolean;
   getStakingTokenBalance: (id: string) => void;
   handleAssociateClick: (token: ITokenData) => void;
   updateStakedHeli: (newValue: string, action: string) => void;
+  updateLockedHeli: (newValue: string, action: string) => void;
 }
 
 enum TabStates {
@@ -64,6 +66,8 @@ const FarmActions = ({
   getStakingTokenBalance,
   handleAssociateClick,
   updateStakedHeli,
+  updateLockedHeli,
+  amountToLock,
   heliStaked,
 }: IFarmActionsProps) => {
   const contextValue = useContext(GlobalContext);
@@ -199,6 +203,7 @@ const FarmActions = ({
     } finally {
       setLoadingLock(false);
       setSelectedButton(0);
+      updateLockedHeli(amountToLock, 'add');
     }
   };
 
@@ -384,7 +389,7 @@ const FarmActions = ({
                   readonly={true}
                   inputTokenComponent={
                     <InputToken
-                      value={heliStaked}
+                      value={amountToLock}
                       disabled={true}
                       isCompact={true}
                       name="amountIn"
