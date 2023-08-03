@@ -17,7 +17,7 @@ import Icon from '../components/Icon';
 import IconToken from '../components/IconToken';
 import Button from '../components/Button';
 import ToasterWrapper from '../components/ToasterWrapper';
-import SingleSidedStakingActions from '../components/SingleSidedStakingActions';
+import SingleSidedStakingActionsOld from '../components/SingleSidedStakingActionsOld';
 import Modal from '../components/Modal';
 import ConfirmTransactionModalContent from '../components/Modals/ConfirmTransactionModalContent';
 import Confirmation from '../components/Confirmation';
@@ -565,7 +565,7 @@ const SingleSidedStaking = () => {
                 </div>
               </div>
             </div>
-            <SingleSidedStakingActions
+            <SingleSidedStakingActionsOld
               campaignEnded={campaignEnded}
               hasUserStaked={hasUserStaked}
               hasUserProvided={hasUserProvided}

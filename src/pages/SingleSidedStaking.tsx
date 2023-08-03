@@ -231,16 +231,17 @@ const SingleSidedStaking = () => {
     }
   }, [rewardsContract, tokenContract, userId]);
 
-  const getHeliBalance = useCallback(async () => {
+  const getHeliBalance = async () => {
     try {
       const balanceBN = await tokenContract.balanceOf(idToAddress(userId));
-      setHeliBalance(formatBigNumberToStringETH(balanceBN));
+      console.log('balanceBN.toString()', balanceBN.toString());
+      setHeliBalance(prev => formatBigNumberToStringETH(balanceBN));
     } catch (error) {
       console.error(error);
     }
-  }, [tokenContract, userId]);
+  };
 
-  const getSSSData = useCallback(async () => {
+  const getSSSData = async () => {
     setLoadingSSSData(true);
     try {
       const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS;
@@ -267,7 +268,7 @@ const SingleSidedStaking = () => {
         },
       };
 
-      console.log('sssData', sssData);
+      // console.log('sssData', sssData);
 
       setSssDdata(sssData);
     } catch (error) {
@@ -275,15 +276,7 @@ const SingleSidedStaking = () => {
     } finally {
       setLoadingSSSData(false);
     }
-  }, [sssContract, userId]);
-
-  useEffect(() => {
-    if (!userId) {
-      setStakingTokenBalance('0');
-    }
-
-    userId && stakingTokenId && getStakingTokenBalance(userId, stakingTokenId);
-  }, [userId, stakingTokenId]);
+  };
 
   useEffect(() => {
     userId && Object.keys(kernelContract).length && getHeliStaked();
@@ -295,11 +288,11 @@ const SingleSidedStaking = () => {
 
   useEffect(() => {
     userId && Object.keys(tokenContract).length && getHeliBalance();
-  }, [tokenContract, userId, getHeliBalance]);
+  }, [tokenContract, userId]);
 
   useEffect(() => {
     userId && Object.keys(sssContract).length && getSSSData();
-  }, [sssContract, userId, getSSSData]);
+  }, [sssContract, userId]);
 
   const userRewardsAddresses = [process.env.REACT_APP_HELI_TOKEN_ADDRESS as string];
 
@@ -307,9 +300,6 @@ const SingleSidedStaking = () => {
   const { tokens: userRewardsData } = useTokensByListIds(userRewardsAddresses, useQueryOptions);
 
   const hasUserStaked = sssData && sssData.totalDeposited && sssData.totalDeposited.inETH !== '0';
-  const hasUserProvided = Number(stakingTokenBalance) !== 0;
-  const campaignEnded =
-    sssData && sssData.position && sssData.position.expiration.inMilliSeconds < Date.now();
   const haveFarm = Object.keys(sssData).length !== 0;
   const campaignHasRewards = true;
   const campaignHasActiveRewards = true;
@@ -379,9 +369,7 @@ const SingleSidedStaking = () => {
                       </p>
                     </div>
                     <div className="col-6 col-md-4">
-                      <p className="text-main text-numeric">
-                        {/* {formatStringToPrice(stripStringToFixedDecimals(sssData.totalStakedUSD, 2))} */}
-                      </p>
+                      <p className="text-main text-numeric">{sssData.totalDeposited.inETH}</p>
                     </div>
                   </div>
 
@@ -462,14 +450,7 @@ const SingleSidedStaking = () => {
                           </p>
                         </div>
                         <div className="col-6 col-md-8 d-md-flex align-items-center">
-                          <p className="text-subheader text-numeric">
-                            {/* {formatStringToPrice(
-                              stripStringToFixedDecimals(
-                                sssData.userStakingData?.stakedAmountUSD as string,
-                                2,
-                              ),
-                            )} */}
-                          </p>
+                          <p className="text-subheader text-numeric">{heliStaked}</p>
                           <p className="d-flex align-items-center ms-md-3 mt-2">
                             <span className="text-secondary text-main">
                               {/* {formatStringETHtoPriceFormatted(
@@ -624,12 +605,6 @@ const SingleSidedStaking = () => {
                           </Modal>
                         ) : null}
                       </>
-                    ) : campaignEnded ? (
-                      <div>
-                        <p className="text-small text-bold text-center my-5">
-                          Campaign is not active
-                        </p>
-                      </div>
                     ) : (
                       <div>
                         <p className="text-small text-bold text-center my-5">
@@ -651,17 +626,15 @@ const SingleSidedStaking = () => {
                 </div>
               </div>
             </div>
-            {/* <SingleSidedStakingActions
-              campaignEnded={campaignEnded}
+            <SingleSidedStakingActions
               hasUserStaked={hasUserStaked}
-              hasUserProvided={hasUserProvided}
-              stakingTokenBalance={stakingTokenBalance}
+              stakingTokenBalance={heliBalance}
               sssData={sssData}
               loadingAssociate={loadingAssociate}
               tokensToAssociate={tokensToAssociate || []}
               handleAssociateClick={handleAssociateClick}
-              getStakingTokenBalance={getStakingTokenBalance}
-            /> */}
+              getStakingTokenBalance={getHeliBalance}
+            />
           </div>
         ) : (
           <div className="row">

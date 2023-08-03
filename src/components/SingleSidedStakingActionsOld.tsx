@@ -7,8 +7,7 @@ import BigNumber from 'bignumber.js';
 
 import { GlobalContext } from '../providers/Global';
 
-import { ITokenData, TokenType } from '../interfaces/tokens';
-import { ISSSData } from '../interfaces/dao';
+import { ITokenData, TokenType, ISSSData } from '../interfaces/tokens';
 
 import Button from './Button';
 import ButtonSelector from './ButtonSelector';
@@ -41,10 +40,12 @@ import {
 interface IFarmActionsProps {
   sssData: ISSSData;
   hasUserStaked: boolean;
+  campaignEnded: boolean;
+  hasUserProvided: boolean;
   stakingTokenBalance: string;
   tokensToAssociate: ITokenData[];
   loadingAssociate: boolean;
-  getStakingTokenBalance: () => void;
+  getStakingTokenBalance: (userId: string, tokenId: string) => void;
   handleAssociateClick: (token: ITokenData) => void;
 }
 
@@ -56,6 +57,8 @@ enum TabStates {
 const FarmActions = ({
   sssData,
   hasUserStaked,
+  campaignEnded,
+  hasUserProvided,
   stakingTokenBalance,
   tokensToAssociate,
   loadingAssociate,
@@ -83,6 +86,7 @@ const FarmActions = ({
 
   const [showStakeModal, setShowStakeModal] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
+  const [loadingDeposit, setLoadingDeposit] = useState(false);
 
   const getInsufficientTokenBalance = useCallback(() => {
     return new BigNumber(lpInputValue as string).gt(new BigNumber(stakingTokenBalance));
@@ -107,25 +111,19 @@ const FarmActions = ({
   };
 
   const handleDepositClick = async () => {
-    setLoadingStake(true);
+    setLoadingDeposit(true);
     try {
       const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
-      const receipt = await sdk.deposit(connectorInstance, lpInputValue, kernelAddress, userId);
+      const tx = await sdk.deposit(connectorInstance, lpInputValue, kernelAddress, userId);
 
-      const {
-        response: { success, error },
-      } = receipt;
-
-      if (success) {
-        setLpInputValue('0');
-        await getStakingTokenBalance();
-      }
+      setLpInputValue('0');
       // getHeliStaked();
+      // getHeliBalance();
       // getUserRewardsBalance();
     } catch (e) {
       console.log('e', e);
     } finally {
-      setLoadingStake(false);
+      setLoadingDeposit(false);
     }
   };
 
@@ -164,7 +162,6 @@ const FarmActions = ({
         kernelAddress,
       );
       await tx.wait();
-      setLpApproved(true);
     } catch (e) {
       console.log('e', e);
     } finally {
@@ -201,8 +198,6 @@ const FarmActions = ({
       setLpApproved(Number(allowance.toString()) > Number(lpInputValue));
     } catch (error) {
       console.error(error);
-    } finally {
-      setLoadingApprove(false);
     }
   }, [lpInputValue, tokenContract, userId]);
 
@@ -244,7 +239,7 @@ const FarmActions = ({
           {tabState === TabStates.STAKE ? (
             <>
               <div>
-                {userId ? (
+                {userId && !campaignEnded && hasUserProvided ? (
                   <InputSlider
                     handleSliderChange={handleSliderChange}
                     handleButtonClick={handleButtonClick}
@@ -255,8 +250,10 @@ const FarmActions = ({
                 <p className="text-small text-bold">Enter HELI Token Amount</p>
                 <InputTokenSelector
                   className="mt-4"
+                  readonly={campaignEnded || !hasUserProvided}
                   inputTokenComponent={
                     <InputToken
+                      disabled={campaignEnded || !hasUserProvided}
                       value={lpInputValue}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         const { value } = e.target;
@@ -271,42 +268,51 @@ const FarmActions = ({
                     <ButtonSelector disabled selectedToken="HELI" selectorText="Select a token" />
                   }
                   walletBalanceComponent={
-                    <WalletBalance
-                      insufficientBallance={getInsufficientTokenBalance()}
-                      walletBalance={stakingTokenBalance}
-                      onMaxButtonClick={(maxValue: string) => {
-                        handleLpInputChange(maxValue);
-                      }}
-                    />
+                    !campaignEnded ? (
+                      <WalletBalance
+                        insufficientBallance={getInsufficientTokenBalance()}
+                        walletBalance={stakingTokenBalance}
+                        onMaxButtonClick={(maxValue: string) => {
+                          handleLpInputChange(maxValue);
+                        }}
+                      />
+                    ) : null
                   }
                 />
               </div>
 
               {userId ? (
-                <div className="d-grid">
-                  {!lpApproved ? (
-                    <Button className="mb-3" loading={loadingApprove} onClick={handleApproveClick}>
-                      <>
-                        Approve HELI
-                        <Tippy
-                          content={`You must give the HeliSwap smart contracts permission to use your HELI tokens.`}
+                !campaignEnded ? (
+                  hasUserProvided ? (
+                    <div className="d-grid">
+                      {!lpApproved ? (
+                        <Button
+                          className="mb-3"
+                          loading={loadingApprove}
+                          onClick={handleApproveClick}
                         >
-                          <span className="ms-2">
-                            <Icon name="hint" />
-                          </span>
-                        </Tippy>
-                      </>
-                    </Button>
-                  ) : null}
-
-                  <Button
-                    disabled={getInsufficientTokenBalance() || !lpApproved}
-                    loading={loadingStake}
-                    onClick={handleDepositClick}
-                  >
-                    <>{getStakeButtonLabel()}</>
-                  </Button>
-                </div>
+                          <>
+                            Approve HELI
+                            <Tippy
+                              content={`You must give the HeliSwap smart contracts permission to use your HELI tokens.`}
+                            >
+                              <span className="ms-2">
+                                <Icon name="hint" />
+                              </span>
+                            </Tippy>
+                          </>
+                        </Button>
+                      ) : null}
+                      <Button
+                        disabled={getInsufficientTokenBalance() || !lpApproved}
+                        loading={loadingStake}
+                        onClick={() => setShowStakeModal(true)}
+                      >
+                        <>{getStakeButtonLabel()}</>
+                      </Button>
+                    </div>
+                  ) : null
+                ) : null
               ) : null}
             </>
           ) : (
@@ -354,6 +360,35 @@ const FarmActions = ({
               </div>
             </>
           )}
+          {showStakeModal ? (
+            <Modal show={showStakeModal} closeModal={() => setShowStakeModal(false)}>
+              <ConfirmTransactionModalContent
+                modalTitle="Stake Your HELI Tokens"
+                closeModal={() => setShowStakeModal(false)}
+                confirmTansaction={handleDepositClick}
+                confirmButtonLabel="Confirm"
+                isLoading={loadingStake}
+              >
+                {loadingStake ? (
+                  <Confirmation confirmationText={`Staking ${lpInputValue || '0'} HELI tokens`} />
+                ) : (
+                  <>
+                    <div className="text-small">HELI token count</div>
+
+                    <div className="d-flex justify-content-between align-items-center mt-4">
+                      <div className="d-flex align-items-center">
+                        <IconToken symbol="HELI" />
+
+                        <span className="text-main ms-3">HELI Token</span>
+                      </div>
+
+                      <div className="text-main text-numeric">{lpInputValue || '0'}</div>
+                    </div>
+                  </>
+                )}
+              </ConfirmTransactionModalContent>
+            </Modal>
+          ) : null}
 
           {showExitModal ? (
             <Modal show={showExitModal} closeModal={() => setShowExitModal(false)}>
