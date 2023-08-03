@@ -7,7 +7,7 @@ import BigNumber from 'bignumber.js';
 
 import { GlobalContext } from '../providers/Global';
 
-import { ITokenData, TokenType } from '../interfaces/tokens';
+import { ITokenData } from '../interfaces/tokens';
 import { ISSSData } from '../interfaces/dao';
 
 import Button from './Button';
@@ -26,14 +26,13 @@ import { formatStringWeiToStringEther, stripStringToFixedDecimals } from '../uti
 
 import useHELITokenContract from '../hooks/useHELITokenContract';
 
-import getErrorMessage from '../content/errors';
+// import getErrorMessage from '../content/errors';
 
 import { MAX_UINT_HTS, SLIDER_INITIAL_VALUE } from '../constants';
 import {
   addressToId,
   calculatePercentageByShare,
   calculateShareByPercentage,
-  checkAllowanceHTS,
   idToAddress,
   invalidInputTokensData,
 } from '../utils/tokenUtils';
@@ -44,8 +43,9 @@ interface IFarmActionsProps {
   stakingTokenBalance: string;
   tokensToAssociate: ITokenData[];
   loadingAssociate: boolean;
-  getStakingTokenBalance: () => void;
+  getStakingTokenBalance: (id: string) => void;
   handleAssociateClick: (token: ITokenData) => void;
+  updateStakedHeli: (newValue: string) => void;
 }
 
 enum TabStates {
@@ -61,6 +61,7 @@ const FarmActions = ({
   loadingAssociate,
   getStakingTokenBalance,
   handleAssociateClick,
+  updateStakedHeli,
 }: IFarmActionsProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
@@ -78,15 +79,8 @@ const FarmActions = ({
   const [loadingExit, setLoadingExit] = useState(false);
 
   const [tabState, setTabState] = useState(TabStates.STAKE);
-
   const [lpApproved, setLpApproved] = useState(false);
-
-  const [showStakeModal, setShowStakeModal] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
-
-  const getInsufficientTokenBalance = useCallback(() => {
-    return new BigNumber(lpInputValue as string).gt(new BigNumber(stakingTokenBalance));
-  }, [stakingTokenBalance, lpInputValue]);
 
   // Handlers
   const handleTabButtonClick = (value: TabStates) => {
@@ -117,8 +111,9 @@ const FarmActions = ({
       } = receipt;
 
       if (success) {
-        setLpInputValue('0');
-        await getStakingTokenBalance();
+        await getStakingTokenBalance(userId);
+        updateStakedHeli(lpInputValue);
+        toast.success('Success! Tokens were deposited.');
       }
       // getHeliStaked();
       // getUserRewardsBalance();
@@ -188,9 +183,9 @@ const FarmActions = ({
     setLpInputValue(calculatedShare);
   };
 
-  useEffect(() => {
-    setLpInputValue(maxHELIInputValue);
-  }, [maxHELIInputValue]);
+  const getInsufficientTokenBalance = useCallback(() => {
+    return new BigNumber(lpInputValue as string).gt(new BigNumber(stakingTokenBalance));
+  }, [stakingTokenBalance, lpInputValue]);
 
   const getHeliAllowance = useCallback(async () => {
     try {
@@ -205,6 +200,10 @@ const FarmActions = ({
       setLoadingApprove(false);
     }
   }, [lpInputValue, tokenContract, userId]);
+
+  useEffect(() => {
+    setLpInputValue(maxHELIInputValue);
+  }, [maxHELIInputValue]);
 
   useEffect(() => {
     userId && Object.keys(tokenContract).length && getHeliAllowance();

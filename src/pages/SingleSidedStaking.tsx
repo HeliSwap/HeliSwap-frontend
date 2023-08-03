@@ -5,15 +5,7 @@ import { ethers } from 'ethers';
 
 import { GlobalContext } from '../providers/Global';
 
-import {
-  IPoolExtendedData,
-  IReward,
-  IRewardsAccumulated,
-  ITokenData,
-  IUserStakingData,
-  TokenType,
-} from '../interfaces/tokens';
-
+import { IPoolExtendedData, ITokenData, TokenType } from '../interfaces/tokens';
 import { ISSSData } from '../interfaces/dao';
 
 import Icon from '../components/Icon';
@@ -32,25 +24,16 @@ import {
   formatContractAmount,
   formatContractDuration,
   formatContractTimestamp,
-  formatStringETHtoPriceFormatted,
-  formatStringToPercentage,
-  formatStringToPrice,
-  formatStringWeiToStringEther,
-  stripStringToFixedDecimals,
 } from '../utils/numberUtils';
-import { renderSSSEndDate } from '../utils/farmUtils';
-
 import {
   addressToId,
   getTokenBalance,
   getUserAssociatedTokens,
   idToAddress,
-  mapWHBARAddress,
 } from '../utils/tokenUtils';
 
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import useTokensByListIds from '../hooks/useTokensByListIds';
-
 import useHELITokenContract from '../hooks/useHELITokenContract';
 import useRewardsContract from '../hooks/useRewardsContract';
 import useKernelContract from '../hooks/useKernelContract';
@@ -66,8 +49,11 @@ const SingleSidedStaking = () => {
   const { userId, connectorInstance, isHashpackLoading, setShowConnectModal, connected } =
     connection;
 
-  const campaignAddress = process.env.REACT_APP_SINGLE_SIDED_STAKING_ADDRESS;
-  const stakingTokenId = addressToId(process.env.REACT_APP_HELI_TOKEN_ADDRESS as string);
+  const kernelContract = useKernelContract();
+  const tokenContract = useHELITokenContract();
+  const rewardsContract = useRewardsContract();
+  const sssContract = useSSSContract();
+
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
 
   const heliPoolTokens = [
@@ -102,48 +88,44 @@ const SingleSidedStaking = () => {
     heliPrice = hbarPrice / heliForHbar;
   }
 
+  const [heliBalance, setHeliBalance] = useState('0');
+  const [heliStaked, setHeliStaked] = useState('0');
+  const [sssData, setSssDdata] = useState({} as ISSSData);
+  const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
+
   const [loadingHarvest, setLoadingHarvest] = useState(false);
+  const [loadingAssociate, setLoadingAssociate] = useState(false);
+  const [userRewardsBalance, setUserRewardsBalance] = useState('0');
+  const [loadingSSSData, setLoadingSSSData] = useState(true);
+
   const [showHarvestModal, setShowHarvestModal] = useState(false);
 
-  const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
-  const [loadingAssociate, setLoadingAssociate] = useState(false);
-  const [stakingTokenBalance, setStakingTokenBalance] = useState('0');
+  const userRewardsAddresses = [process.env.REACT_APP_HELI_TOKEN_ADDRESS as string];
 
-  const kernelContract = useKernelContract();
-  const tokenContract = useHELITokenContract();
-  const rewardsContract = useRewardsContract();
-  const sssContract = useSSSContract();
+  // Get selected tokens to check for assosiations
+  const { tokens: userRewardsData } = useTokensByListIds(userRewardsAddresses, useQueryOptions);
 
-  const [heliStaked, setHeliStaked] = useState('0');
-  const [heliBalance, setHeliBalance] = useState('0');
-  const [userRewardsBalance, setUserRewardsBalance] = useState('0');
+  const getHeliStaked = useCallback(async () => {
+    try {
+      const balanceBN = await kernelContract.balanceOf(idToAddress(userId));
+      console.log('balanceBN', balanceBN.toString());
+      setHeliStaked(formatBigNumberToStringETH(balanceBN));
+    } catch (error) {
+      console.error(error);
+    }
+  }, [kernelContract, userId]);
 
-  const [loadingHeliStaked, setLoadingHeliStaked] = useState(true);
-  const [loadingRewards, setLoadingRewards] = useState(true);
-  const [loadingClaim, setLoadingClaim] = useState(false);
+  const getUserRewardsBalance = useCallback(async () => {
+    try {
+      const balanceBN = await rewardsContract.owed(idToAddress(userId));
+      const decimals = await tokenContract.decimals();
+      const balance = ethers.utils.formatUnits(balanceBN, decimals);
 
-  const [sssData, setSssDdata] = useState({} as ISSSData);
-  const [loadingSSSData, setLoadingSSSData] = useState(false);
-
-  // const userRewardsUSD = useMemo(() => {
-  //   if (Object.keys(sssData).length !== 0) {
-  //     const { userStakingData } = sssData;
-
-  //     if (!userStakingData?.rewardsAccumulated) return '0';
-
-  //     return userStakingData?.rewardsAccumulated?.reduce((acc: string, currentValue) => {
-  //       return (Number(acc) + Number(currentValue.totalAccumulatedUSD)).toString();
-  //     }, '0');
-  //   }
-  // }, [sssData]);
-
-  // const userShare = useMemo(() => {
-  //   const { totalStaked, userStakingData } = sssData;
-
-  //   if (!userStakingData?.stakedAmount || !totalStaked || Number(totalStaked) === 0) return '0';
-
-  //   return ((Number(userStakingData?.stakedAmount) / Number(totalStaked)) * 100).toString();
-  // }, [sssData]);
+      setUserRewardsBalance(balance);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [rewardsContract, tokenContract, userId]);
 
   // Handlers
   const handleHarvestConfirm = async () => {};
@@ -171,6 +153,34 @@ const SingleSidedStaking = () => {
     }
   };
 
+  const getStakingTokenBalance = async (userId: string) => {
+    const stakingTokenBalance =
+      (await getTokenBalance(userId, {
+        decimals: 8,
+        hederaId: addressToId(process.env.REACT_APP_HELI_TOKEN_ADDRESS as string),
+        symbol: 'HELI',
+        type: TokenType.HTS,
+        name: '',
+        address: '',
+      })) || '0';
+    setHeliBalance(stakingTokenBalance);
+  };
+
+  const getTokenIsAssociated = (token: ITokenData) => {
+    const notHTS =
+      Object.keys(token).length === 0 ||
+      token.type === TokenType.HBAR ||
+      token.type === TokenType.ERC20;
+    return notHTS || userAssociatedTokens?.includes(token.hederaId);
+  };
+
+  const updateStakedHeli = (staked: string) => {
+    setHeliStaked(prev => {
+      const newStaked = ethers.utils.parseUnits(prev, 8).add(ethers.utils.parseUnits(staked, 8));
+      return formatBigNumberToStringETH(newStaked);
+    });
+  };
+
   // Check for associations
   useEffect(() => {
     const checkTokenAssociation = async (userId: string) => {
@@ -181,103 +191,6 @@ const SingleSidedStaking = () => {
     userId && checkTokenAssociation(userId);
   }, [userId]);
 
-  const getTokenIsAssociated = (token: ITokenData) => {
-    const notHTS =
-      Object.keys(token).length === 0 ||
-      token.type === TokenType.HBAR ||
-      token.type === TokenType.ERC20;
-    return notHTS || userAssociatedTokens?.includes(token.hederaId);
-  };
-
-  const getStakingTokenBalance = async (userId: string, stakingTokenId: string) => {
-    const stakingTokenBalance =
-      (await getTokenBalance(userId, {
-        decimals: 8,
-        hederaId: stakingTokenId,
-        symbol: 'HELI',
-        type: TokenType.HTS,
-        name: '',
-        address: '',
-      })) || '0';
-    setStakingTokenBalance(stakingTokenBalance);
-  };
-
-  const getHeliStaked = useCallback(async () => {
-    try {
-      setLoadingHeliStaked(true);
-      const balanceBN = await kernelContract.balanceOf(idToAddress(userId));
-      console.log('balanceBN', balanceBN.toString());
-      setHeliStaked(formatBigNumberToStringETH(balanceBN));
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoadingHeliStaked(false);
-    }
-  }, [kernelContract, userId]);
-
-  const getUserRewardsBalance = useCallback(async () => {
-    setLoadingRewards(true);
-
-    try {
-      const balanceBN = await rewardsContract.owed(idToAddress(userId));
-      const decimals = await tokenContract.decimals();
-      const balance = ethers.utils.formatUnits(balanceBN, decimals);
-
-      setUserRewardsBalance(balance);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoadingRewards(false);
-    }
-  }, [rewardsContract, tokenContract, userId]);
-
-  const getHeliBalance = async () => {
-    try {
-      const balanceBN = await tokenContract.balanceOf(idToAddress(userId));
-      console.log('balanceBN.toString()', balanceBN.toString());
-      setHeliBalance(prev => formatBigNumberToStringETH(balanceBN));
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const getSSSData = async () => {
-    setLoadingSSSData(true);
-    try {
-      const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS;
-
-      const totalDeposited = await sssContract.totalDeposited();
-      const treasury = await sssContract.treasury();
-      const positions = await sssContract.positions(kernelAddress, idToAddress(userId));
-      const claimable = await sssContract.claimable(kernelAddress, idToAddress(userId));
-      const totalRewards = await sssContract.totalRewards(kernelAddress, idToAddress(userId));
-
-      const { amount, duration, expiration, rewardsNotClaimed, rewardsPending } = positions;
-
-      const sssData = {
-        totalDeposited: formatContractAmount(totalDeposited),
-        totalRewards: formatContractAmount(totalRewards),
-        claimable: formatContractAmount(claimable),
-        treasury,
-        position: {
-          amount: formatContractAmount(amount),
-          duration: formatContractDuration(duration),
-          expiration: formatContractTimestamp(expiration),
-          rewardsNotClaimed: formatContractAmount(rewardsNotClaimed),
-          rewardsPending: formatContractAmount(rewardsPending),
-        },
-      };
-
-      // console.log('sssData', sssData);
-
-      setSssDdata(sssData);
-    } catch (error) {
-      console.error(`Error getting SSS data: ${error}`);
-    } finally {
-      setLoadingSSSData(false);
-    }
-  };
-
   useEffect(() => {
     userId && Object.keys(kernelContract).length && getHeliStaked();
   }, [kernelContract, userId, getHeliStaked]);
@@ -287,22 +200,52 @@ const SingleSidedStaking = () => {
   }, [tokenContract, rewardsContract, userId, getUserRewardsBalance]);
 
   useEffect(() => {
-    userId && Object.keys(tokenContract).length && getHeliBalance();
-  }, [tokenContract, userId]);
+    userId && getStakingTokenBalance(userId);
+  }, [userId]);
 
   useEffect(() => {
+    const getSSSData = async () => {
+      setLoadingSSSData(true);
+      try {
+        const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS;
+
+        const totalDeposited = await sssContract.totalDeposited();
+        const treasury = await sssContract.treasury();
+        const positions = await sssContract.positions(kernelAddress, idToAddress(userId));
+        const claimable = await sssContract.claimable(kernelAddress, idToAddress(userId));
+        const totalRewards = await sssContract.totalRewards(kernelAddress, idToAddress(userId));
+
+        const { amount, duration, expiration, rewardsNotClaimed, rewardsPending } = positions;
+
+        const sssData = {
+          totalDeposited: formatContractAmount(totalDeposited),
+          totalRewards: formatContractAmount(totalRewards),
+          claimable: formatContractAmount(claimable),
+          treasury,
+          position: {
+            amount: formatContractAmount(amount),
+            duration: formatContractDuration(duration),
+            expiration: formatContractTimestamp(expiration),
+            rewardsNotClaimed: formatContractAmount(rewardsNotClaimed),
+            rewardsPending: formatContractAmount(rewardsPending),
+          },
+        };
+
+        // console.log('sssData', sssData);
+
+        setSssDdata(sssData);
+      } catch (error) {
+        console.error(`Error getting SSS data: ${error}`);
+      } finally {
+        setLoadingSSSData(false);
+      }
+    };
+
     userId && Object.keys(sssContract).length && getSSSData();
   }, [sssContract, userId]);
 
-  const userRewardsAddresses = [process.env.REACT_APP_HELI_TOKEN_ADDRESS as string];
-
-  // Get selected tokens to check for assosiations
-  const { tokens: userRewardsData } = useTokensByListIds(userRewardsAddresses, useQueryOptions);
-
   const hasUserStaked = sssData && sssData.totalDeposited && sssData.totalDeposited.inETH !== '0';
   const haveFarm = Object.keys(sssData).length !== 0;
-  const campaignHasRewards = true;
-  const campaignHasActiveRewards = true;
 
   const tokensToAssociate = userRewardsData?.filter(token => !getTokenIsAssociated(token));
 
@@ -633,7 +576,8 @@ const SingleSidedStaking = () => {
               loadingAssociate={loadingAssociate}
               tokensToAssociate={tokensToAssociate || []}
               handleAssociateClick={handleAssociateClick}
-              getStakingTokenBalance={getHeliBalance}
+              getStakingTokenBalance={getStakingTokenBalance}
+              updateStakedHeli={updateStakedHeli}
             />
           </div>
         ) : (

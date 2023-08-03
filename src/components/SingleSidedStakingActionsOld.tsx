@@ -7,7 +7,7 @@ import BigNumber from 'bignumber.js';
 
 import { GlobalContext } from '../providers/Global';
 
-import { ITokenData, TokenType, ISSSData } from '../interfaces/tokens';
+import { ISSSData, ITokenData, TokenType } from '../interfaces/tokens';
 
 import Button from './Button';
 import ButtonSelector from './ButtonSelector';
@@ -23,8 +23,6 @@ import InputSlider from './InputSlider';
 
 import { formatStringWeiToStringEther, stripStringToFixedDecimals } from '../utils/numberUtils';
 
-import useHELITokenContract from '../hooks/useHELITokenContract';
-
 import getErrorMessage from '../content/errors';
 
 import { MAX_UINT_HTS, SLIDER_INITIAL_VALUE } from '../constants';
@@ -33,7 +31,6 @@ import {
   calculatePercentageByShare,
   calculateShareByPercentage,
   checkAllowanceHTS,
-  idToAddress,
   invalidInputTokensData,
 } from '../utils/tokenUtils';
 
@@ -69,8 +66,6 @@ const FarmActions = ({
   const { connection, sdk } = contextValue;
   const { userId, connectorInstance } = connection;
 
-  const tokenContract = useHELITokenContract();
-
   const maxHELIInputValue = stakingTokenBalance;
 
   const [lpInputValue, setLpInputValue] = useState(maxHELIInputValue);
@@ -86,7 +81,6 @@ const FarmActions = ({
 
   const [showStakeModal, setShowStakeModal] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
-  const [loadingDeposit, setLoadingDeposit] = useState(false);
 
   const getInsufficientTokenBalance = useCallback(() => {
     return new BigNumber(lpInputValue as string).gt(new BigNumber(stakingTokenBalance));
@@ -110,63 +104,88 @@ const FarmActions = ({
     setLpInputValue(value);
   };
 
-  const handleDepositClick = async () => {
-    setLoadingDeposit(true);
+  const handleStakeConfirm = async () => {
+    setLoadingStake(true);
     try {
-      const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
-      const tx = await sdk.deposit(connectorInstance, lpInputValue, kernelAddress, userId);
+      const receipt = await sdk.stakeLP(
+        connectorInstance,
+        lpInputValue as string,
+        sssData.address,
+        userId,
+        8,
+      );
+      const {
+        response: { success, error },
+      } = receipt;
 
-      setLpInputValue('0');
-      // getHeliStaked();
-      // getHeliBalance();
-      // getUserRewardsBalance();
-    } catch (e) {
-      console.log('e', e);
+      if (success) {
+        toast.success('Success! Tokens are staked');
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Error on stake');
     } finally {
-      setLoadingDeposit(false);
+      await getStakingTokenBalance(userId, addressToId(sssData.stakingTokenAddress));
+      setLoadingStake(false);
+      setShowStakeModal(false);
+      setSliderValue(SLIDER_INITIAL_VALUE);
     }
   };
 
   const handleExitConfirm = async () => {
-    // setLoadingExit(true);
-    // try {
-    //   const receipt = await sdk.exit(connectorInstance, sssData.address, userId);
-    //   const {
-    //     response: { success, error },
-    //   } = receipt;
-    //   if (success) {
-    //     toast.success('Success! Exit was successful.');
-    //     setTabState(TabStates.STAKE);
-    //   } else {
-    //     toast.error(getErrorMessage(error.status ? error.status : error));
-    //   }
-    // } catch (err) {
-    //   console.error(err);
-    // } finally {
-    //   setLoadingExit(false);
-    //   setShowExitModal(false);
-    //   setSliderValue(SLIDER_INITIAL_VALUE);
-    // }
+    setLoadingExit(true);
+
+    try {
+      const receipt = await sdk.exit(connectorInstance, sssData.address, userId);
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (success) {
+        toast.success('Success! Exit was successful.');
+        setTabState(TabStates.STAKE);
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingExit(false);
+      setShowExitModal(false);
+      setSliderValue(SLIDER_INITIAL_VALUE);
+    }
   };
 
-  const handleApproveClick = async () => {
+  const handleApproveButtonClick = async (campaignAddress: string, tokenAddress: string) => {
     setLoadingApprove(true);
+    const amount = MAX_UINT_HTS.toString();
+    const tokenId = await addressToId(tokenAddress);
+
     try {
-      const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
-      const tx = await sdk.approveToken(
+      const receipt = await sdk.approveToken(
         connectorInstance,
-        MAX_UINT_HTS.toString(),
+        amount,
         userId,
-        addressToId(process.env.REACT_APP_HELI_TOKEN_ADDRESS as string),
+        tokenId,
         true,
-        kernelAddress,
+        campaignAddress,
       );
-      await tx.wait();
-    } catch (e) {
-      console.log('e', e);
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (success) {
+        toast.success('Success! Token was approved.');
+        setLpApproved(true);
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      }
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoadingApprove(false);
-      getHeliAllowance();
     }
   };
 
@@ -187,23 +206,38 @@ const FarmActions = ({
 
   useEffect(() => {
     setLpInputValue(maxHELIInputValue);
-  }, [maxHELIInputValue]);
-
-  const getHeliAllowance = useCallback(async () => {
-    try {
-      const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
-      const allowance = await tokenContract.allowance(idToAddress(userId), kernelAddress, {
-        gasLimit: 300000,
-      });
-      setLpApproved(Number(allowance.toString()) > Number(lpInputValue));
-    } catch (error) {
-      console.error(error);
-    }
-  }, [lpInputValue, tokenContract, userId]);
+  }, [sssData.poolData?.lpShares, maxHELIInputValue]);
 
   useEffect(() => {
-    userId && Object.keys(tokenContract).length && getHeliAllowance();
-  }, [tokenContract, userId, lpInputValue, getHeliAllowance]);
+    const getLPAllowanceData = async () => {
+      try {
+        const canSpend = await checkAllowanceHTS(
+          userId,
+          {
+            decimals: 8,
+            hederaId: addressToId(sssData.stakingTokenAddress),
+            symbol: 'HELI',
+            type: TokenType.HTS,
+            name: '',
+            address: sssData.stakingTokenAddress,
+          },
+          lpInputValue,
+          sssData.address,
+        );
+        setLpApproved(canSpend);
+      } catch (e) {
+        setLpApproved(false);
+      } finally {
+        setLoadingApprove(false);
+      }
+    };
+
+    getLPAllowanceData();
+
+    return () => {
+      setLpApproved(false);
+    };
+  }, [sssData.stakingTokenAddress, sssData.address, userId, lpInputValue]);
 
   // Helper methods
   const getStakeButtonLabel = () => {
@@ -289,7 +323,9 @@ const FarmActions = ({
                         <Button
                           className="mb-3"
                           loading={loadingApprove}
-                          onClick={handleApproveClick}
+                          onClick={() =>
+                            handleApproveButtonClick(sssData.address, sssData.stakingTokenAddress)
+                          }
                         >
                           <>
                             Approve HELI
@@ -325,7 +361,7 @@ const FarmActions = ({
                   inputTokenComponent={
                     <InputToken
                       value={formatStringWeiToStringEther(
-                        sssData.position.amount.inETH as string,
+                        sssData.userStakingData?.stakedAmount as string,
                         8,
                       )}
                       disabled={true}
@@ -365,7 +401,7 @@ const FarmActions = ({
               <ConfirmTransactionModalContent
                 modalTitle="Stake Your HELI Tokens"
                 closeModal={() => setShowStakeModal(false)}
-                confirmTansaction={handleDepositClick}
+                confirmTansaction={handleStakeConfirm}
                 confirmButtonLabel="Confirm"
                 isLoading={loadingStake}
               >
@@ -402,7 +438,7 @@ const FarmActions = ({
                 {loadingExit ? (
                   <Confirmation
                     confirmationText={`Unstaking ${formatStringWeiToStringEther(
-                      sssData.position.amount.inWEI as string,
+                      sssData.userStakingData?.stakedAmount as string,
                       8,
                     )} HELI tokens`}
                   />
@@ -418,7 +454,10 @@ const FarmActions = ({
                       </div>
 
                       <div className="text-main text-numeric">
-                        {formatStringWeiToStringEther(sssData.position.amount.inWEI as string, 8)}
+                        {formatStringWeiToStringEther(
+                          sssData.userStakingData?.stakedAmount as string,
+                          8,
+                        )}
                       </div>
                     </div>
                   </>
