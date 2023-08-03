@@ -602,7 +602,7 @@ class SDK {
     userId: string,
   ) {
     const tokensAmountBN = formatStringToBigNumberWei(stakeAmount, 8);
-    const maxGas = TRANSACTION_MAX_FEES.STAKE_LP_TOKEN;
+    const maxGas = TRANSACTION_MAX_FEES.DEPOSIT_DAO;
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(kernelAddress))

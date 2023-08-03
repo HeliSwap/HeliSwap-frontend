@@ -108,7 +108,6 @@ const SingleSidedStaking = () => {
   const getHeliStaked = useCallback(async () => {
     try {
       const balanceBN = await kernelContract.balanceOf(idToAddress(userId));
-      console.log('balanceBN', balanceBN.toString());
       setHeliStaked(formatBigNumberToStringETH(balanceBN));
     } catch (error) {
       console.error(error);
@@ -174,9 +173,14 @@ const SingleSidedStaking = () => {
     return notHTS || userAssociatedTokens?.includes(token.hederaId);
   };
 
-  const updateStakedHeli = (staked: string) => {
+  const updateStakedHeli = (staked: string, action: string) => {
     setHeliStaked(prev => {
-      const newStaked = ethers.utils.parseUnits(prev, 8).add(ethers.utils.parseUnits(staked, 8));
+      let newStaked;
+      if (action === 'add') {
+        newStaked = ethers.utils.parseUnits(prev, 8).add(ethers.utils.parseUnits(staked, 8));
+      } else {
+        newStaked = ethers.utils.parseUnits(prev, 8).sub(ethers.utils.parseUnits(staked, 8));
+      }
       return formatBigNumberToStringETH(newStaked);
     });
   };
@@ -572,6 +576,7 @@ const SingleSidedStaking = () => {
             <SingleSidedStakingActions
               hasUserStaked={hasUserStaked}
               stakingTokenBalance={heliBalance}
+              heliStaked={heliStaked}
               sssData={sssData}
               loadingAssociate={loadingAssociate}
               tokensToAssociate={tokensToAssociate || []}

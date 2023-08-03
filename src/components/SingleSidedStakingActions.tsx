@@ -41,11 +41,12 @@ interface IFarmActionsProps {
   sssData: ISSSData;
   hasUserStaked: boolean;
   stakingTokenBalance: string;
+  heliStaked: string;
   tokensToAssociate: ITokenData[];
   loadingAssociate: boolean;
   getStakingTokenBalance: (id: string) => void;
   handleAssociateClick: (token: ITokenData) => void;
-  updateStakedHeli: (newValue: string) => void;
+  updateStakedHeli: (newValue: string, action: string) => void;
 }
 
 enum TabStates {
@@ -62,6 +63,7 @@ const FarmActions = ({
   getStakingTokenBalance,
   handleAssociateClick,
   updateStakedHeli,
+  heliStaked,
 }: IFarmActionsProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
@@ -111,12 +113,11 @@ const FarmActions = ({
       } = receipt;
 
       if (success) {
-        await getStakingTokenBalance(userId);
-        updateStakedHeli(lpInputValue);
+        getStakingTokenBalance(userId);
+        updateStakedHeli(lpInputValue, 'add');
+
         toast.success('Success! Tokens were deposited.');
       }
-      // getHeliStaked();
-      // getUserRewardsBalance();
     } catch (e) {
       console.log('e', e);
     } finally {
@@ -125,25 +126,28 @@ const FarmActions = ({
   };
 
   const handleExitConfirm = async () => {
-    // setLoadingExit(true);
-    // try {
-    //   const receipt = await sdk.exit(connectorInstance, sssData.address, userId);
-    //   const {
-    //     response: { success, error },
-    //   } = receipt;
-    //   if (success) {
-    //     toast.success('Success! Exit was successful.');
-    //     setTabState(TabStates.STAKE);
-    //   } else {
-    //     toast.error(getErrorMessage(error.status ? error.status : error));
-    //   }
-    // } catch (err) {
-    //   console.error(err);
-    // } finally {
-    //   setLoadingExit(false);
-    //   setShowExitModal(false);
-    //   setSliderValue(SLIDER_INITIAL_VALUE);
-    // }
+    setLoadingExit(true);
+    try {
+      const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
+      const receipt = await sdk.withdraw(connectorInstance, heliStaked, kernelAddress, userId);
+
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (success) {
+        setTabState(TabStates.STAKE);
+        getStakingTokenBalance(userId);
+        updateStakedHeli(heliStaked, 'remove');
+        setShowExitModal(false);
+
+        toast.success('Success! Tokens were withdrawn.');
+      }
+    } catch (e) {
+      console.log('e', e);
+    } finally {
+      setLoadingExit(false);
+    }
   };
 
   const handleApproveClick = async () => {
@@ -317,10 +321,7 @@ const FarmActions = ({
                   readonly={true}
                   inputTokenComponent={
                     <InputToken
-                      value={formatStringWeiToStringEther(
-                        sssData.position.amount.inETH as string,
-                        8,
-                      )}
+                      value={heliStaked}
                       disabled={true}
                       isCompact={true}
                       name="amountIn"
@@ -357,7 +358,7 @@ const FarmActions = ({
           {showExitModal ? (
             <Modal show={showExitModal} closeModal={() => setShowExitModal(false)}>
               <ConfirmTransactionModalContent
-                modalTitle="Unstake Your LP Tokens"
+                modalTitle="Unstake Your HELI Tokens"
                 closeModal={() => setShowExitModal(false)}
                 confirmTansaction={handleExitConfirm}
                 confirmButtonLabel="Confirm"
@@ -381,9 +382,7 @@ const FarmActions = ({
                         <span className="text-main ms-3">HELI Token</span>
                       </div>
 
-                      <div className="text-main text-numeric">
-                        {formatStringWeiToStringEther(sssData.position.amount.inWEI as string, 8)}
-                      </div>
+                      <div className="text-main text-numeric">{heliStaked}</div>
                     </div>
                   </>
                 )}
