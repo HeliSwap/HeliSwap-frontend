@@ -96,10 +96,11 @@ const SingleSidedStaking = () => {
 
   const [heliBalance, setHeliBalance] = useState('0');
   const [heliStaked, setHeliStaked] = useState('0');
+  const [heliStakedUSD, setHeliStakedUSD] = useState('0');
   const [totalStaked, setTotalStaked] = useState('0');
   const [totalStakedUSD, setTotalStakedUSD] = useState('0');
-  const [heliStakedUSD, setHeliStakedUSD] = useState('0');
   const [heliLocked, setHeliLocked] = useState('0');
+  const [heliLockedUSD, setHeliLockedUSD] = useState('0');
   const [amountToLock, setAmountToLock] = useState('0');
   const [sssData, setSssDdata] = useState({} as ISSSData);
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
@@ -348,6 +349,10 @@ const SingleSidedStaking = () => {
     heliPrice && totalStaked && setTotalStakedUSD(calculateHeliPrice(totalStaked));
   }, [heliPrice, totalStaked, calculateHeliPrice]);
 
+  useEffect(() => {
+    heliPrice && heliLocked && setHeliLockedUSD(calculateHeliPrice(heliLocked));
+  }, [heliPrice, heliLocked, calculateHeliPrice]);
+
   const hasUserStaked = sssData && sssData.totalDeposited && sssData.totalDeposited.inETH !== '0';
   const haveFarm = Object.keys(sssData).length !== 0;
   const hasUserLockedTokens =
@@ -478,15 +483,12 @@ const SingleSidedStaking = () => {
                               </p>
                             </div>
                             <div className="col-6 col-md-8 d-md-flex align-items-center">
-                              <p className="text-subheader text-numeric">{heliLocked}</p>
+                              <p className="text-subheader text-numeric">
+                                {formatStringToPrice(stripStringToFixedDecimals(heliLockedUSD, 2))}
+                              </p>
                               <p className="d-flex align-items-center ms-md-3 mt-2">
                                 <span className="text-secondary text-main">
-                                  {/* {formatStringETHtoPriceFormatted(
-                                formatStringWeiToStringEther(
-                                  sssData.userStakingData?.stakedAmount || '0',
-                                  8,
-                                ),
-                              )} */}
+                                  {formatStringETHtoPriceFormatted(heliLocked)}
                                 </span>
 
                                 <IconToken className="ms-3" symbol="HELI" />
@@ -578,27 +580,25 @@ const SingleSidedStaking = () => {
                           </div>
                         </div>
 
-                        {hasUserLockedTokens ? (
-                          <div className="d-flex justify-content-between align-items-center mt-4">
-                            <p className="text-main d-flex justify-content-between align-items-center">
-                              <span className="d-flex align-items-center">
-                                <IconToken symbol={'HELI'} />
-                                <span className="text-numeric ms-3">{sssData.claimable.inETH}</span>
-                                <span className="ms-3 text-secondary">{'HELI'}</span>
-                              </span>
-                            </p>
+                        <div className="d-flex justify-content-between align-items-center mt-4">
+                          <p className="text-main d-flex justify-content-between align-items-center">
+                            <span className="d-flex align-items-center">
+                              <IconToken symbol={'HELI'} />
+                              <span className="text-numeric ms-3">{sssData.claimable.inETH}</span>
+                              <span className="ms-3 text-secondary">{'HELI'}</span>
+                            </span>
+                          </p>
 
-                            <Button
-                              className="ms-3"
-                              disabled={Number(sssData.claimable.inETH) === 0}
-                              loading={loadingClaimLocked}
-                              size="small"
-                              onClick={handleClaimButtonClick}
-                            >
-                              Claim
-                            </Button>
-                          </div>
-                        ) : null}
+                          <Button
+                            className="ms-3"
+                            disabled={Number(sssData.claimable.inETH) === 0}
+                            loading={loadingClaimLocked}
+                            size="small"
+                            onClick={handleClaimButtonClick}
+                          >
+                            Claim
+                          </Button>
+                        </div>
 
                         {showHarvestModal ? (
                           <Modal
@@ -667,6 +667,7 @@ const SingleSidedStaking = () => {
               updateStakedHeli={updateStakedHeli}
               updateLockedHeli={updateLockedHeli}
               updateTotalStakedHeli={updateTotalStakedHeli}
+              hasUserLockedTokens={hasUserLockedTokens}
             />
           </div>
         ) : (

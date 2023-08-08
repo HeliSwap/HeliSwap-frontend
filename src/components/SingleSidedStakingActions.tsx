@@ -45,6 +45,7 @@ interface IFarmActionsProps {
   amountToLock: string;
   tokensToAssociate: ITokenData[];
   loadingAssociate: boolean;
+  hasUserLockedTokens: boolean;
   getStakingTokenBalance: (id: string) => void;
   handleAssociateClick: (token: ITokenData) => void;
   updateStakedHeli: (newValue: string, action: string) => void;
@@ -71,6 +72,7 @@ const FarmActions = ({
   updateTotalStakedHeli,
   amountToLock,
   heliStaked,
+  hasUserLockedTokens,
 }: IFarmActionsProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
@@ -94,7 +96,7 @@ const FarmActions = ({
 
   const [selectedButton, setSelectedButton] = useState(0);
   const [lockTimestampValue, setLockTimestampValue] = useState(0);
-  // const [availableToLock, setAvailableToLock] = useState('0');
+  const [availableToLock, setAvailableToLock] = useState('0');
 
   // Handlers
   const handleTabButtonClick = (value: TabStates) => {
@@ -253,6 +255,15 @@ const FarmActions = ({
     userId && Object.keys(tokenContract).length && getHeliAllowance();
   }, [tokenContract, userId, lpInputValue, getHeliAllowance]);
 
+  useEffect(() => {
+    if (hasUserLockedTokens) {
+      const availableToLockNum = Number(heliStaked) - Number(sssData.position.amount.inETH);
+      setAvailableToLock(availableToLockNum.toString());
+    } else {
+      setAvailableToLock(heliStaked);
+    }
+  }, [sssData, hasUserLockedTokens, heliStaked]);
+
   // Helper methods
   const getStakeButtonLabel = () => {
     if (getInsufficientTokenBalance()) return `Insufficient HELI balance`;
@@ -263,6 +274,10 @@ const FarmActions = ({
     {
       seconds: 60,
       label: '1 Minute',
+    },
+    {
+      seconds: 60 * 5,
+      label: '5 Minutes',
     },
     {
       seconds: 3600,
@@ -397,7 +412,7 @@ const FarmActions = ({
                   readonly={true}
                   inputTokenComponent={
                     <InputToken
-                      value={amountToLock}
+                      value={availableToLock}
                       disabled={true}
                       isCompact={true}
                       name="amountIn"
