@@ -212,6 +212,7 @@ const FarmActions = ({
     } finally {
       setLoadingLock(false);
       setSelectedButton(0);
+      setAvailableToLock('0');
       updateLockedHeli(amountToLock, 'add');
     }
   };
