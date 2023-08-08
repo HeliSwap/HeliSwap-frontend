@@ -47,7 +47,7 @@ import getErrorMessage from '../content/errors';
 
 import { useQueryOptions, useQueryOptionsPoolsFarms } from '../constants';
 import { renderSSSEndDate } from '../utils/farmUtils';
-import { timestampToDate } from '../utils/timeUtils';
+import { timestampToDateTime } from '../utils/timeUtils';
 
 const SingleSidedStaking = () => {
   const contextValue = useContext(GlobalContext);
@@ -242,6 +242,18 @@ const SingleSidedStaking = () => {
     });
   };
 
+  const updateTotalStakedHeli = (staked: string, action: string) => {
+    setTotalStaked(prev => {
+      let newStaked;
+      if (action === 'add') {
+        newStaked = ethers.utils.parseUnits(prev, 8).add(ethers.utils.parseUnits(staked, 8));
+      } else {
+        newStaked = ethers.utils.parseUnits(prev, 8).sub(ethers.utils.parseUnits(staked, 8));
+      }
+      return formatBigNumberToStringETH(newStaked);
+    });
+  };
+
   const updateLockedHeli = (locked: string, action: string) => {
     setHeliLocked(prev => {
       let newLocked;
@@ -343,8 +355,6 @@ const SingleSidedStaking = () => {
 
   const tokensToAssociate = userRewardsData?.filter(token => !getTokenIsAssociated(token));
 
-  console.log('sssData', sssData);
-
   return isHashpackLoading ? (
     <Loader />
   ) : loadingSSSData ? (
@@ -379,22 +389,6 @@ const SingleSidedStaking = () => {
 
                 <div className="container-border-rounded-bn-500 mt-4 mt-lg-6">
                   <div className="row">
-                    <div className="col-6 col-md-4 d-flex align-items-center">
-                      <p className="d-flex align-items-center">
-                        <span className="text-secondary text-small">APR from locking</span>
-                        <Tippy content="Your annual rate of return, expressed as a percentage. Interest paid in previous periods is not accounted for.">
-                          <span className="ms-2">
-                            <Icon name="hint" color="gray" size="small" />
-                          </span>
-                        </Tippy>
-                      </p>
-                    </div>
-                    <div className="col-6 col-md-4">
-                      <p className="text-subheader text-numeric">{sssData.rewardsPercentage}%</p>
-                    </div>
-                  </div>
-
-                  <div className="row mt-4">
                     <div className="col-6 col-md-4 d-flex align-items-center">
                       <p className="d-flex align-items-center">
                         <span className="text-secondary text-small">Total Staked</span>
@@ -450,6 +444,26 @@ const SingleSidedStaking = () => {
 
                       {hasUserLockedTokens ? (
                         <>
+                          <hr className="my-5" />
+
+                          <div className="row mt-4">
+                            <div className="col-6 col-md-4 d-flex align-items-center">
+                              <p className="d-flex align-items-center">
+                                <span className="text-secondary text-small">APR from locking</span>
+                                <Tippy content="Your annual rate of return, expressed as a percentage. Interest paid in previous periods is not accounted for.">
+                                  <span className="ms-2">
+                                    <Icon name="hint" color="gray" size="small" />
+                                  </span>
+                                </Tippy>
+                              </p>
+                            </div>
+                            <div className="col-6 col-md-4">
+                              <p className="text-subheader text-numeric">
+                                {sssData.rewardsPercentage}%
+                              </p>
+                            </div>
+                          </div>
+
                           <div className="row mt-4">
                             <div className="col-6 col-md-4 d-flex align-items-center">
                               <p className="d-flex align-items-center">
@@ -493,7 +507,7 @@ const SingleSidedStaking = () => {
                             </div>
                             <div className="col-6 col-md-8 d-md-flex align-items-center">
                               <p className="text-main">
-                                {timestampToDate(sssData.position.expiration.inMilliSeconds)}
+                                {timestampToDateTime(sssData.position.expiration.inMilliSeconds)}
                               </p>
                             </div>
                           </div>
@@ -518,31 +532,6 @@ const SingleSidedStaking = () => {
                               </span>
                             </Tippy>
                           </div>
-
-                          <div className="d-flex justify-content-end">
-                            {tokensToAssociate && tokensToAssociate?.length > 0 ? (
-                              tokensToAssociate.map((token, index) => (
-                                <Button
-                                  key={index}
-                                  loading={loadingAssociate}
-                                  onClick={() => handleAssociateClick(token)}
-                                  size="small"
-                                  type="primary"
-                                >
-                                  {`Associate ${token.symbol}`}
-                                </Button>
-                              ))
-                            ) : (
-                              <Button
-                                loading={loadingClaim}
-                                onClick={() => setShowHarvestModal(true)}
-                                size="small"
-                                type="primary"
-                              >
-                                Harvest
-                              </Button>
-                            )}
-                          </div>
                         </div>
 
                         <div className="mt-5">
@@ -552,42 +541,62 @@ const SingleSidedStaking = () => {
 
                           <hr className="my-4" />
 
-                          <div className="mt-4">
+                          <div className="d-flex justify-content-between align-items-center  mt-4">
                             <p className="text-main d-flex justify-content-between align-items-center mt-4">
-                              <span className="d-flex align-items-center text-secondary">
+                              <span className="d-flex align-items-center">
                                 <IconToken symbol={'HELI'} />
-                                <span className="ms-3">{'HELI'}</span>
+                                <span className="text-numeric ms-3">{userRewardsBalance}</span>
+                                <span className="ms-3 text-secondary">{'HELI'}</span>
                               </span>
-                              <span className="text-numeric ms-3">{userRewardsBalance}</span>
                             </p>
+
+                            <div className="d-flex justify-content-end">
+                              {tokensToAssociate && tokensToAssociate?.length > 0 ? (
+                                tokensToAssociate.map((token, index) => (
+                                  <Button
+                                    key={index}
+                                    loading={loadingAssociate}
+                                    onClick={() => handleAssociateClick(token)}
+                                    size="small"
+                                    type="primary"
+                                  >
+                                    {`Associate ${token.symbol}`}
+                                  </Button>
+                                ))
+                              ) : (
+                                <Button
+                                  disabled={Number(userRewardsBalance) === 0}
+                                  loading={loadingClaim}
+                                  onClick={() => setShowHarvestModal(true)}
+                                  size="small"
+                                  type="primary"
+                                >
+                                  Claim
+                                </Button>
+                              )}
+                            </div>
                           </div>
                         </div>
 
                         {hasUserLockedTokens ? (
-                          <div className="mt-5">
-                            <p className="text-title text-success text-numeric">
-                              {/* {userRewardsBalance} */}
+                          <div className="d-flex justify-content-between align-items-center mt-4">
+                            <p className="text-main d-flex justify-content-between align-items-center">
+                              <span className="d-flex align-items-center">
+                                <IconToken symbol={'HELI'} />
+                                <span className="text-numeric ms-3">{sssData.claimable.inETH}</span>
+                                <span className="ms-3 text-secondary">{'HELI'}</span>
+                              </span>
                             </p>
 
-                            <div className="d-flex align-items-center mt-4">
-                              <p className="text-main d-flex justify-content-between align-items-center">
-                                <span className="d-flex align-items-center text-secondary">
-                                  <IconToken symbol={'HELI'} />
-                                  <span className="ms-3">{'HELI'}</span>
-                                </span>
-                                <span className="text-numeric ms-3">{sssData.claimable.inETH}</span>
-                              </p>
-
-                              <Button
-                                className="ms-3"
-                                disabled={Number(sssData.claimable.inETH) === 0}
-                                loading={loadingClaimLocked}
-                                size="small"
-                                onClick={handleClaimButtonClick}
-                              >
-                                Claim
-                              </Button>
-                            </div>
+                            <Button
+                              className="ms-3"
+                              disabled={Number(sssData.claimable.inETH) === 0}
+                              loading={loadingClaimLocked}
+                              size="small"
+                              onClick={handleClaimButtonClick}
+                            >
+                              Claim
+                            </Button>
                           </div>
                         ) : null}
 
@@ -618,31 +627,6 @@ const SingleSidedStaking = () => {
                                       {userRewardsBalance}
                                     </div>
                                   </div>
-                                  {/* {sssData.rewardsData?.map((reward: IReward) => {
-                                    const userReward =
-                                      sssData.userStakingData?.rewardsAccumulated?.find(
-                                        (currReward: IRewardsAccumulated) =>
-                                          currReward.address === reward.address,
-                                      );
-                                    return (
-                                      <div
-                                        key={reward.address}
-                                        className="d-flex justify-content-between align-items-center mt-4"
-                                      >
-                                        <div className="d-flex align-items-center">
-                                          <IconToken symbol={reward.symbol} />
-                                          <span className="text-main ms-3">{reward.symbol}</span>
-                                        </div>
-
-                                        <div className="text-main text-numeric">
-                                          {formatStringWeiToStringEther(
-                                            userReward?.totalAccumulated || '0',
-                                            reward.decimals,
-                                          )}
-                                        </div>
-                                      </div>
-                                    );
-                                  })} */}
                                 </>
                               )}
                             </ConfirmTransactionModalContent>
@@ -682,6 +666,7 @@ const SingleSidedStaking = () => {
               getStakingTokenBalance={getStakingTokenBalance}
               updateStakedHeli={updateStakedHeli}
               updateLockedHeli={updateLockedHeli}
+              updateTotalStakedHeli={updateTotalStakedHeli}
             />
           </div>
         ) : (

@@ -26,7 +26,7 @@ import { formatStringWeiToStringEther, stripStringToFixedDecimals } from '../uti
 
 import useHELITokenContract from '../hooks/useHELITokenContract';
 
-// import getErrorMessage from '../content/errors';
+import getErrorMessage from '../content/errors';
 
 import { MAX_UINT_HTS, SLIDER_INITIAL_VALUE } from '../constants';
 import {
@@ -49,6 +49,7 @@ interface IFarmActionsProps {
   handleAssociateClick: (token: ITokenData) => void;
   updateStakedHeli: (newValue: string, action: string) => void;
   updateLockedHeli: (newValue: string, action: string) => void;
+  updateTotalStakedHeli: (newValue: string, action: string) => void;
 }
 
 enum TabStates {
@@ -67,6 +68,7 @@ const FarmActions = ({
   handleAssociateClick,
   updateStakedHeli,
   updateLockedHeli,
+  updateTotalStakedHeli,
   amountToLock,
   heliStaked,
 }: IFarmActionsProps) => {
@@ -92,7 +94,7 @@ const FarmActions = ({
 
   const [selectedButton, setSelectedButton] = useState(0);
   const [lockTimestampValue, setLockTimestampValue] = useState(0);
-  const [availableToLock, setAvailableToLock] = useState('0');
+  // const [availableToLock, setAvailableToLock] = useState('0');
 
   // Handlers
   const handleTabButtonClick = (value: TabStates) => {
@@ -125,8 +127,11 @@ const FarmActions = ({
       if (success) {
         getStakingTokenBalance(userId);
         updateStakedHeli(lpInputValue, 'add');
+        updateTotalStakedHeli(lpInputValue, 'add');
 
         toast.success('Success! Tokens were deposited.');
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
       }
     } catch (e) {
       console.log('e', e);
@@ -149,9 +154,12 @@ const FarmActions = ({
         setTabState(TabStates.STAKE);
         getStakingTokenBalance(userId);
         updateStakedHeli(heliStaked, 'remove');
+        updateTotalStakedHeli(heliStaked, 'remove');
         setShowExitModal(false);
 
         toast.success('Success! Tokens were withdrawn.');
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
       }
     } catch (e) {
       console.log('e', e);
