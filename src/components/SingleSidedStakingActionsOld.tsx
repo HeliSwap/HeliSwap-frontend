@@ -7,8 +7,7 @@ import BigNumber from 'bignumber.js';
 
 import { GlobalContext } from '../providers/Global';
 
-import { ITokenData } from '../interfaces/tokens';
-import { ISSSData } from '../interfaces/dao';
+import { ISSSData, ITokenData, TokenType } from '../interfaces/tokens';
 
 import Button from './Button';
 import ButtonSelector from './ButtonSelector';
@@ -24,8 +23,6 @@ import InputSlider from './InputSlider';
 
 import { formatStringWeiToStringEther, stripStringToFixedDecimals } from '../utils/numberUtils';
 
-import useHELITokenContract from '../hooks/useHELITokenContract';
-
 import getErrorMessage from '../content/errors';
 
 import { MAX_UINT_HTS, SLIDER_INITIAL_VALUE } from '../constants';
@@ -33,52 +30,41 @@ import {
   addressToId,
   calculatePercentageByShare,
   calculateShareByPercentage,
-  idToAddress,
+  checkAllowanceHTS,
   invalidInputTokensData,
 } from '../utils/tokenUtils';
 
 interface IFarmActionsProps {
   sssData: ISSSData;
   hasUserStaked: boolean;
+  campaignEnded: boolean;
+  hasUserProvided: boolean;
   stakingTokenBalance: string;
-  heliStaked: string;
-  amountToLock: string;
   tokensToAssociate: ITokenData[];
   loadingAssociate: boolean;
-  hasUserLockedTokens: boolean;
-  getStakingTokenBalance: (id: string) => void;
+  getStakingTokenBalance: (userId: string, tokenId: string) => void;
   handleAssociateClick: (token: ITokenData) => void;
-  updateStakedHeli: (newValue: string, action: string) => void;
-  updateLockedHeli: (newValue: string, action: string) => void;
-  updateTotalStakedHeli: (newValue: string, action: string) => void;
 }
 
 enum TabStates {
   STAKE,
-  LOCK,
   UNSTAKE,
 }
 
 const FarmActions = ({
   sssData,
   hasUserStaked,
+  campaignEnded,
+  hasUserProvided,
   stakingTokenBalance,
   tokensToAssociate,
   loadingAssociate,
   getStakingTokenBalance,
   handleAssociateClick,
-  updateStakedHeli,
-  updateLockedHeli,
-  updateTotalStakedHeli,
-  amountToLock,
-  heliStaked,
-  hasUserLockedTokens,
 }: IFarmActionsProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
   const { userId, connectorInstance } = connection;
-
-  const tokenContract = useHELITokenContract();
 
   const maxHELIInputValue = stakingTokenBalance;
 
@@ -88,15 +74,17 @@ const FarmActions = ({
   const [loadingStake, setLoadingStake] = useState(false);
   const [loadingApprove, setLoadingApprove] = useState(true);
   const [loadingExit, setLoadingExit] = useState(false);
-  const [loadingLock, setLoadingLock] = useState(false);
 
   const [tabState, setTabState] = useState(TabStates.STAKE);
+
   const [lpApproved, setLpApproved] = useState(false);
+
+  const [showStakeModal, setShowStakeModal] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
 
-  const [selectedButton, setSelectedButton] = useState(0);
-  const [lockTimestampValue, setLockTimestampValue] = useState(0);
-  const [availableToLock, setAvailableToLock] = useState('0');
+  const getInsufficientTokenBalance = useCallback(() => {
+    return new BigNumber(lpInputValue as string).gt(new BigNumber(stakingTokenBalance));
+  }, [stakingTokenBalance, lpInputValue]);
 
   // Handlers
   const handleTabButtonClick = (value: TabStates) => {
@@ -116,78 +104,88 @@ const FarmActions = ({
     setLpInputValue(value);
   };
 
-  const handleDepositClick = async () => {
+  const handleStakeConfirm = async () => {
     setLoadingStake(true);
     try {
-      const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
-      const receipt = await sdk.deposit(connectorInstance, lpInputValue, kernelAddress, userId);
-
+      const receipt = await sdk.stakeLP(
+        connectorInstance,
+        lpInputValue as string,
+        sssData.address,
+        userId,
+        8,
+      );
       const {
         response: { success, error },
       } = receipt;
 
       if (success) {
-        getStakingTokenBalance(userId);
-        updateStakedHeli(lpInputValue, 'add');
-        updateTotalStakedHeli(lpInputValue, 'add');
-
-        toast.success('Success! Tokens were deposited.');
+        toast.success('Success! Tokens are staked');
       } else {
         toast.error(getErrorMessage(error.status ? error.status : error));
       }
-    } catch (e) {
-      console.log('e', e);
+    } catch (err) {
+      console.error(err);
+      toast.error('Error on stake');
     } finally {
+      await getStakingTokenBalance(userId, addressToId(sssData.stakingTokenAddress));
       setLoadingStake(false);
+      setShowStakeModal(false);
+      setSliderValue(SLIDER_INITIAL_VALUE);
     }
   };
 
   const handleExitConfirm = async () => {
     setLoadingExit(true);
-    try {
-      const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
-      const receipt = await sdk.withdraw(connectorInstance, heliStaked, kernelAddress, userId);
 
+    try {
+      const receipt = await sdk.exit(connectorInstance, sssData.address, userId);
       const {
         response: { success, error },
       } = receipt;
 
       if (success) {
+        toast.success('Success! Exit was successful.');
         setTabState(TabStates.STAKE);
-        getStakingTokenBalance(userId);
-        updateStakedHeli(heliStaked, 'remove');
-        updateTotalStakedHeli(heliStaked, 'remove');
-        setShowExitModal(false);
-
-        toast.success('Success! Tokens were withdrawn.');
       } else {
         toast.error(getErrorMessage(error.status ? error.status : error));
       }
-    } catch (e) {
-      console.log('e', e);
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoadingExit(false);
+      setShowExitModal(false);
+      setSliderValue(SLIDER_INITIAL_VALUE);
     }
   };
 
-  const handleApproveClick = async () => {
+  const handleApproveButtonClick = async (campaignAddress: string, tokenAddress: string) => {
     setLoadingApprove(true);
+    const amount = MAX_UINT_HTS.toString();
+    const tokenId = await addressToId(tokenAddress);
+
     try {
-      const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
-      await sdk.approveToken(
+      const receipt = await sdk.approveToken(
         connectorInstance,
-        MAX_UINT_HTS.toString(),
+        amount,
         userId,
-        addressToId(process.env.REACT_APP_HELI_TOKEN_ADDRESS as string),
+        tokenId,
         true,
-        kernelAddress,
+        campaignAddress,
       );
-      setLpApproved(true);
-    } catch (e) {
-      console.log('e', e);
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (success) {
+        toast.success('Success! Token was approved.');
+        setLpApproved(true);
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      }
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoadingApprove(false);
-      getHeliAllowance();
     }
   };
 
@@ -200,101 +198,52 @@ const FarmActions = ({
     setLpInputValue(calculatedShare);
   };
 
-  const handleLockClick = async () => {
-    setLoadingLock(true);
-    try {
-      const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
-      await sdk.lock(connectorInstance, lockTimestampValue, kernelAddress, userId);
-
-      setLockTimestampValue(0);
-    } catch (e) {
-      console.log('e', e);
-    } finally {
-      setLoadingLock(false);
-      setSelectedButton(0);
-      updateLockedHeli(amountToLock, 'add');
-    }
-  };
-
-  const handleLockDurationButtonClick = (seconds: number) => {
-    setSelectedButton(seconds);
-    const nowSeconds = Math.floor(Date.now() / 1000);
-    setLockTimestampValue(nowSeconds + seconds);
-  };
-
   const handleButtonClick = (value: string) => {
     setSliderValue(value);
     const calculatedShare = calculateShareByPercentage(maxHELIInputValue, value, 8);
     setLpInputValue(calculatedShare);
   };
 
-  const getInsufficientTokenBalance = useCallback(() => {
-    return new BigNumber(lpInputValue as string).gt(new BigNumber(stakingTokenBalance));
-  }, [stakingTokenBalance, lpInputValue]);
-
-  const getHeliAllowance = useCallback(async () => {
-    try {
-      const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
-      const allowance = await tokenContract.allowance(idToAddress(userId), kernelAddress, {
-        gasLimit: 300000,
-      });
-      setLpApproved(Number(allowance.toString()) > Number(lpInputValue));
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoadingApprove(false);
-    }
-  }, [lpInputValue, tokenContract, userId]);
-
   useEffect(() => {
     setLpInputValue(maxHELIInputValue);
-  }, [maxHELIInputValue]);
+  }, [sssData.poolData?.lpShares, maxHELIInputValue]);
 
   useEffect(() => {
-    userId && Object.keys(tokenContract).length && getHeliAllowance();
-  }, [tokenContract, userId, lpInputValue, getHeliAllowance]);
+    const getLPAllowanceData = async () => {
+      try {
+        const canSpend = await checkAllowanceHTS(
+          userId,
+          {
+            decimals: 8,
+            hederaId: addressToId(sssData.stakingTokenAddress),
+            symbol: 'HELI',
+            type: TokenType.HTS,
+            name: '',
+            address: sssData.stakingTokenAddress,
+          },
+          lpInputValue,
+          sssData.address,
+        );
+        setLpApproved(canSpend);
+      } catch (e) {
+        setLpApproved(false);
+      } finally {
+        setLoadingApprove(false);
+      }
+    };
 
-  useEffect(() => {
-    if (hasUserLockedTokens) {
-      const availableToLockNum = Number(heliStaked) - Number(sssData.position.amount.inETH);
-      setAvailableToLock(availableToLockNum.toString());
-    } else {
-      setAvailableToLock(heliStaked);
-    }
-  }, [sssData, hasUserLockedTokens, heliStaked]);
+    getLPAllowanceData();
+
+    return () => {
+      setLpApproved(false);
+    };
+  }, [sssData.stakingTokenAddress, sssData.address, userId, lpInputValue]);
 
   // Helper methods
   const getStakeButtonLabel = () => {
     if (getInsufficientTokenBalance()) return `Insufficient HELI balance`;
     return 'Stake';
   };
-
-  const buttons = [
-    {
-      seconds: 60,
-      label: '1 Minute',
-    },
-    {
-      seconds: 60 * 5,
-      label: '5 Minutes',
-    },
-    {
-      seconds: 3600,
-      label: '1 Hour',
-    },
-    {
-      seconds: 3600 * 24,
-      label: '1 Day',
-    },
-    {
-      seconds: 15770000,
-      label: '6 Months',
-    },
-    {
-      seconds: 31540000,
-      label: '12 Months',
-    },
-  ];
 
   return (
     <div className="col-md-5 mt-4 mt-md-0">
@@ -308,17 +257,6 @@ const FarmActions = ({
           >
             Stake
           </span>
-          {hasUserStaked ? (
-            <span
-              onClick={() => handleTabButtonClick(TabStates.LOCK)}
-              className={`text-small text-bold text-uppercase link-tab me-5 ${
-                tabState === TabStates.LOCK ? 'is-active' : ''
-              }`}
-            >
-              Lock
-            </span>
-          ) : null}
-
           {hasUserStaked ? (
             <span
               onClick={() => handleTabButtonClick(TabStates.UNSTAKE)}
@@ -335,7 +273,7 @@ const FarmActions = ({
           {tabState === TabStates.STAKE ? (
             <>
               <div>
-                {userId ? (
+                {userId && !campaignEnded && hasUserProvided ? (
                   <InputSlider
                     handleSliderChange={handleSliderChange}
                     handleButtonClick={handleButtonClick}
@@ -346,8 +284,10 @@ const FarmActions = ({
                 <p className="text-small text-bold">Enter HELI Token Amount</p>
                 <InputTokenSelector
                   className="mt-4"
+                  readonly={campaignEnded || !hasUserProvided}
                   inputTokenComponent={
                     <InputToken
+                      disabled={campaignEnded || !hasUserProvided}
                       value={lpInputValue}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         const { value } = e.target;
@@ -362,97 +302,56 @@ const FarmActions = ({
                     <ButtonSelector disabled selectedToken="HELI" selectorText="Select a token" />
                   }
                   walletBalanceComponent={
-                    <WalletBalance
-                      insufficientBallance={getInsufficientTokenBalance()}
-                      walletBalance={stakingTokenBalance}
-                      onMaxButtonClick={(maxValue: string) => {
-                        handleLpInputChange(maxValue);
-                      }}
-                    />
+                    !campaignEnded ? (
+                      <WalletBalance
+                        insufficientBallance={getInsufficientTokenBalance()}
+                        walletBalance={stakingTokenBalance}
+                        onMaxButtonClick={(maxValue: string) => {
+                          handleLpInputChange(maxValue);
+                        }}
+                      />
+                    ) : null
                   }
                 />
               </div>
 
               {userId ? (
-                <div className="d-grid">
-                  {!lpApproved ? (
-                    <Button className="mb-3" loading={loadingApprove} onClick={handleApproveClick}>
-                      <>
-                        Approve HELI
-                        <Tippy
-                          content={`You must give the HeliSwap smart contracts permission to use your HELI tokens.`}
+                !campaignEnded ? (
+                  hasUserProvided ? (
+                    <div className="d-grid">
+                      {!lpApproved ? (
+                        <Button
+                          className="mb-3"
+                          loading={loadingApprove}
+                          onClick={() =>
+                            handleApproveButtonClick(sssData.address, sssData.stakingTokenAddress)
+                          }
                         >
-                          <span className="ms-2">
-                            <Icon name="hint" />
-                          </span>
-                        </Tippy>
-                      </>
-                    </Button>
-                  ) : null}
-
-                  <Button
-                    disabled={getInsufficientTokenBalance() || !lpApproved}
-                    loading={loadingStake}
-                    onClick={handleDepositClick}
-                  >
-                    <>{getStakeButtonLabel()}</>
-                  </Button>
-                </div>
+                          <>
+                            Approve HELI
+                            <Tippy
+                              content={`You must give the HeliSwap smart contracts permission to use your HELI tokens.`}
+                            >
+                              <span className="ms-2">
+                                <Icon name="hint" />
+                              </span>
+                            </Tippy>
+                          </>
+                        </Button>
+                      ) : null}
+                      <Button
+                        disabled={getInsufficientTokenBalance() || !lpApproved}
+                        loading={loadingStake}
+                        onClick={() => setShowStakeModal(true)}
+                      >
+                        <>{getStakeButtonLabel()}</>
+                      </Button>
+                    </div>
+                  ) : null
+                ) : null
               ) : null}
             </>
-          ) : null}
-
-          {tabState === TabStates.LOCK ? (
-            <>
-              <div>
-                <p className="text-small text-bold">HELI Token Amount to lock</p>
-                <InputTokenSelector
-                  className="mt-4"
-                  readonly={true}
-                  inputTokenComponent={
-                    <InputToken
-                      value={availableToLock}
-                      disabled={true}
-                      isCompact={true}
-                      name="amountIn"
-                    />
-                  }
-                  buttonSelectorComponent={
-                    <ButtonSelector disabled selectedToken="HELI" selectorText="Select a token" />
-                  }
-                />
-
-                <p className="text-secondary text-small text-bold mt-5">Lock for:</p>
-
-                <div className="d-flex flex-wrap align-items-center mt-2">
-                  {buttons.map((item, index) => (
-                    <Button
-                      key={index}
-                      onClick={() => handleLockDurationButtonClick(item.seconds)}
-                      className={`${selectedButton === item.seconds ? 'active' : ''} ${
-                        index !== 0 ? 'ms-3' : ''
-                      } mb-3`}
-                      size="small"
-                    >
-                      {item.label}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="d-grid mt-4">
-                <Button
-                  disabled={lockTimestampValue === 0}
-                  loading={loadingLock}
-                  onClick={handleLockClick}
-                >
-                  Lock
-                </Button>
-              </div>
-            </>
-          ) : null}
-
-          {tabState === TabStates.UNSTAKE ? (
+          ) : (
             <>
               <div>
                 <p className="text-small text-bold">HELI Token Amount to unstake</p>
@@ -461,7 +360,10 @@ const FarmActions = ({
                   readonly={true}
                   inputTokenComponent={
                     <InputToken
-                      value={heliStaked}
+                      value={formatStringWeiToStringEther(
+                        sssData.userStakingData?.stakedAmount as string,
+                        8,
+                      )}
                       disabled={true}
                       isCompact={true}
                       name="amountIn"
@@ -493,12 +395,41 @@ const FarmActions = ({
                 )}
               </div>
             </>
+          )}
+          {showStakeModal ? (
+            <Modal show={showStakeModal} closeModal={() => setShowStakeModal(false)}>
+              <ConfirmTransactionModalContent
+                modalTitle="Stake Your HELI Tokens"
+                closeModal={() => setShowStakeModal(false)}
+                confirmTansaction={handleStakeConfirm}
+                confirmButtonLabel="Confirm"
+                isLoading={loadingStake}
+              >
+                {loadingStake ? (
+                  <Confirmation confirmationText={`Staking ${lpInputValue || '0'} HELI tokens`} />
+                ) : (
+                  <>
+                    <div className="text-small">HELI token count</div>
+
+                    <div className="d-flex justify-content-between align-items-center mt-4">
+                      <div className="d-flex align-items-center">
+                        <IconToken symbol="HELI" />
+
+                        <span className="text-main ms-3">HELI Token</span>
+                      </div>
+
+                      <div className="text-main text-numeric">{lpInputValue || '0'}</div>
+                    </div>
+                  </>
+                )}
+              </ConfirmTransactionModalContent>
+            </Modal>
           ) : null}
 
           {showExitModal ? (
             <Modal show={showExitModal} closeModal={() => setShowExitModal(false)}>
               <ConfirmTransactionModalContent
-                modalTitle="Unstake Your HELI Tokens"
+                modalTitle="Unstake Your LP Tokens"
                 closeModal={() => setShowExitModal(false)}
                 confirmTansaction={handleExitConfirm}
                 confirmButtonLabel="Confirm"
@@ -507,7 +438,7 @@ const FarmActions = ({
                 {loadingExit ? (
                   <Confirmation
                     confirmationText={`Unstaking ${formatStringWeiToStringEther(
-                      sssData.position.amount.inWEI as string,
+                      sssData.userStakingData?.stakedAmount as string,
                       8,
                     )} HELI tokens`}
                   />
@@ -522,7 +453,12 @@ const FarmActions = ({
                         <span className="text-main ms-3">HELI Token</span>
                       </div>
 
-                      <div className="text-main text-numeric">{heliStaked}</div>
+                      <div className="text-main text-numeric">
+                        {formatStringWeiToStringEther(
+                          sssData.userStakingData?.stakedAmount as string,
+                          8,
+                        )}
+                      </div>
                     </div>
                   </>
                 )}

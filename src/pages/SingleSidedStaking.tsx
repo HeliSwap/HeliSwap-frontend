@@ -1,17 +1,12 @@
-import { ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import Tippy from '@tippyjs/react';
 import toast from 'react-hot-toast';
+import { ethers } from 'ethers';
 
 import { GlobalContext } from '../providers/Global';
 
-import {
-  IPoolExtendedData,
-  IReward,
-  IRewardsAccumulated,
-  ITokenData,
-  IUserStakingData,
-  TokenType,
-} from '../interfaces/tokens';
+import { IPoolExtendedData, ITokenData, TokenType } from '../interfaces/tokens';
+import { ISSSData } from '../interfaces/dao';
 
 import Icon from '../components/Icon';
 import IconToken from '../components/IconToken';
@@ -25,28 +20,34 @@ import Loader from '../components/Loader';
 import SSSFAQ from '../components/SSSFAQ';
 
 import {
+  formatBigNumberToStringETH,
+  formatContractAmount,
+  formatContractDuration,
+  formatContractNumberPercentage,
+  formatContractTimestamp,
   formatStringETHtoPriceFormatted,
-  formatStringToPercentage,
   formatStringToPrice,
-  formatStringWeiToStringEther,
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
-import { renderSSSEndDate } from '../utils/farmUtils';
-
 import {
   addressToId,
   getTokenBalance,
   getUserAssociatedTokens,
-  mapWHBARAddress,
+  idToAddress,
 } from '../utils/tokenUtils';
 
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import useTokensByListIds from '../hooks/useTokensByListIds';
-import useSSSByAddress from '../hooks/useSSSByAddress';
+import useHELITokenContract from '../hooks/useHELITokenContract';
+import useRewardsContract from '../hooks/useRewardsContract';
+import useKernelContract from '../hooks/useKernelContract';
+import useSSSContract from '../hooks/useSSSContract';
 
 import getErrorMessage from '../content/errors';
 
 import { useQueryOptions, useQueryOptionsPoolsFarms } from '../constants';
+import { renderSSSEndDate } from '../utils/farmUtils';
+import { timestampToDateTime } from '../utils/timeUtils';
 
 const SingleSidedStaking = () => {
   const contextValue = useContext(GlobalContext);
@@ -54,8 +55,11 @@ const SingleSidedStaking = () => {
   const { userId, connectorInstance, isHashpackLoading, setShowConnectModal, connected } =
     connection;
 
-  const campaignAddress = process.env.REACT_APP_SINGLE_SIDED_STAKING_ADDRESS;
-  const stakingTokenId = addressToId(process.env.REACT_APP_HELI_TOKEN_ADDRESS as string);
+  const kernelContract = useKernelContract();
+  const tokenContract = useHELITokenContract();
+  const rewardsContract = useRewardsContract();
+  const sssContract = useSSSContract();
+
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
 
   const heliPoolTokens = [
@@ -90,63 +94,72 @@ const SingleSidedStaking = () => {
     heliPrice = hbarPrice / heliForHbar;
   }
 
-  const { sss: sssData, processingSss } = useSSSByAddress(
-    useQueryOptionsPoolsFarms,
-    userId,
-    heliPrice,
-    campaignAddress || '',
-  );
+  const [heliBalance, setHeliBalance] = useState('0');
+  const [heliStaked, setHeliStaked] = useState('0');
+  const [heliStakedUSD, setHeliStakedUSD] = useState('0');
+  const [totalStaked, setTotalStaked] = useState('0');
+  const [totalStakedUSD, setTotalStakedUSD] = useState('0');
+  const [heliLocked, setHeliLocked] = useState('0');
+  const [heliLockedUSD, setHeliLockedUSD] = useState('0');
+  const [amountToLock, setAmountToLock] = useState('0');
+  const [sssData, setSssDdata] = useState({} as ISSSData);
+  const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
+  const [campaignEndDate, setCampaignEndDate] = useState(0);
 
-  const [loadingHarvest, setLoadingHarvest] = useState(false);
+  const [loadingClaim, setLoadingClaim] = useState(false);
+  const [loadingClaimLocked, setLoadingClaimLocked] = useState(false);
+  const [loadingAssociate, setLoadingAssociate] = useState(false);
+  const [userRewardsBalance, setUserRewardsBalance] = useState('0');
+  const [loadingSSSData, setLoadingSSSData] = useState(true);
+  const [hasUserLockedTokens, setHasUserLockedTokens] = useState(true);
+
   const [showHarvestModal, setShowHarvestModal] = useState(false);
 
-  const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
-  const [loadingAssociate, setLoadingAssociate] = useState(false);
-  const [stakingTokenBalance, setStakingTokenBalance] = useState('0');
+  const userRewardsAddresses = [process.env.REACT_APP_HELI_TOKEN_ADDRESS as string];
 
-  const userRewardsUSD = useMemo(() => {
-    if (Object.keys(sssData).length !== 0) {
-      const { userStakingData } = sssData;
+  // Get selected tokens to check for assosiations
+  const { tokens: userRewardsData } = useTokensByListIds(userRewardsAddresses, useQueryOptions);
 
-      if (!userStakingData?.rewardsAccumulated) return '0';
+  const getHeliStaked = useCallback(async () => {
+    try {
+      const balanceBN = await kernelContract.balanceOf(idToAddress(userId));
+      const totalStakedBN = await kernelContract.heliStaked();
 
-      return userStakingData?.rewardsAccumulated?.reduce((acc: string, currentValue) => {
-        return (Number(acc) + Number(currentValue.totalAccumulatedUSD)).toString();
-      }, '0');
+      setHeliStaked(formatBigNumberToStringETH(balanceBN));
+      setTotalStaked(formatBigNumberToStringETH(totalStakedBN));
+    } catch (error) {
+      console.error(error);
     }
-  }, [sssData]);
+  }, [kernelContract, userId]);
 
-  const userShare = useMemo(() => {
-    const { totalStaked, userStakingData } = sssData;
+  const getUserRewardsBalance = useCallback(async () => {
+    try {
+      const balanceBN = await rewardsContract.owed(idToAddress(userId));
+      const decimals = await tokenContract.decimals();
+      const balance = ethers.utils.formatUnits(balanceBN, decimals);
 
-    if (!userStakingData?.stakedAmount || !totalStaked || Number(totalStaked) === 0) return '0';
+      const pull = await rewardsContract.pullFeature();
+      const endDate = formatContractTimestamp(pull.endTs);
+      // const totalDuration = formatContractDuration(pull.totalDuration);
 
-    return ((Number(userStakingData?.stakedAmount) / Number(totalStaked)) * 100).toString();
-  }, [sssData]);
+      setCampaignEndDate(endDate.inMilliSeconds);
+      setUserRewardsBalance(balance);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [rewardsContract, tokenContract, userId]);
+
+  const calculateHeliPrice = useCallback(
+    (heliAmount: string) => {
+      const heliAmountNum = Number(heliAmount);
+      const calculatedHeliPrice = heliAmountNum * heliPrice;
+
+      return calculatedHeliPrice.toString();
+    },
+    [heliPrice],
+  );
 
   // Handlers
-  const handleHarvestConfirm = async () => {
-    setLoadingHarvest(true);
-    try {
-      const receipt = await sdk.collectRewards(connectorInstance, sssData.address, userId);
-      const {
-        response: { success, error },
-      } = receipt;
-
-      if (success) {
-        toast.success('Success! Rewards were harvested.');
-      } else {
-        toast.error(getErrorMessage(error.status ? error.status : error));
-      }
-    } catch (err) {
-      console.error(err);
-      toast('Error on harvest');
-    } finally {
-      setLoadingHarvest(false);
-      setShowHarvestModal(false);
-    }
-  };
-
   const handleAssociateClick = async (token: ITokenData) => {
     setLoadingAssociate(true);
 
@@ -170,6 +183,92 @@ const SingleSidedStaking = () => {
     }
   };
 
+  const handleClaimClick = async () => {
+    setLoadingClaim(true);
+    try {
+      const rewardsAddress = process.env.REACT_APP_REWARDS_ADDRESS as string;
+      const tx = await sdk.claim(connectorInstance, rewardsAddress, userId);
+      await tx.wait();
+    } catch (e) {
+      console.log('e', e);
+    } finally {
+      setLoadingClaim(false);
+      setShowHarvestModal(false);
+      setUserRewardsBalance('0');
+    }
+  };
+
+  const handleClaimButtonClick = async () => {
+    setLoadingClaimLocked(true);
+    const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
+    try {
+      const tx = await sdk.claimLock(connectorInstance, kernelAddress, userId);
+      await tx.wait();
+    } catch (e) {
+      console.log('e', e);
+    } finally {
+      setLoadingClaimLocked(false);
+    }
+  };
+
+  const getStakingTokenBalance = async (userId: string) => {
+    const stakingTokenBalance =
+      (await getTokenBalance(userId, {
+        decimals: 8,
+        hederaId: addressToId(process.env.REACT_APP_HELI_TOKEN_ADDRESS as string),
+        symbol: 'HELI',
+        type: TokenType.HTS,
+        name: '',
+        address: '',
+      })) || '0';
+    setHeliBalance(stakingTokenBalance);
+  };
+
+  const getTokenIsAssociated = (token: ITokenData) => {
+    const notHTS =
+      Object.keys(token).length === 0 ||
+      token.type === TokenType.HBAR ||
+      token.type === TokenType.ERC20;
+    return notHTS || userAssociatedTokens?.includes(token.hederaId);
+  };
+
+  const updateStakedHeli = (staked: string, action: string) => {
+    setHeliStaked(prev => {
+      let newStaked;
+      if (action === 'add') {
+        newStaked = ethers.utils.parseUnits(prev, 8).add(ethers.utils.parseUnits(staked, 8));
+      } else {
+        newStaked = ethers.utils.parseUnits(prev, 8).sub(ethers.utils.parseUnits(staked, 8));
+      }
+      return formatBigNumberToStringETH(newStaked);
+    });
+  };
+
+  const updateTotalStakedHeli = (staked: string, action: string) => {
+    setTotalStaked(prev => {
+      let newStaked;
+      if (action === 'add') {
+        newStaked = ethers.utils.parseUnits(prev, 8).add(ethers.utils.parseUnits(staked, 8));
+      } else {
+        newStaked = ethers.utils.parseUnits(prev, 8).sub(ethers.utils.parseUnits(staked, 8));
+      }
+      return formatBigNumberToStringETH(newStaked);
+    });
+  };
+
+  const updateLockedHeli = (locked: string, action: string) => {
+    setHeliLocked(prev => {
+      let newLocked;
+      if (action === 'add') {
+        newLocked = ethers.utils.parseUnits(prev, 8).add(ethers.utils.parseUnits(locked, 8));
+        setHasUserLockedTokens(true);
+      } else {
+        newLocked = ethers.utils.parseUnits(prev, 8).sub(ethers.utils.parseUnits(locked, 8));
+      }
+      return formatBigNumberToStringETH(newLocked);
+    });
+  };
+
   // Check for associations
   useEffect(() => {
     const checkTokenAssociation = async (userId: string) => {
@@ -180,64 +279,97 @@ const SingleSidedStaking = () => {
     userId && checkTokenAssociation(userId);
   }, [userId]);
 
-  const getTokenIsAssociated = (token: ITokenData) => {
-    const notHTS =
-      Object.keys(token).length === 0 ||
-      token.type === TokenType.HBAR ||
-      token.type === TokenType.ERC20;
-    return notHTS || userAssociatedTokens?.includes(token.hederaId);
-  };
-
-  const getStakingTokenBalance = async (userId: string, stakingTokenId: string) => {
-    const stakingTokenBalance =
-      (await getTokenBalance(userId, {
-        decimals: 8,
-        hederaId: stakingTokenId,
-        symbol: 'HELI',
-        type: TokenType.HTS,
-        name: '',
-        address: '',
-      })) || '0';
-    setStakingTokenBalance(stakingTokenBalance);
-  };
+  useEffect(() => {
+    userId && heliPrice && Object.keys(kernelContract).length && getHeliStaked();
+  }, [kernelContract, userId, getHeliStaked, heliPrice]);
 
   useEffect(() => {
-    if (!userId) {
-      setStakingTokenBalance('0');
-    }
+    tokenContract && Object.keys(rewardsContract).length && userId && getUserRewardsBalance();
+  }, [tokenContract, rewardsContract, userId, getUserRewardsBalance]);
 
-    userId && stakingTokenId && getStakingTokenBalance(userId, stakingTokenId);
-  }, [userId, stakingTokenId]);
+  useEffect(() => {
+    userId && getStakingTokenBalance(userId);
+  }, [userId]);
 
-  const userRewardsAddresses =
-    sssData.userStakingData?.rewardsAccumulated &&
-    sssData.userStakingData?.rewardsAccumulated?.length > 0
-      ? sssData.userStakingData?.rewardsAccumulated.map(reward => reward.address)
-      : [];
+  useEffect(() => {
+    const getSSSData = async () => {
+      setLoadingSSSData(true);
 
-  // Get selected tokens to check for assosiations
-  const { tokens: userRewardsData } = useTokensByListIds(userRewardsAddresses, useQueryOptions);
+      try {
+        const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS;
 
-  const hasUserStaked = sssData.userStakingData?.stakedAmount !== '0';
-  const hasUserProvided = Number(stakingTokenBalance) !== 0;
-  const campaignEnded = sssData.campaignEndDate < Date.now();
-  const haveFarm = Object.keys(sssData).length !== 0;
-  const campaignHasRewards = sssData.rewardsData?.length > 0;
-  const campaignHasActiveRewards = campaignHasRewards
-    ? Object.keys(sssData.rewardsData.find(reward => reward.rewardEnd > Date.now()) || {}).length >
-      0
-    : false;
+        const promisesArray = [
+          sssContract.totalDeposited(),
+          sssContract.rewardsPercentage(),
+          sssContract.positions(kernelAddress, idToAddress(userId)),
+          sssContract.claimable(kernelAddress, idToAddress(userId)),
+          sssContract.totalRewards(kernelAddress, idToAddress(userId)),
+        ];
 
+        const [totalDeposited, rewardsPercentage, positions, claimable, totalRewards] =
+          await Promise.all(promisesArray);
+
+        const { amount, duration, expiration, rewardsNotClaimed, rewardsPending } = positions;
+
+        const sssData = {
+          rewardsPercentage: formatContractNumberPercentage(rewardsPercentage),
+          totalDeposited: formatContractAmount(totalDeposited),
+          totalRewards: formatContractAmount(totalRewards),
+          claimable: formatContractAmount(claimable),
+          position: {
+            amount: formatContractAmount(amount),
+            duration: formatContractDuration(duration),
+            expiration: formatContractTimestamp(expiration),
+            rewardsNotClaimed: formatContractAmount(rewardsNotClaimed),
+            rewardsPending: formatContractAmount(rewardsPending),
+          },
+        };
+
+        // console.log('sssData', sssData);
+
+        setSssDdata(sssData);
+        setHeliLocked(sssData.position.amount.inETH);
+      } catch (error) {
+        console.error(`Error getting SSS data: ${error}`);
+      } finally {
+        setLoadingSSSData(false);
+      }
+    };
+
+    userId && Object.keys(sssContract).length && getSSSData();
+  }, [sssContract, userId]);
+
+  useEffect(() => {
+    setAmountToLock((Number(heliStaked) - Number(heliLocked)).toString());
+  }, [heliLocked, heliStaked]);
+
+  useEffect(() => {
+    heliPrice && heliStaked && setHeliStakedUSD(calculateHeliPrice(heliStaked));
+  }, [heliPrice, heliStaked, calculateHeliPrice]);
+
+  useEffect(() => {
+    heliPrice && totalStaked && setTotalStakedUSD(calculateHeliPrice(totalStaked));
+  }, [heliPrice, totalStaked, calculateHeliPrice]);
+
+  useEffect(() => {
+    heliPrice && heliLocked && setHeliLockedUSD(calculateHeliPrice(heliLocked));
+  }, [heliPrice, heliLocked, calculateHeliPrice]);
+
+  useEffect(() => {
+    sssData &&
+      sssData.position &&
+      setHasUserLockedTokens(sssData.position.expiration.inMilliSeconds > Date.now());
+  }, [sssData]);
+
+  const hasUserStaked = sssData && sssData.totalDeposited && sssData.totalDeposited.inETH !== '0';
   const tokensToAssociate = userRewardsData?.filter(token => !getTokenIsAssociated(token));
 
   return isHashpackLoading ? (
     <Loader />
-  ) : processingSss ? (
-    <Loader />
   ) : (
     <div className="d-flex justify-content-center">
       <div className="container-max-with-1042">
-        <h1 className="text-headline text-light mb-4">Single Sided Staking - Phase 1</h1>
+        <h1 className="text-headline text-light mb-4">Single Sided Staking - Phase 2</h1>
 
         <p className="text-small mb-4 mb-lg-6">
           Phase 1 is a standard Single Sided Staking pool. Phase 2 will involve the same mechanism,
@@ -247,7 +379,19 @@ const SingleSidedStaking = () => {
           liquidity on time.
         </p>
 
-        {haveFarm ? (
+        {!userId ? (
+          <div className="text-center">
+            <Button
+              size="small"
+              disabled={isHashpackLoading}
+              onClick={() => setShowConnectModal(true)}
+            >
+              Connect wallet
+            </Button>
+          </div>
+        ) : loadingSSSData ? (
+          <Loader />
+        ) : (
           <div className="row">
             <div className="col-md-7">
               <div className="container-blue-neutral-800 rounded p-4 p-lg-5">
@@ -258,30 +402,12 @@ const SingleSidedStaking = () => {
                   </div>
 
                   <div className="container-campaign-status mt-4 mt-md-0 d-flex align-items-center">
-                    {renderSSSEndDate(sssData.campaignEndDate)}
+                    {renderSSSEndDate(campaignEndDate)}
                   </div>
                 </div>
 
                 <div className="container-border-rounded-bn-500 mt-4 mt-lg-6">
                   <div className="row">
-                    <div className="col-6 col-md-4 d-flex align-items-center">
-                      <p className="d-flex align-items-center">
-                        <span className="text-secondary text-small">Total APR</span>
-                        <Tippy content="Your annual rate of return, expressed as a percentage. Interest paid in previous periods is not accounted for.">
-                          <span className="ms-2">
-                            <Icon name="hint" color="gray" size="small" />
-                          </span>
-                        </Tippy>
-                      </p>
-                    </div>
-                    <div className="col-6 col-md-4">
-                      <p className="text-subheader text-numeric">
-                        {formatStringToPercentage(stripStringToFixedDecimals(sssData.APR, 2))}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="row mt-4">
                     <div className="col-6 col-md-4 d-flex align-items-center">
                       <p className="d-flex align-items-center">
                         <span className="text-secondary text-small">Total Staked</span>
@@ -292,77 +418,23 @@ const SingleSidedStaking = () => {
                         </Tippy>
                       </p>
                     </div>
-                    <div className="col-6 col-md-4">
-                      <p className="text-main text-numeric">
-                        {formatStringToPrice(stripStringToFixedDecimals(sssData.totalStakedUSD, 2))}
+                    <div className="col-6 col-md-8 d-md-flex align-items-center">
+                      <p className="text-subheader text-numeric">
+                        {formatStringToPrice(stripStringToFixedDecimals(totalStakedUSD, 2))}
                       </p>
-                    </div>
-                  </div>
+                      <p className="d-flex align-items-center ms-md-3 mt-2">
+                        <span className="text-secondary text-main">
+                          {formatStringETHtoPriceFormatted(totalStaked)}
+                        </span>
 
-                  <hr className="my-5" />
-
-                  <div className="row mt-4">
-                    <div className="col-6 col-md-4 d-flex align-items-center">
-                      <p className="d-flex align-items-center">
-                        <span className="text-secondary text-small">Rewards</span>
-                        <Tippy content="The tokens you will be rewarded with upon harvest.">
-                          <span className="ms-2">
-                            <Icon name="hint" color="gray" size="small" />
-                          </span>
-                        </Tippy>
+                        <IconToken className="ms-3" symbol="HELI" />
                       </p>
-                    </div>
-                    <div className="col-6 col-md-4 d-md-flex align-items-center">
-                      {campaignHasRewards &&
-                        sssData.rewardsData?.reduce((acc: ReactNode[], reward: IReward, index) => {
-                          // When reward is enabled, but not sent -> do not show
-                          const haveRewardSendToCampaign =
-                            reward.totalAmount && Number(reward.totalAmount || reward) !== 0;
-
-                          const rewardActive = reward.rewardEnd > Date.now();
-                          // When all rewards are inactive -> show all, when at least one is active -> show only active
-                          const showReward =
-                            haveRewardSendToCampaign && (rewardActive || !campaignHasActiveRewards);
-
-                          if (showReward) {
-                            const rewardSymbol = mapWHBARAddress(reward);
-
-                            acc.push(
-                              <div
-                                key={index}
-                                className="d-flex align-items-center mt-3 mt-lg-0 me-4"
-                              >
-                                <IconToken symbol={reward.symbol} />{' '}
-                                <span className="text-main ms-3">{rewardSymbol}</span>
-                              </div>,
-                            );
-                          }
-                          return acc;
-                        }, [])}
                     </div>
                   </div>
 
                   {connected && !isHashpackLoading ? (
                     <>
                       <hr className="my-5" />
-
-                      <div className="row mt-4">
-                        <div className="col-6 col-md-4 d-flex align-items-center">
-                          <p className="d-flex align-items-center">
-                            <span className="text-secondary text-small">Your share</span>
-                            <Tippy content="Your staked amount in this single sided staking pool, expressed as a percentage.">
-                              <span className="ms-2">
-                                <Icon name="hint" color="gray" size="small" />
-                              </span>
-                            </Tippy>
-                          </p>
-                        </div>
-                        <div className="col-6 col-md-4 d-flex align-items-center">
-                          <p className="text-main">
-                            {stripStringToFixedDecimals(userShare || '0', 2)}%
-                          </p>
-                        </div>
-                      </div>
 
                       <div className="row mt-4">
                         <div className="col-6 col-md-4 d-flex align-items-center">
@@ -377,27 +449,86 @@ const SingleSidedStaking = () => {
                         </div>
                         <div className="col-6 col-md-8 d-md-flex align-items-center">
                           <p className="text-subheader text-numeric">
-                            {formatStringToPrice(
-                              stripStringToFixedDecimals(
-                                sssData.userStakingData?.stakedAmountUSD as string,
-                                2,
-                              ),
-                            )}
+                            {formatStringToPrice(stripStringToFixedDecimals(heliStakedUSD, 2))}
                           </p>
                           <p className="d-flex align-items-center ms-md-3 mt-2">
                             <span className="text-secondary text-main">
-                              {formatStringETHtoPriceFormatted(
-                                formatStringWeiToStringEther(
-                                  sssData.userStakingData?.stakedAmount || '0',
-                                  8,
-                                ),
-                              )}
+                              {formatStringETHtoPriceFormatted(heliStaked)}
                             </span>
 
                             <IconToken className="ms-3" symbol="HELI" />
                           </p>
                         </div>
                       </div>
+
+                      {hasUserLockedTokens ? (
+                        <>
+                          <hr className="my-5" />
+
+                          <div className="row mt-4">
+                            <div className="col-6 col-md-4 d-flex align-items-center">
+                              <p className="d-flex align-items-center">
+                                <span className="text-secondary text-small">APR from locking</span>
+                                <Tippy content="Your annual rate of return, expressed as a percentage. Interest paid in previous periods is not accounted for.">
+                                  <span className="ms-2">
+                                    <Icon name="hint" color="gray" size="small" />
+                                  </span>
+                                </Tippy>
+                              </p>
+                            </div>
+                            <div className="col-6 col-md-4">
+                              <p className="text-subheader text-numeric">
+                                {sssData.rewardsPercentage}%
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="row mt-4">
+                            <div className="col-6 col-md-4 d-flex align-items-center">
+                              <p className="d-flex align-items-center">
+                                <span className="text-secondary text-small">
+                                  Locked HELI Tokens
+                                </span>
+                                <Tippy content="The amount of your staked tokens in $USD, as well as staked tokens count.">
+                                  <span className="ms-2">
+                                    <Icon name="hint" color="gray" size="small" />
+                                  </span>
+                                </Tippy>
+                              </p>
+                            </div>
+                            <div className="col-6 col-md-8 d-md-flex align-items-center">
+                              <p className="text-subheader text-numeric">
+                                {formatStringToPrice(stripStringToFixedDecimals(heliLockedUSD, 2))}
+                              </p>
+                              <p className="d-flex align-items-center ms-md-3 mt-2">
+                                <span className="text-secondary text-main">
+                                  {formatStringETHtoPriceFormatted(heliLocked)}
+                                </span>
+
+                                <IconToken className="ms-3" symbol="HELI" />
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="row mt-4">
+                            <div className="col-6 col-md-4 d-flex align-items-center">
+                              <p className="d-flex align-items-center">
+                                <span className="text-secondary text-small">Locked until</span>
+                                <Tippy content="The amount of your staked tokens in $USD, as well as staked tokens count.">
+                                  <span className="ms-2">
+                                    <Icon name="hint" color="gray" size="small" />
+                                  </span>
+                                </Tippy>
+                              </p>
+                            </div>
+                            <div className="col-6 col-md-8 d-md-flex align-items-center">
+                              <p className="text-main">
+                                {timestampToDateTime(sssData.position.expiration.inMilliSeconds)}
+                              </p>
+                            </div>
+                          </div>
+                        </>
+                      ) : null}
                     </>
                   ) : null}
                 </div>
@@ -417,77 +548,70 @@ const SingleSidedStaking = () => {
                               </span>
                             </Tippy>
                           </div>
-
-                          <div className="d-flex justify-content-end">
-                            {tokensToAssociate && tokensToAssociate?.length > 0 ? (
-                              tokensToAssociate.map((token, index) => (
-                                <Button
-                                  key={index}
-                                  loading={loadingAssociate}
-                                  onClick={() => handleAssociateClick(token)}
-                                  size="small"
-                                  type="primary"
-                                >
-                                  {`Associate ${token.symbol}`}
-                                </Button>
-                              ))
-                            ) : (
-                              <Button
-                                loading={loadingHarvest}
-                                onClick={() => setShowHarvestModal(true)}
-                                size="small"
-                                type="primary"
-                              >
-                                Harvest
-                              </Button>
-                            )}
-                          </div>
                         </div>
 
                         <div className="mt-5">
                           <p className="text-title text-success text-numeric">
-                            {formatStringToPrice(userRewardsUSD as string, true)}
+                            {/* {userRewardsBalance} */}
                           </p>
 
                           <hr className="my-4" />
 
-                          <div className="mt-4">
-                            {campaignHasRewards &&
-                              sssData.rewardsData?.reduce((acc: ReactNode[], reward: IReward) => {
-                                const userRewardData =
-                                  sssData.userStakingData?.rewardsAccumulated?.find(
-                                    (rewardSingle: IUserStakingData) => {
-                                      return rewardSingle.address === reward.address;
-                                    },
-                                  ) || ({} as IUserStakingData);
+                          <div className="d-flex justify-content-between align-items-center  mt-4">
+                            <p className="text-main d-flex justify-content-between align-items-center mt-4">
+                              <span className="d-flex align-items-center">
+                                <IconToken symbol={'HELI'} />
+                                <span className="text-numeric ms-3">{userRewardsBalance}</span>
+                                <span className="ms-3 text-secondary">{'HELI'}</span>
+                              </span>
+                            </p>
 
-                                const userRewardAccumulated = userRewardData.totalAccumulated > 0;
-
-                                if (userRewardAccumulated) {
-                                  const rewardDecimals = reward.decimals;
-                                  const rewardSymbol = mapWHBARAddress(reward);
-
-                                  acc.push(
-                                    <p
-                                      key={rewardSymbol}
-                                      className="text-main d-flex justify-content-between align-items-center mt-4"
-                                    >
-                                      <span className="d-flex align-items-center text-secondary">
-                                        <IconToken symbol={rewardSymbol} />
-                                        <span className="ms-3">{rewardSymbol}</span>
-                                      </span>
-                                      <span className="text-numeric ms-3">
-                                        {formatStringWeiToStringEther(
-                                          userRewardData.totalAccumulated || '0',
-                                          rewardDecimals,
-                                        )}
-                                      </span>
-                                    </p>,
-                                  );
-                                }
-                                return acc;
-                              }, [])}
+                            <div className="d-flex justify-content-end">
+                              {tokensToAssociate && tokensToAssociate?.length > 0 ? (
+                                tokensToAssociate.map((token, index) => (
+                                  <Button
+                                    key={index}
+                                    loading={loadingAssociate}
+                                    onClick={() => handleAssociateClick(token)}
+                                    size="small"
+                                    type="primary"
+                                  >
+                                    {`Associate ${token.symbol}`}
+                                  </Button>
+                                ))
+                              ) : (
+                                <Button
+                                  disabled={Number(userRewardsBalance) === 0}
+                                  loading={loadingClaim}
+                                  onClick={() => setShowHarvestModal(true)}
+                                  size="small"
+                                  type="primary"
+                                >
+                                  Claim
+                                </Button>
+                              )}
+                            </div>
                           </div>
+                        </div>
+
+                        <div className="d-flex justify-content-between align-items-center mt-4">
+                          <p className="text-main d-flex justify-content-between align-items-center">
+                            <span className="d-flex align-items-center">
+                              <IconToken symbol={'HELI'} />
+                              <span className="text-numeric ms-3">{sssData.claimable.inETH}</span>
+                              <span className="ms-3 text-secondary">{'HELI'}</span>
+                            </span>
+                          </p>
+
+                          <Button
+                            className="ms-3"
+                            disabled={Number(sssData.claimable.inETH) === 0}
+                            loading={loadingClaimLocked}
+                            size="small"
+                            onClick={handleClaimButtonClick}
+                          >
+                            Claim
+                          </Button>
                         </div>
 
                         {showHarvestModal ? (
@@ -498,52 +622,31 @@ const SingleSidedStaking = () => {
                             <ConfirmTransactionModalContent
                               modalTitle="Harvest Pending Rewards"
                               closeModal={() => setShowHarvestModal(false)}
-                              confirmTansaction={handleHarvestConfirm}
+                              confirmTansaction={handleClaimClick}
                               confirmButtonLabel="Confirm"
-                              isLoading={loadingHarvest}
+                              isLoading={loadingClaim}
                             >
-                              {loadingHarvest ? (
+                              {loadingClaim ? (
                                 <Confirmation confirmationText={'Harvesting reward tokens'} />
                               ) : (
                                 <>
                                   <div className="text-small">Estimated pending rewards:</div>
-                                  {sssData.rewardsData?.map((reward: IReward) => {
-                                    const userReward =
-                                      sssData.userStakingData?.rewardsAccumulated?.find(
-                                        (currReward: IRewardsAccumulated) =>
-                                          currReward.address === reward.address,
-                                      );
-                                    return (
-                                      <div
-                                        key={reward.address}
-                                        className="d-flex justify-content-between align-items-center mt-4"
-                                      >
-                                        <div className="d-flex align-items-center">
-                                          <IconToken symbol={reward.symbol} />
-                                          <span className="text-main ms-3">{reward.symbol}</span>
-                                        </div>
+                                  <div className="d-flex justify-content-between align-items-center mt-4">
+                                    <div className="d-flex align-items-center">
+                                      <IconToken symbol={'HELI'} />
+                                      <span className="text-main ms-3">{'HELI'}</span>
+                                    </div>
 
-                                        <div className="text-main text-numeric">
-                                          {formatStringWeiToStringEther(
-                                            userReward?.totalAccumulated || '0',
-                                            reward.decimals,
-                                          )}
-                                        </div>
-                                      </div>
-                                    );
-                                  })}
+                                    <div className="text-main text-numeric">
+                                      {userRewardsBalance}
+                                    </div>
+                                  </div>
                                 </>
                               )}
                             </ConfirmTransactionModalContent>
                           </Modal>
                         ) : null}
                       </>
-                    ) : campaignEnded ? (
-                      <div>
-                        <p className="text-small text-bold text-center my-5">
-                          Campaign is not active
-                        </p>
-                      </div>
                     ) : (
                       <div>
                         <p className="text-small text-bold text-center my-5">
@@ -566,25 +669,20 @@ const SingleSidedStaking = () => {
               </div>
             </div>
             <SingleSidedStakingActions
-              campaignEnded={campaignEnded}
               hasUserStaked={hasUserStaked}
-              hasUserProvided={hasUserProvided}
-              stakingTokenBalance={stakingTokenBalance}
+              stakingTokenBalance={heliBalance}
+              heliStaked={heliStaked}
+              amountToLock={amountToLock}
               sssData={sssData}
               loadingAssociate={loadingAssociate}
               tokensToAssociate={tokensToAssociate || []}
               handleAssociateClick={handleAssociateClick}
               getStakingTokenBalance={getStakingTokenBalance}
+              updateStakedHeli={updateStakedHeli}
+              updateLockedHeli={updateLockedHeli}
+              updateTotalStakedHeli={updateTotalStakedHeli}
+              hasUserLockedTokens={hasUserLockedTokens}
             />
-          </div>
-        ) : (
-          <div className="row">
-            <div className="col-md-6 offset-md-3">
-              <div className="alert alert-warning d-flex align-items-center">
-                <Icon color="warning" name="warning" />
-                <p className="ms-3">This farm does not exist</p>
-              </div>
-            </div>
           </div>
         )}
 

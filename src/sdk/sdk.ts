@@ -5,6 +5,7 @@ import {
   TokenAssociateTransaction,
   Transaction,
 } from '@hashgraph/sdk';
+import { hethers } from '@hashgraph/hethers';
 import Hashconnect from '../connectors/hashconnect';
 import BladeConnect from '../connectors/blade';
 import { ICreatePairData, TokenType } from '../interfaces/tokens';
@@ -21,6 +22,23 @@ import {
   formatStringToBigNumber,
 } from '../utils/numberUtils';
 import { TRANSACTION_MAX_FEES } from '../constants';
+
+interface IAction {
+  functionName: string;
+  functionParams: {
+    type: string;
+    value: string;
+  }[];
+  targetAddress: string;
+  value: number;
+}
+
+interface IProcessedActions {
+  targets: string[];
+  values: number[];
+  signatures: string[];
+  callDatas: Uint8Array[];
+}
 
 class SDK {
   async associateToken(
@@ -555,6 +573,216 @@ class SDK {
       .setFunction('claim', new ContractFunctionParameters());
 
     return this.sendTransactionAndGetResponse(connectorInstance, trans, userId);
+  }
+
+  // SSS and DAO
+  async deposit(
+    hashconnectConnectorInstance: Hashconnect,
+    stakeAmount: string,
+    kernelAddress: string,
+    userId: string,
+  ) {
+    const tokensAmountBN = formatStringToBigNumberWei(stakeAmount, 8);
+    const maxGas = TRANSACTION_MAX_FEES.DEPOSIT_DAO;
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(kernelAddress))
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction('deposit', new ContractFunctionParameters().addUint256(tokensAmountBN));
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
+  async withdraw(
+    hashconnectConnectorInstance: Hashconnect,
+    stakeAmount: string,
+    kernelAddress: string,
+    userId: string,
+  ) {
+    const tokensAmountBN = formatStringToBigNumberWei(stakeAmount, 8);
+    const maxGas = TRANSACTION_MAX_FEES.DEPOSIT_DAO;
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(kernelAddress))
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction('withdraw', new ContractFunctionParameters().addUint256(tokensAmountBN));
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
+  async claim(
+    hashconnectConnectorInstance: Hashconnect,
+    rewardsContractAddress: string,
+    userId: string,
+  ) {
+    const maxGas = TRANSACTION_MAX_FEES.STAKE_LP_TOKEN;
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(rewardsContractAddress))
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction('claim');
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
+  async claimLock(
+    hashconnectConnectorInstance: Hashconnect,
+    kernelAddress: string,
+    userId: string,
+  ) {
+    const maxGas = TRANSACTION_MAX_FEES.STAKE_LP_TOKEN;
+    const sssAddress = process.env.REACT_APP_SSS_ADDRESS as string;
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(sssAddress))
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction('claim', new ContractFunctionParameters().addAddress(kernelAddress));
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
+  async lock(
+    hashconnectConnectorInstance: Hashconnect,
+    timestamp: number,
+    kernelAddress: string,
+    userId: string,
+  ) {
+    const maxGas = TRANSACTION_MAX_FEES.DEPOSIT_DAO;
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(kernelAddress))
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction('lock', new ContractFunctionParameters().addUint256(timestamp));
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
+  async createProposal(
+    hashconnectConnectorInstance: Hashconnect,
+    governanceAddress: string,
+    userId: string,
+    title: string,
+    description: string,
+    actions: IAction[],
+  ) {
+    const getProcessedActions = (actions: IAction[]): IProcessedActions => {
+      let processedActions = actions.reduce(
+        (acc, action) => {
+          acc.targets.push(action.targetAddress);
+          acc.values.push(action.value);
+
+          const paramTypes: string[] = [];
+          const paramValues = [];
+          for (let index = 0; index < action.functionParams.length; index++) {
+            const param = action.functionParams[index];
+            paramTypes.push(param.type);
+            if (param.type.indexOf('uint') !== -1) {
+              paramValues.push(parseInt(param.value));
+            } else {
+              paramValues.push(param.value);
+            }
+          }
+          acc.callDatas.push(
+            hethers.utils.arrayify(hethers.utils.defaultAbiCoder.encode(paramTypes, paramValues)),
+          );
+
+          const getProcessedFunctionName = () => {
+            if (action.functionParams.length === 0) {
+              return action.functionName + '()';
+            } else {
+              let params = '';
+              paramTypes.forEach((param: string, index: number) => {
+                if (index === 0) {
+                  params += param;
+                } else {
+                  params += `, ${param}`;
+                }
+              });
+              return `${action.functionName}(${params})`;
+            }
+          };
+
+          acc.signatures.push(getProcessedFunctionName());
+
+          return acc;
+        },
+        { targets: [], values: [], signatures: [], callDatas: [] } as IProcessedActions,
+      );
+
+      return processedActions;
+    };
+
+    const processedActions = getProcessedActions(actions);
+
+    const { targets, values, signatures, callDatas } = processedActions;
+
+    const maxGas = 1500000;
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(governanceAddress))
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction(
+        'propose',
+        new ContractFunctionParameters()
+          .addAddressArray(targets)
+          .addUint256Array(values)
+          .addStringArray(signatures)
+          .addBytesArray(callDatas)
+          .addString(description)
+          .addString(title),
+      );
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
+  async castVote(
+    hashconnectConnectorInstance: Hashconnect,
+    proposalId: number,
+    support: boolean,
+    userId: string,
+  ) {
+    const maxGas = TRANSACTION_MAX_FEES.STAKE_LP_TOKEN;
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(process.env.REACT_APP_GOVERNANCE_ADDRESS as string))
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction(
+        'castVote',
+        new ContractFunctionParameters().addUint256(proposalId).addBool(support),
+      );
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
+  async queueProposal(
+    hashconnectConnectorInstance: Hashconnect,
+    proposalId: number,
+    userId: string,
+  ) {
+    const maxGas = TRANSACTION_MAX_FEES.STAKE_LP_TOKEN;
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(process.env.REACT_APP_GOVERNANCE_ADDRESS as string))
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction('queue', new ContractFunctionParameters().addUint256(proposalId));
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
   sendTransactionAndGetResponse = async (

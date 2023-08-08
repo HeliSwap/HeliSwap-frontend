@@ -38,6 +38,12 @@ export const formatStringToBigNumber = (numberToFormat: string) => {
   return numberToFormatBN;
 };
 
+export const formatBigNumberToStringETH = (numberToFormat: ethers.BigNumberish) => {
+  const numberToFormatETH = ethers.utils.formatUnits(numberToFormat, 8);
+
+  return numberToFormatETH;
+};
+
 // Used to format values (string | ETH) into BN / wei (used for native contract calls)
 export const formatStringToBigNumberWei = (numberToFormat: string, decimals: number = 18) => {
   const numberToFormatBN = new BigNumber(numberToFormat);
@@ -202,4 +208,34 @@ export const getUserHELIReserves = (
   const myHELIFormatted = ethers.utils.formatUnits(myHELIBN, 8);
 
   return myHELIFormatted;
+};
+
+export const formatContractAmount = (amount: hethers.BigNumberish, decimals = 8) => {
+  return {
+    inETH: ethers.utils.formatUnits(amount, decimals),
+    inWEI: amount.toString(),
+    inBG: amount,
+  };
+};
+
+export const formatContractDuration = (duration: hethers.BigNumberish) => {
+  return {
+    inMilliSeconds: Number(duration.toString()) * 1000,
+    inSeconds: Number(duration.toString()),
+    inMinutes: Number(duration.toString()) / 60,
+    inHours: Number(duration.toString()) / 3600,
+    inDays: Number(duration.toString()) / 86400,
+  };
+};
+
+export const formatContractTimestamp = (timestamp: hethers.BigNumberish) => {
+  return {
+    inMilliSeconds: Number(timestamp.toString()) * 1000,
+    inSeconds: Number(timestamp.toString()),
+    inDate: new Date(Number(timestamp.toString()) * 1000),
+  };
+};
+
+export const formatContractNumberPercentage = (number: hethers.BigNumberish) => {
+  return Number(ethers.utils.formatUnits(number, 18)) * 100;
 };
