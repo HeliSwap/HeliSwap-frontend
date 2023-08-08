@@ -363,13 +363,10 @@ const SingleSidedStaking = () => {
   }, [heliLocked, sssData]);
 
   const hasUserStaked = sssData && sssData.totalDeposited && sssData.totalDeposited.inETH !== '0';
-  const haveFarm = Object.keys(sssData).length !== 0;
 
   const tokensToAssociate = userRewardsData?.filter(token => !getTokenIsAssociated(token));
 
   return isHashpackLoading ? (
-    <Loader />
-  ) : loadingSSSData ? (
     <Loader />
   ) : (
     <div className="d-flex justify-content-center">
@@ -384,7 +381,19 @@ const SingleSidedStaking = () => {
           liquidity on time.
         </p>
 
-        {haveFarm ? (
+        {!userId ? (
+          <div className="text-center">
+            <Button
+              size="small"
+              disabled={isHashpackLoading}
+              onClick={() => setShowConnectModal(true)}
+            >
+              Connect wallet
+            </Button>
+          </div>
+        ) : loadingSSSData ? (
+          <Loader />
+        ) : (
           <div className="row">
             <div className="col-md-7">
               <div className="container-blue-neutral-800 rounded p-4 p-lg-5">
@@ -676,15 +685,6 @@ const SingleSidedStaking = () => {
               updateTotalStakedHeli={updateTotalStakedHeli}
               hasUserLockedTokens={hasUserLockedTokens}
             />
-          </div>
-        ) : (
-          <div className="row">
-            <div className="col-md-6 offset-md-3">
-              <div className="alert alert-warning d-flex align-items-center">
-                <Icon color="warning" name="warning" />
-                <p className="ms-3">This farm does not exist</p>
-              </div>
-            </div>
           </div>
         )}
 
