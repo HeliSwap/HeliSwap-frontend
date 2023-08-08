@@ -100,6 +100,7 @@ const icons: IIconMapping = {
   c14: C14,
   sss: SSS,
   question: Question,
+  governance: Question,
 };
 
 const colorMapping: IColorMapping = {
