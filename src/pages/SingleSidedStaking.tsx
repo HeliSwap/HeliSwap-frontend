@@ -356,14 +356,12 @@ const SingleSidedStaking = () => {
   }, [heliPrice, heliLocked, calculateHeliPrice]);
 
   useEffect(() => {
-    heliLocked &&
-      sssData &&
+    sssData &&
       sssData.position &&
       setHasUserLockedTokens(sssData.position.expiration.inMilliSeconds > Date.now());
-  }, [heliLocked, sssData]);
+  }, [sssData]);
 
   const hasUserStaked = sssData && sssData.totalDeposited && sssData.totalDeposited.inETH !== '0';
-
   const tokensToAssociate = userRewardsData?.filter(token => !getTokenIsAssociated(token));
 
   return isHashpackLoading ? (

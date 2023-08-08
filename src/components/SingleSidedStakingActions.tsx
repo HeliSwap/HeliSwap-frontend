@@ -174,7 +174,7 @@ const FarmActions = ({
     setLoadingApprove(true);
     try {
       const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
-      const tx = await sdk.approveToken(
+      await sdk.approveToken(
         connectorInstance,
         MAX_UINT_HTS.toString(),
         userId,
@@ -182,7 +182,6 @@ const FarmActions = ({
         true,
         kernelAddress,
       );
-      await tx.wait();
       setLpApproved(true);
     } catch (e) {
       console.log('e', e);
