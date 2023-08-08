@@ -111,6 +111,7 @@ const SingleSidedStaking = () => {
   const [loadingAssociate, setLoadingAssociate] = useState(false);
   const [userRewardsBalance, setUserRewardsBalance] = useState('0');
   const [loadingSSSData, setLoadingSSSData] = useState(true);
+  const [hasUserLockedTokens, setHasUserLockedTokens] = useState(true);
 
   const [showHarvestModal, setShowHarvestModal] = useState(false);
 
@@ -260,6 +261,7 @@ const SingleSidedStaking = () => {
       let newLocked;
       if (action === 'add') {
         newLocked = ethers.utils.parseUnits(prev, 8).add(ethers.utils.parseUnits(locked, 8));
+        setHasUserLockedTokens(true);
       } else {
         newLocked = ethers.utils.parseUnits(prev, 8).sub(ethers.utils.parseUnits(locked, 8));
       }
@@ -353,10 +355,15 @@ const SingleSidedStaking = () => {
     heliPrice && heliLocked && setHeliLockedUSD(calculateHeliPrice(heliLocked));
   }, [heliPrice, heliLocked, calculateHeliPrice]);
 
+  useEffect(() => {
+    heliLocked &&
+      sssData &&
+      sssData.position &&
+      setHasUserLockedTokens(sssData.position.expiration.inMilliSeconds > Date.now());
+  }, [heliLocked, sssData]);
+
   const hasUserStaked = sssData && sssData.totalDeposited && sssData.totalDeposited.inETH !== '0';
   const haveFarm = Object.keys(sssData).length !== 0;
-  const hasUserLockedTokens =
-    sssData && sssData.position && sssData.position.expiration.inMilliSeconds > Date.now();
 
   const tokensToAssociate = userRewardsData?.filter(token => !getTokenIsAssociated(token));
 
