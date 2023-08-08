@@ -25,6 +25,9 @@ import {
   formatContractDuration,
   formatContractNumberPercentage,
   formatContractTimestamp,
+  formatStringETHtoPriceFormatted,
+  formatStringToPrice,
+  stripStringToFixedDecimals,
 } from '../utils/numberUtils';
 import {
   addressToId,
@@ -43,6 +46,8 @@ import useSSSContract from '../hooks/useSSSContract';
 import getErrorMessage from '../content/errors';
 
 import { useQueryOptions, useQueryOptionsPoolsFarms } from '../constants';
+import { renderSSSEndDate } from '../utils/farmUtils';
+import { timestampToDate } from '../utils/timeUtils';
 
 const SingleSidedStaking = () => {
   const contextValue = useContext(GlobalContext);
@@ -91,12 +96,17 @@ const SingleSidedStaking = () => {
 
   const [heliBalance, setHeliBalance] = useState('0');
   const [heliStaked, setHeliStaked] = useState('0');
+  const [totalStaked, setTotalStaked] = useState('0');
+  const [totalStakedUSD, setTotalStakedUSD] = useState('0');
+  const [heliStakedUSD, setHeliStakedUSD] = useState('0');
   const [heliLocked, setHeliLocked] = useState('0');
   const [amountToLock, setAmountToLock] = useState('0');
   const [sssData, setSssDdata] = useState({} as ISSSData);
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
+  const [campaignEndDate, setCampaignEndDate] = useState(0);
 
   const [loadingClaim, setLoadingClaim] = useState(false);
+  const [loadingClaimLocked, setLoadingClaimLocked] = useState(false);
   const [loadingAssociate, setLoadingAssociate] = useState(false);
   const [userRewardsBalance, setUserRewardsBalance] = useState('0');
   const [loadingSSSData, setLoadingSSSData] = useState(true);
@@ -111,7 +121,10 @@ const SingleSidedStaking = () => {
   const getHeliStaked = useCallback(async () => {
     try {
       const balanceBN = await kernelContract.balanceOf(idToAddress(userId));
+      const totalStakedBN = await kernelContract.heliStaked();
+
       setHeliStaked(formatBigNumberToStringETH(balanceBN));
+      setTotalStaked(formatBigNumberToStringETH(totalStakedBN));
     } catch (error) {
       console.error(error);
     }
@@ -123,11 +136,26 @@ const SingleSidedStaking = () => {
       const decimals = await tokenContract.decimals();
       const balance = ethers.utils.formatUnits(balanceBN, decimals);
 
+      const pull = await rewardsContract.pullFeature();
+      const endDate = formatContractTimestamp(pull.endTs);
+      // const totalDuration = formatContractDuration(pull.totalDuration);
+
+      setCampaignEndDate(endDate.inMilliSeconds);
       setUserRewardsBalance(balance);
     } catch (error) {
       console.error(error);
     }
   }, [rewardsContract, tokenContract, userId]);
+
+  const calculateHeliPrice = useCallback(
+    (heliAmount: string) => {
+      const heliAmountNum = Number(heliAmount);
+      const calculatedHeliPrice = heliAmountNum * heliPrice;
+
+      return calculatedHeliPrice.toString();
+    },
+    [heliPrice],
+  );
 
   // Handlers
   const handleAssociateClick = async (token: ITokenData) => {
@@ -165,6 +193,19 @@ const SingleSidedStaking = () => {
       setLoadingClaim(false);
       setShowHarvestModal(false);
       setUserRewardsBalance('0');
+    }
+  };
+
+  const handleClaimButtonClick = async () => {
+    setLoadingClaimLocked(true);
+    const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
+    try {
+      const tx = await sdk.claimLock(connectorInstance, kernelAddress, userId);
+      await tx.wait();
+    } catch (e) {
+      console.log('e', e);
+    } finally {
+      setLoadingClaimLocked(false);
     }
   };
 
@@ -224,8 +265,8 @@ const SingleSidedStaking = () => {
   }, [userId]);
 
   useEffect(() => {
-    userId && Object.keys(kernelContract).length && getHeliStaked();
-  }, [kernelContract, userId, getHeliStaked]);
+    userId && heliPrice && Object.keys(kernelContract).length && getHeliStaked();
+  }, [kernelContract, userId, getHeliStaked, heliPrice]);
 
   useEffect(() => {
     tokenContract && Object.keys(rewardsContract).length && userId && getUserRewardsBalance();
@@ -287,10 +328,22 @@ const SingleSidedStaking = () => {
     setAmountToLock((Number(heliStaked) - Number(heliLocked)).toString());
   }, [heliLocked, heliStaked]);
 
+  useEffect(() => {
+    heliPrice && heliStaked && setHeliStakedUSD(calculateHeliPrice(heliStaked));
+  }, [heliPrice, heliStaked, calculateHeliPrice]);
+
+  useEffect(() => {
+    heliPrice && totalStaked && setTotalStakedUSD(calculateHeliPrice(totalStaked));
+  }, [heliPrice, totalStaked, calculateHeliPrice]);
+
   const hasUserStaked = sssData && sssData.totalDeposited && sssData.totalDeposited.inETH !== '0';
   const haveFarm = Object.keys(sssData).length !== 0;
+  const hasUserLockedTokens =
+    sssData && sssData.position && sssData.position.expiration.inMilliSeconds > Date.now();
 
   const tokensToAssociate = userRewardsData?.filter(token => !getTokenIsAssociated(token));
+
+  console.log('sssData', sssData);
 
   return isHashpackLoading ? (
     <Loader />
@@ -320,7 +373,7 @@ const SingleSidedStaking = () => {
                   </div>
 
                   <div className="container-campaign-status mt-4 mt-md-0 d-flex align-items-center">
-                    {/* {renderSSSEndDate(sssData.campaignEndDate)} */}
+                    {renderSSSEndDate(campaignEndDate)}
                   </div>
                 </div>
 
@@ -352,8 +405,17 @@ const SingleSidedStaking = () => {
                         </Tippy>
                       </p>
                     </div>
-                    <div className="col-6 col-md-4">
-                      <p className="text-main text-numeric">{sssData.totalDeposited.inETH}</p>
+                    <div className="col-6 col-md-8 d-md-flex align-items-center">
+                      <p className="text-subheader text-numeric">
+                        {formatStringToPrice(stripStringToFixedDecimals(totalStakedUSD, 2))}
+                      </p>
+                      <p className="d-flex align-items-center ms-md-3 mt-2">
+                        <span className="text-secondary text-main">
+                          {formatStringETHtoPriceFormatted(totalStaked)}
+                        </span>
+
+                        <IconToken className="ms-3" symbol="HELI" />
+                      </p>
                     </div>
                   </div>
 
@@ -373,15 +435,12 @@ const SingleSidedStaking = () => {
                           </p>
                         </div>
                         <div className="col-6 col-md-8 d-md-flex align-items-center">
-                          <p className="text-subheader text-numeric">{heliStaked}</p>
+                          <p className="text-subheader text-numeric">
+                            {formatStringToPrice(stripStringToFixedDecimals(heliStakedUSD, 2))}
+                          </p>
                           <p className="d-flex align-items-center ms-md-3 mt-2">
                             <span className="text-secondary text-main">
-                              {/* {formatStringETHtoPriceFormatted(
-                                formatStringWeiToStringEther(
-                                  sssData.userStakingData?.stakedAmount || '0',
-                                  8,
-                                ),
-                              )} */}
+                              {formatStringETHtoPriceFormatted(heliStaked)}
                             </span>
 
                             <IconToken className="ms-3" symbol="HELI" />
@@ -389,33 +448,57 @@ const SingleSidedStaking = () => {
                         </div>
                       </div>
 
-                      <div className="row mt-4">
-                        <div className="col-6 col-md-4 d-flex align-items-center">
-                          <p className="d-flex align-items-center">
-                            <span className="text-secondary text-small">Locked HELI Tokens</span>
-                            <Tippy content="The amount of your staked tokens in $USD, as well as staked tokens count.">
-                              <span className="ms-2">
-                                <Icon name="hint" color="gray" size="small" />
-                              </span>
-                            </Tippy>
-                          </p>
-                        </div>
-                        <div className="col-6 col-md-8 d-md-flex align-items-center">
-                          <p className="text-subheader text-numeric">{heliLocked}</p>
-                          <p className="d-flex align-items-center ms-md-3 mt-2">
-                            <span className="text-secondary text-main">
-                              {/* {formatStringETHtoPriceFormatted(
+                      {hasUserLockedTokens ? (
+                        <>
+                          <div className="row mt-4">
+                            <div className="col-6 col-md-4 d-flex align-items-center">
+                              <p className="d-flex align-items-center">
+                                <span className="text-secondary text-small">
+                                  Locked HELI Tokens
+                                </span>
+                                <Tippy content="The amount of your staked tokens in $USD, as well as staked tokens count.">
+                                  <span className="ms-2">
+                                    <Icon name="hint" color="gray" size="small" />
+                                  </span>
+                                </Tippy>
+                              </p>
+                            </div>
+                            <div className="col-6 col-md-8 d-md-flex align-items-center">
+                              <p className="text-subheader text-numeric">{heliLocked}</p>
+                              <p className="d-flex align-items-center ms-md-3 mt-2">
+                                <span className="text-secondary text-main">
+                                  {/* {formatStringETHtoPriceFormatted(
                                 formatStringWeiToStringEther(
                                   sssData.userStakingData?.stakedAmount || '0',
                                   8,
                                 ),
                               )} */}
-                            </span>
+                                </span>
 
-                            <IconToken className="ms-3" symbol="HELI" />
-                          </p>
-                        </div>
-                      </div>
+                                <IconToken className="ms-3" symbol="HELI" />
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="row mt-4">
+                            <div className="col-6 col-md-4 d-flex align-items-center">
+                              <p className="d-flex align-items-center">
+                                <span className="text-secondary text-small">Locked until</span>
+                                <Tippy content="The amount of your staked tokens in $USD, as well as staked tokens count.">
+                                  <span className="ms-2">
+                                    <Icon name="hint" color="gray" size="small" />
+                                  </span>
+                                </Tippy>
+                              </p>
+                            </div>
+                            <div className="col-6 col-md-8 d-md-flex align-items-center">
+                              <p className="text-main">
+                                {timestampToDate(sssData.position.expiration.inMilliSeconds)}
+                              </p>
+                            </div>
+                          </div>
+                        </>
+                      ) : null}
                     </>
                   ) : null}
                 </div>
@@ -479,6 +562,34 @@ const SingleSidedStaking = () => {
                             </p>
                           </div>
                         </div>
+
+                        {hasUserLockedTokens ? (
+                          <div className="mt-5">
+                            <p className="text-title text-success text-numeric">
+                              {/* {userRewardsBalance} */}
+                            </p>
+
+                            <div className="d-flex align-items-center mt-4">
+                              <p className="text-main d-flex justify-content-between align-items-center">
+                                <span className="d-flex align-items-center text-secondary">
+                                  <IconToken symbol={'HELI'} />
+                                  <span className="ms-3">{'HELI'}</span>
+                                </span>
+                                <span className="text-numeric ms-3">{sssData.claimable.inETH}</span>
+                              </p>
+
+                              <Button
+                                className="ms-3"
+                                disabled={Number(sssData.claimable.inETH) === 0}
+                                loading={loadingClaimLocked}
+                                size="small"
+                                onClick={handleClaimButtonClick}
+                              >
+                                Claim
+                              </Button>
+                            </div>
+                          </div>
+                        ) : null}
 
                         {showHarvestModal ? (
                           <Modal

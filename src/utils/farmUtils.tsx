@@ -431,7 +431,6 @@ export const renderSSSEndDate = (campaignEndDate: number) => {
   ) : (
     <>
       Until <span className="text-bold">{timestampToDate(campaignEndDate)}</span>
-      <span className="ms-2">(Staking period might be extended)</span>
     </>
   );
 
