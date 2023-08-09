@@ -13,7 +13,6 @@ import useGovernanceContract from '../hooks/useGovernanceContract';
 enum PageTab {
   'All',
   'Active',
-  'Executed',
   'Failed',
 }
 
@@ -186,14 +185,6 @@ const Governance = () => {
                     Active
                   </span>
                   <span
-                    onClick={() => handleTabClick(PageTab.Executed)}
-                    className={`text-main text-bold cursor-pointer m-4 ${
-                      pageTab === PageTab.Executed ? '' : 'text-secondary'
-                    }`}
-                  >
-                    Executed
-                  </span>
-                  <span
                     onClick={() => handleTabClick(PageTab.Failed)}
                     className={`text-main text-bold cursor-pointer m-4 ${
                       pageTab === PageTab.Failed ? '' : 'text-secondary'
@@ -214,8 +205,6 @@ const Governance = () => {
                       switch (pageTab) {
                         case PageTab.Active:
                           return proposal.status === ProposalStatus.ACTIVE;
-                        case PageTab.Executed:
-                          return proposal.status === ProposalStatus.EXECUTED;
                         case PageTab.Failed:
                           return proposal.status === ProposalStatus.FAILED;
                         default:
