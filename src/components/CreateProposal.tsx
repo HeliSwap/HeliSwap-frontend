@@ -59,8 +59,11 @@ const CreateProposal = ({
       if (success) {
         toast.success('Success! Proposal is created.');
 
+        const id =
+          proposals.length > 0 ? Number(proposals[proposals.length - 1].id.toString()) + 1 : 1;
+
         setProposalCreated({
-          id: Number(proposals[proposals.length - 1].id.toString()) + 1,
+          id,
           proposer: userId,
           description,
           title,
