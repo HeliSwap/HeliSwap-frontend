@@ -3,6 +3,8 @@ import toast from 'react-hot-toast';
 
 import { GlobalContext } from '../providers/Global';
 
+import { IProposal, ProposalStatus } from '../interfaces/dao';
+
 import Button from './Button';
 import Icon from './Icon';
 import ToasterWrapper from './ToasterWrapper';
@@ -11,10 +13,15 @@ import getErrorMessage from '../content/errors';
 
 interface ICreateProposalProps {
   setShowCreateProposal: (show: boolean) => void;
-  setProposalCreated: () => void;
+  setProposalCreated: (newProposal: IProposal) => void;
+  proposals: IProposal[];
 }
 
-const CreateProposal = ({ setShowCreateProposal, setProposalCreated }: ICreateProposalProps) => {
+const CreateProposal = ({
+  setShowCreateProposal,
+  setProposalCreated,
+  proposals,
+}: ICreateProposalProps) => {
   const globalContext = useContext(GlobalContext);
   const { sdk, connection } = globalContext;
   const { connectorInstance, userId } = connection;
@@ -50,9 +57,19 @@ const CreateProposal = ({ setShowCreateProposal, setProposalCreated }: ICreatePr
       } = receipt;
 
       if (success) {
-        toast.success('Success! Tokens were locked.');
+        toast.success('Success! Proposal is created.');
 
-        setProposalCreated();
+        setProposalCreated({
+          id: Number(proposals[proposals.length - 1].id.toString()) + 1,
+          proposer: userId,
+          description,
+          title,
+          createTime: 0,
+          eta: 0,
+          status: ProposalStatus.WARMUP,
+          votesFor: 0,
+          votesAgainst: 0,
+        });
         setShowCreateProposal(false);
       } else {
         toast.error(getErrorMessage(error.status ? error.status : error));

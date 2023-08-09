@@ -39,6 +39,10 @@ const Governance = () => {
     setPageTab(target);
   };
 
+  const updateProposal = (newProposal: IProposal) => {
+    setProposals([...proposals, newProposal]);
+  };
+
   const getGovernanceData = useCallback(async () => {
     setLoadingProposals(true);
 
@@ -149,8 +153,9 @@ const Governance = () => {
 
         {showCreateProposal ? (
           <CreateProposal
-            setProposalCreated={getGovernanceData}
+            setProposalCreated={updateProposal}
             setShowCreateProposal={setShowCreateProposal}
+            proposals={proposals}
           />
         ) : (
           <div className="row">
