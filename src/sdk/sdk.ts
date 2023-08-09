@@ -785,6 +785,23 @@ class SDK {
     return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
+  async executeProposal(
+    hashconnectConnectorInstance: Hashconnect,
+    proposalId: number,
+    userId: string,
+  ) {
+    const maxGas = TRANSACTION_MAX_FEES.STAKE_LP_TOKEN;
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(process.env.REACT_APP_GOVERNANCE_ADDRESS as string))
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction('execute', new ContractFunctionParameters().addUint256(proposalId));
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
   sendTransactionAndGetResponse = async (
     connectorInstance: BladeConnect | Hashconnect,
     transaction: Transaction,

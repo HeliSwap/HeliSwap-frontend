@@ -93,6 +93,7 @@ const FarmActions = ({
   const [tabState, setTabState] = useState(TabStates.STAKE);
   const [lpApproved, setLpApproved] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
+  const [showLockModal, setShowLockModal] = useState(false);
 
   const [selectedButton, setSelectedButton] = useState(0);
   const [lockTimestampValue, setLockTimestampValue] = useState(0);
@@ -114,6 +115,36 @@ const FarmActions = ({
     setSliderValue(percentage);
 
     setLpInputValue(value);
+  };
+
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { target } = e;
+    const { value } = target;
+
+    setSliderValue(value);
+    const calculatedShare = calculateShareByPercentage(maxHELIInputValue, value, 8);
+    setLpInputValue(calculatedShare);
+  };
+
+  const handleApproveClick = async () => {
+    setLoadingApprove(true);
+    try {
+      const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
+      await sdk.approveToken(
+        connectorInstance,
+        MAX_UINT_HTS.toString(),
+        userId,
+        addressToId(process.env.REACT_APP_HELI_TOKEN_ADDRESS as string),
+        true,
+        kernelAddress,
+      );
+      setLpApproved(true);
+    } catch (e) {
+      console.log('e', e);
+    } finally {
+      setLoadingApprove(false);
+      getHeliAllowance();
+    }
   };
 
   const handleDepositClick = async () => {
@@ -142,6 +173,36 @@ const FarmActions = ({
     }
   };
 
+  const handleLockConfirm = async () => {
+    setLoadingLock(true);
+    try {
+      const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
+      const receipt = await sdk.lock(connectorInstance, lockTimestampValue, kernelAddress, userId);
+
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (success) {
+        toast.success('Success! Tokens were locked.');
+
+        setTabState(TabStates.STAKE);
+        setSelectedButton(0);
+        setAvailableToLock('0');
+        updateLockedHeli(amountToLock, 'add');
+        setShowLockModal(false);
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      }
+
+      setLockTimestampValue(0);
+    } catch (e) {
+      console.log('e', e);
+    } finally {
+      setLoadingLock(false);
+    }
+  };
+
   const handleExitConfirm = async () => {
     setLoadingExit(true);
     try {
@@ -167,53 +228,6 @@ const FarmActions = ({
       console.log('e', e);
     } finally {
       setLoadingExit(false);
-    }
-  };
-
-  const handleApproveClick = async () => {
-    setLoadingApprove(true);
-    try {
-      const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
-      await sdk.approveToken(
-        connectorInstance,
-        MAX_UINT_HTS.toString(),
-        userId,
-        addressToId(process.env.REACT_APP_HELI_TOKEN_ADDRESS as string),
-        true,
-        kernelAddress,
-      );
-      setLpApproved(true);
-    } catch (e) {
-      console.log('e', e);
-    } finally {
-      setLoadingApprove(false);
-      getHeliAllowance();
-    }
-  };
-
-  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { target } = e;
-    const { value } = target;
-
-    setSliderValue(value);
-    const calculatedShare = calculateShareByPercentage(maxHELIInputValue, value, 8);
-    setLpInputValue(calculatedShare);
-  };
-
-  const handleLockClick = async () => {
-    setLoadingLock(true);
-    try {
-      const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
-      await sdk.lock(connectorInstance, lockTimestampValue, kernelAddress, userId);
-
-      setLockTimestampValue(0);
-    } catch (e) {
-      console.log('e', e);
-    } finally {
-      setLoadingLock(false);
-      setSelectedButton(0);
-      setAvailableToLock('0');
-      updateLockedHeli(amountToLock, 'add');
     }
   };
 
@@ -445,7 +459,7 @@ const FarmActions = ({
                 <Button
                   disabled={lockTimestampValue === 0}
                   loading={loadingLock}
-                  onClick={handleLockClick}
+                  onClick={() => setShowLockModal(true)}
                 >
                   Lock
                 </Button>
@@ -524,6 +538,41 @@ const FarmActions = ({
                       </div>
 
                       <div className="text-main text-numeric">{heliStaked}</div>
+                    </div>
+                  </>
+                )}
+              </ConfirmTransactionModalContent>
+            </Modal>
+          ) : null}
+
+          {showLockModal ? (
+            <Modal show={showLockModal} closeModal={() => setShowLockModal(false)}>
+              <ConfirmTransactionModalContent
+                modalTitle="Lock Your HELI Tokens"
+                closeModal={() => setShowLockModal(false)}
+                confirmTansaction={handleLockConfirm}
+                confirmButtonLabel="Confirm"
+                isLoading={loadingLock}
+              >
+                {loadingLock ? (
+                  <Confirmation confirmationText={`Locking ${availableToLock} HELI tokens`} />
+                ) : (
+                  <>
+                    <div className="text-main text-warning">
+                      You are going to lock {availableToLock} HELI tokens for{' '}
+                      {buttons.find(i => i.seconds === selectedButton)?.label}.
+                    </div>
+
+                    <div className="text-small mt-4">HELI token count</div>
+
+                    <div className="d-flex justify-content-between align-items-center mt-4">
+                      <div className="d-flex align-items-center">
+                        <IconToken symbol="HELI" />
+
+                        <span className="text-main ms-3">HELI Token</span>
+                      </div>
+
+                      <div className="text-main text-numeric">{availableToLock}</div>
                     </div>
                   </>
                 )}

@@ -20,6 +20,8 @@ import ClaimdropDetails from '../pages/ClaimdropDetails';
 import C14 from '../pages/C14';
 import SingleSidedStakingOld from '../pages/SingleSidedStakingOld';
 import SingleSidedStaking from '../pages/SingleSidedStaking';
+import Proposals from '../pages/Governance';
+import ProposalDetails from '../pages/ProposalDetails';
 
 import Header from './Header';
 import Footer from './Footer';
@@ -60,8 +62,9 @@ function App() {
                       <Route path="buy-crypto" element={<C14 />} />
                       <Route path="single-sided-staking-old" element={<SingleSidedStakingOld />} />
                       <Route path="single-sided-staking" element={<SingleSidedStaking />} />
-                      <Route path="governance" element={<HeliVerse />} />
                       <Route path="heliverse" element={<HeliVerse />} />
+                      <Route path="proposals" element={<Proposals />} />
+                      <Route path="proposals/:id" element={<ProposalDetails />} />
                       <Route path="styleguide" element={<Styleguide />} />
                     </Routes>
                   </div>

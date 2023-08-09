@@ -35,6 +35,12 @@ const navigation = [
     text: 'Single Sided Staking',
   },
   {
+    link: '/proposals',
+    name: 'governance',
+    color: 'gray',
+    text: 'DAO',
+  },
+  {
     link: '/claimdrop',
     name: 'claim',
     color: 'gray',
