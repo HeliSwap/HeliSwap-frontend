@@ -162,9 +162,9 @@ const Governance = () => {
                 ) : null}
               </div>
 
-              <div className="container-rounded-dark mt-5">
+              <div className="container-blue-neutral-800 rounded mt-5">
                 <div className="container-border-bottom p-5">
-                  <div className="d-flex mb-5">
+                  <div className="d-flex">
                     <span
                       onClick={() => handleTabClick(PageTab.All)}
                       className={`text-main text-bold cursor-pointer m-4 ${
@@ -205,10 +205,6 @@ const Governance = () => {
                   </div>
                 ) : haveProposals ? (
                   <>
-                    <div className="container-border-bottom p-5">
-                      <p className="text-micro text-secondary">Proposals</p>
-                      <p className="text-micro text-secondary">Votes</p>
-                    </div>
                     {proposals
                       .filter(proposal => {
                         switch (pageTab) {
@@ -223,7 +219,10 @@ const Governance = () => {
                         }
                       })
                       .map((proposal, index) => (
-                        <div key={index} className="container-border-bottom p-5">
+                        <div
+                          key={index}
+                          className="container-border-bottom d-flex justify-content-between align-items-center p-5"
+                        >
                           <div>
                             <Link
                               to={`/proposals/${proposal.id}`}

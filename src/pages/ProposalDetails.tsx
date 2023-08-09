@@ -1,10 +1,9 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Tippy from '@tippyjs/react';
+import toast from 'react-hot-toast';
 
 import { Md5 } from 'ts-md5';
-
-import { hethers } from '@hashgraph/hethers';
 
 import { GlobalContext } from '../providers/Global';
 
@@ -12,19 +11,16 @@ import { IProposal, ProposalStatus } from '../interfaces/dao';
 
 import Icon from '../components/Icon';
 import Button from '../components/Button';
-import Loader from '../components/Loader';
+import ToasterWrapper from '../components/ToasterWrapper';
 
 import { timestampToDate } from '../utils/timeUtils';
 import { addressToId, idToAddress } from '../utils/tokenUtils';
 import { formatBigNumberToStringETH } from '../utils/numberUtils';
-import {
-  commaSeparatedStringToArray,
-  getFunctionNameFromSignature,
-  getParamsFromSignature,
-} from '../utils/stringUtils';
 
 import useGovernanceContract from '../hooks/useGovernanceContract';
 import useKernelContract from '../hooks/useKernelContract';
+
+import getErrorMessage from '../content/errors';
 
 const ProposalDetails = () => {
   const globalContext = useContext(GlobalContext);
@@ -157,36 +153,23 @@ const ProposalDetails = () => {
   const handleCastVote = async (support: boolean) => {
     try {
       setLoadingExecuteAction(true);
-      await sdk.castVote(connectorInstance, Number(id), support, userId);
-    } catch (e) {
-      console.log('e', e);
-    } finally {
-      setLoadingExecuteAction(false);
-      getGovernanceData(Number(id));
-    }
-  };
+      const receipt = await sdk.castVote(connectorInstance, Number(id), support, userId);
 
-  const handleQueueProposal = async () => {
-    try {
-      setLoadingExecuteAction(true);
-      await sdk.queueProposal(connectorInstance, Number(id), userId);
-    } catch (e) {
-      console.log('e', e);
-    } finally {
-      setLoadingExecuteAction(false);
-      getGovernanceData(Number(id));
-    }
-  };
+      const {
+        response: { success, error },
+      } = receipt;
 
-  const handleExecuteProposal = async () => {
-    try {
-      setLoadingExecuteAction(true);
-      await sdk.executeProposal(connectorInstance, Number(id), userId);
+      if (success) {
+        toast.success('Success! Vote is casted.');
+
+        getGovernanceData(Number(id));
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      }
     } catch (e) {
       console.log('e', e);
     } finally {
       setLoadingExecuteAction(false);
-      getGovernanceData(Number(id));
     }
   };
 
@@ -210,7 +193,7 @@ const ProposalDetails = () => {
 
           <div className="row mt-8">
             <div className="col-md-6 offset-md-1">
-              <div className="container-rounded-dark">
+              <div className="container-blue-neutral-800">
                 <div className="container-border-bottom p-5">
                   <h3 className="text-main text-bold">Vote Results</h3>
                 </div>
@@ -289,7 +272,7 @@ const ProposalDetails = () => {
                 </div>
               </div>
 
-              <div className="container-rounded-dark mt-5">
+              <div className="container-blue-neutral-800 mt-5">
                 <div className="container-border-bottom p-5">
                   <h3 className="text-main text-bold">Details</h3>
                 </div>
@@ -297,7 +280,7 @@ const ProposalDetails = () => {
                   <div className="d-flex justify-content-between">
                     <div>
                       <h4 className="text-micro text-bold">Created by</h4>
-                      <div className="container-address mt-3">
+                      <div className="container-address in-proposal mt-3">
                         <img
                           className="img-profile me-3"
                           src={`https://www.gravatar.com/avatar/${Md5.hashStr(
@@ -324,7 +307,7 @@ const ProposalDetails = () => {
                             </span>
                           </Tippy>
                         </div>
-                        <div className="container-address mt-3">
+                        <div className="container-address in-proposal mt-3">
                           <div className="text-secondary text-small text-bold">
                             {creatorPaticipation > proposal.creatorThreshold
                               ? `Above ${proposal.creatorThreshold}%`
@@ -336,36 +319,12 @@ const ProposalDetails = () => {
                   </div>
                   <h4 className="text-micro text-bold mt-8">Description</h4>
                   <p className="text-small mt-4">{proposal.description}</p>
-
-                  {proposal.actions!.length > 0 ? (
-                    <>
-                      <h4 className="text-micro text-bold mt-8">Actions</h4>
-                      {proposal.actions?.map((action, index) => {
-                        const paramValues = hethers.utils.defaultAbiCoder.decode(
-                          commaSeparatedStringToArray(getParamsFromSignature(action.signature)),
-                          action.calldata,
-                        );
-
-                        const functionName = getFunctionNameFromSignature(action.signature);
-
-                        return (
-                          <div className="p-4" key={index}>
-                            <h2 className="text-bold text-main">Action {index + 1}</h2>
-                            <div>{`${action.target}.${action.signature}`}</div>
-                            <div>{`${action.target}.${functionName}(${paramValues.join(
-                              ', ',
-                            )})`}</div>
-                          </div>
-                        );
-                      })}
-                    </>
-                  ) : null}
                 </div>
               </div>
             </div>
 
             <div className="col-md-4 mt-5 mt-md-0">
-              <div className="container-rounded-dark px-5 py-2">
+              <div className="container-blue-neutral-800 px-5 py-2">
                 {proposal.status === ProposalStatus.EXECUTED ? (
                   <div className="d-flex align-items-center my-3">
                     <div className="container-status-with-icon is-executed"></div>
@@ -450,39 +409,27 @@ const ProposalDetails = () => {
               </div>
 
               {connected ? (
-                loadingExecuteAction ? (
-                  <Loader />
-                ) : (
-                  <div>
-                    {proposal.status === ProposalStatus.ACTIVE ? (
-                      <div className="d-flex justify-content-between mt-4">
-                        <Button size="small" onClick={() => handleCastVote(true)}>
-                          Vote for
-                        </Button>
-                        <Button type="secondary" size="small" onClick={() => handleCastVote(false)}>
-                          Vote against
-                        </Button>
-                      </div>
-                    ) : null}
-
+                <div>
+                  {proposal.status === ProposalStatus.ACTIVE ? (
                     <div className="d-flex justify-content-between mt-4">
-                      {proposal.status === ProposalStatus.ACCEPTED ? (
-                        <Button type="secondary" size="small" onClick={() => handleQueueProposal()}>
-                          Queue
-                        </Button>
-                      ) : null}
-                      {proposal.status === ProposalStatus.GRACE ? (
-                        <Button
-                          type="secondary"
-                          size="small"
-                          onClick={() => handleExecuteProposal()}
-                        >
-                          Execute
-                        </Button>
-                      ) : null}
+                      <Button
+                        loading={loadingExecuteAction}
+                        size="small"
+                        onClick={() => handleCastVote(true)}
+                      >
+                        Vote for
+                      </Button>
+                      <Button
+                        loading={loadingExecuteAction}
+                        type="secondary"
+                        size="small"
+                        onClick={() => handleCastVote(false)}
+                      >
+                        Vote against
+                      </Button>
                     </div>
-                  </div>
-                )
+                  ) : null}
+                </div>
               ) : null}
             </div>
           </div>
@@ -490,6 +437,7 @@ const ProposalDetails = () => {
       ) : (
         <p className="text-small text-secondary text-center">No proposal</p>
       )}
+      <ToasterWrapper />
     </div>
   );
 };

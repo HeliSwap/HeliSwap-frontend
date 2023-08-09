@@ -1,24 +1,17 @@
 import { useState, useContext } from 'react';
+import toast from 'react-hot-toast';
 
 import { GlobalContext } from '../providers/Global';
 
-import AddNewActionModal from './AddNewActionModal';
 import Button from './Button';
 import Icon from './Icon';
+import ToasterWrapper from './ToasterWrapper';
+
+import getErrorMessage from '../content/errors';
 
 interface ICreateProposalProps {
   setShowCreateProposal: (show: boolean) => void;
   setProposalCreated: () => void;
-}
-
-interface IAction {
-  functionName: string;
-  functionParams: {
-    type: string;
-    value: string;
-  }[];
-  targetAddress: string;
-  value: number;
 }
 
 const CreateProposal = ({ setShowCreateProposal, setProposalCreated }: ICreateProposalProps) => {
@@ -27,40 +20,47 @@ const CreateProposal = ({ setShowCreateProposal, setProposalCreated }: ICreatePr
   const { connectorInstance, userId } = connection;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [actions, setActions] = useState<IAction[]>([]);
   const [loadingCreateProposal, setLoadingCreateProposal] = useState(false);
-
-  const [showActionModal, setShowActionModal] = useState(false);
 
   const handleBackButtonClick = () => {
     setShowCreateProposal(false);
   };
 
-  const handleActionsModalButtonClick = () => {
-    setShowActionModal(true);
-  };
-
-  const handleAddAction = (action: IAction) => {
-    setActions([...actions, action]);
-  };
-
   const handleCreateProposalButtonClick = async () => {
     try {
       setLoadingCreateProposal(true);
-      await sdk.createProposal(
+      const receipt = await sdk.createProposal(
         connectorInstance,
         process.env.REACT_APP_GOVERNANCE_ADDRESS as string,
         userId,
         title,
         description,
-        actions,
+        [
+          {
+            targetAddress: '0x00000000000000000000000000000000001d90c9',
+            value: 0,
+            functionName: '0',
+            functionParams: [],
+          },
+        ],
       );
+
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (success) {
+        toast.success('Success! Tokens were locked.');
+
+        setProposalCreated();
+        setShowCreateProposal(false);
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      }
     } catch (e) {
       console.log('e', e);
     } finally {
       setLoadingCreateProposal(false);
-      setShowCreateProposal(false);
-      setProposalCreated();
     }
   };
 
@@ -76,8 +76,8 @@ const CreateProposal = ({ setShowCreateProposal, setProposalCreated }: ICreatePr
         <h1 className="text-title text-bold mt-5">Create proposal</h1>
 
         <div className="row mt-5">
-          <div className="col-md-6">
-            <div className="container-rounded-dark">
+          <div className="col-md-10">
+            <div className="container-blue-neutral-800 rounded">
               <div className="container-border-bottom p-5">
                 <h3 className="text-main text-bold">Proposal description</h3>
               </div>
@@ -106,62 +106,6 @@ const CreateProposal = ({ setShowCreateProposal, setProposalCreated }: ICreatePr
               </div>
             </div>
           </div>
-
-          <div className="col-md-6 mt-5 mt-md-0">
-            <div className="container-rounded-dark">
-              <div className="container-border-bottom p-5">
-                <h3 className="text-main text-bold">Actions</h3>
-              </div>
-              {actions!.length > 0 ? (
-                <>
-                  {actions?.map((action: IAction, index) => {
-                    const { targetAddress, functionName, functionParams } = action;
-                    let paramTypesStr = '';
-                    let paramValuessStr = '';
-
-                    functionParams.forEach(
-                      (param: { value: string; type: string }, index: number) => {
-                        paramTypesStr +=
-                          index !== functionParams.length - 1 ? `${param.type},` : `${param.type}`;
-                        paramValuessStr +=
-                          index !== functionParams.length - 1
-                            ? `${param.value},`
-                            : `${param.value}`;
-                      },
-                    );
-
-                    return (
-                      <div className="p-4" key={index}>
-                        <h2 className="text-bold text-main">Action {index + 1}</h2>
-                        <div>{`${targetAddress}.${functionName}(${paramTypesStr})`}</div>
-                        <div>{`${targetAddress}.${functionName}(${paramValuessStr})`}</div>
-                      </div>
-                    );
-                  })}
-                </>
-              ) : null}
-
-              <div className="p-5">
-                <div className="text-center">
-                  <Button
-                    loading={loadingCreateProposal}
-                    disabled={loadingCreateProposal}
-                    onClick={handleActionsModalButtonClick}
-                    outline
-                  >
-                    Add new action
-                  </Button>
-                </div>
-                {showActionModal ? (
-                  <AddNewActionModal
-                    show={showActionModal}
-                    setShowActionModal={setShowActionModal}
-                    addAction={handleAddAction}
-                  />
-                ) : null}
-              </div>
-            </div>
-          </div>
         </div>
 
         <div className="mt-5">
@@ -174,6 +118,7 @@ const CreateProposal = ({ setShowCreateProposal, setProposalCreated }: ICreatePr
           </Button>
         </div>
       </div>
+      <ToasterWrapper />
     </div>
   );
 };

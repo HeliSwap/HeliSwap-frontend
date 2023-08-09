@@ -219,6 +219,14 @@
   &:hover {
     background-color: $blue-neutral-600;
   }
+
+  &.in-proposal {
+    background-color: transparent;
+
+    @include media-breakpoint-up(sm) {
+      margin-left: 0;
+    }
+  }
 }
 
 .container-dark {
@@ -254,6 +262,10 @@
   border: 1px solid $blue-neutral-500;
   border-radius: $border-radius;
   padding: 16px;
+}
+
+.container-border-bottom {
+  border-bottom: 1px solid $blue-neutral-700;
 }
 
 .container-input-token {
@@ -476,6 +488,79 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.container-status {
+  display: inline-block;
+  padding: 8px 26px;
+  border-radius: 58px;
+  color: $primary-900;
+
+  &.is-active {
+    background-color: $primary-100;
+  }
+
+  &.is-executed {
+    background-color: $positive-100;
+  }
+
+  &.is-expired {
+    background-color: $error-100;
+  }
+
+  &.is-failed {
+    background-color: $error-100;
+  }
+  &.is-warmup {
+    background-color: $primary-100;
+  }
+
+  &.is-accepted {
+    background-color: $primary-100;
+  }
+
+  &.is-queued {
+    background-color: $primary-100;
+  }
+
+  &.is-grace {
+    background-color: $primary-100;
+  }
+}
+
+.container-status-with-icon {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+
+  &.is-executed {
+    background-color: $positive-800;
+
+    &:after {
+      content: '';
+      display: block;
+      width: 21px;
+      height: 15px;
+      background-image: url('../icons/system/check-green.svg');
+      background-position: top center;
+    }
+  }
+
+  &.is-failed {
+    background-color: $error-500;
+
+    &:after {
+      content: '';
+      display: block;
+      width: 21px;
+      height: 15px;
+      background-image: url('../icons/system/check-green.svg');
+      background-position: top center;
+    }
+  }
 }
 
 /* Tables */
