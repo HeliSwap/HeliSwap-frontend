@@ -158,105 +158,103 @@ const Governance = () => {
             proposals={proposals}
           />
         ) : (
-          <div className="row">
-            <div className="col-md-10 offset-md-1">
-              <div className="d-flex justify-content-between align-items-center">
-                <h1 className="text-title text-bold">Proposals</h1>
-                {connected ? (
-                  <Button onClick={handleCreateProposalButtonClick}>Create proposal</Button>
-                ) : null}
-              </div>
+          <div>
+            <div className="d-flex justify-content-between align-items-center">
+              <h1 className="text-title text-bold">Proposals</h1>
+              {connected ? (
+                <Button onClick={handleCreateProposalButtonClick}>Create proposal</Button>
+              ) : null}
+            </div>
 
-              <div className="container-blue-neutral-800 rounded mt-5">
+            <div className="container-blue-neutral-800 rounded mt-5">
+              <div className="container-border-bottom p-5">
+                <div className="d-flex">
+                  <span
+                    onClick={() => handleTabClick(PageTab.All)}
+                    className={`text-main text-bold cursor-pointer m-4 ${
+                      pageTab === PageTab.All ? '' : 'text-secondary'
+                    }`}
+                  >
+                    All proposals
+                  </span>
+                  <span
+                    onClick={() => handleTabClick(PageTab.Active)}
+                    className={`text-main text-bold cursor-pointer m-4 ${
+                      pageTab === PageTab.Active ? '' : 'text-secondary'
+                    }`}
+                  >
+                    Active
+                  </span>
+                  <span
+                    onClick={() => handleTabClick(PageTab.Executed)}
+                    className={`text-main text-bold cursor-pointer m-4 ${
+                      pageTab === PageTab.Executed ? '' : 'text-secondary'
+                    }`}
+                  >
+                    Executed
+                  </span>
+                  <span
+                    onClick={() => handleTabClick(PageTab.Failed)}
+                    className={`text-main text-bold cursor-pointer m-4 ${
+                      pageTab === PageTab.Failed ? '' : 'text-secondary'
+                    }`}
+                  >
+                    Failed
+                  </span>
+                </div>
+              </div>
+              {loadingProposals ? (
                 <div className="container-border-bottom p-5">
-                  <div className="d-flex">
-                    <span
-                      onClick={() => handleTabClick(PageTab.All)}
-                      className={`text-main text-bold cursor-pointer m-4 ${
-                        pageTab === PageTab.All ? '' : 'text-secondary'
-                      }`}
-                    >
-                      All proposals
-                    </span>
-                    <span
-                      onClick={() => handleTabClick(PageTab.Active)}
-                      className={`text-main text-bold cursor-pointer m-4 ${
-                        pageTab === PageTab.Active ? '' : 'text-secondary'
-                      }`}
-                    >
-                      Active
-                    </span>
-                    <span
-                      onClick={() => handleTabClick(PageTab.Executed)}
-                      className={`text-main text-bold cursor-pointer m-4 ${
-                        pageTab === PageTab.Executed ? '' : 'text-secondary'
-                      }`}
-                    >
-                      Executed
-                    </span>
-                    <span
-                      onClick={() => handleTabClick(PageTab.Failed)}
-                      className={`text-main text-bold cursor-pointer m-4 ${
-                        pageTab === PageTab.Failed ? '' : 'text-secondary'
-                      }`}
-                    >
-                      Failed
-                    </span>
-                  </div>
+                  <p className="text-small text-secondary text-center">Loading...</p>{' '}
                 </div>
-                {loadingProposals ? (
-                  <div className="container-border-bottom p-5">
-                    <p className="text-small text-secondary text-center">Loading...</p>{' '}
-                  </div>
-                ) : haveProposals ? (
-                  <>
-                    {proposals
-                      .filter(proposal => {
-                        switch (pageTab) {
-                          case PageTab.Active:
-                            return proposal.status === ProposalStatus.ACTIVE;
-                          case PageTab.Executed:
-                            return proposal.status === ProposalStatus.EXECUTED;
-                          case PageTab.Failed:
-                            return proposal.status === ProposalStatus.FAILED;
-                          default:
-                            return true;
-                        }
-                      })
-                      .map((proposal, index) => (
-                        <div
-                          key={index}
-                          className="container-border-bottom d-flex justify-content-between align-items-center p-5"
-                        >
-                          <div>
-                            <Link
-                              to={`/proposals/${proposal.id}`}
-                              className="link text-small text-bold"
-                            >
-                              {proposal.title}
-                            </Link>
-                          </div>
-                          <p
-                            className={`container-status ${
-                              statusClassesMapping[proposal.status].className
-                            } text-uppercase text-small text-bold mt-3`}
+              ) : haveProposals ? (
+                <>
+                  {proposals
+                    .filter(proposal => {
+                      switch (pageTab) {
+                        case PageTab.Active:
+                          return proposal.status === ProposalStatus.ACTIVE;
+                        case PageTab.Executed:
+                          return proposal.status === ProposalStatus.EXECUTED;
+                        case PageTab.Failed:
+                          return proposal.status === ProposalStatus.FAILED;
+                        default:
+                          return true;
+                      }
+                    })
+                    .map((proposal, index) => (
+                      <div
+                        key={index}
+                        className="container-border-bottom d-flex justify-content-between align-items-center p-5"
+                      >
+                        <div>
+                          <Link
+                            to={`/proposals/${proposal.id}`}
+                            className="link text-small text-bold"
                           >
-                            {statusClassesMapping[proposal.status].label}
-                          </p>
+                            {proposal.title}
+                          </Link>
                         </div>
-                      ))}
-                  </>
-                ) : (
-                  <div className="container-border-bottom p-5">
-                    <p className="text-small text-secondary text-center">No proposals</p>{' '}
-                  </div>
-                )}
-                <div className="p-5">
-                  <p className="text-micro text-secondary">
-                    Showing {proposals.length} to {proposals.length} out of {proposals.length}{' '}
-                    proposals
-                  </p>
+                        <p
+                          className={`container-status ${
+                            statusClassesMapping[proposal.status].className
+                          } text-uppercase text-small text-bold mt-3`}
+                        >
+                          {statusClassesMapping[proposal.status].label}
+                        </p>
+                      </div>
+                    ))}
+                </>
+              ) : (
+                <div className="container-border-bottom p-5">
+                  <p className="text-small text-secondary text-center">No proposals</p>{' '}
                 </div>
+              )}
+              <div className="p-5">
+                <p className="text-micro text-secondary">
+                  Showing {proposals.length} to {proposals.length} out of {proposals.length}{' '}
+                  proposals
+                </p>
               </div>
             </div>
           </div>
