@@ -160,8 +160,6 @@ const Governance = () => {
     },
   };
 
-  console.log('propsals', proposals);
-
   return (
     <div className="d-flex justify-content-center">
       <div className="container-max-with-1042">
