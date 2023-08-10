@@ -13,6 +13,7 @@ import useGovernanceContract from '../hooks/useGovernanceContract';
 enum PageTab {
   'All',
   'Active',
+  'Accepted',
   'Failed',
 }
 
@@ -185,6 +186,14 @@ const Governance = () => {
                     Active
                   </span>
                   <span
+                    onClick={() => handleTabClick(PageTab.Accepted)}
+                    className={`text-main text-bold cursor-pointer m-4 ${
+                      pageTab === PageTab.Accepted ? '' : 'text-secondary'
+                    }`}
+                  >
+                    Accepted
+                  </span>
+                  <span
                     onClick={() => handleTabClick(PageTab.Failed)}
                     className={`text-main text-bold cursor-pointer m-4 ${
                       pageTab === PageTab.Failed ? '' : 'text-secondary'
@@ -205,6 +214,8 @@ const Governance = () => {
                       switch (pageTab) {
                         case PageTab.Active:
                           return proposal.status === ProposalStatus.ACTIVE;
+                        case PageTab.Accepted:
+                          return proposal.status === ProposalStatus.ACCEPTED;
                         case PageTab.Failed:
                           return proposal.status === ProposalStatus.FAILED;
                         default:
@@ -214,9 +225,12 @@ const Governance = () => {
                     .map((proposal, index) => (
                       <div
                         key={index}
-                        className="container-border-bottom d-flex justify-content-between align-items-center p-5"
+                        className="container-border-bottom d-flex justify-content-between align-items-center py-3 px-5"
                       >
-                        <div>
+                        <div className="d-flex align-items-center">
+                          <p className="text-small text-secondary me-3">
+                            Proposal #{proposal.id.toString()}
+                          </p>
                           <Link
                             to={`/proposals/${proposal.id}`}
                             className="link text-small text-bold"
