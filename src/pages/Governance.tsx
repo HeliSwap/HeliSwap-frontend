@@ -8,6 +8,8 @@ import { IProposal, ProposalStatus } from '../interfaces/dao';
 import Button from '../components/Button';
 import CreateProposal from '../components/CreateProposal';
 
+import { timestampToDateTime } from '../utils/timeUtils';
+
 import useGovernanceContract from '../hooks/useGovernanceContract';
 
 enum PageTab {
@@ -47,8 +49,18 @@ const Governance = () => {
     setLoadingProposals(true);
 
     try {
-      const lastIdBN = await governanceContract.lastProposalId();
+      const promisesArray = [
+        governanceContract.lastProposalId(),
+        governanceContract.warmUpDuration(),
+        governanceContract.activeDuration(),
+      ];
+
+      const [lastIdBN, warmUpDurationBN, activeDurationBN] = await Promise.all(promisesArray);
+
       const lastId = Number(lastIdBN.toString());
+      const warmUpDuration = Number(warmUpDurationBN.toString());
+      const activeDuration = Number(activeDurationBN.toString());
+
       const proposalIds = [];
 
       if (lastId > 0) {
@@ -89,6 +101,8 @@ const Governance = () => {
             status: proposalStatusesResolved[index],
             eta,
             createTime,
+            votingStart: createTime + warmUpDuration,
+            votingEnd: createTime + warmUpDuration + activeDuration,
           };
         });
 
@@ -145,6 +159,8 @@ const Governance = () => {
       className: 'is-executed',
     },
   };
+
+  console.log('propsals', proposals);
 
   return (
     <div className="d-flex justify-content-center">
@@ -229,14 +245,30 @@ const Governance = () => {
                       >
                         <div className="d-flex align-items-center">
                           <p className="text-small text-secondary me-3">
-                            Proposal #{proposal.id.toString()}
+                            #{proposal.id.toString()}
                           </p>
-                          <Link
-                            to={`/proposals/${proposal.id}`}
-                            className="link text-small text-bold"
-                          >
-                            {proposal.title}
-                          </Link>
+                          <div className="ms-3">
+                            <Link
+                              to={`/proposals/${proposal.id}`}
+                              className="link text-small text-bold"
+                            >
+                              {proposal.title}
+                            </Link>
+                            <div className="mt-2">
+                              <p className="text-micro">
+                                <span className="text-secondary">Voting starts at: </span>
+                                <span className="">
+                                  {timestampToDateTime((proposal.votingStart as number) * 1000)}
+                                </span>
+                              </p>
+                              <p className="text-micro mt-2">
+                                <span className="text-secondary">Voting ends at: </span>
+                                <span className="">
+                                  {timestampToDateTime((proposal.votingEnd as number) * 1000)}
+                                </span>
+                              </p>
+                            </div>
+                          </div>
                         </div>
                         <p
                           className={`container-status ${

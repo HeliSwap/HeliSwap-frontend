@@ -118,6 +118,7 @@ const CreateProposal = ({
                 placeholder="Please enter the goal of the proposal here"
                 className="form-control"
                 value={description}
+                rows={8}
                 onChange={e => setDescription(e.target.value)}
               />
             </div>

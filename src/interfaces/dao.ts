@@ -34,6 +34,8 @@ export interface IProposal {
     warmUpDuration: number;
   };
   creatorThreshold?: number;
+  votingStart?: number;
+  votingEnd?: number;
 }
 
 export interface IAmountData {
