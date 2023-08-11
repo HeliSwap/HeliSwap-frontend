@@ -344,8 +344,6 @@ const SingleSidedStaking = () => {
           },
         };
 
-        // console.log('sssData', sssData);
-
         setSssDdata(sssData);
         setHeliLocked(sssData.position.amount.inETH);
       } catch (error) {
@@ -399,8 +397,6 @@ const SingleSidedStaking = () => {
 
   const hasUserStaked = sssData && sssData.totalDeposited && sssData.totalDeposited.inETH !== '0';
   const tokensToAssociate = userRewardsData?.filter(token => !getTokenIsAssociated(token));
-
-  console.log('dynamicAPR', dynamicAPR);
 
   return isHashpackLoading ? (
     <Loader />
