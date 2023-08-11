@@ -26,6 +26,7 @@ import {
   formatContractNumberPercentage,
   formatContractTimestamp,
   formatStringETHtoPriceFormatted,
+  formatStringToPercentage,
   formatStringToPrice,
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
@@ -110,6 +111,9 @@ const SingleSidedStaking = () => {
   const [sssData, setSssDdata] = useState({} as ISSSData);
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
   const [campaignEndDate, setCampaignEndDate] = useState(0);
+  const [totalDuration, setTotalDuration] = useState(0);
+  const [dynamicAPR, setDynamicAPR] = useState(0);
+  const [totalRewardsAmount, setTotalRewadsAmount] = useState('0');
   const [countDown, setCountDown] = useState(0);
 
   const [loadingClaim, setLoadingClaim] = useState(false);
@@ -152,9 +156,12 @@ const SingleSidedStaking = () => {
 
       const pull = await rewardsContract.pullFeature();
       const endDate = formatContractTimestamp(pull.endTs);
-      // const totalDuration = formatContractDuration(pull.totalDuration);
+      const totalDuration = formatContractDuration(pull.totalDuration);
+      const totalAmount = formatContractAmount(pull.totalAmount);
 
       setCampaignEndDate(endDate.inMilliSeconds);
+      setTotalDuration(totalDuration.inMilliSeconds);
+      setTotalRewadsAmount(totalAmount.inETH);
       setUserRewardsBalance(balance);
     } catch (error) {
       console.error(error);
@@ -281,8 +288,6 @@ const SingleSidedStaking = () => {
     });
   };
 
-  console.log('votingPower', votingPower);
-
   // Check for associations
   useEffect(() => {
     const checkTokenAssociation = async (userId: string) => {
@@ -382,8 +387,20 @@ const SingleSidedStaking = () => {
     }
   }, [sssData]);
 
+  useEffect(() => {
+    if (totalDuration > 0 && Number(totalStaked) > 0 && Number(totalRewardsAmount) > 0) {
+      const dynamicAPR =
+        (Number(totalRewardsAmount) / Number(totalStaked) / totalDuration) *
+        (365 * 24 * 60 * 60) *
+        100;
+      setDynamicAPR(dynamicAPR);
+    }
+  }, [totalDuration, totalStaked, totalRewardsAmount]);
+
   const hasUserStaked = sssData && sssData.totalDeposited && sssData.totalDeposited.inETH !== '0';
   const tokensToAssociate = userRewardsData?.filter(token => !getTokenIsAssociated(token));
+
+  console.log('dynamicAPR', dynamicAPR);
 
   return isHashpackLoading ? (
     <Loader />
@@ -429,6 +446,26 @@ const SingleSidedStaking = () => {
 
                 <div className="container-border-rounded-bn-500 mt-4 mt-lg-6">
                   <div className="row">
+                    <div className="col-6 col-md-4 d-flex align-items-center">
+                      <p className="d-flex align-items-center">
+                        <span className="text-secondary text-small">APR</span>
+                        <Tippy content="Your annual rate of return, expressed as a percentage. Interest paid in previous periods is not accounted for.">
+                          <span className="ms-2">
+                            <Icon name="hint" color="gray" size="small" />
+                          </span>
+                        </Tippy>
+                      </p>
+                    </div>
+                    <div className="col-6 col-md-4">
+                      <p className="text-subheader text-numeric">
+                        {formatStringToPercentage(
+                          stripStringToFixedDecimals(dynamicAPR.toString(), 2),
+                        )}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="row mt-4">
                     <div className="col-6 col-md-4 d-flex align-items-center">
                       <p className="d-flex align-items-center">
                         <span className="text-secondary text-small">Total Staked</span>
