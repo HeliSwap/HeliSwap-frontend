@@ -284,7 +284,7 @@ const FarmActions = ({
     return 'Stake';
   };
 
-  const canUserWithdraw = sssData.position.expiration.inMilliSeconds > Date.now();
+  const canUserWithdraw = sssData.position.expiration.inMilliSeconds < Date.now();
   const canUserLock = Number(availableToLock) > 0;
 
   const buttons = [

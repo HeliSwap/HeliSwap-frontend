@@ -35,6 +35,12 @@ import {
   getUserAssociatedTokens,
   idToAddress,
 } from '../utils/tokenUtils';
+import { renderSSSEndDate } from '../utils/farmUtils';
+import {
+  formatTimeNumber,
+  getCountdownReturnValues,
+  timestampToDateTime,
+} from '../utils/timeUtils';
 
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import useTokensByListIds from '../hooks/useTokensByListIds';
@@ -46,8 +52,6 @@ import useSSSContract from '../hooks/useSSSContract';
 import getErrorMessage from '../content/errors';
 
 import { useQueryOptions, useQueryOptionsPoolsFarms } from '../constants';
-import { renderSSSEndDate } from '../utils/farmUtils';
-import { timestampToDateTime } from '../utils/timeUtils';
 
 const SingleSidedStaking = () => {
   const contextValue = useContext(GlobalContext);
@@ -106,6 +110,7 @@ const SingleSidedStaking = () => {
   const [sssData, setSssDdata] = useState({} as ISSSData);
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
   const [campaignEndDate, setCampaignEndDate] = useState(0);
+  const [countDown, setCountDown] = useState(0);
 
   const [loadingClaim, setLoadingClaim] = useState(false);
   const [loadingClaimLocked, setLoadingClaimLocked] = useState(false);
@@ -370,6 +375,13 @@ const SingleSidedStaking = () => {
       setHasUserLockedTokens(sssData.position.expiration.inMilliSeconds > Date.now());
   }, [sssData]);
 
+  useEffect(() => {
+    if (sssData && sssData.position && sssData.position.expiration) {
+      const timeLeft = sssData.position.expiration.inMilliSeconds - Date.now();
+      setCountDown(timeLeft);
+    }
+  }, [sssData]);
+
   const hasUserStaked = sssData && sssData.totalDeposited && sssData.totalDeposited.inETH !== '0';
   const tokensToAssociate = userRewardsData?.filter(token => !getTokenIsAssociated(token));
 
@@ -552,6 +564,49 @@ const SingleSidedStaking = () => {
                               <p className="text-main">
                                 {timestampToDateTime(sssData.position.expiration.inMilliSeconds)}
                               </p>
+                            </div>
+                          </div>
+
+                          <div className="row mt-4">
+                            <div className="col-6 col-md-4 d-flex align-items-center">
+                              <p className="d-flex align-items-center">
+                                <span className="text-secondary text-small">
+                                  You can withdraw after:
+                                </span>
+                                <Tippy content="The amount of your staked tokens in $USD, as well as staked tokens count.">
+                                  <span className="ms-2">
+                                    <Icon name="hint" color="gray" size="small" />
+                                  </span>
+                                </Tippy>
+                              </p>
+                            </div>
+                            <div className="col-6 col-md-8 d-md-flex align-items-center">
+                              <div className="mt-3 d-flex justify-content-center">
+                                <div className="text-center">
+                                  <p className="text-numeric text-main">
+                                    {formatTimeNumber(getCountdownReturnValues(countDown).days)}
+                                  </p>
+                                  <p className="text-micro text-secondary text-uppercase mt-2">
+                                    days
+                                  </p>
+                                </div>
+                                <div className="text-center ms-3">
+                                  <p className="text-numeric text-main">
+                                    {formatTimeNumber(getCountdownReturnValues(countDown).hours)}
+                                  </p>
+                                  <p className="text-micro text-secondary text-uppercase mt-2">
+                                    hours
+                                  </p>
+                                </div>
+                                <div className="text-center ms-3">
+                                  <p className="text-numeric text-main">
+                                    {formatTimeNumber(getCountdownReturnValues(countDown).minutes)}
+                                  </p>
+                                  <p className="text-micro text-secondary text-uppercase mt-2">
+                                    minutes
+                                  </p>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </>
