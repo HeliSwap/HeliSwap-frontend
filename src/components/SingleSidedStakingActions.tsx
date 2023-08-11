@@ -284,6 +284,9 @@ const FarmActions = ({
     return 'Stake';
   };
 
+  const canUserWithdraw = sssData.position.expiration.inMilliSeconds > Date.now();
+  const canUserLock = Number(availableToLock) > 0;
+
   const buttons = [
     {
       seconds: 60,
@@ -457,7 +460,7 @@ const FarmActions = ({
 
               <div className="d-grid mt-4">
                 <Button
-                  disabled={lockTimestampValue === 0}
+                  disabled={lockTimestampValue === 0 || !canUserLock}
                   loading={loadingLock}
                   onClick={() => setShowLockModal(true)}
                 >
@@ -502,7 +505,11 @@ const FarmActions = ({
                     </Button>
                   ))
                 ) : (
-                  <Button loading={loadingExit} onClick={() => setShowExitModal(true)}>
+                  <Button
+                    disabled={!canUserWithdraw}
+                    loading={loadingExit}
+                    onClick={() => setShowExitModal(true)}
+                  >
                     Unstake
                   </Button>
                 )}
