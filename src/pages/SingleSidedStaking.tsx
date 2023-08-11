@@ -101,6 +101,7 @@ const SingleSidedStaking = () => {
   const [totalStakedUSD, setTotalStakedUSD] = useState('0');
   const [heliLocked, setHeliLocked] = useState('0');
   const [heliLockedUSD, setHeliLockedUSD] = useState('0');
+  const [votingPower, setVotingPower] = useState('0');
   const [amountToLock, setAmountToLock] = useState('0');
   const [sssData, setSssDdata] = useState({} as ISSSData);
   const [userAssociatedTokens, setUserAssociatedTokens] = useState<string[]>([]);
@@ -122,11 +123,17 @@ const SingleSidedStaking = () => {
 
   const getHeliStaked = useCallback(async () => {
     try {
-      const balanceBN = await kernelContract.balanceOf(idToAddress(userId));
-      const totalStakedBN = await kernelContract.heliStaked();
+      const promisesArray = [
+        kernelContract.balanceOf(idToAddress(userId)),
+        kernelContract.heliStaked(),
+        kernelContract.votingPower(idToAddress(userId)),
+      ];
+
+      const [balanceBN, totalStakedBN, votingPowerBN] = await Promise.all(promisesArray);
 
       setHeliStaked(formatBigNumberToStringETH(balanceBN));
       setTotalStaked(formatBigNumberToStringETH(totalStakedBN));
+      setVotingPower(formatBigNumberToStringETH(votingPowerBN));
     } catch (error) {
       console.error(error);
     }
@@ -268,6 +275,8 @@ const SingleSidedStaking = () => {
       return formatBigNumberToStringETH(newLocked);
     });
   };
+
+  console.log('votingPower', votingPower);
 
   // Check for associations
   useEffect(() => {
@@ -457,6 +466,24 @@ const SingleSidedStaking = () => {
                             </span>
 
                             <IconToken className="ms-3" symbol="HELI" />
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="row mt-4">
+                        <div className="col-6 col-md-4 d-flex align-items-center">
+                          <p className="d-flex align-items-center">
+                            <span className="text-secondary text-small">Voting power</span>
+                            <Tippy content="The amount of your staked tokens in $USD, as well as staked tokens count.">
+                              <span className="ms-2">
+                                <Icon name="hint" color="gray" size="small" />
+                              </span>
+                            </Tippy>
+                          </p>
+                        </div>
+                        <div className="col-6 col-md-8 d-md-flex align-items-center">
+                          <p className="text-subheader text-numeric">
+                            {formatStringETHtoPriceFormatted(votingPower)}
                           </p>
                         </div>
                       </div>
