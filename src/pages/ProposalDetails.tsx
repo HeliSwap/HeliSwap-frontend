@@ -13,9 +13,9 @@ import Icon from '../components/Icon';
 import Button from '../components/Button';
 import ToasterWrapper from '../components/ToasterWrapper';
 
-import { timestampToDate } from '../utils/timeUtils';
+import { timestampToDate, timestampToDateTime } from '../utils/timeUtils';
 import { addressToId, idToAddress } from '../utils/tokenUtils';
-import { formatBigNumberToStringETH } from '../utils/numberUtils';
+import { formatBigNumberToStringETH, formatStringETHtoPriceFormatted } from '../utils/numberUtils';
 
 import useGovernanceContract from '../hooks/useGovernanceContract';
 import useKernelContract from '../hooks/useKernelContract';
@@ -36,6 +36,7 @@ const ProposalDetails = () => {
   const kernelContract = useKernelContract();
 
   const [creatorPaticipation, setCreatorPaticipation] = useState(0);
+  const [votingPower, setVotingPower] = useState('0');
 
   const getGovernanceData = useCallback(
     async (proposalId: number) => {
@@ -115,6 +116,8 @@ const ProposalDetails = () => {
           actions,
           parameters,
           creatorThreshold: 1,
+          votingStart: createTime + warmUpDuration,
+          votingEnd: createTime + warmUpDuration + activeDuration,
         };
 
         setProposal(proposalFomatted);
@@ -126,6 +129,18 @@ const ProposalDetails = () => {
     },
     [governanceContract],
   );
+
+  const getKernelData = useCallback(async () => {
+    try {
+      const promisesArray = [kernelContract.votingPower(idToAddress(userId))];
+
+      const [votingPowerBN] = await Promise.all(promisesArray);
+
+      setVotingPower(formatBigNumberToStringETH(votingPowerBN));
+    } catch (error) {
+      console.error(error);
+    }
+  }, [kernelContract, userId]);
 
   useEffect(() => {
     Object.keys(governanceContract).length > 0 &&
@@ -144,6 +159,10 @@ const ProposalDetails = () => {
 
     Object.keys(kernelContract).length && userId && getCreatorThreshold();
   }, [kernelContract, id, userId]);
+
+  useEffect(() => {
+    userId && Object.keys(kernelContract).length && getKernelData();
+  }, [kernelContract, userId, getKernelData]);
 
   const haveProposal = Object.keys(proposal).length > 0;
   const allVotes = proposal.votesFor + proposal.votesAgainst;
@@ -188,10 +207,47 @@ const ProposalDetails = () => {
                 </Link>
               </div>
               <h1 className="text-title text-bold mt-5">{proposal.title}</h1>
+
+              <div className="d-flex justify-content-between align-items-center">
+                <div className="mt-2">
+                  <p className="text-small">
+                    <span className="text-secondary">Voting starts at: </span>
+                    <span className="">
+                      {timestampToDateTime((proposal.votingStart as number) * 1000)}
+                    </span>
+                  </p>
+                  <p className="text-small mt-2">
+                    <span className="text-secondary">Voting ends at: </span>
+                    <span className="">
+                      {timestampToDateTime((proposal.votingEnd as number) * 1000)}
+                    </span>
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-small text-bold mt-3">
+                    Voting power
+                    <Tippy
+                      content={
+                        'Quorum is the percentage of the amount of tokens staked in the DAO that support for a proposal must be greater than for the proposal to be considered valid. For example, if the Quorum % is set to 20%, then more than 20% of the amount of tokens staked in the DAO must vote to approve a proposal for the vote to be considered valid.'
+                      }
+                    >
+                      <span className="ms-2">
+                        <Icon size="small" color="gray" name="hint" />
+                      </span>
+                    </Tippy>
+                  </p>
+                  <p className="d-flex justify-content-end">
+                    <span className="text-subheader text-bold text-numeric text-end">
+                      {formatStringETHtoPriceFormatted(votingPower)}
+                    </span>
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="row mt-8">
+          <div className="row mt-5">
             <div className="col-md-6 offset-md-1">
               <div className="container-blue-neutral-800">
                 <div className="container-border-bottom p-5">
