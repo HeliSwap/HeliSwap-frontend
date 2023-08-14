@@ -305,11 +305,11 @@ const FarmActions = ({
       label: '1 Day',
     },
     {
-      seconds: 15770000,
+      seconds: 15768000,
       label: '6 Months',
     },
     {
-      seconds: 31540000,
+      seconds: 31536000,
       label: '12 Months',
     },
   ];
