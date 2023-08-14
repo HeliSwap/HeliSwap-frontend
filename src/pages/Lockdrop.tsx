@@ -3,18 +3,12 @@ import toast from 'react-hot-toast';
 
 import numeral from 'numeral';
 import { ethers } from 'ethers';
-import { GraphQLClient } from 'graphql-request';
 
 import { GlobalContext } from '../providers/Global';
 
 import useFarmAddress from '../hooks/useFarmAddress';
 
-import {
-  IDaysMapping,
-  ILockdropData,
-  ILockdropDataRaw,
-  LOCKDROP_STATE,
-} from '../interfaces/common';
+import { IDaysMapping, ILockdropData, LOCKDROP_STATE } from '../interfaces/common';
 
 import LockdropStats from '../components/LockdropStats';
 import LockdropFAQ from '../components/LockdropFAQ';
@@ -31,7 +25,6 @@ import {
 } from '../utils/numberUtils';
 
 import { useQueryOptionsPoolsFarms } from '../constants';
-import { GET_LOCKDROP_DATA } from '../GraphQL/Queries';
 
 const LockDropABI = require('../abi/LockDrop.json');
 
@@ -146,21 +139,16 @@ const Lockdrop = () => {
         if (userId) {
           const userAddress = idToAddress(userId);
 
-          const heliSwapAPIUrl = process.env.REACT_APP_DROP_POLLER_URI as string;
-          const variables = {
-            address: userAddress,
-          };
+          const promiseArray = [
+            lockDropContract.claimable(userAddress),
+            lockDropContract.claimedOf(userAddress),
+            lockDropContract.providers(userAddress),
+            lockDropContract.totalClaimable(userAddress),
+          ];
 
-          const client = new GraphQLClient(heliSwapAPIUrl);
-          const response = await client.request<ILockdropDataRaw>(GET_LOCKDROP_DATA, variables);
-          const {
-            getLockDropUserInfo: { claimable, claimed, totalAllocated, deposited },
-          } = response;
-
-          claimableBN = ethers.BigNumber.from(claimable || 0);
-          claimedOfBN = ethers.BigNumber.from(claimed || 0);
-          totalClaimableBN = ethers.BigNumber.from(totalAllocated || 0);
-          stakedTokensBN = ethers.BigNumber.from(deposited || 0);
+          [claimableBN, claimedOfBN, stakedTokensBN, totalClaimableBN] = await Promise.all(
+            promiseArray,
+          );
         }
 
         const totalLP = {
