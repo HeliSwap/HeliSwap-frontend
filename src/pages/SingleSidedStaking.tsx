@@ -115,6 +115,7 @@ const SingleSidedStaking = () => {
   const [dynamicAPR, setDynamicAPR] = useState(0);
   const [totalRewardsAmount, setTotalRewadsAmount] = useState('0');
   const [countDown, setCountDown] = useState(0);
+  const [lockedUntil, setLockedUntil] = useState(0);
 
   const [loadingClaim, setLoadingClaim] = useState(false);
   const [loadingClaimLocked, setLoadingClaimLocked] = useState(false);
@@ -400,6 +401,13 @@ const SingleSidedStaking = () => {
     }
   }, [totalDuration, totalStaked, totalRewardsAmount, campaignEndDate]);
 
+  useEffect(() => {
+    sssData &&
+      sssData.position &&
+      sssData.position.expiration.inMilliSeconds &&
+      setLockedUntil(sssData.position.expiration.inMilliSeconds);
+  }, [sssData]);
+
   const hasUserStaked = sssData && sssData.totalDeposited && sssData.totalDeposited.inETH !== '0';
   const tokensToAssociate = userRewardsData?.filter(token => !getTokenIsAssociated(token));
 
@@ -599,9 +607,7 @@ const SingleSidedStaking = () => {
                               </p>
                             </div>
                             <div className="col-6 col-md-8 d-md-flex align-items-center">
-                              <p className="text-main">
-                                {timestampToDateTime(sssData.position.expiration.inMilliSeconds)}
-                              </p>
+                              <p className="text-main">{timestampToDateTime(lockedUntil)}</p>
                             </div>
                           </div>
 
@@ -803,6 +809,8 @@ const SingleSidedStaking = () => {
               updateTotalStakedHeli={updateTotalStakedHeli}
               hasUserLockedTokens={hasUserLockedTokens}
               timeLeft={Math.ceil(countDown / 1000)}
+              setCountDown={setCountDown}
+              setLockedUntil={setLockedUntil}
             />
           </div>
         )}

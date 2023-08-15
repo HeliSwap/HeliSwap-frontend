@@ -52,6 +52,8 @@ interface IFarmActionsProps {
   updateStakedHeli: (newValue: string, action: string) => void;
   updateLockedHeli: (newValue: string, action: string) => void;
   updateTotalStakedHeli: (newValue: string, action: string) => void;
+  setCountDown: (newValue: number) => void;
+  setLockedUntil: (newValue: number) => void;
 }
 
 enum TabStates {
@@ -75,6 +77,8 @@ const FarmActions = ({
   heliStaked,
   hasUserLockedTokens,
   timeLeft,
+  setCountDown,
+  setLockedUntil,
 }: IFarmActionsProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
@@ -193,6 +197,8 @@ const FarmActions = ({
         setAvailableToLock('0');
         updateLockedHeli(amountToLock, 'add');
         setShowLockModal(false);
+        setCountDown(selectedButton * 1000);
+        setLockedUntil(Date.now() + selectedButton * 1000);
       } else {
         toast.error(getErrorMessage(error.status ? error.status : error));
       }
