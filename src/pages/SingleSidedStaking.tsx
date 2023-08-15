@@ -386,14 +386,19 @@ const SingleSidedStaking = () => {
   }, [sssData]);
 
   useEffect(() => {
-    if (totalDuration > 0 && Number(totalStaked) > 0 && Number(totalRewardsAmount) > 0) {
+    if (
+      campaignEndDate > Date.now() &&
+      totalDuration > 0 &&
+      Number(totalStaked) > 0 &&
+      Number(totalRewardsAmount) > 0
+    ) {
       const dynamicAPR =
         (Number(totalRewardsAmount) / Number(totalStaked) / totalDuration) *
         (365 * 24 * 60 * 60) *
         100;
       setDynamicAPR(dynamicAPR);
     }
-  }, [totalDuration, totalStaked, totalRewardsAmount]);
+  }, [totalDuration, totalStaked, totalRewardsAmount, campaignEndDate]);
 
   const hasUserStaked = sssData && sssData.totalDeposited && sssData.totalDeposited.inETH !== '0';
   const tokensToAssociate = userRewardsData?.filter(token => !getTokenIsAssociated(token));
@@ -797,6 +802,7 @@ const SingleSidedStaking = () => {
               updateLockedHeli={updateLockedHeli}
               updateTotalStakedHeli={updateTotalStakedHeli}
               hasUserLockedTokens={hasUserLockedTokens}
+              timeLeft={Math.ceil(countDown / 1000)}
             />
           </div>
         )}

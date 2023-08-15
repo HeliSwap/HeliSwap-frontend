@@ -46,6 +46,7 @@ interface IFarmActionsProps {
   tokensToAssociate: ITokenData[];
   loadingAssociate: boolean;
   hasUserLockedTokens: boolean;
+  timeLeft: number;
   getStakingTokenBalance: (id: string) => void;
   handleAssociateClick: (token: ITokenData) => void;
   updateStakedHeli: (newValue: string, action: string) => void;
@@ -73,6 +74,7 @@ const FarmActions = ({
   amountToLock,
   heliStaked,
   hasUserLockedTokens,
+  timeLeft,
 }: IFarmActionsProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
@@ -313,6 +315,13 @@ const FarmActions = ({
       label: '12 Months',
     },
   ];
+
+  if (!canUserWithdraw) {
+    buttons.push({
+      seconds: timeLeft + 60,
+      label: 'The rest of the current locking period',
+    });
+  }
 
   return (
     <div className="col-md-5 mt-4 mt-md-0">
