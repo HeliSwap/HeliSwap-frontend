@@ -136,7 +136,7 @@ const FarmActions = ({
     setLoadingApprove(true);
     try {
       const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
-      await sdk.approveToken(
+      const receipt = await sdk.approveToken(
         connectorInstance,
         MAX_UINT_HTS.toString(),
         userId,
@@ -144,12 +144,22 @@ const FarmActions = ({
         true,
         kernelAddress,
       );
-      setLpApproved(true);
+
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (success) {
+        toast.success('Success! Tokens were approved.');
+
+        setLpApproved(true);
+      } else {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      }
     } catch (e) {
       console.log('e', e);
     } finally {
       setLoadingApprove(false);
-      getHeliAllowance();
     }
   };
 
