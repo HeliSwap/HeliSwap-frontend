@@ -198,7 +198,7 @@ const FarmActions = ({
       const timestamp = nowTimestampInSeconds() + timeLeft + 60;
 
       const receipt =
-        !canUserWithdraw && !maxSupplyLimitHit
+        canLock && !canUserWithdraw && !maxSupplyLimitHit
           ? await sdk.depositAndLock(
               connectorInstance,
               lpInputValue,
@@ -334,12 +334,13 @@ const FarmActions = ({
   // Helper methods
   const getStakeButtonLabel = () => {
     if (getInsufficientTokenBalance()) return `Insufficient HELI balance`;
-    if (!canUserWithdraw && !maxSupplyLimitHit) return 'Stake and Lock';
+    if (canLock && !canUserWithdraw && !maxSupplyLimitHit) return 'Stake and Lock';
     return 'Stake';
   };
 
   const canUserWithdraw = sssData.position.expiration.inMilliSeconds < Date.now();
   const maxSupplyLimitHit = Number(sssData.totalDeposited.inETH) >= Number(sssData.maxSupply.inETH);
+  const canLock = campaignEndDate > sssData.position.expiration.inMilliSeconds;
 
   return (
     <div className="col-md-5 mt-4 mt-md-0">
@@ -479,7 +480,7 @@ const FarmActions = ({
 
               <div className="d-grid mt-4">
                 <Button
-                  disabled={maxSupplyLimitHit || lockTimestampValue === 0}
+                  disabled={!canLock || maxSupplyLimitHit || lockTimestampValue === 0}
                   loading={loadingLock}
                   onClick={() => setShowLockModal(true)}
                 >
