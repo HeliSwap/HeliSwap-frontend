@@ -13,6 +13,8 @@ const months = [
   'December',
 ];
 
+export const DAY_IN_SECONDS = 86400;
+
 export const timestampToDate = (UNIX_timestamp: number) => {
   const a = new Date(Number(UNIX_timestamp));
 
@@ -81,4 +83,12 @@ export const getDaysFromDurationMilliseconds = (duration: number) => {
   }
 
   return returnObject;
+};
+
+export const nowTimestampInSeconds = () => Math.floor(Date.now() / 1000);
+
+export const getDaysFromTimestampInSeconds = (timestampInSeconds: number) => {
+  if (timestampInSeconds < nowTimestampInSeconds()) return 0;
+
+  return Math.floor((timestampInSeconds - nowTimestampInSeconds()) / DAY_IN_SECONDS);
 };

@@ -24,6 +24,11 @@ import InputSlider from './InputSlider';
 import InputDaySlider from './InputDaySlider';
 
 import { formatStringWeiToStringEther, stripStringToFixedDecimals } from '../utils/numberUtils';
+import {
+  DAY_IN_SECONDS,
+  getDaysFromTimestampInSeconds,
+  nowTimestampInSeconds,
+} from '../utils/timeUtils';
 
 import useHELITokenContract from '../hooks/useHELITokenContract';
 
@@ -90,8 +95,14 @@ const FarmActions = ({
   const tokenContract = useHELITokenContract();
 
   const maxHELIInputValue = stakingTokenBalance;
-  const daysLeftCampaignEnd = Math.round((campaignEndDate - Date.now()) / 1000 / 60 / 60 / 24);
-  const minLockTimestampValue = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
+
+  const lockTimeEnded = sssData.position.expiration.inMilliSeconds < Date.now();
+  const campaignEndDateInSeconds = Math.floor(campaignEndDate / 1000);
+  const daysLeftCampaignEnd = getDaysFromTimestampInSeconds(campaignEndDateInSeconds);
+  const minLockTimestampValue = lockTimeEnded
+    ? nowTimestampInSeconds() + DAY_IN_SECONDS
+    : sssData.position.expiration.inSeconds + DAY_IN_SECONDS;
+  const siderMinValue = getDaysFromTimestampInSeconds(minLockTimestampValue);
 
   const [lpInputValue, setLpInputValue] = useState(maxHELIInputValue);
   const [sliderValue, setSliderValue] = useState(SLIDER_INITIAL_VALUE);
@@ -103,12 +114,13 @@ const FarmActions = ({
 
   const [tabState, setTabState] = useState(TabStates.STAKE);
   const [lpApproved, setLpApproved] = useState(false);
+  const [showDepositModal, setShowDepositModal] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
   const [showLockModal, setShowLockModal] = useState(false);
 
   const [selectedButton, setSelectedButton] = useState(0);
   const [lockTimestampValue, setLockTimestampValue] = useState(minLockTimestampValue);
-  const [lockSliderValue, setLockSliderValue] = useState('1');
+  const [lockSliderValue, setLockSliderValue] = useState(siderMinValue.toString());
   const [availableToLock, setAvailableToLock] = useState('0');
 
   // Handlers
@@ -142,7 +154,7 @@ const FarmActions = ({
     const { target } = e;
     const { value } = target;
 
-    const newValue = Math.floor(Date.now() / 1000) + Number(value) * 60 * 60 * 24;
+    const newValue = nowTimestampInSeconds() + Number(value) * DAY_IN_SECONDS;
 
     setLockTimestampValue(newValue);
     setLockSliderValue(value);
@@ -179,11 +191,11 @@ const FarmActions = ({
     }
   };
 
-  const handleDepositClick = async () => {
+  const handleDepositConfirm = async () => {
     setLoadingStake(true);
     try {
       const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
-      const timestamp = Math.floor(Date.now() / 1000) + timeLeft + 60;
+      const timestamp = nowTimestampInSeconds() + timeLeft + 60;
 
       const receipt =
         !canUserWithdraw && !maxSupplyLimitHit
@@ -204,6 +216,8 @@ const FarmActions = ({
         getStakingTokenBalance(userId);
         updateStakedHeli(lpInputValue, 'add');
         updateTotalStakedHeli(lpInputValue, 'add');
+
+        !canUserWithdraw && updateLockedHeli(lpInputValue, 'add');
 
         toast.success('Success! Tokens were deposited.');
       } else {
@@ -276,12 +290,6 @@ const FarmActions = ({
     }
   };
 
-  const handleLockDurationButtonClick = (seconds: number) => {
-    setSelectedButton(seconds);
-    const nowSeconds = Math.floor(Date.now() / 1000);
-    setLockTimestampValue(nowSeconds + seconds);
-  };
-
   const handleButtonClick = (value: string) => {
     setSliderValue(value);
     const calculatedShare = calculateShareByPercentage(maxHELIInputValue, value, 8);
@@ -331,42 +339,7 @@ const FarmActions = ({
   };
 
   const canUserWithdraw = sssData.position.expiration.inMilliSeconds < Date.now();
-  const canUserLock = Number(availableToLock) > 0;
   const maxSupplyLimitHit = Number(sssData.totalDeposited.inETH) >= Number(sssData.maxSupply.inETH);
-
-  const buttons = [
-    {
-      seconds: 60,
-      label: '1 Minute',
-    },
-    {
-      seconds: 60 * 5,
-      label: '5 Minutes',
-    },
-    {
-      seconds: 3600,
-      label: '1 Hour',
-    },
-    {
-      seconds: 3600 * 24,
-      label: '1 Day',
-    },
-    {
-      seconds: 15768000,
-      label: '6 Months',
-    },
-    {
-      seconds: 31536000,
-      label: '12 Months',
-    },
-  ];
-
-  if (!canUserWithdraw) {
-    buttons.push({
-      seconds: timeLeft + 60,
-      label: 'The rest of the current locking period',
-    });
-  }
 
   return (
     <div className="col-md-5 mt-4 mt-md-0">
@@ -465,7 +438,7 @@ const FarmActions = ({
                   <Button
                     disabled={getInsufficientTokenBalance() || !lpApproved}
                     loading={loadingStake}
-                    onClick={handleDepositClick}
+                    onClick={() => setShowDepositModal(true)}
                   >
                     <>{getStakeButtonLabel()}</>
                   </Button>
@@ -500,28 +473,13 @@ const FarmActions = ({
                   handleSliderChange={handleLockSliderChange}
                   sliderValue={lockSliderValue}
                   maxValue={daysLeftCampaignEnd.toString()}
-                  minValue="1"
+                  minValue={siderMinValue.toString()}
                 />
-
-                <div className="d-flex flex-wrap align-items-center mt-2">
-                  {buttons.map((item, index) => (
-                    <Button
-                      key={index}
-                      onClick={() => handleLockDurationButtonClick(item.seconds)}
-                      className={`${selectedButton === item.seconds ? 'active' : ''} ${
-                        index !== 0 ? 'ms-3' : ''
-                      } mb-3`}
-                      size="small"
-                    >
-                      {item.label}
-                    </Button>
-                  ))}
-                </div>
               </div>
 
               <div className="d-grid mt-4">
                 <Button
-                  disabled={maxSupplyLimitHit || lockTimestampValue === 0 || !canUserLock}
+                  disabled={maxSupplyLimitHit || lockTimestampValue === 0}
                   loading={loadingLock}
                   onClick={() => setShowLockModal(true)}
                 >
@@ -578,6 +536,36 @@ const FarmActions = ({
             </>
           ) : null}
 
+          {showDepositModal ? (
+            <Modal show={showDepositModal} closeModal={() => setShowDepositModal(false)}>
+              <ConfirmTransactionModalContent
+                modalTitle="Stake Your HELI Tokens"
+                closeModal={() => setShowDepositModal(false)}
+                confirmTansaction={handleDepositConfirm}
+                confirmButtonLabel="Confirm"
+                isLoading={loadingStake}
+              >
+                {loadingStake ? (
+                  <Confirmation confirmationText={`Unstaking ${lpInputValue} HELI tokens`} />
+                ) : (
+                  <>
+                    <div className="text-small">HELI token count</div>
+
+                    <div className="d-flex justify-content-between align-items-center mt-4">
+                      <div className="d-flex align-items-center">
+                        <IconToken symbol="HELI" />
+
+                        <span className="text-main ms-3">HELI Token</span>
+                      </div>
+
+                      <div className="text-main text-numeric">{lpInputValue}</div>
+                    </div>
+                  </>
+                )}
+              </ConfirmTransactionModalContent>
+            </Modal>
+          ) : null}
+
           {showExitModal ? (
             <Modal show={showExitModal} closeModal={() => setShowExitModal(false)}>
               <ConfirmTransactionModalContent
@@ -628,7 +616,7 @@ const FarmActions = ({
                   <>
                     <div className="text-main text-warning">
                       You are going to lock {availableToLock} HELI tokens for{' '}
-                      {buttons.find(i => i.seconds === selectedButton)?.label}.
+                      {getDaysFromTimestampInSeconds(lockTimestampValue)} days.
                     </div>
 
                     <div className="text-small mt-4">HELI token count</div>
