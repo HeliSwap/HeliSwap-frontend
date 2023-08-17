@@ -595,6 +595,29 @@ class SDK {
     return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
+  async depositAndLock(
+    hashconnectConnectorInstance: Hashconnect,
+    stakeAmount: string,
+    timestamp: number,
+    kernelAddress: string,
+    userId: string,
+  ) {
+    const tokensAmountBN = formatStringToBigNumberWei(stakeAmount, 8);
+    const maxGas = TRANSACTION_MAX_FEES.DEPOSIT_DAO;
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(kernelAddress))
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction(
+        'depositAndLock',
+        new ContractFunctionParameters().addUint256(tokensAmountBN).addUint256(timestamp),
+      );
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
   async withdraw(
     hashconnectConnectorInstance: Hashconnect,
     stakeAmount: string,

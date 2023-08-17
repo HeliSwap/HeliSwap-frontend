@@ -21,6 +21,7 @@ import Confirmation from './Confirmation';
 import ConfirmTransactionModalContent from './Modals/ConfirmTransactionModalContent';
 import IconToken from './IconToken';
 import InputSlider from './InputSlider';
+import InputDaySlider from './InputDaySlider';
 
 import { formatStringWeiToStringEther, stripStringToFixedDecimals } from '../utils/numberUtils';
 
@@ -47,6 +48,7 @@ interface IFarmActionsProps {
   loadingAssociate: boolean;
   hasUserLockedTokens: boolean;
   timeLeft: number;
+  campaignEndDate: number;
   getStakingTokenBalance: (id: string) => void;
   handleAssociateClick: (token: ITokenData) => void;
   updateStakedHeli: (newValue: string, action: string) => void;
@@ -79,6 +81,7 @@ const FarmActions = ({
   timeLeft,
   setCountDown,
   setLockedUntil,
+  campaignEndDate,
 }: IFarmActionsProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
@@ -87,6 +90,8 @@ const FarmActions = ({
   const tokenContract = useHELITokenContract();
 
   const maxHELIInputValue = stakingTokenBalance;
+  const daysLeftCampaignEnd = Math.round((campaignEndDate - Date.now()) / 1000 / 60 / 60 / 24);
+  const minLockTimestampValue = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
 
   const [lpInputValue, setLpInputValue] = useState(maxHELIInputValue);
   const [sliderValue, setSliderValue] = useState(SLIDER_INITIAL_VALUE);
@@ -102,7 +107,8 @@ const FarmActions = ({
   const [showLockModal, setShowLockModal] = useState(false);
 
   const [selectedButton, setSelectedButton] = useState(0);
-  const [lockTimestampValue, setLockTimestampValue] = useState(0);
+  const [lockTimestampValue, setLockTimestampValue] = useState(minLockTimestampValue);
+  const [lockSliderValue, setLockSliderValue] = useState('1');
   const [availableToLock, setAvailableToLock] = useState('0');
 
   // Handlers
@@ -130,6 +136,16 @@ const FarmActions = ({
     setSliderValue(value);
     const calculatedShare = calculateShareByPercentage(maxHELIInputValue, value, 8);
     setLpInputValue(calculatedShare);
+  };
+
+  const handleLockSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { target } = e;
+    const { value } = target;
+
+    const newValue = Math.floor(Date.now() / 1000) + Number(value) * 60 * 60 * 24;
+
+    setLockTimestampValue(newValue);
+    setLockSliderValue(value);
   };
 
   const handleApproveClick = async () => {
@@ -167,7 +183,18 @@ const FarmActions = ({
     setLoadingStake(true);
     try {
       const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
-      const receipt = await sdk.deposit(connectorInstance, lpInputValue, kernelAddress, userId);
+      const timestamp = Math.floor(Date.now() / 1000) + timeLeft + 60;
+
+      const receipt =
+        !canUserWithdraw && !maxSupplyLimitHit
+          ? await sdk.depositAndLock(
+              connectorInstance,
+              lpInputValue,
+              timestamp,
+              kernelAddress,
+              userId,
+            )
+          : await sdk.deposit(connectorInstance, lpInputValue, kernelAddress, userId);
 
       const {
         response: { success, error },
@@ -299,11 +326,13 @@ const FarmActions = ({
   // Helper methods
   const getStakeButtonLabel = () => {
     if (getInsufficientTokenBalance()) return `Insufficient HELI balance`;
+    if (!canUserWithdraw && !maxSupplyLimitHit) return 'Stake and Lock';
     return 'Stake';
   };
 
   const canUserWithdraw = sssData.position.expiration.inMilliSeconds < Date.now();
   const canUserLock = Number(availableToLock) > 0;
+  const maxSupplyLimitHit = Number(sssData.totalDeposited.inETH) >= Number(sssData.maxSupply.inETH);
 
   const buttons = [
     {
@@ -465,7 +494,14 @@ const FarmActions = ({
                   }
                 />
 
-                <p className="text-secondary text-small text-bold mt-5">Lock for:</p>
+                <p className="text-secondary text-small text-bold mt-5 mb-3">Lock for:</p>
+
+                <InputDaySlider
+                  handleSliderChange={handleLockSliderChange}
+                  sliderValue={lockSliderValue}
+                  maxValue={daysLeftCampaignEnd.toString()}
+                  minValue="1"
+                />
 
                 <div className="d-flex flex-wrap align-items-center mt-2">
                   {buttons.map((item, index) => (
@@ -485,7 +521,7 @@ const FarmActions = ({
 
               <div className="d-grid mt-4">
                 <Button
-                  disabled={lockTimestampValue === 0 || !canUserLock}
+                  disabled={maxSupplyLimitHit || lockTimestampValue === 0 || !canUserLock}
                   loading={loadingLock}
                   onClick={() => setShowLockModal(true)}
                 >

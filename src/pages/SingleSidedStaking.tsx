@@ -321,12 +321,13 @@ const SingleSidedStaking = () => {
         const promisesArray = [
           sssContract.totalDeposited(),
           sssContract.rewardsPercentage(),
+          sssContract.maxSupply(),
           sssContract.positions(kernelAddress, idToAddress(userId)),
           sssContract.claimable(kernelAddress, idToAddress(userId)),
           sssContract.totalRewards(kernelAddress, idToAddress(userId)),
         ];
 
-        const [totalDeposited, rewardsPercentage, positions, claimable, totalRewards] =
+        const [totalDeposited, rewardsPercentage, maxSupply, positions, claimable, totalRewards] =
           await Promise.all(promisesArray);
 
         const { amount, duration, expiration, rewardsNotClaimed, rewardsPending } = positions;
@@ -334,6 +335,7 @@ const SingleSidedStaking = () => {
         const sssData = {
           rewardsPercentage: formatContractNumberPercentage(rewardsPercentage),
           totalDeposited: formatContractAmount(totalDeposited),
+          maxSupply: formatContractAmount(maxSupply),
           totalRewards: formatContractAmount(totalRewards),
           claimable: formatContractAmount(claimable),
           position: {
@@ -811,6 +813,7 @@ const SingleSidedStaking = () => {
               timeLeft={Math.ceil(countDown / 1000)}
               setCountDown={setCountDown}
               setLockedUntil={setLockedUntil}
+              campaignEndDate={campaignEndDate}
             />
           </div>
         )}
