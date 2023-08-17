@@ -216,6 +216,7 @@ const FarmActions = ({
         getStakingTokenBalance(userId);
         updateStakedHeli(lpInputValue, 'add');
         updateTotalStakedHeli(lpInputValue, 'add');
+        setShowDepositModal(false);
 
         !canUserWithdraw && updateLockedHeli(lpInputValue, 'add');
 
