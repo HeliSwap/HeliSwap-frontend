@@ -23,7 +23,11 @@ import IconToken from './IconToken';
 import InputSlider from './InputSlider';
 import InputDaySlider from './InputDaySlider';
 
-import { formatStringWeiToStringEther, stripStringToFixedDecimals } from '../utils/numberUtils';
+import {
+  formatStringToPercentage,
+  formatStringWeiToStringEther,
+  stripStringToFixedDecimals,
+} from '../utils/numberUtils';
 import {
   DAY_IN_SECONDS,
   getDaysFromTimestampInSeconds,
@@ -111,6 +115,7 @@ const FarmActions = ({
   const [loadingApprove, setLoadingApprove] = useState(true);
   const [loadingExit, setLoadingExit] = useState(false);
   const [loadingLock, setLoadingLock] = useState(false);
+  const [currentLockAPR, setCurrentLockAPR] = useState(0);
 
   const [tabState, setTabState] = useState(TabStates.STAKE);
   const [lpApproved, setLpApproved] = useState(false);
@@ -332,6 +337,11 @@ const FarmActions = ({
     }
   }, [sssData, hasUserLockedTokens, heliStaked]);
 
+  useEffect(() => {
+    const currentAPR = (sssData.rewardsPercentage * Number(lockSliderValue)) / 365;
+    setCurrentLockAPR(currentAPR);
+  }, [lockSliderValue, sssData.rewardsPercentage]);
+
   // Helper methods
   const getStakeButtonLabel = () => {
     if (getInsufficientTokenBalance()) return `Insufficient HELI balance`;
@@ -477,6 +487,15 @@ const FarmActions = ({
                   maxValue={daysLeftCampaignEnd.toString()}
                   minValue={siderMinValue.toString()}
                 />
+
+                <div className="mt-4">
+                  <span className="text-secondary text-small">
+                    Expected APR from current locking period:{' '}
+                  </span>
+                  {formatStringToPercentage(
+                    stripStringToFixedDecimals(currentLockAPR.toString(), 2),
+                  )}
+                </div>
               </div>
 
               <div className="d-grid mt-4">
