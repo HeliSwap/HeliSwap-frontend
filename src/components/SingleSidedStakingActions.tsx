@@ -47,6 +47,8 @@ import {
   invalidInputTokensData,
 } from '../utils/tokenUtils';
 
+import { StakingStatus } from '../pages/SingleSidedStaking';
+
 interface IFarmActionsProps {
   sssData: ISSSData;
   hasUserStaked: boolean;
@@ -65,6 +67,7 @@ interface IFarmActionsProps {
   updateTotalStakedHeli: (newValue: string, action: string) => void;
   setCountDown: (newValue: number) => void;
   setLockedUntil: (newValue: number) => void;
+  setStakingStatus: (newValue: number) => void;
 }
 
 enum TabStates {
@@ -91,6 +94,7 @@ const FarmActions = ({
   setCountDown,
   setLockedUntil,
   campaignEndDate,
+  setStakingStatus,
 }: IFarmActionsProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
@@ -107,9 +111,9 @@ const FarmActions = ({
     ? nowTimestampInSeconds() + DAY_IN_SECONDS
     : sssData.position.expiration.inSeconds + DAY_IN_SECONDS;
   const siderMinValue = getDaysFromTimestampInSeconds(minLockTimestampValue);
-  const canUserWithdraw = sssData.position.expiration.inMilliSeconds < Date.now();
   const maxSupplyLimitHit = Number(sssData.totalDeposited.inETH) >= Number(sssData.maxSupply.inETH);
-  const canLock = campaignEndDate > sssData.position.expiration.inMilliSeconds;
+  const canLock =
+    Number(heliStaked) > 0 && campaignEndDate > sssData.position.expiration.inMilliSeconds;
 
   const [lpInputValue, setLpInputValue] = useState(maxHELIInputValue);
   const [sliderValue, setSliderValue] = useState(SLIDER_INITIAL_VALUE);
@@ -130,6 +134,7 @@ const FarmActions = ({
   const [lockSliderValue, setLockSliderValue] = useState(siderMinValue.toString());
   const [availableToLock, setAvailableToLock] = useState('0');
   const [stakeAndLock, setStakeAndLock] = useState(false);
+  const [userCanWithdraw, setUserCanWithdraw] = useState(false);
 
   // Handlers
   const handleTabButtonClick = (value: TabStates) => {
@@ -206,7 +211,7 @@ const FarmActions = ({
       const timestamp = nowTimestampInSeconds() + timeLeft + 60;
 
       const receipt =
-        canLock && !canUserWithdraw && !maxSupplyLimitHit
+        canLock && !userCanWithdraw && !maxSupplyLimitHit
           ? await sdk.depositAndLock(
               connectorInstance,
               lpInputValue,
@@ -225,8 +230,9 @@ const FarmActions = ({
         updateStakedHeli(lpInputValue, 'add');
         updateTotalStakedHeli(lpInputValue, 'add');
         setShowDepositModal(false);
+        setStakingStatus(StakingStatus.DEPOSIT);
 
-        !canUserWithdraw && updateLockedHeli(lpInputValue, 'add');
+        !userCanWithdraw && updateLockedHeli(lpInputValue, 'add');
 
         toast.success('Success! Tokens were deposited.');
       } else {
@@ -242,6 +248,7 @@ const FarmActions = ({
   const handleLockConfirm = async () => {
     setLoadingLock(true);
     try {
+      // const oneMinAfterNow = Math.floor(Date.now() / 1000) + 60;
       const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
       const receipt = await sdk.lock(connectorInstance, lockTimestampValue, kernelAddress, userId);
 
@@ -259,6 +266,8 @@ const FarmActions = ({
         setCountDown(lockTimestampValue * 1000 - Date.now());
         setLockedUntil(lockTimestampValue * 1000);
         setStakeAndLock(true);
+        setUserCanWithdraw(false);
+        setStakingStatus(StakingStatus.LOCK);
       } else {
         toast.error(getErrorMessage(error.status ? error.status : error));
       }
@@ -285,6 +294,7 @@ const FarmActions = ({
         updateStakedHeli(heliStaked, 'remove');
         updateTotalStakedHeli(heliStaked, 'remove');
         setShowExitModal(false);
+        setStakingStatus(StakingStatus.IDLE);
 
         toast.success('Success! Tokens were withdrawn.');
       } else {
@@ -344,8 +354,12 @@ const FarmActions = ({
   }, [lockSliderValue, sssData.rewardsPercentage]);
 
   useEffect(() => {
-    canLock && !canUserWithdraw && !maxSupplyLimitHit && setStakeAndLock(true);
-  }, [canLock, canUserWithdraw, maxSupplyLimitHit]);
+    canLock && !userCanWithdraw && !maxSupplyLimitHit && setStakeAndLock(true);
+  }, [canLock, userCanWithdraw, maxSupplyLimitHit]);
+
+  useEffect(() => {
+    setUserCanWithdraw(sssData.position.expiration.inMilliSeconds < Date.now());
+  }, [sssData]);
 
   // Helper methods
   const getStakeButtonLabel = () => {
@@ -469,7 +483,7 @@ const FarmActions = ({
                   readonly={true}
                   inputTokenComponent={
                     <InputToken
-                      value={availableToLock}
+                      value={stakeAndLock ? sssData.position.amount.inETH : availableToLock}
                       disabled={true}
                       isCompact={true}
                       name="amountIn"
@@ -505,7 +519,7 @@ const FarmActions = ({
                   loading={loadingLock}
                   onClick={() => setShowLockModal(true)}
                 >
-                  Lock
+                  {stakeAndLock ? 'Increase lock' : 'Lock'}
                 </Button>
               </div>
             </>
@@ -547,7 +561,7 @@ const FarmActions = ({
                   ))
                 ) : (
                   <Button
-                    disabled={!canUserWithdraw}
+                    disabled={!userCanWithdraw}
                     loading={loadingExit}
                     onClick={() => setShowExitModal(true)}
                   >
@@ -571,6 +585,15 @@ const FarmActions = ({
                   <Confirmation confirmationText={`Unstaking ${lpInputValue} HELI tokens`} />
                 ) : (
                   <>
+                    {stakeAndLock ? (
+                      <div className="alert alert-warning d-flex align-items-center">
+                        <Icon color="warning" name="warning" />
+                        <p className="ms-3">
+                          Depositing tokens again will lock them along with the other locked!
+                        </p>
+                      </div>
+                    ) : null}
+
                     <div className="text-small">HELI token count</div>
 
                     <div className="d-flex justify-content-between align-items-center mt-4">
@@ -636,9 +659,15 @@ const FarmActions = ({
                   <Confirmation confirmationText={`Locking ${availableToLock} HELI tokens`} />
                 ) : (
                   <>
-                    <div className="text-main text-warning">
-                      You are going to lock {availableToLock} HELI tokens for{' '}
-                      {getDaysFromTimestampInSeconds(lockTimestampValue)} days.
+                    <div className="alert alert-warning d-flex align-items-center">
+                      <Icon color="warning" name="warning" />
+                      <p className="ms-3">
+                        You are going to lock {availableToLock} HELI tokens for{' '}
+                        {getDaysFromTimestampInSeconds(lockTimestampValue)} days. These tokens will
+                        not be available for withdraw till the locking period is over! Depositing
+                        tokens again will lock them along with the these ones! Are you sure you want
+                        to continue?
+                      </p>
                     </div>
 
                     <div className="text-small mt-4">HELI token count</div>
@@ -650,7 +679,9 @@ const FarmActions = ({
                         <span className="text-main ms-3">HELI Token</span>
                       </div>
 
-                      <div className="text-main text-numeric">{availableToLock}</div>
+                      <div className="text-main text-numeric">
+                        {stakeAndLock ? sssData.position.amount.inETH : availableToLock}
+                      </div>
                     </div>
                   </>
                 )}
