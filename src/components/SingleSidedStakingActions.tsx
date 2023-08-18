@@ -107,6 +107,9 @@ const FarmActions = ({
     ? nowTimestampInSeconds() + DAY_IN_SECONDS
     : sssData.position.expiration.inSeconds + DAY_IN_SECONDS;
   const siderMinValue = getDaysFromTimestampInSeconds(minLockTimestampValue);
+  const canUserWithdraw = sssData.position.expiration.inMilliSeconds < Date.now();
+  const maxSupplyLimitHit = Number(sssData.totalDeposited.inETH) >= Number(sssData.maxSupply.inETH);
+  const canLock = campaignEndDate > sssData.position.expiration.inMilliSeconds;
 
   const [lpInputValue, setLpInputValue] = useState(maxHELIInputValue);
   const [sliderValue, setSliderValue] = useState(SLIDER_INITIAL_VALUE);
@@ -123,10 +126,10 @@ const FarmActions = ({
   const [showExitModal, setShowExitModal] = useState(false);
   const [showLockModal, setShowLockModal] = useState(false);
 
-  const [selectedButton, setSelectedButton] = useState(0);
   const [lockTimestampValue, setLockTimestampValue] = useState(minLockTimestampValue);
   const [lockSliderValue, setLockSliderValue] = useState(siderMinValue.toString());
   const [availableToLock, setAvailableToLock] = useState('0');
+  const [stakeAndLock, setStakeAndLock] = useState(false);
 
   // Handlers
   const handleTabButtonClick = (value: TabStates) => {
@@ -250,17 +253,15 @@ const FarmActions = ({
         toast.success('Success! Tokens were locked.');
 
         setTabState(TabStates.STAKE);
-        setSelectedButton(0);
         setAvailableToLock('0');
         updateLockedHeli(amountToLock, 'add');
         setShowLockModal(false);
-        setCountDown(selectedButton * 1000);
-        setLockedUntil(Date.now() + selectedButton * 1000);
+        setCountDown(lockTimestampValue * 1000 - Date.now());
+        setLockedUntil(lockTimestampValue * 1000);
+        setStakeAndLock(true);
       } else {
         toast.error(getErrorMessage(error.status ? error.status : error));
       }
-
-      setLockTimestampValue(0);
     } catch (e) {
       console.log('e', e);
     } finally {
@@ -342,16 +343,16 @@ const FarmActions = ({
     setCurrentLockAPR(currentAPR);
   }, [lockSliderValue, sssData.rewardsPercentage]);
 
+  useEffect(() => {
+    canLock && !canUserWithdraw && !maxSupplyLimitHit && setStakeAndLock(true);
+  }, [canLock, canUserWithdraw, maxSupplyLimitHit]);
+
   // Helper methods
   const getStakeButtonLabel = () => {
     if (getInsufficientTokenBalance()) return `Insufficient HELI balance`;
-    if (canLock && !canUserWithdraw && !maxSupplyLimitHit) return 'Stake and Lock';
+    if (stakeAndLock) return 'Stake and Lock';
     return 'Stake';
   };
-
-  const canUserWithdraw = sssData.position.expiration.inMilliSeconds < Date.now();
-  const maxSupplyLimitHit = Number(sssData.totalDeposited.inETH) >= Number(sssData.maxSupply.inETH);
-  const canLock = campaignEndDate > sssData.position.expiration.inMilliSeconds;
 
   return (
     <div className="col-md-5 mt-4 mt-md-0">
