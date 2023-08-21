@@ -90,5 +90,5 @@ export const nowTimestampInSeconds = () => Math.floor(Date.now() / 1000);
 export const getDaysFromTimestampInSeconds = (timestampInSeconds: number) => {
   if (timestampInSeconds < nowTimestampInSeconds()) return 0;
 
-  return Math.floor((timestampInSeconds - nowTimestampInSeconds()) / DAY_IN_SECONDS);
+  return Math.ceil((timestampInSeconds - nowTimestampInSeconds()) / DAY_IN_SECONDS);
 };

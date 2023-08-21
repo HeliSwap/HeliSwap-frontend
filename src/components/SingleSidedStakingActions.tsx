@@ -103,11 +103,14 @@ const FarmActions = ({
   const maxHELIInputValue = stakingTokenBalance;
 
   const lockTimeEnded = sssData.position.expiration.inMilliSeconds < Date.now();
-  const daysLeftCampaignEnd = getDaysFromTimestampInSeconds(sssData.expirationDate.inSeconds);
-  const minLockTimestampValue = lockTimeEnded
+  // Here we substract 1 day from the campaign end date to avoid the user to lock tokens on the last day in order to have room for increase the lock time.
+  const daysLeftCampaignEnd = getDaysFromTimestampInSeconds(
+    sssData.expirationDate.inSeconds - DAY_IN_SECONDS,
+  );
+  const minLockTimestampInitialValue = lockTimeEnded
     ? nowTimestampInSeconds() + DAY_IN_SECONDS
     : sssData.position.expiration.inSeconds + DAY_IN_SECONDS;
-  const siderMinValue = getDaysFromTimestampInSeconds(minLockTimestampValue);
+  const sliderMinValue = getDaysFromTimestampInSeconds(minLockTimestampInitialValue);
   const maxSupplyLimitHit = Number(sssData.totalDeposited.inETH) >= Number(sssData.maxSupply.inETH);
   const canLock = Number(heliStaked) > 0;
 
@@ -126,11 +129,14 @@ const FarmActions = ({
   const [showExitModal, setShowExitModal] = useState(false);
   const [showLockModal, setShowLockModal] = useState(false);
 
+  const [minLockTimestampValue, setMinLockTimestampValue] = useState(minLockTimestampInitialValue);
   const [lockTimestampValue, setLockTimestampValue] = useState(minLockTimestampValue);
-  const [lockSliderValue, setLockSliderValue] = useState(siderMinValue.toString());
+  const [lockSliderValue, setLockSliderValue] = useState(sliderMinValue.toString());
+  const [lockSliderMinValue, setLockSliderMinValue] = useState(sliderMinValue.toString());
   const [availableToLock, setAvailableToLock] = useState('0');
   const [stakeAndLock, setStakeAndLock] = useState(false);
   const [userCanWithdraw, setUserCanWithdraw] = useState(false);
+  const [maxLockTimeReached, setMaxLockTimeReacked] = useState(false);
 
   // Handlers
   const handleTabButtonClick = (value: TabStates) => {
@@ -165,7 +171,9 @@ const FarmActions = ({
 
     const newValue = nowTimestampInSeconds() + Number(value) * DAY_IN_SECONDS;
 
-    setLockTimestampValue(newValue);
+    setLockTimestampValue(
+      newValue > sssData.expirationDate.inSeconds ? sssData.expirationDate.inSeconds : newValue,
+    );
     setLockSliderValue(value);
   };
 
@@ -261,6 +269,11 @@ const FarmActions = ({
         setShowLockModal(false);
         setCountDown(lockTimestampValue * 1000 - Date.now());
         setLockedUntil(lockTimestampValue * 1000);
+        setMinLockTimestampValue(lockTimestampValue + DAY_IN_SECONDS);
+        setLockTimestampValue(lockTimestampValue + DAY_IN_SECONDS);
+        setLockSliderMinValue(
+          getDaysFromTimestampInSeconds(lockTimestampValue + DAY_IN_SECONDS).toString(),
+        );
         setStakeAndLock(true);
         setUserCanWithdraw(false);
         setStakingStatus(StakingStatus.LOCK);
@@ -350,13 +363,18 @@ const FarmActions = ({
   }, [lockSliderValue, sssData.rewardsPercentage]);
 
   useEffect(() => {
-    if (canLock && hasUserLockedTokens && !maxSupplyLimitHit) {
+    if (canLock && hasUserLockedTokens && !maxSupplyLimitHit && !maxLockTimeReached) {
       setStakeAndLock(true);
     }
-  }, [canLock, hasUserLockedTokens, maxSupplyLimitHit]);
+  }, [canLock, hasUserLockedTokens, maxSupplyLimitHit, maxLockTimeReached]);
 
   useEffect(() => {
     setUserCanWithdraw(sssData.position.expiration.inMilliSeconds < Date.now());
+  }, [sssData]);
+
+  useEffect(() => {
+    const isReached = sssData.position.expiration.inSeconds === sssData.expirationDate.inSeconds;
+    setMaxLockTimeReacked(isReached);
   }, [sssData]);
 
   // Helper methods
@@ -365,6 +383,10 @@ const FarmActions = ({
     if (stakeAndLock) return 'Stake and Lock';
     return 'Stake';
   };
+
+  console.log('sssData.expirationDate.inSeconds', sssData.expirationDate.inSeconds);
+  console.log('sssData.position.expiration.inSeconds', sssData.position.expiration.inSeconds);
+  console.log('lockTimestampValue', lockTimestampValue);
 
   return (
     <div className="col-md-5 mt-4 mt-md-0">
@@ -492,28 +514,36 @@ const FarmActions = ({
                   }
                 />
 
-                <p className="text-secondary text-small text-bold mt-5 mb-3">Lock for:</p>
+                {maxLockTimeReached ? (
+                  <div className="text-main mt-5 mb-3">Max lock time reached!</div>
+                ) : (
+                  <>
+                    <p className="text-secondary text-small text-bold mt-5 mb-3">Lock for:</p>
 
-                <InputDaySlider
-                  handleSliderChange={handleLockSliderChange}
-                  sliderValue={lockSliderValue}
-                  maxValue={daysLeftCampaignEnd.toString()}
-                  minValue={siderMinValue.toString()}
-                />
+                    <InputDaySlider
+                      handleSliderChange={handleLockSliderChange}
+                      sliderValue={lockSliderValue}
+                      maxValue={daysLeftCampaignEnd.toString()}
+                      minValue={lockSliderMinValue.toString()}
+                    />
 
-                <div className="mt-4">
-                  <span className="text-secondary text-small">
-                    Expected APR from current locking period:{' '}
-                  </span>
-                  {formatStringToPercentage(
-                    stripStringToFixedDecimals(currentLockAPR.toString(), 2),
-                  )}
-                </div>
+                    <div className="mt-4">
+                      <span className="text-secondary text-small">
+                        Expected APR from current locking period:{' '}
+                      </span>
+                      {formatStringToPercentage(
+                        stripStringToFixedDecimals(currentLockAPR.toString(), 2),
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="d-grid mt-4">
                 <Button
-                  disabled={!canLock || maxSupplyLimitHit || lockTimestampValue === 0}
+                  disabled={
+                    !canLock || maxSupplyLimitHit || lockTimestampValue === 0 || maxLockTimeReached
+                  }
                   loading={loadingLock}
                   onClick={() => setShowLockModal(true)}
                 >
