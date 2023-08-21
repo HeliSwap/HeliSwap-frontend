@@ -251,10 +251,10 @@ const FarmActions = ({
   const handleLockConfirm = async () => {
     setLoadingLock(true);
     try {
-      const oneMinAfterNow = Math.floor(Date.now() / 1000) + 60;
+      // const oneMinAfterNow = Math.floor(Date.now() / 1000) + 60;
       const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
-      // const receipt = await sdk.lock(connectorInstance, lockTimestampValue, kernelAddress, userId);
-      const receipt = await sdk.lock(connectorInstance, oneMinAfterNow, kernelAddress, userId);
+      const receipt = await sdk.lock(connectorInstance, lockTimestampValue, kernelAddress, userId);
+      // const receipt = await sdk.lock(connectorInstance, oneMinAfterNow, kernelAddress, userId);
 
       const {
         response: { success, error },
@@ -271,9 +271,7 @@ const FarmActions = ({
         setLockedUntil(lockTimestampValue * 1000);
         setMinLockTimestampValue(lockTimestampValue + DAY_IN_SECONDS);
         setLockTimestampValue(lockTimestampValue + DAY_IN_SECONDS);
-        setLockSliderMinValue(
-          getDaysFromTimestampInSeconds(lockTimestampValue + DAY_IN_SECONDS).toString(),
-        );
+        setLockSliderMinValue(getDaysFromTimestampInSeconds(lockTimestampValue).toString());
         setStakeAndLock(true);
         setUserCanWithdraw(false);
         setStakingStatus(StakingStatus.LOCK);
@@ -383,10 +381,6 @@ const FarmActions = ({
     if (stakeAndLock) return 'Stake and Lock';
     return 'Stake';
   };
-
-  console.log('sssData.expirationDate.inSeconds', sssData.expirationDate.inSeconds);
-  console.log('sssData.position.expiration.inSeconds', sssData.position.expiration.inSeconds);
-  console.log('lockTimestampValue', lockTimestampValue);
 
   return (
     <div className="col-md-5 mt-4 mt-md-0">

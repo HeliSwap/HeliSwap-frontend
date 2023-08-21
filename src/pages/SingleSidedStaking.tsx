@@ -441,8 +441,6 @@ const SingleSidedStaking = () => {
   const hasUserStaked = sssData && sssData.totalDeposited && sssData.totalDeposited.inETH !== '0';
   const tokensToAssociate = userRewardsData?.filter(token => !getTokenIsAssociated(token));
 
-  console.log('sssData', sssData);
-
   return isHashpackLoading ? (
     <Loader />
   ) : (
