@@ -64,6 +64,7 @@ export interface ISSSData {
   maxSupply: IAmountData;
   totalRewards: IAmountData;
   claimable: IAmountData;
+  expirationDate: ITimestampData;
   position: {
     amount: IAmountData;
     duration: IDurationData;

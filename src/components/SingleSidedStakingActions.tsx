@@ -59,7 +59,6 @@ interface IFarmActionsProps {
   loadingAssociate: boolean;
   hasUserLockedTokens: boolean;
   timeLeft: number;
-  campaignEndDate: number;
   getStakingTokenBalance: (id: string) => void;
   handleAssociateClick: (token: ITokenData) => void;
   updateStakedHeli: (newValue: string, action: string) => void;
@@ -93,7 +92,6 @@ const FarmActions = ({
   timeLeft,
   setCountDown,
   setLockedUntil,
-  campaignEndDate,
   setStakingStatus,
 }: IFarmActionsProps) => {
   const contextValue = useContext(GlobalContext);
@@ -105,15 +103,13 @@ const FarmActions = ({
   const maxHELIInputValue = stakingTokenBalance;
 
   const lockTimeEnded = sssData.position.expiration.inMilliSeconds < Date.now();
-  const campaignEndDateInSeconds = Math.floor(campaignEndDate / 1000);
-  const daysLeftCampaignEnd = getDaysFromTimestampInSeconds(campaignEndDateInSeconds);
+  const daysLeftCampaignEnd = getDaysFromTimestampInSeconds(sssData.expirationDate.inSeconds);
   const minLockTimestampValue = lockTimeEnded
     ? nowTimestampInSeconds() + DAY_IN_SECONDS
     : sssData.position.expiration.inSeconds + DAY_IN_SECONDS;
   const siderMinValue = getDaysFromTimestampInSeconds(minLockTimestampValue);
   const maxSupplyLimitHit = Number(sssData.totalDeposited.inETH) >= Number(sssData.maxSupply.inETH);
-  const canLock =
-    Number(heliStaked) > 0 && campaignEndDate > sssData.position.expiration.inMilliSeconds;
+  const canLock = Number(heliStaked) > 0;
 
   const [lpInputValue, setLpInputValue] = useState(maxHELIInputValue);
   const [sliderValue, setSliderValue] = useState(SLIDER_INITIAL_VALUE);
@@ -210,16 +206,15 @@ const FarmActions = ({
       const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
       const timestamp = nowTimestampInSeconds() + timeLeft + 60;
 
-      const receipt =
-        canLock && !userCanWithdraw && !maxSupplyLimitHit
-          ? await sdk.depositAndLock(
-              connectorInstance,
-              lpInputValue,
-              timestamp,
-              kernelAddress,
-              userId,
-            )
-          : await sdk.deposit(connectorInstance, lpInputValue, kernelAddress, userId);
+      const receipt = stakeAndLock
+        ? await sdk.depositAndLock(
+            connectorInstance,
+            lpInputValue,
+            timestamp,
+            kernelAddress,
+            userId,
+          )
+        : await sdk.deposit(connectorInstance, lpInputValue, kernelAddress, userId);
 
       const {
         response: { success, error },
@@ -248,9 +243,10 @@ const FarmActions = ({
   const handleLockConfirm = async () => {
     setLoadingLock(true);
     try {
-      // const oneMinAfterNow = Math.floor(Date.now() / 1000) + 60;
+      const oneMinAfterNow = Math.floor(Date.now() / 1000) + 60;
       const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
-      const receipt = await sdk.lock(connectorInstance, lockTimestampValue, kernelAddress, userId);
+      // const receipt = await sdk.lock(connectorInstance, lockTimestampValue, kernelAddress, userId);
+      const receipt = await sdk.lock(connectorInstance, oneMinAfterNow, kernelAddress, userId);
 
       const {
         response: { success, error },
@@ -354,8 +350,10 @@ const FarmActions = ({
   }, [lockSliderValue, sssData.rewardsPercentage]);
 
   useEffect(() => {
-    canLock && !userCanWithdraw && !maxSupplyLimitHit && setStakeAndLock(true);
-  }, [canLock, userCanWithdraw, maxSupplyLimitHit]);
+    if (canLock && hasUserLockedTokens && !maxSupplyLimitHit) {
+      setStakeAndLock(true);
+    }
+  }, [canLock, hasUserLockedTokens, maxSupplyLimitHit]);
 
   useEffect(() => {
     setUserCanWithdraw(sssData.position.expiration.inMilliSeconds < Date.now());

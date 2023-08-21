@@ -129,7 +129,7 @@ const SingleSidedStaking = () => {
   const [loadingAssociate, setLoadingAssociate] = useState(false);
   const [userRewardsBalance, setUserRewardsBalance] = useState('0');
   const [loadingSSSData, setLoadingSSSData] = useState(true);
-  const [hasUserLockedTokens, setHasUserLockedTokens] = useState(true);
+  const [hasUserLockedTokens, setHasUserLockedTokens] = useState(false);
 
   const [showHarvestModal, setShowHarvestModal] = useState(false);
 
@@ -332,10 +332,18 @@ const SingleSidedStaking = () => {
           sssContract.positions(kernelAddress, idToAddress(userId)),
           sssContract.claimable(kernelAddress, idToAddress(userId)),
           sssContract.totalRewards(kernelAddress, idToAddress(userId)),
+          sssContract.expirationDate(),
         ];
 
-        const [totalDeposited, rewardsPercentage, maxSupply, positions, claimable, totalRewards] =
-          await Promise.all(promisesArray);
+        const [
+          totalDeposited,
+          rewardsPercentage,
+          maxSupply,
+          positions,
+          claimable,
+          totalRewards,
+          expirationDate,
+        ] = await Promise.all(promisesArray);
 
         const { amount, duration, expiration, rewardsNotClaimed, rewardsPending } = positions;
 
@@ -345,6 +353,7 @@ const SingleSidedStaking = () => {
           maxSupply: formatContractAmount(maxSupply),
           totalRewards: formatContractAmount(totalRewards),
           claimable: formatContractAmount(claimable),
+          expirationDate: formatContractTimestamp(expirationDate),
           position: {
             amount: formatContractAmount(amount),
             duration: formatContractDuration(duration),
@@ -431,6 +440,8 @@ const SingleSidedStaking = () => {
 
   const hasUserStaked = sssData && sssData.totalDeposited && sssData.totalDeposited.inETH !== '0';
   const tokensToAssociate = userRewardsData?.filter(token => !getTokenIsAssociated(token));
+
+  console.log('sssData', sssData);
 
   return isHashpackLoading ? (
     <Loader />
@@ -828,7 +839,6 @@ const SingleSidedStaking = () => {
               timeLeft={Math.ceil(countDown / 1000)}
               setCountDown={setCountDown}
               setLockedUntil={setLockedUntil}
-              campaignEndDate={campaignEndDate}
               setStakingStatus={setStakingStatus}
             />
           </div>
