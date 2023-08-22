@@ -59,6 +59,7 @@ interface IFarmActionsProps {
   loadingAssociate: boolean;
   hasUserLockedTokens: boolean;
   timeLeft: number;
+  stakingStatus: StakingStatus;
   getStakingTokenBalance: (id: string) => void;
   handleAssociateClick: (token: ITokenData) => void;
   updateStakedHeli: (newValue: string, action: string) => void;
@@ -93,6 +94,7 @@ const FarmActions = ({
   setCountDown,
   setLockedUntil,
   setStakingStatus,
+  stakingStatus,
 }: IFarmActionsProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
@@ -457,6 +459,17 @@ const FarmActions = ({
                     />
                   }
                 />
+
+                {stakingStatus === StakingStatus.LOCK ? (
+                  <div className="mt-4">
+                    <p className="text-small text-secondary">
+                      Your overall $HELI token position is currently locked. This lock applies to
+                      your entire position and is non revokable. You can however, stake more tokens
+                      into the existing Lock in order to increase your $HELI stake and Voting power
+                      and to benefit from the extra Locking APR and voting power boost.
+                    </p>
+                  </div>
+                ) : null}
               </div>
 
               {userId ? (
@@ -529,6 +542,18 @@ const FarmActions = ({
                         stripStringToFixedDecimals(currentLockAPR.toString(), 2),
                       )}
                     </div>
+
+                    {stakingStatus === StakingStatus.LOCK ? (
+                      <div className="mt-4">
+                        <p className="text-small text-secondary">
+                          You have the possibility to increase the Lock. The increased lock time
+                          will add to your overall allocation of Voting Power and Lock APR. You can
+                          see the APR from Locking and all other stats in the “Lock” Section on the
+                          left. Please be aware, that the increased lock time applies to all $HELI
+                          tokens you have staked into SSS and is non-revokable.
+                        </p>
+                      </div>
+                    ) : null}
                   </>
                 )}
               </div>
@@ -566,6 +591,17 @@ const FarmActions = ({
                     <ButtonSelector disabled selectedToken="HELI" selectorText="Select a token" />
                   }
                 />
+
+                {stakingStatus === StakingStatus.LOCK ? (
+                  <div className="mt-4">
+                    <p className="text-small text-secondary">
+                      Unstaking is currently not possible as your position is locked. You can see
+                      the exact amount of time left for the lock on the left hand side. While your
+                      position is locked, you may not unstake it. If you want to unstake some or all
+                      of your $HELI tokens, you need to wait until the lock has expired.
+                    </p>
+                  </div>
+                ) : null}
               </div>
 
               <div className="d-grid mt-4">

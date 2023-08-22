@@ -489,7 +489,7 @@ const SingleSidedStaking = () => {
                 <div className="d-md-flex justify-content-between align-items-start">
                   <div className="d-flex align-items-center">
                     <IconToken size={'large'} symbol={'HELI'} />
-                    <p className="text-subheader text-light ms-3">HELI</p>
+                    <p className="text-subheader text-light ms-3">Staking</p>
                   </div>
 
                   <div className="container-campaign-status mt-4 mt-md-0 d-flex align-items-center">
@@ -497,12 +497,13 @@ const SingleSidedStaking = () => {
                   </div>
                 </div>
 
-                <div className="container-border-rounded-bn-500 mt-4 mt-lg-6">
+                <div className="container-border-rounded-bn-500 mt-5">
+                  <p className="text-main text-bold mb-4">Total position</p>
                   <div className="row">
                     <div className="col-6 col-md-4 d-flex align-items-center">
                       <p className="d-flex align-items-center">
                         <span className="text-secondary text-small">APR</span>
-                        <Tippy content="Your annual rate of return, expressed as a percentage. Interest paid in previous periods is not accounted for.">
+                        <Tippy content="The annual rate of return (APR) of your dynamic staked $HELI position. This APR may change dynamically as people stake and unstake into SSS. The Lock time of users does not affect this APR.">
                           <span className="ms-2">
                             <Icon name="hint" color="gray" size="small" />
                           </span>
@@ -522,7 +523,7 @@ const SingleSidedStaking = () => {
                     <div className="col-6 col-md-4 d-flex align-items-center">
                       <p className="d-flex align-items-center">
                         <span className="text-secondary text-small">Total Staked</span>
-                        <Tippy content="The total amount of staked tokens in this single sided staking pool, denominated in $USD.">
+                        <Tippy content="The Total Amount of $HELI staked into Dynamic Staking expressed in Token amount and $Dollar Amount.">
                           <span className="ms-2">
                             <Icon name="hint" color="gray" size="small" />
                           </span>
@@ -545,11 +546,12 @@ const SingleSidedStaking = () => {
 
                   <hr className="my-5" />
 
-                  <div className="row mt-4">
+                  <p className="text-main text-bold my-4">Your position</p>
+                  <div className="row">
                     <div className="col-6 col-md-4 d-flex align-items-center">
                       <p className="d-flex align-items-center">
                         <span className="text-secondary text-small">Staked HELI Tokens</span>
-                        <Tippy content="The amount of your staked tokens in $USD, as well as staked tokens count.">
+                        <Tippy content="Your personal amount of $HELI staked into the Single Sided Staking Pool, expressed in Tokens and $Dollar Amount.">
                           <span className="ms-2">
                             <Icon name="hint" color="gray" size="small" />
                           </span>
@@ -574,7 +576,7 @@ const SingleSidedStaking = () => {
                     <div className="col-6 col-md-4 d-flex align-items-center">
                       <p className="d-flex align-items-center">
                         <span className="text-secondary text-small">Voting power</span>
-                        <Tippy content="The amount of your staked tokens in $USD, as well as staked tokens count.">
+                        <Tippy content="The Voting power you earned from Staking into the Dynamic Staking pool. This is increased if you apply a Lock (see Lock voting power below)">
                           <span className="ms-2">
                             <Icon name="hint" color="gray" size="small" />
                           </span>
@@ -590,99 +592,111 @@ const SingleSidedStaking = () => {
                 </div>
 
                 {hasUserLockedTokens ? (
-                  <div className="container-border-rounded-bn-500 mt-4">
-                    <div className="row">
-                      <div className="col-6 col-md-4 d-flex align-items-center">
-                        <p className="d-flex align-items-center">
-                          <span className="text-secondary text-small">APR from locking</span>
-                          <Tippy content="Your annual rate of return, expressed as a percentage. Interest paid in previous periods is not accounted for.">
-                            <span className="ms-2">
-                              <Icon name="hint" color="gray" size="small" />
-                            </span>
-                          </Tippy>
-                        </p>
-                      </div>
-                      <div className="col-6 col-md-4">
-                        <p className="text-subheader text-numeric">{sssData.rewardsPercentage}%</p>
-                      </div>
+                  <>
+                    <div className="d-flex align-items-center mt-5 mb-3">
+                      <Icon name="lock" />
+                      <p className="text-subheader text-light ms-2">Lock</p>
                     </div>
+                    <div className="container-border-rounded-bn-500 mt-4">
+                      <div className="row">
+                        <div className="col-6 col-md-4 d-flex align-items-center">
+                          <p className="d-flex align-items-center">
+                            <span className="text-secondary text-small">APR from locking</span>
+                            <Tippy content="The Extra APR you gain from locking your tokens. This is a statik APR and does not change depending on Lock participants.">
+                              <span className="ms-2">
+                                <Icon name="hint" color="gray" size="small" />
+                              </span>
+                            </Tippy>
+                          </p>
+                        </div>
+                        <div className="col-6 col-md-4">
+                          <p className="text-subheader text-numeric">
+                            {sssData.rewardsPercentage}%
+                          </p>
+                        </div>
+                      </div>
 
-                    <div className="row mt-4">
-                      <div className="col-6 col-md-4 d-flex align-items-center">
-                        <p className="d-flex align-items-center">
-                          <span className="text-secondary text-small">Locked HELI Tokens</span>
-                          <Tippy content="The amount of your staked tokens in $USD, as well as staked tokens count.">
-                            <span className="ms-2">
-                              <Icon name="hint" color="gray" size="small" />
+                      <div className="row mt-4">
+                        <div className="col-6 col-md-4 d-flex align-items-center">
+                          <p className="d-flex align-items-center">
+                            <span className="text-secondary text-small">Locked HELI Tokens</span>
+                            <Tippy content="The Amount of $HELI Tokens you have locked. While a lock is active, this number will always resemble the “Staked HELI Tokens”.">
+                              <span className="ms-2">
+                                <Icon name="hint" color="gray" size="small" />
+                              </span>
+                            </Tippy>
+                          </p>
+                        </div>
+                        <div className="col-6 col-md-8 d-md-flex align-items-center">
+                          <p className="text-subheader text-numeric">
+                            {formatStringToPrice(stripStringToFixedDecimals(heliLockedUSD, 2))}
+                          </p>
+                          <p className="d-flex align-items-center ms-md-3 mt-2">
+                            <span className="text-secondary text-main">
+                              {formatStringETHtoPriceFormatted(heliLocked)}
                             </span>
-                          </Tippy>
-                        </p>
-                      </div>
-                      <div className="col-6 col-md-8 d-md-flex align-items-center">
-                        <p className="text-subheader text-numeric">
-                          {formatStringToPrice(stripStringToFixedDecimals(heliLockedUSD, 2))}
-                        </p>
-                        <p className="d-flex align-items-center ms-md-3 mt-2">
-                          <span className="text-secondary text-main">
-                            {formatStringETHtoPriceFormatted(heliLocked)}
-                          </span>
 
-                          <IconToken className="ms-3" symbol="HELI" />
-                        </p>
+                            <IconToken className="ms-3" symbol="HELI" />
+                          </p>
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="row mt-4">
-                      <div className="col-6 col-md-4 d-flex align-items-center">
-                        <p className="d-flex align-items-center">
-                          <span className="text-secondary text-small">Locked until</span>
-                          <Tippy content="The amount of your staked tokens in $USD, as well as staked tokens count.">
-                            <span className="ms-2">
-                              <Icon name="hint" color="gray" size="small" />
+                      <div className="row mt-4">
+                        <div className="col-6 col-md-4 d-flex align-items-center">
+                          <p className="d-flex align-items-center">
+                            <span className="text-secondary text-small">Locked until</span>
+                            <Tippy content="The exact date and time your position is locked for. You can not unstake during this time. Adding tokens or extending lock is the only option.">
+                              <span className="ms-2">
+                                <Icon name="hint" color="gray" size="small" />
+                              </span>
+                            </Tippy>
+                          </p>
+                        </div>
+                        <div className="col-6 col-md-8 d-md-flex align-items-center">
+                          <p className="text-main">{timestampToDateTime(lockedUntil)}</p>
+                        </div>
+                      </div>
+
+                      <div className="row mt-4">
+                        <div className="col-6 col-md-4 d-flex align-items-center">
+                          <p className="d-flex align-items-center">
+                            <span className="text-secondary text-small">
+                              You can withdraw after:
                             </span>
-                          </Tippy>
-                        </p>
-                      </div>
-                      <div className="col-6 col-md-8 d-md-flex align-items-center">
-                        <p className="text-main">{timestampToDateTime(lockedUntil)}</p>
-                      </div>
-                    </div>
-
-                    <div className="row mt-4">
-                      <div className="col-6 col-md-4 d-flex align-items-center">
-                        <p className="d-flex align-items-center">
-                          <span className="text-secondary text-small">You can withdraw after:</span>
-                          <Tippy content="The amount of your staked tokens in $USD, as well as staked tokens count.">
-                            <span className="ms-2">
-                              <Icon name="hint" color="gray" size="small" />
-                            </span>
-                          </Tippy>
-                        </p>
-                      </div>
-                      <div className="col-6 col-md-8 d-md-flex align-items-center">
-                        <div className="mt-3 d-flex justify-content-center">
-                          <div className="text-center">
-                            <p className="text-numeric text-main">
-                              {formatTimeNumber(getCountdownReturnValues(countDown).days)}
-                            </p>
-                            <p className="text-micro text-secondary text-uppercase mt-2">days</p>
-                          </div>
-                          <div className="text-center ms-3">
-                            <p className="text-numeric text-main">
-                              {formatTimeNumber(getCountdownReturnValues(countDown).hours)}
-                            </p>
-                            <p className="text-micro text-secondary text-uppercase mt-2">hours</p>
-                          </div>
-                          <div className="text-center ms-3">
-                            <p className="text-numeric text-main">
-                              {formatTimeNumber(getCountdownReturnValues(countDown).minutes)}
-                            </p>
-                            <p className="text-micro text-secondary text-uppercase mt-2">minutes</p>
+                            <Tippy content="The Countdown of your lock current lock.">
+                              <span className="ms-2">
+                                <Icon name="hint" color="gray" size="small" />
+                              </span>
+                            </Tippy>
+                          </p>
+                        </div>
+                        <div className="col-6 col-md-8 d-md-flex align-items-center">
+                          <div className="mt-3 d-flex justify-content-center">
+                            <div className="text-center">
+                              <p className="text-numeric text-main">
+                                {formatTimeNumber(getCountdownReturnValues(countDown).days)}
+                              </p>
+                              <p className="text-micro text-secondary text-uppercase mt-2">days</p>
+                            </div>
+                            <div className="text-center ms-3">
+                              <p className="text-numeric text-main">
+                                {formatTimeNumber(getCountdownReturnValues(countDown).hours)}
+                              </p>
+                              <p className="text-micro text-secondary text-uppercase mt-2">hours</p>
+                            </div>
+                            <div className="text-center ms-3">
+                              <p className="text-numeric text-main">
+                                {formatTimeNumber(getCountdownReturnValues(countDown).minutes)}
+                              </p>
+                              <p className="text-micro text-secondary text-uppercase mt-2">
+                                minutes
+                              </p>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </>
                 ) : null}
 
                 <div className="container-blue-neutral rounded p-4 p-lg-5 mt-4 mt-lg-5">
@@ -693,7 +707,7 @@ const SingleSidedStaking = () => {
                           <div className="d-flex align-items-center">
                             <p className="text-small text-bold">Pending rewards</p>
                             <Tippy
-                              content={`Your pending rewards are calculated in real time. The amount shown is a time-sensitive estimation, and might slightly differ from the actual amount. Before and after actions are taken, it takes 5-10 secs for the amounts to update.`}
+                              content={`The Rewards you can claim for your position. They are updating when users are interacting with this mechanism.`}
                             >
                               <span className="ms-2">
                                 <Icon name="hint" />
@@ -715,6 +729,13 @@ const SingleSidedStaking = () => {
                                 <IconToken symbol={'HELI'} />
                                 <span className="text-numeric ms-3">{userRewardsBalance}</span>
                                 <span className="ms-3 text-secondary">{'HELI'}</span>
+                                <Tippy
+                                  content={`The HELI you earned from the dynamic staking mechanism.`}
+                                >
+                                  <span className="ms-2">
+                                    <Icon color="gray" size="small" name="hint" />
+                                  </span>
+                                </Tippy>
                               </span>
                             </p>
 
@@ -752,6 +773,11 @@ const SingleSidedStaking = () => {
                               <IconToken symbol={'HELI'} />
                               <span className="text-numeric ms-3">{sssData.claimable.inETH}</span>
                               <span className="ms-3 text-secondary">{'HELI'}</span>
+                              <Tippy content={`The HELI you earned from the Lock mechanism.`}>
+                                <span className="ms-2">
+                                  <Icon color="gray" size="small" name="hint" />
+                                </span>
+                              </Tippy>
                             </span>
                           </p>
 
@@ -838,6 +864,7 @@ const SingleSidedStaking = () => {
               setCountDown={setCountDown}
               setLockedUntil={setLockedUntil}
               setStakingStatus={setStakingStatus}
+              stakingStatus={stakingStatus}
             />
           </div>
         )}
