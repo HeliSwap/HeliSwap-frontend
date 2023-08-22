@@ -124,6 +124,7 @@ const FarmActions = ({
   const [loadingExit, setLoadingExit] = useState(false);
   const [loadingLock, setLoadingLock] = useState(false);
   const [currentLockAPR, setCurrentLockAPR] = useState(0);
+  const [additionalVotingPower, setAdditionalVotingPower] = useState(0);
 
   const [tabState, setTabState] = useState(TabStates.STAKE);
   const [lpApproved, setLpApproved] = useState(false);
@@ -363,6 +364,11 @@ const FarmActions = ({
   }, [lockSliderValue, sssData.rewardsPercentage]);
 
   useEffect(() => {
+    const votingPower = (Number(heliStaked) * Number(lockSliderValue)) / 365;
+    setAdditionalVotingPower(votingPower);
+  }, [lockSliderValue, heliStaked]);
+
+  useEffect(() => {
     if (canLock && hasUserLockedTokens && !maxSupplyLimitHit && !maxLockTimeReached) {
       setStakeAndLock(true);
     }
@@ -541,6 +547,13 @@ const FarmActions = ({
                       {formatStringToPercentage(
                         stripStringToFixedDecimals(currentLockAPR.toString(), 2),
                       )}
+                    </div>
+
+                    <div className="mt-4">
+                      <span className="text-secondary text-small">
+                        Expected additional voting power:{' '}
+                      </span>
+                      {stripStringToFixedDecimals(additionalVotingPower.toString(), 2)}
                     </div>
 
                     {stakingStatus === StakingStatus.LOCK ? (

@@ -594,8 +594,8 @@ const SingleSidedStaking = () => {
                 {hasUserLockedTokens ? (
                   <>
                     <div className="d-flex align-items-center mt-5 mb-3">
-                      <Icon name="lock" />
-                      <p className="text-subheader text-light ms-2">Lock</p>
+                      {/* <Icon name="lock" /> */}
+                      <p className="text-subheader text-light">Lock</p>
                     </div>
                     <div className="container-border-rounded-bn-500 mt-4">
                       <div className="row">
