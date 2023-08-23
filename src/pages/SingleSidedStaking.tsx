@@ -129,7 +129,9 @@ const SingleSidedStaking = () => {
   const [loadingAssociate, setLoadingAssociate] = useState(false);
   const [userRewardsBalance, setUserRewardsBalance] = useState('0');
   const [loadingSSSData, setLoadingSSSData] = useState(true);
+  const [loadingKernelData, setLoadingKernelData] = useState(true);
   const [hasUserLockedTokens, setHasUserLockedTokens] = useState(false);
+  const [generalError, setGeneralError] = useState(false);
 
   const [showHarvestModal, setShowHarvestModal] = useState(false);
 
@@ -153,6 +155,8 @@ const SingleSidedStaking = () => {
       setVotingPower(formatBigNumberToStringETH(votingPowerBN));
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoadingKernelData(false);
     }
   }, [kernelContract, userId]);
 
@@ -167,12 +171,21 @@ const SingleSidedStaking = () => {
       const totalDuration = formatContractDuration(pull.totalDuration);
       const totalAmount = formatContractAmount(pull.totalAmount);
 
+      // console.log('pull.endTs', pull.endTs.toString());
+      // console.log('pull.totalDuration', pull.totalDuration.toString());
+      // console.log('pull.totalAmount', pull.totalAmount.toString());
+
+      // const endDate = formatContractTimestamp(ethers.BigNumber.from('1693217667'));
+      // const totalDuration = formatContractDuration(ethers.BigNumber.from('432000'));
+      // const totalAmount = formatContractAmount(ethers.BigNumber.from('100000000000'));
+
       setCampaignEndDate(endDate.inMilliSeconds);
       setTotalDuration(totalDuration.inMilliSeconds);
       setTotalRewadsAmount(totalAmount.inETH);
       setUserRewardsBalance(balance);
     } catch (error) {
       console.error(error);
+      setGeneralError(true);
     }
   }, [rewardsContract, tokenContract, userId]);
 
@@ -326,24 +339,32 @@ const SingleSidedStaking = () => {
         const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS;
 
         const promisesArray = [
-          sssContract.totalDeposited(),
           sssContract.rewardsPercentage(),
           sssContract.maxSupply(),
+          sssContract.expirationDate(),
+          sssContract.totalDeposited(),
           sssContract.positions(kernelAddress, idToAddress(userId)),
           sssContract.claimable(kernelAddress, idToAddress(userId)),
           sssContract.totalRewards(kernelAddress, idToAddress(userId)),
-          sssContract.expirationDate(),
         ];
 
         const [
-          totalDeposited,
           rewardsPercentage,
           maxSupply,
+          expirationDate,
+          totalDeposited,
           positions,
           claimable,
           totalRewards,
-          expirationDate,
         ] = await Promise.all(promisesArray);
+
+        // console.log('rewardsPercentage', rewardsPercentage.toString());
+        // console.log('maxSupply', maxSupply.toString());
+        // console.log('expirationDate', expirationDate.toString());
+
+        // const rewardsPercentage = ethers.BigNumber.from('330000000000000000');
+        // const maxSupply = ethers.BigNumber.from('10000000000000');
+        // const expirationDate = ethers.BigNumber.from('1724322580');
 
         const { amount, duration, expiration, rewardsNotClaimed, rewardsPending } = positions;
 
@@ -367,6 +388,7 @@ const SingleSidedStaking = () => {
         setHeliLocked(sssData.position.amount.inETH);
       } catch (error) {
         console.error(`Error getting SSS data: ${error}`);
+        setGeneralError(true);
       } finally {
         setLoadingSSSData(false);
       }
@@ -480,8 +502,14 @@ const SingleSidedStaking = () => {
               Connect wallet
             </Button>
           </div>
-        ) : loadingSSSData ? (
+        ) : loadingSSSData || loadingKernelData ? (
           <Loader />
+        ) : generalError ? (
+          <div className="d-flex justify-content-center">
+            <div className="alert alert-warning my-5">
+              Something went wrong, please try again later...
+            </div>
+          </div>
         ) : (
           <div className="row">
             <div className="col-md-7">
