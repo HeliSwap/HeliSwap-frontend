@@ -30,6 +30,7 @@ const ProposalDetails = () => {
   const { id } = useParams();
   const [proposal, setProposal] = useState<IProposal>({} as IProposal);
   const [loadingProposal, setLoadingProposal] = useState(true);
+  const [errorProposal, setErrorProposal] = useState(false);
   const [loadingExecuteAction, setLoadingExecuteAction] = useState(false);
 
   const governanceContract = useGovernanceContract();
@@ -121,10 +122,11 @@ const ProposalDetails = () => {
         };
 
         setProposal(proposalFomatted);
-
-        setLoadingProposal(false);
       } catch (error) {
         console.error(error);
+        setErrorProposal(true);
+      } finally {
+        setLoadingProposal(false);
       }
     },
     [governanceContract],
@@ -196,6 +198,12 @@ const ProposalDetails = () => {
     <div className="container mt-5 mt-md-10">
       {loadingProposal ? (
         <p className="text-small text-secondary text-center">Loading...</p>
+      ) : errorProposal ? (
+        <div className="d-flex justify-content-center">
+          <div className="alert alert-warning my-5">
+            Something went wrong, please try again later...
+          </div>
+        </div>
       ) : haveProposal ? (
         <>
           <div className="row">
@@ -209,20 +217,22 @@ const ProposalDetails = () => {
               <h1 className="text-title text-bold mt-5">{proposal.title}</h1>
 
               <div className="d-flex justify-content-between align-items-center">
-                <div className="mt-2">
-                  <p className="text-small">
-                    <span className="text-secondary">Voting starts at: </span>
-                    <span className="">
-                      {timestampToDateTime((proposal.votingStart as number) * 1000)}
-                    </span>
-                  </p>
-                  <p className="text-small mt-2">
-                    <span className="text-secondary">Voting ends at: </span>
-                    <span className="">
-                      {timestampToDateTime((proposal.votingEnd as number) * 1000)}
-                    </span>
-                  </p>
-                </div>
+                {!isNaN(proposal.votingStart as number) && !isNaN(proposal.votingEnd as number) ? (
+                  <div className="mt-2">
+                    <p className="text-small">
+                      <span className="text-secondary">Voting starts at: </span>
+                      <span className="">
+                        {timestampToDateTime((proposal.votingStart as number) * 1000)}
+                      </span>
+                    </p>
+                    <p className="text-small mt-2">
+                      <span className="text-secondary">Voting ends at: </span>
+                      <span className="">
+                        {timestampToDateTime((proposal.votingEnd as number) * 1000)}
+                      </span>
+                    </p>
+                  </div>
+                ) : null}
 
                 <div>
                   <p className="text-small text-bold mt-3">
