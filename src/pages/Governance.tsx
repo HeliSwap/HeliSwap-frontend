@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+// import { ethers } from 'ethers';
 
 import { GlobalContext } from '../providers/Global';
 
@@ -57,6 +58,11 @@ const Governance = () => {
       ];
 
       const [lastIdBN, warmUpDurationBN, activeDurationBN] = await Promise.all(promisesArray);
+      // console.log('warmUpDurationBN.toString', warmUpDurationBN.toString());
+      // console.log('activeDurationBN.toString', activeDurationBN.toString());
+
+      // const warmUpDurationBN = ethers.BigNumber.from();
+      // const activeDurationBN = ethers.BigNumber.from();
 
       const lastId = Number(lastIdBN.toString());
       const warmUpDuration = Number(warmUpDurationBN.toString());
