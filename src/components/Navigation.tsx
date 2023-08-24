@@ -29,10 +29,16 @@ const navigation = [
     text: 'Farms',
   },
   {
+    link: '/single-sided-staking-old',
+    name: 'sss',
+    color: 'gray',
+    text: 'Single Sided Staking Phase 1',
+  },
+  {
     link: '/single-sided-staking',
     name: 'sss',
     color: 'gray',
-    text: 'Single Sided Staking',
+    text: 'Single Sided Staking Phase 2',
   },
   {
     link: '/proposals',
