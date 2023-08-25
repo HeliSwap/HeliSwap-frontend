@@ -736,8 +736,8 @@ const FarmActions = ({
                         You are going to lock {availableToLock} HELI tokens for{' '}
                         {getDaysFromTimestampInSeconds(lockTimestampValue)} days. These tokens will
                         not be available for withdraw till the locking period is over! Depositing
-                        tokens again will lock them along with the these ones! Are you sure you want
-                        to continue?
+                        tokens again will lock them along with the already locked ones! Are you sure
+                        you want to continue?
                       </p>
                     </div>
 

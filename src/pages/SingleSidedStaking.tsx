@@ -470,13 +470,21 @@ const SingleSidedStaking = () => {
       <div className="container-max-with-1042">
         <h1 className="text-headline text-light mb-4">Single Sided Staking - Phase 2</h1>
 
-        <p className="text-small mb-4 mb-lg-6">
-          Phase 1 is a standard Single Sided Staking pool. Phase 2 will involve the same mechanism,
-          but with advanced features like lockup periods. In Phase 2, staked tokens will also earn
-          voting power for the HeliSwap DAO. Phase 2 will follow a few weeks after Phase 1 and we
-          will update the community well in advance to make sure everyone can migrate their
-          liquidity on time.
+        <p className="text-small mb-4">
+          On HeliSwap, you can stake your $HELI tokens into the pool below and earn APR on your
+          stake - and even lock up your position for a certain amount of time for extra APR - but
+          most importantly: Participating grants you voting rights within the HeliSwap DAO allowing
+          active participation in the community. Please look at all the tips and be careful before
+          locking your tokens longer than you are comfortable with.
+          <br />
+          <br />
+          Notes:
         </p>
+
+        <ul className="list-default text-small mb-4 mb-lg-6">
+          <li>Voting power did not update after staking</li>
+          <li>Also rewards did not update</li>
+        </ul>
 
         {stakingStatus === StakingStatus.DEPOSIT ? (
           <div className="text-small mb-4 mb-lg-6">
@@ -630,7 +638,7 @@ const SingleSidedStaking = () => {
                         <div className="col-6 col-md-4 d-flex align-items-center">
                           <p className="d-flex align-items-center">
                             <span className="text-secondary text-small">APR from locking</span>
-                            <Tippy content="The Extra APR you gain from locking your tokens. This is a statik APR and does not change depending on Lock participants.">
+                            <Tippy content="The Extra APR you gain from locking your tokens. This is a static APR and does not change depending on Lock participants.">
                               <span className="ms-2">
                                 <Icon name="hint" color="gray" size="small" />
                               </span>
@@ -688,9 +696,7 @@ const SingleSidedStaking = () => {
                       <div className="row mt-4">
                         <div className="col-6 col-md-4 d-flex align-items-center">
                           <p className="d-flex align-items-center">
-                            <span className="text-secondary text-small">
-                              You can withdraw after:
-                            </span>
+                            <span className="text-secondary text-small">Remaining Lock time:</span>
                             <Tippy content="The Countdown of your lock current lock.">
                               <span className="ms-2">
                                 <Icon name="hint" color="gray" size="small" />
@@ -801,7 +807,9 @@ const SingleSidedStaking = () => {
                               <IconToken symbol={'HELI'} />
                               <span className="text-numeric ms-3">{sssData.claimable.inETH}</span>
                               <span className="ms-3 text-secondary">{'HELI'}</span>
-                              <Tippy content={`The HELI you earned from the Lock mechanism.`}>
+                              <Tippy
+                                content={`The HELI you earned from the Lock mechanism. It can only be claimed once the lock has expired.`}
+                              >
                                 <span className="ms-2">
                                   <Icon color="gray" size="small" name="hint" />
                                 </span>

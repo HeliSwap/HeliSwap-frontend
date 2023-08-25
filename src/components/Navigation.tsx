@@ -89,7 +89,7 @@ const Navigation = () => {
       {navigation.map((item, index) => {
         return (
           <NavLink
-            key={item.name}
+            key={index}
             to={item.link}
             className={({ isActive }) => getClasses(isActive, index).join(' ')}
           >
