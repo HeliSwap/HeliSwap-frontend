@@ -319,36 +319,8 @@ export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbar
   if (hbarPrice === 0) return '0';
   if (tokenAddress === WHBARAddress) return hbarPrice.toString();
 
-  // Filter pools with WHBAR not deep enough in order to not distort price calculation
-  const filteredPoolsData = poolsData.filter(pool => {
-    const { token0, token0Amount, token0Decimals, token1, token1Amount, token1Decimals } = pool;
-
-    const token0AmountFormattedNumber = Number(
-      formatStringWeiToStringEther(token0Amount, token0Decimals),
-    );
-    const token1AmountFormattedNumber = Number(
-      formatStringWeiToStringEther(token1Amount, token1Decimals),
-    );
-
-    const token0AmountValueInUSD = token0AmountFormattedNumber * hbarPrice;
-    const token1AmountValueInUSD = token1AmountFormattedNumber * hbarPrice;
-
-    const hasToken0AmountEnough = token0AmountValueInUSD >= minLiquidity;
-    const hasToken1AmountEnough = token1AmountValueInUSD >= minLiquidity;
-
-    if (token0 === WHBARAddress) {
-      return hasToken0AmountEnough;
-    }
-
-    if (token1 === WHBARAddress) {
-      return hasToken1AmountEnough;
-    }
-
-    return true;
-  });
-
   // Check for direct pool with HBAR
-  const directPool = filteredPoolsData.find(pool => {
+  const directPool = poolsData.find(pool => {
     const { token0, token1 } = pool;
 
     return (
@@ -380,6 +352,34 @@ export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbar
 
     return tokenPrice.toString();
   } else {
+    // Filter pools with WHBAR not deep enough in order to not distort price calculation
+    const filteredPoolsData = poolsData.filter(pool => {
+      const { token0, token0Amount, token0Decimals, token1, token1Amount, token1Decimals } = pool;
+
+      const token0AmountFormattedNumber = Number(
+        formatStringWeiToStringEther(token0Amount, token0Decimals),
+      );
+      const token1AmountFormattedNumber = Number(
+        formatStringWeiToStringEther(token1Amount, token1Decimals),
+      );
+
+      const token0AmountValueInUSD = token0AmountFormattedNumber * hbarPrice;
+      const token1AmountValueInUSD = token1AmountFormattedNumber * hbarPrice;
+
+      const hasToken0AmountEnough = token0AmountValueInUSD >= minLiquidity;
+      const hasToken1AmountEnough = token1AmountValueInUSD >= minLiquidity;
+
+      if (token0 === WHBARAddress) {
+        return hasToken0AmountEnough;
+      }
+
+      if (token1 === WHBARAddress) {
+        return hasToken1AmountEnough;
+      }
+
+      return true;
+    });
+
     // Calculate the target token amount for 1 HBAR
     let tradesIn = getPossibleTradesExactIn(
       filteredPoolsData || [],
