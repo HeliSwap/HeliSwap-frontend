@@ -19,6 +19,7 @@ import Icon from './Icon';
 import Modal from './Modal';
 import Confirmation from './Confirmation';
 import ConfirmTransactionModalContent from './Modals/ConfirmTransactionModalContent';
+import ConfirmTransactionModalCheckboxContent from './Modals/ConfirmTransactionModalCheckboxContent';
 import IconToken from './IconToken';
 import InputSlider from './InputSlider';
 import InputDaySlider from './InputDaySlider';
@@ -645,12 +646,17 @@ const FarmActions = ({
 
           {showDepositModal ? (
             <Modal show={showDepositModal} closeModal={() => setShowDepositModal(false)}>
-              <ConfirmTransactionModalContent
+              <ConfirmTransactionModalCheckboxContent
                 modalTitle="Stake Your HELI Tokens"
                 closeModal={() => setShowDepositModal(false)}
                 confirmTansaction={handleDepositConfirm}
                 confirmButtonLabel="Confirm"
                 isLoading={loadingStake}
+                checkboxText={
+                  stakeAndLock
+                    ? 'I understand that I will lock and not be able to withdraw till the end of the lock period.'
+                    : ''
+                }
               >
                 {loadingStake ? (
                   <Confirmation confirmationText={`Unstaking ${lpInputValue} HELI tokens`} />
@@ -678,7 +684,7 @@ const FarmActions = ({
                     </div>
                   </>
                 )}
-              </ConfirmTransactionModalContent>
+              </ConfirmTransactionModalCheckboxContent>
             </Modal>
           ) : null}
 
@@ -719,12 +725,15 @@ const FarmActions = ({
 
           {showLockModal ? (
             <Modal show={showLockModal} closeModal={() => setShowLockModal(false)}>
-              <ConfirmTransactionModalContent
+              <ConfirmTransactionModalCheckboxContent
                 modalTitle="Lock Your HELI Tokens"
                 closeModal={() => setShowLockModal(false)}
                 confirmTansaction={handleLockConfirm}
                 confirmButtonLabel="Confirm"
                 isLoading={loadingLock}
+                checkboxText={
+                  'I understand that I will lock and not be able to withdraw till the end of the lock period.'
+                }
               >
                 {loadingLock ? (
                   <Confirmation confirmationText={`Locking ${availableToLock} HELI tokens`} />
@@ -756,7 +765,7 @@ const FarmActions = ({
                     </div>
                   </>
                 )}
-              </ConfirmTransactionModalContent>
+              </ConfirmTransactionModalCheckboxContent>
             </Modal>
           ) : null}
         </div>
