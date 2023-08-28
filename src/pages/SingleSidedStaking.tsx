@@ -891,7 +891,7 @@ const SingleSidedStaking = () => {
                     <>
                       <div className="d-flex justify-content-between align-items-start">
                         <div className="d-flex align-items-center">
-                          <p className="text-small text-bold">Claimable rewards</p>
+                          <p className="text-small text-bold">Accumulated rewards</p>
                           <Tippy
                             content={`The Rewards you can claim for your position. They are claimable once the lock has expired.`}
                           >
@@ -908,7 +908,7 @@ const SingleSidedStaking = () => {
                         <p className="text-main d-flex justify-content-between align-items-center">
                           <span className="d-flex align-items-center">
                             <IconToken symbol={'HELI'} />
-                            <span className="text-numeric ms-3">{sssData.claimable.inETH}</span>
+                            <span className="text-numeric ms-3">{sssData.totalRewards.inETH}</span>
                             <span className="ms-3 text-secondary">{'HELI'}</span>
                             <Tippy
                               content={`The HELI you earned from the Lock mechanism. It can only be claimed once the lock has expired.`}
