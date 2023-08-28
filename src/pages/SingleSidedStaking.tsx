@@ -131,6 +131,7 @@ const SingleSidedStaking = () => {
   const [loadingKernelData, setLoadingKernelData] = useState(true);
   const [hasUserLockedTokens, setHasUserLockedTokens] = useState(false);
   const [generalError, setGeneralError] = useState(false);
+  const [shouldRefresh, setShouldRefresh] = useState(false);
 
   const [showHarvestModal, setShowHarvestModal] = useState(false);
 
@@ -308,6 +309,23 @@ const SingleSidedStaking = () => {
     });
   };
 
+  const updateVotingPower = (votingPower: string, action: string) => {
+    setVotingPower(prev => {
+      let newVotingPower;
+      if (action === 'add') {
+        newVotingPower = ethers.utils
+          .parseUnits(prev, 8)
+          .add(ethers.utils.parseUnits(votingPower, 8));
+        setHasUserLockedTokens(true);
+      } else {
+        newVotingPower = ethers.utils
+          .parseUnits(prev, 8)
+          .sub(ethers.utils.parseUnits(votingPower, 8));
+      }
+      return formatBigNumberToStringETH(newVotingPower);
+    });
+  };
+
   // Check for associations
   useEffect(() => {
     const checkTokenAssociation = async (userId: string) => {
@@ -382,6 +400,8 @@ const SingleSidedStaking = () => {
             rewardsPending: formatContractAmount(rewardsPending),
           },
         };
+
+        // console.log('sssData', sssData);
 
         setSssDdata(sssData);
         setHeliLocked(sssData.position.amount.inETH);
@@ -515,7 +535,7 @@ const SingleSidedStaking = () => {
               <div className="container-blue-neutral-800 rounded p-4 p-lg-5">
                 <div className="d-md-flex justify-content-between align-items-start">
                   <div className="d-flex align-items-center">
-                    <IconToken size={'large'} symbol={'HELI'} />
+                    <IconToken symbol={'HELI'} />
                     <p className="text-subheader text-light ms-3">Staking</p>
                   </div>
 
@@ -610,10 +630,29 @@ const SingleSidedStaking = () => {
                         </Tippy>
                       </p>
                     </div>
-                    <div className="col-6 col-md-8 d-md-flex align-items-center">
+                    <div className="col-6 col-md-8">
                       <p className="text-subheader text-numeric">
-                        {formatStringETHtoPriceFormatted(votingPower)}
+                        {formatStringETHtoPriceFormatted(votingPower)}{' '}
                       </p>
+                      {hasUserLockedTokens ? (
+                        <p className="d-flex align-items-center mt-2">
+                          <span className="text-secondary text-main">
+                            ({formatStringETHtoPriceFormatted(heliStaked)} +{' '}
+                            {formatStringETHtoPriceFormatted(
+                              (Number(votingPower) - Number(heliStaked)).toString(),
+                            )}{' '}
+                            from lock)
+                          </span>
+                        </p>
+                      ) : null}
+                      {shouldRefresh ? (
+                        <p className="d-flex align-items-center ms-2 mt-3">
+                          <Icon size="small" name="warning" color="warning" />
+                          <span className="text-micro text-warning ms-2">
+                            Please refresh the page for more accurate data
+                          </span>
+                        </p>
+                      ) : null}
                     </div>
                   </div>
                 </div>
@@ -722,8 +761,8 @@ const SingleSidedStaking = () => {
                 </div>
 
                 <div className="d-flex align-items-center mt-5 mb-3">
-                  {/* <Icon name="lock" /> */}
-                  <p className="text-subheader text-light">Lock</p>
+                  <Icon name={hasUserLockedTokens ? 'lock' : 'unlock'} />
+                  <p className="text-subheader text-light ms-3">Lock</p>
                 </div>
                 <div className="container-border-rounded-bn-500 mt-4">
                   <div className="row">
@@ -922,6 +961,8 @@ const SingleSidedStaking = () => {
               setLockedUntil={setLockedUntil}
               setStakingStatus={setStakingStatus}
               stakingStatus={stakingStatus}
+              updateVotingPower={updateVotingPower}
+              setShouldRefresh={setShouldRefresh}
             />
           </div>
         )}

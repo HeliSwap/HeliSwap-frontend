@@ -38,6 +38,7 @@ import { ReactComponent as C14 } from '../icons/system/c14.svg';
 import { ReactComponent as SSS } from '../icons/system/sss.svg';
 import { ReactComponent as Question } from '../icons/system/question.svg';
 import { ReactComponent as Lock } from '../icons/system/lock.svg';
+import { ReactComponent as Unlock } from '../icons/system/unlock.svg';
 
 interface IIconProps {
   name: string;
@@ -103,6 +104,7 @@ const icons: IIconMapping = {
   question: Question,
   governance: Question,
   lock: Lock,
+  unlock: Unlock,
 };
 
 const colorMapping: IColorMapping = {

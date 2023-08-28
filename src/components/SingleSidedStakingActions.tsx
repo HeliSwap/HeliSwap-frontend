@@ -65,10 +65,12 @@ interface IFarmActionsProps {
   handleAssociateClick: (token: ITokenData) => void;
   updateStakedHeli: (newValue: string, action: string) => void;
   updateLockedHeli: (newValue: string, action: string) => void;
+  updateVotingPower: (newValue: string, action: string) => void;
   updateTotalStakedHeli: (newValue: string, action: string) => void;
   setCountDown: (newValue: number) => void;
   setLockedUntil: (newValue: number) => void;
   setStakingStatus: (newValue: number) => void;
+  setShouldRefresh: (newValue: boolean) => void;
 }
 
 enum TabStates {
@@ -96,6 +98,8 @@ const FarmActions = ({
   setLockedUntil,
   setStakingStatus,
   stakingStatus,
+  updateVotingPower,
+  setShouldRefresh,
 }: IFarmActionsProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
@@ -236,10 +240,12 @@ const FarmActions = ({
         getStakingTokenBalance(userId);
         updateStakedHeli(lpInputValue, 'add');
         updateTotalStakedHeli(lpInputValue, 'add');
+        updateVotingPower(lpInputValue, 'add');
         setShowDepositModal(false);
         setStakingStatus(StakingStatus.DEPOSIT);
 
         !userCanWithdraw && updateLockedHeli(lpInputValue, 'add');
+        setShouldRefresh(stakeAndLock);
 
         toast.success('Success! Tokens were deposited.');
       } else {
@@ -279,6 +285,7 @@ const FarmActions = ({
         setStakeAndLock(true);
         setUserCanWithdraw(false);
         setStakingStatus(StakingStatus.LOCK);
+        setShouldRefresh(true);
       } else {
         toast.error(getErrorMessage(error.status ? error.status : error));
       }
@@ -304,6 +311,7 @@ const FarmActions = ({
         getStakingTokenBalance(userId);
         updateStakedHeli(heliStaked, 'remove');
         updateTotalStakedHeli(heliStaked, 'remove');
+        updateVotingPower(heliStaked, 'remove');
         setShowExitModal(false);
         setStakingStatus(StakingStatus.IDLE);
 
