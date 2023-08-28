@@ -316,7 +316,6 @@ const SingleSidedStaking = () => {
         newVotingPower = ethers.utils
           .parseUnits(prev, 8)
           .add(ethers.utils.parseUnits(votingPower, 8));
-        setHasUserLockedTokens(true);
       } else {
         newVotingPower = ethers.utils
           .parseUnits(prev, 8)
@@ -784,8 +783,8 @@ const SingleSidedStaking = () => {
                   <div className="row mt-4">
                     <div className="col-6 col-md-4 d-flex align-items-center">
                       <p className="d-flex align-items-center">
-                        <span className="text-secondary text-small">Total HELI Tokens locked</span>
-                        <Tippy content="">
+                        <span className="text-secondary text-small">Total locked</span>
+                        <Tippy content="The amount of total locked tokens and the available token limit">
                           <span className="ms-2">
                             <Icon name="hint" color="gray" size="small" />
                           </span>
@@ -892,9 +891,9 @@ const SingleSidedStaking = () => {
                     <>
                       <div className="d-flex justify-content-between align-items-start">
                         <div className="d-flex align-items-center">
-                          <p className="text-small text-bold">Pending rewards</p>
+                          <p className="text-small text-bold">Claimable rewards</p>
                           <Tippy
-                            content={`The Rewards you can claim for your position. They are updating when users are interacting with this mechanism.`}
+                            content={`The Rewards you can claim for your position. They are claimable once the lock has expired.`}
                           >
                             <span className="ms-2">
                               <Icon name="hint" />
