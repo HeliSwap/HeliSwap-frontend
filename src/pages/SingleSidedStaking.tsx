@@ -63,8 +63,7 @@ export enum StakingStatus {
 const SingleSidedStaking = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk, tokensWhitelisted, hbarPrice } = contextValue;
-  const { userId, connectorInstance, isHashpackLoading, setShowConnectModal, connected } =
-    connection;
+  const { userId, connectorInstance, isHashpackLoading, setShowConnectModal } = connection;
 
   const kernelContract = useKernelContract();
   const tokenContract = useHELITokenContract();
@@ -476,15 +475,7 @@ const SingleSidedStaking = () => {
           most importantly: Participating grants you voting rights within the HeliSwap DAO allowing
           active participation in the community. Please look at all the tips and be careful before
           locking your tokens longer than you are comfortable with.
-          <br />
-          <br />
-          Notes:
         </p>
-
-        <ul className="list-default text-small mb-4 mb-lg-6">
-          <li>Voting power did not update after staking</li>
-          <li>Also rewards did not update</li>
-        </ul>
 
         {stakingStatus === StakingStatus.DEPOSIT ? (
           <div className="text-small mb-4 mb-lg-6">
@@ -627,56 +618,180 @@ const SingleSidedStaking = () => {
                   </div>
                 </div>
 
-                {hasUserLockedTokens ? (
-                  <>
-                    <div className="d-flex align-items-center mt-5 mb-3">
-                      {/* <Icon name="lock" /> */}
-                      <p className="text-subheader text-light">Lock</p>
-                    </div>
-                    <div className="container-border-rounded-bn-500 mt-4">
-                      <div className="row">
-                        <div className="col-6 col-md-4 d-flex align-items-center">
-                          <p className="d-flex align-items-center">
-                            <span className="text-secondary text-small">APR from locking</span>
-                            <Tippy content="The Extra APR you gain from locking your tokens. This is a static APR and does not change depending on Lock participants.">
-                              <span className="ms-2">
-                                <Icon name="hint" color="gray" size="small" />
-                              </span>
-                            </Tippy>
-                          </p>
-                        </div>
-                        <div className="col-6 col-md-4">
-                          <p className="text-subheader text-numeric">
-                            {sssData.rewardsPercentage}%
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="row mt-4">
-                        <div className="col-6 col-md-4 d-flex align-items-center">
-                          <p className="d-flex align-items-center">
-                            <span className="text-secondary text-small">Locked HELI Tokens</span>
-                            <Tippy content="The Amount of $HELI Tokens you have locked. While a lock is active, this number will always resemble the “Staked HELI Tokens”.">
-                              <span className="ms-2">
-                                <Icon name="hint" color="gray" size="small" />
-                              </span>
-                            </Tippy>
-                          </p>
-                        </div>
-                        <div className="col-6 col-md-8 d-md-flex align-items-center">
-                          <p className="text-subheader text-numeric">
-                            {formatStringToPrice(stripStringToFixedDecimals(heliLockedUSD, 2))}
-                          </p>
-                          <p className="d-flex align-items-center ms-md-3 mt-2">
-                            <span className="text-secondary text-main">
-                              {formatStringETHtoPriceFormatted(heliLocked)}
+                <div className="container-blue-neutral rounded p-4 p-lg-5 mt-4 mt-lg-5">
+                  {hasUserStaked ? (
+                    <>
+                      <div className="d-flex justify-content-between align-items-start">
+                        <div className="d-flex align-items-center">
+                          <p className="text-small text-bold">Pending rewards</p>
+                          <Tippy
+                            content={`The Rewards you can claim for your position. They are updating when users are interacting with this mechanism.`}
+                          >
+                            <span className="ms-2">
+                              <Icon name="hint" />
                             </span>
-
-                            <IconToken className="ms-3" symbol="HELI" />
-                          </p>
+                          </Tippy>
                         </div>
                       </div>
 
+                      <div>
+                        <hr className="my-4" />
+
+                        <div className="d-flex justify-content-between align-items-center">
+                          <p className="text-main d-flex justify-content-between align-items-center">
+                            <span className="d-flex align-items-center">
+                              <IconToken symbol={'HELI'} />
+                              <span className="text-numeric ms-3">{userRewardsBalance}</span>
+                              <span className="ms-3 text-secondary">{'HELI'}</span>
+                              <Tippy
+                                content={`The HELI you earned from the dynamic staking mechanism.`}
+                              >
+                                <span className="ms-2">
+                                  <Icon color="gray" size="small" name="hint" />
+                                </span>
+                              </Tippy>
+                            </span>
+                          </p>
+
+                          <div className="d-flex justify-content-end">
+                            {tokensToAssociate && tokensToAssociate?.length > 0 ? (
+                              tokensToAssociate.map((token, index) => (
+                                <Button
+                                  key={index}
+                                  loading={loadingAssociate}
+                                  onClick={() => handleAssociateClick(token)}
+                                  size="small"
+                                  type="primary"
+                                >
+                                  {`Associate ${token.symbol}`}
+                                </Button>
+                              ))
+                            ) : (
+                              <Button
+                                disabled={Number(userRewardsBalance) === 0}
+                                loading={loadingClaim}
+                                onClick={() => setShowHarvestModal(true)}
+                                size="small"
+                                type="primary"
+                              >
+                                Claim
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {showHarvestModal ? (
+                        <Modal
+                          show={showHarvestModal}
+                          closeModal={() => setShowHarvestModal(false)}
+                        >
+                          <ConfirmTransactionModalContent
+                            modalTitle="Harvest Pending Rewards"
+                            closeModal={() => setShowHarvestModal(false)}
+                            confirmTansaction={handleClaimClick}
+                            confirmButtonLabel="Confirm"
+                            isLoading={loadingClaim}
+                          >
+                            {loadingClaim ? (
+                              <Confirmation confirmationText={'Harvesting reward tokens'} />
+                            ) : (
+                              <>
+                                <div className="text-small">Estimated pending rewards:</div>
+                                <div className="d-flex justify-content-between align-items-center mt-4">
+                                  <div className="d-flex align-items-center">
+                                    <IconToken symbol={'HELI'} />
+                                    <span className="text-main ms-3">{'HELI'}</span>
+                                  </div>
+
+                                  <div className="text-main text-numeric">{userRewardsBalance}</div>
+                                </div>
+                              </>
+                            )}
+                          </ConfirmTransactionModalContent>
+                        </Modal>
+                      ) : null}
+                    </>
+                  ) : (
+                    <div>
+                      <p className="text-small text-bold text-center my-5">
+                        Stake Your HELI Tokens and Earn Rewards
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="d-flex align-items-center mt-5 mb-3">
+                  {/* <Icon name="lock" /> */}
+                  <p className="text-subheader text-light">Lock</p>
+                </div>
+                <div className="container-border-rounded-bn-500 mt-4">
+                  <div className="row">
+                    <div className="col-6 col-md-4 d-flex align-items-center">
+                      <p className="d-flex align-items-center">
+                        <span className="text-secondary text-small">APR from locking</span>
+                        <Tippy content="The Extra APR you gain from locking your tokens. This is a static APR and does not change depending on Lock participants.">
+                          <span className="ms-2">
+                            <Icon name="hint" color="gray" size="small" />
+                          </span>
+                        </Tippy>
+                      </p>
+                    </div>
+                    <div className="col-6 col-md-4">
+                      <p className="text-subheader text-numeric">{sssData.rewardsPercentage}%</p>
+                    </div>
+                  </div>
+
+                  <div className="row mt-4">
+                    <div className="col-6 col-md-4 d-flex align-items-center">
+                      <p className="d-flex align-items-center">
+                        <span className="text-secondary text-small">Total HELI Tokens locked</span>
+                        <Tippy content="">
+                          <span className="ms-2">
+                            <Icon name="hint" color="gray" size="small" />
+                          </span>
+                        </Tippy>
+                      </p>
+                    </div>
+                    <div className="col-6 col-md-8 d-md-flex align-items-center">
+                      <p className="d-flex align-items-center">
+                        <span className="text-secondary text-main">
+                          {formatStringETHtoPriceFormatted(sssData.totalDeposited.inETH)}/
+                          {formatStringETHtoPriceFormatted(sssData.maxSupply.inETH)}
+                        </span>
+
+                        <IconToken className="ms-3" symbol="HELI" />
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="row mt-4">
+                    <div className="col-6 col-md-4 d-flex align-items-center">
+                      <p className="d-flex align-items-center">
+                        <span className="text-secondary text-small">Locked HELI Tokens</span>
+                        <Tippy content="The Amount of $HELI Tokens you have locked. While a lock is active, this number will always resemble the “Staked HELI Tokens”.">
+                          <span className="ms-2">
+                            <Icon name="hint" color="gray" size="small" />
+                          </span>
+                        </Tippy>
+                      </p>
+                    </div>
+                    <div className="col-6 col-md-8 d-md-flex align-items-center">
+                      <p className="text-subheader text-numeric">
+                        {formatStringToPrice(stripStringToFixedDecimals(heliLockedUSD, 2))}
+                      </p>
+                      <p className="d-flex align-items-center ms-md-3 mt-2">
+                        <span className="text-secondary text-main">
+                          {formatStringETHtoPriceFormatted(heliLocked)}
+                        </span>
+
+                        <IconToken className="ms-3" symbol="HELI" />
+                      </p>
+                    </div>
+                  </div>
+
+                  {hasUserLockedTokens ? (
+                    <>
                       <div className="row mt-4">
                         <div className="col-6 col-md-4 d-flex align-items-center">
                           <p className="d-flex align-items-center">
@@ -729,154 +844,60 @@ const SingleSidedStaking = () => {
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </>
-                ) : null}
+                    </>
+                  ) : null}
+                </div>
 
                 <div className="container-blue-neutral rounded p-4 p-lg-5 mt-4 mt-lg-5">
-                  {connected && !isHashpackLoading ? (
-                    hasUserStaked ? (
-                      <>
-                        <div className="d-flex justify-content-between align-items-start">
-                          <div className="d-flex align-items-center">
-                            <p className="text-small text-bold">Pending rewards</p>
+                  {hasUserStaked ? (
+                    <>
+                      <div className="d-flex justify-content-between align-items-start">
+                        <div className="d-flex align-items-center">
+                          <p className="text-small text-bold">Pending rewards</p>
+                          <Tippy
+                            content={`The Rewards you can claim for your position. They are updating when users are interacting with this mechanism.`}
+                          >
+                            <span className="ms-2">
+                              <Icon name="hint" />
+                            </span>
+                          </Tippy>
+                        </div>
+                      </div>
+
+                      <hr className="my-4" />
+
+                      <div className="d-flex justify-content-between align-items-center mt-4">
+                        <p className="text-main d-flex justify-content-between align-items-center">
+                          <span className="d-flex align-items-center">
+                            <IconToken symbol={'HELI'} />
+                            <span className="text-numeric ms-3">{sssData.claimable.inETH}</span>
+                            <span className="ms-3 text-secondary">{'HELI'}</span>
                             <Tippy
-                              content={`The Rewards you can claim for your position. They are updating when users are interacting with this mechanism.`}
+                              content={`The HELI you earned from the Lock mechanism. It can only be claimed once the lock has expired.`}
                             >
                               <span className="ms-2">
-                                <Icon name="hint" />
+                                <Icon color="gray" size="small" name="hint" />
                               </span>
                             </Tippy>
-                          </div>
-                        </div>
-
-                        <div className="mt-5">
-                          <p className="text-title text-success text-numeric">
-                            {/* {userRewardsBalance} */}
-                          </p>
-
-                          <hr className="my-4" />
-
-                          <div className="d-flex justify-content-between align-items-center  mt-4">
-                            <p className="text-main d-flex justify-content-between align-items-center mt-4">
-                              <span className="d-flex align-items-center">
-                                <IconToken symbol={'HELI'} />
-                                <span className="text-numeric ms-3">{userRewardsBalance}</span>
-                                <span className="ms-3 text-secondary">{'HELI'}</span>
-                                <Tippy
-                                  content={`The HELI you earned from the dynamic staking mechanism.`}
-                                >
-                                  <span className="ms-2">
-                                    <Icon color="gray" size="small" name="hint" />
-                                  </span>
-                                </Tippy>
-                              </span>
-                            </p>
-
-                            <div className="d-flex justify-content-end">
-                              {tokensToAssociate && tokensToAssociate?.length > 0 ? (
-                                tokensToAssociate.map((token, index) => (
-                                  <Button
-                                    key={index}
-                                    loading={loadingAssociate}
-                                    onClick={() => handleAssociateClick(token)}
-                                    size="small"
-                                    type="primary"
-                                  >
-                                    {`Associate ${token.symbol}`}
-                                  </Button>
-                                ))
-                              ) : (
-                                <Button
-                                  disabled={Number(userRewardsBalance) === 0}
-                                  loading={loadingClaim}
-                                  onClick={() => setShowHarvestModal(true)}
-                                  size="small"
-                                  type="primary"
-                                >
-                                  Claim
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="d-flex justify-content-between align-items-center mt-4">
-                          <p className="text-main d-flex justify-content-between align-items-center">
-                            <span className="d-flex align-items-center">
-                              <IconToken symbol={'HELI'} />
-                              <span className="text-numeric ms-3">{sssData.claimable.inETH}</span>
-                              <span className="ms-3 text-secondary">{'HELI'}</span>
-                              <Tippy
-                                content={`The HELI you earned from the Lock mechanism. It can only be claimed once the lock has expired.`}
-                              >
-                                <span className="ms-2">
-                                  <Icon color="gray" size="small" name="hint" />
-                                </span>
-                              </Tippy>
-                            </span>
-                          </p>
-
-                          <Button
-                            className="ms-3"
-                            disabled={Number(sssData.claimable.inETH) === 0}
-                            loading={loadingClaimLocked}
-                            size="small"
-                            onClick={handleClaimButtonClick}
-                          >
-                            Claim
-                          </Button>
-                        </div>
-
-                        {showHarvestModal ? (
-                          <Modal
-                            show={showHarvestModal}
-                            closeModal={() => setShowHarvestModal(false)}
-                          >
-                            <ConfirmTransactionModalContent
-                              modalTitle="Harvest Pending Rewards"
-                              closeModal={() => setShowHarvestModal(false)}
-                              confirmTansaction={handleClaimClick}
-                              confirmButtonLabel="Confirm"
-                              isLoading={loadingClaim}
-                            >
-                              {loadingClaim ? (
-                                <Confirmation confirmationText={'Harvesting reward tokens'} />
-                              ) : (
-                                <>
-                                  <div className="text-small">Estimated pending rewards:</div>
-                                  <div className="d-flex justify-content-between align-items-center mt-4">
-                                    <div className="d-flex align-items-center">
-                                      <IconToken symbol={'HELI'} />
-                                      <span className="text-main ms-3">{'HELI'}</span>
-                                    </div>
-
-                                    <div className="text-main text-numeric">
-                                      {userRewardsBalance}
-                                    </div>
-                                  </div>
-                                </>
-                              )}
-                            </ConfirmTransactionModalContent>
-                          </Modal>
-                        ) : null}
-                      </>
-                    ) : (
-                      <div>
-                        <p className="text-small text-bold text-center my-5">
-                          Stake Your HELI Tokens and Earn Rewards
+                          </span>
                         </p>
+
+                        <Button
+                          className="ms-3"
+                          disabled={Number(sssData.claimable.inETH) === 0}
+                          loading={loadingClaimLocked}
+                          size="small"
+                          onClick={handleClaimButtonClick}
+                        >
+                          Claim
+                        </Button>
                       </div>
-                    )
+                    </>
                   ) : (
-                    <div className="text-center">
-                      <Button
-                        size="small"
-                        disabled={isHashpackLoading}
-                        onClick={() => setShowConnectModal(true)}
-                      >
-                        Connect wallet
-                      </Button>
+                    <div>
+                      <p className="text-small text-bold text-center my-5">
+                        Stake Your HELI Tokens and Earn Rewards
+                      </p>
                     </div>
                   )}
                 </div>
