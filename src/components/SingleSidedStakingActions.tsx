@@ -33,6 +33,7 @@ import {
   DAY_IN_SECONDS,
   getDaysFromTimestampInSeconds,
   nowTimestampInSeconds,
+  timestampToDateTime,
 } from '../utils/timeUtils';
 
 import useHELITokenContract from '../hooks/useHELITokenContract';
@@ -261,11 +262,11 @@ const FarmActions = ({
   const handleLockConfirm = async () => {
     setLoadingLock(true);
     try {
-      const oneMinAfterNow = Math.floor(Date.now() / 1000) + 60;
+      // // const oneMinAfterNow = Math.floor(Date.now() / 1000) + 60;
       // const oneHourAfterNow = Math.floor(Date.now() / 1000) + 3600;
       const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
-      // const receipt = await sdk.lock(connectorInstance, lockTimestampValue, kernelAddress, userId);
-      const receipt = await sdk.lock(connectorInstance, oneMinAfterNow, kernelAddress, userId);
+      const receipt = await sdk.lock(connectorInstance, lockTimestampValue, kernelAddress, userId);
+      // const receipt = await sdk.lock(connectorInstance, oneHourAfterNow, kernelAddress, userId);
 
       const {
         response: { success, error },
@@ -552,6 +553,13 @@ const FarmActions = ({
                     />
 
                     <div className="mt-4">
+                      <p className="text-main">
+                        <span className="text-secondary">Lock till:</span>{' '}
+                        <span>{timestampToDateTime(lockTimestampValue * 1000)}</span>
+                      </p>
+                    </div>
+
+                    <div className="mt-4">
                       <span className="text-secondary text-small">
                         Expected APR from current locking period:{' '}
                       </span>
@@ -752,11 +760,12 @@ const FarmActions = ({
                     <div className="alert alert-warning d-flex align-items-center">
                       <Icon color="warning" name="warning" />
                       <p className="ms-3">
-                        You are going to lock {availableToLock} HELI tokens for{' '}
-                        {getDaysFromTimestampInSeconds(lockTimestampValue)} days. These tokens will
-                        not be available for withdraw till the locking period is over! Depositing
-                        tokens again will lock them along with the already locked ones! Are you sure
-                        you want to continue?
+                        You are going to lock{' '}
+                        {stakeAndLock ? sssData.position.amount.inETH : availableToLock} HELI tokens
+                        for {getDaysFromTimestampInSeconds(lockTimestampValue)} days. These tokens
+                        will not be available for withdraw till the locking period is over!
+                        Depositing tokens again will lock them along with the already locked ones!
+                        Are you sure you want to continue?
                       </p>
                     </div>
 
