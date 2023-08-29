@@ -496,20 +496,6 @@ const SingleSidedStaking = () => {
           locking your tokens longer than you are comfortable with.
         </p>
 
-        {stakingStatus === StakingStatus.DEPOSIT ? (
-          <div className="text-small mb-4 mb-lg-6">
-            Your Single Sided Staking position is unlocked. You may stake and unstake your $HELI as
-            you please.
-          </div>
-        ) : null}
-
-        {stakingStatus === StakingStatus.LOCK ? (
-          <div className="text-small mb-4 mb-lg-6">
-            Your Single Sided Staking position is locked. While you wait for lock to expire, you may
-            still add more tokens to the existing lock or incearse the lock for extra APR.
-          </div>
-        ) : null}
-
         {!userId ? (
           <div className="text-center">
             <Button
@@ -536,6 +522,16 @@ const SingleSidedStaking = () => {
                   <div className="d-flex align-items-center">
                     <IconToken symbol={'HELI'} />
                     <p className="text-subheader text-light ms-3">Staking</p>
+                    {stakingStatus === StakingStatus.DEPOSIT ? (
+                      <Tippy
+                        content={`Your Single Sided Staking position is unlocked. You may stake and unstake your
+                      $HELI as you please.`}
+                      >
+                        <span className="ms-2">
+                          <Icon size="small" name="hint" />
+                        </span>
+                      </Tippy>
+                    ) : null}
                   </div>
 
                   <div className="container-campaign-status mt-4 mt-md-0 d-flex align-items-center">
@@ -622,7 +618,7 @@ const SingleSidedStaking = () => {
                     <div className="col-6 col-md-4 d-flex align-items-center">
                       <p className="d-flex align-items-center">
                         <span className="text-secondary text-small">Voting power</span>
-                        <Tippy content="The Voting power you earned from Staking into the Dynamic Staking pool. This is increased if you apply a Lock (see Lock voting power below)">
+                        <Tippy content="Your total voting power for the HeliSwap DAO. It is derived from your stake in the Dynamic Yield Farm as well as additional voting power granted by an actively locked position.">
                           <span className="ms-2">
                             <Icon name="hint" color="gray" size="small" />
                           </span>
@@ -661,9 +657,9 @@ const SingleSidedStaking = () => {
                     <>
                       <div className="d-flex justify-content-between align-items-start">
                         <div className="d-flex align-items-center">
-                          <p className="text-small text-bold">Pending rewards</p>
+                          <p className="text-small text-bold">Staking rewards</p>
                           <Tippy
-                            content={`The Rewards you can claim for your position. They are updating when users are interacting with this mechanism.`}
+                            content={`Your earned rewards from single sided staking (excluding lock). They can be claimed any time.`}
                           >
                             <span className="ms-2">
                               <Icon name="hint" />
@@ -682,7 +678,7 @@ const SingleSidedStaking = () => {
                               <span className="text-numeric ms-3">{userRewardsBalance}</span>
                               <span className="ms-3 text-secondary">{'HELI'}</span>
                               <Tippy
-                                content={`The HELI you earned from the dynamic staking mechanism.`}
+                                content={`The reward is updated (at least) once every 24 hours. When you just started your position, it is normal to see 0.0 for up to 24 hours. This does not effect the rewards you earned.`}
                               >
                                 <span className="ms-2">
                                   <Icon color="gray" size="small" name="hint" />
@@ -762,6 +758,18 @@ const SingleSidedStaking = () => {
                 <div className="d-flex align-items-center mt-5 mb-3">
                   <Icon name={hasUserLockedTokens ? 'lock' : 'unlock'} />
                   <p className="text-subheader text-light ms-3">Lock</p>
+
+                  {stakingStatus === StakingStatus.LOCK ? (
+                    <Tippy
+                      content={`Your Single Sided Staking position is locked. While you wait for lock to
+                      expire, you may still add more tokens to the existing lock or incearse the
+                      lock for extra APR.`}
+                    >
+                      <span className="ms-2">
+                        <Icon size="small" name="hint" />
+                      </span>
+                    </Tippy>
+                  ) : null}
                 </div>
                 <div className="container-border-rounded-bn-500 mt-4">
                   <div className="row">
@@ -783,8 +791,8 @@ const SingleSidedStaking = () => {
                   <div className="row mt-4">
                     <div className="col-6 col-md-4 d-flex align-items-center">
                       <p className="d-flex align-items-center">
-                        <span className="text-secondary text-small">Total locked</span>
-                        <Tippy content="The amount of total locked tokens and the available token limit">
+                        <span className="text-secondary text-small">Total lockable tokens</span>
+                        <Tippy content="There is a limit to the maximum HELI that can be locked at the same time. This includes all locked tokens from all participants. This gives an indication of how many tokens may still be locked.">
                           <span className="ms-2">
                             <Icon name="hint" color="gray" size="small" />
                           </span>
@@ -793,7 +801,7 @@ const SingleSidedStaking = () => {
                     </div>
                     <div className="col-6 col-md-8 d-md-flex align-items-center">
                       <p className="d-flex align-items-center">
-                        <span className="text-secondary text-main">
+                        <span className="text-subheader text-numeric">
                           {formatStringETHtoPriceFormatted(sssData.totalDeposited.inETH)}/
                           {formatStringETHtoPriceFormatted(sssData.maxSupply.inETH)}
                         </span>
@@ -850,7 +858,7 @@ const SingleSidedStaking = () => {
                         <div className="col-6 col-md-4 d-flex align-items-center">
                           <p className="d-flex align-items-center">
                             <span className="text-secondary text-small">Remaining Lock time:</span>
-                            <Tippy content="The Countdown of your lock current lock.">
+                            <Tippy content="The Countdown of when your current lock ends.">
                               <span className="ms-2">
                                 <Icon name="hint" color="gray" size="small" />
                               </span>
@@ -891,9 +899,9 @@ const SingleSidedStaking = () => {
                     <>
                       <div className="d-flex justify-content-between align-items-start">
                         <div className="d-flex align-items-center">
-                          <p className="text-small text-bold">Accumulated rewards</p>
+                          <p className="text-small text-bold">Lock rewards</p>
                           <Tippy
-                            content={`The Rewards you can claim for your position. They are claimable once the lock has expired.`}
+                            content={`The Rewards earned from locking. Only expired lock rewards are claimable. Rewards from active locks can only be redeemed once that lock expired.`}
                           >
                             <span className="ms-2">
                               <Icon name="hint" />
@@ -911,7 +919,7 @@ const SingleSidedStaking = () => {
                             <span className="text-numeric ms-3">{sssData.totalRewards.inETH}</span>
                             <span className="ms-3 text-secondary">{'HELI'}</span>
                             <Tippy
-                              content={`The HELI you earned from the Lock mechanism. It can only be claimed once the lock has expired.`}
+                              content={`If you see a HELI reward amount, but the “Claim” button is greyed out, these rewards were earned by a currently active lock and can hence not be claimed yet. If the “Claim” button is usable - you are currently unlocked and the rewards were earned by previously expired locks.`}
                             >
                               <span className="ms-2">
                                 <Icon color="gray" size="small" name="hint" />

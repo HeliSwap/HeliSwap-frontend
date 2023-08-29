@@ -261,11 +261,11 @@ const FarmActions = ({
   const handleLockConfirm = async () => {
     setLoadingLock(true);
     try {
-      // const oneMinAfterNow = Math.floor(Date.now() / 1000) + 60;
+      const oneMinAfterNow = Math.floor(Date.now() / 1000) + 60;
       // const oneHourAfterNow = Math.floor(Date.now() / 1000) + 3600;
       const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
-      const receipt = await sdk.lock(connectorInstance, lockTimestampValue, kernelAddress, userId);
-      // const receipt = await sdk.lock(connectorInstance, oneMinAfterNow, kernelAddress, userId);
+      // const receipt = await sdk.lock(connectorInstance, lockTimestampValue, kernelAddress, userId);
+      const receipt = await sdk.lock(connectorInstance, oneMinAfterNow, kernelAddress, userId);
 
       const {
         response: { success, error },
