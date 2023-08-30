@@ -824,11 +824,15 @@ const SingleSidedStaking = () => {
                     </div>
                     <div className="col-6 col-md-8 d-md-flex align-items-center">
                       <p className="text-subheader text-numeric">
-                        {formatStringToPrice(stripStringToFixedDecimals(heliLockedUSD, 2))}
+                        {hasUserLockedTokens
+                          ? formatStringToPrice(stripStringToFixedDecimals(heliLockedUSD, 2))
+                          : formatStringToPrice(stripStringToFixedDecimals('0', 2))}
                       </p>
                       <p className="d-flex align-items-center ms-md-3 mt-2">
                         <span className="text-secondary text-main">
-                          {formatStringETHtoPriceFormatted(heliLocked)}
+                          {hasUserLockedTokens
+                            ? formatStringETHtoPriceFormatted(heliLocked)
+                            : formatStringETHtoPriceFormatted('0')}
                         </span>
 
                         <IconToken className="ms-3" symbol="HELI" />
