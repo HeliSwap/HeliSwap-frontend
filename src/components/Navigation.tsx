@@ -29,11 +29,23 @@ const navigation = [
     text: 'Farms',
   },
   {
+    link: '/single-sided-staking-old',
+    name: 'sss',
+    color: 'gray',
+    text: 'Single Sided Staking Phase 1',
+  },
+  {
     link: '/single-sided-staking',
     name: 'sss',
     color: 'gray',
-    text: 'Single Sided Staking',
+    text: 'Single Sided Staking Phase 2',
   },
+  // {
+  //   link: '/proposals',
+  //   name: 'governance',
+  //   color: 'gray',
+  //   text: 'DAO',
+  // },
   {
     link: '/claimdrop',
     name: 'claim',
@@ -77,7 +89,7 @@ const Navigation = () => {
       {navigation.map((item, index) => {
         return (
           <NavLink
-            key={item.name}
+            key={index}
             to={item.link}
             className={({ isActive }) => getClasses(isActive, index).join(' ')}
           >

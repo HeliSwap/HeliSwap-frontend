@@ -15,9 +15,15 @@ $primary-300: #4d5fff;
 $primary-200: #7391ff;
 $primary-100: #99bcff;
 
+$positive-100: #a6f3bb;
+$positive-300: #53d47f;
 $positive-400: #29bc63;
 $positive-600: #048b3a;
+$positive-800: #005720;
 
+$error-100: #ffa6b1;
+$error-200: #ff7c92;
+$error-400: #fd2b5e;
 $error-500: #ea1548;
 
 $neutral-900: #101011;
@@ -372,3 +378,9 @@ $pagination-border-width: 0;
 $alert-bg-scale: -70% !default;
 $alert-border-scale: 40% !default;
 $alert-color-scale: 60% !default;
+
+// Progress
+$progress-height: 8px;
+$progress-border-radius: 41px;
+$progress-bar-bg: $positive-300;
+$progress-bg: $error-200;
