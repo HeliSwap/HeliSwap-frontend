@@ -180,8 +180,6 @@ const usePoolsByUser = (
             newPool,
           };
 
-          console.log('poolData', poolData);
-
           return poolData;
         });
 
