@@ -166,18 +166,18 @@ const SingleSidedStaking = () => {
       const decimals = await tokenContract.decimals();
       const balance = ethers.utils.formatUnits(balanceBN, decimals);
 
-      const pull = await rewardsContract.pullFeature();
-      const endDate = formatContractTimestamp(pull.endTs);
-      const totalDuration = formatContractDuration(pull.totalDuration);
-      const totalAmount = formatContractAmount(pull.totalAmount);
+      // const pull = await rewardsContract.pullFeature();
+      // const endDate = formatContractTimestamp(pull.endTs);
+      // const totalDuration = formatContractDuration(pull.totalDuration);
+      // const totalAmount = formatContractAmount(pull.totalAmount);
 
       // console.log('pull.endTs', pull.endTs.toString());
       // console.log('pull.totalDuration', pull.totalDuration.toString());
       // console.log('pull.totalAmount', pull.totalAmount.toString());
 
-      // const endDate = formatContractTimestamp(ethers.BigNumber.from('1693217667'));
-      // const totalDuration = formatContractDuration(ethers.BigNumber.from('432000'));
-      // const totalAmount = formatContractAmount(ethers.BigNumber.from('100000000000'));
+      const endDate = formatContractTimestamp(ethers.BigNumber.from('1725017519'));
+      const totalDuration = formatContractDuration(ethers.BigNumber.from('31536000'));
+      const totalAmount = formatContractAmount(ethers.BigNumber.from('364000000000000'));
 
       setCampaignEndDate(endDate.inMilliSeconds);
       setTotalDuration(totalDuration.inMilliSeconds);
@@ -355,9 +355,9 @@ const SingleSidedStaking = () => {
         const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS;
 
         const promisesArray = [
-          sssContract.rewardsPercentage(),
-          sssContract.maxSupply(),
-          sssContract.expirationDate(),
+          // sssContract.rewardsPercentage(),
+          // sssContract.maxSupply(),
+          // sssContract.expirationDate(),
           sssContract.totalDeposited(),
           sssContract.positions(kernelAddress, idToAddress(userId)),
           sssContract.claimable(kernelAddress, idToAddress(userId)),
@@ -365,9 +365,9 @@ const SingleSidedStaking = () => {
         ];
 
         const [
-          rewardsPercentage,
-          maxSupply,
-          expirationDate,
+          // rewardsPercentage,
+          // maxSupply,
+          // expirationDate,
           totalDeposited,
           positions,
           claimable,
@@ -378,9 +378,9 @@ const SingleSidedStaking = () => {
         // console.log('maxSupply', maxSupply.toString());
         // console.log('expirationDate', expirationDate.toString());
 
-        // const rewardsPercentage = ethers.BigNumber.from('330000000000000000');
-        // const maxSupply = ethers.BigNumber.from('10000000000000');
-        // const expirationDate = ethers.BigNumber.from('1724322580');
+        const rewardsPercentage = ethers.BigNumber.from('150000000000000000');
+        const maxSupply = ethers.BigNumber.from('1500000000000000');
+        const expirationDate = ethers.BigNumber.from('1725019604');
 
         const { amount, duration, expiration, rewardsNotClaimed, rewardsPending } = positions;
 
@@ -561,7 +561,7 @@ const SingleSidedStaking = () => {
                               2,
                             ),
                           )}{' '}
-                          + 1.00%
+                          {dynamicAPR > 0 ? '+ 1.00%' : null}
                         </p>
                         {dynamicAPR > 0 ? (
                           <Tippy content="The single sided mechanism is complex and calls several contracts at once, which may lead to an increased transaction cost. To compensate users and to let everyone use the product at ease, this Transaction Offset APR was added.">
