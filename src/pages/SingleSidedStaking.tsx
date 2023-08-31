@@ -452,7 +452,7 @@ const SingleSidedStaking = () => {
       Number(totalRewardsAmount) > 0
     ) {
       const dynamicAPR =
-        (Number(totalRewardsAmount) / Number(totalStaked) / totalDuration) *
+        (Number(totalRewardsAmount) / Number(totalStaked) / (totalDuration / 1000)) *
         (365 * 24 * 60 * 60) *
         100;
       setDynamicAPR(dynamicAPR);
@@ -552,12 +552,25 @@ const SingleSidedStaking = () => {
                         </Tippy>
                       </p>
                     </div>
-                    <div className="col-6 col-md-4">
-                      <p className="text-subheader text-numeric">
-                        {formatStringToPercentage(
-                          stripStringToFixedDecimals(dynamicAPR.toString(), 2),
-                        )}
-                      </p>
+                    <div className="col-6 col-md-8">
+                      <div className="d-flex align-items-center">
+                        <p className="text-subheader text-numeric">
+                          {formatStringToPercentage(
+                            stripStringToFixedDecimals(
+                              dynamicAPR > 0 ? (dynamicAPR - 1).toString() : dynamicAPR.toString(),
+                              2,
+                            ),
+                          )}{' '}
+                          + 1.00%
+                        </p>
+                        {dynamicAPR > 0 ? (
+                          <Tippy content="The single sided mechanism is complex and calls several contracts at once, which may lead to an increased transaction cost. To compensate users and to let everyone use the product at ease, this Transaction Offset APR was added.">
+                            <span className="ms-2">
+                              <Icon name="hint" />
+                            </span>
+                          </Tippy>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
 

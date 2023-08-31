@@ -47,7 +47,7 @@ export const formatTimeNumber = (numberToFormat: number) =>
 export const getCountdownReturnValues = (countDown: number) => {
   const days = Math.floor(countDown / (1000 * 60 * 60 * 24));
   const hours = Math.floor((countDown % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const minutes = Math.ceil((countDown % (1000 * 60 * 60)) / (1000 * 60));
+  const minutes = Math.floor((countDown % (1000 * 60 * 60)) / (1000 * 60));
   const seconds = Math.floor((countDown % (1000 * 60)) / 1000);
 
   return { days, hours, minutes, seconds };
@@ -87,8 +87,11 @@ export const getDaysFromDurationMilliseconds = (duration: number) => {
 
 export const nowTimestampInSeconds = () => Math.floor(Date.now() / 1000);
 
-export const getDaysFromTimestampInSeconds = (timestampInSeconds: number) => {
+export const getDaysFromTimestampInSeconds = (
+  timestampInSeconds: number,
+  from = nowTimestampInSeconds(),
+) => {
   if (timestampInSeconds < nowTimestampInSeconds()) return 0;
 
-  return Math.ceil((timestampInSeconds - nowTimestampInSeconds()) / DAY_IN_SECONDS);
+  return Math.floor((timestampInSeconds - from) / DAY_IN_SECONDS);
 };

@@ -111,14 +111,16 @@ const FarmActions = ({
   const maxHELIInputValue = stakingTokenBalance;
 
   const lockTimeEnded = sssData.position.expiration.inMilliSeconds < Date.now();
+
   // Here we substract 1 day from the campaign end date to avoid the user to lock tokens on the last day in order to have room for increase the lock time.
   const daysLeftCampaignEnd = getDaysFromTimestampInSeconds(
     sssData.expirationDate.inSeconds - DAY_IN_SECONDS,
   );
   const minLockTimestampInitialValue = lockTimeEnded
-    ? nowTimestampInSeconds() + DAY_IN_SECONDS
-    : sssData.position.expiration.inSeconds + DAY_IN_SECONDS;
-  const sliderMinValue = getDaysFromTimestampInSeconds(minLockTimestampInitialValue);
+    ? nowTimestampInSeconds() + DAY_IN_SECONDS * 3
+    : sssData.position.expiration.inSeconds + DAY_IN_SECONDS * 3;
+
+  const sliderMinValue = daysLeftCampaignEnd >= 3 ? '3' : daysLeftCampaignEnd.toString();
   const maxSupplyLimitHit = Number(sssData.totalDeposited.inETH) >= Number(sssData.maxSupply.inETH);
   const canLock = Number(heliStaked) > 0;
 
@@ -141,7 +143,6 @@ const FarmActions = ({
   const [minLockTimestampValue, setMinLockTimestampValue] = useState(minLockTimestampInitialValue);
   const [lockTimestampValue, setLockTimestampValue] = useState(minLockTimestampValue);
   const [lockSliderValue, setLockSliderValue] = useState(sliderMinValue.toString());
-  const [lockSliderMinValue, setLockSliderMinValue] = useState(sliderMinValue.toString());
   const [availableToLock, setAvailableToLock] = useState('0');
   const [stakeAndLock, setStakeAndLock] = useState(false);
   const [userCanWithdraw, setUserCanWithdraw] = useState(false);
@@ -178,7 +179,9 @@ const FarmActions = ({
     const { target } = e;
     const { value } = target;
 
-    const newValue = nowTimestampInSeconds() + Number(value) * DAY_IN_SECONDS;
+    const newValue = lockTimeEnded
+      ? nowTimestampInSeconds() + Number(value) * DAY_IN_SECONDS
+      : sssData.position.expiration.inSeconds + Number(value) * DAY_IN_SECONDS;
 
     setLockTimestampValue(
       newValue > sssData.expirationDate.inSeconds ? sssData.expirationDate.inSeconds : newValue,
@@ -262,11 +265,12 @@ const FarmActions = ({
   const handleLockConfirm = async () => {
     setLoadingLock(true);
     try {
-      // // const oneMinAfterNow = Math.floor(Date.now() / 1000) + 60;
+      // const oneMinAfterNow = Math.floor(Date.now() / 1000) + 60;
+      // const fiveMinAfterNow = Math.floor(Date.now() / 1000) + 60 * 5;
       // const oneHourAfterNow = Math.floor(Date.now() / 1000) + 3600;
       const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS as string;
       const receipt = await sdk.lock(connectorInstance, lockTimestampValue, kernelAddress, userId);
-      // const receipt = await sdk.lock(connectorInstance, oneHourAfterNow, kernelAddress, userId);
+      // const receipt = await sdk.lock(connectorInstance, fiveMinAfterNow, kernelAddress, userId);
 
       const {
         response: { success, error },
@@ -281,9 +285,9 @@ const FarmActions = ({
         setShowLockModal(false);
         setCountDown(lockTimestampValue * 1000 - Date.now());
         setLockedUntil(lockTimestampValue * 1000);
-        setMinLockTimestampValue(lockTimestampValue + DAY_IN_SECONDS);
-        setLockTimestampValue(lockTimestampValue + DAY_IN_SECONDS);
-        setLockSliderMinValue(getDaysFromTimestampInSeconds(lockTimestampValue).toString());
+        setMinLockTimestampValue(lockTimestampValue + DAY_IN_SECONDS * 3);
+        setLockTimestampValue(lockTimestampValue + DAY_IN_SECONDS * 3);
+        setLockSliderValue('3');
         setStakeAndLock(true);
         setUserCanWithdraw(false);
         setStakingStatus(StakingStatus.LOCK);
@@ -543,13 +547,15 @@ const FarmActions = ({
                   <div className="text-main mt-5 mb-3">Max lock time reached!</div>
                 ) : (
                   <>
-                    <p className="text-secondary text-small text-bold mt-5 mb-3">Lock for:</p>
+                    <p className="text-secondary text-small text-bold mt-5 mb-3">
+                      {stakeAndLock ? 'Increase current lock with:' : 'Lock for:'}
+                    </p>
 
                     <InputDaySlider
                       handleSliderChange={handleLockSliderChange}
                       sliderValue={lockSliderValue}
                       maxValue={daysLeftCampaignEnd.toString()}
-                      minValue={lockSliderMinValue.toString()}
+                      minValue={sliderMinValue.toString()}
                     />
 
                     <div className="mt-4">
