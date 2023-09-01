@@ -26,6 +26,10 @@ export const formatHBARStringToPrice = (stringToFormat: string) => {
   return `${numeral(stringToFormat).format('0,0.0000')}`;
 };
 
+export const formatHeliStringToPrice = (stringToFormat: string) => {
+  return `${numeral(stringToFormat).format('0,0')}`;
+};
+
 export const formatNumberToBigNumber = (numberToFormat: number) => {
   const numberToFormatBN = new BigNumber(numberToFormat);
 
