@@ -25,6 +25,7 @@ import {
   formatContractDuration,
   formatContractNumberPercentage,
   formatContractTimestamp,
+  formatHeliStringToPrice,
   formatStringETHtoPriceFormatted,
   formatStringToPercentage,
   formatStringToPrice,
@@ -591,7 +592,7 @@ const SingleSidedStaking = () => {
                       </p>
                       <p className="d-flex align-items-center ms-md-3 mt-2">
                         <span className="text-secondary text-main">
-                          {formatStringETHtoPriceFormatted(totalStaked)}
+                          {formatHeliStringToPrice(totalStaked)}
                         </span>
 
                         <IconToken className="ms-3" symbol="HELI" />
@@ -619,7 +620,7 @@ const SingleSidedStaking = () => {
                       </p>
                       <p className="d-flex align-items-center ms-md-3 mt-2">
                         <span className="text-secondary text-main">
-                          {formatStringETHtoPriceFormatted(heliStaked)}
+                          {formatHeliStringToPrice(heliStaked)}
                         </span>
 
                         <IconToken className="ms-3" symbol="HELI" />
@@ -814,9 +815,9 @@ const SingleSidedStaking = () => {
                     </div>
                     <div className="col-6 col-md-8 d-md-flex align-items-center">
                       <p className="d-flex align-items-center">
-                        <span className="text-subheader text-numeric">
-                          {formatStringETHtoPriceFormatted(sssData.totalDeposited.inETH)}/
-                          {formatStringETHtoPriceFormatted(sssData.maxSupply.inETH)}
+                        <span className="text-main text-numeric">
+                          {formatHeliStringToPrice(sssData.totalDeposited.inETH)}/
+                          {formatHeliStringToPrice(sssData.maxSupply.inETH)}
                         </span>
 
                         <IconToken className="ms-3" symbol="HELI" />
