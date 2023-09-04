@@ -815,9 +815,9 @@ const SingleSidedStaking = () => {
                     </div>
                     <div className="col-6 col-md-8 d-md-flex align-items-center">
                       <p className="d-flex align-items-center">
-                        <span className="text-main text-numeric">
-                          {formatHeliStringToPrice(sssData.totalDeposited.inETH)}/
-                          {formatHeliStringToPrice(sssData.maxSupply.inETH)}
+                        <span className="text-subheader text-numeric">
+                          {formatStringToPrice(sssData.totalDeposited.inETH)}/
+                          {formatStringToPrice(sssData.maxSupply.inETH)}
                         </span>
 
                         <IconToken className="ms-3" symbol="HELI" />
