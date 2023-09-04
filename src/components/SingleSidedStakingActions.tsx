@@ -768,10 +768,9 @@ const FarmActions = ({
                       <p className="ms-3">
                         You are going to lock{' '}
                         {stakeAndLock ? sssData.position.amount.inETH : availableToLock} HELI tokens
-                        for {getDaysFromTimestampInSeconds(lockTimestampValue)} days. These tokens
-                        will not be available for withdraw till the locking period is over!
-                        Depositing tokens again will lock them along with the already locked ones!
-                        Are you sure you want to continue?
+                        for {lockSliderValue} days. These tokens will not be available for withdraw
+                        till the locking period is over! Depositing tokens again will lock them
+                        along with the already locked ones! Are you sure you want to continue?
                       </p>
                     </div>
 
