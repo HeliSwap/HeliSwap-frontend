@@ -184,7 +184,9 @@ const FarmActions = ({
       : sssData.position.expiration.inSeconds + Number(value) * DAY_IN_SECONDS;
 
     setLockTimestampValue(
-      newValue > sssData.expirationDate.inSeconds ? sssData.expirationDate.inSeconds : newValue,
+      newValue > sssData.expirationDate.inSeconds
+        ? sssData.expirationDate.inSeconds - DAY_IN_SECONDS
+        : newValue,
     );
     setLockSliderValue(value);
   };
