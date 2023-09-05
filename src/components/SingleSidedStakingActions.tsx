@@ -385,9 +385,7 @@ const FarmActions = ({
   }, [lockSliderValue, heliStaked]);
 
   useEffect(() => {
-    if (canLock && hasUserLockedTokens && !maxSupplyLimitHit && !maxLockTimeReached) {
-      setStakeAndLock(true);
-    }
+    setStakeAndLock(canLock && hasUserLockedTokens && !maxSupplyLimitHit && !maxLockTimeReached);
   }, [canLock, hasUserLockedTokens, maxSupplyLimitHit, maxLockTimeReached]);
 
   useEffect(() => {
