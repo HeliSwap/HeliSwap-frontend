@@ -51,6 +51,7 @@ export interface IHistoricalData {
   tvl: string;
   time: string;
   volume: string;
+  price: string;
 }
 
 export interface ITokenHistoricalData {

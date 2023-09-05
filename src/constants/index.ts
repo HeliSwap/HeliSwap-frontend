@@ -127,6 +127,7 @@ export const TOKENS_PER_PAGE = 10;
 export enum INITIAL_CHART_LABELS {
   TVL_LINE_CHART = 'TVL',
   VOLUME_BAR_CHART = 'Volume 24H',
+  PRICE = 'Price',
 }
 
 export enum CHART_DATA {

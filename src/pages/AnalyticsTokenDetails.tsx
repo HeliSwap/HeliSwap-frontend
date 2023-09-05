@@ -7,7 +7,7 @@ import Loader from '../components/Loader';
 import { viewTitleMapping } from './Analytics';
 import Icon from '../components/Icon';
 import LineChart from '../components/LineChart';
-import CandleChart from '../components/CandleChart';
+import PriceLineChart from '../components/PriceLineChart';
 import BarChart from '../components/BarChart';
 import Button from '../components/Button';
 
@@ -62,7 +62,8 @@ const AnalyticsTokenDetials = () => {
         const aggregatedValue = tokenData.metrics[tokenData.metrics.length - 1].volume;
         return <BarChart chartData={tokenData.metrics} aggregatedValue={Number(aggregatedValue)} />;
       } else if (chartToShow === ChartToShowEnum.price) {
-        return <CandleChart chartData={tokenData.priceCandles} />;
+        const aggregatedValue = tokenData.metrics[tokenData.metrics.length - 1].price;
+        return <PriceLineChart chartData={tokenData.metrics} aggregatedValue={aggregatedValue} />;
       } else return null;
     }
   };

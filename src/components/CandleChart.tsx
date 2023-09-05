@@ -6,7 +6,7 @@ import utc from 'dayjs/plugin/utc';
 
 import { ITokenCandleData } from '../interfaces/common';
 import { getTransformedCandleData } from '../utils/metricsUtils';
-import { formatStringToPrice } from '../utils/numberUtils';
+import { formatStringToPriceWithPrecision } from '../utils/numberUtils';
 
 dayjs.extend(utc);
 
@@ -159,7 +159,7 @@ const CandleChart = ({ chartData }: LineChartProps) => {
       )}
       {value && (
         <p className="text-headline text-bold mt-3">
-          {formatStringToPrice(value?.toString() as string)}
+          {formatStringToPriceWithPrecision(value?.toString() as string)}
         </p>
       )}
       <div ref={chartRef} />
