@@ -301,6 +301,66 @@ const data = [
     claimdropDescription:
       'As part of a series of Claimdrops to appreciate our collaboration with Blade Wallet, and to introduce the loyal Blade Wallet users to the DeFi space on Hedera, we have set up a first (of several) appreciation Claimdrops. The first 1,000 Blade Wallet Loyalty Card Holders are eligible for this Claimdrop. You can check your position under the "NFT" section of your Blade Wallet when you look at the Serial Number of your loyalty card (if you hold one).',
   },
+  {
+    claimdropStart: {
+      date: '08 September 2023',
+      timestamp: 1694173844000,
+    },
+    claimdropEnd: {
+      date: '08 October 2023',
+      timestamp: 1696765844000,
+    },
+    expiryEnd: {
+      date: '15 October 2023',
+      timestamp: 1697370644000,
+    },
+    vestingPeriod: {
+      valueString: '30 Days',
+      valueNumericDays: 30,
+      valueNumericMilliseconds: 2592000000,
+    },
+    claimPeriod: {
+      valueString: '7 Days',
+      valueNumericDays: 7,
+      valueNumericMilliseconds: 604800000,
+    },
+    totalAllocated: {
+      valueBN: ethers.BigNumber.from('32083500000000'),
+      valueStringWei: '32083500000000',
+      valueStringETH: '320835.0',
+    },
+    claimedOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    vestedTokensOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    claimable: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    extraTokensOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    totalAllocatedOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    token: '0x00000000000000000000000000000000001d90C9',
+    claimdropAddress: '0x0000000000000000000000000000000000390bc1',
+    title: 'HeliSwap X Zealy Summer Sprint',
+    claimdropTitle: 'HeliSwap X Zealy Summer Sprint',
+    claimdropDescription:
+      'Dear HeliSwap and Zealy community, As part of our Zealy campaign, we are giving away 333,333 HELI Tokens among the top 100 Zealy participants with the most experience points from this year’s Summer Sprint (14th August 2023 to 4th September 2023). The Tokens you were allocated vest linearly over 1 month. After the full month has been reached, we allow for another 2 month courtesy period for everyone to claim all the tokens. We want to show some love to the Heliswap community. Thank you for your continued support! The HeliSwap team.',
+  },
 ];
 
 export default data;
