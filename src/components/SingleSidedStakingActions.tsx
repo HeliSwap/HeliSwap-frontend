@@ -526,7 +526,9 @@ const FarmActions = ({
           {tabState === TabStates.LOCK ? (
             <>
               <div>
-                <p className="text-small text-bold">HELI Token Amount to lock</p>
+                <p className="text-small text-bold">
+                  {stakeAndLock ? 'Increase lock for' : 'HELI Token Amount to lock'}
+                </p>
                 <InputTokenSelector
                   className="mt-4"
                   readonly={true}
