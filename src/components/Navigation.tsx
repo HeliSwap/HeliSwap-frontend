@@ -40,12 +40,12 @@ const navigation = [
     color: 'gray',
     text: 'Single Sided Staking Phase 2',
   },
-  // {
-  //   link: '/proposals',
-  //   name: 'governance',
-  //   color: 'gray',
-  //   text: 'DAO',
-  // },
+  {
+    link: '/proposals',
+    name: 'governance',
+    color: 'gray',
+    text: 'DAO',
+  },
   {
     link: '/claimdrop',
     name: 'claim',
