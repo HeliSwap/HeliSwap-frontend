@@ -243,7 +243,7 @@ const ProposalDetails = () => {
                     Voting power
                     <Tippy
                       content={
-                        'Quorum is the percentage of the amount of tokens staked in the DAO that support for a proposal must be greater than for the proposal to be considered valid. For example, if the Quorum % is set to 20%, then more than 20% of the amount of tokens staked in the DAO must vote to approve a proposal for the vote to be considered valid.'
+                        'Your total voting power for the HeliSwap DAO. It is derived from your stake in the Dynamic Yield Farm as well as additional voting power granted by an actively locked position.'
                       }
                     >
                       <span className="ms-2">

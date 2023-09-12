@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import Tippy from '@tippyjs/react';
 // import { ethers } from 'ethers';
 
 import { GlobalContext } from '../providers/Global';
@@ -7,11 +8,15 @@ import { GlobalContext } from '../providers/Global';
 import { IProposal, ProposalStatus } from '../interfaces/dao';
 
 import Button from '../components/Button';
+import Icon from '../components/Icon';
 import CreateProposal from '../components/CreateProposal';
 
 import { timestampToDateTime } from '../utils/timeUtils';
+import { idToAddress } from '../utils/tokenUtils';
+import { formatBigNumberToStringETH, formatStringETHtoPriceFormatted } from '../utils/numberUtils';
 
 import useGovernanceContract from '../hooks/useGovernanceContract';
+import useKernelContract from '../hooks/useKernelContract';
 
 enum PageTab {
   'All',
@@ -23,13 +28,15 @@ enum PageTab {
 const Governance = () => {
   const globalContext = useContext(GlobalContext);
   const { connection } = globalContext;
-  const { connected } = connection;
+  const { connected, userId } = connection;
 
   const governanceContract = useGovernanceContract();
+  const kernelContract = useKernelContract();
 
   const [proposals, setProposals] = useState<IProposal[]>([]);
   const [loadingProposals, setLoadingProposals] = useState(true);
   const [errorProposals, setErrorProposals] = useState(false);
+  const [votingPower, setVotingPower] = useState('0');
 
   const [showCreateProposal, setShowCreateProposal] = useState(false);
 
@@ -46,6 +53,18 @@ const Governance = () => {
   const updateProposal = (newProposal: IProposal) => {
     setProposals([...proposals, newProposal]);
   };
+
+  const getKernelData = useCallback(async () => {
+    try {
+      const promisesArray = [kernelContract.votingPower(idToAddress(userId))];
+
+      const [votingPowerBN] = await Promise.all(promisesArray);
+
+      setVotingPower(formatBigNumberToStringETH(votingPowerBN));
+    } catch (error) {
+      console.error(error);
+    }
+  }, [kernelContract, userId]);
 
   const getGovernanceData = useCallback(async () => {
     setLoadingProposals(true);
@@ -127,6 +146,10 @@ const Governance = () => {
     Object.keys(governanceContract).length > 0 && getGovernanceData();
   }, [governanceContract, getGovernanceData]);
 
+  useEffect(() => {
+    userId && Object.keys(kernelContract).length && getKernelData();
+  }, [kernelContract, userId, getKernelData]);
+
   const haveProposals = proposals.length > 0;
 
   const statusClassesMapping: any = {
@@ -183,9 +206,31 @@ const Governance = () => {
           <div>
             <div className="d-flex justify-content-between align-items-center">
               <h1 className="text-title text-bold">Proposals</h1>
-              {connected ? (
-                <Button onClick={handleCreateProposalButtonClick}>Create proposal</Button>
-              ) : null}
+
+              <div className="d-flex  align-items-center">
+                <div className="me-3">
+                  <p className="text-small text-bold mt-3">
+                    Voting power
+                    <Tippy
+                      content={
+                        'Your total voting power for the HeliSwap DAO. It is derived from your stake in the Dynamic Yield Farm as well as additional voting power granted by an actively locked position.'
+                      }
+                    >
+                      <span className="ms-2">
+                        <Icon size="small" color="gray" name="hint" />
+                      </span>
+                    </Tippy>
+                  </p>
+                  <p className="d-flex justify-content-end">
+                    <span className="text-subheader text-bold text-numeric text-end">
+                      {formatStringETHtoPriceFormatted(votingPower)}
+                    </span>
+                  </p>
+                </div>
+                {connected ? (
+                  <Button onClick={handleCreateProposalButtonClick}>Create proposal</Button>
+                ) : null}
+              </div>
             </div>
 
             <div className="container-blue-neutral-800 rounded mt-5">
