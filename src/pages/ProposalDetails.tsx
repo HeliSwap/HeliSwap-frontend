@@ -53,13 +53,17 @@ const ProposalDetails = () => {
           forVotes,
           executed,
           eta: etaBN,
-          description,
+          description: descriptionBN,
           createTime: createTimeBN,
           canceled,
           againstVotes,
           parameters: parametersBN,
         } = proposalsResolved;
 
+        console.log('descriptionBN', descriptionBN);
+
+        const re = /\n/gi;
+        const description = descriptionBN.replace(re, '<br />');
         const votesFor = Number(forVotes.toString());
         const votesAgainst = Number(againstVotes.toString());
         const eta = Number(etaBN.toString());
@@ -384,7 +388,10 @@ const ProposalDetails = () => {
                     ) : null}
                   </div>
                   <h4 className="text-micro text-bold mt-8">Description</h4>
-                  <p className="text-small mt-4">{proposal.description}</p>
+                  <p
+                    className="text-small mt-4"
+                    dangerouslySetInnerHTML={{ __html: proposal.description }}
+                  ></p>
                 </div>
               </div>
             </div>

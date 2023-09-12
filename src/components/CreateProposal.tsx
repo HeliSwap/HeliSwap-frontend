@@ -17,6 +17,42 @@ interface ICreateProposalProps {
   proposals: IProposal[];
 }
 
+const contentFields = [
+  {
+    name: 'introductory',
+    label: 'Introductory Paragraph',
+    placeholder: 'Introductory Paragraph',
+  },
+  {
+    name: 'projectSummary',
+    label: 'Project Summary',
+    placeholder:
+      'The “Example Proposal” focuses on the development and implementation of a new decentralized voting system within the HeliSwap platform. We propose the creation of a Decentralized Autonomous Organization (DAO) for HeliSwap, which will empower token holders to have a direct say in the platform’s decision-making processes. This DAO will be governed by $HELI token holders, allowing them to propose and vote on key platform changes, such as protocol upgrades, fee adjustments, and ecosystem expansion. The motivation behind this proposal is to foster greater community involvement, transparency, and decentralization within HeliSwap.',
+  },
+  {
+    name: 'benefits',
+    label: 'Benefits to HeliSwap Ecosystem',
+    placeholder:
+      'Benefits to HeliSwap Ecosystem: Implementing a DAO within HeliSwap offers several significant advantages to the platform and its $HELI token holders: Enhanced Governance: The DAO will enable $HELI holders to actively participate in shaping the platform’s future, leading to more inclusive and community-driven decisions. Transparency: All proposals, discussions, and voting outcomes will be transparently recorded on the blockchain, ensuring complete openness in decision-making processes. Community Engagement: By allowing token holders to voice their opinions and propose changes, we anticipate increased community engagement and a stronger sense of ownership among HeliSwap users. Alignment with Decentralization: This initiative aligns with HeliSwap’s commitment to decentralization, making it a more resilient and censorship-resistant platform.',
+  },
+  {
+    name: 'summarySpecifics',
+    label: 'Summary Specifics',
+    placeholder:
+      'In brief, the “Example Proposal” seeks a portion of the HeliSwap treasury to support the development and implementation of the DAO infrastructure. This allocation will enable the creation of smart contracts and user interfaces necessary for the DAO’s functionality and governance operations, including voting and proposal submissions.',
+  },
+  {
+    name: 'conculsion',
+    label: 'Conclusion',
+    placeholder:
+      'In conclusion, the “Example Proposal” represents an exciting opportunity for the HeliSwap community to take a significant step towards greater decentralization and community-driven governance. We encourage all $HELI holders to participate in the forthcoming vote to decide on the allocation of treasury funds for this project. Together, we can shape the future of HeliSwap and create a more robust and inclusive ecosystem for all stakeholders. Thank you for your attention, and we look forward to your support in making HeliSwap even better. Let’s build a stronger, more decentralized future together!',
+  },
+];
+
+interface IContent {
+  [key: string]: string;
+}
+
 const CreateProposal = ({
   setShowCreateProposal,
   setProposalCreated,
@@ -26,14 +62,31 @@ const CreateProposal = ({
   const { sdk, connection } = globalContext;
   const { connectorInstance, userId } = connection;
   const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [content, setContent] = useState<IContent>({
+    introductory: '',
+    projectSummary: '',
+    benefits: '',
+    summarySpecifics: '',
+    conculsion: '',
+  });
   const [loadingCreateProposal, setLoadingCreateProposal] = useState(false);
+
+  const handleContentUpdate = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    const name = e.target.name;
+
+    setContent(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleBackButtonClick = () => {
     setShowCreateProposal(false);
   };
 
   const handleCreateProposalButtonClick = async () => {
+    const description = Object.values(content)
+      .map(item => item)
+      .join('\n\n');
+
     try {
       setLoadingCreateProposal(true);
       const receipt = await sdk.createProposal(
@@ -84,6 +137,8 @@ const CreateProposal = ({
     }
   };
 
+  const formValid = title.length > 0 && Object.values(content).every(value => value.length > 0);
+
   return (
     <div>
       <div>
@@ -112,16 +167,19 @@ const CreateProposal = ({
               />
             </div>
 
-            <div className="mt-5">
-              <p className="text-small text-bold mb-3">Description</p>
-              <textarea
-                placeholder="Please enter the goal of the proposal here"
-                className="form-control"
-                value={description}
-                rows={8}
-                onChange={e => setDescription(e.target.value)}
-              />
-            </div>
+            {contentFields.map((field, index) => (
+              <div key={index} className="mt-5">
+                <p className="text-small text-bold mb-3">{field.label}</p>
+                <textarea
+                  rows={7}
+                  name={field.name}
+                  placeholder={field.placeholder}
+                  className="form-control"
+                  value={content[field.name]}
+                  onChange={handleContentUpdate}
+                />
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -129,7 +187,7 @@ const CreateProposal = ({
       <div className="mt-5">
         <Button
           loading={loadingCreateProposal}
-          disabled={loadingCreateProposal}
+          disabled={loadingCreateProposal || !formValid}
           onClick={handleCreateProposalButtonClick}
         >
           Create proposal

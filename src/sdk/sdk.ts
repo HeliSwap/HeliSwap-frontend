@@ -749,7 +749,7 @@ class SDK {
 
     const { targets, values, signatures, callDatas } = processedActions;
 
-    const maxGas = 1500000;
+    const maxGas = 2500000;
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(addressToId(governanceAddress))
