@@ -84,7 +84,7 @@ const CreateProposal = ({
 
   const handleCreateProposalButtonClick = async () => {
     const description = Object.values(content)
-      .map(item => item)
+      .map((item, index) => `${contentFields[index].label}\n${item}`)
       .join('\n\n');
 
     try {

@@ -60,8 +60,6 @@ const ProposalDetails = () => {
           parameters: parametersBN,
         } = proposalsResolved;
 
-        console.log('descriptionBN', descriptionBN);
-
         const re = /\n/gi;
         const description = descriptionBN.replace(re, '<br />');
         const votesFor = Number(forVotes.toString());
