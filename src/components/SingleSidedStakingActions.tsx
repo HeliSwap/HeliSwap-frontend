@@ -122,7 +122,9 @@ const FarmActions = ({
 
   const sliderMinValue = daysLeftCampaignEnd >= 3 ? '3' : daysLeftCampaignEnd.toString();
   const maxSupplyLimitHit = Number(sssData.totalDeposited.inETH) >= Number(sssData.maxSupply.inETH);
-  const canLock = Number(heliStaked) > 0;
+  const totalAvailableToLock =
+    Number(sssData.maxSupply.inETH) - Number(sssData.totalDeposited.inETH);
+  const canLock = Number(heliStaked) > 0 && Number(heliStaked) < totalAvailableToLock;
 
   const [lpInputValue, setLpInputValue] = useState(maxHELIInputValue);
   const [sliderValue, setSliderValue] = useState(SLIDER_INITIAL_VALUE);
