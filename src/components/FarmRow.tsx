@@ -59,7 +59,11 @@ const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
         }, [])
       : [];
 
-    return formatIcons(rewardsSymbols);
+    const sortedRewardsSymbols = rewardsSymbols.sort((a, b) =>
+      a === 'HBAR' ? -1 : b === 'HBAR' ? 1 : 0,
+    );
+
+    return formatIcons(sortedRewardsSymbols);
   };
 
   const haveNotVerifiedTokens =
