@@ -1,22 +1,22 @@
 import { useState, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { GlobalContext } from '../providers/Global';
 
 import Button from '../components/Button';
 import Loader from '../components/Loader';
 
-import { formatIcons } from '../utils/iconUtils';
-
 import usePools from '../hooks/usePools';
 import useFarms from '../hooks/useFarms';
 
 import { useQueryOptionsPoolsFarms } from '../constants';
+import FarmRow from '../components/FarmRow';
 
 const ManageFarms = () => {
   const contextValue = useContext(GlobalContext);
   const { connection, sdk } = contextValue;
   const { userId, connectorInstance, isHashpackLoading, setShowConnectModal } = connection;
+  const navigate = useNavigate();
 
   // Get pools withouth farms - usePoolWithouthFarms
   const { pools: poolsWithouthFarms, loading: loadingPools } = usePools();
@@ -33,6 +33,10 @@ const ManageFarms = () => {
   const [loadingFarmDeploy, setLoadingFarmDeploy] = useState(false);
 
   // Events
+  const handleRowClick = (farmAddress: string) => {
+    navigate(`/manage-permissionless-farms/${farmAddress}`);
+  };
+
   const handlePoolSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setTokenAddress(event.target.value);
   };
@@ -97,19 +101,19 @@ const ManageFarms = () => {
                   <Loader />
                 </div>
               ) : farms.length > 0 ? (
-                <div>
+                <div className="table-pools">
+                  <div
+                    className={`d-none d-md-grid table-pools-row with-${
+                      userId ? '7' : '6'
+                    }-columns-farms`}
+                  ></div>
                   {farms.map((farm, index) => (
-                    <div key={index}>
-                      <Link
-                        className="link-primary d-flex align-items-center my-4"
-                        to={`/manage-permissionless-farms/${farm.address}`}
-                      >
-                        {formatIcons([farm.poolData.token0Symbol, farm.poolData.token1Symbol])}
-                        <span className="text-small ms-3">
-                          {farm.poolData.token0Symbol}/{farm.poolData.token1Symbol}
-                        </span>
-                      </Link>
-                    </div>
+                    <FarmRow
+                      key={index}
+                      farmData={farm}
+                      index={0}
+                      handleRowClick={() => handleRowClick(farm.address)}
+                    />
                   ))}
                 </div>
               ) : (
