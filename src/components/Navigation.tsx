@@ -42,7 +42,7 @@ const navigation = [
   },
   {
     link: '/proposals',
-    name: 'governance',
+    name: 'dao',
     color: 'gray',
     text: 'DAO',
   },
