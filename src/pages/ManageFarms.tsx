@@ -25,20 +25,20 @@ const ManageFarms = () => {
     poolsWithouthFarms,
   );
 
-  const [selectedPoolAddress, setSelectedPoolAddress] = useState('');
+  const [tokenAddresses, setTokenAddress] = useState('');
 
   const [loadingFarmDeploy, setLoadingFarmDeploy] = useState(false);
 
   // Events
   const handlePoolSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedPoolAddress(event.target.value);
+    setTokenAddress(event.target.value);
   };
 
   const handleDeployFarmButtonClick = async () => {
     setLoadingFarmDeploy(true);
 
     try {
-      const tx = await sdk.deployFarm(connectorInstance, selectedPoolAddress, userId);
+      const tx = await sdk.deployFarm(connectorInstance, tokenAddresses, userId);
       console.log('tx', tx);
     } catch (error) {
       console.log('error', error);
@@ -47,7 +47,7 @@ const ManageFarms = () => {
     }
   };
 
-  console.log('selectedPoolAddress', selectedPoolAddress);
+  console.log('tokenAddresses', tokenAddresses);
 
   return (
     <div className="d-flex justify-content-center">
@@ -67,7 +67,7 @@ const ManageFarms = () => {
             <select onChange={handlePoolSelectChange} className="form-control" name="" id="">
               <option>Please select pool</option>
               {poolsWithouthFarms.map((pool, index) => (
-                <option key={index} value={pool.pairAddress}>
+                <option key={index} value={`${pool.token0},${pool.token1}`}>
                   {pool.token0Name}/{pool.token1Name}
                 </option>
               ))}
@@ -77,7 +77,7 @@ const ManageFarms = () => {
           )}
 
           <Button
-            disabled={!selectedPoolAddress}
+            disabled={!tokenAddresses}
             loading={loadingFarmDeploy}
             className="ws-no-wrap ms-3"
             onClick={handleDeployFarmButtonClick}
