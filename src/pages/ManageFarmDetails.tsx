@@ -18,9 +18,10 @@ import { mapWHBARAddress } from '../utils/tokenUtils';
 
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import useFarmByAddress from '../hooks/useFarmByAddress';
-import useTokens from '../hooks/useTokens';
+// import useTokens from '../hooks/useTokens';
 
-import { useQueryOptions, useQueryOptionsPoolsFarms } from '../constants';
+// import { useQueryOptions, useQueryOptionsPoolsFarms } from '../constants';
+import { useQueryOptionsPoolsFarms } from '../constants';
 
 const ManageFarmDetails = () => {
   const contextValue = useContext(GlobalContext);
@@ -31,7 +32,7 @@ const ManageFarmDetails = () => {
   const { address } = useParams();
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
 
-  const { tokens, loading: loadingTokens } = useTokens(useQueryOptions);
+  // const { tokens, loading: loadingTokens } = useTokens(useQueryOptions);
 
   const { poolsByTokenList: pools } = usePoolsByTokensList(
     useQueryOptionsPoolsFarms,
@@ -47,7 +48,7 @@ const ManageFarmDetails = () => {
   );
 
   const [selectedDuration, setSelectedDuration] = useState(0);
-  const [selectedReward, setSelectedReward] = useState('');
+  // const [selectedReward, setSelectedReward] = useState('');
   const [loadingEnableReward, setLoadingEnableReward] = useState(false);
 
   // Events
@@ -55,9 +56,9 @@ const ManageFarmDetails = () => {
     setSelectedDuration(Number(event.target.value));
   };
 
-  const handleSelectRewardChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedReward(event.target.value);
-  };
+  // const handleSelectRewardChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  //   setSelectedReward(event.target.value);
+  // };
 
   const handleEnableRewardClick = async () => {
     setLoadingEnableReward(true);
@@ -79,7 +80,8 @@ const ManageFarmDetails = () => {
     ? Object.keys(farmData.rewardsData.find(reward => reward.rewardEnd > Date.now()) || {}).length >
       0
     : false;
-  const canEnableReward = selectedDuration > 0 && selectedReward !== '';
+  // const canEnableReward = selectedDuration > 0 && selectedReward !== '';
+  const canEnableReward = selectedDuration > 0;
 
   return isHashpackLoading ? (
     <Loader />
@@ -106,19 +108,22 @@ const ManageFarmDetails = () => {
                   </p>
                 </div>
 
-                <p className="text-small text-bold mb-2">Duration</p>
-                <select
-                  onChange={handleSelectDurationChange}
-                  value={selectedDuration}
-                  className="form-control mb-4"
-                >
-                  <option value={0}>Select duration</option>
-                  <option value={1}>1 month</option>
-                  <option value={2}>2 months</option>
-                  <option value={3}>3 months</option>
-                </select>
+                <div className="d-flex align-items-end">
+                  <div className="flex-1">
+                    <p className="text-small text-bold mb-2">Duration</p>
+                    <select
+                      onChange={handleSelectDurationChange}
+                      value={selectedDuration}
+                      className="form-control"
+                    >
+                      <option value={0}>Select duration</option>
+                      <option value={1}>1 month</option>
+                      <option value={2}>2 months</option>
+                      <option value={3}>3 months</option>
+                    </select>
+                  </div>
 
-                {loadingTokens ? (
+                  {/* {loadingTokens ? (
                   <p>Lodaing tokens...</p>
                 ) : tokens!.length > 0 ? (
                   <>
@@ -138,15 +143,17 @@ const ManageFarmDetails = () => {
                   </>
                 ) : (
                   <p>No tokens tokens...</p>
-                )}
+                )} */}
 
-                <Button
-                  loading={loadingEnableReward}
-                  onClick={handleEnableRewardClick}
-                  disabled={!canEnableReward}
-                >
-                  Enable reward
-                </Button>
+                  <Button
+                    className="ws-no-wrap ms-3"
+                    loading={loadingEnableReward}
+                    onClick={handleEnableRewardClick}
+                    disabled={!canEnableReward}
+                  >
+                    Enable reward
+                  </Button>
+                </div>
 
                 <hr />
 
