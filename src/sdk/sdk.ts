@@ -825,6 +825,19 @@ class SDK {
     return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
+  async deployFarm(hashconnectConnectorInstance: Hashconnect, poolAddress: string, userId: string) {
+    const maxGas = TRANSACTION_MAX_FEES.STAKE_LP_TOKEN;
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(process.env.REACT_APP_PYF_FACTORY_ADDRESS as string))
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction('deploy', new ContractFunctionParameters());
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
   sendTransactionAndGetResponse = async (
     connectorInstance: BladeConnect | Hashconnect,
     transaction: Transaction,

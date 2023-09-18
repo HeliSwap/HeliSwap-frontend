@@ -22,6 +22,8 @@ import SingleSidedStakingOld from '../pages/SingleSidedStakingOld';
 import SingleSidedStaking from '../pages/SingleSidedStaking';
 import Proposals from '../pages/Governance';
 import ProposalDetails from '../pages/ProposalDetails';
+import ManageFarms from '../pages/ManageFarms';
+import ManageFarmDetails from '../pages/ManageFarmDetails';
 
 import Header from './Header';
 import Footer from './Footer';
@@ -65,6 +67,11 @@ function App() {
                       <Route path="heliverse" element={<HeliVerse />} />
                       <Route path="proposals" element={<Proposals />} />
                       <Route path="proposals/:id" element={<ProposalDetails />} />
+                      <Route path="manage-permissionless-farms" element={<ManageFarms />} />
+                      <Route
+                        path="manage-permissionless-farms/:address"
+                        element={<ManageFarmDetails />}
+                      />
                       <Route path="styleguide" element={<Styleguide />} />
                     </Routes>
                   </div>
