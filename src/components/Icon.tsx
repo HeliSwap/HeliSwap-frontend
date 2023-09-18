@@ -39,6 +39,7 @@ import { ReactComponent as SSS } from '../icons/system/sss.svg';
 import { ReactComponent as Question } from '../icons/system/question.svg';
 import { ReactComponent as Lock } from '../icons/system/lock.svg';
 import { ReactComponent as Unlock } from '../icons/system/unlock.svg';
+import { ReactComponent as Dao } from '../icons/system/dao.svg';
 
 interface IIconProps {
   name: string;
@@ -105,6 +106,7 @@ const icons: IIconMapping = {
   governance: Question,
   lock: Lock,
   unlock: Unlock,
+  dao: Dao,
 };
 
 const colorMapping: IColorMapping = {
