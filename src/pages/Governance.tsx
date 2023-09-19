@@ -39,6 +39,7 @@ const Governance = () => {
   const [votingPower, setVotingPower] = useState('0');
 
   const [showCreateProposal, setShowCreateProposal] = useState(false);
+  const [canCreateProposal, setCanCreateProposal] = useState(false);
 
   const [pageTab, setPageTab] = useState(PageTab.All);
 
@@ -56,10 +57,14 @@ const Governance = () => {
 
   const getKernelData = useCallback(async () => {
     try {
-      const promisesArray = [kernelContract.votingPower(idToAddress(userId))];
+      const promisesArray = [
+        kernelContract.votingPower(idToAddress(userId)),
+        kernelContract.heliStaked(),
+      ];
 
-      const [votingPowerBN] = await Promise.all(promisesArray);
-
+      const [votingPowerBN, totalStakedBN] = await Promise.all(promisesArray);
+      const stakingPercentage = Number(votingPowerBN.toString()) / Number(totalStakedBN.toString());
+      setCanCreateProposal(stakingPercentage * 100 > 1);
       setVotingPower(formatBigNumberToStringETH(votingPowerBN));
     } catch (error) {
       console.error(error);
@@ -228,7 +233,20 @@ const Governance = () => {
                   </p>
                 </div>
                 {connected ? (
-                  <Button onClick={handleCreateProposalButtonClick}>Create proposal</Button>
+                  <>
+                    <Button disabled={!canCreateProposal} onClick={handleCreateProposalButtonClick}>
+                      Create proposal
+                    </Button>
+                    {!canCreateProposal ? (
+                      <Tippy
+                        content={`You will need 1% of all staked tokens in order to submit a proposal`}
+                      >
+                        <span className="ms-2">
+                          <Icon color="gray" size="small" name="hint" />
+                        </span>
+                      </Tippy>
+                    ) : null}
+                  </>
                 ) : null}
               </div>
             </div>
