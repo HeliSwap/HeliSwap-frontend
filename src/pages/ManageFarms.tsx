@@ -18,7 +18,7 @@ const ManageFarms = () => {
   const { userId, connectorInstance, isHashpackLoading, setShowConnectModal } = connection;
   const navigate = useNavigate();
 
-  // Get pools withouth farms - usePoolWithouthFarms
+  // Get pools withouth farms - usePoolWithouthFarms with minimum liquidity
   const { pools: poolsWithouthFarms, loading: loadingPools } = usePools();
 
   // Get all perimissionless farms - usePermissionlessFarms

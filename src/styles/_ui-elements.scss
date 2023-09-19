@@ -563,6 +563,17 @@
   }
 }
 
+.container-farm-reward {
+  border-radius: $border-radius;
+  background-color: $neutral-700;
+  padding: 6px;
+  cursor: pointer;
+
+  &.is-selected {
+    background-color: $primary-700;
+  }
+}
+
 /* Tables */
 .table-pools {
   border-radius: 4px 4px 0px 0px;

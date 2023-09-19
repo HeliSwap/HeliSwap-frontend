@@ -13,7 +13,7 @@ import IconToken from '../components/IconToken';
 import Icon from '../components/Icon';
 
 import { formatIcons } from '../utils/iconUtils';
-import { timestampToDate } from '../utils/timeUtils';
+// import { timestampToDate } from '../utils/timeUtils';
 import { mapWHBARAddress } from '../utils/tokenUtils';
 
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
@@ -22,6 +22,7 @@ import useFarmByAddress from '../hooks/useFarmByAddress';
 
 // import { useQueryOptions, useQueryOptionsPoolsFarms } from '../constants';
 import { useQueryOptionsPoolsFarms } from '../constants';
+import ManageReward from '../components/ManageReward';
 
 const ManageFarmDetails = () => {
   const contextValue = useContext(GlobalContext);
@@ -50,6 +51,8 @@ const ManageFarmDetails = () => {
   const [selectedDuration, setSelectedDuration] = useState(0);
   // const [selectedReward, setSelectedReward] = useState('');
   const [loadingEnableReward, setLoadingEnableReward] = useState(false);
+  const [showManageReward, setShowManageReward] = useState(false);
+  const [selectedRewardToken, setSelectedRewardToken] = useState<IReward>({} as IReward);
 
   // Events
   const handleSelectDurationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -72,6 +75,11 @@ const ManageFarmDetails = () => {
     } finally {
       setLoadingEnableReward(false);
     }
+  };
+
+  const handleRewardClick = (token: IReward) => {
+    setSelectedRewardToken(token);
+    setShowManageReward(true);
   };
 
   const haveFarm = Object.keys(farmData).length !== 0;
@@ -167,36 +175,55 @@ const ManageFarmDetails = () => {
                     </Tippy>
                   </p>
                 </div>
-                <div className="">
-                  {campaignHasRewards &&
-                    farmData.rewardsData?.reduce((acc: ReactNode[], reward: IReward, index) => {
-                      // When reward is enabled, but not sent -> do not show
-                      const haveRewardSendToCampaign =
-                        reward.totalAmount && Number(reward.totalAmount || reward) !== 0;
+                <div className="row">
+                  <div className="col-6">
+                    {campaignHasRewards &&
+                      farmData.rewardsData?.reduce((acc: ReactNode[], reward: IReward, index) => {
+                        // When reward is enabled, but not sent -> do not show
+                        const haveRewardSendToCampaign =
+                          reward.totalAmount && Number(reward.totalAmount || reward) !== 0;
 
-                      const rewardActive = reward.rewardEnd > Date.now();
-                      // When all rewards are inactive -> show all, when at least one is active -> show only active
-                      const showReward =
-                        haveRewardSendToCampaign && (rewardActive || !campaignHasActiveRewards);
-                      if (showReward) {
-                        const rewardSymbol = mapWHBARAddress(reward);
+                        const rewardActive = reward.rewardEnd > Date.now();
+                        // When all rewards are inactive -> show all, when at least one is active -> show only active
+                        const showReward =
+                          haveRewardSendToCampaign && (rewardActive || !campaignHasActiveRewards);
+                        if (showReward) {
+                          const rewardSymbol = mapWHBARAddress(reward);
 
-                        acc.push(
-                          <div key={index} className="d-flex align-items-center my-4">
-                            <IconToken symbol={reward.symbol} />{' '}
-                            <span className="text-main ms-3">{rewardSymbol}</span>
-                            {rewardActive ? (
-                              <span className="text-small text-success ms-3">
-                                Active untill {timestampToDate(reward.rewardEnd)}
-                              </span>
-                            ) : (
-                              <span className="text-small text-danger ms-3">Expired</span>
-                            )}
-                          </div>,
-                        );
-                      }
-                      return acc;
-                    }, [])}
+                          acc.push(
+                            <div
+                              onClick={() => handleRewardClick(reward)}
+                              key={index}
+                              className={`d-flex align-items-center my-4 container-farm-reward ${
+                                selectedRewardToken.symbol === reward.symbol ? 'is-selected' : ''
+                              }`}
+                            >
+                              <IconToken symbol={reward.symbol} />{' '}
+                              <span className="text-main ms-3">{rewardSymbol}</span>
+                              {/* {rewardActive ? (
+                                <span className="text-small text-success ms-3">
+                                  Active untill {timestampToDate(reward.rewardEnd)}
+                                </span>
+                              ) : (
+                                <span className="text-small text-danger ms-3">Expired</span>
+                              )} */}
+                            </div>,
+                          );
+                        }
+                        return acc;
+                      }, [])}
+                  </div>
+                  <div className="col-6">
+                    {showManageReward && (
+                      <ManageReward
+                        token={selectedRewardToken}
+                        userId={userId}
+                        farmAddress={address || ''}
+                        sdk={sdk}
+                        connectorInstance={connectorInstance}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
