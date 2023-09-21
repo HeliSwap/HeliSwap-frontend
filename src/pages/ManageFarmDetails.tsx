@@ -1,6 +1,8 @@
 import { useState, useContext, ReactNode } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+
 import Tippy from '@tippyjs/react';
+import toast from 'react-hot-toast';
 
 import { GlobalContext } from '../providers/Global';
 
@@ -11,18 +13,18 @@ import Loader from '../components/Loader';
 import PageHeader from '../components/PageHeader';
 import IconToken from '../components/IconToken';
 import Icon from '../components/Icon';
+import ToasterWrapper from '../components/ToasterWrapper';
+import ManageReward from '../components/ManageReward';
 
 import { formatIcons } from '../utils/iconUtils';
-// import { timestampToDate } from '../utils/timeUtils';
 import { mapWHBARAddress } from '../utils/tokenUtils';
 
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import useFarmByAddress from '../hooks/useFarmByAddress';
-// import useTokens from '../hooks/useTokens';
 
-// import { useQueryOptions, useQueryOptionsPoolsFarms } from '../constants';
 import { useQueryOptionsPoolsFarms } from '../constants';
-import ManageReward from '../components/ManageReward';
+
+import getErrorMessage from '../content/errors';
 
 const ManageFarmDetails = () => {
   const contextValue = useContext(GlobalContext);
@@ -32,8 +34,6 @@ const ManageFarmDetails = () => {
   const navigate = useNavigate();
   const { address } = useParams();
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
-
-  // const { tokens, loading: loadingTokens } = useTokens(useQueryOptions);
 
   const { poolsByTokenList: pools } = usePoolsByTokensList(
     useQueryOptionsPoolsFarms,
@@ -49,7 +49,6 @@ const ManageFarmDetails = () => {
   );
 
   const [selectedDuration, setSelectedDuration] = useState(0);
-  // const [selectedReward, setSelectedReward] = useState('');
   const [loadingEnableReward, setLoadingEnableReward] = useState(false);
   const [showManageReward, setShowManageReward] = useState(false);
   const [selectedRewardToken, setSelectedRewardToken] = useState<IReward>({} as IReward);
@@ -59,17 +58,26 @@ const ManageFarmDetails = () => {
     setSelectedDuration(Number(event.target.value));
   };
 
-  // const handleSelectRewardChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-  //   setSelectedReward(event.target.value);
-  // };
-
   const handleEnableRewardClick = async () => {
     setLoadingEnableReward(true);
 
     try {
-      const tx = await sdk.enableReward(connectorInstance, address || '', selectedDuration, userId);
+      const receipt = await sdk.enableReward(
+        connectorInstance,
+        address || '',
+        selectedDuration,
+        userId,
+      );
 
-      console.log('tx', tx);
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (!success) {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      } else {
+        toast.success('Success! Duration is set.');
+      }
     } catch (e) {
       console.log('error', e);
     } finally {
@@ -88,7 +96,6 @@ const ManageFarmDetails = () => {
     ? Object.keys(farmData.rewardsData.find(reward => reward.rewardEnd > Date.now()) || {}).length >
       0
     : false;
-  // const canEnableReward = selectedDuration > 0 && selectedReward !== '';
   const canEnableReward = selectedDuration > 0;
 
   return isHashpackLoading ? (
@@ -120,6 +127,7 @@ const ManageFarmDetails = () => {
                   <div className="flex-1">
                     <p className="text-small text-bold mb-2">Duration</p>
                     <select
+                      disabled={campaignHasActiveRewards}
                       onChange={handleSelectDurationChange}
                       value={selectedDuration}
                       className="form-control"
@@ -131,35 +139,13 @@ const ManageFarmDetails = () => {
                     </select>
                   </div>
 
-                  {/* {loadingTokens ? (
-                  <p>Lodaing tokens...</p>
-                ) : tokens!.length > 0 ? (
-                  <>
-                    <p className="text-small text-bold mb-2">Reward</p>
-                    <select
-                      value={selectedReward}
-                      onChange={handleSelectRewardChange}
-                      className="form-control mb-4"
-                    >
-                      <option>Select token</option>
-                      {tokens?.map((token, index) => (
-                        <option key={index}>
-                          {token.symbol} ({token.hederaId})
-                        </option>
-                      ))}
-                    </select>
-                  </>
-                ) : (
-                  <p>No tokens tokens...</p>
-                )} */}
-
                   <Button
                     className="ws-no-wrap ms-3"
                     loading={loadingEnableReward}
                     onClick={handleEnableRewardClick}
                     disabled={!canEnableReward}
                   >
-                    Enable reward
+                    Set duration
                   </Button>
                 </div>
 
@@ -221,6 +207,7 @@ const ManageFarmDetails = () => {
                         farmAddress={address || ''}
                         sdk={sdk}
                         connectorInstance={connectorInstance}
+                        selectedDuration={selectedDuration}
                       />
                     )}
                   </div>
@@ -252,6 +239,7 @@ const ManageFarmDetails = () => {
           </div>
         )}
       </div>
+      <ToasterWrapper />
     </div>
   );
 };

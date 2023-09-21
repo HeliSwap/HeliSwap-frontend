@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ethers } from 'ethers';
 
+import toast from 'react-hot-toast';
+
 import { IReward, ITokenData, TokenType } from '../interfaces/tokens';
 import SDK from '../sdk/sdk';
 
@@ -19,12 +21,15 @@ import {
   getTokenBalanceERC20,
 } from '../utils/tokenUtils';
 
+import getErrorMessage from '../content/errors';
+
 interface IManageRewardProps {
   token: IReward;
   userId: string;
   farmAddress: string;
   sdk: SDK;
   connectorInstance: any;
+  selectedDuration: number;
 }
 
 const ManageReward = ({
@@ -33,6 +38,7 @@ const ManageReward = ({
   farmAddress,
   sdk,
   connectorInstance,
+  selectedDuration,
 }: IManageRewardProps) => {
   const [approved, setApproved] = useState(false);
   const [tokenBalance, setTokenBalance] = useState('0');
@@ -43,6 +49,7 @@ const ManageReward = ({
   const [loadingApprove, setLoadingApprove] = useState(false);
   const [loadingWrap, setLoadingWrap] = useState(false);
   const [loadingUnwrap, setLoadingUnwrap] = useState(false);
+  const [loadingSend, setLoadingSend] = useState(false);
 
   const isTokenWHBAR = token.address === process.env.REACT_APP_WHBAR_ADDRESS;
 
@@ -76,14 +83,14 @@ const ManageReward = ({
         farmAddress,
       );
       const {
-        response: { success },
+        response: { success, error },
       } = receipt;
 
       if (!success) {
-        // toast.error(getErrorMessage(error.status ? error.status : error));
+        toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         setApproved(true);
-        // toast.success('Success! Token was approved.');
+        toast.success('Success! Token was approved.');
       }
     } catch (error) {
       console.log('error', error);
@@ -92,7 +99,36 @@ const ManageReward = ({
     }
   };
 
-  const handleSendClick = async () => {};
+  // TODO: here selectedDuration could not be correct, a check is needed to get the current duration. This logic needs to be added in Manage Farm Details component.
+  const handleSendClick = async () => {
+    setLoadingSend(true);
+
+    try {
+      const receipt = await sdk.sendReward(
+        connectorInstance,
+        farmAddress,
+        token.address,
+        inputValue,
+        token.decimals,
+        selectedDuration,
+        userId,
+      );
+
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (!success) {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      } else {
+        toast.success('Success! Rewards are sent.');
+      }
+    } catch (error) {
+      console.log('error', error);
+    } finally {
+      setLoadingSend(false);
+    }
+  };
 
   const handleWrapClick = async () => {
     setLoadingWrap(true);
@@ -100,15 +136,15 @@ const ManageReward = ({
     try {
       const receipt = await sdk.wrapHBAR(connectorInstance, userId, inputHBARValue);
       const {
-        response: { success },
+        response: { success, error },
       } = receipt;
 
       if (!success) {
-        // toast.error(getErrorMessage(error.status ? error.status : error));
+        toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         getHBARBalance();
         getBalance();
-        // toast.success('Success! Token was approved.');
+        toast.success('Success! Tokens were wrapped.');
       }
     } catch (error) {
       console.log('error', error);
@@ -123,15 +159,15 @@ const ManageReward = ({
     try {
       const receipt = await sdk.unwrapHBAR(connectorInstance, userId, inputValue);
       const {
-        response: { success },
+        response: { success, error },
       } = receipt;
 
       if (!success) {
-        // toast.error(getErrorMessage(error.status ? error.status : error));
+        toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         getHBARBalance();
         getBalance();
-        // toast.success('Success! Token was approved.');
+        toast.success('Success! Tokens were unwrapped.');
       }
     } catch (error) {
       console.log('error', error);
@@ -140,6 +176,7 @@ const ManageReward = ({
     }
   };
 
+  // TODO: use IToken data instead of IReward in order to get the token type and using getTokenBalance function which requires token type. This is needed to not use the relay every time. Same for checking the allowance.
   useEffect(() => {
     getBalance();
   }, [token, userId, getBalance]);
@@ -243,7 +280,7 @@ const ManageReward = ({
             Approve
           </Button>
         ) : null}
-        <Button onClick={handleSendClick} disabled={!approved}>
+        <Button loading={loadingSend} onClick={handleSendClick} disabled={!approved}>
           Send
         </Button>
       </div>

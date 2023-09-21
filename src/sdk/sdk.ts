@@ -864,6 +864,34 @@ class SDK {
     return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }
 
+  async sendReward(
+    hashconnectConnectorInstance: Hashconnect,
+    farmAddress: string,
+    tokenAddress: string,
+    amount: string,
+    decimals: number,
+    duration: number,
+    userId: string,
+  ) {
+    const maxGas = TRANSACTION_MAX_FEES.DEPLOY_PYF_FACTORY;
+    const tokensAmountBN = formatStringToBigNumberWei(amount, decimals);
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(addressToId(farmAddress))
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction(
+        'notifyRewardAmount',
+        new ContractFunctionParameters()
+          .addAddress(tokenAddress)
+          .addUint256(tokensAmountBN)
+          .addUint256(duration),
+      );
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
   sendTransactionAndGetResponse = async (
     connectorInstance: BladeConnect | Hashconnect,
     transaction: Transaction,
