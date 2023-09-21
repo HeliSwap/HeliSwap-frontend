@@ -13,7 +13,7 @@ import WalletBalance from './WalletBalance';
 import { stripStringToFixedDecimals } from '../utils/numberUtils';
 import {
   addressToId,
-  checkAllowanceHTS,
+  checkAllowanceERC20,
   getAmountToApprove,
   getTokenBalance,
   getTokenBalanceERC20,
@@ -39,15 +39,16 @@ const ManageReward = ({
   const [HBARBalance, setHBARBalance] = useState('0');
   const [inputValue, setInputValue] = useState('0');
   const [inputHBARValue, setInputHBARValue] = useState('0');
+  const [loadingCheckApprove, setLoadingCheckApprove] = useState(true);
   const [loadingApprove, setLoadingApprove] = useState(false);
   const [loadingWrap, setLoadingWrap] = useState(false);
+  const [loadingUnwrap, setLoadingUnwrap] = useState(false);
 
   const isTokenWHBAR = token.address === process.env.REACT_APP_WHBAR_ADDRESS;
 
   const getBalance = useCallback(async () => {
     const balanceNoDecimals = await getTokenBalanceERC20(token.address, userId);
     const balance = ethers.utils.formatUnits(balanceNoDecimals, token.decimals);
-    console.log('balance', balance);
     setTokenBalance(balance);
   }, [token, userId]);
 
@@ -116,6 +117,29 @@ const ManageReward = ({
     }
   };
 
+  const handleUnwrapClick = async () => {
+    setLoadingUnwrap(true);
+
+    try {
+      const receipt = await sdk.unwrapHBAR(connectorInstance, userId, inputValue);
+      const {
+        response: { success },
+      } = receipt;
+
+      if (!success) {
+        // toast.error(getErrorMessage(error.status ? error.status : error));
+      } else {
+        getHBARBalance();
+        getBalance();
+        // toast.success('Success! Token was approved.');
+      }
+    } catch (error) {
+      console.log('error', error);
+    } finally {
+      setLoadingUnwrap(false);
+    }
+  };
+
   useEffect(() => {
     getBalance();
   }, [token, userId, getBalance]);
@@ -130,17 +154,9 @@ const ManageReward = ({
 
   useEffect(() => {
     const getApproved = async () => {
-      const approved = await checkAllowanceHTS(
-        userId,
-        {
-          address: token.address,
-          decimals: token.decimals,
-          symbol: token.symbol,
-          hederaId: addressToId(token.address),
-        } as ITokenData,
-        inputValue,
-        farmAddress,
-      );
+      setLoadingCheckApprove(true);
+      const approved = await checkAllowanceERC20(token.address, userId, farmAddress, inputValue);
+      setLoadingCheckApprove(false);
       setApproved(approved);
     };
 
@@ -213,8 +229,17 @@ const ManageReward = ({
         }
       />
       <div className="d-flex align-items-center mt-4">
+        {isTokenWHBAR ? (
+          <Button loading={loadingUnwrap} onClick={handleUnwrapClick} className="ws-no-wrap me-3">
+            Unwrap WHBAR
+          </Button>
+        ) : null}
         {!approved ? (
-          <Button loading={loadingApprove} onClick={handleApproveClick} className="me-3">
+          <Button
+            loading={loadingApprove || loadingCheckApprove}
+            onClick={handleApproveClick}
+            className="me-3"
+          >
             Approve
           </Button>
         ) : null}
