@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ethers } from 'ethers';
 
-import { IReward, ITokenData } from '../interfaces/tokens';
+import { IReward, ITokenData, TokenType } from '../interfaces/tokens';
 import SDK from '../sdk/sdk';
 
 import Button from './Button';
@@ -15,7 +15,8 @@ import {
   addressToId,
   checkAllowanceHTS,
   getAmountToApprove,
-  getHTSTokenWalletBalance,
+  getTokenBalance,
+  getTokenBalanceERC20,
 } from '../utils/tokenUtils';
 
 interface IManageRewardProps {
@@ -35,8 +36,28 @@ const ManageReward = ({
 }: IManageRewardProps) => {
   const [approved, setApproved] = useState(false);
   const [tokenBalance, setTokenBalance] = useState('0');
+  const [HBARBalance, setHBARBalance] = useState('0');
   const [inputValue, setInputValue] = useState('0');
+  const [inputHBARValue, setInputHBARValue] = useState('0');
   const [loadingApprove, setLoadingApprove] = useState(false);
+  const [loadingWrap, setLoadingWrap] = useState(false);
+
+  const isTokenWHBAR = token.address === process.env.REACT_APP_WHBAR_ADDRESS;
+
+  const getBalance = useCallback(async () => {
+    const balanceNoDecimals = await getTokenBalanceERC20(token.address, userId);
+    const balance = ethers.utils.formatUnits(balanceNoDecimals, token.decimals);
+    console.log('balance', balance);
+    setTokenBalance(balance);
+  }, [token, userId]);
+
+  const getHBARBalance = useCallback(async () => {
+    const balance =
+      (await getTokenBalance(userId, {
+        type: TokenType.HBAR,
+      } as ITokenData)) || '0';
+    setHBARBalance(balance);
+  }, [userId]);
 
   const handleApproveClick = async () => {
     setLoadingApprove(true);
@@ -72,19 +93,36 @@ const ManageReward = ({
 
   const handleSendClick = async () => {};
 
-  // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setInputValue(e.target.value);
-  // };
+  const handleWrapClick = async () => {
+    setLoadingWrap(true);
+
+    try {
+      const receipt = await sdk.wrapHBAR(connectorInstance, userId, inputHBARValue);
+      const {
+        response: { success },
+      } = receipt;
+
+      if (!success) {
+        // toast.error(getErrorMessage(error.status ? error.status : error));
+      } else {
+        getHBARBalance();
+        getBalance();
+        // toast.success('Success! Token was approved.');
+      }
+    } catch (error) {
+      console.log('error', error);
+    } finally {
+      setLoadingWrap(false);
+    }
+  };
 
   useEffect(() => {
-    const getBalance = async () => {
-      const balanceNoDecimals = await getHTSTokenWalletBalance(userId, addressToId(token.address));
-      const balance = ethers.utils.formatUnits(balanceNoDecimals, token.decimals);
-      setTokenBalance(balance);
-    };
-
     getBalance();
-  }, [token, userId]);
+  }, [token, userId, getBalance]);
+
+  useEffect(() => {
+    isTokenWHBAR && getHBARBalance();
+  }, [token, userId, isTokenWHBAR, getHBARBalance]);
 
   useEffect(() => {
     setInputValue(tokenBalance);
@@ -111,7 +149,42 @@ const ManageReward = ({
 
   return (
     <div>
-      {/* <InputToken onChange={handleInputChange} value={inputValue} /> */}
+      {isTokenWHBAR ? (
+        <>
+          <InputTokenSelector
+            className="mt-4"
+            inputTokenComponent={
+              <InputToken
+                value={inputHBARValue}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const { value } = e.target;
+                  const strippedValue = stripStringToFixedDecimals(value, token.decimals);
+                  setInputHBARValue(strippedValue);
+                }}
+                isCompact={true}
+                name="amountIn"
+              />
+            }
+            buttonSelectorComponent={
+              <ButtonSelector disabled selectedToken={'HBAR'} selectorText="Select a token" />
+            }
+            walletBalanceComponent={
+              <WalletBalance
+                // insufficientBallance={getInsufficientTokenBalance()}
+                walletBalance={HBARBalance}
+                onMaxButtonClick={(maxValue: string) => {
+                  setInputHBARValue(maxValue);
+                }}
+              />
+            }
+          />
+          <div className="d-flex align-items-center mt-4">
+            <Button loading={loadingWrap} onClick={handleWrapClick}>
+              Wrap HBAR
+            </Button>
+          </div>
+        </>
+      ) : null}
       <InputTokenSelector
         className="mt-4"
         inputTokenComponent={
