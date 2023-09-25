@@ -210,7 +210,19 @@ const Governance = () => {
         ) : (
           <div>
             <div className="d-flex justify-content-between align-items-center">
-              <h1 className="text-title text-bold">Proposals</h1>
+              <div>
+                <h1 className="text-title text-bold mb-1">Proposals</h1>
+                <p>
+                  <a
+                    href="https://discord.com/channels/995562793560440852/1044912482134802582"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="link-primary"
+                  >
+                    Join the DAO discussions here &raquo;
+                  </a>
+                </p>
+              </div>
 
               <div className="d-flex  align-items-center">
                 <div className="me-3">
