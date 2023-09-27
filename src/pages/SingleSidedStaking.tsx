@@ -163,9 +163,11 @@ const SingleSidedStaking = () => {
 
   const getUserRewardsBalance = useCallback(async () => {
     try {
-      const balanceBN = await rewardsContract.owed(idToAddress(userId));
       const decimals = await tokenContract.decimals();
-      const balance = ethers.utils.formatUnits(balanceBN, decimals);
+      const rewardsBN = await rewardsContract.callStatic.claim({
+        from: idToAddress(userId),
+      });
+      const rewards = ethers.utils.formatUnits(rewardsBN, decimals);
 
       // const pull = await rewardsContract.pullFeature();
       // const endDate = formatContractTimestamp(pull.endTs);
@@ -183,7 +185,7 @@ const SingleSidedStaking = () => {
       setCampaignEndDate(endDate.inMilliSeconds);
       setTotalDuration(totalDuration.inMilliSeconds);
       setTotalRewadsAmount(totalAmount.inETH);
-      setUserRewardsBalance(balance);
+      setUserRewardsBalance(rewards);
     } catch (error) {
       console.error(error);
       setGeneralError(true);
