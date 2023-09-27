@@ -284,6 +284,7 @@ export const GET_FARMS = gql`
     }
   }
 `;
+
 //TODO: check parameters names
 export const GET_FARM_BY_ADDRESS = gql`
   query getFarmDetails($farmAddress: String!, $userAddress: String!) {
@@ -298,6 +299,47 @@ export const GET_FARM_BY_ADDRESS = gql`
         rewardEnd
         totalAmount
         duration
+      }
+      userStakingData {
+        stakedAmount
+        rewardsAccumulated {
+          address
+          totalAccumulated
+        }
+      }
+      poolData {
+        pairSymbol
+        pairAddress
+        pairName
+        pairSupply
+        lpShares
+        token0
+        token0Amount
+        token0Decimals
+        token0Symbol
+        token1
+        token1Amount
+        token1Decimals
+        token1Symbol
+      }
+    }
+  }
+`;
+
+export const GET_PERMISSIONLESS_FARMS = gql`
+  query getPYFOverview($userAddress: String!) {
+    getPYFOverview(userAddress: $userAddress) {
+      address
+      totalStaked
+      stakingTokenAddress
+      rewardsData {
+        address
+        symbol
+        decimals
+        rewardEnd
+        totalAmount
+        duration
+        isHts
       }
       userStakingData {
         stakedAmount

@@ -7,7 +7,7 @@ import Button from '../components/Button';
 import Loader from '../components/Loader';
 
 import usePools from '../hooks/usePools';
-import useFarms from '../hooks/useFarms';
+import useFarms from '../hooks/usePermissionlessFarms';
 
 import { useQueryOptionsPoolsFarms } from '../constants';
 import FarmRow from '../components/FarmRow';
