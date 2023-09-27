@@ -426,8 +426,8 @@ const getUserHTSData = async (userId: string) => {
   return tokens?._map;
 };
 
-export const requestIdFromAddress = async (id: string) => {
-  const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/contracts/${id}`;
+export const requestIdFromAddress = async (address: string) => {
+  const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/contracts/${address}`;
   try {
     const {
       data: { contract_id },
@@ -439,8 +439,8 @@ export const requestIdFromAddress = async (id: string) => {
   }
 };
 
-export const requestAddressFromId = async (address: string) => {
-  const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/contracts/${address}`;
+export const requestAddressFromId = async (id: string) => {
+  const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/contracts/${id}`;
   try {
     const {
       data: { evm_address },
