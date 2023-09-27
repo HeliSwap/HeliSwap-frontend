@@ -18,6 +18,7 @@ import ManageReward from '../components/ManageReward';
 
 import { formatIcons } from '../utils/iconUtils';
 import { mapWHBARAddress } from '../utils/tokenUtils';
+import { formatStringWeiToStringEther } from '../utils/numberUtils';
 
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import useFarmByAddress from '../hooks/useFarmByAddress';
@@ -180,12 +181,24 @@ const ManageFarmDetails = () => {
                             <div
                               onClick={() => handleRewardClick(reward)}
                               key={index}
-                              className={`d-flex align-items-center my-4 container-farm-reward ${
+                              className={`d-flex justify-content-between align-items-center my-4 container-farm-reward ${
                                 selectedRewardToken.symbol === reward.symbol ? 'is-selected' : ''
                               }`}
                             >
-                              <IconToken symbol={reward.symbol} />{' '}
-                              <span className="text-main ms-3">{rewardSymbol}</span>
+                              <div className="d-flex align-items-center">
+                                <IconToken symbol={reward.symbol} />{' '}
+                                <span className="text-main ms-3">{rewardSymbol}</span>
+                              </div>
+                              <div>
+                                {rewardActive ? (
+                                  <span className="text-small text-numeric">
+                                    {formatStringWeiToStringEther(
+                                      reward.totalAmount,
+                                      reward.decimals,
+                                    )}
+                                  </span>
+                                ) : null}
+                              </div>
                               {/* {rewardActive ? (
                                 <span className="text-small text-success ms-3">
                                   Active untill {timestampToDate(reward.rewardEnd)}
