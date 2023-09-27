@@ -853,9 +853,10 @@ class SDK {
     userId: string,
   ) {
     const maxGas = TRANSACTION_MAX_FEES.DEPLOY_PYF_FACTORY;
+    const farmId = await requestIdFromAddress(farmAddress);
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
-      .setContractId(addressToId(farmAddress))
+      .setContractId(farmId)
       //Set the gas for the contract call
       .setGas(maxGas)
       //Set the contract function to call
@@ -875,9 +876,10 @@ class SDK {
   ) {
     const maxGas = TRANSACTION_MAX_FEES.DEPLOY_PYF_FACTORY;
     const tokensAmountBN = formatStringToBigNumberWei(amount, decimals);
+    const farmId = await requestIdFromAddress(farmAddress);
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
-      .setContractId(addressToId(farmAddress))
+      .setContractId(farmId)
       //Set the gas for the contract call
       .setGas(maxGas)
       //Set the contract function to call
