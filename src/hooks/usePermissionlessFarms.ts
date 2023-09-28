@@ -31,11 +31,11 @@ const usePermissionlessFarms = (
 
   useEffect(() => {
     const getFarmsData = () => {
-      const { getFarmsOverview } = data;
+      const { getPYFOverview } = data;
 
-      if (getFarmsOverview && getFarmsOverview.length > 0 && pools.length && hbarPrice !== 0) {
+      if (getPYFOverview && getPYFOverview.length > 0 && pools.length && hbarPrice !== 0) {
         try {
-          const processedFarms = getProcessedFarms(getFarmsOverview, pools, hbarPrice);
+          const processedFarms = getProcessedFarms(getPYFOverview, pools, hbarPrice);
 
           // Exclude duplicated or expired farms
           const farms = processedFarms.filter(farm => !farmsToExclude.includes(farm.address));
@@ -53,7 +53,7 @@ const usePermissionlessFarms = (
   useEffect(() => {
     if (
       !loading &&
-      (error || (data && (!data.getFarmsOverview || data?.getFarmsOverview?.length === 0)))
+      (error || (data && (!data.getPYFOverview || data?.getPYFOverview?.length === 0)))
     ) {
       setProcessingFarms(false);
     }

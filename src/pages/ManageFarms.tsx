@@ -1,5 +1,6 @@
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 import { GlobalContext } from '../providers/Global';
 
@@ -11,6 +12,8 @@ import useFarms from '../hooks/usePermissionlessFarms';
 
 import { useQueryOptionsPoolsFarms } from '../constants';
 import FarmRow from '../components/FarmRow';
+import ToasterWrapper from '../components/ToasterWrapper';
+import getErrorMessage from '../content/errors';
 
 const ManageFarms = () => {
   const contextValue = useContext(GlobalContext);
@@ -22,7 +25,7 @@ const ManageFarms = () => {
   const { pools: poolsWithouthFarms, loading: loadingPools } = usePools();
 
   // Get all perimissionless farms - usePermissionlessFarms
-  const { farms, processingFarms } = useFarms(
+  const { farms, processingFarms, loading } = useFarms(
     useQueryOptionsPoolsFarms,
     userId,
     poolsWithouthFarms,
@@ -45,8 +48,16 @@ const ManageFarms = () => {
     setLoadingFarmDeploy(true);
 
     try {
-      const tx = await sdk.deployFarm(connectorInstance, tokenAddresses, userId);
-      console.log('tx', tx);
+      const receipt = await sdk.deployFarm(connectorInstance, tokenAddresses, userId);
+      const {
+        response: { success, error },
+      } = receipt;
+
+      if (!success) {
+        toast.error(getErrorMessage(error.status ? error.status : error));
+      } else {
+        toast.success('Success! Campaign is deployed.');
+      }
     } catch (error) {
       console.log('error', error);
     } finally {
@@ -96,7 +107,7 @@ const ManageFarms = () => {
             <hr />
 
             <div>
-              {processingFarms ? (
+              {processingFarms || loading ? (
                 <div className="d-flex justify-content-center align-items-center">
                   <Loader />
                 </div>
@@ -136,6 +147,7 @@ const ManageFarms = () => {
           </div>
         )}
       </div>
+      <ToasterWrapper />
     </div>
   );
 };
