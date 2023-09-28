@@ -73,7 +73,7 @@ const FarmsPermissionless = ({ itemsPerPage }: IFarmsProps) => {
   };
 
   const handleRowClick = (farmAddress: string) => {
-    navigate(`/farms/${farmAddress}`);
+    navigate(`/farms-permissionless/${farmAddress}`);
   };
 
   const handleSortClick = (sortBy: SORT_OPTIONS) => {

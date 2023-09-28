@@ -185,7 +185,7 @@ const FarmPermissionlessDetails = () => {
   ) : (
     <div className="d-flex justify-content-center">
       <div className="container-max-with-1042">
-        <PageHeader title="Manage Farm" handleBackClick={() => navigate('/farms')} />
+        <PageHeader title="Manage Farm" handleBackClick={() => navigate('/farms-permissionless')} />
         {haveFarm ? (
           <div className="row">
             <div className="col-md-7">
