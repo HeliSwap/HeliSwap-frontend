@@ -26,6 +26,32 @@ export const GET_POOLS = gql`
   }
 `;
 
+export const GET_POOLS_WITHOUT_FARMS = gql`
+  query {
+    getPoolsWithoutFarms {
+      id
+      pairName
+      pairSymbol
+      pairAddress
+      pairSupply
+      token0
+      token0Name
+      token0Amount
+      token0Symbol
+      token0Decimals
+      token1
+      token1Name
+      token1Symbol
+      token1Amount
+      token1Decimals
+      volume24h
+      volume7d
+      hasProblematicToken
+      hasCampaign
+    }
+  }
+`;
+
 export const GET_POOL_BY_TOKEN = gql`
   query getPoolByToken($token: String!) {
     poolsByToken(token: $token) {
@@ -329,6 +355,88 @@ export const GET_FARM_BY_ADDRESS = gql`
 export const GET_PERMISSIONLESS_FARMS = gql`
   query getPYFOverview($userAddress: String!) {
     getPYFOverview(userAddress: $userAddress) {
+      address
+      totalStaked
+      stakingTokenAddress
+      rewardsData {
+        address
+        symbol
+        decimals
+        rewardEnd
+        totalAmount
+        duration
+        isHts
+      }
+      userStakingData {
+        stakedAmount
+        rewardsAccumulated {
+          address
+          totalAccumulated
+        }
+      }
+      poolData {
+        pairSymbol
+        pairAddress
+        pairName
+        pairSupply
+        lpShares
+        token0
+        token0Amount
+        token0Decimals
+        token0Symbol
+        token1
+        token1Amount
+        token1Decimals
+        token1Symbol
+      }
+    }
+  }
+`;
+
+export const GET_PERMISSIONLESS_FARM_DETAILS = gql`
+  query getPermissionlessFarmDetails($farmAddress: String!) {
+    getPermissionlessFarmDetails(farmAddress: $farmAddress, userAddress: "") {
+      address
+      totalStaked
+      stakingTokenAddress
+      rewardsData {
+        address
+        symbol
+        decimals
+        rewardEnd
+        totalAmount
+        duration
+        isHts
+      }
+      userStakingData {
+        stakedAmount
+        rewardsAccumulated {
+          address
+          totalAccumulated
+        }
+      }
+      poolData {
+        pairSymbol
+        pairAddress
+        pairName
+        pairSupply
+        lpShares
+        token0
+        token0Amount
+        token0Decimals
+        token0Symbol
+        token1
+        token1Amount
+        token1Decimals
+        token1Symbol
+      }
+    }
+  }
+`;
+
+export const GET_PERMISSIONLESS_FARM_REWARDS = gql`
+  query getRewardsByFarmAddress($farmAddress: String!) {
+    getRewardsByFarmAddress(farmAddress: $farmAddress) {
       address
       totalStaked
       stakingTokenAddress

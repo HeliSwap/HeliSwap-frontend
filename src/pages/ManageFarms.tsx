@@ -7,7 +7,7 @@ import { GlobalContext } from '../providers/Global';
 import Button from '../components/Button';
 import Loader from '../components/Loader';
 
-import usePools from '../hooks/usePools';
+import usePools from '../hooks/usePoolsWithoutFarms';
 import useFarms from '../hooks/usePermissionlessFarms';
 
 import { useQueryOptionsPoolsFarms } from '../constants';

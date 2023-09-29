@@ -21,7 +21,7 @@ import { mapWHBARAddress } from '../utils/tokenUtils';
 import { formatStringWeiToStringEther } from '../utils/numberUtils';
 
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
-import useFarmByAddress from '../hooks/useFarmByAddress';
+import useFarmByAddress from '../hooks/usePermissionlessFarmRewardsByAddress';
 
 import { useQueryOptionsPoolsFarms } from '../constants';
 
@@ -44,7 +44,6 @@ const ManageFarmDetails = () => {
 
   const { farm: farmData, processingFarms } = useFarmByAddress(
     useQueryOptionsPoolsFarms,
-    userId,
     pools,
     address || '',
   );

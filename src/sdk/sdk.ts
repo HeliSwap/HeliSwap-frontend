@@ -832,9 +832,12 @@ class SDK {
   ) {
     const maxGas = TRANSACTION_MAX_FEES.DEPLOY_PYF_FACTORY;
     const [address0, address1] = tokenAddresses.split(',');
+    const factoryAddress = await requestIdFromAddress(
+      process.env.REACT_APP_PYF_FACTORY_ADDRESS as string,
+    );
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
-      .setContractId(addressToId(process.env.REACT_APP_PYF_FACTORY_ADDRESS as string))
+      .setContractId(factoryAddress)
       //Set the gas for the contract call
       .setGas(maxGas)
       //Set the contract function to call
