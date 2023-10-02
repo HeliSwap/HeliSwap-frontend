@@ -84,7 +84,7 @@ const ManageReward = ({
         amount,
         userId,
         hederaId,
-        true,
+        token.isHts,
         farmAddress,
       );
       const {
@@ -206,7 +206,7 @@ const ManageReward = ({
             inputValue,
             farmAddress,
           )
-        : await checkAllowanceERC20(token.address, userId, farmAddress, inputValue);
+        : await checkAllowanceERC20(token.address, userId, farmAddress, inputValue, token.decimals);
       setLoadingCheckApprove(false);
       setApproved(approved);
     };
