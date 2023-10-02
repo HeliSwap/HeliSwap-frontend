@@ -77,7 +77,10 @@ function App() {
                       <Route path="heliverse" element={<HeliVerse />} />
                       <Route path="proposals" element={<Proposals />} />
                       <Route path="proposals/:id" element={<ProposalDetails />} />
-                      <Route path="manage-permissionless-farms" element={<ManageFarms />} />
+                      <Route
+                        path="manage-permissionless-farms"
+                        element={<ManageFarms itemsPerPage={10} />}
+                      />
                       <Route
                         path="manage-permissionless-farms/:address"
                         element={<ManageFarmDetails />}
