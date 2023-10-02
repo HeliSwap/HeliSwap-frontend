@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-
+import { ethers } from 'ethers';
+import BigNumber from 'bignumber.js';
 import toast from 'react-hot-toast';
 
 import { IReward, ITokenData, TokenType } from '../interfaces/tokens';
@@ -11,13 +12,14 @@ import ButtonSelector from './ButtonSelector';
 import InputTokenSelector from './InputTokenSelector';
 import WalletBalance from './WalletBalance';
 
-import { stripStringToFixedDecimals } from '../utils/numberUtils';
+import { formatBigNumberToStringETH, stripStringToFixedDecimals } from '../utils/numberUtils';
 import {
   addressToId,
   checkAllowanceERC20,
   checkAllowanceHTS,
   getAmountToApprove,
   getTokenBalance,
+  invalidInputTokensData,
 } from '../utils/tokenUtils';
 
 import getErrorMessage from '../content/errors';
@@ -51,6 +53,26 @@ const ManageReward = ({
   const [loadingSend, setLoadingSend] = useState(false);
 
   const isTokenWHBAR = token.address === process.env.REACT_APP_WHBAR_ADDRESS;
+
+  const updateWHBARBalance = (balance: string, action: string) => {
+    setTokenBalance(prev => {
+      let newStaked;
+      if (action === 'add') {
+        newStaked = ethers.utils.parseUnits(prev, 8).add(ethers.utils.parseUnits(balance, 8));
+      } else {
+        newStaked = ethers.utils.parseUnits(prev, 8).sub(ethers.utils.parseUnits(balance, 8));
+      }
+      return formatBigNumberToStringETH(newStaked);
+    });
+  };
+
+  const getInsufficientTokenBalance = useCallback(() => {
+    return new BigNumber(inputValue as string).gt(new BigNumber(tokenBalance));
+  }, [tokenBalance, inputValue]);
+
+  const getInsufficientHBARBalance = useCallback(() => {
+    return new BigNumber(inputHBARValue as string).gt(new BigNumber(HBARBalance));
+  }, [HBARBalance, inputHBARValue]);
 
   const getBalance = useCallback(async () => {
     const tokenData = {
@@ -126,6 +148,7 @@ const ManageReward = ({
         toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         toast.success('Success! Rewards are sent.');
+        setInputValue('0');
       }
     } catch (error) {
       console.log('error', error);
@@ -147,7 +170,8 @@ const ManageReward = ({
         toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         getHBARBalance();
-        getBalance();
+        updateWHBARBalance(inputHBARValue, 'add');
+        setInputHBARValue('0');
         toast.success('Success! Tokens were wrapped.');
       }
     } catch (error) {
@@ -170,7 +194,7 @@ const ManageReward = ({
         toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         getHBARBalance();
-        getBalance();
+        updateWHBARBalance(inputValue, 'remove');
         toast.success('Success! Tokens were unwrapped.');
       }
     } catch (error) {
@@ -182,15 +206,12 @@ const ManageReward = ({
 
   useEffect(() => {
     getBalance();
+    setInputValue('0');
   }, [token, userId, getBalance]);
 
   useEffect(() => {
     isTokenWHBAR && getHBARBalance();
   }, [token, userId, isTokenWHBAR, getHBARBalance]);
-
-  useEffect(() => {
-    setInputValue(tokenBalance);
-  }, [tokenBalance]);
 
   useEffect(() => {
     const getApproved = async () => {
@@ -220,13 +241,17 @@ const ManageReward = ({
         <>
           <InputTokenSelector
             className="mt-4"
+            isInvalid={getInsufficientHBARBalance()}
             inputTokenComponent={
               <InputToken
                 value={inputHBARValue}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   const { value } = e.target;
                   const strippedValue = stripStringToFixedDecimals(value, token.decimals);
-                  setInputHBARValue(strippedValue);
+
+                  if (!invalidInputTokensData(strippedValue)) {
+                    setInputHBARValue(strippedValue);
+                  }
                 }}
                 isCompact={true}
                 name="amountIn"
@@ -237,7 +262,7 @@ const ManageReward = ({
             }
             walletBalanceComponent={
               <WalletBalance
-                // insufficientBallance={getInsufficientTokenBalance()}
+                insufficientBallance={getInsufficientHBARBalance()}
                 walletBalance={HBARBalance}
                 onMaxButtonClick={(maxValue: string) => {
                   setInputHBARValue(maxValue);
@@ -254,13 +279,17 @@ const ManageReward = ({
       ) : null}
       <InputTokenSelector
         className="mt-4"
+        isInvalid={getInsufficientTokenBalance()}
         inputTokenComponent={
           <InputToken
             value={inputValue}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               const { value } = e.target;
               const strippedValue = stripStringToFixedDecimals(value, token.decimals);
-              setInputValue(strippedValue);
+
+              if (!invalidInputTokensData(strippedValue)) {
+                setInputValue(strippedValue);
+              }
             }}
             isCompact={true}
             name="amountIn"
@@ -271,7 +300,7 @@ const ManageReward = ({
         }
         walletBalanceComponent={
           <WalletBalance
-            // insufficientBallance={getInsufficientTokenBalance()}
+            insufficientBallance={getInsufficientTokenBalance()}
             walletBalance={tokenBalance}
             onMaxButtonClick={(maxValue: string) => {
               setInputValue(maxValue);
