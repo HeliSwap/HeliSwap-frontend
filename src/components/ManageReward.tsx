@@ -12,7 +12,12 @@ import ButtonSelector from './ButtonSelector';
 import InputTokenSelector from './InputTokenSelector';
 import WalletBalance from './WalletBalance';
 
-import { formatBigNumberToStringETH, stripStringToFixedDecimals } from '../utils/numberUtils';
+import {
+  formatBigNumberToStringETH,
+  formatStringToBigNumberEthersWei,
+  formatStringWeiToStringEther,
+  stripStringToFixedDecimals,
+} from '../utils/numberUtils';
 import {
   addressToId,
   checkAllowanceERC20,
@@ -23,6 +28,8 @@ import {
 } from '../utils/tokenUtils';
 
 import getErrorMessage from '../content/errors';
+import { MONTH_IN_SECONDS } from '../utils/timeUtils';
+import IconToken from './IconToken';
 
 interface IManageRewardProps {
   token: IReward;
@@ -31,6 +38,7 @@ interface IManageRewardProps {
   sdk: SDK;
   connectorInstance: any;
   selectedDuration: number;
+  campaignEnd: number;
 }
 
 const ManageReward = ({
@@ -40,6 +48,7 @@ const ManageReward = ({
   sdk,
   connectorInstance,
   selectedDuration,
+  campaignEnd,
 }: IManageRewardProps) => {
   const [approved, setApproved] = useState(false);
   const [tokenBalance, setTokenBalance] = useState('0');
@@ -51,8 +60,14 @@ const ManageReward = ({
   const [loadingWrap, setLoadingWrap] = useState(false);
   const [loadingUnwrap, setLoadingUnwrap] = useState(false);
   const [loadingSend, setLoadingSend] = useState(false);
+  const [rewardRate, setRewardRate] = useState('0');
+  const [actualReward, setActualReward] = useState('0');
 
   const isTokenWHBAR = token.address === process.env.REACT_APP_WHBAR_ADDRESS;
+  const secondsLeftTillEnd =
+    campaignEnd > Date.now()
+      ? Math.floor((campaignEnd - Date.now()) / 1000)
+      : selectedDuration * MONTH_IN_SECONDS;
 
   const updateWHBARBalance = (balance: string, action: string) => {
     setTokenBalance(prev => {
@@ -235,6 +250,19 @@ const ManageReward = ({
     getApproved();
   }, [token, inputValue, userId, farmAddress]);
 
+  useEffect(() => {
+    // const rate = formatStringToBigNumberWei(inputValue, token.decimals)
+    //   .dividedBy(secondsLeftTillEnd)
+    //   .toString();
+    const rateBN = formatStringToBigNumberEthersWei(inputValue, token.decimals)
+      .div(secondsLeftTillEnd)
+      .toString();
+
+    const actualAmount = secondsLeftTillEnd * Number(rateBN);
+    setRewardRate(rateBN);
+    setActualReward(formatStringWeiToStringEther(actualAmount.toString(), token.decimals));
+  }, [token, secondsLeftTillEnd, inputValue]);
+
   return (
     <div>
       {isTokenWHBAR ? (
@@ -308,6 +336,24 @@ const ManageReward = ({
           />
         }
       />
+
+      <div className="mt-4">
+        <p className="text-small">
+          <span className="text-bold me-3">Reward rate:</span>{' '}
+          <span className="text-numeric">
+            {formatStringWeiToStringEther(rewardRate, token.decimals)}
+          </span>
+          <IconToken className="mx-2" symbol={token.symbol} />
+          {token.symbol} per second
+        </p>
+        <p className="text-small mt-3">
+          <span className="text-bold me-3">Reward to be send:</span> {/* Add fee! */}
+          <span className="text-numeric">{actualReward}</span>
+          <IconToken className="mx-2" symbol={token.symbol} />
+          {token.symbol}
+        </p>
+      </div>
+
       <div className="d-flex align-items-center mt-4">
         {isTokenWHBAR ? (
           <Button loading={loadingUnwrap} onClick={handleUnwrapClick} className="ws-no-wrap me-3">

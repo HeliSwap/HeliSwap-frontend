@@ -53,6 +53,7 @@ const ManageFarmDetails = () => {
   const [loadingEnableReward, setLoadingEnableReward] = useState(false);
   const [showManageReward, setShowManageReward] = useState(false);
   const [selectedRewardToken, setSelectedRewardToken] = useState<IReward>({} as IReward);
+  const [campaignEnd, setCampaignEnd] = useState(0);
 
   // Events
   const handleSelectDurationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -109,6 +110,19 @@ const ManageFarmDetails = () => {
   useEffect(() => {
     rewardsDurationMonths > 0 && setSelectedDuration(rewardsDurationMonths);
   }, [rewardsDurationMonths]);
+
+  useEffect(() => {
+    if (Object.keys(farmData).length > 0 && farmData.rewardsData.length > 0) {
+      const campaignEnd = farmData.rewardsData.reduce((acc, reward) => {
+        if (reward.rewardEnd > acc) {
+          acc = reward.rewardEnd;
+        }
+        return acc;
+      }, 0);
+
+      setCampaignEnd(campaignEnd);
+    }
+  }, [farmData]);
 
   return isHashpackLoading ? (
     <Loader />
@@ -223,6 +237,7 @@ const ManageFarmDetails = () => {
                         sdk={sdk}
                         connectorInstance={connectorInstance}
                         selectedDuration={selectedDuration}
+                        campaignEnd={campaignEnd}
                       />
                     )}
                   </div>
