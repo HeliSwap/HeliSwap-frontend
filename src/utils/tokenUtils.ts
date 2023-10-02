@@ -82,30 +82,6 @@ export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
   }
 };
 
-export const getHTSTokenWalletBalance = async (
-  userId: string,
-  tokenId: string,
-): Promise<number> => {
-  const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/tokens/${tokenId}/balances?account.id=${userId}&order=desc&limit=2`;
-
-  try {
-    const {
-      data: { balances },
-    } = await axios(url);
-
-    if (balances.length > 0) {
-      const { balance } = balances[0];
-
-      return balance;
-    } else {
-      return 0;
-    }
-  } catch (e) {
-    console.error(e);
-    return 0;
-  }
-};
-
 export const getUserAssociatedTokens = async (userId: string): Promise<string[]> => {
   const tokens = (await getUserHTSData(userId)) || [];
   const keys: string[] = [];
@@ -141,7 +117,6 @@ export const checkAllowanceERC20 = async (
 ) => {
   const provider = getProvider();
   const tokenContract = new ethers.Contract(tokenAddress, ERC20.abi, provider);
-
   const allowance = await tokenContract.allowance(idToAddress(userId), spenderAddress);
   const amountToSpendBN = formatStringToBigNumberEthersWei(amountToSpend);
 
@@ -167,7 +142,7 @@ export const checkAllowanceHTS = async (
 ) => {
   const spenderId =
     spenderAddress && spenderAddress !== ''
-      ? addressToId(spenderAddress as string)
+      ? await requestIdFromAddress(spenderAddress as string)
       : addressToId(process.env.REACT_APP_ROUTER_ADDRESS as string);
   const allowances = await getTokenAllowance(userId, spenderId, token.hederaId);
 

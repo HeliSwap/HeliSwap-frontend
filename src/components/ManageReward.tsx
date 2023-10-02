@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ethers } from 'ethers';
 
 import toast from 'react-hot-toast';
 
@@ -16,9 +15,9 @@ import { stripStringToFixedDecimals } from '../utils/numberUtils';
 import {
   addressToId,
   checkAllowanceERC20,
+  checkAllowanceHTS,
   getAmountToApprove,
   getTokenBalance,
-  getTokenBalanceERC20,
 } from '../utils/tokenUtils';
 
 import getErrorMessage from '../content/errors';
@@ -54,8 +53,14 @@ const ManageReward = ({
   const isTokenWHBAR = token.address === process.env.REACT_APP_WHBAR_ADDRESS;
 
   const getBalance = useCallback(async () => {
-    const balanceNoDecimals = await getTokenBalanceERC20(token.address, userId);
-    const balance = ethers.utils.formatUnits(balanceNoDecimals, token.decimals);
+    const tokenData = {
+      type: token.isHts ? TokenType.HTS : TokenType.ERC20,
+      // TODO: check if newly deployed tokens are EVM or long zero address
+      hederaId: addressToId(token.address),
+      decimals: token.decimals,
+      address: token.address,
+    } as ITokenData;
+    const balance = (await getTokenBalance(userId, tokenData)) || '0';
     setTokenBalance(balance);
   }, [token, userId]);
 
@@ -175,7 +180,6 @@ const ManageReward = ({
     }
   };
 
-  // TODO: use IToken data instead of IReward in order to get the token type and using getTokenBalance function which requires token type. This is needed to not use the relay every time. Same for checking the allowance.
   useEffect(() => {
     getBalance();
   }, [token, userId, getBalance]);
@@ -191,7 +195,18 @@ const ManageReward = ({
   useEffect(() => {
     const getApproved = async () => {
       setLoadingCheckApprove(true);
-      const approved = await checkAllowanceERC20(token.address, userId, farmAddress, inputValue);
+
+      const approved = token.isHts
+        ? await checkAllowanceHTS(
+            userId,
+            {
+              hederaId: addressToId(token.address),
+              decimals: token.decimals,
+            } as ITokenData,
+            inputValue,
+            farmAddress,
+          )
+        : await checkAllowanceERC20(token.address, userId, farmAddress, inputValue);
       setLoadingCheckApprove(false);
       setApproved(approved);
     };
