@@ -1,4 +1,4 @@
-import { useState, useContext, ReactNode } from 'react';
+import { useState, useContext, ReactNode, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import Tippy from '@tippyjs/react';
@@ -19,6 +19,7 @@ import ManageReward from '../components/ManageReward';
 import { formatIcons } from '../utils/iconUtils';
 import { mapWHBARAddress } from '../utils/tokenUtils';
 import { formatStringWeiToStringEther } from '../utils/numberUtils';
+import { MONTH_IN_SECONDS } from '../utils/timeUtils';
 
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import useFarmByAddress from '../hooks/usePermissionlessFarmRewardsByAddress';
@@ -92,11 +93,22 @@ const ManageFarmDetails = () => {
 
   const haveFarm = Object.keys(farmData).length !== 0;
   const campaignHasRewards = farmData.rewardsData?.length > 0;
+  const rewardsDuration = farmData.rewardsData?.reduce((acc, reward) => {
+    if (reward.duration > acc && reward.rewardEnd > Date.now()) {
+      acc = reward.duration;
+    }
+    return acc;
+  }, 0);
+  const rewardsDurationMonths = rewardsDuration > 0 ? rewardsDuration / MONTH_IN_SECONDS : 0;
   const campaignHasActiveRewards = campaignHasRewards
     ? Object.keys(farmData.rewardsData.find(reward => reward.rewardEnd > Date.now()) || {}).length >
       0
     : false;
-  const canEnableReward = selectedDuration > 0;
+  const canEnableReward = selectedDuration > 0 && !campaignHasActiveRewards;
+
+  useEffect(() => {
+    rewardsDurationMonths > 0 && setSelectedDuration(rewardsDurationMonths);
+  }, [rewardsDurationMonths]);
 
   return isHashpackLoading ? (
     <Loader />
@@ -165,49 +177,40 @@ const ManageFarmDetails = () => {
                   <div className="col-6">
                     {campaignHasRewards &&
                       farmData.rewardsData?.reduce((acc: ReactNode[], reward: IReward, index) => {
-                        // When reward is enabled, but not sent -> do not show
-                        const haveRewardSendToCampaign =
-                          reward.totalAmount && Number(reward.totalAmount || reward) !== 0;
-
                         const rewardActive = reward.rewardEnd > Date.now();
-                        // When all rewards are inactive -> show all, when at least one is active -> show only active
-                        const showReward =
-                          haveRewardSendToCampaign && (rewardActive || !campaignHasActiveRewards);
-                        if (showReward) {
-                          const rewardSymbol = mapWHBARAddress(reward);
+                        const rewardSymbol = mapWHBARAddress(reward);
 
-                          acc.push(
-                            <div
-                              onClick={() => handleRewardClick(reward)}
-                              key={index}
-                              className={`d-flex justify-content-between align-items-center my-4 container-farm-reward ${
-                                selectedRewardToken.symbol === reward.symbol ? 'is-selected' : ''
-                              }`}
-                            >
-                              <div className="d-flex align-items-center">
-                                <IconToken symbol={reward.symbol} />{' '}
-                                <span className="text-main ms-3">{rewardSymbol}</span>
-                              </div>
-                              <div>
-                                {rewardActive ? (
-                                  <span className="text-small text-numeric">
-                                    {formatStringWeiToStringEther(
-                                      reward.totalAmount,
-                                      reward.decimals,
-                                    )}
-                                  </span>
-                                ) : null}
-                              </div>
-                              {/* {rewardActive ? (
+                        acc.push(
+                          <div
+                            onClick={() => handleRewardClick(reward)}
+                            key={index}
+                            className={`d-flex justify-content-between align-items-center my-4 container-farm-reward ${
+                              selectedRewardToken.symbol === reward.symbol ? 'is-selected' : ''
+                            }`}
+                          >
+                            <div className="d-flex align-items-center">
+                              <IconToken symbol={reward.symbol} />{' '}
+                              <span className="text-main ms-3">{rewardSymbol}</span>
+                            </div>
+                            <div>
+                              {rewardActive ? (
+                                <span className="text-small text-numeric">
+                                  {formatStringWeiToStringEther(
+                                    reward.totalAmount,
+                                    reward.decimals,
+                                  )}
+                                </span>
+                              ) : null}
+                            </div>
+                            {/* {rewardActive ? (
                                 <span className="text-small text-success ms-3">
                                   Active untill {timestampToDate(reward.rewardEnd)}
                                 </span>
                               ) : (
                                 <span className="text-small text-danger ms-3">Expired</span>
                               )} */}
-                            </div>,
-                          );
-                        }
+                          </div>,
+                        );
                         return acc;
                       }, [])}
                   </div>

@@ -99,7 +99,6 @@ const ManageReward = ({
     }
   };
 
-  // TODO: here selectedDuration could not be correct, a check is needed to get the current duration. This logic needs to be added in Manage Farm Details component.
   const handleSendClick = async () => {
     setLoadingSend(true);
 
