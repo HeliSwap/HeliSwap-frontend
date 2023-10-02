@@ -394,8 +394,8 @@ export const GET_PERMISSIONLESS_FARMS = gql`
 `;
 
 export const GET_PERMISSIONLESS_FARM_DETAILS = gql`
-  query getPermissionlessFarmDetails($farmAddress: String!) {
-    getPermissionlessFarmDetails(farmAddress: $farmAddress, userAddress: "") {
+  query getPermissionlessFarmDetails($farmAddress: String!, $userAddress: String!) {
+    getPermissionlessFarmDetails(farmAddress: $farmAddress, userAddress: $userAddress) {
       address
       totalStaked
       stakingTokenAddress

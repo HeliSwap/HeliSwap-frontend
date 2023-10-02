@@ -8,6 +8,7 @@ import Button from '../components/Button';
 import Loader from '../components/Loader';
 
 import usePools from '../hooks/usePoolsWithoutFarms';
+import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import useFarms from '../hooks/usePermissionlessFarms';
 
 import { useQueryOptionsPoolsFarms } from '../constants';
@@ -17,19 +18,23 @@ import getErrorMessage from '../content/errors';
 
 const ManageFarms = () => {
   const contextValue = useContext(GlobalContext);
-  const { connection, sdk } = contextValue;
+  const { connection, sdk, tokensWhitelisted } = contextValue;
   const { userId, connectorInstance, isHashpackLoading, setShowConnectModal } = connection;
   const navigate = useNavigate();
+
+  const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
 
   // Get pools withouth farms - usePoolWithouthFarms with minimum liquidity
   const { pools: poolsWithouthFarms, loading: loadingPools } = usePools();
 
-  // Get all perimissionless farms - usePermissionlessFarms
-  const { farms, processingFarms, loading } = useFarms(
+  const { poolsByTokenList: pools } = usePoolsByTokensList(
     useQueryOptionsPoolsFarms,
-    userId,
-    poolsWithouthFarms,
+    true,
+    tokensWhitelistedAddresses,
   );
+
+  // Get all perimissionless farms - usePermissionlessFarms
+  const { farms, processingFarms } = useFarms(useQueryOptionsPoolsFarms, userId, pools);
 
   const [tokenAddresses, setTokenAddress] = useState('');
 
@@ -107,7 +112,7 @@ const ManageFarms = () => {
             <hr />
 
             <div>
-              {processingFarms || loading ? (
+              {processingFarms ? (
                 <div className="d-flex justify-content-center align-items-center">
                   <Loader />
                 </div>

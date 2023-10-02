@@ -136,7 +136,7 @@ const FarmsPermissionless = ({ itemsPerPage }: IFarmsProps) => {
       <div className="container-max-with-1042">
         <div className="d-flex justify-content-between align-items-center mb-4">
           <div className="d-flex">
-            <h2 className={`text-subheader tab-title is-active mx-4 `}>Farms</h2>
+            <h2 className={`text-subheader tab-title is-active mx-4 `}>Permissionless Farms</h2>
           </div>
           {userId ? (
             <div className="form-check form-switch">

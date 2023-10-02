@@ -50,6 +50,7 @@ const usePermissionlessFarms = (
 
     data && getFarmsData();
   }, [data, pools, hbarPrice]);
+
   useEffect(() => {
     if (
       !loading &&

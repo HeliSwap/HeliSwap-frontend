@@ -38,7 +38,7 @@ import { getUserAssociatedTokens, mapWHBARAddress } from '../utils/tokenUtils';
 
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import useTokensByListIds from '../hooks/useTokensByListIds';
-import useFarmByAddress from '../hooks/useFarmByAddress';
+import useFarmByAddress from '../hooks/usePermissionlessFarmByAddress';
 
 import getErrorMessage from '../content/errors';
 
