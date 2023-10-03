@@ -169,6 +169,15 @@ const SingleSidedStaking = () => {
       });
       const rewards = ethers.utils.formatUnits(rewardsBN, decimals);
 
+      setUserRewardsBalance(rewards);
+    } catch (error) {
+      console.error(error);
+      setGeneralError(true);
+    }
+  }, [rewardsContract, tokenContract, userId]);
+
+  const getCampaignData = useCallback(async () => {
+    try {
       // const pull = await rewardsContract.pullFeature();
       // const endDate = formatContractTimestamp(pull.endTs);
       // const totalDuration = formatContractDuration(pull.totalDuration);
@@ -185,12 +194,11 @@ const SingleSidedStaking = () => {
       setCampaignEndDate(endDate.inMilliSeconds);
       setTotalDuration(totalDuration.inMilliSeconds);
       setTotalRewadsAmount(totalAmount.inETH);
-      setUserRewardsBalance(rewards);
     } catch (error) {
       console.error(error);
       setGeneralError(true);
     }
-  }, [rewardsContract, tokenContract, userId]);
+  }, []);
 
   const calculateHeliPrice = useCallback(
     (heliAmount: string) => {
@@ -343,8 +351,16 @@ const SingleSidedStaking = () => {
   }, [kernelContract, userId, getHeliStaked, heliPrice]);
 
   useEffect(() => {
-    tokenContract && Object.keys(rewardsContract).length && userId && getUserRewardsBalance();
-  }, [tokenContract, rewardsContract, userId, getUserRewardsBalance]);
+    tokenContract &&
+      Object.keys(rewardsContract).length &&
+      userId &&
+      Number(heliStaked) > 0 &&
+      getUserRewardsBalance();
+  }, [tokenContract, rewardsContract, userId, getUserRewardsBalance, heliStaked]);
+
+  useEffect(() => {
+    tokenContract && Object.keys(rewardsContract).length && getCampaignData();
+  }, [tokenContract, rewardsContract, getCampaignData]);
 
   useEffect(() => {
     userId && getStakingTokenBalance(userId);
