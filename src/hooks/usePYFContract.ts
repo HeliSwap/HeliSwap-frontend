@@ -10,7 +10,7 @@ const usePYFContract = (farmAddress: string) => {
   useEffect(() => {
     const provider = getProvider();
     setFarmContract(new ethers.Contract(farmAddress, MultiRewards, provider));
-  }, []);
+  }, [farmAddress]);
 
   return farmContract;
 };

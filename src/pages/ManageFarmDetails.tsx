@@ -1,4 +1,4 @@
-import { useState, useContext, ReactNode, useEffect } from 'react';
+import { useState, useContext, ReactNode, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import Tippy from '@tippyjs/react';
@@ -100,25 +100,25 @@ const ManageFarmDetails = () => {
 
   const haveFarm = Object.keys(farmData).length !== 0;
   const campaignHasRewards = farmData.rewardsData?.length > 0;
-  const rewardsDuration = farmData.rewardsData?.reduce((acc, reward) => {
-    if (reward.duration > acc && reward.rewardEnd > Date.now()) {
-      acc = reward.duration;
-    }
-    return acc;
-  }, 0);
-  const rewardsDurationMonths = rewardsDuration > 0 ? rewardsDuration / MONTH_IN_SECONDS : 0;
+  // const rewardsDuration = farmData.rewardsData?.reduce((acc, reward) => {
+  //   if (reward.duration > acc && reward.rewardEnd > Date.now()) {
+  //     acc = reward.duration;
+  //   }
+  //   return acc;
+  // }, 0);
   const campaignHasActiveRewards = campaignHasRewards
     ? Object.keys(farmData.rewardsData.find(reward => reward.rewardEnd > Date.now()) || {}).length >
       0
     : false;
   const canEnableReward = selectedDuration > 0 && !campaignHasActiveRewards;
 
-  const getContractData = async () => {
+  const getContractData = useCallback(async () => {
     const promisesArray = [farmContract.periodFinish(), farmContract.rewardsDuration()];
 
     const [periodFinish, rewardsDuration] = await Promise.all(promisesArray);
+    console.log('periodFinish', periodFinish);
     setCampaignDuration(Number(rewardsDuration.toString()) / MONTH_IN_SECONDS);
-  };
+  }, [farmContract]);
 
   useEffect(() => {
     campaignDuration > 0 && setSelectedDuration(campaignDuration);
