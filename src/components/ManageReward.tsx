@@ -251,9 +251,6 @@ const ManageReward = ({
   }, [token, inputValue, userId, farmAddress]);
 
   useEffect(() => {
-    // const rate = formatStringToBigNumberWei(inputValue, token.decimals)
-    //   .dividedBy(secondsLeftTillEnd)
-    //   .toString();
     const rateBN = formatStringToBigNumberEthersWei(inputValue, token.decimals)
       .div(secondsLeftTillEnd)
       .toString();
@@ -262,6 +259,10 @@ const ManageReward = ({
     setRewardRate(rateBN);
     setActualReward(formatStringWeiToStringEther(actualAmount.toString(), token.decimals));
   }, [token, secondsLeftTillEnd, inputValue]);
+
+  const canSend = approved && !getInsufficientTokenBalance() && Number(inputValue) > 0;
+  const canWrap = !getInsufficientHBARBalance() && Number(inputHBARValue) > 0;
+  const canUnwrap = !getInsufficientTokenBalance() && Number(inputValue) > 0;
 
   return (
     <div>
@@ -299,7 +300,7 @@ const ManageReward = ({
             }
           />
           <div className="d-flex align-items-center mt-4">
-            <Button loading={loadingWrap} onClick={handleWrapClick}>
+            <Button disabled={!canWrap} loading={loadingWrap} onClick={handleWrapClick}>
               Wrap HBAR
             </Button>
           </div>
@@ -356,7 +357,12 @@ const ManageReward = ({
 
       <div className="d-flex align-items-center mt-4">
         {isTokenWHBAR ? (
-          <Button loading={loadingUnwrap} onClick={handleUnwrapClick} className="ws-no-wrap me-3">
+          <Button
+            disabled={!canUnwrap}
+            loading={loadingUnwrap}
+            onClick={handleUnwrapClick}
+            className="ws-no-wrap me-3"
+          >
             Unwrap WHBAR
           </Button>
         ) : null}
@@ -369,7 +375,7 @@ const ManageReward = ({
             Approve
           </Button>
         ) : null}
-        <Button loading={loadingSend} onClick={handleSendClick} disabled={!approved}>
+        <Button loading={loadingSend} onClick={handleSendClick} disabled={!canSend}>
           Send
         </Button>
       </div>
