@@ -23,6 +23,7 @@ import {
   SORT_OPTIONS,
   SORT_OPTIONS_ENUM,
   useQueryOptionsPoolsFarms,
+  useQueryOptionsPoolsWithoutFarms,
 } from '../constants';
 
 import getErrorMessage from '../content/errors';
@@ -40,7 +41,9 @@ const ManageFarms = ({ itemsPerPage }: IManageFarmsProps) => {
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
 
   // Get pools withouth farms - usePoolWithouthFarms with minimum liquidity
-  const { pools: poolsWithouthFarms, loading: loadingPools } = usePools();
+  const { pools: poolsWithouthFarms, loading: loadingPools } = usePools(
+    useQueryOptionsPoolsWithoutFarms,
+  );
 
   const { poolsByTokenList: pools } = usePoolsByTokensList(
     useQueryOptionsPoolsFarms,

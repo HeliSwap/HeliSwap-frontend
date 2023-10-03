@@ -23,8 +23,9 @@ import { MONTH_IN_SECONDS } from '../utils/timeUtils';
 
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import useFarmByAddress from '../hooks/usePermissionlessFarmRewardsByAddress';
+import usePYFContract from '../hooks/usePYFContract';
 
-import { useQueryOptionsPoolsFarms } from '../constants';
+import { MAX_PYF_DURATION, useQueryOptionsPoolsFarms } from '../constants';
 
 import getErrorMessage from '../content/errors';
 
@@ -49,11 +50,15 @@ const ManageFarmDetails = () => {
     address || '',
   );
 
-  const [selectedDuration, setSelectedDuration] = useState(0);
+  const farmContract = usePYFContract(address || '');
+
+  const [selectedDuration, setSelectedDuration] = useState(1);
   const [loadingEnableReward, setLoadingEnableReward] = useState(false);
   const [showManageReward, setShowManageReward] = useState(false);
   const [selectedRewardToken, setSelectedRewardToken] = useState<IReward>({} as IReward);
   const [campaignEnd, setCampaignEnd] = useState(0);
+  const [campaignDuration, setCampaignDuration] = useState(0);
+  const [selectOptions, setSelectOptions] = useState<ReactNode[]>([]);
 
   // Events
   const handleSelectDurationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -79,6 +84,7 @@ const ManageFarmDetails = () => {
         toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         toast.success('Success! Duration is set.');
+        getContractData();
       }
     } catch (e) {
       console.log('error', e);
@@ -107,9 +113,16 @@ const ManageFarmDetails = () => {
     : false;
   const canEnableReward = selectedDuration > 0 && !campaignHasActiveRewards;
 
+  const getContractData = async () => {
+    const promisesArray = [farmContract.periodFinish(), farmContract.rewardsDuration()];
+
+    const [periodFinish, rewardsDuration] = await Promise.all(promisesArray);
+    setCampaignDuration(Number(rewardsDuration.toString()) / MONTH_IN_SECONDS);
+  };
+
   useEffect(() => {
-    rewardsDurationMonths > 0 && setSelectedDuration(rewardsDurationMonths);
-  }, [rewardsDurationMonths]);
+    campaignDuration > 0 && setSelectedDuration(campaignDuration);
+  }, [campaignDuration]);
 
   useEffect(() => {
     if (Object.keys(farmData).length > 0 && farmData.rewardsData.length > 0) {
@@ -123,6 +136,34 @@ const ManageFarmDetails = () => {
       setCampaignEnd(campaignEnd);
     }
   }, [farmData]);
+
+  useEffect(() => {
+    haveFarm && farmContract && getContractData();
+  }, [farmContract, haveFarm, getContractData]);
+
+  const renderSelectDurationOptions = (campaignDuration: number) => {
+    const options = [];
+
+    for (let i = 1; i <= MAX_PYF_DURATION; i++) {
+      options.push(
+        campaignDuration === i ? (
+          <option selected key={i} value={i}>
+            {`${i} ${i > 1 ? 'months' : 'month'}`}
+          </option>
+        ) : (
+          <option key={i} value={i}>
+            {`${i} ${i > 1 ? 'months' : 'month'}`}
+          </option>
+        ),
+      );
+    }
+
+    return options;
+  };
+
+  useEffect(() => {
+    setSelectOptions(renderSelectDurationOptions(campaignDuration));
+  }, [campaignDuration]);
 
   return isHashpackLoading ? (
     <Loader />
@@ -158,10 +199,7 @@ const ManageFarmDetails = () => {
                       value={selectedDuration}
                       className="form-control"
                     >
-                      <option value={0}>Select duration</option>
-                      <option value={1}>1 month</option>
-                      <option value={2}>2 months</option>
-                      <option value={3}>3 months</option>
+                      {selectOptions}
                     </select>
                   </div>
 
@@ -187,61 +225,67 @@ const ManageFarmDetails = () => {
                     </Tippy>
                   </p>
                 </div>
-                <div className="row">
-                  <div className="col-6">
-                    {campaignHasRewards &&
-                      farmData.rewardsData?.reduce((acc: ReactNode[], reward: IReward, index) => {
-                        const rewardActive = reward.rewardEnd > Date.now();
-                        const rewardSymbol = mapWHBARAddress(reward);
+                {campaignDuration === 0 ? (
+                  <div className="my-4">
+                    <p className="text-warning">Please set campaign duration</p>
+                  </div>
+                ) : (
+                  <div className="row">
+                    <div className="col-6">
+                      {campaignHasRewards &&
+                        farmData.rewardsData?.reduce((acc: ReactNode[], reward: IReward, index) => {
+                          const rewardActive = reward.rewardEnd > Date.now();
+                          const rewardSymbol = mapWHBARAddress(reward);
 
-                        acc.push(
-                          <div
-                            onClick={() => handleRewardClick(reward)}
-                            key={index}
-                            className={`d-flex justify-content-between align-items-center my-4 container-farm-reward ${
-                              selectedRewardToken.symbol === reward.symbol ? 'is-selected' : ''
-                            }`}
-                          >
-                            <div className="d-flex align-items-center">
-                              <IconToken symbol={reward.symbol} />{' '}
-                              <span className="text-main ms-3">{rewardSymbol}</span>
-                            </div>
-                            <div>
-                              {rewardActive ? (
-                                <span className="text-small text-numeric">
-                                  {formatStringWeiToStringEther(
-                                    reward.totalAmount,
-                                    reward.decimals,
-                                  )}
-                                </span>
-                              ) : null}
-                            </div>
-                            {/* {rewardActive ? (
+                          acc.push(
+                            <div
+                              onClick={() => handleRewardClick(reward)}
+                              key={index}
+                              className={`d-flex justify-content-between align-items-center my-4 container-farm-reward ${
+                                selectedRewardToken.symbol === reward.symbol ? 'is-selected' : ''
+                              }`}
+                            >
+                              <div className="d-flex align-items-center">
+                                <IconToken symbol={reward.symbol} />{' '}
+                                <span className="text-main ms-3">{rewardSymbol}</span>
+                              </div>
+                              <div>
+                                {rewardActive ? (
+                                  <span className="text-small text-numeric">
+                                    {formatStringWeiToStringEther(
+                                      reward.totalAmount,
+                                      reward.decimals,
+                                    )}
+                                  </span>
+                                ) : null}
+                              </div>
+                              {/* {rewardActive ? (
                                 <span className="text-small text-success ms-3">
                                   Active untill {timestampToDate(reward.rewardEnd)}
                                 </span>
                               ) : (
                                 <span className="text-small text-danger ms-3">Expired</span>
                               )} */}
-                          </div>,
-                        );
-                        return acc;
-                      }, [])}
+                            </div>,
+                          );
+                          return acc;
+                        }, [])}
+                    </div>
+                    <div className="col-6">
+                      {showManageReward && (
+                        <ManageReward
+                          token={selectedRewardToken}
+                          userId={userId}
+                          farmAddress={address || ''}
+                          sdk={sdk}
+                          connectorInstance={connectorInstance}
+                          selectedDuration={selectedDuration}
+                          campaignEnd={campaignEnd}
+                        />
+                      )}
+                    </div>
                   </div>
-                  <div className="col-6">
-                    {showManageReward && (
-                      <ManageReward
-                        token={selectedRewardToken}
-                        userId={userId}
-                        farmAddress={address || ''}
-                        sdk={sdk}
-                        connectorInstance={connectorInstance}
-                        selectedDuration={selectedDuration}
-                        campaignEnd={campaignEnd}
-                      />
-                    )}
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           ) : (

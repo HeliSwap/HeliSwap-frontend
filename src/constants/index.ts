@@ -120,6 +120,11 @@ export const useQueryOptionsPoolsFarms = {
   pollInterval: REFRESH_TIME_POOLS_FARMS,
 };
 
+export const useQueryOptionsPoolsWithoutFarms = {
+  fetchPolicy: 'no-cache' as WatchQueryFetchPolicy,
+  pollInterval: REFRESH_TIME_POOLS_FARMS,
+};
+
 export const HASHSCAN_ROOT_DOMAIN = 'https://hashscan.io';
 
 export const POOLS_PER_PAGE = 10;
@@ -177,3 +182,5 @@ export const tokenWeights: { [key: string]: number } = {
   USDC: 97,
   'USDC[hts]': 96,
 };
+
+export const MAX_PYF_DURATION = 12;
