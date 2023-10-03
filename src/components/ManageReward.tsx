@@ -251,13 +251,15 @@ const ManageReward = ({
   }, [token, inputValue, userId, farmAddress]);
 
   useEffect(() => {
-    const rateBN = formatStringToBigNumberEthersWei(inputValue, token.decimals)
-      .div(secondsLeftTillEnd)
-      .toString();
+    if (secondsLeftTillEnd > 0) {
+      const rateBN = formatStringToBigNumberEthersWei(inputValue, token.decimals)
+        .div(secondsLeftTillEnd)
+        .toString();
 
-    const actualAmount = secondsLeftTillEnd * Number(rateBN);
-    setRewardRate(rateBN);
-    setActualReward(formatStringWeiToStringEther(actualAmount.toString(), token.decimals));
+      const actualAmount = secondsLeftTillEnd * Number(rateBN);
+      setRewardRate(rateBN);
+      setActualReward(formatStringWeiToStringEther(actualAmount.toString(), token.decimals));
+    }
   }, [token, secondsLeftTillEnd, inputValue]);
 
   const canSend = approved && !getInsufficientTokenBalance() && Number(inputValue) > 0;
