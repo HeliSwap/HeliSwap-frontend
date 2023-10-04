@@ -29,7 +29,7 @@ import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import useFarmByAddress from '../hooks/usePermissionlessFarmRewardsByAddress';
 import usePYFContract from '../hooks/usePYFContract';
 
-import { MAX_PYF_DURATION, useQueryOptionsPoolsFarms } from '../constants';
+import { MAX_PYF_DURATION, useQueryOptionsPYF, useQueryOptionsPoolsFarms } from '../constants';
 
 import getErrorMessage from '../content/errors';
 
@@ -49,7 +49,7 @@ const ManageFarmDetails = () => {
   );
 
   const { farm: farmData, processingFarms } = useFarmByAddress(
-    useQueryOptionsPoolsFarms,
+    useQueryOptionsPYF,
     pools,
     address || '',
   );

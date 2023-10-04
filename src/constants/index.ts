@@ -13,6 +13,7 @@ export const HUNDRED_BN = new BigNumber('100');
 export const REFRESH_TIME = 10000;
 export const REFRESH_TIME_PROVIDE_SWAP_REMOVE = 10000;
 export const REFRESH_TIME_POOLS_FARMS = 30000;
+export const REFRESH_TIME_PYF = 10000;
 export const HEALTH_CHECK_INTERVAL = 10000;
 export const BALLANCE_FETCH_INTERVAL = 60000;
 export const SLIDER_INITIAL_VALUE = '100';
@@ -120,9 +121,14 @@ export const useQueryOptionsPoolsFarms = {
   pollInterval: REFRESH_TIME_POOLS_FARMS,
 };
 
+export const useQueryOptionsPYF = {
+  fetchPolicy: 'network-only' as WatchQueryFetchPolicy,
+  pollInterval: REFRESH_TIME_PYF,
+};
+
 export const useQueryOptionsPoolsWithoutFarms = {
   fetchPolicy: 'no-cache' as WatchQueryFetchPolicy,
-  pollInterval: REFRESH_TIME_POOLS_FARMS,
+  pollInterval: REFRESH_TIME_PYF,
 };
 
 export const HASHSCAN_ROOT_DOMAIN = 'https://hashscan.io';
