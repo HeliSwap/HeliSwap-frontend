@@ -114,6 +114,7 @@ const ManageFarmDetails = () => {
   const canEnableReward = selectedDuration > 0 && !campaignHasActiveRewards;
   const secondsLeftTillEnd =
     campaignEnd > Date.now() ? Math.floor((campaignEnd - Date.now()) / 1000) : 0;
+  const showDurationWarningMessage = campaignDuration > 0 && !campaignHasActiveRewards;
 
   const getContractData = useCallback(async () => {
     const promisesArray = [farmContract.periodFinish(), farmContract.rewardsDuration()];
@@ -163,7 +164,7 @@ const ManageFarmDetails = () => {
     setSelectOptions(renderSelectDurationOptions(campaignDuration));
   }, [campaignDuration]);
 
-  const { days, hours } = getCountdownReturnValues(secondsLeftTillEnd * 1000);
+  const { days, hours, minutes } = getCountdownReturnValues(secondsLeftTillEnd * 1000);
 
   return isHashpackLoading ? (
     <Loader />
@@ -191,20 +192,42 @@ const ManageFarmDetails = () => {
                 </div>
 
                 {campaignHasActiveRewards ? (
-                  <div className="mb-5">
+                  <div className="container-border-rounded-bn-500 mb-5">
+                    {/* <p className="text-main">
+                      Campaign is active till (according to contract){' '}
+                      <span className="text-bold">
+                        {timestampToDateTime(Number(periodFinish.toString()) * 1000)}
+                      </span>
+                    </p> */}
                     <p className="text-main">
                       Campaign is active till{' '}
                       <span className="text-bold">{timestampToDateTime(campaignEnd)}</span>
                     </p>
-                    <p className="text-small mt-3">
-                      {days} days, {hours} hours left till campaign ends.
+                    <p className="text-secondary text-small mt-3">
+                      {days} days, {hours} hours, {minutes} minutes left till campaign ends.
+                    </p>
+                  </div>
+                ) : null}
+
+                {showDurationWarningMessage ? (
+                  <div className="mb-5">
+                    <p className="text-small text-warning">
+                      Campaign duration is set to {campaignDuration} months. When selecting a
+                      reward, please use the same duration or select a new one from the dropdown!
                     </p>
                   </div>
                 ) : null}
 
                 <div className="d-flex align-items-end">
                   <div className="flex-1">
-                    <p className="text-small text-bold mb-2">Duration</p>
+                    <div className="d-flex align-items-center mb-3">
+                      <p className="text-small text-bold">Duration</p>
+                      <Tippy content="Once campaign is active duration can not be changed.">
+                        <span className="ms-2">
+                          <Icon name="hint" size="small" />
+                        </span>
+                      </Tippy>
+                    </div>
                     <select
                       disabled={campaignHasActiveRewards}
                       onChange={handleSelectDurationChange}
@@ -229,8 +252,8 @@ const ManageFarmDetails = () => {
 
                 <div className="col-6 col-md-4 d-flex align-items-center">
                   <p className="d-flex align-items-center">
-                    <span className="text-secondary text-small">Rewards</span>
-                    <Tippy content="The tokens you will be rewarded with upon harvest.">
+                    <span className="text-secondary text-small">Available Rewards</span>
+                    <Tippy content="These are the available rewards that could be sent to the campaign.">
                       <span className="ms-2">
                         <Icon name="hint" color="gray" size="small" />
                       </span>
@@ -239,7 +262,9 @@ const ManageFarmDetails = () => {
                 </div>
                 {campaignDuration === 0 ? (
                   <div className="my-4">
-                    <p className="text-warning">Please set campaign duration</p>
+                    <p className="text-small text-warning">
+                      Please set campaign duration before adding rewards!
+                    </p>
                   </div>
                 ) : (
                   <div className="row">
