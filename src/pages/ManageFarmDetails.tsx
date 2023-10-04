@@ -19,7 +19,11 @@ import ManageReward from '../components/ManageReward';
 import { formatIcons } from '../utils/iconUtils';
 import { mapWHBARAddress } from '../utils/tokenUtils';
 import { formatStringWeiToStringEther } from '../utils/numberUtils';
-import { MONTH_IN_SECONDS } from '../utils/timeUtils';
+import {
+  MONTH_IN_SECONDS,
+  getCountdownReturnValues,
+  timestampToDateTime,
+} from '../utils/timeUtils';
 
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import useFarmByAddress from '../hooks/usePermissionlessFarmRewardsByAddress';
@@ -57,10 +61,13 @@ const ManageFarmDetails = () => {
   const [showManageReward, setShowManageReward] = useState(false);
   const [selectedRewardToken, setSelectedRewardToken] = useState<IReward>({} as IReward);
   const [campaignEnd, setCampaignEnd] = useState(0);
+  const [periodFinish, setPeriodFinish] = useState(0);
   const [campaignDuration, setCampaignDuration] = useState(0);
   const [selectOptions, setSelectOptions] = useState<ReactNode[]>([]);
 
-  // Events
+  console.log('periodFinish', periodFinish);
+
+  // Handlers
   const handleSelectDurationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedDuration(Number(event.target.value));
   };
@@ -84,7 +91,7 @@ const ManageFarmDetails = () => {
         toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
         toast.success('Success! Duration is set.');
-        getContractData();
+        setCampaignDuration(selectedDuration);
       }
     } catch (e) {
       console.log('error', e);
@@ -100,32 +107,43 @@ const ManageFarmDetails = () => {
 
   const haveFarm = Object.keys(farmData).length !== 0;
   const campaignHasRewards = farmData.rewardsData?.length > 0;
-  // const rewardsDuration = farmData.rewardsData?.reduce((acc, reward) => {
-  //   if (reward.duration > acc && reward.rewardEnd > Date.now()) {
-  //     acc = reward.duration;
-  //   }
-  //   return acc;
-  // }, 0);
   const campaignHasActiveRewards = campaignHasRewards
     ? Object.keys(farmData.rewardsData.find(reward => reward.rewardEnd > Date.now()) || {}).length >
       0
     : false;
   const canEnableReward = selectedDuration > 0 && !campaignHasActiveRewards;
+  const secondsLeftTillEnd =
+    campaignEnd > Date.now() ? Math.floor((campaignEnd - Date.now()) / 1000) : 0;
 
   const getContractData = useCallback(async () => {
     const promisesArray = [farmContract.periodFinish(), farmContract.rewardsDuration()];
 
     const [periodFinish, rewardsDuration] = await Promise.all(promisesArray);
-    console.log('periodFinish', periodFinish);
+    setPeriodFinish(periodFinish);
     setCampaignDuration(Number(rewardsDuration.toString()) / MONTH_IN_SECONDS);
   }, [farmContract]);
 
+  const renderSelectDurationOptions = (campaignDuration: number) => {
+    const options = [];
+
+    for (let i = 1; i <= MAX_PYF_DURATION; i++) {
+      options.push(
+        <option key={i} value={i}>
+          {`${i} ${i > 1 ? 'months' : 'month'}`}
+        </option>,
+      );
+    }
+
+    return options;
+  };
+
+  // Use effects
   useEffect(() => {
     campaignDuration > 0 && setSelectedDuration(campaignDuration);
   }, [campaignDuration]);
 
   useEffect(() => {
-    if (Object.keys(farmData).length > 0 && farmData.rewardsData.length > 0) {
+    if (haveFarm && farmData.rewardsData.length > 0) {
       const campaignEnd = farmData.rewardsData.reduce((acc, reward) => {
         if (reward.rewardEnd > acc) {
           acc = reward.rewardEnd;
@@ -135,35 +153,17 @@ const ManageFarmDetails = () => {
 
       setCampaignEnd(campaignEnd);
     }
-  }, [farmData]);
+  }, [farmData, haveFarm]);
 
   useEffect(() => {
     haveFarm && farmContract && getContractData();
   }, [farmContract, haveFarm, getContractData]);
 
-  const renderSelectDurationOptions = (campaignDuration: number) => {
-    const options = [];
-
-    for (let i = 1; i <= MAX_PYF_DURATION; i++) {
-      options.push(
-        campaignDuration === i ? (
-          <option selected key={i} value={i}>
-            {`${i} ${i > 1 ? 'months' : 'month'}`}
-          </option>
-        ) : (
-          <option key={i} value={i}>
-            {`${i} ${i > 1 ? 'months' : 'month'}`}
-          </option>
-        ),
-      );
-    }
-
-    return options;
-  };
-
   useEffect(() => {
     setSelectOptions(renderSelectDurationOptions(campaignDuration));
   }, [campaignDuration]);
+
+  const { days, hours } = getCountdownReturnValues(secondsLeftTillEnd * 1000);
 
   return isHashpackLoading ? (
     <Loader />
@@ -189,6 +189,18 @@ const ManageFarmDetails = () => {
                     {farmData.poolData?.token0Symbol} / {farmData.poolData?.token1Symbol}
                   </p>
                 </div>
+
+                {campaignHasActiveRewards ? (
+                  <div className="mb-5">
+                    <p className="text-main">
+                      Campaign is active till{' '}
+                      <span className="text-bold">{timestampToDateTime(campaignEnd)}</span>
+                    </p>
+                    <p className="text-small mt-3">
+                      {days} days, {hours} hours left till campaign ends.
+                    </p>
+                  </div>
+                ) : null}
 
                 <div className="d-flex align-items-end">
                   <div className="flex-1">
