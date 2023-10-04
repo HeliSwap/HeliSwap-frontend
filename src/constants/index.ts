@@ -184,3 +184,4 @@ export const tokenWeights: { [key: string]: number } = {
 };
 
 export const MAX_PYF_DURATION = 12;
+export const PYF_FEE = 0.05;

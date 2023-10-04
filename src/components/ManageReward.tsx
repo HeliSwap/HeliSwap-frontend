@@ -30,6 +30,7 @@ import {
 import getErrorMessage from '../content/errors';
 import { MONTH_IN_SECONDS } from '../utils/timeUtils';
 import IconToken from './IconToken';
+import { PYF_FEE } from '../constants';
 
 interface IManageRewardProps {
   token: IReward;
@@ -252,7 +253,8 @@ const ManageReward = ({
 
   useEffect(() => {
     if (secondsLeftTillEnd > 0) {
-      const rateBN = formatStringToBigNumberEthersWei(inputValue, token.decimals)
+      const amountAfterFee = Number(inputValue) - Number(inputValue) * PYF_FEE;
+      const rateBN = formatStringToBigNumberEthersWei(amountAfterFee.toString(), token.decimals)
         .div(secondsLeftTillEnd)
         .toString();
 
@@ -342,7 +344,11 @@ const ManageReward = ({
 
       <div className="mt-4">
         <p className="text-small">
-          <span className="text-bold me-3">Reward rate:</span>{' '}
+          <span className="text-bold me-2">Fee:</span>{' '}
+          <span className="text-numeric">{PYF_FEE * 100}%</span>
+        </p>
+        <p className="text-small mt-3">
+          <span className="text-bold me-2">Reward rate:</span>{' '}
           <span className="text-numeric">
             {formatStringWeiToStringEther(rewardRate, token.decimals)}
           </span>
@@ -350,7 +356,7 @@ const ManageReward = ({
           {token.symbol} per second
         </p>
         <p className="text-small mt-3">
-          <span className="text-bold me-3">Reward to be send:</span> {/* Add fee! */}
+          <span className="text-bold me-2">Reward to be send:</span> {/* Add fee! */}
           <span className="text-numeric">{actualReward}</span>
           <IconToken className="mx-2" symbol={token.symbol} />
           {token.symbol}
