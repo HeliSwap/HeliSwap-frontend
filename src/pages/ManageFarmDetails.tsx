@@ -192,21 +192,29 @@ const ManageFarmDetails = () => {
                 </div>
 
                 {campaignHasActiveRewards ? (
-                  <div className="container-border-rounded-bn-500 mb-5">
-                    {/* <p className="text-main">
+                  <>
+                    <div className="container-border-rounded-bn-500 mb-5">
+                      {/* <p className="text-main">
                       Campaign is active till (according to contract){' '}
                       <span className="text-bold">
                         {timestampToDateTime(Number(periodFinish.toString()) * 1000)}
                       </span>
                     </p> */}
-                    <p className="text-main">
-                      Campaign is active till{' '}
-                      <span className="text-bold">{timestampToDateTime(campaignEnd)}</span>
-                    </p>
-                    <p className="text-secondary text-small mt-3">
-                      {days} days, {hours} hours, {minutes} minutes left till campaign ends.
-                    </p>
-                  </div>
+                      <p className="text-main">
+                        Campaign is active till{' '}
+                        <span className="text-bold">{timestampToDateTime(campaignEnd)}</span>
+                      </p>
+                      <p className="text-secondary text-small mt-3">
+                        {days} days, {hours} hours, {minutes} minutes left till campaign ends.
+                      </p>
+                    </div>
+                    <div className="mb-5">
+                      <p className="text-small text-warning">
+                        When sending a reward, keep in mind the reward rate will be calculated based
+                        on the time left, not on the original duration.
+                      </p>
+                    </div>
+                  </>
                 ) : null}
 
                 {showDurationWarningMessage ? (

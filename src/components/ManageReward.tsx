@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
+import Tippy from '@tippyjs/react';
+import toast from 'react-hot-toast';
+
 import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
-import toast from 'react-hot-toast';
 
 import { IReward, ITokenData, TokenType } from '../interfaces/tokens';
 import SDK from '../sdk/sdk';
@@ -11,6 +13,7 @@ import InputToken from './InputToken';
 import ButtonSelector from './ButtonSelector';
 import InputTokenSelector from './InputTokenSelector';
 import WalletBalance from './WalletBalance';
+import Icon from './Icon';
 
 import {
   formatBigNumberToStringETH,
@@ -346,6 +349,11 @@ const ManageReward = ({
         <p className="text-small">
           <span className="text-bold me-2">Fee:</span>{' '}
           <span className="text-numeric">{PYF_FEE * 100}%</span>
+          <Tippy content="Fee is deducted from the sent rewards.">
+            <span className="ms-2">
+              <Icon name="hint" size="small" />
+            </span>
+          </Tippy>
         </p>
         <p className="text-small mt-3">
           <span className="text-bold me-2">Reward rate:</span>{' '}
@@ -354,12 +362,22 @@ const ManageReward = ({
           </span>
           <IconToken className="mx-2" symbol={token.symbol} />
           {token.symbol} per second
+          <Tippy content="This is the reward rate - amount of tokens fiven by every second.">
+            <span className="ms-2">
+              <Icon name="hint" size="small" />
+            </span>
+          </Tippy>
         </p>
         <p className="text-small mt-3">
           <span className="text-bold me-2">Reward to be send:</span> {/* Add fee! */}
           <span className="text-numeric">{actualReward}</span>
           <IconToken className="mx-2" symbol={token.symbol} />
           {token.symbol}
+          <Tippy content="This is the actual reward amount that will be given. The reward rate multiplied by the duration (left) in the campaign.">
+            <span className="ms-2">
+              <Icon name="hint" size="small" />
+            </span>
+          </Tippy>
         </p>
       </div>
 
