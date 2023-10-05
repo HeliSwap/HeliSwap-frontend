@@ -355,7 +355,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenPeriodFinish",
+        "type": "uint256"
+      }
+    ],
     "name": "lastTimeRewardApplicable",
     "outputs": [
       {
