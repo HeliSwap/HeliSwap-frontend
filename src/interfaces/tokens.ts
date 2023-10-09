@@ -154,6 +154,7 @@ export interface IRewardRaw {
   duration: number;
   totalAccumulated: string;
   rewardEnd: number;
+  isHts: boolean;
 }
 
 export interface IReward extends IRewardRaw {

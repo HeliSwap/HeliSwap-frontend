@@ -14,6 +14,7 @@ const months = [
 ];
 
 export const DAY_IN_SECONDS = 86400;
+export const MONTH_IN_SECONDS = 2592000;
 
 export const timestampToDate = (UNIX_timestamp: number) => {
   const a = new Date(Number(UNIX_timestamp));

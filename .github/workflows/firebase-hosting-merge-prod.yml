@@ -33,6 +33,7 @@ jobs:
           echo "REACT_APP_KERNEL_ADDRESS=0x00000000000000000000000000000000003868f5" >> $GITHUB_ENV
           echo "REACT_APP_REWARDS_ADDRESS=0x00000000000000000000000000000000003868f7" >> $GITHUB_ENV
           echo "REACT_APP_SSS_ADDRESS=0x0000000000000000000000000000000000386900" >> $GITHUB_ENV
+          echo "REACT_APP_PYF_FACTORY_ADDRESS=0xc74a04548d665586bCfC5F65e92C98df3aA78AdF" >> $GITHUB_ENV
       - name: Build
         run: yarn install --frozen-lockfile && yarn run build
       - uses: FirebaseExtended/action-hosting-deploy@v0

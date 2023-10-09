@@ -448,9 +448,11 @@ class SDK {
   ) {
     const tokensLpAmountBN = formatStringToBigNumberWei(stakeAmount, decimals);
     const maxGas = TRANSACTION_MAX_FEES.STAKE_LP_TOKEN;
+    const contractId = await requestIdFromAddress(campaignAddress);
+
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
-      .setContractId(addressToId(campaignAddress))
+      .setContractId(contractId)
       //Set the gas for the contract call
       .setGas(maxGas)
       //Set the contract function to call
@@ -465,10 +467,11 @@ class SDK {
     userId: string,
   ) {
     const maxGas = TRANSACTION_MAX_FEES.COLLECT_REWARDS;
+    const contractId = await requestIdFromAddress(campaignAddress);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
-      .setContractId(addressToId(campaignAddress))
+      .setContractId(contractId)
       //Set the gas for the contract call
       .setGas(maxGas)
       //Set the contract function to call
@@ -483,10 +486,11 @@ class SDK {
     userId: string,
   ) {
     const maxGas = TRANSACTION_MAX_FEES.EXIT_CAMPAIGN;
+    const contractId = await requestIdFromAddress(campaignAddress);
 
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
-      .setContractId(addressToId(campaignAddress))
+      .setContractId(contractId)
       //Set the gas for the contract call
       .setGas(maxGas)
       //Set the contract function to call
@@ -821,6 +825,78 @@ class SDK {
       .setGas(maxGas)
       //Set the contract function to call
       .setFunction('execute', new ContractFunctionParameters().addUint256(proposalId));
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
+  async deployFarm(
+    hashconnectConnectorInstance: Hashconnect,
+    tokenAddresses: string,
+    userId: string,
+  ) {
+    const maxGas = TRANSACTION_MAX_FEES.DEPLOY_PYF_FACTORY;
+    const [address0, address1] = tokenAddresses.split(',');
+    const factoryAddress = await requestIdFromAddress(
+      process.env.REACT_APP_PYF_FACTORY_ADDRESS as string,
+    );
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(factoryAddress)
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction(
+        'deploy',
+        new ContractFunctionParameters().addAddress(address0).addAddress(address1),
+      );
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
+  async enableReward(
+    hashconnectConnectorInstance: Hashconnect,
+    farmAddress: string,
+    duration: number,
+    userId: string,
+  ) {
+    const maxGas = TRANSACTION_MAX_FEES.DEPLOY_PYF_FACTORY;
+    const farmId = await requestIdFromAddress(farmAddress);
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(farmId)
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction('enableReward', new ContractFunctionParameters().addUint256(duration));
+
+    return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
+  }
+
+  async sendReward(
+    hashconnectConnectorInstance: Hashconnect,
+    farmAddress: string,
+    tokenAddress: string,
+    amount: string,
+    decimals: number,
+    duration: number,
+    userId: string,
+  ) {
+    const maxGas = TRANSACTION_MAX_FEES.DEPLOY_PYF_FACTORY;
+    const tokensAmountBN = formatStringToBigNumberWei(amount, decimals);
+    const farmId = await requestIdFromAddress(farmAddress);
+    const trans = new ContractExecuteTransaction()
+      //Set the ID of the contract
+      .setContractId(farmId)
+      //Set the gas for the contract call
+      .setGas(maxGas)
+      //Set the contract function to call
+      .setFunction(
+        'notifyRewardAmount',
+        new ContractFunctionParameters()
+          .addAddress(tokenAddress)
+          .addUint256(tokensAmountBN)
+          .addUint256(duration),
+      );
 
     return this.sendTransactionAndGetResponse(hashconnectConnectorInstance, trans, userId);
   }

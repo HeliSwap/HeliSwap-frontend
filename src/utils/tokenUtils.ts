@@ -82,30 +82,6 @@ export const getHTSTokenInfo = async (tokenId: string): Promise<ITokenData> => {
   }
 };
 
-export const getHTSTokenWalletBalance = async (
-  userId: string,
-  tokenId: string,
-): Promise<number> => {
-  const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/tokens/${tokenId}/balances?account.id=${userId}&order=desc&limit=2`;
-
-  try {
-    const {
-      data: { balances },
-    } = await axios(url);
-
-    if (balances.length > 0) {
-      const { balance } = balances[0];
-
-      return balance;
-    } else {
-      return 0;
-    }
-  } catch (e) {
-    console.error(e);
-    return 0;
-  }
-};
-
 export const getUserAssociatedTokens = async (userId: string): Promise<string[]> => {
   const tokens = (await getUserHTSData(userId)) || [];
   const keys: string[] = [];
@@ -138,12 +114,12 @@ export const checkAllowanceERC20 = async (
   userId: string,
   spenderAddress: string,
   amountToSpend: string,
+  decimals: number = 18,
 ) => {
   const provider = getProvider();
   const tokenContract = new ethers.Contract(tokenAddress, ERC20.abi, provider);
-
   const allowance = await tokenContract.allowance(idToAddress(userId), spenderAddress);
-  const amountToSpendBN = formatStringToBigNumberEthersWei(amountToSpend);
+  const amountToSpendBN = formatStringToBigNumberEthersWei(amountToSpend, decimals);
 
   const canSpend = amountToSpendBN.lte(allowance);
 
@@ -167,7 +143,7 @@ export const checkAllowanceHTS = async (
 ) => {
   const spenderId =
     spenderAddress && spenderAddress !== ''
-      ? addressToId(spenderAddress as string)
+      ? await requestIdFromAddress(spenderAddress as string)
       : addressToId(process.env.REACT_APP_ROUTER_ADDRESS as string);
   const allowances = await getTokenAllowance(userId, spenderId, token.hederaId);
 
@@ -426,8 +402,8 @@ const getUserHTSData = async (userId: string) => {
   return tokens?._map;
 };
 
-export const requestIdFromAddress = async (id: string) => {
-  const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/contracts/${id}`;
+export const requestIdFromAddress = async (address: string) => {
+  const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/contracts/${address}`;
   try {
     const {
       data: { contract_id },
@@ -439,8 +415,8 @@ export const requestIdFromAddress = async (id: string) => {
   }
 };
 
-export const requestAddressFromId = async (address: string) => {
-  const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/contracts/${address}`;
+export const requestAddressFromId = async (id: string) => {
+  const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/contracts/${id}`;
   try {
     const {
       data: { evm_address },

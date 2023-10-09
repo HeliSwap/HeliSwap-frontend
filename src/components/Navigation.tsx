@@ -29,6 +29,18 @@ const navigation = [
     text: 'Farms',
   },
   {
+    link: '/farms-permissionless',
+    name: 'farms',
+    color: 'gray',
+    text: 'Permissionless Farms',
+  },
+  {
+    link: '/manage-permissionless-farms',
+    name: 'farms',
+    color: 'gray',
+    text: 'Manage farms',
+  },
+  {
     link: '/single-sided-staking-old',
     name: 'sss',
     color: 'gray',

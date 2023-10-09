@@ -13,6 +13,7 @@ export const HUNDRED_BN = new BigNumber('100');
 export const REFRESH_TIME = 10000;
 export const REFRESH_TIME_PROVIDE_SWAP_REMOVE = 10000;
 export const REFRESH_TIME_POOLS_FARMS = 30000;
+export const REFRESH_TIME_PYF = 10000;
 export const HEALTH_CHECK_INTERVAL = 10000;
 export const BALLANCE_FETCH_INTERVAL = 60000;
 export const SLIDER_INITIAL_VALUE = '100';
@@ -37,6 +38,7 @@ export const TRANSACTION_MAX_FEES = {
   COLLECT_REWARDS: 360000,
   EXIT_CAMPAIGN: 400000,
   DEPOSIT_DAO: 5000000,
+  DEPLOY_PYF_FACTORY: 5000000,
 };
 
 export enum SORT_OPTIONS_ENUM {
@@ -119,6 +121,16 @@ export const useQueryOptionsPoolsFarms = {
   pollInterval: REFRESH_TIME_POOLS_FARMS,
 };
 
+export const useQueryOptionsPYF = {
+  fetchPolicy: 'network-only' as WatchQueryFetchPolicy,
+  pollInterval: REFRESH_TIME_PYF,
+};
+
+export const useQueryOptionsPoolsWithoutFarms = {
+  fetchPolicy: 'no-cache' as WatchQueryFetchPolicy,
+  pollInterval: REFRESH_TIME_PYF,
+};
+
 export const HASHSCAN_ROOT_DOMAIN = 'https://hashscan.io';
 
 export const POOLS_PER_PAGE = 10;
@@ -176,3 +188,6 @@ export const tokenWeights: { [key: string]: number } = {
   USDC: 97,
   'USDC[hts]': 96,
 };
+
+export const MAX_PYF_DURATION = 12;
+export const PYF_FEE = 0.05;

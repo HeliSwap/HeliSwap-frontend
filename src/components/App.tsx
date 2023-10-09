@@ -22,11 +22,15 @@ import SingleSidedStakingOld from '../pages/SingleSidedStakingOld';
 import SingleSidedStaking from '../pages/SingleSidedStaking';
 import Proposals from '../pages/Governance';
 import ProposalDetails from '../pages/ProposalDetails';
+import ManageFarms from '../pages/ManageFarms';
+import ManageFarmDetails from '../pages/ManageFarmDetails';
+import FarmsPermissionless from '../pages/FarmsPermissionless';
+import FarmPermissionlessDetails from '../pages/FarmPermissionlessDetails';
+import HeliVerse from '../pages/HeliVerse';
 
 import Header from './Header';
 import Footer from './Footer';
 import Sidebar from './Sidebar';
-import HeliVerse from '../pages/HeliVerse';
 
 function App() {
   const apolloClient = getApolloClient();
@@ -50,6 +54,14 @@ function App() {
                       <Route path="pools" element={<Pools itemsPerPage={10} />} />
                       <Route path="farms" element={<Farms itemsPerPage={10} />} />
                       <Route path="farms/:campaignAddress" element={<FarmDetails />} />
+                      <Route
+                        path="farms-permissionless"
+                        element={<FarmsPermissionless itemsPerPage={10} />}
+                      />
+                      <Route
+                        path="farms-permissionless/:campaignAddress"
+                        element={<FarmPermissionlessDetails />}
+                      />
                       <Route path="tokens" element={<Tokens />} />
                       <Route path="analytics" element={<Analytics />} />
                       <Route path="lockdrop" element={<Lockdrop />} />
@@ -65,6 +77,14 @@ function App() {
                       <Route path="heliverse" element={<HeliVerse />} />
                       <Route path="proposals" element={<Proposals />} />
                       <Route path="proposals/:id" element={<ProposalDetails />} />
+                      <Route
+                        path="manage-permissionless-farms"
+                        element={<ManageFarms itemsPerPage={10} />}
+                      />
+                      <Route
+                        path="manage-permissionless-farms/:address"
+                        element={<ManageFarmDetails />}
+                      />
                       <Route path="styleguide" element={<Styleguide />} />
                     </Routes>
                   </div>

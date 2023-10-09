@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { GlobalContext } from '../providers/Global';
 
 import { IFarmData, IReward } from '../interfaces/tokens';
@@ -21,9 +21,10 @@ interface IFarmRowProps {
   collapseAll?: boolean;
   setCollapseAll?: (collapsed: boolean) => void;
   handleRowClick: (address: string) => void;
+  showUserStaked?: boolean;
 }
 
-const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
+const FarmRow = ({ farmData, index, handleRowClick, showUserStaked = true }: IFarmRowProps) => {
   const contextValue = useContext(GlobalContext);
   const { connection } = contextValue;
   const { userId } = connection;
@@ -73,7 +74,7 @@ const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
   return (
     <div
       onClick={handleViewDetailsRowClick}
-      className={`table-pools-row with-${userId ? '7' : '6'}-columns-farms`}
+      className={`table-pools-row with-${userId && showUserStaked ? '7' : '6'}-columns-farms`}
     >
       <div className="d-none d-md-flex table-pools-cell">
         <span className="text-small">{index + 1}</span>
@@ -129,7 +130,7 @@ const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
         </span>
       </div>
 
-      {userId ? (
+      {userId && showUserStaked ? (
         <div className="table-pools-cell justify-content-between justify-content-md-end">
           <span className="d-md-none text-small">Your Stake</span>
           <span className="text-small text-numeric">
