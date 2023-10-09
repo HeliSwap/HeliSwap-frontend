@@ -166,7 +166,7 @@ const ManageReward = ({
       if (!success) {
         toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
-        toast.success('Success! Rewards are sent.');
+        toast.success('Success! Rewards are sent. Please wait a few seconds to see the changes.');
         setInputValue('0');
       }
     } catch (error) {

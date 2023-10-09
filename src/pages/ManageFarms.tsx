@@ -104,7 +104,7 @@ const ManageFarms = ({ itemsPerPage }: IManageFarmsProps) => {
       if (!success) {
         toast.error(getErrorMessage(error.status ? error.status : error));
       } else {
-        toast.success('Success! Campaign is deployed.');
+        toast.success('Success! Campaign is deployed. Please wait few seconds to see the farm.');
       }
     } catch (error) {
       console.log('error', error);
@@ -151,11 +151,23 @@ const ManageFarms = ({ itemsPerPage }: IManageFarmsProps) => {
       <div className="container-max-with-1042">
         <div className="mb-4">
           <div className="d-flex">
-            <h2 className={`text-subheader tab-title is-active mx-4 `}>Manage Farms</h2>
+            <h2 className={`text-subheader tab-title is-active mx-4 `}>
+              Manage Permissionless Farms
+            </h2>
           </div>
         </div>
 
         <hr />
+
+        <div className="mb-4">
+          <p className="text-small">
+            Creating a permissionless farm is a multi step process.
+            <br />
+            First you need to choose a pool without a farm. Then you need to deploy a farm contract.
+            <br />
+            After that select a farm to set a duration and sent rewards.
+          </p>
+        </div>
 
         {!isHashpackLoading && userId ? (
           <>

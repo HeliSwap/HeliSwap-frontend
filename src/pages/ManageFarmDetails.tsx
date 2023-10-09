@@ -174,7 +174,7 @@ const ManageFarmDetails = () => {
     <div className="d-flex justify-content-center">
       <div className="container-max-with-1042">
         <PageHeader
-          title="Manage Farm"
+          title="Manage Permissionless Farm"
           handleBackClick={() => navigate('/manage-permissionless-farms')}
         />
         {!isHashpackLoading && userId ? (
@@ -208,12 +208,6 @@ const ManageFarmDetails = () => {
                         {days} days, {hours} hours, {minutes} minutes left till campaign ends.
                       </p>
                     </div>
-                    <div className="mb-5">
-                      <p className="text-small text-warning">
-                        When sending a reward, keep in mind the reward rate will be calculated based
-                        on the time left, not on the original duration.
-                      </p>
-                    </div>
                   </>
                 ) : null}
 
@@ -223,6 +217,12 @@ const ManageFarmDetails = () => {
                       Campaign duration is set to {campaignDuration} months. When selecting a
                       reward, please use the same duration or select a new one from the dropdown!
                     </p>
+                  </div>
+                ) : null}
+
+                {campaignDuration === 0 ? (
+                  <div className="mb-5">
+                    <p className="text-small">Next step is to set the duration of the campaign.</p>
                   </div>
                 ) : null}
 
@@ -257,6 +257,19 @@ const ManageFarmDetails = () => {
                 </div>
 
                 <hr />
+
+                <div className="mb-4">
+                  <p className="text-small">
+                    Last step is sending rewards. If campaign is active the newly sent rewards will
+                    be distributed till the end of the current duration.
+                  </p>
+                  {campaignHasActiveRewards ? (
+                    <p className="text-small text-warning">
+                      When sending a reward, keep in mind the reward rate will be calculated based
+                      on the time left, not on the original duration.
+                    </p>
+                  ) : null}
+                </div>
 
                 <div className="col-6 col-md-4 d-flex align-items-center">
                   <p className="d-flex align-items-center">
