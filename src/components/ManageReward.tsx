@@ -17,7 +17,7 @@ import Icon from './Icon';
 
 import {
   formatBigNumberToStringETH,
-  formatStringToBigNumberEthersWei,
+  formatStringToBigNumberWei,
   formatStringWeiToStringEther,
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
@@ -257,7 +257,7 @@ const ManageReward = ({
   useEffect(() => {
     if (secondsLeftTillEnd > 0) {
       const amountAfterFee = Number(inputValue) - Number(inputValue) * PYF_FEE;
-      const rateBN = formatStringToBigNumberEthersWei(amountAfterFee.toString(), token.decimals)
+      const rateBN = formatStringToBigNumberWei(amountAfterFee.toString(), token.decimals)
         .div(secondsLeftTillEnd)
         .toString();
 
