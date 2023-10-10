@@ -287,6 +287,8 @@ const ManageReward = ({
 
                   if (!invalidInputTokensData(strippedValue)) {
                     setInputHBARValue(strippedValue);
+                  } else {
+                    setInputHBARValue('0');
                   }
                 }}
                 isCompact={true}
@@ -325,6 +327,8 @@ const ManageReward = ({
 
               if (!invalidInputTokensData(strippedValue)) {
                 setInputValue(strippedValue);
+              } else {
+                setInputValue('0');
               }
             }}
             isCompact={true}
