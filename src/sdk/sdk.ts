@@ -449,7 +449,6 @@ class SDK {
     const tokensLpAmountBN = formatStringToBigNumberWei(stakeAmount, decimals);
     const maxGas = TRANSACTION_MAX_FEES.STAKE_LP_TOKEN;
     const contractId = await requestIdFromAddress(campaignAddress);
-
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(contractId)
@@ -468,7 +467,6 @@ class SDK {
   ) {
     const maxGas = TRANSACTION_MAX_FEES.COLLECT_REWARDS;
     const contractId = await requestIdFromAddress(campaignAddress);
-
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(contractId)
@@ -487,7 +485,6 @@ class SDK {
   ) {
     const maxGas = TRANSACTION_MAX_FEES.EXIT_CAMPAIGN;
     const contractId = await requestIdFromAddress(campaignAddress);
-
     const trans = new ContractExecuteTransaction()
       //Set the ID of the contract
       .setContractId(contractId)
