@@ -13,7 +13,7 @@ import USDT from '../icons/tokens/USDT.png';
 import WBTC from '../icons/tokens/WBTC.png';
 import OM from '../icons/tokens/OM.png';
 import DAI from '../icons/tokens/DAI.png';
-import WMATIC from '../icons/tokens/WMATIC.webp';
+import WMATIC from '../icons/tokens/WMATIC.png';
 import HBARX from '../icons/tokens/HBARX.svg';
 import HST from '../icons/tokens/HST.png';
 import CLXY from '../icons/tokens/CLXY.png';
