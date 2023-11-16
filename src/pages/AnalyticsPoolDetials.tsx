@@ -272,7 +272,9 @@ const AnalyticsPoolDetials = () => {
 
                     <p className="text-small text-gray mt-5">Fees 24H</p>
                     <p className="text-subheader">
-                      {formatStringToPrice(poolData?.fees.amount?.toString() as string)}
+                      {formatStringToPrice(
+                        (Number(poolData?.volume24hUsd) * 0.003).toString() as string,
+                      )}
                     </p>
                   </div>
                 </div>
