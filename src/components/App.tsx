@@ -14,6 +14,7 @@ import Styleguide from '../pages/Styleguide';
 import FarmDetails from '../pages/FarmDetails';
 import Analytics from '../pages/Analytics';
 import AnalyticsPoolDetials from '../pages/AnalyticsPoolDetials';
+import AnalyticsTokenDetials from '../pages/AnalyticsTokenDetails';
 import Lockdrop from '../pages/Lockdrop';
 import Claimdrop from '../pages/Claimdrop';
 import ClaimdropDetails from '../pages/ClaimdropDetails';
@@ -63,11 +64,15 @@ function App() {
                         element={<FarmPermissionlessDetails />}
                       />
                       <Route path="tokens" element={<Tokens />} />
-                      <Route path="analytics" element={<Analytics />} />
                       <Route path="lockdrop" element={<Lockdrop />} />
+                      <Route path="analytics" element={<Analytics />} />
                       <Route
                         path="analytics/pool/:poolAddress"
                         element={<AnalyticsPoolDetials />}
+                      />
+                      <Route
+                        path="analytics/token/:tokenAddress"
+                        element={<AnalyticsTokenDetials />}
                       />
                       <Route path="claimdrop" element={<Claimdrop />} />
                       <Route path="claimdrop/:campaign" element={<ClaimdropDetails />} />

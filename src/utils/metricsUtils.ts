@@ -1,7 +1,13 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
-import { GenericChartEntry, IHistoricalData, VolumeChartView } from '../interfaces/common';
+import {
+  GenericChartEntry,
+  IHistoricalData,
+  ITokenHistoricalData,
+  VolumeChartView,
+  ITokenCandleData,
+} from '../interfaces/common';
 
 // format dayjs with the libraries that we need
 dayjs.extend(utc);
@@ -48,6 +54,35 @@ export function getTransformedTvlData(chartData: IHistoricalData[]) {
       return {
         time: unixToDate(day.time),
         value: Number(day.tvl),
+      };
+    });
+  } else {
+    return [];
+  }
+}
+
+export function getTransformedPriceData(chartData: ITokenHistoricalData[]) {
+  if (chartData) {
+    return chartData.map(day => {
+      return {
+        time: unixToDate(day.time),
+        value: Number(day.price),
+      };
+    });
+  } else {
+    return [];
+  }
+}
+
+export function getTransformedCandleData(chartData: ITokenCandleData[]) {
+  if (chartData) {
+    return chartData.map(candle => {
+      return {
+        time: Number(candle.time),
+        open: Number(candle.open),
+        close: Number(candle.close),
+        high: Number(candle.high),
+        low: Number(candle.low),
       };
     });
   } else {

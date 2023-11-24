@@ -544,3 +544,26 @@ export const GET_CLAIMDROP_DATA = gql`
     }
   }
 `;
+
+export const GET_TOKEN_PRICE = gql`
+  query getTokenPrice($token: String!) {
+    getTokenPrice(token: $token) {
+      address
+      name
+      symbol
+      metrics {
+        price
+        time
+        tvl
+        volume
+      }
+      priceCandles {
+        time
+        open
+        close
+        high
+        low
+      }
+    }
+  }
+`;
