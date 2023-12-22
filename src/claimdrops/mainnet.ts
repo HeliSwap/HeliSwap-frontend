@@ -421,6 +421,66 @@ const data = [
     claimdropDescription:
       'Dear HeliVerse, HeliSwap and Zealy community, As part of our Zealy campaign, we are giving away 333,333 HELI Tokens among the top 100 Zealy participants with the most experience points from our first ever HeliVerse Sprint (ended beginning of Nov 2023). The tokens you were allocated vest linearly over 1 month. After the full month has been reached, we allow for another 2 month courtesy period for everyone to claim all the tokens. We want to show some love to the HeliVerse and HeliSwap community. Thank you for your continued support!',
   },
+  {
+    claimdropStart: {
+      date: '22 December 2023',
+      timestamp: 1703247242000,
+    },
+    claimdropEnd: {
+      date: '21 January 2024',
+      timestamp: 1705839242000,
+    },
+    expiryEnd: {
+      date: '21 March 2024',
+      timestamp: 1711023242000,
+    },
+    vestingPeriod: {
+      valueString: '30 Days',
+      valueNumericDays: 30,
+      valueNumericMilliseconds: 2592000000,
+    },
+    claimPeriod: {
+      valueString: '60 Days',
+      valueNumericDays: 60,
+      valueNumericMilliseconds: 5184000000,
+    },
+    totalAllocated: {
+      valueBN: ethers.BigNumber.from('29554000000000'),
+      valueStringWei: '29554000000000',
+      valueStringETH: '295540.0',
+    },
+    claimedOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    vestedTokensOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    claimable: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    extraTokensOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    totalAllocatedOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    token: '0x00000000000000000000000000000000001d90C9',
+    claimdropAddress: '0x0000000000000000000000000000000000421147',
+    title: 'Second HeliSwap Zealy Sprint Claimdrop',
+    claimdropTitle: 'Second HeliSwap Zealy Sprint Claimdrop',
+    claimdropDescription:
+      'Dear HeliSwap, HeliVerse, and Zealy community, As part of our Zealy campaign, we are giving away 333,333 HELI Tokens among the top 100 Zealy participants with the most experience points from our second HeliSwap Sprint (ended mid of December 2023). The tokens you were allocated vest linearly over 1 month. After the full month has been reached, we allow for another 2 month courtesy period for everyone to claim all the tokens. We want to show some love to the HeliSwap and HeliVerse community. Thank you for your continued support!',
+  },
 ];
 
 export default data;
