@@ -94,7 +94,7 @@ const FarmRow = ({ farmData, index, handleRowClick }: IFarmRowProps) => {
           </>
         ) : null}
 
-        {boostedPools.includes(farmData.poolData.pairAddress) ? (
+        {boostedPools.length > 0 && boostedPools.includes(farmData.poolData.pairAddress) ? (
           <>
             <span className="text-micro text-uppercase badge bg-success ms-3">Super Farm</span>
             <Tippy content="This Yield Farm has increased HBAR Rewards (almost 50% of USD Reward Value are HBAR)">
