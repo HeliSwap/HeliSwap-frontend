@@ -2,6 +2,7 @@ import { useCallback, useContext, useEffect, useState } from 'react';
 import Tippy from '@tippyjs/react';
 import toast from 'react-hot-toast';
 import { ethers } from 'ethers';
+import axios from 'axios';
 
 import { GlobalContext } from '../providers/Global';
 
@@ -29,6 +30,7 @@ import {
   formatStringETHtoPriceFormatted,
   formatStringToPercentage,
   formatStringToPrice,
+  formatStringWeiToStringEther,
   stripStringToFixedDecimals,
 } from '../utils/numberUtils';
 import {
@@ -140,26 +142,6 @@ const SingleSidedStaking = () => {
 
   // Get selected tokens to check for assosiations
   const { tokens: userRewardsData } = useTokensByListIds(userRewardsAddresses, useQueryOptions);
-
-  const getHeliStaked = useCallback(async () => {
-    try {
-      const promisesArray = [
-        kernelContract.balanceOf(idToAddress(userId)),
-        kernelContract.heliStaked(),
-        kernelContract.votingPower(idToAddress(userId)),
-      ];
-
-      const [balanceBN, totalStakedBN, votingPowerBN] = await Promise.all(promisesArray);
-
-      setHeliStaked(formatBigNumberToStringETH(balanceBN));
-      setTotalStaked(formatBigNumberToStringETH(totalStakedBN));
-      setVotingPower(formatBigNumberToStringETH(votingPowerBN));
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoadingKernelData(false);
-    }
-  }, [kernelContract, userId]);
 
   const getUserRewardsBalance = useCallback(async () => {
     try {
@@ -337,6 +319,7 @@ const SingleSidedStaking = () => {
   };
 
   // Check for associations
+  /*
   useEffect(() => {
     const checkTokenAssociation = async (userId: string) => {
       const tokens = await getUserAssociatedTokens(userId);
@@ -346,9 +329,7 @@ const SingleSidedStaking = () => {
     userId && checkTokenAssociation(userId);
   }, [userId]);
 
-  useEffect(() => {
-    userId && heliPrice && Object.keys(kernelContract).length && getHeliStaked();
-  }, [kernelContract, userId, getHeliStaked, heliPrice]);
+
 
   useEffect(() => {
     tokenContract &&
@@ -496,6 +477,30 @@ const SingleSidedStaking = () => {
       }
     }
   }, [heliStaked, sssData]);
+  */
+
+  useEffect(() => {
+    const getAddresses = async () => {
+      const result = await axios(
+        'https://mainnet-public.mirrornode.hedera.com/api/v1/contracts/0.0.3696885/results?limit=1000&order=desc',
+      );
+
+      const addresses = result.data.results.map((item: any) => item.from);
+      const uniqueAddresses = addresses.filter(
+        (item: any, index: number) => addresses.indexOf(item) === index,
+      );
+
+      const promisesArray = uniqueAddresses.map((address: string) =>
+        kernelContract.votingPower(address),
+      );
+      const results = await Promise.all(promisesArray);
+      results.forEach(result => {
+        console.log(formatStringWeiToStringEther(result.toString(), 8));
+      });
+    };
+
+    kernelContract && getAddresses();
+  }, [kernelContract]);
 
   const hasUserStaked = sssData && sssData.totalDeposited && sssData.totalDeposited.inETH !== '0';
   const tokensToAssociate = userRewardsData?.filter(token => !getTokenIsAssociated(token));
