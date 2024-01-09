@@ -408,6 +408,9 @@ const FarmActions = ({
     return 'Stake';
   };
 
+  // Prevent user from unstaking if he locked and the lock limit will be reached
+  const canStake = hasUserLockedTokens ? (canLock ? true : false) : true;
+
   return (
     <div className="col-md-5 mt-4 mt-md-0">
       <div className="container-blue-neutral-900 rounded p-4 p-lg-5 height-100 d-flex flex-column">
@@ -514,7 +517,7 @@ const FarmActions = ({
                   ) : null}
 
                   <Button
-                    disabled={getInsufficientTokenBalance() || !lpApproved}
+                    disabled={getInsufficientTokenBalance() || !lpApproved || !canStake}
                     loading={loadingStake}
                     onClick={() => setShowDepositModal(true)}
                   >
