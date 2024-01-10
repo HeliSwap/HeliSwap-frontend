@@ -35,7 +35,7 @@ import {
   addressToId,
   getTokenBalance,
   getUserAssociatedTokens,
-  idToAddress,
+  requestUserAddressFromId,
 } from '../utils/tokenUtils';
 import { renderSSSEndDate } from '../utils/farmUtils';
 import {
@@ -142,11 +142,12 @@ const SingleSidedStaking = () => {
   const { tokens: userRewardsData } = useTokensByListIds(userRewardsAddresses, useQueryOptions);
 
   const getHeliStaked = useCallback(async () => {
+    const userAddress = await requestUserAddressFromId(userId);
     try {
       const promisesArray = [
-        kernelContract.balanceOf(idToAddress(userId)),
+        kernelContract.balanceOf(userAddress),
         kernelContract.heliStaked(),
-        kernelContract.votingPower(idToAddress(userId)),
+        kernelContract.votingPower(userAddress),
       ];
 
       const [balanceBN, totalStakedBN, votingPowerBN] = await Promise.all(promisesArray);
@@ -162,10 +163,11 @@ const SingleSidedStaking = () => {
   }, [kernelContract, userId]);
 
   const getUserRewardsBalance = useCallback(async () => {
+    const userAddress = await requestUserAddressFromId(userId);
     try {
       const decimals = await tokenContract.decimals();
       const rewardsBN = await rewardsContract.callStatic.claim({
-        from: idToAddress(userId),
+        from: userAddress,
       });
       const rewards = ethers.utils.formatUnits(rewardsBN, decimals);
 
@@ -370,6 +372,8 @@ const SingleSidedStaking = () => {
     const getSSSData = async () => {
       setLoadingSSSData(true);
 
+      const userAddress = await requestUserAddressFromId(userId);
+
       try {
         const kernelAddress = process.env.REACT_APP_KERNEL_ADDRESS;
 
@@ -378,9 +382,9 @@ const SingleSidedStaking = () => {
           // sssContract.maxSupply(),
           // sssContract.expirationDate(),
           sssContract.totalDeposited(),
-          sssContract.positions(kernelAddress, idToAddress(userId)),
-          sssContract.claimable(kernelAddress, idToAddress(userId)),
-          sssContract.totalRewards(kernelAddress, idToAddress(userId)),
+          sssContract.positions(kernelAddress, userAddress),
+          sssContract.claimable(kernelAddress, userAddress),
+          sssContract.totalRewards(kernelAddress, userAddress),
         ];
 
         const [

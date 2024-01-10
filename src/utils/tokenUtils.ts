@@ -452,6 +452,19 @@ export const requestAddressFromId = async (id: string) => {
   }
 };
 
+export const requestUserAddressFromId = async (id: string) => {
+  const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/accounts/${id}`;
+  try {
+    const {
+      data: { evm_address },
+    } = await axios(url);
+    return evm_address;
+  } catch (e) {
+    console.error(e);
+    return '0';
+  }
+};
+
 export const hasFeesOrKeys = (token: ITokenData) => {
   const { hasFees, keys: tokenKeys } = token;
   const keys = tokenKeys ? Object.keys(tokenKeys) : [];
