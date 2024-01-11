@@ -145,3 +145,8 @@ export interface IClaimdropData {
   claimdropTitle?: string;
   claimdropDescription?: string;
 }
+
+export enum KeyType {
+  ED25519 = 'ED25519',
+  ECDSA_SECP256K1 = 'ECDSA_SECP256K1',
+}

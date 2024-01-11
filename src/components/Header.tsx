@@ -1,14 +1,19 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import { GlobalContext } from '../providers/Global';
 import { Md5 } from 'ts-md5/dist/md5';
+import Tippy from '@tippyjs/react';
+import axios from 'axios';
 
 import Button from './Button';
 import Modal from './Modal';
+import Icon from './Icon';
 import ConnectModalContent from './Modals/ConnectModalContent';
 import UserAccountModalContent from './Modals/UserAccountModalContent';
 
 import { formatHBARStringToPrice, formatStringETHtoPriceFormatted } from '../utils/numberUtils';
+
+import { KeyType } from '../interfaces/common';
 
 import { BALLANCE_FETCH_INTERVAL, useQueryOptionsProvideSwapRemove } from '../constants';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
@@ -58,6 +63,7 @@ const Header = () => {
 
   const [showUserAccountModal, setShowUserAccountModal] = useState(false);
   const [userBalance, setUserBalance] = useState('0.0');
+  const [keyType, setKeyType] = useState<KeyType>();
 
   const handleConnectButtonClick = () => {
     setShowConnectModal(true);
@@ -90,6 +96,21 @@ const Header = () => {
       clearInterval(fetchInterval);
     };
   }, [getUserTokensData]);
+
+  useEffect(() => {
+    const getUserAccountType = async (userId: string) => {
+      const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/accounts/${userId}`;
+      try {
+        const { data } = await axios(url);
+        setKeyType(data.key._type);
+      } catch (e) {
+        console.error(e);
+        return 0;
+      }
+    };
+
+    userId && getUserAccountType(userId);
+  }, [userId]);
 
   return (
     <div className="container-header p-3 p-md-5">
@@ -162,7 +183,20 @@ const Header = () => {
                 className="container-address mt-2 mt-sm-0"
                 onClick={() => setShowUserAccountModal(true)}
               >
-                <div className="text-small">{userId}</div>
+                <div
+                  className={`text-small ${
+                    keyType === KeyType.ECDSA_SECP256K1 ? 'text-danger' : ''
+                  }`}
+                >
+                  {userId}
+                </div>
+                {keyType === KeyType.ECDSA_SECP256K1 ? (
+                  <Tippy content="ECDSA created wallets, or wallets created within Metamask, are currently not supported on the HeliSwap App.">
+                    <span className="ms-2">
+                      <Icon size="small" color="danger" name="warning" />
+                    </span>
+                  </Tippy>
+                ) : null}
                 <img
                   className="img-profile ms-3"
                   src={`https://www.gravatar.com/avatar/${Md5.hashStr(userId)}/?d=identicon`}
