@@ -14,6 +14,7 @@ import {
   requestAddressFromId,
   idToAddress,
   requestIdFromAddress,
+  requestUserAddressFromId,
 } from '../utils/tokenUtils';
 import {
   getAmountWithSlippage,
@@ -318,7 +319,7 @@ class SDK {
     };
 
     const routerContractAddress = process.env.REACT_APP_ROUTER_ADDRESS as string;
-    const userAddress = idToAddress(userId);
+    const userAddress = await requestUserAddressFromId(userId);
 
     const tokenInAmount = exactAmountIn
       ? formatStringToBigNumberWei(amountIn, decIn)
