@@ -26,6 +26,7 @@ import {
   formatContractNumberPercentage,
   formatContractTimestamp,
   formatHeliStringToPrice,
+  formatHeliStringToPriceShort,
   formatStringETHtoPriceFormatted,
   formatStringToPercentage,
   formatStringToPrice,
@@ -838,8 +839,8 @@ const SingleSidedStaking = () => {
                     <div className="col-6 col-md-8 d-md-flex align-items-center">
                       <p className="d-flex align-items-center">
                         <span className="text-subheader text-numeric">
-                          {formatStringToPrice(sssData.totalDeposited.inETH)}/
-                          {formatStringToPrice(sssData.maxSupply.inETH)}
+                          {formatHeliStringToPriceShort(sssData.totalDeposited.inETH)}/
+                          {formatHeliStringToPriceShort(sssData.maxSupply.inETH)}
                         </span>
 
                         <IconToken className="ms-3" symbol="HELI" />

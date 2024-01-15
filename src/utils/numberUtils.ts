@@ -30,6 +30,10 @@ export const formatHeliStringToPrice = (stringToFormat: string) => {
   return `${numeral(stringToFormat).format('0,0')}`;
 };
 
+export const formatHeliStringToPriceShort = (stringToFormat: string) => {
+  return `${numeral(stringToFormat).format('0.00a')}`;
+};
+
 export const formatNumberToBigNumber = (numberToFormat: number) => {
   const numberToFormatBN = new BigNumber(numberToFormat);
 
