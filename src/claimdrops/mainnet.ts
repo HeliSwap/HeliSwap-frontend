@@ -481,6 +481,66 @@ const data = [
     claimdropDescription:
       'Dear HeliSwap, HeliVerse, and Zealy community, As part of our Zealy campaign, we are giving away 333,333 HELI Tokens among the top 100 Zealy participants with the most experience points from our second HeliSwap Sprint (ended mid of December 2023). The tokens you were allocated vest linearly over 1 month. After the full month has been reached, we allow for another 2 month courtesy period for everyone to claim all the tokens. We want to show some love to the HeliSwap and HeliVerse community. Thank you for your continued support!',
   },
+  {
+    claimdropStart: {
+      date: '24 January 2024',
+      timestamp: 1706099684000,
+    },
+    claimdropEnd: {
+      date: '24 January 2024',
+      timestamp: 1706099685000,
+    },
+    expiryEnd: {
+      date: '24 March 2024',
+      timestamp: 1711283685000,
+    },
+    vestingPeriod: {
+      valueString: '0 Days',
+      valueNumericDays: 0,
+      valueNumericMilliseconds: 0,
+    },
+    claimPeriod: {
+      valueString: '60 Days',
+      valueNumericDays: 60,
+      valueNumericMilliseconds: 5184000000,
+    },
+    totalAllocated: {
+      valueBN: ethers.BigNumber.from('69599999997000000'),
+      valueStringWei: '69599999997000000',
+      valueStringETH: '69599999997.0',
+    },
+    claimedOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    vestedTokensOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    claimable: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    extraTokensOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    totalAllocatedOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    token: '0x0000000000000000000000000000000000455D51',
+    claimdropAddress: '0x00000000000000000000000000000000004563ce',
+    title: 'HELI Doge Claimdrop for Single Sided Stakers ',
+    claimdropTitle: 'HELI Doge Claimdrop for Single Sided Stakers ',
+    claimdropDescription:
+      'This Claimdrop is our way of thanking those who actively participated in our locked and flexible single-sided staking. A generous 6.96% of the total supply is now claimable by the community, as decided by the DAO. No vesting period! You have a 2-month window to claim your tokens. Act fast to secure your share. Tokens not claimed within this period will be forfeited. Your loyalty deserves to be rewarded – let the claiming begin!',
+  },
 ];
 
 export default data;
