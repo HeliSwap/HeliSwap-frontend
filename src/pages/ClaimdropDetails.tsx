@@ -22,7 +22,7 @@ import {
   getHTSTokenInfo,
   getProvider,
   getUserAssociatedTokens,
-  idToAddress,
+  requestUserAddressFromId,
 } from '../utils/tokenUtils';
 // import { getDaysFromDurationMilliseconds, timestampToDate } from '../utils/timeUtils';
 import {
@@ -154,7 +154,7 @@ const ClaimdropDetails = () => {
   //     let totalAllocatedOfBN = ethers.BigNumber.from(0);
 
   //     if (userId) {
-  //       const userAddress = idToAddress(userId);
+  //       const userAddress = await requestUserAddressFromId(userId);
 
   //       const userPromisesArray = [
   //         claimDropContract.claimedOf(userAddress),
@@ -304,7 +304,7 @@ const ClaimdropDetails = () => {
       let totalAllocatedOfBN = ethers.BigNumber.from(0);
 
       if (userId) {
-        const userAddress = idToAddress(userId);
+        const userAddress = await requestUserAddressFromId(userId);
 
         const userPromisesArray = [
           claimDropContract.claimedOf(userAddress),

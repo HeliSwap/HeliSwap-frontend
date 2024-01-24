@@ -6,7 +6,7 @@ env:
   CI: false
   REACT_APP_PROVIDER_URL: https://heliswap.arkhia.io/hedera/mainnet/json-rpc/v1/10qcuS2f8vd2i2dqducf9wci9Upc292a
   REACT_APP_MIRROR_NODE_URL: https://mainnet-public.mirrornode.hedera.com
-  REACT_APP_TOKEN_LIST_URL: https://heliswap.infura-ipfs.io/ipfs/Qmf5u6N2ohZnBc1yxepYzS3RYagkMZbU5dwwU4TGxXt9Lf
+  REACT_APP_TOKEN_LIST_URL: https://heliswap.infura-ipfs.io/ipfs/QmZgQLMmnXZcRYxTaWh4xQUNHUDCt4L7eUkK26VaKxPLNz
   REACT_APP_NETWORK_TYPE: mainnet
   REACT_APP_GRAPHQL_URI: https://heliswap-prod-362307.oa.r.appspot.com/query
   REACT_APP_DROP_POLLER_URI: https://heliswap-drops-poller-53iakaarfq-ey.a.run.app/query
