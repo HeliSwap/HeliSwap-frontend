@@ -33,6 +33,7 @@ import SUS from '../icons/tokens/SUS.png';
 import GARY from '../icons/tokens/GARY.png';
 import HD from '../icons/tokens/HD.png';
 import ODD from '../icons/tokens/ODD.png';
+import TYS from '../icons/tokens/TYS.png';
 
 interface IIconTokenProps {
   symbol: string;
@@ -85,6 +86,7 @@ const tokenMapping: ITokenMapping = {
   'GARY ': GARY,
   HD: HD,
   ODD: ODD,
+  TYS: TYS,
   LP: LP,
 };
 
