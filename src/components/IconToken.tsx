@@ -89,8 +89,7 @@ const tokenMapping: ITokenMapping = {
   ODD: ODD,
   TYS: TYS,
   LP: LP,
-  HASH: HASH,
-
+  $HASH: HASH,
 };
 
 const defaultIconToken = unknown;
