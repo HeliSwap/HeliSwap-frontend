@@ -541,6 +541,66 @@ const data = [
     claimdropDescription:
       'This Claimdrop is our way of thanking those who actively participated in our locked and flexible single-sided staking. A generous 6.96% of the total supply is now claimable by the community, as decided by the DAO. No vesting period! You have a 2-month window to claim your tokens. Act fast to secure your share. Tokens not claimed within this period will be forfeited. Your loyalty deserves to be rewarded – let the claiming begin!',
   },
+  {
+    claimdropStart: {
+      date: '19 March 2024',
+      timestamp: 1710839456000,
+    },
+    claimdropEnd: {
+      date: '18 May 2024',
+      timestamp: 1716023456000,
+    },
+    expiryEnd: {
+      date: '17 July 2024',
+      timestamp: 1721207456000,
+    },
+    vestingPeriod: {
+      valueString: '60 Days',
+      valueNumericDays: 60,
+      valueNumericMilliseconds: 5184000000,
+    },
+    claimPeriod: {
+      valueString: '60 Days',
+      valueNumericDays: 60,
+      valueNumericMilliseconds: 5184000000,
+    },
+    totalAllocated: {
+      valueBN: ethers.BigNumber.from('57945102472516'),
+      valueStringWei: '57945102472516',
+      valueStringETH: '579451.02472516',
+    },
+    claimedOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    vestedTokensOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    claimable: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    extraTokensOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    totalAllocatedOf: {
+      valueBN: ethers.BigNumber.from('0'),
+      valueStringWei: '0',
+      valueStringETH: '0.0',
+    },
+    token: '0x00000000000000000000000000000000001d90C9',
+    claimdropAddress: '0x00000000000000000000000000000000004ca734',
+    title: ' Febrary Claimdrop for Single Sided Staking supporters',
+    claimdropTitle: ' Febrary Claimdrop for Single Sided Staking supporters',
+    claimdropDescription:
+      'Dear HeliSwap community, Just like discussed on proposal #15 on our DAO (https://app.heliswap.io/proposals/15) - this is the Claimdrop for participants that were in SSS throughout February until 19 March 2024. Like promised the first claimdrop comes with more APR to compensate for the time that has passed since then. Hence, this Claimdrop is distributing an additional 9% APR to SSS participants. Please be aware that 9% APR means ANNUAL return. You have a 2-month window to claim your tokens after the vesting is over.  This Claimdrop has a vesting period of 30 days.',
+  },
 ];
 
 export default data;
