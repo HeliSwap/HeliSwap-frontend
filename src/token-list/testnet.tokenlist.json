@@ -12,7 +12,7 @@
   "tokens": [
     {
       "chainId": 290,
-      "address": "0x000000000000000000000000000000000006A6cB",
+      "address": "0x0000000000000000000000000000000000443231",
       "name": "Wrapped HBAR",
       "symbol": "WHBAR",
       "decimals": 8,
@@ -20,7 +20,7 @@
     },
     {
       "chainId": 290,
-      "address": "0x000000000000000000000000000000000006a5c5",
+      "address": "0x0000000000000000000000000000000000443228",
       "name": "USD Coin",
       "symbol": "USDC",
       "decimals": 6,
@@ -28,7 +28,7 @@
     },
     {
       "chainId": 290,
-      "address": "0x000000000000000000000000000000000006a5e2",
+      "address": "0x000000000000000000000000000000000044322b",
       "name": "Wrapped Ethereum",
       "symbol": "WETH",
       "decimals": 8,
@@ -36,7 +36,7 @@
     },
     {
       "chainId": 290,
-      "address": "0x000000000000000000000000000000000006a5F0",
+      "address": "0x000000000000000000000000000000000044322E",
       "name": "Wrapped Bitcoin",
       "symbol": "WBTC",
       "decimals": 8,
@@ -44,7 +44,7 @@
     },
     {
       "chainId": 290,
-      "address": "0x000000000000000000000000000000000001d7FA",
+      "address": "0x000000000000000000000000000000000044322f",
       "name": "HeliSwap",
       "symbol": "HELI",
       "decimals": 8,
