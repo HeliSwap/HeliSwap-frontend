@@ -25,7 +25,7 @@
     "ethers": "^5.7.2",
     "graphql": "^16.5.0",
     "graphql-request": "^6.0.0",
-    "hashconnect": "^0.2.4",
+    "hashconnect": "^0.2.9",
     "lodash": "^4.17.21",
     "numeral": "^2.0.6",
     "qrcode.react": "^3.1.0",
