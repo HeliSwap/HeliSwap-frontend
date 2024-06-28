@@ -148,7 +148,7 @@ class Hashconnect {
   }
 
   clearPairings() {
-    this.hashconnect.clearConnectionsAndData();
+    this.hashconnect.disconnect(this.hashconnect.hcData.topic);
     this.pairingData = null;
   }
 
