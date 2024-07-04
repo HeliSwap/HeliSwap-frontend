@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
@@ -11,6 +11,12 @@ import IconToken from '../components/IconToken';
 import Button from '../components/Button';
 import { ethers } from 'ethers';
 import { formatStringWeiToStringEther } from '../utils/numberUtils';
+import {
+  getTokenAllowance,
+  getHTSTokenInfo,
+  requestIdFromAddress,
+  addressToId,
+} from '../utils/tokenUtils';
 
 interface IRewardDetailsProps {
   reward: IReward;
@@ -21,75 +27,77 @@ interface IRewardDetailsProps {
 }
 
 const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IRewardDetailsProps) => {
-  //Component state
-  const [loadingSendReward, setLoadingSendReward] = useState<boolean>(false);
-  const [loadingChangeRewardDuration, setLoadingChangeRewardDuration] = useState<boolean>(false);
-  const [loadingApproveReward, setLoadingApproveReward] = useState<boolean>(false);
-  const [sendRewardAmount, setSendRewardAmount] = useState<number>(0);
+  const [rewardAmount, setRewardAmount] = useState<number>(0);
+  const [sendingReward, setSendingReward] = useState<boolean>(false);
   const [changeRewardDuration, setChangeRewardDuration] = useState<number>(0);
-  const [approveRewardAmount, setApproveRewardAmount] = useState<number>(0);
+  const [loadingChangeRewardDuration, setLoadingChangeRewardDuration] = useState<boolean>(false);
+  const [canSpend, setCanSpend] = useState<boolean>(false);
 
-  //Handlers
-  const handleSendReward = async (rewardAddress: string) => {
-    setLoadingSendReward(true);
+  const farmDeployer = process.env.REACT_APP_DEPLOYER_ID as string;
+  const isWHBAR =
+    process.env.REACT_APP_WHBAR_ADDRESS === reward.address ||
+    process.env.REACT_APP_WHBAR_ADDRESS_OLD === reward.address;
+
+  const checkAllowance = useCallback(async () => {
+    const tokenInfo = await getHTSTokenInfo(addressToId(reward.address));
+    const farmId = await requestIdFromAddress(farmAddress);
+
+    const allowance = await getTokenAllowance(farmDeployer, farmId, tokenInfo.hederaId);
+    setCanSpend(allowance[0].amount > rewardAmount);
+  }, [farmDeployer, farmAddress, reward.address, rewardAmount]);
+
+  useEffect(() => {
+    checkAllowance();
+  }, [checkAllowance]);
+
+  const handleSendReward = useCallback(async () => {
+    setSendingReward(true);
     try {
-      await farmsSDK.sendReward(farmAddress, rewardAddress, sendRewardAmount);
-
-      setSendRewardAmount(0);
+      await farmsSDK.sendReward(farmAddress, reward.address, rewardAmount);
+      setRewardAmount(0);
       toast.success('Success! Reward was sent.');
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast.error('Error while sending reward.');
     } finally {
-      setLoadingSendReward(false);
+      setSendingReward(false);
     }
-  };
+  }, [farmAddress, farmsSDK, reward.address, rewardAmount]);
 
-  const handleChangeRewardDuration = async (rewardAddress: string) => {
+  const handleChangeRewardDuration = useCallback(async () => {
     setLoadingChangeRewardDuration(true);
-
     try {
-      await farmsSDK.setRewardDuration(farmAddress, rewardAddress, changeRewardDuration);
-
+      await farmsSDK.setRewardDuration(farmAddress, reward.address, changeRewardDuration);
       toast.success('Success! Reward duration set.');
       setChangeRewardDuration(0);
     } catch (error) {
-      toast.error('Error while settin duration.');
-      console.log(error);
+      console.error(error);
+      toast.error('Error while setting duration.');
     } finally {
       setLoadingChangeRewardDuration(false);
     }
-  };
+  }, [farmAddress, farmsSDK, reward.address, changeRewardDuration]);
 
-  const handleWrapAndApproveToken = async (rewardAddress: string, rewardAmount: string) => {
-    setLoadingApproveReward(true);
-    try {
-      await farmsSDK.wrapHBAR(rewardAmount);
-      const formattedAmount = ethers.utils.parseUnits(rewardAmount, 8);
-      await farmsSDK.approveToken(rewardAddress, farmAddress, formattedAmount.toString());
-      toast.success('Success! Token was approved.');
-      setApproveRewardAmount(0);
-    } catch (error) {
-      console.log(error);
-      toast.error('Error while approving token');
-    } finally {
-      setLoadingApproveReward(false);
-    }
-  };
-
-  const handleApproveToken = async (rewardAddress: string) => {
-    setLoadingApproveReward(true);
-    try {
-      await farmsSDK.approveToken(rewardAddress, farmAddress, approveRewardAmount.toString());
-      toast.success('Success! Token was approved.');
-      setApproveRewardAmount(0);
-    } catch (error) {
-      console.log(error);
-      toast.error('Error while approving token');
-    } finally {
-      setLoadingApproveReward(false);
-    }
-  };
+  const handleApprove = useCallback(
+    async (isWHBAR = false) => {
+      setSendingReward(true);
+      try {
+        if (isWHBAR) {
+          await farmsSDK.wrapHBAR(rewardAmount.toString());
+        }
+        const formattedAmount = ethers.utils.parseUnits(rewardAmount.toString(), 8);
+        await farmsSDK.approveToken(reward.address, farmAddress, formattedAmount.toString());
+        toast.success('Success! Token was approved.');
+        setRewardAmount(0);
+      } catch (error) {
+        console.error(error);
+        toast.error('Error while approving token');
+      } finally {
+        setSendingReward(false);
+      }
+    },
+    [farmAddress, farmsSDK, reward.address, rewardAmount],
+  );
 
   return (
     <div className="mt-3 container-dark p-4" key={index}>
@@ -154,57 +162,7 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
 
       {/* Actions */}
       <div className="row">
-        <div className="col-4">
-          <div>
-            <p className="text-small mb-3">WEI amount</p>
-            <input
-              className="form-control"
-              value={approveRewardAmount}
-              placeholder="Enter WEI amount"
-              onChange={(e: any) => setApproveRewardAmount(e.target.value)}
-            />
-          </div>
-          <div className="mt-4">
-            <Button
-              onClick={() =>
-                process.env.REACT_APP_WHBAR_ADDRESS === reward.address ||
-                process.env.REACT_APP_WHBAR_ADDRESS_OLD === reward.address
-                  ? handleWrapAndApproveToken(reward.address, approveRewardAmount.toString())
-                  : handleApproveToken(reward.address)
-              }
-              loading={loadingApproveReward}
-              size="small"
-            >
-              {process.env.REACT_APP_WHBAR_ADDRESS === reward.address ||
-              process.env.REACT_APP_WHBAR_ADDRESS_OLD === reward.address
-                ? 'Wrap and Approve'
-                : 'Approve token'}
-            </Button>
-          </div>
-        </div>
-
-        <div className="col-4">
-          <div>
-            <p className="text-small mb-3">WEI amount</p>
-            <input
-              className="form-control"
-              value={sendRewardAmount}
-              placeholder="Enter WEI amount"
-              onChange={(e: any) => setSendRewardAmount(e.target.value)}
-            />
-          </div>
-          <div className="mt-4">
-            <Button
-              onClick={() => handleSendReward(reward.address)}
-              loading={loadingSendReward}
-              size="small"
-            >
-              Send reward
-            </Button>
-          </div>
-        </div>
-
-        <div className="col-4">
+        <div className="col-6">
           <div>
             <p className="text-small mb-3">Duration</p>
             <input
@@ -216,12 +174,36 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
           </div>
           <div className="mt-4">
             <Button
-              onClick={() => handleChangeRewardDuration(reward.address)}
+              onClick={() => handleChangeRewardDuration()}
               loading={loadingChangeRewardDuration}
               size="small"
             >
               Set Duration
             </Button>
+          </div>
+        </div>
+
+        <div className="col-6">
+          <div>
+            <p className="text-small mb-3">WEI amount</p>
+            <input
+              className="form-control"
+              value={rewardAmount}
+              placeholder="Enter WEI amount"
+              onChange={(e: any) => setRewardAmount(e.target.value)}
+              type="number"
+            />
+          </div>
+          <div className="mt-4">
+            {canSpend ? (
+              <Button onClick={handleSendReward} loading={sendingReward} size="small">
+                Send token
+              </Button>
+            ) : (
+              <Button onClick={() => handleApprove} loading={sendingReward} size="small">
+                {isWHBAR ? 'Wrap and Approve' : 'Approve token'}
+              </Button>
+            )}
           </div>
         </div>
       </div>

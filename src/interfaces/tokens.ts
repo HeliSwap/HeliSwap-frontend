@@ -213,6 +213,8 @@ export interface ICreatePairData {
 }
 
 export interface IAllowanceData {
+  [x: string]: any;
+  amount: number;
   owner: string;
   spender: string;
   amount_granted: number;
