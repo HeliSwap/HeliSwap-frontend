@@ -4,6 +4,7 @@ import FactoryContractABI from './abis/FactoryABI.json';
 import MultirewardsContractABI from './abis/MultirewardsABI.json';
 import WHBARABI from './abis/WHBARABI.json';
 import ERC20 from '../abi/ERC20.json';
+import { add } from 'lodash';
 
 type networkType = 'testnet' | 'mainnet';
 class FarmsSDK {
@@ -25,7 +26,7 @@ class FarmsSDK {
     this.factoryAddress = process.env.REACT_APP_CAMPAIGN_FACTORY_ADDRESS as string;
     this.walletAddress = process.env.REACT_APP_DEPLOYER_ADDRESS as string;
 
-    this.walletId = addressToId(this.walletAddress);
+    this.walletId = process.env.REACT_APP_DEPLOYER_ID as string;
     this.walletPrivateKey = process.env.REACT_APP_DEPLOYER_PK as string;
     this.provider = hethers.providers.getDefaultProvider(this.network);
 
@@ -116,6 +117,19 @@ class FarmsSDK {
     });
 
     await depositTx.wait();
+  }
+
+  async WHBARBalance() {
+    const WHBAR = new hethers.Contract(
+      process.env.REACT_APP_WHBAR_ADDRESS as string,
+      WHBARABI,
+      this.connectedWallet,
+    );
+    const balance = await WHBAR.balanceOf(this.walletAddress, {
+      gasLimit: 1000000,
+    });
+
+    return balance.toString();
   }
 
   async approveToken(tokenAddress: string, spenderAddress: string, amountToApprove: string) {
