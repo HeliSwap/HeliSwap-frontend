@@ -6,6 +6,8 @@ import { IReward } from '../interfaces/tokens';
 
 import IconToken from '../components/IconToken';
 import Button from '../components/Button';
+import Modal from './Modal';
+
 import { ethers } from 'ethers';
 import { formatStringWeiToStringEther } from '../utils/numberUtils';
 import {
@@ -26,11 +28,13 @@ interface IRewardDetailsProps {
 
 const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IRewardDetailsProps) => {
   const [rewardAmount, setRewardAmount] = useState<number>(0);
-  const [sendingReward, setSendingReward] = useState<boolean>(false);
   const [changeRewardDuration, setChangeRewardDuration] = useState<number>(0);
-  const [loadingChangeRewardDuration, setLoadingChangeRewardDuration] = useState<boolean>(false);
   const [allowanceAmount, setAllowanceAmount] = useState<number>(0);
-  const [canSpend, setCanSpend] = useState<boolean>(false);
+  const [unWrapAmount, setUnWrapAmount] = useState<number>(0);
+  const [sendingReward, setSendingReward] = useState<boolean>(false);
+  const [loadingChangeRewardDuration, setLoadingChangeRewardDuration] = useState<boolean>(false);
+  const [showTransferModal, setShowTransferModal] = useState<boolean>(false);
+  const [canSpend, setCanSpend] = useState<boolean | undefined>(undefined);
 
   const farmDeployer = process.env.REACT_APP_DEPLOYER_ID as string;
   const isWHBAR =
@@ -45,38 +49,53 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
       const allowance = await getTokenAllowance(farmDeployer, farmId, tokenInfo.hederaId);
       const allowanceAmt = allowance[0]?.amount;
 
-      const checkAllowance = await checkAllowanceHTS(
-        farmDeployer,
-        tokenInfo,
-        formattedAmt,
-        farmAddress,
-      );
+      if (canSpend === undefined || allowanceAmount <= rewardAmount || rewardAmount === 0) {
+        const checkAllowance = await checkAllowanceHTS(
+          farmDeployer,
+          tokenInfo,
+          formattedAmt,
+          farmAddress,
+        );
+        setCanSpend(checkAllowance);
+      }
 
       setAllowanceAmount(allowanceAmt);
-      setCanSpend(checkAllowance);
     } catch (error) {
       console.error('Error checking HTS allowance:', error);
     }
-  }, [farmDeployer, farmAddress, reward.address, rewardAmount]);
+  }, [reward.address, rewardAmount, farmAddress, farmDeployer, canSpend, allowanceAmount]);
 
   const getWHBARBalance = useCallback(async () => {
     try {
-      const balance = await farmsSDK.WHBARBalance();
-      console.log(balance);
-      setAllowanceAmount(Number(balance));
-      if (rewardAmount) setCanSpend(Number(balance) >= rewardAmount);
+      // If rewardAmount is 0, fetch the balance and update allowanceAmount and canSpend.
+      if (rewardAmount === 0) {
+        const balance = await farmsSDK.WHBARBalance();
+        setAllowanceAmount(Number(balance));
+        setCanSpend(Number(balance) >= rewardAmount);
+      } else {
+        // Directly set canSpend based on the comparison, removing the need for an else block.
+        setCanSpend(allowanceAmount >= rewardAmount);
+      }
     } catch (error) {
       console.error('Error getting WHBAR balance:', error);
     }
-  }, [farmsSDK, rewardAmount]);
+  }, [farmsSDK, rewardAmount, allowanceAmount]);
+
+  const checkWHBARAllowance = useCallback(async () => {
+    try {
+      await getWHBARBalance();
+    } catch (error) {
+      console.error('Error getting WHBAR balance:', error);
+    }
+  }, [getWHBARBalance]);
 
   useEffect(() => {
     if (isWHBAR) {
-      getWHBARBalance();
+      checkWHBARAllowance();
     } else {
       checkHTSAllowance();
     }
-  }, [allowanceAmount, isWHBAR, checkHTSAllowance, getWHBARBalance]);
+  }, [allowanceAmount, isWHBAR, checkHTSAllowance, checkWHBARAllowance]);
 
   const handleSendReward = useCallback(async () => {
     setSendingReward(true);
@@ -109,10 +128,15 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
   const handleApprove = useCallback(async () => {
     setSendingReward(true);
     try {
-      if (isWHBAR) {
-        await farmsSDK.wrapHBAR(rewardAmount.toString());
+      let approveAmount = rewardAmount;
+      if (allowanceAmount) {
+        approveAmount = rewardAmount - allowanceAmount;
       }
-      await farmsSDK.approveToken(reward.address, farmAddress, rewardAmount.toString());
+
+      if (isWHBAR) {
+        await farmsSDK.wrapHBAR(approveAmount.toString());
+      }
+      await farmsSDK.approveToken(reward.address, farmAddress, approveAmount.toString());
       toast.success('Success! Token was approved.');
       setRewardAmount(0);
     } catch (error) {
@@ -121,7 +145,21 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
     } finally {
       setSendingReward(false);
     }
-  }, [farmAddress, farmsSDK, reward.address, rewardAmount, isWHBAR]);
+  }, [rewardAmount, allowanceAmount, isWHBAR, farmsSDK, reward.address, farmAddress]);
+
+  const handleUnwrapHbar = useCallback(async () => {
+    setSendingReward(true);
+    try {
+      await farmsSDK.unWrapHBAR(unWrapAmount);
+      toast.success('Success! WHBAR was unwrapped.');
+      setRewardAmount(0);
+    } catch (error) {
+      console.error('Error unwrapping WHBAR:', error);
+      toast.error('Error while unwrapping WHBAR.');
+    } finally {
+      setSendingReward(false);
+    }
+  }, [farmsSDK, unWrapAmount]);
 
   return (
     <div className="mt-3 container-dark p-4" key={index}>
@@ -190,9 +228,23 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
           </p>
         </div>
         <div className="col-6 col-md-4">
-          <p className="text-main text-numeric">
-            {allowanceAmount} {isWHBAR ? 'WHBAR' : 'WEI'}
-          </p>
+          <div className="text-main text-numeric">
+            {allowanceAmount}{' '}
+            {isWHBAR ? (
+              <>
+                WHBAR
+                <Button
+                  onClick={() => setShowTransferModal(true)}
+                  size="small"
+                  className="mx-4 w-50 p-1"
+                >
+                  Unwrap
+                </Button>
+              </>
+            ) : (
+              'WEI'
+            )}
+          </div>
         </div>
       </div>
 
@@ -242,6 +294,25 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
             )}
           </div>
         </div>
+
+        <Modal show={showTransferModal} closeModal={() => setShowTransferModal(false)}>
+          <div className="p-5">
+            <div>
+              <p className="text-small mb-3">{isWHBAR ? 'WHBAR' : 'WEI'} Amount</p>
+              <input
+                className="form-control"
+                value={unWrapAmount}
+                placeholder="Enter WEI amount"
+                onChange={e => setUnWrapAmount(Number(e.target.value))}
+              />
+            </div>
+            <div className="mt-4">
+              <Button onClick={handleUnwrapHbar} loading={sendingReward} size="small">
+                Unwrap WHBAR
+              </Button>
+            </div>
+          </div>
+        </Modal>
       </div>
     </div>
   );

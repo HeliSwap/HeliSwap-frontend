@@ -1,10 +1,8 @@
 import { hethers } from '@hashgraph/hethers';
-import { addressToId } from '../utils/tokenUtils';
 import FactoryContractABI from './abis/FactoryABI.json';
 import MultirewardsContractABI from './abis/MultirewardsABI.json';
 import WHBARABI from './abis/WHBARABI.json';
 import ERC20 from '../abi/ERC20.json';
-import { add } from 'lodash';
 
 type networkType = 'testnet' | 'mainnet';
 class FarmsSDK {
@@ -113,6 +111,20 @@ class FarmsSDK {
 
     const depositTx = await WHBAR.deposit({
       value: hbarAmount,
+      gasLimit: 150_000,
+    });
+
+    await depositTx.wait();
+  }
+
+  async unWrapHBAR(hbarAmount: number) {
+    const WHBAR = new hethers.Contract(
+      process.env.REACT_APP_WHBAR_ADDRESS as string,
+      WHBARABI,
+      this.connectedWallet,
+    );
+
+    const depositTx = await WHBAR.withdraw(hbarAmount, {
       gasLimit: 150_000,
     });
 
