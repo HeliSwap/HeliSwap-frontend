@@ -33,7 +33,7 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
   const [unWrapAmount, setUnWrapAmount] = useState<number>(0);
   const [sendingReward, setSendingReward] = useState<boolean>(false);
   const [loadingChangeRewardDuration, setLoadingChangeRewardDuration] = useState<boolean>(false);
-  const [showTransferModal, setShowTransferModal] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
   const [canSpend, setCanSpend] = useState<boolean | undefined>(undefined);
 
   const farmDeployer = process.env.REACT_APP_DEPLOYER_ID as string;
@@ -151,15 +151,18 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
     setSendingReward(true);
     try {
       await farmsSDK.unWrapHBAR(unWrapAmount);
+      await getWHBARBalance();
       toast.success('Success! WHBAR was unwrapped.');
       setRewardAmount(0);
+      setShowModal(false);
+
     } catch (error) {
       console.error('Error unwrapping WHBAR:', error);
       toast.error('Error while unwrapping WHBAR.');
     } finally {
       setSendingReward(false);
     }
-  }, [farmsSDK, unWrapAmount]);
+  }, [farmsSDK, getWHBARBalance, unWrapAmount]);
 
   return (
     <div className="mt-3 container-dark p-4" key={index}>
@@ -234,7 +237,7 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
               <>
                 WHBAR
                 <Button
-                  onClick={() => setShowTransferModal(true)}
+                  onClick={() => setShowModal(true)}
                   size="small"
                   className="mx-4 w-50 p-1"
                 >
@@ -295,7 +298,7 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
           </div>
         </div>
 
-        <Modal show={showTransferModal} closeModal={() => setShowTransferModal(false)}>
+        <Modal show={showModal} closeModal={() => setShowModal(false)}>
           <div className="p-5">
             <div>
               <p className="text-small mb-3">{isWHBAR ? 'WHBAR' : 'WEI'} Amount</p>
