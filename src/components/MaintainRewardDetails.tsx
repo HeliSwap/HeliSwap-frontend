@@ -232,10 +232,9 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
         </div>
         <div className="col-6 col-md-4">
           <div className="text-main text-numeric">
-            {allowanceAmount}{' '}
-            {isWHBAR ? (
+            {allowanceAmount || 0}   {isWHBAR ? (
               <>
-                WHBAR
+                 WHBAR
                 <Button
                   onClick={() => setShowModal(true)}
                   size="small"
@@ -261,7 +260,8 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
               className="form-control"
               value={changeRewardDuration}
               placeholder="Enter new duration"
-              onChange={e => setChangeRewardDuration(Number(e.target.value))}
+              type='number'
+              onChange={(e: any) => setChangeRewardDuration(e.target.value)}
             />
           </div>
           <div className="mt-4">
@@ -282,7 +282,8 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
               className="form-control"
               value={rewardAmount}
               placeholder="Enter WEI amount"
-              onChange={e => setRewardAmount(Number(e.target.value))}
+              type='number'
+              onChange={(e: any) => setRewardAmount(e.target.value)}
             />
           </div>
           <div className="mt-4">
@@ -301,12 +302,13 @@ const MaintainRewardDetails = ({ reward, index, farmsSDK, farmAddress }: IReward
         <Modal show={showModal} closeModal={() => setShowModal(false)}>
           <div className="p-5">
             <div>
-              <p className="text-small mb-3">{isWHBAR ? 'WHBAR' : 'WEI'} Amount</p>
+              <p className="text-small mb-3">WHBAR Amount</p>
               <input
                 className="form-control"
                 value={unWrapAmount}
                 placeholder="Enter WEI amount"
-                onChange={e => setUnWrapAmount(Number(e.target.value))}
+                type='number'
+                onChange={(e: any) => setUnWrapAmount(e.target.value)}
               />
             </div>
             <div className="mt-4">
