@@ -180,15 +180,6 @@ const FarmDetails = () => {
 
               <div className="row">
                 <div className="col-6">
-                  <p className="text-small mb-3">Reward address</p>
-                  <input
-                    className="form-control"
-                    value={enableRewardAddress}
-                    placeholder="Enter Reward address"
-                    onChange={(e: any) => setEnableRewardAddress(e.target.value)}
-                  />
-                </div>
-                <div className="col-6">
                   <p className="text-small mb-3">Duration in seconds</p>
                   <input
                     className="form-control"
@@ -197,7 +188,15 @@ const FarmDetails = () => {
                     onChange={(e: any) => setEnableRewardDuration(e.target.value)}
                   />
                 </div>
-
+                  <div className="col-6">
+                  <p className="text-small mb-3">Reward address</p>
+                  <input
+                    className="form-control"
+                    value={enableRewardAddress}
+                    placeholder="Enter Reward address"
+                    onChange={(e: any) => setEnableRewardAddress(e.target.value)}
+                  />
+                </div>
                 <div className="mt-4">
                   <Button onClick={HandleEnableReward} loading={loadingEnableReward} size="small">
                     Enable reward
