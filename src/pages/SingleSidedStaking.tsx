@@ -175,7 +175,7 @@ const SingleSidedStaking = () => {
       setUserRewardsBalance(rewards);
     } catch (error) {
       console.error(error);
-      setGeneralError(true);
+      setUserRewardsBalance('0.0');
     }
   }, [rewardsContract, tokenContract, userId]);
 
