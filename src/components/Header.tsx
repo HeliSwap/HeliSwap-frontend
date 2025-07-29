@@ -12,6 +12,7 @@ import ConnectModalContent from './Modals/ConnectModalContent';
 import UserAccountModalContent from './Modals/UserAccountModalContent';
 
 import { formatHBARStringToPrice, formatStringETHtoPriceFormatted } from '../utils/numberUtils';
+import { getHBARBalance } from '../utils/tokenUtils';
 
 import { KeyType } from '../interfaces/common';
 
@@ -71,8 +72,7 @@ const Header = () => {
 
   const getUserTokensData = useCallback(async () => {
     if (userId) {
-      const provider = hethers.providers.getDefaultProvider(process.env.REACT_APP_NETWORK_TYPE);
-      const userBalanceBN = await provider.getBalance(userId);
+      const userBalanceBN = await getHBARBalance(userId);
       const tokenBalance = hethers.utils.formatHbar(userBalanceBN);
 
       setUserBalance(formatStringETHtoPriceFormatted(tokenBalance));
