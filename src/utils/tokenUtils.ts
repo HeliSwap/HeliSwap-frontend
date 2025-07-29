@@ -106,12 +106,37 @@ export const getHTSTokenWalletBalance = async (
   }
 };
 
-export const getUserAssociatedTokens = async (userId: string): Promise<string[]> => {
-  const tokens = (await getUserHTSData(userId)) || [];
-  const keys: string[] = [];
-  tokens.forEach((_, key) => keys.push(key as string));
+export const getHBARBalance = async (userId: string) => {
+  const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/accounts/${userId}`;
+  try {
+    const {
+      data: {
+        balance: { balance },
+      },
+    } = await axios(url);
+    return balance;
+  } catch (e) {
+    console.error(e);
+    return 0;
+  }
+};
 
-  return keys;
+export const getUserAssociatedTokens = async (userId: string): Promise<string[]> => {
+  const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/accounts/${userId}`;
+  try {
+    const {
+      data: {
+        balance: { tokens },
+      },
+    } = await axios(url);
+
+    const formattedTokens = tokens.map((token: any) => token.token_id);
+
+    return formattedTokens;
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
 };
 
 export const getTokenAllowance = async (
@@ -287,17 +312,18 @@ export const getTokenBalance = async (userId: string, tokenData: ITokenData) => 
   let tokenBalance;
 
   if (tokenData.type === TokenType.HBAR && userId) {
-    const provider = hethers.providers.getDefaultProvider(process.env.REACT_APP_NETWORK_TYPE);
-    const userBalanceBN = await provider.getBalance(userId);
-    tokenBalance = hethers.utils.formatHbar(userBalanceBN);
+    const hbarBalance = await getHBARBalance(userId);
+    tokenBalance = hethers.utils.formatHbar(hbarBalance);
   } else if (tokenData.type === TokenType.HTS) {
     tokenBalance = '0';
-    const accountTokens = await getUserHTSData(userId);
-    const balance = accountTokens?.get(tokenData.hederaId);
+    const balanceFromMirrorNode = await getHTSTokenWalletBalance(userId, tokenData.hederaId);
     const tokenDecimals = tokenData?.decimals;
 
-    if (balance)
-      tokenBalance = formatStringWeiToStringEther(balance.toString(), tokenDecimals).toString();
+    if (balanceFromMirrorNode)
+      tokenBalance = formatStringWeiToStringEther(
+        balanceFromMirrorNode.toString(),
+        tokenDecimals,
+      ).toString();
   } else if (tokenData.type === TokenType.ERC20) {
     tokenBalance = '0';
     const provider = getProvider();
@@ -419,12 +445,12 @@ export const getTokenPrice = (poolsData: IPoolData[], tokenAddress: string, hbar
   }
 };
 
-const getUserHTSData = async (userId: string) => {
-  const networkType = process.env.REACT_APP_NETWORK_TYPE as string;
-  const client = networkType === 'testnet' ? Client.forTestnet() : Client.forMainnet();
-  const { tokens } = await new AccountBalanceQuery().setAccountId(userId).execute(client);
-  return tokens?._map;
-};
+// const getUserHTSData = async (userId: string) => {
+//   const networkType = process.env.REACT_APP_NETWORK_TYPE as string;
+//   const client = networkType === 'testnet' ? Client.forTestnet() : Client.forMainnet();
+//   const { tokens } = await new AccountBalanceQuery().setAccountId(userId).execute(client);
+//   return tokens?._map;
+// };
 
 export const requestIdFromAddress = async (address: string) => {
   const url = `${process.env.REACT_APP_MIRROR_NODE_URL}/api/v1/contracts/${address}`;
