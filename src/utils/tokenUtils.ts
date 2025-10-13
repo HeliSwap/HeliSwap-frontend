@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { hethers } from '@hashgraph/hethers';
 import { ethers } from 'ethers';
-import { Client, AccountBalanceQuery } from '@hashgraph/sdk';
 import BigNumber from 'bignumber.js';
 
 import { IAllowanceData, IPoolData, IReward, ITokenData, TokenType } from '../interfaces/tokens';
