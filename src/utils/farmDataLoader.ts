@@ -52,3 +52,17 @@ export const getFarmByAddress = (farmAddress: string): IFarmData | undefined => 
   const allFarms = loadAllFarms();
   return allFarms.find(farm => farm.address.toLowerCase() === farmAddress.toLowerCase());
 };
+
+/**
+ * Gets a farm by the pair address (LP token address)
+ * @param pairAddress - The address of the LP token (pair contract)
+ * @returns The farm data if found, undefined otherwise
+ */
+export const getFarmByPairAddress = (pairAddress: string): IFarmData | undefined => {
+  const allFarms = loadAllFarms();
+  return allFarms.find(
+    farm =>
+      farm.poolData?.pairAddress?.toLowerCase() === pairAddress.toLowerCase() ||
+      farm.stakingTokenAddress?.toLowerCase() === pairAddress.toLowerCase(),
+  );
+};
