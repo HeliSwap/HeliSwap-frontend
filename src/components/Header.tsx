@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { hethers } from '@hashgraph/hethers';
 import { GlobalContext } from '../providers/Global';
 import { Md5 } from 'ts-md5/dist/md5';
@@ -35,10 +35,15 @@ const Header = () => {
     setShowConnectModal,
   } = contextValue.connection;
 
-  const poolTokens = [
-    process.env.REACT_APP_HELI_TOKEN_ADDRESS as string,
-    process.env.REACT_APP_WHBAR_ADDRESS as string,
-  ];
+  // Memoize poolTokens to prevent infinite re-renders
+  // The array reference must be stable for usePoolsByTokensList hook
+  const poolTokens = useMemo(
+    () => [
+      process.env.REACT_APP_HELI_TOKEN_ADDRESS as string,
+      process.env.REACT_APP_WHBAR_ADDRESS as string,
+    ],
+    [],
+  );
 
   const { poolsByTokenList: pools, processingPools: loadingPools } = usePoolsByTokensList(
     useQueryOptionsProvideSwapRemove,
