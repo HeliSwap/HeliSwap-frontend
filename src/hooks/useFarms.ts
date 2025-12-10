@@ -1,66 +1,38 @@
-import { useContext, useEffect, useState } from 'react';
-import { GlobalContext } from '../providers/Global';
-
-import { QueryHookOptions, useQuery } from '@apollo/client';
-import { GET_FARMS } from '../GraphQL/Queries';
-
+import { useEffect, useState } from 'react';
+import { QueryHookOptions } from '@apollo/client';
 import { IFarmData, IPoolData } from '../interfaces/tokens';
+import { loadAllFarms } from '../utils/farmDataLoader';
 
-import { getProcessedFarms } from '../utils/farmUtils';
-import { idToAddress } from '../utils/tokenUtils';
-
-import { REFRESH_TIME, farmsToExclude } from '../constants';
-
+/**
+ * Hook to load farms from static farms.json file
+ * Replaces the previous GraphQL-based implementation
+ * @param useQueryOptions - Kept for backward compatibility but not used
+ * @param userId - User ID (kept for backward compatibility but not used since farms.json has default user data)
+ * @param pools - Pools data (kept for backward compatibility but not used since farms.json already has processed data)
+ * @returns Object containing farms array, loading state, error state, and processing state
+ */
 const useFarms = (useQueryOptions: QueryHookOptions = {}, userId: string, pools: IPoolData[]) => {
-  const contextValue = useContext(GlobalContext);
-  const { hbarPrice } = contextValue;
-
   const [processingFarms, setProcessingFarms] = useState<boolean>(true);
   const [farms, setFarms] = useState<IFarmData[]>([]);
-
-  const userAddress = userId ? idToAddress(userId) : '';
-
-  const { loading, data, error, startPolling, stopPolling } = useQuery(GET_FARMS, {
-    variables: { userAddress },
-    ...useQueryOptions,
-  });
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<any>(null);
 
   useEffect(() => {
-    const getFarmsData = () => {
-      const { getFarmsOverview } = data;
-
-      if (getFarmsOverview && getFarmsOverview.length > 0 && pools.length && hbarPrice !== 0) {
-        try {
-          const processedFarms = getProcessedFarms(getFarmsOverview, pools, hbarPrice);
-
-          // Exclude duplicated or expired farms
-          const farms = processedFarms.filter(farm => !farmsToExclude.includes(farm.address));
-          setFarms(farms);
-        } catch (e) {
-          console.error('Error while processing campaigns data');
-        } finally {
-          setProcessingFarms(false);
-        }
-      }
-    };
-
-    data && getFarmsData();
-  }, [data, pools, hbarPrice]);
-  useEffect(() => {
-    if (
-      !loading &&
-      (error || (data && (!data.getFarmsOverview || data?.getFarmsOverview?.length === 0)))
-    ) {
+    try {
+      // Load all farms from static JSON file
+      // farms.json already contains processed data (totalStakedUSD, APR, totalRewardsUSD, etc.)
+      // and excluded farms are filtered out in loadAllFarms
+      const allFarms = loadAllFarms();
+      setFarms(allFarms);
+      setLoading(false);
+      setProcessingFarms(false);
+    } catch (err) {
+      console.error('Error loading farms data:', err);
+      setError(err);
+      setLoading(false);
       setProcessingFarms(false);
     }
-  }, [loading, data, error]);
-
-  useEffect(() => {
-    startPolling(useQueryOptions.pollInterval || REFRESH_TIME);
-    return () => {
-      stopPolling();
-    };
-  }, [startPolling, stopPolling, useQueryOptions]);
+  }, []); // Empty dependency array since data is static
 
   return { farms, loading, error, processingFarms };
 };

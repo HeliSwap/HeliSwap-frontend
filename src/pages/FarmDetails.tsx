@@ -5,13 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 import { GlobalContext } from '../providers/Global';
 
-import {
-  IReward,
-  IRewardsAccumulated,
-  ITokenData,
-  IUserStakingData,
-  TokenType,
-} from '../interfaces/tokens';
+import { IReward, IRewardsAccumulated, ITokenData, TokenType } from '../interfaces/tokens';
 
 import Icon from '../components/Icon';
 import IconToken from '../components/IconToken';
@@ -39,6 +33,7 @@ import { getUserAssociatedTokens, mapWHBARAddress } from '../utils/tokenUtils';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
 import useTokensByListIds from '../hooks/useTokensByListIds';
 import useFarmByAddress from '../hooks/useFarmByAddress';
+import useUserFarmPosition from '../hooks/useUserFarmPosition';
 
 import getErrorMessage from '../content/errors';
 
@@ -46,9 +41,10 @@ import { restrictedFarms, useQueryOptions, useQueryOptionsPoolsFarms } from '../
 
 const FarmDetails = () => {
   const contextValue = useContext(GlobalContext);
-  const { connection, sdk, tokensWhitelisted } = contextValue;
+  const { connection, sdk, tokensWhitelisted, hbarPrice } = contextValue;
   const { userId, connectorInstance, isHashpackLoading, setShowConnectModal, connected } =
     connection;
+  console.log('userId', userId);
 
   const navigate = useNavigate();
   const { campaignAddress } = useParams();
@@ -67,6 +63,52 @@ const FarmDetails = () => {
     campaignAddress || '',
   );
 
+  // Fetch user position from contract when connected
+  const {
+    userPosition: contractUserPosition,
+    loading: loadingUserPosition,
+    refetch: refetchUserPosition,
+  } = useUserFarmPosition(
+    campaignAddress || '',
+    userId || '',
+    farmData.poolData,
+    pools,
+    hbarPrice,
+    farmData.rewardsData || [],
+    connected && !isHashpackLoading && !!campaignAddress && !!userId,
+  );
+
+  // Merge contract user position with static farm data
+  // Use contract data when available, fallback to static data
+  const mergedFarmData = useMemo(() => {
+    // If we have contract position data (even if it's empty/zero), use it
+    // Only fall back to static data if contract position is null (not fetched yet) and still loading
+    if (contractUserPosition !== null) {
+      // Contract data is available (even if stakedAmount is '0'), use it
+      return {
+        ...farmData,
+        userStakingData: contractUserPosition,
+      };
+    }
+
+    // If still loading and no contract data yet, show static data
+    // Once loading completes, contractUserPosition will be set (even if empty)
+    if (loadingUserPosition) {
+      return farmData;
+    }
+
+    // Loading completed but no contract position means user has no position
+    // Return farm data with empty position
+    return {
+      ...farmData,
+      userStakingData: {
+        stakedAmount: '0',
+        stakedAmountUSD: '0',
+        rewardsAccumulated: [],
+      },
+    };
+  }, [farmData, contractUserPosition, loadingUserPosition]);
+
   const [loadingHarvest, setLoadingHarvest] = useState(false);
   const [showHarvestModal, setShowHarvestModal] = useState(false);
 
@@ -74,8 +116,8 @@ const FarmDetails = () => {
   const [loadingAssociate, setLoadingAssociate] = useState(false);
 
   const userRewardsUSD = useMemo(() => {
-    if (Object.keys(farmData).length !== 0) {
-      const { userStakingData } = farmData;
+    if (Object.keys(mergedFarmData).length !== 0) {
+      const { userStakingData } = mergedFarmData;
 
       if (!userStakingData?.rewardsAccumulated) return '0';
 
@@ -83,27 +125,32 @@ const FarmDetails = () => {
         return (Number(acc) + Number(currentValue.totalAccumulatedUSD)).toString();
       }, '0');
     }
-  }, [farmData]);
+  }, [mergedFarmData]);
 
   const userShare = useMemo(() => {
-    const { totalStaked, userStakingData } = farmData;
+    const { totalStaked, userStakingData } = mergedFarmData;
 
     if (!userStakingData?.stakedAmount || !totalStaked || Number(totalStaked) === 0) return '0';
 
     return ((Number(userStakingData?.stakedAmount) / Number(totalStaked)) * 100).toString();
-  }, [farmData]);
+  }, [mergedFarmData]);
 
   // Handlers
   const handleHarvestConfirm = async () => {
     setLoadingHarvest(true);
     try {
-      const receipt = await sdk.collectRewards(connectorInstance, farmData.address, userId);
+      const receipt = await sdk.collectRewards(connectorInstance, mergedFarmData.address, userId);
       const {
         response: { success, error },
       } = receipt;
 
       if (success) {
         toast.success('Success! Rewards were harvested.');
+        // Refetch user position after successful harvest
+        // Wait a bit for the transaction to be processed
+        setTimeout(() => {
+          refetchUserPosition();
+        }, 2000);
       } else {
         toast.error(getErrorMessage(error.status ? error.status : error));
       }
@@ -158,22 +205,22 @@ const FarmDetails = () => {
   };
 
   const userRewardsAddresses =
-    farmData.userStakingData?.rewardsAccumulated &&
-    farmData.userStakingData?.rewardsAccumulated?.length > 0
-      ? farmData.userStakingData?.rewardsAccumulated.map(reward => reward.address)
+    mergedFarmData.userStakingData?.rewardsAccumulated &&
+    mergedFarmData.userStakingData?.rewardsAccumulated?.length > 0
+      ? mergedFarmData.userStakingData?.rewardsAccumulated.map(reward => reward.address)
       : [];
 
   // Get selected tokens to check for assosiations
   const { tokens: userRewardsData } = useTokensByListIds(userRewardsAddresses, useQueryOptions);
 
-  const hasUserStaked = farmData.userStakingData?.stakedAmount !== '0';
-  const hasUserProvided = farmData.poolData?.lpShares !== '0';
-  const campaignEnded = farmData.campaignEndDate < Date.now();
-  const haveFarm = Object.keys(farmData).length !== 0;
-  const campaignHasRewards = farmData.rewardsData?.length > 0;
+  const hasUserStaked = mergedFarmData.userStakingData?.stakedAmount !== '0';
+  const hasUserProvided = mergedFarmData.poolData?.lpShares !== '0';
+  const campaignEnded = mergedFarmData.campaignEndDate < Date.now();
+  const haveFarm = Object.keys(mergedFarmData).length !== 0;
+  const campaignHasRewards = mergedFarmData.rewardsData?.length > 0;
   const campaignHasActiveRewards = campaignHasRewards
-    ? Object.keys(farmData.rewardsData.find(reward => reward.rewardEnd > Date.now()) || {}).length >
-      0
+    ? Object.keys(mergedFarmData.rewardsData.find(reward => reward.rewardEnd > Date.now()) || {})
+        .length > 0
     : false;
 
   const tokensToAssociate = userRewardsData?.filter(token => !getTokenIsAssociated(token));
@@ -193,16 +240,20 @@ const FarmDetails = () => {
                 <div className="d-md-flex justify-content-between align-items-start">
                   <div className="d-flex align-items-center">
                     {formatIcons(
-                      [farmData.poolData?.token0Symbol, farmData.poolData?.token1Symbol],
+                      [
+                        mergedFarmData.poolData?.token0Symbol,
+                        mergedFarmData.poolData?.token1Symbol,
+                      ],
                       'large',
                     )}
                     <p className="text-subheader text-light ms-4">
-                      {farmData.poolData?.token0Symbol} / {farmData.poolData?.token1Symbol}
+                      {mergedFarmData.poolData?.token0Symbol} /{' '}
+                      {mergedFarmData.poolData?.token1Symbol}
                     </p>
                   </div>
 
                   <div className="container-campaign-status mt-4 mt-md-0 d-flex align-items-center">
-                    {renderCampaignEndDate(farmData.campaignEndDate)}
+                    {renderCampaignEndDate(mergedFarmData.campaignEndDate)}
                   </div>
                 </div>
 
@@ -220,7 +271,9 @@ const FarmDetails = () => {
                     </div>
                     <div className="col-6 col-md-4">
                       <p className="text-subheader text-numeric">
-                        {formatStringToPercentage(stripStringToFixedDecimals(farmData.APR, 2))}
+                        {formatStringToPercentage(
+                          stripStringToFixedDecimals(mergedFarmData.APR, 2),
+                        )}
                       </p>
                     </div>
                   </div>
@@ -239,7 +292,7 @@ const FarmDetails = () => {
                     <div className="col-6 col-md-4">
                       <p className="text-main text-numeric">
                         {formatStringToPrice(
-                          stripStringToFixedDecimals(farmData.totalStakedUSD, 2),
+                          stripStringToFixedDecimals(mergedFarmData.totalStakedUSD, 2),
                         )}
                       </p>
                     </div>
@@ -260,31 +313,35 @@ const FarmDetails = () => {
                     </div>
                     <div className="col-6 col-md-4 d-md-flex align-items-center">
                       {campaignHasRewards &&
-                        farmData.rewardsData?.reduce((acc: ReactNode[], reward: IReward, index) => {
-                          // When reward is enabled, but not sent -> do not show
-                          const haveRewardSendToCampaign =
-                            reward.totalAmount && Number(reward.totalAmount || reward) !== 0;
+                        mergedFarmData.rewardsData?.reduce(
+                          (acc: ReactNode[], reward: IReward, index) => {
+                            // When reward is enabled, but not sent -> do not show
+                            const haveRewardSendToCampaign =
+                              reward.totalAmount && Number(reward.totalAmount || reward) !== 0;
 
-                          const rewardActive = reward.rewardEnd > Date.now();
-                          // When all rewards are inactive -> show all, when at least one is active -> show only active
-                          const showReward =
-                            haveRewardSendToCampaign && (rewardActive || !campaignHasActiveRewards);
+                            const rewardActive = reward.rewardEnd > Date.now();
+                            // When all rewards are inactive -> show all, when at least one is active -> show only active
+                            const showReward =
+                              haveRewardSendToCampaign &&
+                              (rewardActive || !campaignHasActiveRewards);
 
-                          if (showReward) {
-                            const rewardSymbol = mapWHBARAddress(reward);
+                            if (showReward) {
+                              const rewardSymbol = mapWHBARAddress(reward);
 
-                            acc.push(
-                              <div
-                                key={index}
-                                className="d-flex align-items-center mt-3 mt-lg-0 me-4"
-                              >
-                                <IconToken symbol={reward.symbol} />{' '}
-                                <span className="text-main ms-3">{rewardSymbol}</span>
-                              </div>,
-                            );
-                          }
-                          return acc;
-                        }, [])}
+                              acc.push(
+                                <div
+                                  key={index}
+                                  className="d-flex align-items-center mt-3 mt-lg-0 me-4"
+                                >
+                                  <IconToken symbol={reward.symbol} />{' '}
+                                  <span className="text-main ms-3">{rewardSymbol}</span>
+                                </div>,
+                              );
+                            }
+                            return acc;
+                          },
+                          [],
+                        )}
                     </div>
                   </div>
 
@@ -292,64 +349,72 @@ const FarmDetails = () => {
                     <>
                       <hr className="my-5" />
 
-                      <div className="row mt-4">
-                        <div className="col-6 col-md-4 d-flex align-items-center">
-                          <p className="d-flex align-items-center">
-                            <span className="text-secondary text-small">Your share</span>
-                            <Tippy content="Your staked amount in this farm pool, expressed as a percentage.">
-                              <span className="ms-2">
-                                <Icon name="hint" color="gray" size="small" />
-                              </span>
-                            </Tippy>
-                          </p>
+                      {loadingUserPosition ? (
+                        <div className="d-flex justify-content-center my-5">
+                          <Loader />
                         </div>
-                        <div className="col-6 col-md-4 d-flex align-items-center">
-                          <p className="text-main">
-                            {stripStringToFixedDecimals(userShare || '0', 2)}%
-                          </p>
-                        </div>
-                      </div>
+                      ) : (
+                        <>
+                          <div className="row mt-4">
+                            <div className="col-6 col-md-4 d-flex align-items-center">
+                              <p className="d-flex align-items-center">
+                                <span className="text-secondary text-small">Your share</span>
+                                <Tippy content="Your staked amount in this farm pool, expressed as a percentage.">
+                                  <span className="ms-2">
+                                    <Icon name="hint" color="gray" size="small" />
+                                  </span>
+                                </Tippy>
+                              </p>
+                            </div>
+                            <div className="col-6 col-md-4 d-flex align-items-center">
+                              <p className="text-main">
+                                {stripStringToFixedDecimals(userShare || '0', 2)}%
+                              </p>
+                            </div>
+                          </div>
 
-                      <div className="row mt-4">
-                        <div className="col-6 col-md-4 d-flex align-items-center">
-                          <p className="d-flex align-items-center">
-                            <span className="text-secondary text-small">Staked LP Tokens</span>
-                            <Tippy content="The amount of your staked tokens in $USD, as well as staked tokens count.">
-                              <span className="ms-2">
-                                <Icon name="hint" color="gray" size="small" />
-                              </span>
-                            </Tippy>
-                          </p>
-                        </div>
-                        <div className="col-6 col-md-8 d-md-flex align-items-center">
-                          <p className="text-subheader text-numeric">
-                            {formatStringToPrice(
-                              stripStringToFixedDecimals(
-                                farmData.userStakingData?.stakedAmountUSD as string,
-                                2,
-                              ),
-                            )}
-                          </p>
-                          <p className="d-flex align-items-center ms-md-3 mt-2">
-                            <span className="text-secondary text-main">
-                              {formatStringETHtoPriceFormatted(
-                                formatStringWeiToStringEther(
-                                  farmData.userStakingData?.stakedAmount || '0',
-                                ),
-                              )}
-                            </span>
+                          <div className="row mt-4">
+                            <div className="col-6 col-md-4 d-flex align-items-center">
+                              <p className="d-flex align-items-center">
+                                <span className="text-secondary text-small">Staked LP Tokens</span>
+                                <Tippy content="The amount of your staked tokens in $USD, as well as staked tokens count.">
+                                  <span className="ms-2">
+                                    <Icon name="hint" color="gray" size="small" />
+                                  </span>
+                                </Tippy>
+                              </p>
+                            </div>
+                            <div className="col-6 col-md-8 d-md-flex align-items-center">
+                              <p className="text-subheader text-numeric">
+                                {formatStringToPrice(
+                                  stripStringToFixedDecimals(
+                                    mergedFarmData.userStakingData?.stakedAmountUSD as string,
+                                    2,
+                                  ),
+                                )}
+                              </p>
+                              <p className="d-flex align-items-center ms-md-3 mt-2">
+                                <span className="text-secondary text-main">
+                                  {formatStringETHtoPriceFormatted(
+                                    formatStringWeiToStringEther(
+                                      mergedFarmData.userStakingData?.stakedAmount || '0',
+                                    ),
+                                  )}
+                                </span>
 
-                            <IconToken className="ms-3" symbol="LP" />
-                          </p>
-                        </div>
-                      </div>
+                                <IconToken className="ms-3" symbol="LP" />
+                              </p>
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </>
                   ) : null}
                 </div>
 
                 <div className="container-blue-neutral rounded p-4 p-lg-5 mt-4 mt-lg-5">
                   {connected && !isHashpackLoading ? (
-                    hasUserStaked && !restrictedFarms.includes(farmData.address) ? (
+                    hasUserStaked && !restrictedFarms.includes(mergedFarmData.address) ? (
                       <>
                         <div className="d-flex justify-content-between align-items-start">
                           <div className="d-flex align-items-center">
@@ -398,40 +463,45 @@ const FarmDetails = () => {
 
                           <div className="mt-4">
                             {campaignHasRewards &&
-                              farmData.rewardsData?.reduce((acc: ReactNode[], reward: IReward) => {
-                                const userRewardData =
-                                  farmData.userStakingData?.rewardsAccumulated?.find(
-                                    (rewardSingle: IUserStakingData) => {
-                                      return rewardSingle.address === reward.address;
-                                    },
-                                  ) || ({} as IUserStakingData);
+                              mergedFarmData.rewardsData?.reduce(
+                                (acc: ReactNode[], reward: IReward) => {
+                                  const userRewardData =
+                                    mergedFarmData.userStakingData?.rewardsAccumulated?.find(
+                                      (rewardSingle: IRewardsAccumulated) => {
+                                        return rewardSingle.address === reward.address;
+                                      },
+                                    ) || ({} as IRewardsAccumulated);
 
-                                const userRewardAccumulated = userRewardData.totalAccumulated > 0;
+                                  const userRewardAccumulated =
+                                    userRewardData?.totalAccumulated &&
+                                    Number(userRewardData.totalAccumulated) > 0;
 
-                                if (userRewardAccumulated) {
-                                  const rewardDecimals = reward.decimals;
-                                  const rewardSymbol = mapWHBARAddress(reward);
+                                  if (userRewardAccumulated) {
+                                    const rewardDecimals = reward.decimals;
+                                    const rewardSymbol = mapWHBARAddress(reward);
 
-                                  acc.push(
-                                    <p
-                                      key={rewardSymbol}
-                                      className="text-main d-flex justify-content-between align-items-center mt-4"
-                                    >
-                                      <span className="d-flex align-items-center text-secondary">
-                                        <IconToken symbol={rewardSymbol} />
-                                        <span className="ms-3">{rewardSymbol}</span>
-                                      </span>
-                                      <span className="text-numeric ms-3">
-                                        {formatStringWeiToStringEther(
-                                          userRewardData.totalAccumulated || '0',
-                                          rewardDecimals,
-                                        )}
-                                      </span>
-                                    </p>,
-                                  );
-                                }
-                                return acc;
-                              }, [])}
+                                    acc.push(
+                                      <p
+                                        key={rewardSymbol}
+                                        className="text-main d-flex justify-content-between align-items-center mt-4"
+                                      >
+                                        <span className="d-flex align-items-center text-secondary">
+                                          <IconToken symbol={rewardSymbol} />
+                                          <span className="ms-3">{rewardSymbol}</span>
+                                        </span>
+                                        <span className="text-numeric ms-3">
+                                          {formatStringWeiToStringEther(
+                                            userRewardData.totalAccumulated || '0',
+                                            rewardDecimals,
+                                          )}
+                                        </span>
+                                      </p>,
+                                    );
+                                  }
+                                  return acc;
+                                },
+                                [],
+                              )}
                           </div>
                         </div>
 
@@ -452,9 +522,9 @@ const FarmDetails = () => {
                               ) : (
                                 <>
                                   <div className="text-small">Estimated pending rewards:</div>
-                                  {farmData.rewardsData?.map((reward: IReward) => {
+                                  {mergedFarmData.rewardsData?.map((reward: IReward) => {
                                     const userReward =
-                                      farmData.userStakingData?.rewardsAccumulated?.find(
+                                      mergedFarmData.userStakingData?.rewardsAccumulated?.find(
                                         (currReward: IRewardsAccumulated) =>
                                           currReward.address === reward.address,
                                       );
@@ -514,7 +584,7 @@ const FarmDetails = () => {
               campaignEnded={campaignEnded}
               hasUserStaked={hasUserStaked}
               hasUserProvided={hasUserProvided}
-              farmData={farmData}
+              farmData={mergedFarmData}
               loadingAssociate={loadingAssociate}
               tokensToAssociate={tokensToAssociate || []}
               handleAssociateClick={handleAssociateClick}

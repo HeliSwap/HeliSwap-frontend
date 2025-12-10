@@ -1,0 +1,3773 @@
+[
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x0000000000000000000000000000000000143715",
+    "totalStaked": "65235559938801",
+    "stakingTokenAddress": "0x581f8294B4A0779d723bb4e289a1f4Ee4C196B6a",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1680694488000,
+        "totalAmount": "57099826560",
+        "duration": 773040,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1680694550000,
+        "totalAmount": "357099643680",
+        "duration": 773040,
+        "totalAmountUSD": "0.1790630770850103",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "HST WHBAR",
+      "pairAddress": "0x581f8294B4A0779d723bb4e289a1f4Ee4C196B6a",
+      "pairName": "HeadStarter Wrapped Hbar LP",
+      "pairSupply": "65315961067087",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000000Ec585",
+      "token0Amount": "346786892070141",
+      "token0Decimals": 8,
+      "token0Symbol": "HST",
+      "token1": "0x00000000000000000000000000000000000F7e89",
+      "token1Amount": "12807220262008",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "47845.63334130456",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1680694550000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x0000000000000000000000000000000000143706",
+    "totalStaked": "14318436145",
+    "stakingTokenAddress": "0x442AF81EaAD6C27D4c7e029C935603bAE96c66E8",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685362114000,
+        "totalAmount": "1028599757680",
+        "duration": 950392,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685362182000,
+        "totalAmount": "5142899947632",
+        "duration": 950392,
+        "totalAmountUSD": "2.578841805254092",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "USDC WHBAR",
+      "pairAddress": "0x442AF81EaAD6C27D4c7e029C935603bAE96c66E8",
+      "pairName": "USD Coin Wrapped Hbar LP",
+      "pairSupply": "18894484038",
+      "lpShares": "0",
+      "token0": "0x000000000000000000000000000000000006f89a",
+      "token0Amount": "934215993",
+      "token0Decimals": 6,
+      "token0Symbol": "USDC",
+      "token1": "0x00000000000000000000000000000000000F7e89",
+      "token1Amount": "510198672098",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "1421.131922101558",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1685362182000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000001e7033",
+    "totalStaked": "0",
+    "stakingTokenAddress": "0x9D87DfFB6b4c9D01F9545b49642ff6b0bBBFc3A4",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1680700614000,
+        "totalAmount": "7099599360",
+        "duration": 773040,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1680700776000,
+        "totalAmount": "42799359600",
+        "duration": 773040,
+        "totalAmountUSD": "0.021461194831410856",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "WHBAR SOF",
+      "pairAddress": "0x9D87DfFB6b4c9D01F9545b49642ff6b0bBBFc3A4",
+      "pairName": "Wrapped Hbar SOF LP",
+      "pairSupply": "3874516549",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000000F7e89",
+      "token0Amount": "12261223738",
+      "token0Decimals": 8,
+      "token0Symbol": "HBAR",
+      "token1": "0x000000000000000000000000000000000012E088",
+      "token1Amount": "1254367352",
+      "token1Decimals": 7,
+      "token1Symbol": "SOF"
+    },
+    "totalStakedUSD": "0",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1680700776000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002cd001",
+    "totalStaked": "9497487",
+    "stakingTokenAddress": "0xf4D8e05ce43BEC2179A7bdc1313DC56B16Edd96A",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1724158368000,
+        "totalAmount": "2899332240",
+        "duration": 8812560,
+        "totalAmountUSD": "5.3415654234823995",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1745414364000,
+        "totalAmount": "1399992249600",
+        "duration": 8467200,
+        "totalAmountUSD": "0.7020083176929305",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "USDC USDC[hts]",
+      "pairAddress": "0xf4D8e05ce43BEC2179A7bdc1313DC56B16Edd96A",
+      "pairName": "USD Coin USD Coin LP",
+      "pairSupply": "63936074",
+      "lpShares": "0",
+      "token0": "0x000000000000000000000000000000000006f89a",
+      "token0Amount": "69051760",
+      "token0Decimals": 6,
+      "token0Symbol": "USDC",
+      "token1": "0x0000000000000000000000000000000000101Ae3",
+      "token1Amount": "70132148",
+      "token1Decimals": 6,
+      "token1Symbol": "USDC[hts]"
+    },
+    "totalStakedUSD": "12.293868579048674",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1745414364000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x0000000000000000000000000000000000143717",
+    "totalStaked": "2779399057",
+    "stakingTokenAddress": "0x6b15d05f55a60341D738250F78774cB395EcF05A",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685362730000,
+        "totalAmount": "514299878840",
+        "duration": 950392,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685362794000,
+        "totalAmount": "5657099084920",
+        "duration": 950392,
+        "totalAmountUSD": "2.8366804264534884",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "USDC HBARX",
+      "pairAddress": "0x6b15d05f55a60341D738250F78774cB395EcF05A",
+      "pairName": "USD Coin HBARX LP",
+      "pairSupply": "42719902011",
+      "lpShares": "0",
+      "token0": "0x000000000000000000000000000000000006f89a",
+      "token0Amount": "2376854997",
+      "token0Decimals": 6,
+      "token0Symbol": "USDC",
+      "token1": "0x00000000000000000000000000000000000cbA44",
+      "token1Amount": "953911442007",
+      "token1Decimals": 8,
+      "token1Symbol": "HBARX"
+    },
+    "totalStakedUSD": "310.3644697885929",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1685362794000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000001E4E4F",
+    "totalStaked": "9819407253116",
+    "stakingTokenAddress": "0x3904ad0E5c86c9C3Ac452cD61afE1776BF92Cecd",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685361148000,
+        "totalAmount": "59999999482848",
+        "duration": 950392,
+        "totalAmountUSD": "30.086237056358932",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x0000000000000000000000000000000000107d76",
+        "symbol": "OM[hts]",
+        "decimals": 8,
+        "rewardEnd": 1685361076000,
+        "totalAmount": "1474299391568",
+        "duration": 950392,
+        "totalAmountUSD": "1590.092689503407",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685360864000,
+        "totalAmount": "5999999568128",
+        "duration": 950392,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "WHBAR HELI",
+      "pairAddress": "0x3904ad0E5c86c9C3Ac452cD61afE1776BF92Cecd",
+      "pairName": "Wrapped Hbar HeliSwap LP",
+      "pairSupply": "69445859985239",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000000F7e89",
+      "token0Amount": "1187635481359",
+      "token0Decimals": 8,
+      "token0Symbol": "HBAR",
+      "token1": "0x00000000000000000000000000000000001d90C9",
+      "token1Amount": "4363878653024550",
+      "token1Decimals": 8,
+      "token1Symbol": "HELI"
+    },
+    "totalStakedUSD": "618.811248877973",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1685361148000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000001EDba3",
+    "totalStaked": "15154941045",
+    "stakingTokenAddress": "0xEc9396Fd1019a6644534Ce7905183F495bC86baf",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685361628000,
+        "totalAmount": "2571399603040",
+        "duration": 950392,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685361850000,
+        "totalAmount": "47999999396200",
+        "duration": 950392,
+        "totalAmountUSD": "24.068989549774752",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x0000000000000000000000000000000000107d76",
+        "symbol": "OM[hts]",
+        "decimals": 8,
+        "rewardEnd": 1688041173000,
+        "totalAmount": "2657099360094",
+        "duration": 2665239,
+        "totalAmountUSD": "2865.791230691678",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "USDC HELI",
+      "pairAddress": "0xEc9396Fd1019a6644534Ce7905183F495bC86baf",
+      "pairName": "USD Coin HeliSwap LP",
+      "pairSupply": "794433519936",
+      "lpShares": "0",
+      "token0": "0x000000000000000000000000000000000006f89a",
+      "token0Amount": "627349266",
+      "token0Decimals": 6,
+      "token0Symbol": "USDC",
+      "token1": "0x00000000000000000000000000000000001d90C9",
+      "token1Amount": "1250984315330675",
+      "token1Decimals": 8,
+      "token1Symbol": "HELI"
+    },
+    "totalStakedUSD": "23.97809500521564",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1688041173000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x078e1f8e895B9A9d9c06dfD76AD228212e86e595",
+    "totalStaked": "70311594632716",
+    "stakingTokenAddress": "0xDEFc06E8433FB7b308c81ff1814f138c3835a19B",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1761135272000,
+        "totalAmount": "25999993736400",
+        "duration": 15721080,
+        "totalAmountUSD": "13.037366362657966",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1724160464000,
+        "totalAmount": "291396108960",
+        "duration": 8812560,
+        "totalAmountUSD": "536.8516787017295",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x0000000000000000000000000000000000455D51",
+        "symbol": "HD",
+        "decimals": 6,
+        "rewardEnd": 1712753468000,
+        "totalAmount": "16499999998661112",
+        "duration": 1831188,
+        "totalAmountUSD": "439.1107567112262",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "WHBAR HD",
+      "pairAddress": "0xDEFc06E8433FB7b308c81ff1814f138c3835a19B",
+      "pairName": "Wrapped Hbar HELI Doge LP",
+      "pairSupply": "82048538021554",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000002cc823",
+      "token0Amount": "320140002645",
+      "token0Decimals": 8,
+      "token0Symbol": "HBAR",
+      "token1": "0x0000000000000000000000000000000000455D51",
+      "token1Amount": "22162583229804037",
+      "token1Decimals": 6,
+      "token1Symbol": "HD"
+    },
+    "totalStakedUSD": "1010.8730250925468",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1761135272000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x000000000000000000000000000000000031194c",
+    "totalStaked": "222424915902",
+    "stakingTokenAddress": "0xa04E1D7B414745eA5777b76e3712d229Be33492C",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x0000000000000000000000000000000000101Ae3",
+        "symbol": "USDC[hts]",
+        "decimals": 6,
+        "rewardEnd": 1695985367000,
+        "totalAmount": "99170027",
+        "duration": 2680271,
+        "totalAmountUSD": "19.02589743748883",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1692952587000,
+        "totalAmount": "1971057327750",
+        "duration": 2678977,
+        "totalAmountUSD": "0.9883616420915512",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1692952465000,
+        "totalAmount": "341323101616",
+        "duration": 2678977,
+        "totalAmountUSD": "628.8343407748933",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002A30A8",
+        "symbol": "SUS.h",
+        "decimals": 6,
+        "rewardEnd": 1695985277000,
+        "totalAmount": "14999999957679",
+        "duration": 2680271,
+        "totalAmountUSD": "36.71729960522671",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "SUS.h WHBAR",
+      "pairAddress": "0xa04E1D7B414745eA5777b76e3712d229Be33492C",
+      "pairName": "SUS Token Wrapped Hbar LP",
+      "pairSupply": "227473714100",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000002A30A8",
+      "token0Amount": "6904379244319",
+      "token0Decimals": 6,
+      "token0Symbol": "SUS.h",
+      "token1": "0x00000000000000000000000000000000002cc823",
+      "token1Amount": "9173467921",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "33.05113102263787",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1695985367000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002Cd37F",
+    "totalStaked": "0",
+    "stakingTokenAddress": "0x1c78852bCb1d8340BAeA7cC22729C38E646682b3",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1745414856000,
+        "totalAmount": "699991891200",
+        "duration": 8467200,
+        "totalAmountUSD": "0.35100203596156027",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1724159590000,
+        "totalAmount": "2899332240",
+        "duration": 8812560,
+        "totalAmountUSD": "5.3415654234823995",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "HASHTREE WHBAR",
+      "pairAddress": "0x1c78852bCb1d8340BAeA7cC22729C38E646682b3",
+      "pairName": "HASHTREE Wrapped Hbar LP",
+      "pairSupply": "1000",
+      "lpShares": "0",
+      "token0": "0x0000000000000000000000000000000000163748",
+      "token0Amount": "1",
+      "token0Decimals": 0,
+      "token0Symbol": "HASHTREE",
+      "token1": "0x00000000000000000000000000000000002cc823",
+      "token1Amount": "609719557",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "0",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1745414856000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x0000000000000000000000000000000000143702",
+    "totalStaked": "6231477213860",
+    "stakingTokenAddress": "0xD18f1922CFFA8f4BBc47793A6D198120447AD8E4",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685361950000,
+        "totalAmount": "514299878840",
+        "duration": 950392,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685362002000,
+        "totalAmount": "5142899947632",
+        "duration": 950392,
+        "totalAmountUSD": "2.578841805254092",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "HBARX WHBAR",
+      "pairAddress": "0xD18f1922CFFA8f4BBc47793A6D198120447AD8E4",
+      "pairName": "HBARX Wrapped Hbar LP",
+      "pairSupply": "6874576030689",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000000cbA44",
+      "token0Amount": "5961197722677",
+      "token0Decimals": 8,
+      "token0Symbol": "HBARX",
+      "token1": "0x00000000000000000000000000000000000F7e89",
+      "token1Amount": "8086786847961",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "27017.427301060583",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1685362002000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002CD36a",
+    "totalStaked": "28004361343",
+    "stakingTokenAddress": "0xC660D5e7951c0926270e231Ca9d28eF3203c2317",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1745414602000,
+        "totalAmount": "139996684800",
+        "duration": 8467200,
+        "totalAmountUSD": "0.07019955803835005",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1724155682000,
+        "totalAmount": "396565200",
+        "duration": 8812560,
+        "totalAmountUSD": "0.7306092524519999",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "JAM WHBAR",
+      "pairAddress": "0xC660D5e7951c0926270e231Ca9d28eF3203c2317",
+      "pairName": "JAM Wrapped Hbar LP",
+      "pairSupply": "823102036911",
+      "lpShares": "0",
+      "token0": "0x000000000000000000000000000000000001f385",
+      "token0Amount": "45244265887586",
+      "token0Decimals": 8,
+      "token0Symbol": "JAM",
+      "token1": "0x00000000000000000000000000000000002cc823",
+      "token1Amount": "22187074660",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "2.781458624189255",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1745414602000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002e3503",
+    "totalStaked": "39238352004",
+    "stakingTokenAddress": "0xB6098F15C0537dD69A017FB907332eBEd6b69B45",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1745415048000,
+        "totalAmount": "139996684800",
+        "duration": 8467200,
+        "totalAmountUSD": "0.07019955803835005",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x000000000000000000000000000000000022D6de",
+        "symbol": "KARATE",
+        "decimals": 8,
+        "rewardEnd": 1689333270000,
+        "totalAmount": "39999998209824",
+        "duration": 1813264,
+        "totalAmountUSD": "30.10930633772233",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1724159376000,
+        "totalAmount": "396565200",
+        "duration": 8812560,
+        "totalAmountUSD": "0.7306092524519999",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "KARATE WHBAR",
+      "pairAddress": "0xB6098F15C0537dD69A017FB907332eBEd6b69B45",
+      "pairName": "Karate Wrapped Hbar LP",
+      "pairSupply": "39238353004",
+      "lpShares": "0",
+      "token0": "0x000000000000000000000000000000000022D6de",
+      "token0Amount": "33609858431860",
+      "token0Decimals": 8,
+      "token0Symbol": "KARATE",
+      "token1": "0x00000000000000000000000000000000002cc823",
+      "token1Amount": "13732098009",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "50.59847714960631",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1745415048000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002CD020",
+    "totalStaked": "738672614519",
+    "stakingTokenAddress": "0x58B9c4815f8F3D46928E1765BD2b024b82A9c77e",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1728475994000,
+        "totalAmount": "10697526000",
+        "duration": 4317000,
+        "totalAmountUSD": "19.70851570926",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1761135398000,
+        "totalAmount": "12999996868200",
+        "duration": 15721080,
+        "totalAmountUSD": "6.518683181328983",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x0000000000000000000000000000000000107d76",
+        "symbol": "OM[hts]",
+        "decimals": 8,
+        "rewardEnd": 1694522676000,
+        "totalAmount": "399999600000",
+        "duration": 604800,
+        "totalAmountUSD": "431.41606338711614",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "OM[hts] HELI",
+      "pairAddress": "0x58B9c4815f8F3D46928E1765BD2b024b82A9c77e",
+      "pairName": "MANTRA HeliSwap LP",
+      "pairSupply": "1471814899314",
+      "lpShares": "0",
+      "token0": "0x0000000000000000000000000000000000107d76",
+      "token0Amount": "36215893613",
+      "token0Decimals": 8,
+      "token0Symbol": "OM[hts]",
+      "token1": "0x00000000000000000000000000000000001d90C9",
+      "token1Amount": "74930232699703",
+      "token1Decimals": 8,
+      "token1Symbol": "HELI"
+    },
+    "totalStakedUSD": "38.46054784917536",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1761135398000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002dd71C",
+    "totalStaked": "5528372697869",
+    "stakingTokenAddress": "0x4C9AF28Ae82C01464f2B41124DcB310C1ccD6254",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1745414986000,
+        "totalAmount": "139996684800",
+        "duration": 8467200,
+        "totalAmountUSD": "0.07019955803835005",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1724159008000,
+        "totalAmount": "299627040",
+        "duration": 8812560,
+        "totalAmountUSD": "0.5520158796303999",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "WHBAR PEPE[hts]",
+      "pairAddress": "0x4C9AF28Ae82C01464f2B41124DcB310C1ccD6254",
+      "pairName": "Wrapped Hbar Pepe LP",
+      "pairSupply": "5528372698869",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000002cc823",
+      "token0Amount": "39864853213",
+      "token0Decimals": 8,
+      "token0Symbol": "HBAR",
+      "token1": "0x00000000000000000000000000000000002D4720",
+      "token1Amount": "808878335007678",
+      "token1Decimals": 8,
+      "token1Symbol": "PEPE[hts]"
+    },
+    "totalStakedUSD": "146.88949307599475",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1745414986000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002Cd361",
+    "totalStaked": "0",
+    "stakingTokenAddress": "0x23A94E80f5390A66e6A6E14b3041F25811f91b31",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1695122428000,
+        "totalAmount": "69999552000",
+        "duration": 604800,
+        "totalAmountUSD": "0.03510038555771932",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1695122378000,
+        "totalAmount": "799545600",
+        "duration": 604800,
+        "totalAmountUSD": "1.4730375058559997",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "DOV[hts] WHBAR",
+      "pairAddress": "0x23A94E80f5390A66e6A6E14b3041F25811f91b31",
+      "pairName": "DOVU Wrapped Hbar LP",
+      "pairSupply": "491014311141",
+      "lpShares": "0",
+      "token0": "0x0000000000000000000000000000000000098779",
+      "token0Amount": "38786888918307",
+      "token0Decimals": 8,
+      "token0Symbol": "DOV[hts]",
+      "token1": "0x00000000000000000000000000000000002cc823",
+      "token1Amount": "12531000068",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "0",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1695122428000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002Cd384",
+    "totalStaked": "0",
+    "stakingTokenAddress": "0x760CC855E7d2BE294f8A4270d989987c655C54b1",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1708517488000,
+        "totalAmount": "39999594960",
+        "duration": 604260,
+        "totalAmountUSD": "0.020057288441626117",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1707913158000,
+        "totalAmount": "99515520",
+        "duration": 691080,
+        "totalAmountUSD": "0.1833417548352",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "SOF WHBAR",
+      "pairAddress": "0x760CC855E7d2BE294f8A4270d989987c655C54b1",
+      "pairName": "SOF Wrapped Hbar LP",
+      "pairSupply": "1000",
+      "lpShares": "0",
+      "token0": "0x000000000000000000000000000000000012E088",
+      "token0Amount": "271",
+      "token0Decimals": 7,
+      "token0Symbol": "SOF",
+      "token1": "0x00000000000000000000000000000000002cc823",
+      "token1Amount": "3701",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "0",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1708517488000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x000000000000000000000000000000000014371f",
+    "totalStaked": "0",
+    "stakingTokenAddress": "0x8164516Ca825293c46E5EEFE3Cff44B38B9227ab",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1680696620000,
+        "totalAmount": "499999952880",
+        "duration": 773040,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1680696686000,
+        "totalAmount": "2142799625520",
+        "duration": 773040,
+        "totalAmountUSD": "1.0744796342223528",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "WETH[hts] WHBAR",
+      "pairAddress": "0x8164516Ca825293c46E5EEFE3Cff44B38B9227ab",
+      "pairName": "Wrapped Ether[hts] Wrapped Hbar LP",
+      "pairSupply": "2131969",
+      "lpShares": "0",
+      "token0": "0x000000000000000000000000000000000008437c",
+      "token0Amount": "15271",
+      "token0Decimals": 8,
+      "token0Symbol": "WETH[hts]",
+      "token1": "0x00000000000000000000000000000000000F7e89",
+      "token1Amount": "307360963",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "0",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1680696686000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002Cd388",
+    "totalStaked": "84624510",
+    "stakingTokenAddress": "0xea8f005c7F2E19dA7DC583757b128E41eED35E0C",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1745414922000,
+        "totalAmount": "13996281600",
+        "duration": 8467200,
+        "totalAmountUSD": "0.007018257495911011",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1724156108000,
+        "totalAmount": "96938160",
+        "duration": 8812560,
+        "totalAmountUSD": "0.17859337282159995",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "KHK WHBAR",
+      "pairAddress": "0xea8f005c7F2E19dA7DC583757b128E41eED35E0C",
+      "pairName": "KHK Wrapped Hbar LP",
+      "pairSupply": "389606980",
+      "lpShares": "0",
+      "token0": "0x000000000000000000000000000000000011219e",
+      "token0Amount": "3044702",
+      "token0Decimals": 0,
+      "token0Symbol": "KHK",
+      "token1": "0x00000000000000000000000000000000002cc823",
+      "token1Amount": "59778536377",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "47.842655652848315",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1745414922000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002Cd365",
+    "totalStaked": "6542303",
+    "stakingTokenAddress": "0x8A55D80453795CcbEE2d3f3b1a63EF62b46A785C",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1745414538000,
+        "totalAmount": "62995968000",
+        "duration": 8467200,
+        "totalAmountUSD": "0.031588527386314534",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1724156612000,
+        "totalAmount": "193876320",
+        "duration": 8812560,
+        "totalAmountUSD": "0.3571867456431999",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "CREAM WHBAR",
+      "pairAddress": "0x8A55D80453795CcbEE2d3f3b1a63EF62b46A785C",
+      "pairName": "CREAM Wrapped Hbar LP",
+      "pairSupply": "1568520544",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000000E22B1",
+      "token0Amount": "11047558",
+      "token0Decimals": 0,
+      "token0Symbol": "CREAM",
+      "token1": "0x00000000000000000000000000000000002cc823",
+      "token1Amount": "236425908990",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "3.6335912671150545",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1745414538000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x000000000000000000000000000000000014371e",
+    "totalStaked": "52540086",
+    "stakingTokenAddress": "0xf4D8e05ce43BEC2179A7bdc1313DC56B16Edd96A",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685363196000,
+        "totalAmount": "857099620496",
+        "duration": 950392,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685363264000,
+        "totalAmount": "2571399603040",
+        "duration": 950392,
+        "totalAmountUSD": "1.289395644841704",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "USDC USDC[hts]",
+      "pairAddress": "0xf4D8e05ce43BEC2179A7bdc1313DC56B16Edd96A",
+      "pairName": "USD Coin USD Coin LP",
+      "pairSupply": "63936074",
+      "lpShares": "0",
+      "token0": "0x000000000000000000000000000000000006f89a",
+      "token0Amount": "69051760",
+      "token0Decimals": 6,
+      "token0Symbol": "USDC",
+      "token1": "0x0000000000000000000000000000000000101Ae3",
+      "token1Amount": "70132148",
+      "token1Decimals": 6,
+      "token1Symbol": "USDC[hts]"
+    },
+    "totalStakedUSD": "68.00966533735873",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1685363264000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002CD35b",
+    "totalStaked": "161919005627",
+    "stakingTokenAddress": "0xC34800C63DB3dd6655783E49CaDEcf32d7F94E7a",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1745414236000,
+        "totalAmount": "559995206400",
+        "duration": 8467200,
+        "totalAmountUSD": "0.2808024779232102",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1724155352000,
+        "totalAmount": "599254080",
+        "duration": 8812560,
+        "totalAmountUSD": "1.1040317592607998",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "HST WHBAR",
+      "pairAddress": "0xC34800C63DB3dd6655783E49CaDEcf32d7F94E7a",
+      "pairName": "HeadStarter Wrapped Hbar LP",
+      "pairSupply": "164308655635",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000000Ec585",
+      "token0Amount": "866945759871",
+      "token0Decimals": 8,
+      "token0Symbol": "HST",
+      "token1": "0x00000000000000000000000000000000002cc823",
+      "token1Amount": "32501688625",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "118.01681067899857",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1745414236000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x0000000000000000000000000000000000143719",
+    "totalStaked": "2946497726506",
+    "stakingTokenAddress": "0xB62DC6E5f021Dc2E1Acc61F9fdd66b768F59622e",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685364384000,
+        "totalAmount": "308599401028",
+        "duration": 950212,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x0000000000000000000000000000000000107d76",
+        "symbol": "OM[hts]",
+        "decimals": 8,
+        "rewardEnd": 1685364542000,
+        "totalAmount": "1474299528176",
+        "duration": 950212,
+        "totalAmountUSD": "1590.0928368407685",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685364468000,
+        "totalAmount": "3085699444560",
+        "duration": 950212,
+        "totalAmountUSD": "1.5472847628981445",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "WHBAR OM[hts]",
+      "pairAddress": "0xB62DC6E5f021Dc2E1Acc61F9fdd66b768F59622e",
+      "pairName": "Wrapped Hbar MANTRA LP",
+      "pairSupply": "3279602653065",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000000F7e89",
+      "token0Amount": "2772988707170",
+      "token0Decimals": 8,
+      "token0Symbol": "HBAR",
+      "token1": "0x0000000000000000000000000000000000107d76",
+      "token1Amount": "4752823531793",
+      "token1Decimals": 8,
+      "token1Symbol": "OM[hts]"
+    },
+    "totalStakedUSD": "9210.926592173653",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1685364542000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002CD36F",
+    "totalStaked": "0",
+    "stakingTokenAddress": "0xCa833cd33bc9f4a92171DD70B4f32086cDf08e54",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1709102184000,
+        "totalAmount": "6999976980",
+        "duration": 584940,
+        "totalAmountUSD": "0.003510049477076077",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1705407189000,
+        "totalAmount": "99687645",
+        "duration": 687501,
+        "totalAmountUSD": "0.18365886818144997",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "QUACK WHBAR",
+      "pairAddress": "0xCa833cd33bc9f4a92171DD70B4f32086cDf08e54",
+      "pairName": "QUACK Wrapped Hbar LP",
+      "pairSupply": "1000",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000001139fd",
+      "token0Amount": "3",
+      "token0Decimals": 0,
+      "token0Symbol": "QUACK",
+      "token1": "0x00000000000000000000000000000000002cc823",
+      "token1Amount": "566669",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "0",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1709102184000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x000000000000000000000000000000000020210A",
+    "totalStaked": "4791405696",
+    "stakingTokenAddress": "0x0aA81a482DA9A402063B5E48066620f7F46ea171",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685359932000,
+        "totalAmount": "25699550072",
+        "duration": 950392,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685359986000,
+        "totalAmount": "119999345096",
+        "duration": 950392,
+        "totalAmountUSD": "0.06017214623807041",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "SOF HELI",
+      "pairAddress": "0x0aA81a482DA9A402063B5E48066620f7F46ea171",
+      "pairName": "SOF HeliSwap LP",
+      "pairSupply": "4857369494",
+      "lpShares": "0",
+      "token0": "0x000000000000000000000000000000000012E088",
+      "token0Amount": "27265871",
+      "token0Decimals": 7,
+      "token0Symbol": "SOF",
+      "token1": "0x00000000000000000000000000000000001d90C9",
+      "token1Amount": "886573270160",
+      "token1Decimals": 8,
+      "token1Symbol": "HELI"
+    },
+    "totalStakedUSD": "1.115232052486404",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1685359986000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x0000000000000000000000000000000000143725",
+    "totalStaked": "5465365080",
+    "stakingTokenAddress": "0x8CB5bE7CCda89b4f1b2014a0b75D9cdf31c94E4b",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1680697156000,
+        "totalAmount": "71399520480",
+        "duration": 773040,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1680697218000,
+        "totalAmount": "214199334480",
+        "duration": 773040,
+        "totalAmountUSD": "0.10740753350042699",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "HBARX CLXY",
+      "pairAddress": "0x8CB5bE7CCda89b4f1b2014a0b75D9cdf31c94E4b",
+      "pairName": "HBARX Calaxy Tokens LP",
+      "pairSupply": "7865590944",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000000cbA44",
+      "token0Amount": "9220999337",
+      "token0Decimals": 8,
+      "token0Symbol": "HBARX",
+      "token1": "0x00000000000000000000000000000000000D1ea6",
+      "token1Amount": "7853709341",
+      "token1Decimals": 6,
+      "token1Symbol": "CLXY"
+    },
+    "totalStakedUSD": "48.402495411078476",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1680697218000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002020Fc",
+    "totalStaked": "13371809",
+    "stakingTokenAddress": "0x5c93f5Dbb67da372CC1790cfd450Ad9D083BF166",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685358882000,
+        "totalAmount": "85699697816",
+        "duration": 950392,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685358948000,
+        "totalAmount": "1971399075992",
+        "duration": 950392,
+        "totalAmountUSD": "0.9885330074034017",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "CREAM HELI",
+      "pairAddress": "0x5c93f5Dbb67da372CC1790cfd450Ad9D083BF166",
+      "pairName": "CREAM HeliSwap LP",
+      "pairSupply": "13372809",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000000E22B1",
+      "token0Amount": "2390",
+      "token0Decimals": 0,
+      "token0Symbol": "CREAM",
+      "token1": "0x00000000000000000000000000000000001d90C9",
+      "token1Amount": "76768341591",
+      "token1Decimals": 8,
+      "token1Symbol": "HELI"
+    },
+    "totalStakedUSD": "0.13271633151752246",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1685358948000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002CD379",
+    "totalStaked": "14210624",
+    "stakingTokenAddress": "0x087e68bc9CEc7E329a81997ccED3ef6121b7A67a",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1745414788000,
+        "totalAmount": "69998342400",
+        "duration": 8467200,
+        "totalAmountUSD": "0.03509977901917503",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1724155962000,
+        "totalAmount": "96938160",
+        "duration": 8812560,
+        "totalAmountUSD": "0.17859337282159995",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "LIL WHBAR",
+      "pairAddress": "0x087e68bc9CEc7E329a81997ccED3ef6121b7A67a",
+      "pairName": "LIL Wrapped Hbar LP",
+      "pairSupply": "194853082",
+      "lpShares": "0",
+      "token0": "0x0000000000000000000000000000000000107980",
+      "token0Amount": "2672377",
+      "token0Decimals": 0,
+      "token0Symbol": "LIL",
+      "token1": "0x00000000000000000000000000000000002cc823",
+      "token1Amount": "17044441286",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "4.580250192628591",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1745414788000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x0000000000000000000000000000000000202105",
+    "totalStaked": "120983194",
+    "stakingTokenAddress": "0xBeD14f5e8dCf9fDcFD9f487884e5A899BCE48c03",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685359630000,
+        "totalAmount": "17099452864",
+        "duration": 950392,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685359690000,
+        "totalAmount": "137099748352",
+        "duration": 950392,
+        "totalAmountUSD": "0.06874692608063396",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "WHALE HELI",
+      "pairAddress": "0xBeD14f5e8dCf9fDcFD9f487884e5A899BCE48c03",
+      "pairName": "WHALE HeliSwap LP",
+      "pairSupply": "441947503",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000001176B5",
+      "token0Amount": "1277326",
+      "token0Decimals": 2,
+      "token0Symbol": "WHALE",
+      "token1": "0x00000000000000000000000000000000001d90C9",
+      "token1Amount": "236731341525",
+      "token1Decimals": 8,
+      "token1Symbol": "HELI"
+    },
+    "totalStakedUSD": "0.07333214783930642",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1685359690000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x296426CfE6a7A69D7243A782204ce4b54151E05f",
+    "totalStaked": "60003841431",
+    "stakingTokenAddress": "0x0c259b9007B9cF47b58b397250e29e9965E839eD",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1745415158000,
+        "totalAmount": "139996684800",
+        "duration": 8467200,
+        "totalAmountUSD": "0.07019955803835005",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1724160006000,
+        "totalAmount": "396565200",
+        "duration": 8812560,
+        "totalAmountUSD": "0.7306092524519999",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "WMATIC[hts] HELI",
+      "pairAddress": "0x0c259b9007B9cF47b58b397250e29e9965E839eD",
+      "pairName": "Wrapped Matic[hts] HeliSwap LP",
+      "pairSupply": "70995291318",
+      "lpShares": "0",
+      "token0": "0x0000000000000000000000000000000000083E9E",
+      "token0Amount": "1348975229",
+      "token0Decimals": 8,
+      "token0Symbol": "WMATIC[hts]",
+      "token1": "0x00000000000000000000000000000000001d90C9",
+      "token1Amount": "4004527512946",
+      "token1Decimals": 8,
+      "token1Symbol": "HELI"
+    },
+    "totalStakedUSD": "3.550050341915106",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1745415158000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002CcA7D",
+    "totalStaked": "0",
+    "stakingTokenAddress": "0x635Fa94b5bEF0De9a59b8ed7A9aEe3D9D8Eaba37",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1688036497000,
+        "totalAmount": "8857099188961",
+        "duration": 2667437,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1688036701000,
+        "totalAmount": "13285708800774",
+        "duration": 2667437,
+        "totalAmountUSD": "6.661949798118024",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "HBARX WHBAR",
+      "pairAddress": "0x635Fa94b5bEF0De9a59b8ed7A9aEe3D9D8Eaba37",
+      "pairName": "HBARX Wrapped Hbar LP",
+      "pairSupply": "5102194402837",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000000cbA44",
+      "token0Amount": "4389512761713",
+      "token0Decimals": 8,
+      "token0Symbol": "HBARX",
+      "token1": "0x00000000000000000000000000000000002cc823",
+      "token1Amount": "5956362572338",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "0",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1688036701000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002CD037",
+    "totalStaked": "0",
+    "stakingTokenAddress": "0xe001dDE8f149a96B658ED8C6875a74C445927cdC",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x0000000000000000000000000000000000107d76",
+        "symbol": "OM[hts]",
+        "decimals": 8,
+        "rewardEnd": 1694523086000,
+        "totalAmount": "399999600000",
+        "duration": 604800,
+        "totalAmountUSD": "431.41606338711614",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1695127894000,
+        "totalAmount": "1699999660800",
+        "duration": 604800,
+        "totalAmountUSD": "0.852443220523355",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1695127856000,
+        "totalAmount": "19099584000",
+        "duration": 604800,
+        "totalAmountUSD": "35.18799125183999",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "USDC[hts] OM",
+      "pairAddress": "0xe001dDE8f149a96B658ED8C6875a74C445927cdC",
+      "pairName": "USD Coin MANTRA DAO LP",
+      "pairSupply": "4288443375",
+      "lpShares": "0",
+      "token0": "0x0000000000000000000000000000000000101Ae3",
+      "token0Amount": "159476372",
+      "token0Decimals": 6,
+      "token0Symbol": "USDC[hts]",
+      "token1": "0x0000000000000000000000000000000000107d76",
+      "token1Amount": "148030040701",
+      "token1Decimals": 8,
+      "token1Symbol": "OM"
+    },
+    "totalStakedUSD": "0",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1695127894000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002CD373",
+    "totalStaked": "1324834556",
+    "stakingTokenAddress": "0xd18f8677f4CFa455f5fDEE0fA36c8a3a5cDa4F23",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1745414666000,
+        "totalAmount": "27992563200",
+        "duration": 8467200,
+        "totalAmountUSD": "0.014036514991822022",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1704719655000,
+        "totalAmount": "199492992",
+        "duration": 1558539,
+        "totalAmountUSD": "0.3675345838579199",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "WHALE WHBAR",
+      "pairAddress": "0xd18f8677f4CFa455f5fDEE0fA36c8a3a5cDa4F23",
+      "pairName": "WHALE Wrapped Hbar LP",
+      "pairSupply": "1324835556",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000001176B5",
+      "token0Amount": "310610603",
+      "token0Decimals": 2,
+      "token0Symbol": "WHALE",
+      "token1": "0x00000000000000000000000000000000002cc823",
+      "token1Amount": "19689599261",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "72.54994910750027",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1745414666000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002CCa8F",
+    "totalStaked": "0",
+    "stakingTokenAddress": "0x53BD01DCf3dfFb9dfe241793D6B79d90079e0f48",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1688036969000,
+        "totalAmount": "6642899746816",
+        "duration": 2667437,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1688037027000,
+        "totalAmount": "66428597352610",
+        "duration": 2667437,
+        "totalAmountUSD": "33.30977574163766",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "USDC WHBAR",
+      "pairAddress": "0x53BD01DCf3dfFb9dfe241793D6B79d90079e0f48",
+      "pairName": "USD Coin Wrapped Hbar LP",
+      "pairSupply": "8546235640",
+      "lpShares": "0",
+      "token0": "0x000000000000000000000000000000000006f89a",
+      "token0Amount": "445781019",
+      "token0Decimals": 6,
+      "token0Symbol": "USDC",
+      "token1": "0x00000000000000000000000000000000002cc823",
+      "token1Amount": "242855283736",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "0",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1688037027000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002cCaCe",
+    "totalStaked": "145100127339411",
+    "stakingTokenAddress": "0x5718F1127E025C6745835faCF551283481630423",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1761134834000,
+        "totalAmount": "64990944720",
+        "duration": 15721080,
+        "totalAmountUSD": "119.7356337319272",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1761134952000,
+        "totalAmount": "3119999987258760",
+        "duration": 15721080,
+        "totalAmountUSD": "1564.484334026335",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x0000000000000000000000000000000000107d76",
+        "symbol": "OM[hts]",
+        "decimals": 8,
+        "rewardEnd": 1694520106000,
+        "totalAmount": "399999600000",
+        "duration": 604800,
+        "totalAmountUSD": "431.41606338711614",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "HELI WHBAR",
+      "pairAddress": "0x5718F1127E025C6745835faCF551283481630423",
+      "pairName": "HeliSwap Wrapped Hbar LP",
+      "pairSupply": "160892157852912",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000001d90C9",
+      "token0Amount": "10218341803895826",
+      "token0Decimals": 8,
+      "token0Symbol": "HELI",
+      "token1": "0x00000000000000000000000000000000002cc823",
+      "token1Amount": "2781163269285",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "9241.87233638723",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1761134952000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x0000000000000000000000000000000000143731",
+    "totalStaked": "7359616",
+    "stakingTokenAddress": "0x49483A71140894D2381feD43F9dD3b6462FDe657",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1679925213000,
+        "totalAmount": "628499803812",
+        "duration": 1810383,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000E22B1",
+        "symbol": "CREAM",
+        "decimals": 0,
+        "rewardEnd": 1669020612000,
+        "totalAmount": "0",
+        "duration": 1196218,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1679925253000,
+        "totalAmount": "2199999146196",
+        "duration": 1810383,
+        "totalAmountUSD": "1.103161606779039",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "CREAM WHBAR",
+      "pairAddress": "0x49483A71140894D2381feD43F9dD3b6462FDe657",
+      "pairName": "CREAM Wrapped Hbar LP",
+      "pairSupply": "35614707",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000000E22B1",
+      "token0Amount": "243328",
+      "token0Decimals": 0,
+      "token0Symbol": "CREAM",
+      "token1": "0x00000000000000000000000000000000000F7e89",
+      "token1Amount": "5583401674",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "3.965036646613897",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1679925253000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x000000000000000000000000000000000014372b",
+    "totalStaked": "0",
+    "stakingTokenAddress": "0x7E4e0a89ce690E6F5D4c9237A54E96dcc866065D",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1680697680000,
+        "totalAmount": "57099826560",
+        "duration": 773040,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1680697744000,
+        "totalAmount": "285699350160",
+        "duration": 773040,
+        "totalAmountUSD": "0.14326030749748023",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "USDC HST",
+      "pairAddress": "0x7E4e0a89ce690E6F5D4c9237A54E96dcc866065D",
+      "pairName": "USD Coin HeadStarter LP",
+      "pairSupply": "57930201",
+      "lpShares": "0",
+      "token0": "0x000000000000000000000000000000000006f89a",
+      "token0Amount": "403438",
+      "token0Decimals": 6,
+      "token0Symbol": "USDC",
+      "token1": "0x00000000000000000000000000000000000Ec585",
+      "token1Amount": "8718394246",
+      "token1Decimals": 8,
+      "token1Symbol": "HST"
+    },
+    "totalStakedUSD": "0",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1680697744000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x0000000000000000000000000000000000202103",
+    "totalStaked": "22255387",
+    "stakingTokenAddress": "0x095CC0bF1e0482599DD565CB3543c307DD788e6a",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685359490000,
+        "totalAmount": "17099452864",
+        "duration": 950392,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685359554000,
+        "totalAmount": "257099093448",
+        "duration": 950392,
+        "totalAmountUSD": "0.12891907231870436",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "QUACK HELI",
+      "pairAddress": "0x095CC0bF1e0482599DD565CB3543c307DD788e6a",
+      "pairName": "QUACK HeliSwap LP",
+      "pairSupply": "222256387",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000001139fd",
+      "token0Amount": "72612",
+      "token0Decimals": 0,
+      "token0Symbol": "QUACK",
+      "token1": "0x00000000000000000000000000000000001d90C9",
+      "token1Amount": "922573571761",
+      "token1Decimals": 8,
+      "token1Symbol": "HELI"
+    },
+    "totalStakedUSD": "2.5766001925117847",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1685359554000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x0000000000000000000000000000000000161eeF",
+    "totalStaked": "30104803",
+    "stakingTokenAddress": "0xc8d4829279f50bF982433b4c850C5c3fBF1A9Bcc",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1679920670000,
+        "totalAmount": "125699649000",
+        "duration": 1812540,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1679920814000,
+        "totalAmount": "471399965580",
+        "duration": 1812540,
+        "totalAmountUSD": "0.23637752058404052",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "WHBAR LIL",
+      "pairAddress": "0xc8d4829279f50bF982433b4c850C5c3fBF1A9Bcc",
+      "pairName": "Wrapped Hbar LIL LP",
+      "pairSupply": "466379723",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000000F7e89",
+      "token0Amount": "39529628467",
+      "token0Decimals": 8,
+      "token0Symbol": "HBAR",
+      "token1": "0x0000000000000000000000000000000000107980",
+      "token1Amount": "6357852",
+      "token1Decimals": 0,
+      "token1Symbol": "LIL"
+    },
+    "totalStakedUSD": "9.644776113980392",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1679920814000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002020Ff",
+    "totalStaked": "137039138263",
+    "stakingTokenAddress": "0x9df76CaeEbdA5C7f7E13769c49e7CDc809FD3fFa",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685359204000,
+        "totalAmount": "25699550072",
+        "duration": 950392,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685359266000,
+        "totalAmount": "394299583352",
+        "duration": 950392,
+        "totalAmountUSD": "0.19771651397002202",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "JAM HELI",
+      "pairAddress": "0x9df76CaeEbdA5C7f7E13769c49e7CDc809FD3fFa",
+      "pairName": "JAM HeliSwap LP",
+      "pairSupply": "137039139263",
+      "lpShares": "0",
+      "token0": "0x000000000000000000000000000000000001f385",
+      "token0Amount": "153828375212",
+      "token0Decimals": 8,
+      "token0Symbol": "JAM",
+      "token1": "0x00000000000000000000000000000000001d90C9",
+      "token1Amount": "135867447643",
+      "token1Decimals": 8,
+      "token1Symbol": "HELI"
+    },
+    "totalStakedUSD": "0.20710619065292554",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1685359266000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x0000000000000000000000000000000000151255",
+    "totalStaked": "3862463900",
+    "stakingTokenAddress": "0xe001dDE8f149a96B658ED8C6875a74C445927cdC",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685364700000,
+        "totalAmount": "85699620280",
+        "duration": 950212,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x0000000000000000000000000000000000107d76",
+        "symbol": "OM[hts]",
+        "decimals": 8,
+        "rewardEnd": 1685364774000,
+        "totalAmount": "1474299528176",
+        "duration": 950212,
+        "totalAmountUSD": "1590.0928368407685",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685364834000,
+        "totalAmount": "857099775908",
+        "duration": 950212,
+        "totalAmountUSD": "0.4297817876863787",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "USDC[hts] OM",
+      "pairAddress": "0xe001dDE8f149a96B658ED8C6875a74C445927cdC",
+      "pairName": "USD Coin MANTRA DAO LP",
+      "pairSupply": "4288443375",
+      "lpShares": "0",
+      "token0": "0x0000000000000000000000000000000000101Ae3",
+      "token0Amount": "159476372",
+      "token0Decimals": 6,
+      "token0Symbol": "USDC[hts]",
+      "token1": "0x0000000000000000000000000000000000107d76",
+      "token1Amount": "148030040701",
+      "token1Decimals": 8,
+      "token1Symbol": "OM"
+    },
+    "totalStakedUSD": "171.35412215784322",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1685364834000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002Ccd1c",
+    "totalStaked": "770656901666",
+    "stakingTokenAddress": "0xEc9396Fd1019a6644534Ce7905183F495bC86baf",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x0000000000000000000000000000000000107d76",
+        "symbol": "OM[hts]",
+        "decimals": 8,
+        "rewardEnd": 1694520716000,
+        "totalAmount": "399999600000",
+        "duration": 604800,
+        "totalAmountUSD": "431.41606338711614",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1761135198000,
+        "totalAmount": "194999984465160",
+        "duration": 15721080,
+        "totalAmountUSD": "97.78026348620621",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1761135092000,
+        "totalAmount": "64990944720",
+        "duration": 15721080,
+        "totalAmountUSD": "119.7356337319272",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "USDC HELI",
+      "pairAddress": "0xEc9396Fd1019a6644534Ce7905183F495bC86baf",
+      "pairName": "USD Coin HeliSwap LP",
+      "pairSupply": "794433519936",
+      "lpShares": "0",
+      "token0": "0x000000000000000000000000000000000006f89a",
+      "token0Amount": "627349266",
+      "token0Decimals": 6,
+      "token0Symbol": "USDC",
+      "token1": "0x00000000000000000000000000000000001d90C9",
+      "token1Amount": "1250984315330675",
+      "token1Decimals": 8,
+      "token1Symbol": "HELI"
+    },
+    "totalStakedUSD": "1219.330669100104",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1761135198000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002020f4",
+    "totalStaked": "1151119737",
+    "stakingTokenAddress": "0x7eA5C6153aFC2Dd1B9503c02D6eA344eBb9C6D28",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685358534000,
+        "totalAmount": "119999345096",
+        "duration": 950392,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685358596000,
+        "totalAmount": "1199999153312",
+        "duration": 950392,
+        "totalAmountUSD": "0.6017243217526297",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "CLXY HELI",
+      "pairAddress": "0x7eA5C6153aFC2Dd1B9503c02D6eA344eBb9C6D28",
+      "pairName": "Calaxy Tokens HeliSwap LP",
+      "pairSupply": "1151120737",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000000D1ea6",
+      "token0Amount": "16597075",
+      "token0Decimals": 6,
+      "token0Symbol": "CLXY",
+      "token1": "0x00000000000000000000000000000000001d90C9",
+      "token1Amount": "83862175269",
+      "token1Decimals": 8,
+      "token1Symbol": "HELI"
+    },
+    "totalStakedUSD": "0.14054545043654318",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1685358596000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002020f2",
+    "totalStaked": "37208995291",
+    "stakingTokenAddress": "0xa501B838Ce05670a7fc59062E90B78dd0631Bef7",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685358132000,
+        "totalAmount": "51399100144",
+        "duration": 950392,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685358440000,
+        "totalAmount": "857099620496",
+        "duration": 950392,
+        "totalAmountUSD": "0.42978170975700675",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "HST HELI",
+      "pairAddress": "0xa501B838Ce05670a7fc59062E90B78dd0631Bef7",
+      "pairName": "HeadStarter HeliSwap LP",
+      "pairSupply": "621330073485",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000000Ec585",
+      "token0Amount": "56429250524",
+      "token0Decimals": 8,
+      "token0Symbol": "HST",
+      "token1": "0x00000000000000000000000000000000001d90C9",
+      "token1Amount": "7106936965565",
+      "token1Decimals": 8,
+      "token1Symbol": "HELI"
+    },
+    "totalStakedUSD": "0.4468221514988529",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1685358440000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x0000000000000000000000000000000000159b09",
+    "totalStaked": "272899472",
+    "stakingTokenAddress": "0xfa65dD60f176B3Fb88EDDFad511706796a9Eb900",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1680699158000,
+        "totalAmount": "21399293280",
+        "duration": 773040,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001176B5",
+        "symbol": "WHALE",
+        "decimals": 2,
+        "rewardEnd": 1675930038000,
+        "totalAmount": "7742898",
+        "duration": 2580966,
+        "totalAmountUSD": "0.9042628848336521",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1680699220000,
+        "totalAmount": "71399520480",
+        "duration": 773040,
+        "totalAmountUSD": "0.03580238195644847",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "WHBAR WHALE",
+      "pairAddress": "0xfa65dD60f176B3Fb88EDDFad511706796a9Eb900",
+      "pairName": "Wrapped Hbar WHALE LP",
+      "pairSupply": "313965959",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000000F7e89",
+      "token0Amount": "3427655074",
+      "token0Decimals": 8,
+      "token0Symbol": "HBAR",
+      "token1": "0x00000000000000000000000000000000001176B5",
+      "token1Amount": "52492979",
+      "token1Decimals": 2,
+      "token1Symbol": "WHALE"
+    },
+    "totalStakedUSD": "10.657185254266988",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1680699220000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x000000000000000000000000000000000014371D",
+    "totalStaked": "159126",
+    "stakingTokenAddress": "0x9a41DE1112a920D491e064519D83Edee4Eb90703",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1680696052000,
+        "totalAmount": "285699350160",
+        "duration": 773040,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1680696266000,
+        "totalAmount": "857099596560",
+        "duration": 773040,
+        "totalAmountUSD": "0.4297816977546038",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "WHBAR WBTC[hts]",
+      "pairAddress": "0x9a41DE1112a920D491e064519D83Edee4Eb90703",
+      "pairName": "Wrapped Hbar Wrapped BTC LP",
+      "pairSupply": "160126",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000000F7e89",
+      "token0Amount": "99326460",
+      "token0Decimals": 8,
+      "token0Symbol": "HBAR",
+      "token1": "0x0000000000000000000000000000000000101aFb",
+      "token1Amount": "328",
+      "token1Decimals": 8,
+      "token1Symbol": "WBTC[hts]"
+    },
+    "totalStakedUSD": "0.48768720298829016",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1680696266000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x000000000000000000000000000000000014372C",
+    "totalStaked": "0",
+    "stakingTokenAddress": "0x9DdA110649FB2969c705E23B338f6Ab093027AC9",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1680697864000,
+        "totalAmount": "14199971760",
+        "duration": 773040,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1680697908000,
+        "totalAmount": "128499347040",
+        "duration": 773040,
+        "totalAmountUSD": "0.06443436416591893",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "DOV[hts] WHBAR",
+      "pairAddress": "0x9DdA110649FB2969c705E23B338f6Ab093027AC9",
+      "pairName": "DOVU Wrapped Hbar LP",
+      "pairSupply": "111556211800",
+      "lpShares": "0",
+      "token0": "0x0000000000000000000000000000000000098779",
+      "token0Amount": "7089186464455",
+      "token0Decimals": 8,
+      "token0Symbol": "DOV[hts]",
+      "token1": "0x00000000000000000000000000000000000F7e89",
+      "token1Amount": "2364196854",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "0",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1680697908000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x0000000000000000000000000000000000202107",
+    "totalStaked": "24175792",
+    "stakingTokenAddress": "0xB552a6C5D6Cb3602aE34b83EEd22Df13E037Adb0",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685359782000,
+        "totalAmount": "17099452864",
+        "duration": 950392,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685359836000,
+        "totalAmount": "205699993304",
+        "duration": 950392,
+        "totalAmountUSD": "0.1031456469062928",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "LIL HELI",
+      "pairAddress": "0xB552a6C5D6Cb3602aE34b83EEd22Df13E037Adb0",
+      "pairName": "LIL HeliSwap LP",
+      "pairSupply": "24176792",
+      "lpShares": "0",
+      "token0": "0x0000000000000000000000000000000000107980",
+      "token0Amount": "4383",
+      "token0Decimals": 0,
+      "token0Symbol": "LIL",
+      "token1": "0x00000000000000000000000000000000001d90C9",
+      "token1Amount": "140909166193",
+      "token1Decimals": 8,
+      "token1Symbol": "HELI"
+    },
+    "totalStakedUSD": "0.12215441178020447",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1685359836000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x0000000000000000000000000000000000143721",
+    "totalStaked": "0",
+    "stakingTokenAddress": "0x189079f6Bac1F07c99308Faaa380Ec0D14e62ee1",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1680696904000,
+        "totalAmount": "35699760240",
+        "duration": 773040,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1680696950000,
+        "totalAmount": "285699350160",
+        "duration": 773040,
+        "totalAmountUSD": "0.14326030749748023",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "CLXY WHBAR",
+      "pairAddress": "0x189079f6Bac1F07c99308Faaa380Ec0D14e62ee1",
+      "pairName": "Calaxy Tokens Wrapped Hbar LP",
+      "pairSupply": "1000",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000000D1ea6",
+      "token0Amount": "91",
+      "token0Decimals": 6,
+      "token0Symbol": "CLXY",
+      "token1": "0x00000000000000000000000000000000000F7e89",
+      "token1Amount": "11359",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "0",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1680696950000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002CcfEa",
+    "totalStaked": "251805357",
+    "stakingTokenAddress": "0x0a7A675861F1686dcb9E33dCfbe9Cc2F196eB9B2",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1724158234000,
+        "totalAmount": "599254080",
+        "duration": 8812560,
+        "totalAmountUSD": "1.1040317592607998",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1745414470000,
+        "totalAmount": "279993369600",
+        "duration": 8467200,
+        "totalAmountUSD": "0.1403991160767001",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "USDC[hts] USDT[hts]",
+      "pairAddress": "0x0a7A675861F1686dcb9E33dCfbe9Cc2F196eB9B2",
+      "pairName": "USD Coin Tether USD LP",
+      "pairSupply": "6544920305",
+      "lpShares": "0",
+      "token0": "0x0000000000000000000000000000000000101Ae3",
+      "token0Amount": "6628135401",
+      "token0Decimals": 6,
+      "token0Symbol": "USDC[hts]",
+      "token1": "0x0000000000000000000000000000000000101aF0",
+      "token1Amount": "6620374048",
+      "token1Decimals": 6,
+      "token1Symbol": "USDT[hts]"
+    },
+    "totalStakedUSD": "297.85723159673296",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1745414470000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002CcaaB",
+    "totalStaked": "1221323348",
+    "stakingTokenAddress": "0x53BD01DCf3dfFb9dfe241793D6B79d90079e0f48",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1724156314000,
+        "totalAmount": "58295084400",
+        "duration": 8812560,
+        "totalAmountUSD": "107.39956011044397",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1761135470000,
+        "totalAmount": "51999987472800",
+        "duration": 15721080,
+        "totalAmountUSD": "26.074732725315933",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "USDC WHBAR",
+      "pairAddress": "0x53BD01DCf3dfFb9dfe241793D6B79d90079e0f48",
+      "pairName": "USD Coin Wrapped Hbar LP",
+      "pairSupply": "8546235640",
+      "lpShares": "0",
+      "token0": "0x000000000000000000000000000000000006f89a",
+      "token0Amount": "445781019",
+      "token0Decimals": 6,
+      "token0Symbol": "USDC",
+      "token1": "0x00000000000000000000000000000000002cc823",
+      "token1Amount": "242855283736",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "127.88037936448683",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1761135470000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x000000000000000000000000000000000016a142",
+    "totalStaked": "0",
+    "stakingTokenAddress": "0x791940F4cFe9309B9766E2C3818145CAF8791E68",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685364172000,
+        "totalAmount": "1714299324076",
+        "duration": 950212,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685364250000,
+        "totalAmount": "2571399099984",
+        "duration": 950212,
+        "totalAmountUSD": "1.2893953925906674",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "WHBAR HASHTREE",
+      "pairAddress": "0x791940F4cFe9309B9766E2C3818145CAF8791E68",
+      "pairName": "Wrapped Hbar HASHTREE LP",
+      "pairSupply": "122404",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000000F7e89",
+      "token0Amount": "4424840285",
+      "token0Decimals": 8,
+      "token0Symbol": "HBAR",
+      "token1": "0x0000000000000000000000000000000000163748",
+      "token1Amount": "4",
+      "token1Decimals": 0,
+      "token1Symbol": "HASHTREE"
+    },
+    "totalStakedUSD": "0",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1685364250000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x000000000000000000000000000000000014372d",
+    "totalStaked": "0",
+    "stakingTokenAddress": "0x6E38eCaBAbbA37FfB94150bd53c4593f72E1f920",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685363796000,
+        "totalAmount": "342899203592",
+        "duration": 950212,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685363960000,
+        "totalAmount": "1542899133304",
+        "duration": 950212,
+        "totalAmountUSD": "0.7736671579789735",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "USDC[hts] DAI[hts]",
+      "pairAddress": "0x6E38eCaBAbbA37FfB94150bd53c4593f72E1f920",
+      "pairName": "USD Coin Dai Stablecoin LP",
+      "pairSupply": "1000",
+      "lpShares": "0",
+      "token0": "0x0000000000000000000000000000000000101Ae3",
+      "token0Amount": "102",
+      "token0Decimals": 6,
+      "token0Symbol": "USDC[hts]",
+      "token1": "0x0000000000000000000000000000000000101Af5",
+      "token1Amount": "9957",
+      "token1Decimals": 8,
+      "token1Symbol": "DAI[hts]"
+    },
+    "totalStakedUSD": "0",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1685363960000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x0000000000000000000000000000000000159b13",
+    "totalStaked": "282436171",
+    "stakingTokenAddress": "0xF68a4d27bac7E83F1867e35f46Eb16A633A7D0A0",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1680698976000,
+        "totalAmount": "14199971760",
+        "duration": 773040,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1680699034000,
+        "totalAmount": "99999681360",
+        "duration": 773040,
+        "totalAmountUSD": "0.05014356908148608",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "WHBAR QUACK",
+      "pairAddress": "0xF68a4d27bac7E83F1867e35f46Eb16A633A7D0A0",
+      "pairName": "Wrapped Hbar QUACK LP",
+      "pairSupply": "428735665",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000000F7e89",
+      "token0Amount": "31049005028",
+      "token0Decimals": 8,
+      "token0Symbol": "HBAR",
+      "token1": "0x00000000000000000000000000000000001139fd",
+      "token1Amount": "8967828",
+      "token1Decimals": 0,
+      "token1Symbol": "QUACK"
+    },
+    "totalStakedUSD": "4111.750328160453",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1680699034000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002cD35D",
+    "totalStaked": "38278839094",
+    "stakingTokenAddress": "0x6b15d05f55a60341D738250F78774cB395EcF05A",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1696331956000,
+        "totalAmount": "799999200000",
+        "duration": 1209600,
+        "totalAmountUSD": "0.4011494297258789",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1696331918000,
+        "totalAmount": "8999424000",
+        "duration": 1209600,
+        "totalAmountUSD": "16.580028810239998",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "USDC HBARX",
+      "pairAddress": "0x6b15d05f55a60341D738250F78774cB395EcF05A",
+      "pairName": "USD Coin HBARX LP",
+      "pairSupply": "42719902011",
+      "lpShares": "0",
+      "token0": "0x000000000000000000000000000000000006f89a",
+      "token0Amount": "2376854997",
+      "token0Decimals": 6,
+      "token0Symbol": "USDC",
+      "token1": "0x00000000000000000000000000000000000cbA44",
+      "token1Amount": "953911442007",
+      "token1Decimals": 8,
+      "token1Symbol": "HBARX"
+    },
+    "totalStakedUSD": "4274.446150368744",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1696331956000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x0000000000000000000000000000000000143728",
+    "totalStaked": "6286055327",
+    "stakingTokenAddress": "0x0a7A675861F1686dcb9E33dCfbe9Cc2F196eB9B2",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685363548000,
+        "totalAmount": "342899532816",
+        "duration": 950392,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685363628000,
+        "totalAmount": "1542899636520",
+        "duration": 950392,
+        "totalAmountUSD": "0.7736674103102401",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "USDC[hts] USDT[hts]",
+      "pairAddress": "0x0a7A675861F1686dcb9E33dCfbe9Cc2F196eB9B2",
+      "pairName": "USD Coin Tether USD LP",
+      "pairSupply": "6544920305",
+      "lpShares": "0",
+      "token0": "0x0000000000000000000000000000000000101Ae3",
+      "token0Amount": "6628135401",
+      "token0Decimals": 6,
+      "token0Symbol": "USDC[hts]",
+      "token1": "0x0000000000000000000000000000000000101aF0",
+      "token1Amount": "6620374048",
+      "token1Decimals": 6,
+      "token1Symbol": "USDT[hts]"
+    },
+    "totalStakedUSD": "7435.691836230934",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1685363628000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002CCC35",
+    "totalStaked": "137232940217",
+    "stakingTokenAddress": "0x0a0f03CBB50b0C9Ae160Dc5C3c87aC6074ce3a8d",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1761135540000,
+        "totalAmount": "17679989452320",
+        "duration": 15721080,
+        "totalAmountUSD": "8.865405973353125",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x0000000000000000000000000000000000107d76",
+        "symbol": "OM[hts]",
+        "decimals": 8,
+        "rewardEnd": 1694521440000,
+        "totalAmount": "399999600000",
+        "duration": 604800,
+        "totalAmountUSD": "431.41606338711614",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1724157580000,
+        "totalAmount": "10495758960",
+        "duration": 8812560,
+        "totalAmountUSD": "19.3367915482296",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "OM[hts] WHBAR",
+      "pairAddress": "0x0a0f03CBB50b0C9Ae160Dc5C3c87aC6074ce3a8d",
+      "pairName": "MANTRA Wrapped Hbar LP",
+      "pairSupply": "142894777588",
+      "lpShares": "0",
+      "token0": "0x0000000000000000000000000000000000107d76",
+      "token0Amount": "228450415762",
+      "token0Decimals": 8,
+      "token0Symbol": "OM[hts]",
+      "token1": "0x00000000000000000000000000000000002cc823",
+      "token1Amount": "133739021144",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "473.26099713878847",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1761135540000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002Cd015",
+    "totalStaked": "0",
+    "stakingTokenAddress": "0x6E38eCaBAbbA37FfB94150bd53c4593f72E1f920",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1696336718000,
+        "totalAmount": "20299507200",
+        "duration": 1209600,
+        "totalAmountUSD": "37.39866175987199",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1696336752000,
+        "totalAmount": "1799999712000",
+        "duration": 1209600,
+        "totalAmountUSD": "0.9025869750564078",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "USDC[hts] DAI[hts]",
+      "pairAddress": "0x6E38eCaBAbbA37FfB94150bd53c4593f72E1f920",
+      "pairName": "USD Coin Dai Stablecoin LP",
+      "pairSupply": "1000",
+      "lpShares": "0",
+      "token0": "0x0000000000000000000000000000000000101Ae3",
+      "token0Amount": "102",
+      "token0Decimals": 6,
+      "token0Symbol": "USDC[hts]",
+      "token1": "0x0000000000000000000000000000000000101Af5",
+      "token1Amount": "9957",
+      "token1Decimals": 8,
+      "token1Symbol": "DAI[hts]"
+    },
+    "totalStakedUSD": "0",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1696336752000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x000000000000000000000000000000000020210D",
+    "totalStaked": "0",
+    "stakingTokenAddress": "0xF142200F5195E5802EBAD1e13788ec806F57C0c8",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685360094000,
+        "totalAmount": "68599294560",
+        "duration": 950392,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685360160000,
+        "totalAmount": "771399922680",
+        "duration": 950392,
+        "totalAmountUSD": "0.386808685650772",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "KHK HELI",
+      "pairAddress": "0xF142200F5195E5802EBAD1e13788ec806F57C0c8",
+      "pairName": "KHK HeliSwap LP",
+      "pairSupply": "40906152",
+      "lpShares": "0",
+      "token0": "0x000000000000000000000000000000000011219e",
+      "token0Amount": "6738",
+      "token0Decimals": 0,
+      "token0Symbol": "KHK",
+      "token1": "0x00000000000000000000000000000000001d90C9",
+      "token1Amount": "298162128870",
+      "token1Decimals": 8,
+      "token1Symbol": "HELI"
+    },
+    "totalStakedUSD": "0",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1685360160000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000001f0ECE",
+    "totalStaked": "338814690865",
+    "stakingTokenAddress": "0x58B9c4815f8F3D46928E1765BD2b024b82A9c77e",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685361282000,
+        "totalAmount": "3428599965088",
+        "duration": 950392,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x0000000000000000000000000000000000107d76",
+        "symbol": "OM[hts]",
+        "decimals": 8,
+        "rewardEnd": 1685361402000,
+        "totalAmount": "1028599757680",
+        "duration": 950392,
+        "totalAmountUSD": "1109.387255035373",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685361344000,
+        "totalAmount": "36857099880440",
+        "duration": 950392,
+        "totalAmountUSD": "18.48152422950956",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "OM[hts] HELI",
+      "pairAddress": "0x58B9c4815f8F3D46928E1765BD2b024b82A9c77e",
+      "pairName": "MANTRA HeliSwap LP",
+      "pairSupply": "1471814899314",
+      "lpShares": "0",
+      "token0": "0x0000000000000000000000000000000000107d76",
+      "token0Amount": "36215893613",
+      "token0Decimals": 8,
+      "token0Symbol": "OM[hts]",
+      "token1": "0x00000000000000000000000000000000001d90C9",
+      "token1Amount": "74930232699703",
+      "token1Decimals": 8,
+      "token1Symbol": "HELI"
+    },
+    "totalStakedUSD": "17.641101583957138",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1685361402000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002CCac6",
+    "totalStaked": "4007580090034",
+    "stakingTokenAddress": "0x635Fa94b5bEF0De9a59b8ed7A9aEe3D9D8Eaba37",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1761134614000,
+        "totalAmount": "129999984403080",
+        "duration": 15721080,
+        "totalAmountUSD": "65.18683969642557",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000002cc823",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1761134564000,
+        "totalAmount": "64990944720",
+        "duration": 15721080,
+        "totalAmountUSD": "119.7356337319272",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "HBARX WHBAR",
+      "pairAddress": "0x635Fa94b5bEF0De9a59b8ed7A9aEe3D9D8Eaba37",
+      "pairName": "HBARX Wrapped Hbar LP",
+      "pairSupply": "5102194402837",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000000cbA44",
+      "token0Amount": "4389512761713",
+      "token0Decimals": 8,
+      "token0Symbol": "HBARX",
+      "token1": "0x00000000000000000000000000000000002cc823",
+      "token1Amount": "5956362572338",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "17238.79468315149",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1761134614000,
+    "isFarmDeprecated": false
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000001593De",
+    "totalStaked": "48377788714642",
+    "stakingTokenAddress": "0x5cb7F7164df83557C791374d4F474149D2117C41",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1680698506000,
+        "totalAmount": "14199971760",
+        "duration": 773040,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x000000000000000000000000000000000001f385",
+        "symbol": "JAM",
+        "decimals": 8,
+        "rewardEnd": 1675929912000,
+        "totalAmount": "799999999894224",
+        "duration": 2580966,
+        "totalAmountUSD": "722.7648989982755",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1680698662000,
+        "totalAmount": "142799814000",
+        "duration": 773040,
+        "totalAmountUSD": "0.0716051515439785",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "JAM WHBAR",
+      "pairAddress": "0x5cb7F7164df83557C791374d4F474149D2117C41",
+      "pairName": "JAM Wrapped Hbar LP",
+      "pairSupply": "48639481048833",
+      "lpShares": "0",
+      "token0": "0x000000000000000000000000000000000001f385",
+      "token0Amount": "3176966731092854",
+      "token0Decimals": 8,
+      "token0Symbol": "JAM",
+      "token1": "0x00000000000000000000000000000000000F7e89",
+      "token1Amount": "1433187289686",
+      "token1Decimals": 8,
+      "token1Symbol": "HBAR"
+    },
+    "totalStakedUSD": "5709.6147989940355",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1680698662000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x000000000000000000000000000000000016a987",
+    "totalStaked": "96439894",
+    "stakingTokenAddress": "0x37522f48Cad2aB403e391Dd0B7Daa5D8EA2c0F79",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1679922054000,
+        "totalAmount": "282799709580",
+        "duration": 1816860,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x0000000000000000000000000000000000107d76",
+        "symbol": "OM[hts]",
+        "decimals": 8,
+        "rewardEnd": 1679922042000,
+        "totalAmount": "1399999698600",
+        "duration": 1740990,
+        "totalAmountUSD": "1509.9574067403094",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "WHBAR KHK",
+      "pairAddress": "0x37522f48Cad2aB403e391Dd0B7Daa5D8EA2c0F79",
+      "pairName": "Wrapped Hbar KHK LP",
+      "pairSupply": "100144145",
+      "lpShares": "0",
+      "token0": "0x00000000000000000000000000000000000F7e89",
+      "token0Amount": "14992740359",
+      "token0Decimals": 8,
+      "token0Symbol": "HBAR",
+      "token1": "0x000000000000000000000000000000000011219e",
+      "token1Amount": "776491",
+      "token1Decimals": 0,
+      "token1Symbol": "KHK"
+    },
+    "totalStakedUSD": "54.096433736188885",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1679922054000,
+    "isFarmDeprecated": true
+  },
+  {
+    "__typename": "RewardsResponse",
+    "address": "0x00000000000000000000000000000000002020f7",
+    "totalStaked": "0",
+    "stakingTokenAddress": "0xeFbB5200f3aD0209e84bE08B40127C1D8Fd9Ca70",
+    "rewardsData": [
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000000F7e89",
+        "symbol": "WHBAR",
+        "decimals": 8,
+        "rewardEnd": 1685358698000,
+        "totalAmount": "51399100144",
+        "duration": 950392,
+        "totalAmountUSD": "0",
+        "totalAccumulatedUSD": "NaN"
+      },
+      {
+        "__typename": "RewardsData",
+        "address": "0x00000000000000000000000000000000001d90C9",
+        "symbol": "HELI",
+        "decimals": 8,
+        "rewardEnd": 1685358762000,
+        "totalAmount": "685699274472",
+        "duration": 950392,
+        "totalAmountUSD": "0.3438351849825496",
+        "totalAccumulatedUSD": "NaN"
+      }
+    ],
+    "userStakingData": {
+      "stakedAmount": "0",
+      "stakedAmountUSD": "0",
+      "rewardsAccumulated": []
+    },
+    "poolData": {
+      "__typename": "PoolWithShares",
+      "pairSymbol": "DOV[hts] HELI",
+      "pairAddress": "0xeFbB5200f3aD0209e84bE08B40127C1D8Fd9Ca70",
+      "pairName": "DOVU HeliSwap LP",
+      "pairSupply": "1000",
+      "lpShares": "0",
+      "token0": "0x0000000000000000000000000000000000098779",
+      "token0Amount": "1170",
+      "token0Decimals": 8,
+      "token0Symbol": "DOV[hts]",
+      "token1": "0x00000000000000000000000000000000001d90C9",
+      "token1Amount": "883",
+      "token1Decimals": 8,
+      "token1Symbol": "HELI"
+    },
+    "totalStakedUSD": "0",
+    "APR": "0",
+    "totalRewardsUSD": "0",
+    "campaignEndDate": 1685358762000,
+    "isFarmDeprecated": true
+  }
+]

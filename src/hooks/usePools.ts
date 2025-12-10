@@ -1,40 +1,39 @@
-import { useContext, useEffect, useState } from 'react';
-import { GlobalContext } from '../providers/Global';
-
-import { QueryHookOptions, useQuery } from '@apollo/client';
-import { GET_POOLS } from '../GraphQL/Queries';
-import { REFRESH_TIME } from '../constants';
-
+import { useState, useEffect } from 'react';
 import { IPoolExtendedData } from '../interfaces/tokens';
+import { loadAllPools } from '../utils/poolDataLoader';
 
-import { getProcessedPools } from '../utils/poolUtils';
-
-const usePools = (useQueryOptions: QueryHookOptions = {}, getExtended = false) => {
-  const contextValue = useContext(GlobalContext);
-  const { hbarPrice } = contextValue;
-
+/**
+ * Hook to load pools from static pools.json file
+ * Replaces the previous GraphQL-based implementation
+ * @param useQueryOptions - Kept for backward compatibility but not used
+ * @param getExtended - If true, returns extended pool data (pools.json already has extended data)
+ * @returns Object containing pools array, loading state, error state, and refetch function
+ */
+const usePools = (useQueryOptions: any = {}, getExtended = false) => {
   const [pools, setPools] = useState<IPoolExtendedData[]>([]);
-  const { loading, data, error, startPolling, stopPolling, refetch } = useQuery(
-    GET_POOLS,
-    useQueryOptions,
-  );
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<any>(null);
 
   useEffect(() => {
-    startPolling(useQueryOptions.pollInterval || REFRESH_TIME);
-    return () => {
-      stopPolling();
-    };
-  }, [startPolling, stopPolling, useQueryOptions]);
+    try {
+      // Load all pools from static JSON file
+      const allPools = loadAllPools();
 
-  useEffect(() => {
-    if (data) {
-      const { pools } = data;
-      if (pools) {
-        const processedPools = getProcessedPools(pools, getExtended, hbarPrice);
-        if (processedPools) setPools(processedPools);
-      }
+      // pools.json already contains extended data, so we can return it directly
+      // If getExtended is false, we still return the same data since it's already processed
+      setPools(allPools);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error loading pools data:', err);
+      setError(err);
+      setLoading(false);
     }
-  }, [data, hbarPrice, getExtended]);
+  }, [getExtended]);
+
+  // refetch function kept for backward compatibility but does nothing
+  const refetch = () => {
+    // No-op since data is static
+  };
 
   return { pools, loading, error, refetch };
 };

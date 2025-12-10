@@ -16,6 +16,7 @@ import Icon from '../components/Icon';
 
 import useFarms from '../hooks/useFarms';
 import usePoolsByTokensList from '../hooks/usePoolsByTokensList';
+import useUserFarmsPositions from '../hooks/useUserFarmsPositions';
 
 import {
   SORT_DIRECTION,
@@ -30,8 +31,8 @@ interface IFarmsProps {
 
 const Farms = ({ itemsPerPage }: IFarmsProps) => {
   const contextValue = useContext(GlobalContext);
-  const { tokensWhitelisted, connection } = contextValue;
-  const { userId, isHashpackLoading, setShowConnectModal } = connection;
+  const { tokensWhitelisted, connection, hbarPrice } = contextValue;
+  const { userId, isHashpackLoading, setShowConnectModal, connected } = connection;
   const navigate = useNavigate();
 
   const tokensWhitelistedAddresses = tokensWhitelisted.map(item => item.address) || [];
@@ -52,6 +53,45 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
 
   const { farms, processingFarms } = useFarms(useQueryOptionsPoolsFarms, userId, pools);
 
+  // Fetch user positions from contracts when user is connected
+  const { userPositions, loading: loadingUserPositions } = useUserFarmsPositions(
+    farms,
+    userId || '',
+    pools,
+    hbarPrice || 0,
+    connected && !isHashpackLoading && !!userId && farms.length > 0 && pools.length > 0,
+  );
+
+  // Merge contract user positions with static farm data
+  // Contract data takes precedence for userStakingData when available
+  const farmsWithContractData = useMemo(() => {
+    if (!connected || !userId || userPositions.size === 0) {
+      // If not connected or no positions fetched, return static farms as-is
+      return farms;
+    }
+
+    // Merge contract positions with static farm data
+    return farms.map(farm => {
+      const contractPosition = userPositions.get(farm.address);
+      if (contractPosition) {
+        // Use contract data for userStakingData
+        return {
+          ...farm,
+          userStakingData: contractPosition,
+        };
+      }
+      // If no contract position found, use static data (or set to 0)
+      return {
+        ...farm,
+        userStakingData: {
+          stakedAmount: '0',
+          stakedAmountUSD: '0',
+          rewardsAccumulated: [],
+        },
+      };
+    });
+  }, [farms, userPositions, connected, userId]);
+
   const sortFarms = useMemo(
     () => (farmA: IFarmData, farmB: IFarmData, direction: SORT_DIRECTION) => {
       const valueABN = new BigNumber(farmA[farmsSortBy]);
@@ -66,7 +106,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
 
   // Handlers
   const handlePageClick = (event: any) => {
-    const newOffset = (event.selected * itemsPerPage) % farms.length;
+    const newOffset = (event.selected * itemsPerPage) % farmsWithContractData.length;
 
     setCurrentPage(event.selected);
     setItemOffset(newOffset);
@@ -94,7 +134,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
     if (showOnlyStaked) {
       const userCampaigns: IFarmData[] = [];
 
-      ([...farms] || []).forEach((farm: IFarmData) => {
+      farmsWithContractData.forEach((farm: IFarmData) => {
         if (Number(farm.userStakingData.stakedAmount) !== 0) {
           userCampaigns.push(farm);
         }
@@ -104,7 +144,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
         sortFarms(a, b, sortDirection),
       );
     } else {
-      sortedFarms = [...farms]
+      sortedFarms = [...farmsWithContractData]
         .filter(farm => !farm.isFarmDeprecated)
         .sort((a: IFarmData, b: IFarmData) => sortFarms(a, b, sortDirection));
     }
@@ -117,7 +157,15 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
       setCurrentItems(sortedFarms.slice(itemOffset, endOffset));
     }
     setPageCount(Math.ceil(sortedFarms.length / itemsPerPage));
-  }, [itemOffset, itemsPerPage, farms, sortDirection, farmsSortBy, sortFarms, showOnlyStaked]);
+  }, [
+    itemOffset,
+    itemsPerPage,
+    farmsWithContractData,
+    sortDirection,
+    farmsSortBy,
+    sortFarms,
+    showOnlyStaked,
+  ]);
 
   useEffect(() => {
     if (!userId) setShowOnlyStaked(false);
@@ -129,7 +177,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
     return option === farmsSortBy ? icon : null;
   };
 
-  const haveFarms = farms.length > 0;
+  const haveFarms = farmsWithContractData.length > 0;
 
   return !isHashpackLoading ? (
     <div className="d-flex justify-content-center">
@@ -156,7 +204,7 @@ const Farms = ({ itemsPerPage }: IFarmsProps) => {
 
         <hr />
 
-        {processingFarms ? (
+        {processingFarms || loadingUserPositions ? (
           <div className="d-flex justify-content-center my-6">
             <Loader />
           </div>
