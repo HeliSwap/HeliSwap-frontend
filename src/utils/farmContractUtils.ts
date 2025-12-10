@@ -22,14 +22,35 @@ export const getUserStakedBalance = async (
   userAddress: string,
 ): Promise<string> => {
   try {
+    // Validate addresses
+    if (!ethers.utils.isAddress(farmAddress)) {
+      console.error(`[getUserStakedBalance] Invalid farm address: ${farmAddress}`);
+      return '0';
+    }
+    if (!ethers.utils.isAddress(userAddress)) {
+      console.error(`[getUserStakedBalance] Invalid user address: ${userAddress}`);
+      return '0';
+    }
+
     const provider = getProvider();
     const farmContract = new ethers.Contract(farmAddress, MULTI_REWARDS_ABI, provider);
     const stakedBalance = await farmContract.balanceOf(userAddress);
     return stakedBalance.toString();
-  } catch (error) {
+  } catch (error: any) {
     // Silently return '0' if farm doesn't exist or call fails
     // This is expected for farms that don't exist or when user has no position
-    console.error(`Error fetching staked balance for farm ${farmAddress}:`, error);
+    // Check if it's a contract call error (revert) vs network error
+    if (error.code === 'CALL_EXCEPTION' || error.reason === 'execution reverted') {
+      // Contract doesn't exist or method doesn't exist - expected for invalid farms
+      console.debug(
+        `[getUserStakedBalance] Contract call failed for farm ${farmAddress} (may not exist)`,
+      );
+    } else {
+      console.error(
+        `[getUserStakedBalance] Error fetching staked balance for farm ${farmAddress}:`,
+        error,
+      );
+    }
     return '0';
   }
 };
@@ -44,26 +65,42 @@ const getRewardTokens = async (farmAddress: string): Promise<string[]> => {
     const provider = getProvider();
     const farmContract = new ethers.Contract(farmAddress, MULTI_REWARDS_ABI, provider);
 
-    // Try to get rewardTokens array length by calling rewardTokens with increasing index
+    // Try to get rewardTokens array by calling rewardTokens with increasing index
     // until we get an error (which means we've reached the end)
+    // Safety limit: max 20 reward tokens per farm (should be more than enough)
+    const MAX_REWARD_TOKENS = 20;
     const rewardTokens: string[] = [];
     let index = 0;
     let hasMore = true;
 
-    while (hasMore) {
+    while (hasMore && index < MAX_REWARD_TOKENS) {
       try {
         const tokenAddress = await farmContract.rewardTokens(index);
-        rewardTokens.push(tokenAddress);
-        index++;
-      } catch (error) {
-        // Reached the end of the array
+        // Validate that we got a valid address (not zero address)
+        if (tokenAddress && tokenAddress !== ethers.constants.AddressZero) {
+          rewardTokens.push(tokenAddress);
+          index++;
+        } else {
+          // Zero address means we've reached the end
+          hasMore = false;
+        }
+      } catch (error: any) {
+        // Check if error is due to array out of bounds (expected) vs other errors
+        // In Solidity 0.5.17, accessing array out of bounds reverts
+        // Reached the end of the array or invalid index
         hasMore = false;
       }
     }
 
+    if (index >= MAX_REWARD_TOKENS) {
+      console.warn(
+        `[getRewardTokens] Reached max limit (${MAX_REWARD_TOKENS}) for farm ${farmAddress}. There may be more reward tokens.`,
+      );
+    }
+
     return rewardTokens;
   } catch (error) {
-    console.error(`Error fetching reward tokens for farm ${farmAddress}:`, error);
+    console.error(`[getRewardTokens] Error fetching reward tokens for farm ${farmAddress}:`, error);
     return [];
   }
 };
@@ -85,11 +122,19 @@ const getUserEarnedReward = async (
     const farmContract = new ethers.Contract(farmAddress, MULTI_REWARDS_ABI, provider);
     const earnedAmount = await farmContract.earned(userAddress, rewardTokenAddress);
     return earnedAmount.toString();
-  } catch (error) {
-    console.error(
-      `Error fetching earned reward for token ${rewardTokenAddress} in farm ${farmAddress}:`,
-      error,
-    );
+  } catch (error: any) {
+    // Check if it's a contract call error (revert) vs network error
+    if (error.code === 'CALL_EXCEPTION' || error.reason === 'execution reverted') {
+      // Contract call failed - reward token may not be enabled or other contract issue
+      console.debug(
+        `[getUserEarnedReward] Contract call failed for token ${rewardTokenAddress} in farm ${farmAddress}`,
+      );
+    } else {
+      console.error(
+        `[getUserEarnedReward] Error fetching earned reward for token ${rewardTokenAddress} in farm ${farmAddress}:`,
+        error,
+      );
+    }
     return '0';
   }
 };
@@ -149,6 +194,16 @@ export const getUserFarmPosition = async (
   rewardsData: Array<{ address: string; decimals: number }>,
 ): Promise<IUserStakingData | null> => {
   try {
+    // Validate inputs
+    if (!farmAddress || !userAddress || !poolData || !pools || pools.length === 0) {
+      console.error(
+        `[getUserFarmPosition] Invalid inputs - farmAddress: ${!!farmAddress}, userAddress: ${!!userAddress}, poolData: ${!!poolData}, pools: ${
+          pools.length
+        }`,
+      );
+      return null;
+    }
+
     // Get user's staked balance
     const stakedAmount = await getUserStakedBalance(farmAddress, userAddress);
 
@@ -162,8 +217,9 @@ export const getUserFarmPosition = async (
     }
 
     // Calculate LP value for USD conversion
+    // LP tokens use 18 decimals (default in formatStringWeiToStringEther)
     const lpValue = calculateLPValue(poolData, pools, hbarPrice);
-    const stakedAmountFormatted = formatStringWeiToStringEther(stakedAmount);
+    const stakedAmountFormatted = formatStringWeiToStringEther(stakedAmount); // Defaults to 18 decimals for LP tokens
     const stakedAmountUSD = (lpValue * Number(stakedAmountFormatted)).toString();
 
     // Get all reward token addresses
