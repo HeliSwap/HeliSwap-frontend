@@ -44,6 +44,7 @@ const FarmDetails = () => {
   const { connection, sdk, tokensWhitelisted, hbarPrice } = contextValue;
   const { userId, connectorInstance, isHashpackLoading, setShowConnectModal, connected } =
     connection;
+  console.log('userId', userId);
 
   const navigate = useNavigate();
   const { campaignAddress } = useParams();
@@ -80,15 +81,31 @@ const FarmDetails = () => {
   // Merge contract user position with static farm data
   // Use contract data when available, fallback to static data
   const mergedFarmData = useMemo(() => {
-    if (!contractUserPosition || loadingUserPosition) {
-      // Return static data while loading or if contract data unavailable
+    // If we have contract position data (even if it's empty/zero), use it
+    // Only fall back to static data if contract position is null (not fetched yet) and still loading
+    if (contractUserPosition !== null) {
+      // Contract data is available (even if stakedAmount is '0'), use it
+      return {
+        ...farmData,
+        userStakingData: contractUserPosition,
+      };
+    }
+
+    // If still loading and no contract data yet, show static data
+    // Once loading completes, contractUserPosition will be set (even if empty)
+    if (loadingUserPosition) {
       return farmData;
     }
 
-    // Merge contract user position data with static farm data
+    // Loading completed but no contract position means user has no position
+    // Return farm data with empty position
     return {
       ...farmData,
-      userStakingData: contractUserPosition,
+      userStakingData: {
+        stakedAmount: '0',
+        stakedAmountUSD: '0',
+        rewardsAccumulated: [],
+      },
     };
   }, [farmData, contractUserPosition, loadingUserPosition]);
 
@@ -332,57 +349,65 @@ const FarmDetails = () => {
                     <>
                       <hr className="my-5" />
 
-                      <div className="row mt-4">
-                        <div className="col-6 col-md-4 d-flex align-items-center">
-                          <p className="d-flex align-items-center">
-                            <span className="text-secondary text-small">Your share</span>
-                            <Tippy content="Your staked amount in this farm pool, expressed as a percentage.">
-                              <span className="ms-2">
-                                <Icon name="hint" color="gray" size="small" />
-                              </span>
-                            </Tippy>
-                          </p>
+                      {loadingUserPosition ? (
+                        <div className="d-flex justify-content-center my-5">
+                          <Loader />
                         </div>
-                        <div className="col-6 col-md-4 d-flex align-items-center">
-                          <p className="text-main">
-                            {stripStringToFixedDecimals(userShare || '0', 2)}%
-                          </p>
-                        </div>
-                      </div>
+                      ) : (
+                        <>
+                          <div className="row mt-4">
+                            <div className="col-6 col-md-4 d-flex align-items-center">
+                              <p className="d-flex align-items-center">
+                                <span className="text-secondary text-small">Your share</span>
+                                <Tippy content="Your staked amount in this farm pool, expressed as a percentage.">
+                                  <span className="ms-2">
+                                    <Icon name="hint" color="gray" size="small" />
+                                  </span>
+                                </Tippy>
+                              </p>
+                            </div>
+                            <div className="col-6 col-md-4 d-flex align-items-center">
+                              <p className="text-main">
+                                {stripStringToFixedDecimals(userShare || '0', 2)}%
+                              </p>
+                            </div>
+                          </div>
 
-                      <div className="row mt-4">
-                        <div className="col-6 col-md-4 d-flex align-items-center">
-                          <p className="d-flex align-items-center">
-                            <span className="text-secondary text-small">Staked LP Tokens</span>
-                            <Tippy content="The amount of your staked tokens in $USD, as well as staked tokens count.">
-                              <span className="ms-2">
-                                <Icon name="hint" color="gray" size="small" />
-                              </span>
-                            </Tippy>
-                          </p>
-                        </div>
-                        <div className="col-6 col-md-8 d-md-flex align-items-center">
-                          <p className="text-subheader text-numeric">
-                            {formatStringToPrice(
-                              stripStringToFixedDecimals(
-                                mergedFarmData.userStakingData?.stakedAmountUSD as string,
-                                2,
-                              ),
-                            )}
-                          </p>
-                          <p className="d-flex align-items-center ms-md-3 mt-2">
-                            <span className="text-secondary text-main">
-                              {formatStringETHtoPriceFormatted(
-                                formatStringWeiToStringEther(
-                                  mergedFarmData.userStakingData?.stakedAmount || '0',
-                                ),
-                              )}
-                            </span>
+                          <div className="row mt-4">
+                            <div className="col-6 col-md-4 d-flex align-items-center">
+                              <p className="d-flex align-items-center">
+                                <span className="text-secondary text-small">Staked LP Tokens</span>
+                                <Tippy content="The amount of your staked tokens in $USD, as well as staked tokens count.">
+                                  <span className="ms-2">
+                                    <Icon name="hint" color="gray" size="small" />
+                                  </span>
+                                </Tippy>
+                              </p>
+                            </div>
+                            <div className="col-6 col-md-8 d-md-flex align-items-center">
+                              <p className="text-subheader text-numeric">
+                                {formatStringToPrice(
+                                  stripStringToFixedDecimals(
+                                    mergedFarmData.userStakingData?.stakedAmountUSD as string,
+                                    2,
+                                  ),
+                                )}
+                              </p>
+                              <p className="d-flex align-items-center ms-md-3 mt-2">
+                                <span className="text-secondary text-main">
+                                  {formatStringETHtoPriceFormatted(
+                                    formatStringWeiToStringEther(
+                                      mergedFarmData.userStakingData?.stakedAmount || '0',
+                                    ),
+                                  )}
+                                </span>
 
-                            <IconToken className="ms-3" symbol="LP" />
-                          </p>
-                        </div>
-                      </div>
+                                <IconToken className="ms-3" symbol="LP" />
+                              </p>
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </>
                   ) : null}
                 </div>

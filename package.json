@@ -47,7 +47,8 @@
     "build": "GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "add-liquidity": "ts-node --project scripts/tsconfig.json scripts/add-liquidity-hbar-usdc.ts"
+    "add-liquidity": "ts-node --project scripts/tsconfig.json scripts/add-liquidity-hbar-usdc.ts",
+    "check-positions": "ts-node --project scripts/tsconfig.json scripts/check-user-positions.ts"
   },
   "eslintConfig": {
     "extends": [

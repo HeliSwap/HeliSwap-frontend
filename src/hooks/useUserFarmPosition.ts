@@ -30,9 +30,18 @@ const useUserFarmPosition = (
   const fetchUserPosition = useCallback(async () => {
     // Skip if not enabled, no farm address, no user ID, or no pool data
     if (!enabled || !farmAddress || !userId || !poolData || pools.length === 0 || hbarPrice === 0) {
+      console.debug(
+        `[useUserFarmPosition] Skipping fetch - enabled: ${enabled}, farmAddress: ${!!farmAddress}, userId: ${!!userId}, poolData: ${!!poolData}, pools: ${
+          pools.length
+        }, hbarPrice: ${hbarPrice}`,
+      );
       setLoading(false);
       return;
     }
+
+    console.debug(
+      `[useUserFarmPosition] Starting fetch - Farm: ${farmAddress}, User: ${userId}, Pool: ${poolData?.pairAddress}`,
+    );
 
     setLoading(true);
     setError(null);
@@ -40,6 +49,7 @@ const useUserFarmPosition = (
     try {
       // Convert Hedera ID to address
       const userAddress = idToAddress(userId);
+      console.debug(`[useUserFarmPosition] Converted user ID to address: ${userAddress}`);
 
       // Fetch user position from contract
       const position = await getUserFarmPosition(
@@ -51,11 +61,18 @@ const useUserFarmPosition = (
         rewardsData,
       );
 
+      console.debug(
+        `[useUserFarmPosition] Position fetched - stakedAmount: ${
+          position?.stakedAmount || 'null'
+        }, stakedAmountUSD: ${position?.stakedAmountUSD || 'null'}`,
+      );
+
       if (position) {
         setUserPosition(position);
       } else {
         // If position is null, user likely has no position or contract call failed
         // Set to empty position
+        console.debug(`[useUserFarmPosition] Position is null, setting empty position`);
         setUserPosition({
           stakedAmount: '0',
           stakedAmountUSD: '0',
@@ -63,7 +80,7 @@ const useUserFarmPosition = (
         });
       }
     } catch (err) {
-      console.error('Error in useUserFarmPosition:', err);
+      console.error('[useUserFarmPosition] Error fetching position:', err);
       setError(err);
       // Set empty position on error
       setUserPosition({
@@ -73,6 +90,7 @@ const useUserFarmPosition = (
       });
     } finally {
       setLoading(false);
+      console.debug(`[useUserFarmPosition] Fetch completed, loading set to false`);
     }
   }, [farmAddress, userId, poolData, pools, hbarPrice, rewardsData, enabled]);
 

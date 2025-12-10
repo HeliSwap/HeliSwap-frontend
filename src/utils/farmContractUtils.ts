@@ -22,7 +22,7 @@ export const getUserStakedBalance = async (
   userAddress: string,
 ): Promise<string> => {
   try {
-    // Validate addresses
+    // Validate and normalize addresses to checksum format
     if (!ethers.utils.isAddress(farmAddress)) {
       console.error(`[getUserStakedBalance] Invalid farm address: ${farmAddress}`);
       return '0';
@@ -32,22 +32,33 @@ export const getUserStakedBalance = async (
       return '0';
     }
 
+    // Normalize addresses to checksum format to ensure consistent comparison
+    const normalizedFarmAddress = ethers.utils.getAddress(farmAddress);
+    const normalizedUserAddress = ethers.utils.getAddress(userAddress);
+
     const provider = getProvider();
-    const farmContract = new ethers.Contract(farmAddress, MULTI_REWARDS_ABI, provider);
-    const stakedBalance = await farmContract.balanceOf(userAddress);
+    const farmContract = new ethers.Contract(normalizedFarmAddress, MULTI_REWARDS_ABI, provider);
+    const stakedBalance = await farmContract.balanceOf(normalizedUserAddress);
+
+    // Log successful calls for debugging (only if balance > 0 to avoid spam)
+    if (stakedBalance && !stakedBalance.isZero()) {
+      console.debug(
+        `[getUserStakedBalance] Found balance for farm ${normalizedFarmAddress}, user ${normalizedUserAddress}: ${stakedBalance.toString()}`,
+      );
+    }
+
     return stakedBalance.toString();
   } catch (error: any) {
-    // Silently return '0' if farm doesn't exist or call fails
-    // This is expected for farms that don't exist or when user has no position
+    // Log all errors for debugging - don't silently swallow them
     // Check if it's a contract call error (revert) vs network error
     if (error.code === 'CALL_EXCEPTION' || error.reason === 'execution reverted') {
       // Contract doesn't exist or method doesn't exist - expected for invalid farms
       console.debug(
-        `[getUserStakedBalance] Contract call failed for farm ${farmAddress} (may not exist)`,
+        `[getUserStakedBalance] Contract call failed for farm ${farmAddress}, user ${userAddress} (may not exist or user has no position)`,
       );
     } else {
       console.error(
-        `[getUserStakedBalance] Error fetching staked balance for farm ${farmAddress}:`,
+        `[getUserStakedBalance] Error fetching staked balance for farm ${farmAddress}, user ${userAddress}:`,
         error,
       );
     }
@@ -204,8 +215,20 @@ export const getUserFarmPosition = async (
       return null;
     }
 
+    // Normalize addresses to checksum format
+    const normalizedFarmAddress = ethers.utils.getAddress(farmAddress);
+    const normalizedUserAddress = ethers.utils.getAddress(userAddress);
+
+    console.debug(
+      `[getUserFarmPosition] Checking position - Farm: ${normalizedFarmAddress}, User: ${normalizedUserAddress}`,
+    );
+
     // Get user's staked balance
-    const stakedAmount = await getUserStakedBalance(farmAddress, userAddress);
+    const stakedAmount = await getUserStakedBalance(normalizedFarmAddress, normalizedUserAddress);
+
+    console.debug(
+      `[getUserFarmPosition] Staked balance result - Farm: ${normalizedFarmAddress}, User: ${normalizedUserAddress}, Balance: ${stakedAmount}`,
+    );
 
     // If user has no staked amount, return empty position
     if (!stakedAmount || stakedAmount === '0') {
@@ -223,11 +246,11 @@ export const getUserFarmPosition = async (
     const stakedAmountUSD = (lpValue * Number(stakedAmountFormatted)).toString();
 
     // Get all reward token addresses
-    const rewardTokenAddresses = await getRewardTokens(farmAddress);
+    const rewardTokenAddresses = await getRewardTokens(normalizedFarmAddress);
 
     // Fetch earned rewards for each reward token in parallel
     const earnedRewardsPromises = rewardTokenAddresses.map(rewardTokenAddress =>
-      getUserEarnedReward(farmAddress, userAddress, rewardTokenAddress),
+      getUserEarnedReward(normalizedFarmAddress, normalizedUserAddress, rewardTokenAddress),
     );
 
     const earnedRewards = await Promise.all(earnedRewardsPromises);
