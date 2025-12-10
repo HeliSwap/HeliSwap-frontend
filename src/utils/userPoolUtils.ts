@@ -12,7 +12,7 @@ import {
   getTokenPrice,
 } from './tokenUtils';
 import { formatStringWeiToStringEther } from './numberUtils';
-import { getFarmByPairAddress } from './farmDataLoader';
+import { getFarmByPairAddress, getAllFarmsByPairAddress } from './farmDataLoader';
 
 const ERC20 = require('../abi/ERC20.json');
 
@@ -92,20 +92,36 @@ export const getUserPoolPositions = async (
 
     // Check all pools in this batch in parallel
     // Fetch both LP balance and staked balance (if farm exists)
+    // Check ALL farms for each pool, not just the first one
     const balancePromises = batch.map(async pool => {
       try {
-        const [lpBalance, stakedBalance] = await Promise.all([
+        const [lpBalance, totalStakedBalance] = await Promise.all([
           getUserLPBalance(pool.pairAddress, userAddress),
-          // Check if pool has a farm and fetch staked balance
+          // Check ALL farms matching this pool and sum their staked balances
           (async () => {
-            const farm = getFarmByPairAddress(pool.pairAddress);
-            if (farm && farm.address) {
-              return await getUserStakedBalance(farm.address, userAddress);
+            const farms = getAllFarmsByPairAddress(pool.pairAddress);
+            if (farms.length === 0) {
+              return '0';
             }
-            return '0';
+
+            // Check staked balance for ALL farms in parallel
+            const stakedBalancePromises = farms.map(farm =>
+              getUserStakedBalance(farm.address, userAddress),
+            );
+            const stakedBalances = await Promise.all(stakedBalancePromises);
+
+            // Sum all staked balances
+            let totalStaked = new BigNumber('0');
+            for (const balance of stakedBalances) {
+              if (balance && balance !== '0') {
+                totalStaked = totalStaked.plus(new BigNumber(balance));
+              }
+            }
+
+            return totalStaked.toString();
           })(),
         ]);
-        return { pool, lpBalance, stakedBalance, success: true };
+        return { pool, lpBalance, stakedBalance: totalStakedBalance, success: true };
       } catch (error) {
         return { pool, lpBalance: '0', stakedBalance: '0', success: false };
       }
@@ -175,8 +191,11 @@ export const getUserPoolPositions = async (
           : '0';
 
         // Process staked balance and farm address
-        // Get farm address for this pool (if it exists)
-        const farm = getFarmByPairAddress(pool.pairAddress);
+        // Get ALL farms for this pool (if any exist)
+        // Prefer active farms over deprecated ones for display purposes
+        const farms = getAllFarmsByPairAddress(pool.pairAddress);
+        const activeFarm = farms.find(farm => !farm.isFarmDeprecated);
+        const farm = activeFarm || farms[0]; // Use active farm if available, otherwise first one
         let farmAddress: string | undefined = undefined;
         if (farm && farm.address) {
           farmAddress = farm.address;

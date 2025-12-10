@@ -66,3 +66,18 @@ export const getFarmByPairAddress = (pairAddress: string): IFarmData | undefined
       farm.stakingTokenAddress?.toLowerCase() === pairAddress.toLowerCase(),
   );
 };
+
+/**
+ * Gets ALL farms matching a pair address (LP token address)
+ * This is useful when multiple farms exist for the same pool (e.g., deprecated and active farms)
+ * @param pairAddress - The address of the LP token (pair contract)
+ * @returns Array of all matching farms
+ */
+export const getAllFarmsByPairAddress = (pairAddress: string): IFarmData[] => {
+  const allFarms = loadAllFarms();
+  return allFarms.filter(
+    farm =>
+      farm.poolData?.pairAddress?.toLowerCase() === pairAddress.toLowerCase() ||
+      farm.stakingTokenAddress?.toLowerCase() === pairAddress.toLowerCase(),
+  );
+};
