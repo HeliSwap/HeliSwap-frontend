@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/client';
 
 import { GlobalProvider } from '../providers/Global';
@@ -33,51 +33,46 @@ function App() {
   const apolloClient = getApolloClient();
 
   return (
-    <BrowserRouter>
-      <ApolloProvider client={apolloClient}>
-        <GlobalProvider>
-          <div className="d-md-flex">
-            <Sidebar />
-            <div className="wrapper flex-1">
-              <div className="main">
-                <div className="flex-1">
-                  <GlobalMessage />
-                  <Header />
-                  <div className="container py-4 py-lg-7">
-                    <Routes>
-                      <Route path="/" element={<Swap />} />
-                      <Route path="/:token0/:token1" element={<Swap />} />
-                      <Route path="create/" element={<Create />} />
-                      <Route path="create/:token0/:token1" element={<Create />} />
-                      <Route path="pools" element={<Pools itemsPerPage={10} />} />
-                      <Route path="farms" element={<Farms itemsPerPage={10} />} />
-                      <Route path="farms/:campaignAddress" element={<FarmDetails />} />
-                      <Route path="tokens" element={<Tokens />} />
-                      <Route path="analytics" element={<Analytics />} />
-                      <Route path="lockdrop" element={<Lockdrop />} />
-                      <Route
-                        path="analytics/pool/:poolAddress"
-                        element={<AnalyticsPoolDetials />}
-                      />
-                      <Route path="claimdrop" element={<Claimdrop />} />
-                      <Route path="claimdrop/:campaign" element={<ClaimdropDetails />} />
-                      <Route path="buy-crypto" element={<C14 />} />
-                      <Route path="single-sided-staking-old" element={<SingleSidedStakingOld />} />
-                      <Route path="single-sided-staking" element={<SingleSidedStaking />} />
-                      <Route path="heliverse" element={<HeliVerse />} />
-                      <Route path="proposals" element={<Proposals />} />
-                      <Route path="proposals/:id" element={<ProposalDetails />} />
-                      <Route path="styleguide" element={<Styleguide />} />
-                    </Routes>
-                  </div>
+    <ApolloProvider client={apolloClient}>
+      <GlobalProvider>
+        <div className="d-md-flex">
+          <Sidebar />
+          <div className="wrapper flex-1">
+            <div className="main">
+              <div className="flex-1">
+                <GlobalMessage />
+                <Header />
+                <div className="container py-4 py-lg-7">
+                  <Routes>
+                    <Route path="/" element={<Swap />} />
+                    <Route path="/:token0/:token1" element={<Swap />} />
+                    <Route path="create/" element={<Create />} />
+                    <Route path="create/:token0/:token1" element={<Create />} />
+                    <Route path="pools" element={<Pools itemsPerPage={10} />} />
+                    <Route path="farms" element={<Farms itemsPerPage={10} />} />
+                    <Route path="farms/:campaignAddress" element={<FarmDetails />} />
+                    <Route path="tokens" element={<Tokens />} />
+                    <Route path="analytics" element={<Analytics />} />
+                    <Route path="lockdrop" element={<Lockdrop />} />
+                    <Route path="analytics/pool/:poolAddress" element={<AnalyticsPoolDetials />} />
+                    <Route path="claimdrop" element={<Claimdrop />} />
+                    <Route path="claimdrop/:campaign" element={<ClaimdropDetails />} />
+                    <Route path="buy-crypto" element={<C14 />} />
+                    <Route path="single-sided-staking-old" element={<SingleSidedStakingOld />} />
+                    <Route path="single-sided-staking" element={<SingleSidedStaking />} />
+                    <Route path="heliverse" element={<HeliVerse />} />
+                    <Route path="proposals" element={<Proposals />} />
+                    <Route path="proposals/:id" element={<ProposalDetails />} />
+                    <Route path="styleguide" element={<Styleguide />} />
+                  </Routes>
                 </div>
-                <Footer />
               </div>
+              <Footer />
             </div>
           </div>
-        </GlobalProvider>
-      </ApolloProvider>
-    </BrowserRouter>
+        </div>
+      </GlobalProvider>
+    </ApolloProvider>
   );
 }
 
